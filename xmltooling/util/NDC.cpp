@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-/* NDC.cpp
+/**
+ * @file NDC.cpp
  * 
  * Diagnostic context for logging 
- * 
- * $Id:$
  */
 
 #include "internal.h"
@@ -26,7 +25,6 @@
 
 #include <log4cpp/NDC.hh>
 
-using namespace std;
 using namespace xmltooling;
 
 NDC::NDC(const char* context)
@@ -34,7 +32,7 @@ NDC::NDC(const char* context)
     log4cpp::NDC::push(context);
 }
 
-NDC::NDC(const string& context)
+NDC::NDC(const std::string& context)
 {
     log4cpp::NDC::push(context);
 }

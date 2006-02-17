@@ -51,9 +51,7 @@ namespace xmltooling {
          */
         ~NDC();
         
-    private:
-        NDC(const NDC&);
-        NDC& operator=(const NDC&);
+    MAKE_NONCOPYABLE(NDC);
     };
 
 };
