@@ -34,7 +34,38 @@
 #endif
 
 #include "base.h"
+#include "XMLToolingConfig.h"
+
+#include <vector>
 
 #define XMLTOOLING_LOGCAT "XMLTooling"
+
+namespace {
+    
+    class XMLToolingInternalConfig : public xmltooling::XMLToolingConfig
+    {
+    public:
+        XMLToolingInternalConfig() : m_lock(NULL) {}
+
+        // global per-process setup and shutdown of runtime
+        bool init();
+        void term();
+
+        // global mutex available to library applications
+        xmltooling::ILockable& lock();
+        void unlock();
+
+        // configuration
+        bool load_library(const char* path, void* context=NULL);
+        bool log_config(const char* config=NULL);
+
+    private:
+        std::vector<void*> m_libhandles;
+        void* m_lock;
+        //XSECProvider* m_xsec;
+        //PlugManager m_plugMgr;
+    };
+
+};
 
 #endif /* __xmltooling_internal_h__ */

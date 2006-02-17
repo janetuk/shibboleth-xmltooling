@@ -71,4 +71,14 @@
   #define XMLTOOL_EXCEPTIONAPI(api)
 #endif
 
+// Macro to block copy c'tor and assignment operator for a class
+#define MAKE_NONCOPYABLE(type) \
+    private: \
+        type(const type&); \
+        type& operator=(const type&)
+
+#ifndef NULL
+#define NULL    0
+#endif
+
 #endif /* __xmltooling_base_h__ */

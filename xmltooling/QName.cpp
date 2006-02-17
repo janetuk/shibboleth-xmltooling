@@ -15,34 +15,36 @@
  */
 
 /**
- * @file Namespace.cpp
+ * @file QName.cpp
  * 
- * Representing XML namespace attributes 
+ * Representing XML QNames 
  */
 
 #include "internal.h"
-#include "Namespace.h"
+#include "QName.h"
 
 using namespace xmltooling;
 
-Namespace::Namespace(const XMLCh* uri, const XMLCh* prefix)
+QName::QName(const XMLCh* uri, const XMLCh* localPart, const XMLCh* prefix)
 {
 #ifndef HAVE_GOOD_STL
-    m_uri=m_prefix=NULL;
+    m_uri=m_prefix=m_local=NULL;
 #endif
     setNamespaceURI(uri);
-    setNamespacePrefix(prefix);
+    setLocalPart(localPart);
+    setPrefix(prefix);
 }
 
-Namespace::~Namespace()
+QName::~QName()
 {
 #ifndef HAVE_GOOD_STL
     XMLString::release(&m_uri);
     XMLString::release(&m_prefix);
+    XMLString::release(&m_local);
 #endif
 }
 
-void Namespace::setNamespacePrefix(const XMLCh* prefix)
+void QName::setPrefix(const XMLCh* prefix)
 {
 #ifdef HAVE_GOOD_STL
     if (prefix)
@@ -56,7 +58,7 @@ void Namespace::setNamespacePrefix(const XMLCh* prefix)
 #endif
 }
 
-void Namespace::setNamespaceURI(const XMLCh* uri)
+void QName::setNamespaceURI(const XMLCh* uri)
 {
 #ifdef HAVE_GOOD_STL
     if (uri)
@@ -70,34 +72,50 @@ void Namespace::setNamespaceURI(const XMLCh* uri)
 #endif
 }
 
-#ifndef HAVE_GOOD_STL
-Namespace::Namespace(const Namespace& src)
+void QName::setLocalPart(const XMLCh* localPart)
 {
-    m_uri=XMLString::replicate(src.getNamespaceURI());
-    m_prefix=XMLString::replicate(src.getNamespacePrefix());
+#ifdef HAVE_GOOD_STL
+    if (localPart)
+        m_local=localPart;
+    else
+        m_local.erase();
+#else
+    if (m_local)
+        XMLString::release(&m_local);
+    m_local=XMLString::replicate(localPart);
+#endif
 }
 
-Namespace& Namespace::operator=(const Namespace& src)
+#ifndef HAVE_GOOD_STL
+QName::QName(const QName& src)
 {
     m_uri=XMLString::replicate(src.getNamespaceURI());
-    m_prefix=XMLString::replicate(src.getNamespacePrefix());
+    m_prefix=XMLString::replicate(src.getPrefix());
+    m_local=XMLString::replicate(src.getLocalPart());
+}
+
+QName& QName::operator=(const QName& src)
+{
+    m_uri=XMLString::replicate(src.getNamespaceURI());
+    m_prefix=XMLString::replicate(src.getPrefix());
+    m_local=XMLString::replicate(src.getLocalPart());
     return *this;
 }
 
-bool xmltooling::operator==(const Namespace& op1, const Namespace& op2)
+bool xmltooling::operator==(const QName& op1, const QName& op2)
 {
     return (!XMLString::compareString(op1.getNamespaceURI(),op2.getNamespaceURI()) &&
-            !XMLString::compareString(op1.getNamespacePrefix(),op2.getNamespacePrefix()));
+            !XMLString::compareString(op1.getLocalPart(),op2.getLocalPart()));
 }
 #endif
 
-bool xmltooling::operator<(const Namespace& op1, const Namespace& op2)
+bool xmltooling::operator<(const QName& op1, const QName& op2)
 {
     int i=XMLString::compareString(op1.getNamespaceURI(),op2.getNamespaceURI());
     if (i<0)
         return true;
     else if (i==0)
-        return (XMLString::compareString(op1.getNamespacePrefix(),op2.getNamespacePrefix())<0);
+        return (XMLString::compareString(op1.getLocalPart(),op2.getLocalPart())<0);
     else
         return false;
 }

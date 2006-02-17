@@ -45,7 +45,6 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				DisableLanguageExtensions="true"
 				UsePrecompiledHeader="0"
 				BrowseInformation="1"
 				WarningLevel="3"
@@ -63,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="log4cppD.lib xerces-c_2D.lib"
+				AdditionalDependencies="log4cppD.lib xerces-c_2D.lib xsec_1D.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_1D.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -123,7 +122,6 @@
 				AdditionalIncludeDirectories="&quot;$(SolutionDir)&quot;;&quot;$(ProjectDir)&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;XMLTOOLING_EXPORTS"
 				RuntimeLibrary="2"
-				DisableLanguageExtensions="true"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
@@ -140,7 +138,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="log4cpp.lib xerces-c_2.lib"
+				AdditionalDependencies="log4cpp.lib xerces-c_2.lib xsec_1.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_1.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -187,11 +185,27 @@
 				RelativePath=".\Namespace.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\QName.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\XMLToolingConfig.cpp"
+				>
+			</File>
 			<Filter
 				Name="util"
 				>
 				<File
 					RelativePath=".\util\NDC.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\util\XMLConstants.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\util\XMLHelper.cpp"
 					>
 				</File>
 			</Filter>
@@ -210,11 +224,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ILockable.h"
+				>
+			</File>
+			<File
 				RelativePath=".\internal.h"
 				>
 			</File>
 			<File
 				RelativePath=".\Namespace.h"
+				>
+			</File>
+			<File
+				RelativePath=".\QName.h"
 				>
 			</File>
 			<File
@@ -225,11 +247,31 @@
 				RelativePath=".\version.h"
 				>
 			</File>
+			<File
+				RelativePath=".\XMLObject.h"
+				>
+			</File>
+			<File
+				RelativePath=".\XMLObjectBuilder.h"
+				>
+			</File>
+			<File
+				RelativePath=".\XMLToolingConfig.h"
+				>
+			</File>
 			<Filter
 				Name="util"
 				>
 				<File
 					RelativePath=".\util\NDC.h"
+					>
+				</File>
+				<File
+					RelativePath=".\util\XMLConstants.h"
+					>
+				</File>
+				<File
+					RelativePath=".\util\XMLHelper.h"
 					>
 				</File>
 			</Filter>

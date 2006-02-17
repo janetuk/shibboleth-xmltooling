@@ -94,11 +94,9 @@ namespace xmltooling {
          */
         char* release() { char* temp=m_buf; m_buf=NULL; return temp; }
 
-    private:
-        auto_ptr_char(const auto_ptr_char&);
-        auto_ptr_char& operator=(const auto_ptr_char&);
-        
+    private:    
         char* m_buf;
+    MAKE_NONCOPYABLE(auto_ptr_char);
     };
 
     /**
@@ -143,10 +141,8 @@ namespace xmltooling {
         XMLCh* release() { XMLCh* temp=m_buf; m_buf=NULL; return temp; }
 
     private:
-        auto_ptr_XMLCh(const auto_ptr_XMLCh&);
-        auto_ptr_XMLCh& operator=(const auto_ptr_XMLCh&);
-
         XMLCh* m_buf;
+    MAKE_NONCOPYABLE(auto_ptr_XMLCh);
     };
 
 };

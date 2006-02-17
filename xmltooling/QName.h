@@ -15,42 +15,45 @@
  */
 
 /**
- * @file Namespace.h
+ * @file QName.h
  * 
- * Representing XML namespace attributes 
+ * Representing XML QNames 
  */
 
-#if !defined(__xmltooling_namespace_h__)
-#define __xmltooling_namespace_h__
+#if !defined(__xmltooling_qname_h__)
+#define __xmltooling_qname_h__
 
+#include <algorithm>
 #include <xmltooling/unicode.h>
 
 namespace xmltooling {
     
     /**
-     * A data structure for encapsulating XML Namespace attributes
+     * A data structure for encapsulating XML QNames.
+     * The Xerces class is too limited to use at the moment.
      */
-    class XMLTOOL_API Namespace
+    class XMLTOOL_API QName
     {
     public:
         /**
          * Constructor
          * @param uri       namespace URI
+         * @param localPart local name
          * @param prefix    namespace prefix (without the colon)
          */
-        Namespace(const XMLCh* uri=NULL, const XMLCh* prefix=NULL);
+        QName(const XMLCh* uri=NULL, const XMLCh* localPart=NULL, const XMLCh* prefix=NULL);
         
-        ~Namespace();
+        ~QName();
 #ifndef HAVE_GOOD_STL
         /**
          * Deep copy constructor
          */
-        Namespace(const Namespace& src);
+        QName(const QName& src);
 
         /**
          * Deep assignment operator
          */
-        Namespace& operator=(const Namespace& src);
+        QName& operator=(const QName& src);
 #endif
         
 #ifdef HAVE_GOOD_STL
@@ -58,32 +61,44 @@ namespace xmltooling {
          * Returns the namespace prefix
          * @return  Null-terminated Unicode string containing the prefix, without the colon
          */
-        const XMLCh* getNamespacePrefix() const { return m_prefix.c_str(); }
+        const XMLCh* getPrefix() const { return m_prefix.c_str(); }
 
         /**
          * Returns the namespace URI
          * @return  Null-terminated Unicode string containing the URI
          */
         const XMLCh* getNamespaceURI() const { return m_uri.c_str(); }
+
+        /**
+         * Returns the local part of the name
+         * @return  Null-terminated Unicode string containing the local name
+         */
+        const XMLCh* getLocalPart() const { return m_local.c_str(); }
 #else
         /**
          * Returns the namespace prefix
          * @return  Null-terminated Unicode string containing the prefix, without the colon
          */
-        const XMLCh* getNamespacePrefix() const { return m_prefix; }
+        const XMLCh* getPrefix() const { return m_prefix; }
 
         /**
          * Returns the namespace URI
          * @return  Null-terminated Unicode string containing the URI
          */
         const XMLCh* getNamespaceURI() const { return m_uri; }
+
+        /**
+         * Returns the local part of the name
+         * @return  Null-terminated Unicode string containing the local name
+         */
+        const XMLCh* getLocalPart() const { return m_local; }
 #endif
 
         /**
          * Sets the namespace prefix
          * @param prefix    Null-terminated Unicode string containing the prefix, without the colon
          */
-        void setNamespacePrefix(const XMLCh* prefix);
+        void setPrefix(const XMLCh* prefix);
 
         /**
          * Sets the namespace URI
@@ -91,12 +106,20 @@ namespace xmltooling {
          */
         void setNamespaceURI(const XMLCh* uri);
         
+        /**
+         * Sets the local part of the name
+         * @param localPart  Null-terminated Unicode string containing the local name
+         */
+        void setLocalPart(const XMLCh* localPart);
+        
     private:
 #ifdef HAVE_GOOD_STL
         xstring m_uri;
+        xstring m_local;
         xstring m_prefix;
 #else
         XMLCh* m_uri;
+        XMLCh* m_local;
         XMLCh* m_prefix;
 #endif
     };
@@ -107,20 +130,20 @@ namespace xmltooling {
      * 
      * Needed for use with sorted STL containers.
      * 
-     * @param op1   First namspace to compare
-     * @param op2   Second namespace to compare
+     * @param op1   First qname to compare
+     * @param op2   Second qname to compare
      */
-    extern XMLTOOL_API bool operator<(const Namespace& op1, const Namespace& op2);
+    extern XMLTOOL_API bool operator<(const QName& op1, const QName& op2);
 
 #ifndef HAVE_GOOD_STL
     /**
-     * Returns true iff op1's namespace and prefix are equal to op2's namespace and prefix.
-     * @param op1   First namspace to compare
-     * @param op2   Second namespace to compare
+     * Returns true iff op1's components are equal to op2's components.
+     * @param op1   First qname to compare
+     * @param op2   Second qname to compare
      */
-    extern XMLTOOL_API bool operator==(const Namespace& op1, const Namespace& op2);
+    extern XMLTOOL_API bool operator==(const QName& op1, const QName& op2);
 #endif
 
 };
 
-#endif /* __xmltooling_namespace_h__ */
+#endif /* __xmltooling_qname_h__ */
