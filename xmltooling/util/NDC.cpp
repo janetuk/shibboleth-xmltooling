@@ -15,7 +15,7 @@
  */
 
 /**
- * @file NDC.cpp
+ * NDC.cpp
  * 
  * Diagnostic context for logging 
  */

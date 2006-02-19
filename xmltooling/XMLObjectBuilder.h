@@ -42,7 +42,15 @@ namespace xmltooling {
          * 
          * @return the empty XMLObject
          */
-        public XMLObject* buildObject();
+        XMLObject* buildObject() const;
+
+        /**
+         * Resets the state of the builder.
+         * 
+         * This normally means null'ing out any properties that were
+         * needed to build an object.
+         */
+        void resetState();
     };
 
 };

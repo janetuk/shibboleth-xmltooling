@@ -29,6 +29,10 @@ namespace xmltooling {
 
     /**
      * Singleton object that manages library startup/shutdown.configuration.
+     * 
+     * A locking interface is supplied as a convenience for code that wants to
+     * obtain a global system lock, but the actual configuration itself is not
+     * synchronized.
      */
     class XMLTOOL_API XMLToolingConfig : public ILockable
     {
@@ -68,6 +72,8 @@ namespace xmltooling {
          *      extern "C" int xmltooling_extension_init(void* context);<br>
          *      extern "C" void xmltooling_extension_term();
          * 
+         * This method is internally synchronized.
+         * 
          * @param path      pathname of shared library to load into process
          * @param context   arbitrary data to pass to library initialization hook
          * @return true iff library was loaded successfully
@@ -77,14 +83,15 @@ namespace xmltooling {
         /**
          * Configure logging system.
          * 
-         * May be called first, before initializing the library.
+         * May be called first, before initializing the library. Other calls to it
+         * must be externally synchronized. 
          * 
          * @param config    either a logging configuration file, or a level from the set
          *                  (DEBUG, INFO, NOTICE, WARN, ERROR, CRIT, ALERT, FATAL, EMERG)
          * @return true iff configuration was successful
          */
         virtual bool log_config(const char* config=NULL)=0;
-
+        
     protected:
         XMLToolingConfig() {}
     };

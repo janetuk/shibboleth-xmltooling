@@ -15,7 +15,7 @@
  */
 
 /**
- * @file Namespace.cpp
+ * Namespace.cpp
  * 
  * Representing XML namespace attributes 
  */

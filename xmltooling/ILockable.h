@@ -28,7 +28,7 @@
 namespace xmltooling {
 
     /**
-     * Singleton object that manages library startup/shutdown.configuration.
+     * Abstract mixin interface for interfaces that support locking
      */
     struct XMLTOOL_API ILockable
     {

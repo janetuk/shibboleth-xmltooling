@@ -75,7 +75,7 @@
 #define MAKE_NONCOPYABLE(type) \
     private: \
         type(const type&); \
-        type& operator=(const type&)
+        type& operator=(const type&);
 
 #ifndef NULL
 #define NULL    0

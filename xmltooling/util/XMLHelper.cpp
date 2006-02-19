@@ -15,7 +15,7 @@
  */
 
 /**
- * @file XMLHelper.cpp
+ * XMLHelper.cpp
  * 
  * A helper class for working with W3C DOM objects. 
  */

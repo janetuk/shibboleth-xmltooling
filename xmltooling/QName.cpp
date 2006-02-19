@@ -15,7 +15,7 @@
  */
 
 /**
- * @file QName.cpp
+ * QName.cpp
  * 
  * Representing XML QNames 
  */

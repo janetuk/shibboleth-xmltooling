@@ -15,7 +15,7 @@
  */
 
 /**
- * @file XMLToolingConfig.cpp
+ * XMLToolingConfig.cpp
  * 
  * Library configuration 
  */
@@ -183,6 +183,8 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
 #endif
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".XMLToolingConfig");
     log.info("loading extension: %s", path);
+
+    Locker locker(this);
 
 #if defined(WIN32)
     HMODULE handle=NULL;

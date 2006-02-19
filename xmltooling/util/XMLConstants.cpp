@@ -15,7 +15,7 @@
  */
 
 /**
- * @file XMLConstants.cpp
+ * XMLConstants.cpp
  * 
  * Fundamental XML namespace constants 
  */
