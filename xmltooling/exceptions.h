@@ -24,19 +24,35 @@
 #define __xmltooling_exceptions_h__
 
 #include <string>
-#include <exception>
 #include <xmltooling/base.h>
 
 #define DECL_XMLTOOLING_EXCEPTION(type) \
-    class XMLTOOL_EXCEPTIONAPI(XMLTOOL_API) type : public std::exception { \
+    class XMLTOOL_EXCEPTIONAPI(XMLTOOL_API) type : public XMLToolingException { \
     public: \
-        type(const char* msg) : std::exception(msg) {} \
-        type(std::string& msg) : std::exception(msg.c_str()) {} \
+        type(const char* msg) : XMLToolingException(msg) {} \
+        type(std::string& msg) : XMLToolingException(msg) {} \
         virtual ~type() {} \
     }
 
 namespace xmltooling {
     
+    /**
+     * Base exception class.
+     * std::exception seems to be inconsistently defined, so this is just
+     * a substitute base class.
+     */
+    class XMLTOOL_EXCEPTIONAPI(XMLTOOL_API) XMLToolingException
+    {
+    public:
+        XMLToolingException() {}
+        virtual ~XMLToolingException() {}
+        XMLToolingException(const char* const msg) : m_msg(msg) {}
+        XMLToolingException(const std::string& msg) : m_msg(msg) {}
+        virtual const char* what() const { return m_msg.c_str(); }
+    private:
+        std::string m_msg;
+    };
+
     DECL_XMLTOOLING_EXCEPTION(XMLParserException);
 
 };
