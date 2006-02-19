@@ -3,9 +3,8 @@ AUTOMAKE_OPTIONS = foreign
 lib_LTLIBRARIES = libxmltooling.la
 
 libxmltoolingincludedir = \
-	$(includedir)/xmltooling \
-	$(includedir)/xmltooling/util
-	
+	$(includedir)/xmltooling
+
 libxmltoolinginclude_HEADERS = \
 	base.h \
 	config_pub.h \
@@ -17,11 +16,16 @@ libxmltoolinginclude_HEADERS = \
 	version.h \
 	XMLObject.h \
 	XMLObjectBuilder.h \
-	XMLToolingConfig.h \
-	util/NDC.h \
-	util/ParserPool.h \
-	util/XMLConstants.h \
-	util/XMLHelper.h
+	XMLToolingConfig.h
+
+utilincludedir = \
+        $(includedir)/xmltooling/util
+
+utilinclude_HEADERS = \
+        util/NDC.h \
+        util/ParserPool.h \
+        util/XMLConstants.h \
+        util/XMLHelper.h
 
 noinst_HEADERS = \
 	internal.h
