@@ -29,8 +29,8 @@
 #define DECL_XMLTOOLING_EXCEPTION(type) \
     class XMLTOOL_EXCEPTIONAPI(XMLTOOL_API) type : public XMLToolingException { \
     public: \
-        type(const char* msg) : XMLToolingException(msg) {} \
-        type(std::string& msg) : XMLToolingException(msg) {} \
+        type(const char* const msg) : XMLToolingException(msg) {} \
+        type(const std::string& msg) : XMLToolingException(msg) {} \
         virtual ~type() {} \
     }
 
