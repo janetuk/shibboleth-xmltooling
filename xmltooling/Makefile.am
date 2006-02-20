@@ -6,8 +6,12 @@ libxmltoolingincludedir = \
 	$(includedir)/xmltooling
 
 libxmltoolinginclude_HEADERS = \
+	AbstractDOMCachingXMLObject.h \
+	AbstractXMLObject.h \
+	AbstractXMLObjectBuilder.h \
 	base.h \
 	config_pub.h \
+	DOMCachingXMLObject.h \
 	exceptions.h \
 	ILockable.h \
 	Namespace.h \
@@ -31,6 +35,7 @@ noinst_HEADERS = \
 	internal.h
 
 libxmltooling_la_SOURCES = \
+	AbstractDOMCachingXMLObject.cpp \
 	Namespace.cpp \
 	QName.cpp \
 	unicode.cpp \

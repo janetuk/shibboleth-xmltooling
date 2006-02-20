@@ -182,6 +182,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\AbstractDOMCachingXMLObject.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Namespace.cpp"
 				>
 			</File>
@@ -224,11 +228,27 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\AbstractDOMCachingXMLObject.h"
+				>
+			</File>
+			<File
+				RelativePath=".\AbstractXMLObject.h"
+				>
+			</File>
+			<File
+				RelativePath=".\AbstractXMLObjectBuilder.h"
+				>
+			</File>
+			<File
 				RelativePath=".\base.h"
 				>
 			</File>
 			<File
 				RelativePath=".\config_pub_win32.h"
+				>
+			</File>
+			<File
+				RelativePath=".\DOMCachingXMLObject.h"
 				>
 			</File>
 			<File

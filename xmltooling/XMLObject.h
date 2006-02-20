@@ -37,6 +37,7 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(XMLObject);
     public:
+        XMLObject() {}
         virtual ~XMLObject() {}
         
         /**
