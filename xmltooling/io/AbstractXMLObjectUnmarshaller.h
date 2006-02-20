@@ -1,0 +1,161 @@
+/*
+*  Copyright 2001-2006 Internet2
+ * 
+* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @file AbstractXMLObjectUnmarshaller.h
+ * 
+ * A thread-safe abstract unmarshaller.
+ */
+
+#if !defined(__xmltooling_xmlunmarshaller_h__)
+#define __xmltooling_xmlunmarshaller_h__
+
+#include <xmltooling/DOMCachingXMLObject.h>
+#include <xmltooling/exceptions.h>
+#include <xmltooling/XMLObjectBuilder.h>
+#include <xmltooling/io/Unmarshaller.h>
+#include <xmltooling/util/XMLConstants.h>
+#include <xmltooling/util/XMLHelper.h>
+
+namespace xmltooling {
+
+    /**
+     * A thread-safe abstract unmarshaller.
+     */
+    class XMLTOOL_API AbstractXMLObjectUnmarshaller : public virtual Unmarshaller
+    {
+    public:
+        virtual ~AbstractXMLObjectUnmarshaller() {}
+
+        /**
+         * @see Unmarshaller::unmarshall()
+         */
+        XMLObject* unmarshall(DOMElement* element, bool bindDocument=false) const;
+    
+        
+    protected:
+        /**
+         * Constructor.
+         * 
+         * @param targetNamespaceURI the namespace URI of either the schema type QName or element QName of the elements this
+         *            unmarshaller operates on
+         * @param targetLocalName the local name of either the schema type QName or element QName of the elements this
+         *            unmarshaller operates on
+         */
+        AbstractXMLObjectUnmarshaller(const XMLCh* targetNamespaceURI, const XMLCh* targetLocalName)
+                : m_targetQName(targetNamespaceURI, targetLocalName) {
+            if (!targetLocalName || !*targetLocalName)
+                throw UnmarshallerException("targetLocalName cannot be null or empty");
+        }
+
+        /**
+         * Checks that the given DOM Element's XSI type or namespace qualified element name matches the target QName of this
+         * unmarshaller.
+         * 
+         * @param domElement the DOM element to check
+         * 
+         * @throws UnmarshallingException thrown if the DOM Element does not match the target of this unmarshaller
+         */
+        void checkElementIsTarget(DOMElement* domElement) const;
+        
+        /**
+         * Constructs the XMLObject that the given DOM Element will be unmarshalled into. If the DOM element has an XML
+         * Schema type defined this method will attempt to retrieve an XMLObjectBuilder using the schema type. If no
+         * schema type is present or no builder is registered for the schema type, the element's QName is used. Once
+         * the builder is found the XMLObject is created by invoking XMLObjectBuilder::buildObject().
+         * Extending classes may wish to override this logic if more than just schema type or element name
+         * (e.g. element attributes or content) need to be used to determine how to create the XMLObject.
+         * 
+         * @param domElement the DOM Element the created XMLObject will represent
+         * @return the empty XMLObject that DOM Element can be unmarshalled into
+         * 
+         * @throws UnmarshallingException thrown if there is now XMLObjectBuilder registered for the given DOM Element
+         */
+        virtual XMLObject* buildXMLObject(DOMElement* domElement) const;
+        
+        /**
+         * Unmarshalls the attributes from the given DOM Element into the given XMLObject. If the attribute is an XML
+         * namespace declaration the namespace is added to the given element via XMLObject::addNamespace().
+         * If it is a schema type (xsi:type) the schema type is added to the element via XMLObject::setSchemaType().
+         * All other attributes are passed to the processAttribute hook.
+         * 
+         * @param domElement the DOM Element whose attributes will be unmarshalled
+         * @param xmlObject the XMLObject that will recieve information from the DOM attribute
+         * 
+         * @throws UnmarshallingException thrown if there is a problem unmarshalling an attribute
+         */
+        virtual void unmarshallAttributes(DOMElement* domElement, XMLObject* xmlObject) const;
+
+        /**
+         * Unmarshalls a given Element's children. For each child an unmarshaller is retrieved using
+         * getUnmarshaller(). The unmarshaller is then used to unmarshall the child element and the
+         * resulting XMLObject is passed to processChildElement() for further processing.
+         * 
+         * @param domElement the DOM Element whose children will be unmarshalled
+         * @param xmlObject the parent object of the unmarshalled children
+         * 
+         * @throws UnmarshallingException thrown if an error occurs unmarshalling the child elements
+         */
+        virtual void unmarshallChildElements(DOMElement* domElement, XMLObject* xmlObject) const;
+
+        /**
+         * Gets the Unmarshaller for the given Element. If the child element has an explicit XML Schema type,
+         * that is used to get the unmarshaller. If there is no unmarshaller registered for the schema type,
+         * or the element does not have an explicit schema type, the element's QName is used.
+         * 
+         * @param domElement the DOM Element to get the Unmarshaller for
+         * @return the Unmarshaller for the given DOM Element
+         * 
+         * @throws UnmarshallingException thrown if no unmarshaller is available for the given DOM Element
+         */
+        const Unmarshaller* getUnmarshaller(DOMElement* domElement) const;
+
+        /**
+         * Called after a child element has been unmarshalled so that it can be added to the parent XMLObject.
+         * 
+         * @param parent the parent XMLObject
+         * @param child the child XMLObject
+         * 
+         * @throws UnmarshallingException thrown if there is a problem adding the child to the parent
+         */
+        virtual void processChildElement(XMLObject* parent, XMLObject* child) const=0;
+    
+        /**
+         * Called after an attribute has been unmarshalled so that it can be added to the XMLObject.
+         * 
+         * @param xmlObject the XMLObject
+         * @param name the attribute's name
+         * @param value the attribute's value
+         * 
+         * @throws UnmarshallingException thrown if there is a problem adding the attribute to the XMLObject
+         */
+        virtual void processAttribute(XMLObject* xmlObject, const XMLCh* name, const XMLCh* value) const=0;
+    
+        /**
+         * Called if the element being unmarshalled contained textual content so that it can be added to the XMLObject.
+         * 
+         * @param xmlObject XMLObject the content will be given to
+         * @param elementContent the Element's text content
+         */
+        virtual void processElementContent(XMLObject* xmlObject, const XMLCh* elementContent) const=0;
+
+    private:
+        QName m_targetQName;
+    };
+    
+};
+
+#endif /* __xmltooling_xmlunmarshaller_h__ */
