@@ -26,8 +26,10 @@
 #include <xmltooling/AbstractXMLObject.h>
 #include <xmltooling/DOMCachingXMLObject.h>
 
-#pragma warning( push )
-#pragma warning( disable : 4250 4251 )
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4250 4251 )
+#endif
 
 namespace xmltooling {
 
@@ -148,6 +150,8 @@ namespace xmltooling {
     
 };
 
-#pragma warning( pop )
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
 
 #endif /* __xmltooling_abstractdomxmlobj_h__ */

@@ -25,8 +25,10 @@
 
 #include <xmltooling/XMLObject.h>
 
-#pragma warning( push )
-#pragma warning( disable : 4250 4251 )
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4250 4251 )
+#endif
 
 namespace xmltooling {
 
@@ -134,6 +136,8 @@ namespace xmltooling {
 
 };
 
-#pragma warning( pop )
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
 
 #endif /* __xmltooling_abstractxmlobj_h__ */

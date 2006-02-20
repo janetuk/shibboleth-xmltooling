@@ -34,6 +34,11 @@
 
 using namespace xercesc;
 
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4250 4251 )
+#endif
+
 namespace xmltooling {
 
     /**
@@ -159,5 +164,9 @@ namespace xmltooling {
         };
     };
 };
+
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
 
 #endif /* __xmltooling_pool_h__ */
