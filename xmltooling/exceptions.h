@@ -55,6 +55,8 @@ namespace xmltooling {
 
     DECL_XMLTOOLING_EXCEPTION(XMLParserException);
     DECL_XMLTOOLING_EXCEPTION(XMLObjectException);
+    DECL_XMLTOOLING_EXCEPTION(MarshallingException);
+    DECL_XMLTOOLING_EXCEPTION(UnmarshallingException);
 
 };
 
