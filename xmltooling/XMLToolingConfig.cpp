@@ -22,6 +22,9 @@
 
 #include "internal.h"
 #include "XMLToolingConfig.h"
+#include "XMLObjectBuilder.h"
+#include "io/Marshaller.h"
+#include "io/Unmarshaller.h"
 #include "util/NDC.h"
 
 #ifdef HAVE_DLFCN_H
@@ -250,4 +253,25 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
     m_libhandles.push_back(handle);
     log.info("loaded extension: %s", path);
     return true;
+}
+
+map<QName,XMLObjectBuilder*> XMLObjectBuilder::m_map;
+
+void XMLObjectBuilder::destroyBuilders()
+{
+    for_each(m_map.begin(),m_map.end(),cleanup_pair<QName,XMLObjectBuilder>());
+}
+
+map<QName,Marshaller*> Marshaller::m_map;
+
+void Marshaller::destroyMarshallers()
+{
+    for_each(m_map.begin(),m_map.end(),cleanup_pair<QName,Marshaller>());
+}
+
+map<QName,Unmarshaller*> Unmarshaller::m_map;
+
+void Unmarshaller::destroyUnmarshallers()
+{
+    for_each(m_map.begin(),m_map.end(),cleanup_pair<QName,Unmarshaller>());
 }
