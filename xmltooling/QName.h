@@ -112,6 +112,14 @@ namespace xmltooling {
          */
         void setLocalPart(const XMLCh* localPart);
         
+        /**
+         * Gets a string representation of the QName for logging, etc.
+         * Format is prefix:localPart or {namespaceURI}localPart if no prefix.
+         * 
+         * @return the string representation
+         */
+        std::string toString() const;
+        
     private:
 #ifdef HAVE_GOOD_STL
         xstring m_uri;

@@ -24,6 +24,7 @@
 #include "QName.h"
 
 using namespace xmltooling;
+using namespace std;
 
 QName::QName(const XMLCh* uri, const XMLCh* localPart, const XMLCh* prefix)
 {
@@ -118,4 +119,21 @@ bool xmltooling::operator<(const QName& op1, const QName& op2)
         return (XMLString::compareString(op1.getLocalPart(),op2.getLocalPart())<0);
     else
         return false;
+}
+
+string QName::toString() const
+{
+    if (!getLocalPart())
+        return "";
+    auto_ptr_char local(getLocalPart());
+    if (getPrefix()) {
+        auto_ptr_char pre(getPrefix());
+        return string(pre.get()) + ':' + local.get(); 
+    }
+    else if (getNamespaceURI()) {
+        auto_ptr_char ns(getNamespaceURI());
+        return string("{") + ns.get() + '}' + local.get(); 
+    }
+    else
+        return local.get();
 }
