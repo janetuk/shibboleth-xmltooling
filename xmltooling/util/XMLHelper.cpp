@@ -30,7 +30,7 @@ using namespace xmltooling;
 
 static const XMLCh type[]={chLatin_t, chLatin_y, chLatin_p, chLatin_e, chNull };
     
-bool XMLHelper::hasXSIType(DOMElement* e)
+bool XMLHelper::hasXSIType(const DOMElement* e)
 {
     if (e) {
         if (e->hasAttributeNS(XMLConstants::XSI_NS, type)) {
@@ -41,7 +41,7 @@ bool XMLHelper::hasXSIType(DOMElement* e)
     return false;
 }
 
-QName* XMLHelper::getXSIType(DOMElement* e)
+QName* XMLHelper::getXSIType(const DOMElement* e)
 {
     DOMAttr* attribute = e->getAttributeNodeNS(XMLConstants::XSI_NS, type);
     if (attribute) {
@@ -60,7 +60,7 @@ QName* XMLHelper::getXSIType(DOMElement* e)
     return NULL;
 }
 
-DOMAttr* XMLHelper::getIdAttribute(DOMElement* domElement)
+DOMAttr* XMLHelper::getIdAttribute(const DOMElement* domElement)
 {
     if(!domElement->hasAttributes()) {
         return NULL;
@@ -78,14 +78,14 @@ DOMAttr* XMLHelper::getIdAttribute(DOMElement* domElement)
     return NULL;
 }
 
-QName* XMLHelper::getNodeQName(DOMNode* domNode)
+QName* XMLHelper::getNodeQName(const DOMNode* domNode)
 {
     if (domNode)
         return new QName(domNode->getNamespaceURI(), domNode->getLocalName(), domNode->getPrefix());
     return NULL; 
 }
 
-QName* XMLHelper::getAttributeValueAsQName(DOMAttr* attribute)
+QName* XMLHelper::getAttributeValueAsQName(const DOMAttr* attribute)
 {
     if (!attribute)
         return NULL;

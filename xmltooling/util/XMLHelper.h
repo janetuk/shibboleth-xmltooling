@@ -42,7 +42,7 @@ namespace xmltooling {
          * @param e the DOM element
          * @return true if there is a type, false if not
          */
-        static bool hasXSIType(DOMElement* e);
+        static bool hasXSIType(const DOMElement* e);
 
         /**
          * Gets the XSI type for a given element if it has one.
@@ -50,7 +50,7 @@ namespace xmltooling {
          * @param e the element
          * @return the type or null
          */
-        static QName* getXSIType(DOMElement* e);
+        static QName* getXSIType(const DOMElement* e);
 
         /**
          * Gets the ID attribute of a DOM element.
@@ -58,7 +58,7 @@ namespace xmltooling {
          * @param domElement the DOM element
          * @return the ID attribute or null if there isn't one
          */
-        static DOMAttr* getIdAttribute(DOMElement* domElement);
+        static DOMAttr* getIdAttribute(const DOMElement* domElement);
 
         /**
          * Gets the QName for the given DOM node.
@@ -66,7 +66,7 @@ namespace xmltooling {
          * @param domNode the DOM node
          * @return the QName for the element or null if the element was null
          */
-        static QName* getNodeQName(DOMNode* domNode);
+        static QName* getNodeQName(const DOMNode* domNode);
 
         /**
          * Constructs a QName from an attributes value.
@@ -74,7 +74,7 @@ namespace xmltooling {
          * @param attribute the attribute with a QName value
          * @return a QName from an attributes value, or null if the given attribute is null
          */
-        static QName* getAttributeValueAsQName(DOMAttr* attribute);
+        static QName* getAttributeValueAsQName(const DOMAttr* attribute);
 
         /**
          * Appends the child Element to the parent Element,
