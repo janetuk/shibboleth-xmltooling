@@ -17,12 +17,13 @@
 /**
  * @file Marshaller.h
  * 
- * Transforms XMLObjects into DOM trees.
+ * Transforms XMLObjects into DOM trees
  */
 
 #if !defined(__xmltooling_marshaller_h__)
 #define __xmltooling_marshaller_h__
 
+#include <map>
 #include <xercesc/dom/DOM.hpp>
 #include <xmltooling/XMLObject.h>
 
@@ -69,13 +70,30 @@ namespace xmltooling {
             std::map<QName,Marshaller*>::const_iterator i=m_map.find(key);
             return (i==m_map.end()) ? NULL : i->second;
         }
+
+        /**
+         * Retrieves a Marshaller for a DOM element
+         * 
+         * @param element the element for which to return a marshaller
+         * @return the marshaller or NULL
+         */
+        static const Marshaller* getMarshaller(const DOMElement* key);
+
+        /**
+         * Retrieves default Marshaller for DOM elements
+         * 
+         * @return the default marshaller or NULL
+         */
+        static const Marshaller* getDefaultMarshaller() {
+            return m_default;
+        }
     
         /**
          * Gets an immutable list of all the marshallers currently registered.
          * 
          * @return list of all the marshallers currently registered
          */
-        static const std::map<QName,Marshaller*>& getMarshaller() {
+        static const std::map<QName,Marshaller*>& getMarshallers() {
             return m_map;
         }
     
@@ -86,9 +104,20 @@ namespace xmltooling {
          * @param marshaller the marshaller
          */
         static void registerMarshaller(const QName& key, Marshaller* marshaller) {
+            deregisterMarshaller(key);
             m_map[key]=marshaller;
         }
-    
+
+        /**
+         * Registers default marshaller
+         * 
+         * @param marshaller the default marshaller
+         */
+        static void registerDefaultMarshaller(Marshaller* marshaller) {
+            deregisterDefaultMarshaller();
+            m_default=marshaller;
+        }
+
         /**
          * Deregisters a marshaller.
          * 
@@ -98,7 +127,15 @@ namespace xmltooling {
             delete getMarshaller(key);
             m_map.erase(key);
         }
-        
+
+        /**
+         * Deregisters default marshaller.
+         */
+        static void deregisterDefaultMarshaller() {
+            delete m_default;
+            m_default=NULL;
+        }
+
         /**
          * Unregisters and destroys all registered marshallers. 
          */
@@ -106,6 +143,7 @@ namespace xmltooling {
     
     private:
         static std::map<QName,Marshaller*> m_map;
+        static Marshaller* m_default;
     };
     
 };

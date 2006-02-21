@@ -23,6 +23,7 @@
 #if !defined(__xmltooling_unmarshaller_h__)
 #define __xmltooling_unmarshaller_h__
 
+#include <map>
 #include <xercesc/dom/DOM.hpp>
 #include <xmltooling/XMLObject.h>
 
@@ -60,7 +61,7 @@ namespace xmltooling {
         virtual XMLObject* unmarshall(DOMElement* element, bool bindDocument=false) const=0;
 
         /**
-         * Retrieves a unmarshaller using the key it was registered with.
+         * Retrieves an unmarshaller using the key it was registered with.
          * 
          * @param key the key used to register the unmarshaller
          * @return the unmarshaller
@@ -71,11 +72,28 @@ namespace xmltooling {
         }
     
         /**
+         * Retrieves an Unmarshaller for a DOM element
+         * 
+         * @param element the element for which to return an unmarshaller
+         * @return the unmarshaller or NULL
+         */
+        static const Unmarshaller* getUnmarshaller(const DOMElement* key);
+
+        /**
+         * Retrieves the default Unmarshaller for an unknown DOM element
+         * 
+         * @return the default unmarshaller or NULL
+         */
+        static const Unmarshaller* getDefaultUnmarshaller() {
+            return m_default;
+        }
+
+        /**
          * Gets an immutable list of all the unmarshallers currently registered.
          * 
          * @return list of all the unmarshallers currently registered
          */
-        static const std::map<QName,Unmarshaller*>& getUnmarshaller() {
+        static const std::map<QName,Unmarshaller*>& getUnmarshallers() {
             return m_map;
         }
     
@@ -86,7 +104,18 @@ namespace xmltooling {
          * @param unmarshaller the unmarshaller
          */
         static void registerUnmarshaller(const QName& key, Unmarshaller* unmarshaller) {
+            deregisterUnmarshaller(key);
             m_map[key]=unmarshaller;
+        }
+
+        /**
+         * Registers a new default unmarshaller
+         * 
+         * @param unmarshaller the default unmarshaller
+         */
+        static void registerDefaultUnmarshaller(Unmarshaller* unmarshaller) {
+            deregisterDefaultUnmarshaller();
+            m_default=unmarshaller;
         }
     
         /**
@@ -98,6 +127,14 @@ namespace xmltooling {
             delete getUnmarshaller(key);
             m_map.erase(key);
         }
+
+        /**
+         * Deregisters the default unmarshaller.
+         */
+        static void deregisterDefaultUnmarshaller() {
+            delete m_default;
+            m_default=NULL;
+        }
         
         /**
          * Unregisters and destroys all registered unmarshallers. 
@@ -106,6 +143,7 @@ namespace xmltooling {
     
     private:
         static std::map<QName,Unmarshaller*> m_map;
+        static Unmarshaller* m_default;
     };
     
 };

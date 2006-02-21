@@ -23,12 +23,8 @@
 #if !defined(__xmltooling_xmlunmarshaller_h__)
 #define __xmltooling_xmlunmarshaller_h__
 
-#include <xmltooling/DOMCachingXMLObject.h>
-#include <xmltooling/exceptions.h>
-#include <xmltooling/XMLObjectBuilder.h>
+#include <xmltooling/XMLObject.h>
 #include <xmltooling/io/Unmarshaller.h>
-#include <xmltooling/util/XMLConstants.h>
-#include <xmltooling/util/XMLHelper.h>
 
 namespace xmltooling {
 
@@ -55,11 +51,7 @@ namespace xmltooling {
          * @param targetLocalName the local name of either the schema type QName or element QName of the elements this
          *            unmarshaller operates on
          */
-        AbstractXMLObjectUnmarshaller(const XMLCh* targetNamespaceURI, const XMLCh* targetLocalName)
-                : m_targetQName(targetNamespaceURI, targetLocalName) {
-            if (!targetLocalName || !*targetLocalName)
-                throw UnmarshallerException("targetLocalName cannot be null or empty");
-        }
+        AbstractXMLObjectUnmarshaller(const XMLCh* targetNamespaceURI, const XMLCh* targetLocalName);
 
         /**
          * Checks that the given DOM Element's XSI type or namespace qualified element name matches the target QName of this
@@ -69,7 +61,7 @@ namespace xmltooling {
          * 
          * @throws UnmarshallingException thrown if the DOM Element does not match the target of this unmarshaller
          */
-        void checkElementIsTarget(DOMElement* domElement) const;
+        void checkElementIsTarget(const DOMElement* domElement) const;
         
         /**
          * Constructs the XMLObject that the given DOM Element will be unmarshalled into. If the DOM element has an XML
@@ -84,7 +76,7 @@ namespace xmltooling {
          * 
          * @throws UnmarshallingException thrown if there is now XMLObjectBuilder registered for the given DOM Element
          */
-        virtual XMLObject* buildXMLObject(DOMElement* domElement) const;
+        virtual XMLObject* buildXMLObject(const DOMElement* domElement) const;
         
         /**
          * Unmarshalls the attributes from the given DOM Element into the given XMLObject. If the attribute is an XML
@@ -97,7 +89,7 @@ namespace xmltooling {
          * 
          * @throws UnmarshallingException thrown if there is a problem unmarshalling an attribute
          */
-        virtual void unmarshallAttributes(DOMElement* domElement, XMLObject* xmlObject) const;
+        virtual void unmarshallAttributes(const DOMElement* domElement, XMLObject* xmlObject) const;
 
         /**
          * Unmarshalls a given Element's children. For each child an unmarshaller is retrieved using
@@ -109,19 +101,7 @@ namespace xmltooling {
          * 
          * @throws UnmarshallingException thrown if an error occurs unmarshalling the child elements
          */
-        virtual void unmarshallChildElements(DOMElement* domElement, XMLObject* xmlObject) const;
-
-        /**
-         * Gets the Unmarshaller for the given Element. If the child element has an explicit XML Schema type,
-         * that is used to get the unmarshaller. If there is no unmarshaller registered for the schema type,
-         * or the element does not have an explicit schema type, the element's QName is used.
-         * 
-         * @param domElement the DOM Element to get the Unmarshaller for
-         * @return the Unmarshaller for the given DOM Element
-         * 
-         * @throws UnmarshallingException thrown if no unmarshaller is available for the given DOM Element
-         */
-        const Unmarshaller* getUnmarshaller(DOMElement* domElement) const;
+        virtual void unmarshallChildElements(const DOMElement* domElement, XMLObject* xmlObject) const;
 
         /**
          * Called after a child element has been unmarshalled so that it can be added to the parent XMLObject.
@@ -137,12 +117,11 @@ namespace xmltooling {
          * Called after an attribute has been unmarshalled so that it can be added to the XMLObject.
          * 
          * @param xmlObject the XMLObject
-         * @param name the attribute's name
-         * @param value the attribute's value
+         * @param attribute the attribute being unmarshalled
          * 
          * @throws UnmarshallingException thrown if there is a problem adding the attribute to the XMLObject
          */
-        virtual void processAttribute(XMLObject* xmlObject, const XMLCh* name, const XMLCh* value) const=0;
+        virtual void processAttribute(XMLObject* xmlObject, const DOMAttr* attribute) const=0;
     
         /**
          * Called if the element being unmarshalled contained textual content so that it can be added to the XMLObject.
@@ -152,6 +131,7 @@ namespace xmltooling {
          */
         virtual void processElementContent(XMLObject* xmlObject, const XMLCh* elementContent) const=0;
 
+        void* m_log;
     private:
         QName m_targetQName;
     };
