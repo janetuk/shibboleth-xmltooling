@@ -198,6 +198,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\XMLObjectBuilder.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\XMLToolingConfig.cpp"
 				>
 			</File>
@@ -221,6 +225,22 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="io"
+				>
+				<File
+					RelativePath=".\io\AbstractXMLObjectUnmarshaller.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\io\Marshaller.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\io\Unmarshaller.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -233,10 +253,6 @@
 			</File>
 			<File
 				RelativePath=".\AbstractXMLObject.h"
-				>
-			</File>
-			<File
-				RelativePath=".\AbstractXMLObjectBuilder.h"
 				>
 			</File>
 			<File
@@ -308,6 +324,22 @@
 				</File>
 				<File
 					RelativePath=".\util\XMLHelper.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="io"
+				>
+				<File
+					RelativePath=".\io\AbstractXMLObjectUnmarshaller.h"
+					>
+				</File>
+				<File
+					RelativePath=".\io\Marshaller.h"
+					>
+				</File>
+				<File
+					RelativePath=".\io\Unmarshaller.h"
 					>
 				</File>
 			</Filter>

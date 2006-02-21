@@ -15,7 +15,7 @@
  */
 
 /**
- * @file exception.h
+ * @file exceptions.h
  * 
  * Exception classes
  */
@@ -57,6 +57,8 @@ namespace xmltooling {
     DECL_XMLTOOLING_EXCEPTION(XMLObjectException);
     DECL_XMLTOOLING_EXCEPTION(MarshallingException);
     DECL_XMLTOOLING_EXCEPTION(UnmarshallingException);
+    DECL_XMLTOOLING_EXCEPTION(UnknownElementException);
+    DECL_XMLTOOLING_EXCEPTION(UnknownAttributeException);
 
 };
 

@@ -8,7 +8,6 @@ libxmltoolingincludedir = \
 libxmltoolinginclude_HEADERS = \
 	AbstractDOMCachingXMLObject.h \
 	AbstractXMLObject.h \
-	AbstractXMLObjectBuilder.h \
 	base.h \
 	config_pub.h \
 	DOMCachingXMLObject.h \
@@ -23,13 +22,21 @@ libxmltoolinginclude_HEADERS = \
 	XMLToolingConfig.h
 
 utilincludedir = \
-        $(includedir)/xmltooling/util
+    $(includedir)/xmltooling/util
 
 utilinclude_HEADERS = \
-        util/NDC.h \
-        util/ParserPool.h \
-        util/XMLConstants.h \
-        util/XMLHelper.h
+    util/NDC.h \
+    util/ParserPool.h \
+    util/XMLConstants.h \
+    util/XMLHelper.h
+
+ioincludedir = \
+    $(includedir)/xmltooling/io
+
+ioinclude_HEADERS = \
+	io/AbstractXMLObjectUnmarshaller.h \
+    io/Marshaller.h \
+    io/Unmarshaller.h
 
 noinst_HEADERS = \
 	internal.h
@@ -39,7 +46,11 @@ libxmltooling_la_SOURCES = \
 	Namespace.cpp \
 	QName.cpp \
 	unicode.cpp \
+	XMLObjectBuilder.cpp \
 	XMLToolingConfig.cpp \
+	io/AbstractXMLObjectUnmarshaller.cpp \
+	io/Marshaller.cpp \
+	io/Unmarshaller.cpp \
 	util/NDC.cpp \
 	util/ParserPool.cpp \
 	util/XMLConstants.cpp \
