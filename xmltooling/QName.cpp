@@ -102,13 +102,13 @@ QName& QName::operator=(const QName& src)
     m_local=XMLString::replicate(src.getLocalPart());
     return *this;
 }
+#endif
 
 bool xmltooling::operator==(const QName& op1, const QName& op2)
 {
     return (!XMLString::compareString(op1.getNamespaceURI(),op2.getNamespaceURI()) &&
             !XMLString::compareString(op1.getLocalPart(),op2.getLocalPart()));
 }
-#endif
 
 bool xmltooling::operator<(const QName& op1, const QName& op2)
 {

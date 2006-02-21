@@ -143,14 +143,12 @@ namespace xmltooling {
      */
     extern XMLTOOL_API bool operator<(const QName& op1, const QName& op2);
 
-#ifndef HAVE_GOOD_STL
     /**
-     * Returns true iff op1's components are equal to op2's components.
+     * Returns true iff op1's components are equal to op2's components, excluding prefix.
      * @param op1   First qname to compare
      * @param op2   Second qname to compare
      */
     extern XMLTOOL_API bool operator==(const QName& op1, const QName& op2);
-#endif
 
 };
 
