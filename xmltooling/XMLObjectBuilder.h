@@ -24,8 +24,11 @@
 #define __xmltooling_xmlobjbuilder_h__
 
 #include <map>
+#include <xercesc/dom/DOM.hpp>
 #include <xmltooling/QName.h>
 #include <xmltooling/XMLObject.h>
+
+using namespace xercesc;
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -49,27 +52,36 @@ namespace xmltooling {
          * 
          * @return the empty XMLObject
          */
-        virtual XMLObject* buildObject()=0;
+        virtual XMLObject* buildObject() const=0;
 
-        /**
-         * Resets the state of the builder.
-         * 
-         * This normally means null'ing out any properties that were
-         * needed to build an object.
-         */
-        virtual void resetState()=0;
-        
         /**
          * Retrieves an XMLObjectBuilder using the key it was registered with.
          * 
          * @param key the key used to register the builder
          * @return the builder
          */
-        static XMLObjectBuilder* getBuilder(const QName& key) {
+        static const XMLObjectBuilder* getBuilder(const QName& key) {
             std::map<QName,XMLObjectBuilder*>::const_iterator i=m_map.find(key);
             return (i==m_map.end()) ? NULL : i->second;
         }
-    
+
+        /**
+         * Retrieves an XMLObjectBuilder for a given DOM element
+         * 
+         * @param element the element for which to locate a builder
+         * @return the builder or NULL
+         */
+        static const XMLObjectBuilder* getBuilder(const DOMElement* element);
+
+        /**
+         * Retrieves the default XMLObjectBuilder for DOM elements
+         * 
+         * @return the default builder or NULL
+         */
+        static const XMLObjectBuilder* getDefaultBuilder(const DOMElement* element) {
+            return m_default;
+        }
+
         /**
          * Gets an immutable list of all the builders currently registered.
          * 
@@ -86,9 +98,20 @@ namespace xmltooling {
          * @param builder the builder
          */
         static void registerBuilder(const QName& builderKey, XMLObjectBuilder* builder) {
+            deregisterBuilder(builderKey);
             m_map[builderKey]=builder;
         }
-    
+
+        /**
+         * Registers a default builder
+         * 
+         * @param builder the default builder
+         */
+        static void registerDefaultBuilder(XMLObjectBuilder* builder) {
+            deregisterDefaultBuilder();
+            m_default=builder;
+        }
+
         /**
          * Deregisters a builder.
          * 
@@ -98,7 +121,15 @@ namespace xmltooling {
             delete getBuilder(builderKey);
             m_map.erase(builderKey);
         }
-        
+
+        /**
+         * Deregisters default builder.
+         */
+        static void deregisterDefaultBuilder() {
+            delete m_default;
+            m_default=NULL;
+        }
+
         /**
          * Unregisters and destroys all registered builders. 
          */
@@ -106,6 +137,7 @@ namespace xmltooling {
     
     private:
         static std::map<QName,XMLObjectBuilder*> m_map;
+        static XMLObjectBuilder* m_default;
     };
 
 };
