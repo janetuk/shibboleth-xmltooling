@@ -51,9 +51,7 @@ namespace xmltooling {
         /**
          * @see DOMCachingXMLObject::setDOM()
          */
-        void setDOM(DOMElement* dom) {
-            m_dom=dom;
-        }
+        void setDOM(DOMElement* dom, bool bindDocument=false);
         
         /**
          * @see DOMCachingXMLObject::setDocument()

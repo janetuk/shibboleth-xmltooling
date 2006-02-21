@@ -38,6 +38,22 @@ AbstractDOMCachingXMLObject::~AbstractDOMCachingXMLObject()
         m_document->release();
 }
 
+void AbstractDOMCachingXMLObject::setDOM(DOMElement* dom, bool bindDocument)
+{
+    m_dom=dom;
+    if (dom) {
+        if (bindDocument) {
+            DOMDocument* tmp=setDocument(dom->getOwnerDocument());
+            if (tmp)
+                tmp->release();
+        }
+    }
+    else if (m_document) {
+        m_document->release();
+        m_document=NULL;
+    }
+}
+
 void AbstractDOMCachingXMLObject::releaseDOM()
 {
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".DOM");

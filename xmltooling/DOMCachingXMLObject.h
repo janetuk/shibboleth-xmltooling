@@ -49,9 +49,10 @@ namespace xmltooling {
         /**
          * Sets the DOM representation of this XMLObject.
          * 
-         * @param dom DOM representation of this XMLObject
+         * @param dom       DOM representation of this XMLObject
+         * @param bindDocument  true if the object should take ownership of the associated Document
          */
-        virtual void setDOM(DOMElement* dom)=0;
+        virtual void setDOM(DOMElement* dom, bool bindDocument=false)=0;
     
         /**
          * Assigns ownership of a DOM document to the XMLObject.
