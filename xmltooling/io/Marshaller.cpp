@@ -35,32 +35,31 @@ map<QName,Marshaller*> Marshaller::m_map;
 
 Marshaller* Marshaller::m_default=NULL;
 
-const Marshaller* Marshaller::getMarshaller(const DOMElement* domElement)
+const Marshaller* Marshaller::getMarshaller(const XMLObject* xmlObject)
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("getMarshaller");
 #endif
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Marshaller");
  
-    auto_ptr<QName> schemaType(XMLHelper::getXSIType(domElement));
-    const Marshaller* m = getMarshaller(*(schemaType.get()));
+    const QName* type=xmlObject->getSchemaType();
+    const Marshaller* m = type ? getMarshaller(*type) : NULL;
     if (m) {
         if (log.isDebugEnabled()) {
-            log.debug("Located Marshaller for schema type: %s", schemaType->toString().c_str());
+            log.debug("located Marshaller for schema type: %s", type->toString().c_str());
         }
         return m;
     }
     
-    auto_ptr<QName> elementName(XMLHelper::getNodeQName(domElement));
-    m = getMarshaller(*(elementName.get()));
+    m = getMarshaller(xmlObject->getElementQName());
     if (m) {
         if (log.isDebugEnabled()) {
-            log.debug("Located Marshaller for element name: %s", elementName->toString().c_str());
+            log.debug("located Marshaller for element name: %s", xmlObject->getElementQName().toString().c_str());
         }
         return m;
     }
 
-    log.error("No Marshaller was registered for element: %s", elementName->toString().c_str());
+    log.error("no Marshaller registered for element: %s", xmlObject->getElementQName().toString().c_str());
     return NULL;
 }
 

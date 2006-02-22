@@ -58,7 +58,7 @@ namespace xmltooling {
          * 
          * @throws MarshallingException thrown if there is a problem marshalling the given object
          */
-        virtual DOMElement* marshall(XMLObject* xmlObject, DOMDocument* document) const=0;
+        virtual DOMElement* marshall(XMLObject* xmlObject, DOMDocument* document=NULL) const=0;
 
         /**
          * Retrieves a Marshaller using the key it was registered with.
@@ -72,12 +72,12 @@ namespace xmltooling {
         }
 
         /**
-         * Retrieves a Marshaller for a DOM element
+         * Retrieves a Marshaller for an XML object
          * 
-         * @param element the element for which to return a marshaller
+         * @param xmlObject the object for which to return a marshaller
          * @return the marshaller or NULL
          */
-        static const Marshaller* getMarshaller(const DOMElement* key);
+        static const Marshaller* getMarshaller(const XMLObject* xmlObject);
 
         /**
          * Retrieves default Marshaller for DOM elements
