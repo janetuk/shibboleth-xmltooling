@@ -23,7 +23,6 @@
 #if !defined(__xmltooling_xmlunmarshaller_h__)
 #define __xmltooling_xmlunmarshaller_h__
 
-#include <xmltooling/XMLObject.h>
 #include <xmltooling/io/Unmarshaller.h>
 
 namespace xmltooling {
@@ -53,16 +52,6 @@ namespace xmltooling {
          */
         AbstractXMLObjectUnmarshaller(const XMLCh* targetNamespaceURI, const XMLCh* targetLocalName);
 
-        /**
-         * Checks that the given DOM Element's XSI type or namespace qualified element name matches the target QName of this
-         * unmarshaller.
-         * 
-         * @param domElement the DOM element to check
-         * 
-         * @throws UnmarshallingException thrown if the DOM Element does not match the target of this unmarshaller
-         */
-        void checkElementIsTarget(const DOMElement* domElement) const;
-        
         /**
          * Constructs the XMLObject that the given DOM Element will be unmarshalled into. If the DOM element has an XML
          * Schema type defined this method will attempt to retrieve an XMLObjectBuilder using the schema type. If no

@@ -229,6 +229,10 @@
 				Name="io"
 				>
 				<File
+					RelativePath=".\io\AbstractXMLObjectMarshaller.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\io\AbstractXMLObjectUnmarshaller.cpp"
 					>
 				</File>
@@ -330,6 +334,10 @@
 			<Filter
 				Name="io"
 				>
+				<File
+					RelativePath=".\io\AbstractXMLObjectMarshaller.h"
+					>
+				</File>
 				<File
 					RelativePath=".\io\AbstractXMLObjectUnmarshaller.h"
 					>

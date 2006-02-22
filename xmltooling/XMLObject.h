@@ -143,7 +143,7 @@ namespace xmltooling {
          * @param v     vector in which to store pointers to child objects
          * @return the number of children
          */
-        virtual size_t getOrderedChildren(std::vector<XMLObject*>& v)=0;
+        virtual size_t getOrderedChildren(std::vector<XMLObject*>& v) const=0;
  };
 
 };

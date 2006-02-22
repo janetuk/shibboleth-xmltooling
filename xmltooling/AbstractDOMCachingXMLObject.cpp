@@ -59,9 +59,6 @@ void AbstractDOMCachingXMLObject::releaseDOM()
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".DOM");
     if (log.isDebugEnabled())
         log.debug("Releasing cached DOM reprsentation for %s", getElementQName().toString().c_str());
-
-    // We don't get rid of the document we're holding, if any.
-    // The marshalling process deals with that.
     setDOM(NULL);
 }
 
@@ -86,11 +83,11 @@ void AbstractDOMCachingXMLObject::releaseParentDOM(bool propagateRelease)
 class _release : public binary_function<XMLObject*,bool,void> {
 public:
     void operator()(XMLObject* obj, bool propagate) const {
-        DOMCachingXMLObject* domCachingParent = dynamic_cast<DOMCachingXMLObject*>(obj);
-        if (domCachingParent) {
-            domCachingParent->releaseDOM();
+        DOMCachingXMLObject* domCaching = dynamic_cast<DOMCachingXMLObject*>(obj);
+        if (domCaching) {
+            domCaching->releaseDOM();
             if (propagate)
-                domCachingParent->releaseChildrenDOM(propagate);
+                domCaching->releaseChildrenDOM(propagate);
         }
     }
 };

@@ -44,7 +44,7 @@ namespace xmltooling {
         /**
          * @see DOMCachingXMLObject::getDOM()
          */
-        const DOMElement* getDOM() const {
+        DOMElement* getDOM() const {
             return m_dom;
         }
         
@@ -92,8 +92,8 @@ namespace xmltooling {
          */
         void releaseThisAndChildrenDOM() {
             if (m_dom) {
-                releaseDOM();
                 releaseChildrenDOM(true);
+                releaseDOM();
             }
         }
     

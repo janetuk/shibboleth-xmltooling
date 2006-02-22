@@ -44,7 +44,7 @@ namespace xmltooling {
          * 
          * @return the DOM representation of this XMLObject
          */
-        virtual const DOMElement* getDOM() const=0;
+        virtual DOMElement* getDOM() const=0;
         
         /**
          * Sets the DOM representation of this XMLObject.

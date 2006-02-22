@@ -56,10 +56,6 @@ XMLObject* AbstractXMLObjectUnmarshaller::unmarshall(DOMElement* element, bool b
         XT_log.debug("unmarshalling DOM element %s", dname.get());
     }
 
-#ifdef _DEBUG
-    checkElementIsTarget(element);
-#endif
-
     XMLObject* xmlObject = buildXMLObject(element);
 
     if (element->hasAttributes()) {
@@ -83,31 +79,6 @@ XMLObject* AbstractXMLObjectUnmarshaller::unmarshall(DOMElement* element, bool b
         dc->setDOM(element,bindDocument);
         
     return xmlObject;
-}
-
-void AbstractXMLObjectUnmarshaller::checkElementIsTarget(const DOMElement* domElement) const
-{
-    auto_ptr<QName> elementName(XMLHelper::getNodeQName(domElement));
-
-    XT_log.debug("checking that root element meets target criteria");
-
-    auto_ptr<QName> type(XMLHelper::getXSIType(domElement));
-
-    if (type.get() && m_targetQName==*(type.get())) {
-        XT_log.debug("schema type of element matches target");
-        return;
-    }
-    else {
-        if (m_targetQName==*(elementName.get())) {
-            XT_log.debug("element name matches target");
-            return;
-        }
-        else {
-            XT_log.errorStream() << "unmarshaller for (" << m_targetQName.toString()
-                << ") passed (" << elementName->toString() << ")" << CategoryStream::ENDLINE;
-            throw UnmarshallingException("Incorrect element type passed to unmarshaller.");
-        }
-    }
 }
 
 XMLObject* AbstractXMLObjectUnmarshaller::buildXMLObject(const DOMElement* domElement) const
@@ -197,8 +168,13 @@ void AbstractXMLObjectUnmarshaller::unmarshallChildElements(const DOMElement* do
                     unmarshaller=Unmarshaller::getDefaultUnmarshaller();
                     if (!unmarshaller) {
                         auto_ptr<QName> cname(XMLHelper::getNodeQName(childNode));
-                        XT_log.error("no default unmarshaller installed, detected unknown child element %s", cname->toString().c_str());
-                        throw UnmarshallingException("Unmarshaller detected unknown child element, but no default unmarshaller was found.");
+                        XT_log.error(
+                            "no default unmarshaller installed, found unknown child element %s",
+                            cname->toString().c_str()
+                            );
+                        throw UnmarshallingException(
+                            "Unmarshaller found unknown child element, but no default unmarshaller was found."
+                            );
                     }
                     else {
                         XT_log.debug("using default unmarshaller");
@@ -207,7 +183,7 @@ void AbstractXMLObjectUnmarshaller::unmarshallChildElements(const DOMElement* do
                 else {
                     auto_ptr<QName> cname(XMLHelper::getNodeQName(childNode));
                     XT_log.error("detected unknown child element %s", cname->toString().c_str());
-                    throw UnknownElementException("Unmarshaller detected unknown child element.");
+                    throw UnknownElementException("Unmarshaller found unknown child element.");
                 }
             }
 
