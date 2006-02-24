@@ -92,18 +92,8 @@ namespace xmltooling {
          */
         virtual bool log_config(const char* config=NULL)=0;
         
-        /**
-         * Allow and capture unknown attributes during unmarshalling
-         */
-        bool ignoreUnknownAttributes;
-
-        /**
-         * Allow and capture unknown elements during unmarshalling 
-         */
-        bool ignoreUnknownElements;
-
     protected:
-        XMLToolingConfig() : ignoreUnknownAttributes(true), ignoreUnknownElements(true) {}
+        XMLToolingConfig() {}
     };
 
 };

@@ -39,8 +39,7 @@ namespace xmltooling {
          * @see Unmarshaller::unmarshall()
          */
         XMLObject* unmarshall(DOMElement* element, bool bindDocument=false) const;
-    
-        
+            
     protected:
         /**
          * Constructor.

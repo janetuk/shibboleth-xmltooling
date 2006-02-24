@@ -22,6 +22,7 @@
 
 #include "internal.h"
 #include "XMLToolingConfig.h"
+#include "impl/UnknownElement.h"
 #include "util/NDC.h"
 
 #ifdef HAVE_DLFCN_H
@@ -45,6 +46,11 @@ namespace {
 }
 
 XMLToolingConfig& XMLToolingConfig::getConfig()
+{
+    return g_config;
+}
+
+XMLToolingInternalConfig& XMLToolingInternalConfig::getInternalConfig()
 {
     return g_config;
 }
@@ -124,7 +130,13 @@ bool XMLToolingInternalConfig::init()
         //m_xsec=new XSECProvider();
         log.debug("XMLSec initialization complete");
         
+        m_parserPool=new ParserPool();
         m_lock=xercesc::XMLPlatformUtils::makeMutex();
+
+        // default registrations
+        XMLObjectBuilder::registerDefaultBuilder(new UnknownElementBuilder());
+        Marshaller::registerDefaultMarshaller(new UnknownElementMarshaller());
+        Unmarshaller::registerDefaultUnmarshaller(new UnknownElementUnmarshaller());
     }
     catch (const xercesc::XMLException&) {
         log.fatal("caught exception while initializing Xerces");
@@ -154,9 +166,13 @@ void XMLToolingInternalConfig::term()
     }
     m_libhandles.clear();
     
+    delete m_parserPool;
+    m_parserPool=NULL;
+
     //delete m_xsec; m_xsec=NULL;
     XSECPlatformUtils::Terminate();
     xercesc::XMLPlatformUtils::closeMutex(m_lock);
+    m_lock=NULL;
     xercesc::XMLPlatformUtils::Terminate();
 
  #ifdef _DEBUG

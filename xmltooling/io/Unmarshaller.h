@@ -72,7 +72,8 @@ namespace xmltooling {
         }
     
         /**
-         * Retrieves an Unmarshaller for a DOM element
+         * Retrieves an Unmarshaller for a DOM element.
+         * If no match is found, the default unmarshaller is returned, if any.
          * 
          * @param element the element for which to return an unmarshaller
          * @return the unmarshaller or NULL

@@ -45,7 +45,7 @@ const XMLObjectBuilder* XMLObjectBuilder::getBuilder(const DOMElement* domElemen
     const XMLObjectBuilder* xmlObjectBuilder = getBuilder(*(schemaType.get()));
     if (xmlObjectBuilder) {
         if (log.isDebugEnabled()) {
-            log.debug("Located XMLObjectBuilder for schema type: %s", schemaType->toString().c_str());
+            log.debug("located XMLObjectBuilder for schema type: %s", schemaType->toString().c_str());
         }
         return xmlObjectBuilder;
     }
@@ -54,13 +54,13 @@ const XMLObjectBuilder* XMLObjectBuilder::getBuilder(const DOMElement* domElemen
     xmlObjectBuilder = getBuilder(*(elementName.get()));
     if (xmlObjectBuilder) {
         if (log.isDebugEnabled()) {
-            log.debug("Located XMLObjectBuilder for element name: %s", elementName->toString().c_str());
+            log.debug("located XMLObjectBuilder for element name: %s", elementName->toString().c_str());
         }
         return xmlObjectBuilder;
     }
 
-    log.error("No XMLObjectBuilder was registered for element: %s", elementName->toString().c_str());
-    return NULL;
+    log.error("no XMLObjectBuilder registered for element (%s), using default", elementName->toString().c_str());
+    return m_default;
 }
 
 void XMLObjectBuilder::destroyBuilders()

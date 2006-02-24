@@ -59,8 +59,8 @@ const Marshaller* Marshaller::getMarshaller(const XMLObject* xmlObject)
         return m;
     }
 
-    log.error("no Marshaller registered for element: %s", xmlObject->getElementQName().toString().c_str());
-    return NULL;
+    log.error("no Marshaller registered for element (%s), returning default", xmlObject->getElementQName().toString().c_str());
+    return m_default;
 }
 
 void Marshaller::destroyMarshallers()

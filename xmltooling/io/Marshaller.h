@@ -64,7 +64,7 @@ namespace xmltooling {
          * Retrieves a Marshaller using the key it was registered with.
          * 
          * @param key the key used to register the marshaller
-         * @return the marshaller
+         * @return the marshaller or NULL
          */
         static const Marshaller* getMarshaller(const QName& key) {
             std::map<QName,Marshaller*>::const_iterator i=m_map.find(key);
@@ -73,6 +73,7 @@ namespace xmltooling {
 
         /**
          * Retrieves a Marshaller for an XML object
+         * If no match is found, the default marshaller is returned, if any.
          * 
          * @param xmlObject the object for which to return a marshaller
          * @return the marshaller or NULL

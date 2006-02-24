@@ -245,6 +245,14 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="impl"
+				>
+				<File
+					RelativePath=".\impl\UnknownElement.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -348,6 +356,14 @@
 				</File>
 				<File
 					RelativePath=".\io\Unmarshaller.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="impl"
+				>
+				<File
+					RelativePath=".\impl\UnknownElement.h"
 					>
 				</File>
 			</Filter>

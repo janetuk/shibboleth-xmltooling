@@ -46,7 +46,7 @@ const Unmarshaller* Unmarshaller::getUnmarshaller(const DOMElement* domElement)
     const Unmarshaller* m = getUnmarshaller(*(schemaType.get()));
     if (m) {
         if (log.isDebugEnabled()) {
-            log.debug("Located Unmarshaller for schema type: %s", schemaType->toString().c_str());
+            log.debug("located Unmarshaller for schema type: %s", schemaType->toString().c_str());
         }
         return m;
     }
@@ -55,16 +55,13 @@ const Unmarshaller* Unmarshaller::getUnmarshaller(const DOMElement* domElement)
     m = getUnmarshaller(*(elementName.get()));
     if (m) {
         if (log.isDebugEnabled()) {
-            log.debug("Located Unmarshaller for element name: %s", elementName->toString().c_str());
+            log.debug("located Unmarshaller for element name: %s", elementName->toString().c_str());
         }
         return m;
     }
 
-    log.error("No Unmarshaller was registered for element: %s", elementName->toString().c_str());
-    if (XMLToolingConfig::getConfig().ignoreUnknownElements) {
-    }
-    
-    return NULL;
+    log.error("no Unmarshaller registered for element (%s), using default", elementName->toString().c_str());
+    return m_default;
 }
 
 void Unmarshaller::destroyUnmarshallers()

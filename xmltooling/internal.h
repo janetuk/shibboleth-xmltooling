@@ -35,17 +35,20 @@
 
 #include "base.h"
 #include "XMLToolingConfig.h"
+#include "util/ParserPool.h"
 
 #include <vector>
 
 #define XMLTOOLING_LOGCAT "XMLTooling"
 
-namespace {
+namespace xmltooling {
     
     class XMLToolingInternalConfig : public xmltooling::XMLToolingConfig
     {
     public:
-        XMLToolingInternalConfig() : m_lock(NULL) {}
+        XMLToolingInternalConfig() : m_lock(NULL), m_parserPool(NULL) {}
+
+        static XMLToolingInternalConfig& getInternalConfig();
 
         // global per-process setup and shutdown of runtime
         bool init();
@@ -58,6 +61,9 @@ namespace {
         // configuration
         bool load_library(const char* path, void* context=NULL);
         bool log_config(const char* config=NULL);
+
+        // internal parser pool
+        xmltooling::ParserPool* m_parserPool;
 
     private:
         std::vector<void*> m_libhandles;

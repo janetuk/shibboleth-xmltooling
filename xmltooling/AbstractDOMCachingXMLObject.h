@@ -65,17 +65,17 @@ namespace xmltooling {
         /**
          * @see DOMCachingXMLObject::releaseDOM()
          */
-        void releaseDOM();
+        virtual void releaseDOM();
         
         /**
          * @see DOMCachingXMLObject::releaseParentDOM()
          */
-        void releaseParentDOM(bool propagateRelease=true);
+        virtual void releaseParentDOM(bool propagateRelease=true);
         
         /**
          * @see DOMCachingXMLObject::releaseChildrenDOM()
          */
-        void releaseChildrenDOM(bool propagateRelease=true);
+        virtual void releaseChildrenDOM(bool propagateRelease=true);
     
         /**
          * A convenience method that is equal to calling releaseDOM() then releaseParentDOM(true).
@@ -88,7 +88,7 @@ namespace xmltooling {
         }
     
         /**
-         * A convenience method that is equal to calling releaseDOM() then releaseChildrenDOM(true).
+         * A convenience method that is equal to calling releaseChildrenDOM(true) then releaseDOM().
          */
         void releaseThisAndChildrenDOM() {
             if (m_dom) {
@@ -132,13 +132,15 @@ namespace xmltooling {
          */
         XMLObject* prepareForAssignment(const XMLObject* oldValue, XMLObject* newValue);
 
+        AbstractDOMCachingXMLObject() : m_dom(NULL), m_document(NULL) {}
+
         /**
          * Constructor
          * 
          * @param namespaceURI the namespace the element is in
          * @param elementLocalName the local name of the XML element this Object represents
          */
-        explicit AbstractDOMCachingXMLObject(const XMLCh* namespaceURI, const XMLCh* elementLocalName)
+        AbstractDOMCachingXMLObject(const XMLCh* namespaceURI, const XMLCh* elementLocalName)
             : AbstractXMLObject(namespaceURI,elementLocalName), m_dom(NULL), m_document(NULL) {}
 
     private:

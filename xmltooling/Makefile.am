@@ -39,7 +39,8 @@ ioinclude_HEADERS = \
     io/Unmarshaller.h
 
 noinst_HEADERS = \
-	internal.h
+	internal.h \
+	impl/UnknownElement.h
 
 libxmltooling_la_SOURCES = \
 	AbstractDOMCachingXMLObject.cpp \
@@ -48,6 +49,8 @@ libxmltooling_la_SOURCES = \
 	unicode.cpp \
 	XMLObjectBuilder.cpp \
 	XMLToolingConfig.cpp \
+	impl/UnknownElement.cpp \
+	io/AbstractXMLObjectMarshaller.cpp \
 	io/AbstractXMLObjectUnmarshaller.cpp \
 	io/Marshaller.cpp \
 	io/Unmarshaller.cpp \

@@ -58,7 +58,7 @@ void AbstractDOMCachingXMLObject::releaseDOM()
 {
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".DOM");
     if (log.isDebugEnabled())
-        log.debug("Releasing cached DOM reprsentation for %s", getElementQName().toString().c_str());
+        log.debug("releasing cached DOM reprsentation for %s", getElementQName().toString().c_str());
     setDOM(NULL);
 }
 
@@ -67,7 +67,7 @@ void AbstractDOMCachingXMLObject::releaseParentDOM(bool propagateRelease)
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".DOM");
     if (log.isDebugEnabled()) {
         log.debug(
-            "Releasing cached DOM representation for parent of %s with propagation set to %s",
+            "releasing cached DOM representation for parent of %s with propagation set to %s",
             getElementQName().toString().c_str(), propagateRelease ? "true" : "false"
             );
     }
@@ -97,7 +97,7 @@ void AbstractDOMCachingXMLObject::releaseChildrenDOM(bool propagateRelease)
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".DOM");
     if (log.isDebugEnabled()) {
         log.debug(
-            "Releasing cached DOM representation for children of %s with propagation set to %s",
+            "releasing cached DOM representation for children of %s with propagation set to %s",
             getElementQName().toString().c_str(), propagateRelease ? "true" : "false"
             );
     }

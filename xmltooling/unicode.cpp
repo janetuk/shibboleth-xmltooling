@@ -26,7 +26,7 @@
 #include <xercesc/util/XMLUTF8Transcoder.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
 
-static XMLCh UTF8[]={ chLatin_U, chLatin_T, chLatin_F, chDigit_8, chNull };
+static const XMLCh UTF8[]={ chLatin_U, chLatin_T, chLatin_F, chDigit_8, chNull };
 
 char* xmltooling::toUTF8(const XMLCh* src)
 {

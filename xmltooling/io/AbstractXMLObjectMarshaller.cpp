@@ -192,22 +192,11 @@ public:
 
         const Marshaller* marshaller = Marshaller::getMarshaller(obj);
         if (!marshaller) {
-            if (XMLToolingConfig::getConfig().ignoreUnknownElements) {
-                marshaller=Marshaller::getDefaultMarshaller();
-                if (marshaller)
-                    XT_log.debug("using default marshaller");
-                else {
-                    XT_log.error(
-                        "no default unmarshaller installed, unknown child object: %s",
-                        obj->getElementQName().toString().c_str()
-                        );
-                    throw MarshallingException("Marshaller found unknown child element, but no default marshaller was found.");
-                }
-            }
-            else {
-                XT_log.error("unknown child object: %s", obj->getElementQName().toString().c_str());
-                throw UnknownElementException("Marshaller found unknown child object.");
-            }
+            XT_log.error(
+                "no default unmarshaller installed, unknown child object: %s",
+                obj->getElementQName().toString().c_str()
+                );
+            throw MarshallingException("Marshaller found unknown child element, but no default marshaller was found.");
         }
         element->appendChild(marshaller->marshall(obj, element->getOwnerDocument()));
     }

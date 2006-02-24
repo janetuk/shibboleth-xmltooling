@@ -118,13 +118,15 @@ namespace xmltooling {
         }
     
      protected:
+         AbstractXMLObject() : m_typeQname(NULL), m_parent(NULL) {}
+
         /**
          * Constructor
          * 
          * @param namespaceURI the namespace the element is in
          * @param elementLocalName the local name of the XML element this Object represents
          */
-        explicit AbstractXMLObject(const XMLCh* namespaceURI, const XMLCh* elementLocalName)
+        AbstractXMLObject(const XMLCh* namespaceURI, const XMLCh* elementLocalName)
             : m_elementQname(namespaceURI,elementLocalName), m_typeQname(NULL), m_parent(NULL) {}
         
     private:

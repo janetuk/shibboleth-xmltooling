@@ -58,7 +58,7 @@ namespace xmltooling {
          * Retrieves an XMLObjectBuilder using the key it was registered with.
          * 
          * @param key the key used to register the builder
-         * @return the builder
+         * @return the builder or NULL
          */
         static const XMLObjectBuilder* getBuilder(const QName& key) {
             std::map<QName,XMLObjectBuilder*>::const_iterator i=m_map.find(key);
@@ -66,7 +66,8 @@ namespace xmltooling {
         }
 
         /**
-         * Retrieves an XMLObjectBuilder for a given DOM element
+         * Retrieves an XMLObjectBuilder for a given DOM element.
+         * If no match is found, the default builder is returned, if any.
          * 
          * @param element the element for which to locate a builder
          * @return the builder or NULL
@@ -134,6 +135,9 @@ namespace xmltooling {
          * Unregisters and destroys all registered builders. 
          */
         static void destroyBuilders();
+
+    protected:
+        XMLObjectBuilder() {}
     
     private:
         static std::map<QName,XMLObjectBuilder*> m_map;
