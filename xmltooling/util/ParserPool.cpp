@@ -152,10 +152,7 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
         chLatin_c, chLatin_a, chLatin_t, chLatin_a, chLatin_l, chLatin_o, chLatin_g, chNull
     };
 
-    // Get a local parser to use. When it pops, the document will go with it.
-    DOMImplementation* impl=DOMImplementationRegistry::getDOMImplementation(impltype);
-    auto_ptr<DOMBuilder> parser(static_cast<DOMImplementationLS*>(impl)->createDOMBuilder(DOMImplementationLS::MODE_SYNCHRONOUS,0));
-    parser->setFeature(XMLUni::fgDOMNamespaces,true);
+    // Parse the catalog with the internal parser pool.
 
     if (log.isDebugEnabled()) {
         auto_ptr_char temp(pathname);
@@ -165,7 +162,7 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
     LocalFileInputSource fsrc(NULL,pathname);
     Wrapper4InputSource domsrc(&fsrc,false);
     try {
-        DOMDocument* doc=parser->parse(domsrc);
+        DOMDocument* doc=XMLToolingInternalConfig::getInternalConfig().m_parserPool->parse(domsrc);
         
         // Check root element.
         const DOMElement* root=doc->getDocumentElement();
@@ -198,22 +195,8 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
 #endif
         XMLPlatformUtils::unlockMutex(m_lock);
     }
-    catch (DOMException& e) {
-        auto_ptr_char p(pathname);
-        auto_ptr_char m(e.getMessage());
-        log.error("catalog loader caught DOMException (%s) from file (%s)", m.get(), p.get());
-        return false;
-    }
-    catch (SAXException& e) {
-        auto_ptr_char p(pathname);
-        auto_ptr_char m(e.getMessage());
-        log.error("catalog loader caught SAXException (%s) from file (%s)", m.get(), p.get());
-        return false;
-    }
-    catch (XMLException& e) {
-        auto_ptr_char p(pathname);
-        auto_ptr_char m(e.getMessage());
-        log.error("catalog loader caught XMLException (%s) from file (%s)", m.get(), p.get());
+    catch (XMLParserException& e) {
+        log.error("catalog loader caught XMLParserException: %s", e.what());
         return false;
     }
 
