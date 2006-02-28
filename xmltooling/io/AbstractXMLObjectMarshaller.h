@@ -36,9 +36,14 @@ namespace xmltooling {
         virtual ~AbstractXMLObjectMarshaller() {}
 
         /**
-         * @see Marshaller::marshall()
+         * @see Marshaller::marshall(XMLObject*,DOMDocument*)
          */
         DOMElement* marshall(XMLObject* xmlObject, DOMDocument* document=NULL) const;
+
+        /**
+         * @see Marshaller::marshall(XMLObject*,DOMElement*)
+         */
+        DOMElement* marshall(XMLObject* xmlObject, DOMElement* parentElement) const;
     
         
     protected:
@@ -52,6 +57,31 @@ namespace xmltooling {
          */
         AbstractXMLObjectMarshaller(const XMLCh* targetNamespaceURI, const XMLCh* targetLocalName);
 
+        /**
+         * Sets the given element as the Document Element of the given Document.
+         * If the document already has a Document Element it is replaced by the given element.
+         * 
+         * @param document the document
+         * @param element the Element that will serve as the Document Element
+         */
+        void setDocumentElement(DOMDocument* document, DOMElement* element) const {
+            DOMElement* documentRoot = document->getDocumentElement();
+            if (documentRoot)
+                document->replaceChild(documentRoot, element);
+            else
+                document->appendChild(element);
+        }
+    
+        /**
+         * Marshalls the given XMLObject into the given DOM Element.
+         * The DOM Element must be within a DOM tree rooted in the owning Document.
+         * 
+         * @param xmlObject the XMLObject to marshall
+         * @param targetElement the Element into which the XMLObject is marshalled into
+         * @throws MarshallingException thrown if there is a problem marshalling the object
+         */
+        void marshallInto(XMLObject* xmlObject, DOMElement* targetElement) const;
+    
         /**
          * Creates an xsi:type attribute, corresponding to the given type of the XMLObject, on the DOM element.
          * 

@@ -103,7 +103,9 @@ DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMDocument
     DOMElement* cachedDOM=unk->getDOM();
     if (cachedDOM) {
         if (!document || document==cachedDOM->getOwnerDocument()) {
-            log.debug("XMLObject has a usable cached DOM, using it");
+            log.debug("XMLObject has a usable cached DOM, reusing it");
+            setDocumentElement(cachedDOM->getOwnerDocument(),cachedDOM);
+            unk->releaseParentDOM(true);
             return cachedDOM;
         }
         
@@ -121,7 +123,7 @@ DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMDocument
     log.debug("parsing XML back into DOM tree");
     DOMDocument* internalDoc=XMLToolingInternalConfig::getInternalConfig().m_parserPool->parse(dsrc);
     if (document) {
-        // The caller insists on using his own document, so we now have to import the damn thing
+        // The caller insists on using his own document, so we now have to import the thing
         // into it. Then we're just dumping the one we built.
         log.debug("reimporting new DOM into caller-supplied document");
         cachedDOM=static_cast<DOMElement*>(document->importNode(internalDoc->getDocumentElement(), true));
@@ -129,13 +131,64 @@ DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMDocument
     }
     else {
         // We just bind the document we built to the object as the result.
+        cachedDOM=static_cast<DOMElement*>(internalDoc->getDocumentElement());
         document=internalDoc;
         bindDocument=true;
     }
 
     // Recache the DOM and clear the serialized copy.
-    log.debug("caching DOM for XMLObject");
+    setDocumentElement(document, cachedDOM);
+    log.debug("caching DOM for XMLObject (document is %sbound)", bindDocument ? "" : "not ");
     unk->setDOM(cachedDOM, bindDocument);
+    unk->releaseParentDOM(true);
+    unk->m_xml.erase();
+    return cachedDOM;
+}
+
+DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMElement* parentElement) const
+{
+#ifdef _DEBUG
+    xmltooling::NDC ndc("marshall");
+#endif
+    
+    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Marshaller");
+    log.debug("marshalling unknown content");
+
+    UnknownElementImpl* unk=dynamic_cast<UnknownElementImpl*>(xmlObject);
+    if (!unk)
+        throw MarshallingException("Only objects of class UnknownElementImpl can be marshalled.");
+    
+    DOMElement* cachedDOM=unk->getDOM();
+    if (cachedDOM) {
+        if (parentElement->getOwnerDocument()==cachedDOM->getOwnerDocument()) {
+            log.debug("XMLObject has a usable cached DOM, reusing it");
+            parentElement->appendChild(cachedDOM);
+            unk->releaseParentDOM(true);
+            return cachedDOM;
+        }
+        
+        // We have a DOM but it doesn't match the document we were given. This both sucks and blows.
+        // Without an adoptNode option to maintain the child pointers, we rely on our custom
+        // implementation class to preserve the XML when we release the existing DOM.
+        unk->releaseDOM();
+    }
+    
+    // If we get here, we didn't have a usable DOM (and/or we flushed the one we had).
+    // We need to reparse the XML we saved off into a new DOM.
+    MemBufInputSource src(reinterpret_cast<const XMLByte*>(unk->m_xml.c_str()),unk->m_xml.length(),"UnknownElementImpl");
+    Wrapper4InputSource dsrc(&src,false);
+    log.debug("parsing XML back into DOM tree");
+    DOMDocument* internalDoc=XMLToolingInternalConfig::getInternalConfig().m_parserPool->parse(dsrc);
+    
+    log.debug("reimporting new DOM into caller-supplied document");
+    cachedDOM=static_cast<DOMElement*>(parentElement->getOwnerDocument()->importNode(internalDoc->getDocumentElement(), true));
+    internalDoc->release();
+
+    // Recache the DOM and clear the serialized copy.
+    parentElement->appendChild(cachedDOM);
+    log.debug("caching DOM for XMLObject");
+    unk->setDOM(cachedDOM, false);
+    unk->releaseParentDOM(true);
     unk->m_xml.erase();
     return cachedDOM;
 }

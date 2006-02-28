@@ -45,7 +45,7 @@ AbstractXMLObjectMarshaller::AbstractXMLObjectMarshaller(const XMLCh* targetName
     if (!targetLocalName || !*targetLocalName)
         throw MarshallingException("targetLocalName cannot be null or empty");
 }
-        
+
 DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMDocument* document) const
 {
 #ifdef _DEBUG
@@ -53,7 +53,7 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMDocum
 #endif
 
     if (XT_log.isDebugEnabled()) {
-        XT_log.debug("marshalling %s", xmlObject->getElementQName().toString().c_str());
+        XT_log.debug("starting to marshalling %s", xmlObject->getElementQName().toString().c_str());
     }
 
     DOMCachingXMLObject* dc=dynamic_cast<DOMCachingXMLObject*>(xmlObject);
@@ -61,7 +61,9 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMDocum
         DOMElement* cachedDOM=dc->getDOM();
         if (cachedDOM) {
             if (!document || document==cachedDOM->getOwnerDocument()) {
-                XT_log.debug("XMLObject has a usable cached DOM, using it.");
+                XT_log.debug("XMLObject has a usable cached DOM, reusing it");
+                setDocumentElement(cachedDOM->getOwnerDocument(),cachedDOM);
+                dc->releaseParentDOM(true);
                 return cachedDOM;
             }
             
@@ -75,7 +77,7 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMDocum
         }
     }
     
-    // If we get here, we didn't have a usable DOM (and/or we flushed the one we had).
+    // If we get here, we didn't have a usable DOM (and/or we released the one we had).
     // We may need to create our own document.
     bool bindDocument=false;
     if (!document) {
@@ -83,43 +85,103 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMDocum
         bindDocument=true;
     }
 
-    XT_log.debug("creating root element to marshall");
-    DOMElement* domElement = document->createElementNS(
-        xmlObject->getElementQName().getNamespaceURI(), xmlObject->getElementQName().getLocalPart()
-        );
-    domElement->setPrefix(xmlObject->getElementQName().getPrefix());
-
     try {
-        marshallNamespaces(xmlObject, domElement);
-        marshallAttributes(xmlObject, domElement);
-        marshallChildElements(xmlObject, domElement);
-        marshallElementContent(xmlObject, domElement);
-        marshallElementType(xmlObject, domElement);
-    
-        /* TODO: signing
-        if (xmlObject instanceof SignableXMLObject) {
-            signElement(domElement, xmlObject);
+        XT_log.debug("creating root element to marshall");
+        DOMElement* domElement = document->createElementNS(
+            xmlObject->getElementQName().getNamespaceURI(), xmlObject->getElementQName().getLocalPart()
+            );
+        setDocumentElement(document, domElement);
+        marshallInto(xmlObject, domElement);
+
+        //Recache the DOM.
+        if (dc) {
+            XT_log.debug("caching DOM for XMLObject (document is %sbound)", bindDocument ? "" : "not ");
+            dc->setDOM(domElement, bindDocument);
+            dc->releaseParentDOM(true);
         }
-        */
+
+        return domElement;
     }
     catch (...) {
         // Delete the document if need be, and rethrow.
         if (bindDocument) {
             document->release();
-            document=NULL;
         }
         throw;
     }
+}
+
+DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMElement* parentElement) const
+{
+#ifdef _DEBUG
+    xmltooling::NDC ndc("marshall");
+#endif
+
+    if (XT_log.isDebugEnabled()) {
+        XT_log.debug("starting to marshalling %s", xmlObject->getElementQName().toString().c_str());
+    }
+
+    DOMCachingXMLObject* dc=dynamic_cast<DOMCachingXMLObject*>(xmlObject);
+    if (dc) {
+        DOMElement* cachedDOM=dc->getDOM();
+        if (cachedDOM) {
+            if (parentElement->getOwnerDocument()==cachedDOM->getOwnerDocument()) {
+                XT_log.debug("XMLObject has a usable cached DOM, reusing it");
+                if (parentElement!=cachedDOM->getParentNode()) {
+                    parentElement->appendChild(cachedDOM);
+                    dc->releaseParentDOM(true);
+                }
+                return cachedDOM;
+            }
+            
+            // We have a DOM but it doesn't match the document we were given. This both sucks and blows.
+            // Without an adoptNode option to maintain the child pointers, we have to either import the
+            // DOM while somehow reassigning all the nested references (which amounts to a complete
+            // *unmarshall* operation), or we just release the existing DOM and hope that we can get
+            // it back. This depends on all objects being able to preserve their DOM at all costs.
+            dc->releaseChildrenDOM(true);
+            dc->releaseDOM();
+        }
+    }
+    
+    // If we get here, we didn't have a usable DOM (and/or we released the one we had).
+    XT_log.debug("creating root element to marshall");
+    DOMElement* domElement = parentElement->getOwnerDocument()->createElementNS(
+        xmlObject->getElementQName().getNamespaceURI(), xmlObject->getElementQName().getLocalPart()
+        );
+    parentElement->appendChild(domElement);
+    marshallInto(xmlObject, domElement);
 
     //Recache the DOM.
     if (dc) {
         XT_log.debug("caching DOM for XMLObject");
-        dc->setDOM(domElement, bindDocument);
+        dc->setDOM(domElement, false);
+        dc->releaseParentDOM(true);
     }
 
     return domElement;
 }
-    
+        
+void AbstractXMLObjectMarshaller::marshallInto(XMLObject* xmlObject, DOMElement* targetElement) const
+{
+    targetElement->setPrefix(xmlObject->getElementQName().getPrefix());
+    marshallNamespaces(xmlObject, targetElement);
+    marshallAttributes(xmlObject, targetElement);
+    marshallChildElements(xmlObject, targetElement);
+    marshallElementContent(xmlObject, targetElement);
+    marshallElementType(xmlObject, targetElement);
+
+    /* TODO Signing/Encryption
+    if (xmlObject instanceof SignableXMLObject) {
+        signElement(targetElement, xmlObject);
+    }
+
+    if (xmlObject instanceof EncryptableXMLObject) {
+        encryptElement(targetElement, xmlObject);
+    }
+    */
+}
+
 void AbstractXMLObjectMarshaller::marshallElementType(XMLObject* xmlObject, DOMElement* domElement) const
 {
     const QName* type = xmlObject->getSchemaType();

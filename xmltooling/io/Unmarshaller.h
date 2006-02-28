@@ -78,7 +78,7 @@ namespace xmltooling {
          * @param element the element for which to return an unmarshaller
          * @return the unmarshaller or NULL
          */
-        static const Unmarshaller* getUnmarshaller(const DOMElement* key);
+        static const Unmarshaller* getUnmarshaller(const DOMElement* element);
 
         /**
          * Retrieves the default Unmarshaller for an unknown DOM element

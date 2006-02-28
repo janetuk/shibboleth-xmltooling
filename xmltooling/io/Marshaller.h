@@ -47,18 +47,32 @@ namespace xmltooling {
         virtual ~Marshaller() {}
         
         /**
-         * Marshall this element, and its children, into a W3C DOM element rooted in a given document.
-         * If no document is provided, then the marshaller will create one, and bind it to the
-         * object being marshalled.
+         * Marshalls an object, and its children, into a DOM element.
+         * If a document is supplied, then it will be used to create the resulting elements.
+         * If the document does not have a Document Element set, then the resulting
+         * element will be set as the Document Element. If no document is supplied, then
+         * a new document will be created and bound to the lifetime of the root object being
+         * marshalled, unless an existing DOM can be reused without creating a new document. 
          * 
          * @param xmlObject the object to marshall
-         * @param document the DOM document the marshalled element will be rooted in
-         * 
-         * @return the W3C DOM element representing this XML element
-         * 
+         * @param document the DOM document the marshalled element will be placed in, or NULL
+         * @return the DOM element representing this XMLObject
          * @throws MarshallingException thrown if there is a problem marshalling the given object
          */
         virtual DOMElement* marshall(XMLObject* xmlObject, DOMDocument* document=NULL) const=0;
+        
+        /**
+         * Marshall the given XMLObject and append it as a child of the given parent element.
+         * 
+         * <strong>NOTE:</strong> The given Element must be within a DOM tree rooted in 
+         * the Document owning the given Element.
+         * 
+         * @param xmlObject the XMLObject to be marshalled
+         * @param parentElement the parent element to append the resulting DOM tree
+         * @return the marshalled element tree
+         * @throws MarshallingException thrown if the given XMLObject can not be marshalled.
+         */
+        virtual DOMElement* marshall(XMLObject* xmlObject, DOMElement* parentElement) const=0;
 
         /**
          * Retrieves a Marshaller using the key it was registered with.

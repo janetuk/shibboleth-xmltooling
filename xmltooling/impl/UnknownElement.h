@@ -112,9 +112,23 @@ namespace xmltooling {
         virtual ~UnknownElementMarshaller() {}
     
         /**
-         * @see Marshaller::marshall()
+         * @see Marshaller::marshall(XMLObject*,DOMDocument*)
          */
         DOMElement* marshall(XMLObject* xmlObject, DOMDocument* document=NULL) const;
+
+        /**
+         * @see Marshaller::marshall(XMLObject*,DOMElement*)
+         */
+        DOMElement* marshall(XMLObject* xmlObject, DOMElement* parentElement) const;
+        
+    protected:
+        void setDocumentElement(DOMDocument* document, DOMElement* element) const {
+            DOMElement* documentRoot = document->getDocumentElement();
+            if (documentRoot)
+                document->replaceChild(documentRoot, element);
+            else
+                document->appendChild(element);
+        }
     };
 
     /**
