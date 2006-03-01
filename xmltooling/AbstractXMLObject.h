@@ -67,7 +67,9 @@ namespace xmltooling {
          * @see XMLObject::addNamespace()
          */
         void addNamespace(const Namespace& ns) {
-            m_namespaces.insert(ns);
+            if (ns.alwaysDeclare() || m_namespaces.find(ns)==m_namespaces.end()) {
+                m_namespaces.insert(ns);
+            }
         }
     
         /**
@@ -126,8 +128,10 @@ namespace xmltooling {
          * @param namespaceURI the namespace the element is in
          * @param elementLocalName the local name of the XML element this Object represents
          */
-        AbstractXMLObject(const XMLCh* namespaceURI, const XMLCh* elementLocalName)
-            : m_elementQname(namespaceURI,elementLocalName), m_typeQname(NULL), m_parent(NULL) {}
+        AbstractXMLObject(const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix)
+            : m_elementQname(namespaceURI,elementLocalName, namespacePrefix), m_typeQname(NULL), m_parent(NULL) {
+            addNamespace(Namespace(namespaceURI, namespacePrefix));
+        }
         
     private:
         XMLObject* m_parent;

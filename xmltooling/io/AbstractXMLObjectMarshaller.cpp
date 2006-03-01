@@ -62,7 +62,8 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMDocum
         if (cachedDOM) {
             if (!document || document==cachedDOM->getOwnerDocument()) {
                 XT_log.debug("XMLObject has a usable cached DOM, reusing it");
-                setDocumentElement(cachedDOM->getOwnerDocument(),cachedDOM);
+                if (document)
+                    setDocumentElement(cachedDOM->getOwnerDocument(),cachedDOM);
                 dc->releaseParentDOM(true);
                 return cachedDOM;
             }
@@ -165,11 +166,11 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMEleme
 void AbstractXMLObjectMarshaller::marshallInto(XMLObject* xmlObject, DOMElement* targetElement) const
 {
     targetElement->setPrefix(xmlObject->getElementQName().getPrefix());
+    marshallElementType(xmlObject, targetElement);
     marshallNamespaces(xmlObject, targetElement);
     marshallAttributes(xmlObject, targetElement);
     marshallChildElements(xmlObject, targetElement);
     marshallElementContent(xmlObject, targetElement);
-    marshallElementType(xmlObject, targetElement);
 
     /* TODO Signing/Encryption
     if (xmlObject instanceof SignableXMLObject) {
@@ -221,6 +222,12 @@ public:
     void operator()(DOMElement* domElement, const Namespace& ns) const {
         const XMLCh* prefix=ns.getNamespacePrefix();
         const XMLCh* uri=ns.getNamespaceURI();
+        
+        // Check to see if the prefix is already declared properly above this node.
+        if (!ns.alwaysDeclare() && domElement->getParentNode() &&
+                XMLString::equals(domElement->getParentNode()->lookupNamespaceURI(prefix),uri))
+            return;
+            
         if (prefix && *prefix) {
             XMLCh* xmlns=new XMLCh[XMLString::stringLen(XMLConstants::XMLNS_PREFIX) + XMLString::stringLen(prefix) + 2*sizeof(XMLCh)];
             *xmlns=chNull;
@@ -260,7 +267,7 @@ public:
                 );
             throw MarshallingException("Marshaller found unknown child element, but no default marshaller was found.");
         }
-        element->appendChild(marshaller->marshall(obj, element->getOwnerDocument()));
+        element->appendChild(marshaller->marshall(obj, element));
     }
 };
 

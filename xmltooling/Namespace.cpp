@@ -25,7 +25,7 @@
 
 using namespace xmltooling;
 
-Namespace::Namespace(const XMLCh* uri, const XMLCh* prefix)
+Namespace::Namespace(const XMLCh* uri, const XMLCh* prefix, bool alwaysDeclare) : m_pinned(alwaysDeclare)
 {
 #ifndef HAVE_GOOD_STL
     m_uri=m_prefix=NULL;
@@ -75,19 +75,21 @@ Namespace::Namespace(const Namespace& src)
 {
     m_uri=XMLString::replicate(src.getNamespaceURI());
     m_prefix=XMLString::replicate(src.getNamespacePrefix());
+    m_pinned=src.getAlwaysDeclare();
 }
 
 Namespace& Namespace::operator=(const Namespace& src)
 {
     m_uri=XMLString::replicate(src.getNamespaceURI());
     m_prefix=XMLString::replicate(src.getNamespacePrefix());
+    m_pinned=src.getAlwaysDeclare();
     return *this;
 }
 
 bool xmltooling::operator==(const Namespace& op1, const Namespace& op2)
 {
-    return (!XMLString::compareString(op1.getNamespaceURI(),op2.getNamespaceURI()) &&
-            !XMLString::compareString(op1.getNamespacePrefix(),op2.getNamespacePrefix()));
+    return (XMLString::equals(op1.getNamespaceURI(),op2.getNamespaceURI()) &&
+            XMLString::equals(op1.getNamespacePrefix(),op2.getNamespacePrefix()));
 }
 #endif
 

@@ -52,12 +52,19 @@
 <item id="org.eclipse.cdt.core.pathentry">
 <pathentry include="C:/log4cpp-0.3.5rc1/include" kind="inc" path="" system="true"/>
 <pathentry include="C:/xerces-c2_7_0-win32/include" kind="inc" path="" system="true"/>
+<pathentry include="C:/xml-security-c-1.2.0/include" kind="inc" path="" system="true"/>
+<pathentry include="C:/cxxtest" kind="inc" path="" system="true"/>
 <pathentry base-path="XMLTooling-C" include="" kind="inc" path="" system="true"/>
 <pathentry base-path="XMLTooling-C" include="xmltooling" kind="inc" path="" system="true"/>
 <pathentry kind="mac" name="_MSC_VER" path="" value=""/>
-<pathentry kind="src" path=""/>
+<pathentry kind="mac" name="WIN32" path="" value=""/>
 <pathentry kind="out" path=""/>
 <pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
+<pathentry excluding="util/|io/|impl/" kind="src" path="xmltooling"/>
+<pathentry kind="src" path="xmltooling/util"/>
+<pathentry kind="src" path="xmltooling/io"/>
+<pathentry kind="src" path="xmltooling/impl"/>
+<pathentry kind="src" path="xmltoolingtest"/>
 </item>
 </data>
 </cdtproject>

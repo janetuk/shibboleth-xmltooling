@@ -58,6 +58,24 @@ namespace xmltooling {
         
 #ifdef HAVE_GOOD_STL
         /**
+         * Indicates whether the QName has a prefix.
+         * @return  true iff the prefix is non-empty
+         */
+        bool hasPrefix() const { return !m_prefix.empty(); }
+
+        /**
+         * Indicates whether the QName has a non-empty namespace.
+         * @return  true iff the namespace is non-empty
+         */
+        bool hasNamespaceURI() const { return !m_uri.empty(); }
+
+        /**
+         * Indicates whether the QName has a non-empty local name.
+         * @return  true iff the local name is non-empty
+         */
+        bool hasLocalPart() const { return !m_local.empty(); }
+
+        /**
          * Returns the namespace prefix
          * @return  Null-terminated Unicode string containing the prefix, without the colon
          */
@@ -75,6 +93,24 @@ namespace xmltooling {
          */
         const XMLCh* getLocalPart() const { return m_local.c_str(); }
 #else
+        /**
+         * Indicates whether the QName has a prefix.
+         * @return  true iff the prefix is non-empty
+         */
+        bool hasPrefix() const { return m_prefix && *m_prefix; }
+
+        /**
+         * Indicates whether the QName has a non-empty namespace.
+         * @return  true iff the namespace is non-empty
+         */
+        bool hasNamespaceURI() const { return m_uri && *m_uri; }
+
+        /**
+         * Indicates whether the QName has a non-empty local name.
+         * @return  true iff the local name is non-empty
+         */
+        bool hasLocalPart() const { return m_local && *m_local; }
+
         /**
          * Returns the namespace prefix
          * @return  Null-terminated Unicode string containing the prefix, without the colon

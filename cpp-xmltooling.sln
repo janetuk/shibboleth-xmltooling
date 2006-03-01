@@ -3,6 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xmltooling", "xmltooling\xmltooling.vcproj", "{06B55A46-D3B3-41AE-B5A5-B57830BA010D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xmltoolingtest", "xmltoolingtest\xmltoolingtest.vcproj", "{3E34CDCC-FCBA-490D-A165-1CB6F4559799}"
+	ProjectSection(ProjectDependencies) = postProject
+		{06B55A46-D3B3-41AE-B5A5-B57830BA010D} = {06B55A46-D3B3-41AE-B5A5-B57830BA010D}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +18,10 @@ Global
 		{06B55A46-D3B3-41AE-B5A5-B57830BA010D}.Debug|Win32.Build.0 = Debug|Win32
 		{06B55A46-D3B3-41AE-B5A5-B57830BA010D}.Release|Win32.ActiveCfg = Release|Win32
 		{06B55A46-D3B3-41AE-B5A5-B57830BA010D}.Release|Win32.Build.0 = Release|Win32
+		{3E34CDCC-FCBA-490D-A165-1CB6F4559799}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3E34CDCC-FCBA-490D-A165-1CB6F4559799}.Debug|Win32.Build.0 = Debug|Win32
+		{3E34CDCC-FCBA-490D-A165-1CB6F4559799}.Release|Win32.ActiveCfg = Release|Win32
+		{3E34CDCC-FCBA-490D-A165-1CB6F4559799}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

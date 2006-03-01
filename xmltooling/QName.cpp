@@ -123,14 +123,14 @@ bool xmltooling::operator<(const QName& op1, const QName& op2)
 
 string QName::toString() const
 {
-    if (!getLocalPart())
+    if (!hasLocalPart())
         return "";
     auto_ptr_char local(getLocalPart());
-    if (getPrefix()) {
+    if (hasPrefix()) {
         auto_ptr_char pre(getPrefix());
         return string(pre.get()) + ':' + local.get(); 
     }
-    else if (getNamespaceURI()) {
+    else if (hasNamespaceURI()) {
         auto_ptr_char ns(getNamespaceURI());
         return string("{") + ns.get() + '}' + local.get(); 
     }

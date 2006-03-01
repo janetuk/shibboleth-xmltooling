@@ -60,7 +60,9 @@ const Unmarshaller* Unmarshaller::getUnmarshaller(const DOMElement* domElement)
         return m;
     }
 
-    log.error("no Unmarshaller registered for element (%s), using default", elementName->toString().c_str());
+    if (log.isDebugEnabled()) {
+        log.debug("no Unmarshaller registered for element (%s), returning default", elementName->toString().c_str());
+    }
     return m_default;
 }
 

@@ -47,6 +47,7 @@ namespace xmltooling {
     {
     public:
         UnknownElementImpl() {}
+        virtual ~UnknownElementImpl() {}
 
         /**
          * Overridden to ensure XML content of DOM isn't lost.

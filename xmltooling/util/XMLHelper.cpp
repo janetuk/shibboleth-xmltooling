@@ -21,9 +21,11 @@
  */
 
 #include "internal.h"
+#include "exceptions.h"
 #include "util/XMLHelper.h"
 #include "util/XMLConstants.h"
 
+#include <xercesc/framework/MemBufFormatTarget.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmltooling;
@@ -113,4 +115,25 @@ DOMElement* XMLHelper::appendChildElement(DOMElement* parentElement, DOMElement*
 
     parentElement->appendChild(childElement);
     return childElement;
+}
+
+void XMLHelper::serialize(const DOMElement* e, std::string& buf)
+{
+    static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
+    static const XMLCh UTF8[]={ chLatin_U, chLatin_T, chLatin_F, chDigit_8, chNull };
+    DOMImplementation* impl=DOMImplementationRegistry::getDOMImplementation(impltype);
+    DOMWriter* serializer=(static_cast<DOMImplementationLS*>(impl))->createDOMWriter();
+    serializer->setEncoding(UTF8);
+    try {
+        MemBufFormatTarget target;
+        if (!serializer->writeNode(&target,*e))
+            throw XMLParserException("unable to serialize XML");
+        buf.erase();
+        buf.append(reinterpret_cast<const char*>(target.getRawBuffer()),target.getLen());
+        serializer->release();
+    }
+    catch (...) {
+        serializer->release();
+        throw;
+    }
 }

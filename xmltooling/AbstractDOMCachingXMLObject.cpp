@@ -57,23 +57,21 @@ void AbstractDOMCachingXMLObject::setDOM(DOMElement* dom, bool bindDocument)
 void AbstractDOMCachingXMLObject::releaseDOM()
 {
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".DOM");
-    if (log.isDebugEnabled())
-        log.debug("releasing cached DOM reprsentation for %s", getElementQName().toString().c_str());
+    if (log.isDebugEnabled()) {
+        string qname=getElementQName().toString();
+        log.debug("releasing cached DOM representation for (%s)", qname.empty() ? "unknown" : qname.c_str());
+    }
     setDOM(NULL);
 }
 
 void AbstractDOMCachingXMLObject::releaseParentDOM(bool propagateRelease)
 {
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".DOM");
-    if (log.isDebugEnabled()) {
-        log.debug(
-            "releasing cached DOM representation for parent of %s with propagation set to %s",
-            getElementQName().toString().c_str(), propagateRelease ? "true" : "false"
-            );
-    }
-
     DOMCachingXMLObject* domCachingParent = dynamic_cast<DOMCachingXMLObject*>(getParent());
     if (domCachingParent) {
+        Category::getInstance(XMLTOOLING_LOGCAT".DOM").debug(
+            "releasing cached DOM representation for parent object with propagation set to %s",
+            propagateRelease ? "true" : "false"
+            );
         domCachingParent->releaseDOM();
         if (propagateRelease)
             domCachingParent->releaseParentDOM(propagateRelease);
@@ -94,23 +92,20 @@ public:
 
 void AbstractDOMCachingXMLObject::releaseChildrenDOM(bool propagateRelease)
 {
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".DOM");
-    if (log.isDebugEnabled()) {
-        log.debug(
-            "releasing cached DOM representation for children of %s with propagation set to %s",
-            getElementQName().toString().c_str(), propagateRelease ? "true" : "false"
-            );
-    }
-    
     vector<XMLObject*> children;
-    if (getOrderedChildren(children))
+    if (getOrderedChildren(children)) {
+        Category::getInstance(XMLTOOLING_LOGCAT".DOM").debug(
+            "releasing cached DOM representation for children with propagation set to %s",
+            propagateRelease ? "true" : "false"
+            );
         for_each(children.begin(),children.end(),bind2nd(_release(),propagateRelease));
+    }
 }
 
 XMLObject* AbstractDOMCachingXMLObject::prepareForAssignment(const XMLObject* oldValue, XMLObject* newValue) {
 
     if (newValue && newValue->hasParent())
-        throw XMLObjectException("child XMLObject cannot be added - it is already the child of another XMLObject");
+        throw XMLObjectException("Child XMLObject cannot be added - it is already the child of another XMLObject");
 
     if (!oldValue) {
         if (newValue) {

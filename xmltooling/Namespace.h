@@ -35,10 +35,11 @@ namespace xmltooling {
     public:
         /**
          * Constructor
-         * @param uri       namespace URI
-         * @param prefix    namespace prefix (without the colon)
+         * @param uri               namespace URI
+         * @param prefix            namespace prefix (without the colon)
+         * @param alwaysDeclare     true iff the namespace should always be declared regardless of in-scope declarations
          */
-        Namespace(const XMLCh* uri=NULL, const XMLCh* prefix=NULL);
+        Namespace(const XMLCh* uri=NULL, const XMLCh* prefix=NULL, bool alwaysDeclare=false);
         
         ~Namespace();
 #ifndef HAVE_GOOD_STL
@@ -80,6 +81,12 @@ namespace xmltooling {
 #endif
 
         /**
+         * Returns true iff the namespace should always be declared regardless of in-scope declarations
+         * @return the alwaysDeclared setting
+         */
+        const bool alwaysDeclare() const { return m_pinned; } 
+
+        /**
          * Sets the namespace prefix
          * @param prefix    Null-terminated Unicode string containing the prefix, without the colon
          */
@@ -90,8 +97,15 @@ namespace xmltooling {
          * @param uri  Null-terminated Unicode string containing the URI
          */
         void setNamespaceURI(const XMLCh* uri);
+
+        /**
+         * Sets the alwaysDeclared property
+         * @param alwaysDeclare     true iff the namespace should always be declared regardless of in-scope declarations
+         */
+        void setAlwaysDeclare(bool alwaysDeclare) { m_pinned = alwaysDeclare; } 
         
     private:
+        bool m_pinned;
 #ifdef HAVE_GOOD_STL
         xstring m_uri;
         xstring m_prefix;

@@ -24,9 +24,9 @@
 #include "exceptions.h"
 #include "impl/UnknownElement.h"
 #include "util/NDC.h"
+#include "util/XMLHelper.h"
 
 #include <log4cpp/Category.hh>
-#include <xercesc/framework/MemBufFormatTarget.hpp>
 #include <xercesc/framework/MemBufInputSource.hpp>
 #include <xercesc/framework/Wrapper4InputSource.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
@@ -66,25 +66,8 @@ XMLObject* UnknownElementImpl::clone() const
 
 void UnknownElementImpl::serialize(string& s) const
 {
-    if (getDOM()) {
-        static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
-        static const XMLCh UTF8[]={ chLatin_U, chLatin_T, chLatin_F, chDigit_8, chNull };
-        DOMImplementation* impl=DOMImplementationRegistry::getDOMImplementation(impltype);
-        DOMWriter* serializer=(static_cast<DOMImplementationLS*>(impl))->createDOMWriter();
-        serializer->setEncoding(UTF8);
-        try {
-            MemBufFormatTarget target;
-            if (!serializer->writeNode(&target,*(getDOM())))
-                throw XMLObjectException("unable to serialize XML to preserve DOM");
-            s.erase();
-            s.append(reinterpret_cast<const char*>(target.getRawBuffer()),target.getLen());
-            serializer->release();
-        }
-        catch (...) {
-            serializer->release();
-            throw;
-        }
-    }
+    if (getDOM())
+        XMLHelper::serialize(getDOM(),s);
 }
 
 DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMDocument* document) const
@@ -104,7 +87,8 @@ DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMDocument
     if (cachedDOM) {
         if (!document || document==cachedDOM->getOwnerDocument()) {
             log.debug("XMLObject has a usable cached DOM, reusing it");
-            setDocumentElement(cachedDOM->getOwnerDocument(),cachedDOM);
+            if (document)
+                setDocumentElement(cachedDOM->getOwnerDocument(),cachedDOM);
             unk->releaseParentDOM(true);
             return cachedDOM;
         }

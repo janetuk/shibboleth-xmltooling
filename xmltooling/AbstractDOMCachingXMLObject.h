@@ -140,8 +140,8 @@ namespace xmltooling {
          * @param namespaceURI the namespace the element is in
          * @param elementLocalName the local name of the XML element this Object represents
          */
-        AbstractDOMCachingXMLObject(const XMLCh* namespaceURI, const XMLCh* elementLocalName)
-            : AbstractXMLObject(namespaceURI,elementLocalName), m_dom(NULL), m_document(NULL) {}
+        AbstractDOMCachingXMLObject(const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix)
+            : AbstractXMLObject(namespaceURI,elementLocalName, namespacePrefix), m_dom(NULL), m_document(NULL) {}
 
     private:
         DOMElement* m_dom;

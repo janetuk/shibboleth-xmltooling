@@ -59,7 +59,9 @@ const XMLObjectBuilder* XMLObjectBuilder::getBuilder(const DOMElement* domElemen
         return xmlObjectBuilder;
     }
 
-    log.error("no XMLObjectBuilder registered for element (%s), using default", elementName->toString().c_str());
+    if (log.isDebugEnabled()) {
+        log.debug("no XMLObjectBuilder registered for element (%s), returning default", elementName->toString().c_str());
+    }
     return m_default;
 }
 

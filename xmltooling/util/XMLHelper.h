@@ -95,8 +95,17 @@ namespace xmltooling {
          * @return  true iff the element's qualified name matches the other parameters
          */
         static bool isElementNamed(const DOMElement* e, const XMLCh* ns, const XMLCh* local) {
-            return (e && !XMLString::compareString(ns,e->getNamespaceURI()) && !XMLString::compareString(local,e->getLocalName()));
+            return (e && XMLString::equals(ns,e->getNamespaceURI()) && XMLString::equals(local,e->getLocalName()));
         }
+
+        /**
+         * Serializes the DOM Element provided into a buffer using UTF-8 encoding and
+         * the default XML serializer available. No manipulation or formatting is applied.
+         * 
+         * @param e     element to serialize
+         * @param buf   buffer to serialize element into
+         */
+        static void serialize(const DOMElement* e, std::string& buf);
     };
 
 };
