@@ -59,7 +59,8 @@ public:
     const XMLCh* getValue() const { return m_value; }
     void setValue(const XMLCh* value) { m_value=prepareForAssignment(m_value,value); }
     
-    const list<SimpleXMLObject*>& getSimpleXMLObjects() const { return m_children; }
+    // TODO: Leave non-const, but wrap STL container to intercept adds. 
+    list<SimpleXMLObject*>& getSimpleXMLObjects() { return m_children; }
     
     bool hasChildren() const { return !m_children.empty(); }
     size_t getOrderedChildren(vector<XMLObject*>& children) const {
