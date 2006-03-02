@@ -80,7 +80,7 @@ namespace xmltooling {
          * @param targetElement the Element into which the XMLObject is marshalled into
          * @throws MarshallingException thrown if there is a problem marshalling the object
          */
-        void marshallInto(XMLObject* xmlObject, DOMElement* targetElement) const;
+        void marshallInto(XMLObject& xmlObject, DOMElement* targetElement) const;
     
         /**
          * Creates an xsi:type attribute, corresponding to the given type of the XMLObject, on the DOM element.
@@ -91,7 +91,7 @@ namespace xmltooling {
          * @throws MarshallingException thrown if the type on the XMLObject is doesn't contain
          * a local name, prefix, and namespace URI
          */
-        void marshallElementType(XMLObject* xmlObject, DOMElement* domElement) const;
+        void marshallElementType(XMLObject& xmlObject, DOMElement* domElement) const;
 
         /**
          * Creates the xmlns attributes for any namespaces set on the given XMLObject.
@@ -99,7 +99,7 @@ namespace xmltooling {
          * @param xmlObject the XMLObject
          * @param domElement the DOM element the namespaces will be added to
          */
-        void marshallNamespaces(const XMLObject* xmlObject, DOMElement* domElement) const;
+        void marshallNamespaces(const XMLObject& xmlObject, DOMElement* domElement) const;
     
         /**
          * Marshalls the child elements of the given XMLObject.
@@ -109,7 +109,7 @@ namespace xmltooling {
          * 
          * @throws MarshallingException thrown if there is a problem marshalling a child element
          */
-        void marshallChildElements(const XMLObject* xmlObject, DOMElement* domElement) const;
+        void marshallChildElements(const XMLObject& xmlObject, DOMElement* domElement) const;
 
         /**
          * Marshalls the attributes from the given XMLObject into the given DOM element.
@@ -121,7 +121,7 @@ namespace xmltooling {
          * 
          * @throws UnmarshallingException thrown if there is a problem unmarshalling an attribute
          */
-        virtual void marshallAttributes(const XMLObject* xmlObject, DOMElement* domElement) const=0;
+        virtual void marshallAttributes(const XMLObject& xmlObject, DOMElement* domElement) const=0;
 
         /**
          * Marshalls data from the XMLObject into content of the DOM Element.
@@ -129,7 +129,7 @@ namespace xmltooling {
          * @param xmlObject the XMLObject
          * @param domElement the DOM element recieving the content
          */
-        virtual void marshallElementContent(const XMLObject* xmlObject, DOMElement* domElement) const=0;
+        virtual void marshallElementContent(const XMLObject& xmlObject, DOMElement* domElement) const=0;
 
         void* m_log;
     private:

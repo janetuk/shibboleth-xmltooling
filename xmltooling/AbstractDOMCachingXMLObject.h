@@ -56,10 +56,10 @@ namespace xmltooling {
         /**
          * @see DOMCachingXMLObject::setDocument()
          */
-        DOMDocument* setDocument(DOMDocument* doc) {
-            DOMDocument* ret=m_document;
+        void setDocument(DOMDocument* doc) {
+            if (m_document)
+                m_document->release();
             m_document=doc;
-            return ret;
         }
     
         /**
@@ -112,7 +112,7 @@ namespace xmltooling {
             XMLCh* newString = XMLString::replicate(newValue);
             XMLString::trim(newString);
 
-            if (oldValue && !newValue || !oldValue && newValue || XMLString::compareString(oldValue,newValue))
+            if (!XMLString::equals(oldValue,newValue))
                 releaseThisandParentDOM();
     
             return newString;

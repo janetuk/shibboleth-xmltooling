@@ -77,7 +77,7 @@ namespace xmltooling {
          * 
          * @throws UnmarshallingException thrown if there is a problem unmarshalling an attribute
          */
-        virtual void unmarshallAttributes(const DOMElement* domElement, XMLObject* xmlObject) const;
+        virtual void unmarshallAttributes(const DOMElement* domElement, XMLObject& xmlObject) const;
 
         /**
          * Unmarshalls a given Element's children. For each child an unmarshaller is retrieved using
@@ -89,17 +89,17 @@ namespace xmltooling {
          * 
          * @throws UnmarshallingException thrown if an error occurs unmarshalling the child elements
          */
-        virtual void unmarshallChildElements(const DOMElement* domElement, XMLObject* xmlObject) const;
+        virtual void unmarshallChildElements(const DOMElement* domElement, XMLObject& xmlObject) const;
 
         /**
          * Called after a child element has been unmarshalled so that it can be added to the parent XMLObject.
          * 
          * @param parent the parent XMLObject
-         * @param child the child XMLObject
+         * @param child pointer to the child XMLObject
          * 
          * @throws UnmarshallingException thrown if there is a problem adding the child to the parent
          */
-        virtual void processChildElement(XMLObject* parent, XMLObject* child) const=0;
+        virtual void processChildElement(XMLObject& parent, XMLObject* child) const=0;
     
         /**
          * Called after an attribute has been unmarshalled so that it can be added to the XMLObject.
@@ -109,7 +109,7 @@ namespace xmltooling {
          * 
          * @throws UnmarshallingException thrown if there is a problem adding the attribute to the XMLObject
          */
-        virtual void processAttribute(XMLObject* xmlObject, const DOMAttr* attribute) const=0;
+        virtual void processAttribute(XMLObject& xmlObject, const DOMAttr* attribute) const=0;
     
         /**
          * Called if the element being unmarshalled contained textual content so that it can be added to the XMLObject.
@@ -117,7 +117,7 @@ namespace xmltooling {
          * @param xmlObject XMLObject the content will be given to
          * @param elementContent the Element's text content
          */
-        virtual void processElementContent(XMLObject* xmlObject, const XMLCh* elementContent) const=0;
+        virtual void processElementContent(XMLObject& xmlObject, const XMLCh* elementContent) const=0;
 
         void* m_log;
     private:

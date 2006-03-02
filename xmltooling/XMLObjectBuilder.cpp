@@ -42,7 +42,7 @@ const XMLObjectBuilder* XMLObjectBuilder::getBuilder(const DOMElement* domElemen
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".XMLObjectBuilder");
  
     auto_ptr<QName> schemaType(XMLHelper::getXSIType(domElement));
-    const XMLObjectBuilder* xmlObjectBuilder = getBuilder(*(schemaType.get()));
+    const XMLObjectBuilder* xmlObjectBuilder = schemaType.get() ? getBuilder(*(schemaType.get())) : NULL;
     if (xmlObjectBuilder) {
         if (log.isDebugEnabled()) {
             log.debug("located XMLObjectBuilder for schema type: %s", schemaType->toString().c_str());

@@ -60,7 +60,7 @@ namespace xmltooling {
          * 
          * @param doc DOM document bound to this object 
          */
-        virtual DOMDocument* setDocument(DOMDocument* doc)=0;
+        virtual void setDocument(DOMDocument* doc)=0;
 
         /**
          * Releases the DOM representation of this XMLObject, if there is one.

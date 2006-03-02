@@ -92,7 +92,7 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMDocum
             xmlObject->getElementQName().getNamespaceURI(), xmlObject->getElementQName().getLocalPart()
             );
         setDocumentElement(document, domElement);
-        marshallInto(xmlObject, domElement);
+        marshallInto(*xmlObject, domElement);
 
         //Recache the DOM.
         if (dc) {
@@ -151,7 +151,7 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMEleme
         xmlObject->getElementQName().getNamespaceURI(), xmlObject->getElementQName().getLocalPart()
         );
     parentElement->appendChild(domElement);
-    marshallInto(xmlObject, domElement);
+    marshallInto(*xmlObject, domElement);
 
     //Recache the DOM.
     if (dc) {
@@ -163,9 +163,9 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMEleme
     return domElement;
 }
         
-void AbstractXMLObjectMarshaller::marshallInto(XMLObject* xmlObject, DOMElement* targetElement) const
+void AbstractXMLObjectMarshaller::marshallInto(XMLObject& xmlObject, DOMElement* targetElement) const
 {
-    targetElement->setPrefix(xmlObject->getElementQName().getPrefix());
+    targetElement->setPrefix(xmlObject.getElementQName().getPrefix());
     marshallElementType(xmlObject, targetElement);
     marshallNamespaces(xmlObject, targetElement);
     marshallAttributes(xmlObject, targetElement);
@@ -183,9 +183,9 @@ void AbstractXMLObjectMarshaller::marshallInto(XMLObject* xmlObject, DOMElement*
     */
 }
 
-void AbstractXMLObjectMarshaller::marshallElementType(XMLObject* xmlObject, DOMElement* domElement) const
+void AbstractXMLObjectMarshaller::marshallElementType(XMLObject& xmlObject, DOMElement* domElement) const
 {
-    const QName* type = xmlObject->getSchemaType();
+    const QName* type = xmlObject.getSchemaType();
     if (type) {
         XT_log.debug("setting xsi:type attribute for XMLObject");
         
@@ -213,7 +213,7 @@ void AbstractXMLObjectMarshaller::marshallElementType(XMLObject* xmlObject, DOME
             XMLString::release(&xsivalue);
 
         XT_log.debug("Adding XSI namespace to list of namespaces used by XMLObject");
-        xmlObject->addNamespace(Namespace(XMLConstants::XSI_NS, XMLConstants::XSI_PREFIX));
+        xmlObject.addNamespace(Namespace(XMLConstants::XSI_NS, XMLConstants::XSI_PREFIX));
     }
 }
 
@@ -243,10 +243,10 @@ public:
     }
 };
 
-void AbstractXMLObjectMarshaller::marshallNamespaces(const XMLObject* xmlObject, DOMElement* domElement) const
+void AbstractXMLObjectMarshaller::marshallNamespaces(const XMLObject& xmlObject, DOMElement* domElement) const
 {
     XT_log.debug("marshalling namespace attributes for XMLObject");
-    const set<Namespace>& namespaces = xmlObject->getNamespaces();
+    const set<Namespace>& namespaces = xmlObject.getNamespaces();
     for_each(namespaces.begin(),namespaces.end(),bind1st(_addns(),domElement));
 }
 
@@ -271,12 +271,12 @@ public:
     }
 };
 
-void AbstractXMLObjectMarshaller::marshallChildElements(const XMLObject* xmlObject, DOMElement* domElement) const
+void AbstractXMLObjectMarshaller::marshallChildElements(const XMLObject& xmlObject, DOMElement* domElement) const
 {
     XT_log.debug("marshalling child elements for XMLObject");
 
     vector<XMLObject*> children;
-    if (xmlObject->getOrderedChildren(children)) {
+    if (xmlObject.getOrderedChildren(children)) {
         for_each(children.begin(),children.end(),bind2nd(_marshallchild(m_log),domElement));
     }
 }

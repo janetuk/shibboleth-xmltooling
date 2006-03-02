@@ -81,4 +81,55 @@
 #define NULL    0
 #endif
 
+#include <utility>
+
+namespace xmltooling {
+
+    /**
+     * Template function for cloning a sequence of XMLObjects.
+     * Invokes the clone() member on each element of the input sequence and adds the copy to
+     * the output sequence. Order is preserved.
+     * 
+     * @param in    input sequence to clone
+     * @param out   output sequence to copy cloned pointers into
+     */
+    template<class InputSequence,class OutputSequence> void clone(const InputSequence& in, OutputSequence& out) {
+        for (InputSequence::const_iterator i=in.begin(); i!=in.end(); i++)
+            out.push_back((*i)->clone());
+    }
+
+    /*
+     * Functor for cleaning up heap objects in containers.
+     */
+    template<class T> struct cleanup
+    {
+        /**
+         * Function operator to delete an object.
+         * 
+         * @param ptr   object to delete
+         */
+        void operator()(T* ptr) {delete ptr;}
+        
+        /**
+         * Function operator to delete an object stored as const.
+         * 
+         * @param ptr   object to delete after casting away const
+         */
+        void operator()(const T* ptr) {delete const_cast<T*>(ptr);}
+    };
+
+    /*
+     * Functor for cleaning up heap objects in key/value containers.
+     */
+    template<class A,class B> struct cleanup_pair
+    {
+        /**
+         * Function operator to delete an object.
+         * 
+         * @param p   a pair in which the second component is the object to delete
+         */
+        void operator()(const std::pair<A,B*>& p) {delete p.second;}
+    };
+};
+
 #endif /* __xmltooling_base_h__ */

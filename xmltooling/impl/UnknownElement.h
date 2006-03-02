@@ -46,9 +46,6 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL UnknownElementImpl : public AbstractDOMCachingXMLObject
     {
     public:
-        UnknownElementImpl() {}
-        virtual ~UnknownElementImpl() {}
-
         /**
          * Overridden to ensure XML content of DOM isn't lost.
          * 
@@ -92,9 +89,6 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL UnknownElementBuilder : public virtual XMLObjectBuilder
     {
     public:
-        UnknownElementBuilder() {}
-        virtual ~UnknownElementBuilder() {}
-    
         /**
          * @see XMLObjectBuilder::buildObject()
          */
@@ -109,9 +103,6 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL UnknownElementMarshaller : public virtual Marshaller
     {
     public:
-        UnknownElementMarshaller() {}
-        virtual ~UnknownElementMarshaller() {}
-    
         /**
          * @see Marshaller::marshall(XMLObject*,DOMDocument*)
          */
@@ -138,9 +129,6 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL UnknownElementUnmarshaller : public virtual Unmarshaller
     {
     public:
-        UnknownElementUnmarshaller() {}
-        virtual ~UnknownElementUnmarshaller() {}
-    
         /**
          * @see Unmarshaller::unmarshall()
          */

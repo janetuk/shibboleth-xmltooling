@@ -43,7 +43,7 @@ const Unmarshaller* Unmarshaller::getUnmarshaller(const DOMElement* domElement)
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Unmarshaller");
  
     auto_ptr<QName> schemaType(XMLHelper::getXSIType(domElement));
-    const Unmarshaller* m = getUnmarshaller(*(schemaType.get()));
+    const Unmarshaller* m = schemaType.get() ? getUnmarshaller(*(schemaType.get())) : NULL;
     if (m) {
         if (log.isDebugEnabled()) {
             log.debug("located Unmarshaller for schema type: %s", schemaType->toString().c_str());

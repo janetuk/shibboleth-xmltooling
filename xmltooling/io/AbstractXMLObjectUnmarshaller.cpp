@@ -59,14 +59,14 @@ XMLObject* AbstractXMLObjectUnmarshaller::unmarshall(DOMElement* element, bool b
     XMLObject* xmlObject = buildXMLObject(element);
 
     if (element->hasAttributes()) {
-        unmarshallAttributes(element, xmlObject);
+        unmarshallAttributes(element, *xmlObject);
     }
 
     if (element->getTextContent()) {
-        processElementContent(xmlObject, element->getTextContent());
+        processElementContent(*xmlObject, element->getTextContent());
     }
 
-    unmarshallChildElements(element, xmlObject);
+    unmarshallChildElements(element, *xmlObject);
 
     /* TODO: Signing
     if (xmlObject instanceof SignableXMLObject) {
@@ -89,7 +89,7 @@ XMLObject* AbstractXMLObjectUnmarshaller::buildXMLObject(const DOMElement* domEl
     throw UnmarshallingException("Failed to locate XMLObjectBuilder for element.");
 }
 
-void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domElement, XMLObject* xmlObject) const
+void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domElement, XMLObject& xmlObject) const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("unmarshallAttributes");
@@ -123,18 +123,18 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
         const XMLCh* nsuri=attribute->getNamespaceURI();
         if (XMLString::equals(nsuri,XMLConstants::XMLNS_NS)) {
             XT_log.debug("found namespace declaration, adding it to the list of namespaces on the XMLObject");
-            xmlObject->addNamespace(Namespace(attribute->getValue(), attribute->getLocalName(), true));
+            xmlObject.addNamespace(Namespace(attribute->getValue(), attribute->getLocalName(), true));
             continue;
         }
         else if (XMLString::equals(nsuri,XMLConstants::XSI_NS) && XMLString::equals(attribute->getLocalName(),type)) {
             XT_log.debug("found xsi:type declaration, setting the schema type of the XMLObject");
             auto_ptr<QName> xsitype(XMLHelper::getAttributeValueAsQName(attribute));
-            xmlObject->setSchemaType(xsitype.get());
+            xmlObject.setSchemaType(xsitype.get());
             continue;
         }
         else if (nsuri) {
             XT_log.debug("found namespace-qualified attribute, adding prefix to the list of namespaces on the XMLObject");
-            xmlObject->addNamespace(Namespace(nsuri, attribute->getPrefix()));
+            xmlObject.addNamespace(Namespace(nsuri, attribute->getPrefix()));
         }
 
         XT_log.debug("processing generic attribute");
@@ -142,7 +142,7 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
     }
 }
 
-void AbstractXMLObjectUnmarshaller::unmarshallChildElements(const DOMElement* domElement, XMLObject* xmlObject) const
+void AbstractXMLObjectUnmarshaller::unmarshallChildElements(const DOMElement* domElement, XMLObject& xmlObject) const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("unmarshallChildElements");

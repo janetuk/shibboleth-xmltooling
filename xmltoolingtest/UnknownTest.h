@@ -17,8 +17,6 @@
 #include "XMLObjectBaseTestCase.h"
 
 #include <fstream>
-#include <xmltooling/io/Marshaller.h>
-#include <xmltooling/io/Unmarshaller.h>
 
 
 class UnknownTest : public CxxTest::TestSuite {
