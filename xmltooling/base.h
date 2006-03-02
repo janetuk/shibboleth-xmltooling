@@ -94,7 +94,7 @@ namespace xmltooling {
      * @param out   output sequence to copy cloned pointers into
      */
     template<class InputSequence,class OutputSequence> void clone(const InputSequence& in, OutputSequence& out) {
-        for (InputSequence::const_iterator i=in.begin(); i!=in.end(); i++)
+        for (typename InputSequence::const_iterator i=in.begin(); i!=in.end(); i++)
             out.push_back((*i)->clone());
     }
 
