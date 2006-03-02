@@ -56,17 +56,19 @@ XMLObject* AbstractXMLObjectUnmarshaller::unmarshall(DOMElement* element, bool b
         XT_log.debug("unmarshalling DOM element %s", dname.get());
     }
 
-    XMLObject* xmlObject = buildXMLObject(element);
+    auto_ptr<XMLObject> xmlObject(buildXMLObject(element));
 
     if (element->hasAttributes()) {
-        unmarshallAttributes(element, *xmlObject);
+        unmarshallAttributes(element, *(xmlObject.get()));
     }
 
-    if (element->getTextContent()) {
-        processElementContent(*xmlObject, element->getTextContent());
+    const XMLCh* textContent=element->getTextContent();
+    if (textContent && *textContent) {
+        XT_log.debug("processing element content");
+        processElementContent(*(xmlObject.get()), textContent);
     }
 
-    unmarshallChildElements(element, *xmlObject);
+    unmarshallChildElements(element, *(xmlObject.get()));
 
     /* TODO: Signing
     if (xmlObject instanceof SignableXMLObject) {
@@ -74,11 +76,13 @@ XMLObject* AbstractXMLObjectUnmarshaller::unmarshall(DOMElement* element, bool b
     }
     */
 
-    DOMCachingXMLObject* dc=dynamic_cast<DOMCachingXMLObject*>(xmlObject);
+    DOMCachingXMLObject* dc=dynamic_cast<DOMCachingXMLObject*>(xmlObject.get());
     if (dc)
         dc->setDOM(element,bindDocument);
+    else if (bindDocument)
+        throw UnmarshallingException("Unable to bind document to non-DOM caching XMLObject instance.");
         
-    return xmlObject;
+    return xmlObject.release();
 }
 
 XMLObject* AbstractXMLObjectUnmarshaller::buildXMLObject(const DOMElement* domElement) const
@@ -178,7 +182,11 @@ void AbstractXMLObjectUnmarshaller::unmarshallChildElements(const DOMElement* do
                 auto_ptr<QName> cname(XMLHelper::getNodeQName(childNode));
                 XT_log.debug("unmarshalling child element %s", cname->toString().c_str());
             }
-            processChildElement(xmlObject, unmarshaller->unmarshall(static_cast<DOMElement*>(childNode)));
+
+            // Retain ownership of the unmarshalled child until it's processed by the parent.
+            auto_ptr<XMLObject> childObject(unmarshaller->unmarshall(static_cast<DOMElement*>(childNode)));
+            processChildElement(xmlObject, childObject.get());
+            childObject.release();
         }
     }
 }
