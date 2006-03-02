@@ -224,9 +224,11 @@ public:
         const XMLCh* uri=ns.getNamespaceURI();
         
         // Check to see if the prefix is already declared properly above this node.
-        if (!ns.alwaysDeclare() && domElement->getParentNode() &&
-                XMLString::equals(domElement->getParentNode()->lookupNamespaceURI(prefix),uri))
-            return;
+        if (!ns.alwaysDeclare()) {
+            const XMLCh* declared=lookupNamespaceURI(domElement->getParentNode(),prefix);
+            if (declared && XMLString::equals(declared,uri))
+                return;
+        }
             
         if (prefix && *prefix) {
             XMLCh* xmlns=new XMLCh[XMLString::stringLen(XMLConstants::XMLNS_PREFIX) + XMLString::stringLen(prefix) + 2*sizeof(XMLCh)];
@@ -240,6 +242,32 @@ public:
         else {
             domElement->setAttributeNS(XMLConstants::XMLNS_NS, XMLConstants::XMLNS_PREFIX, uri);
         }
+    }
+
+    const XMLCh* lookupNamespaceURI(const DOMNode* n, const XMLCh* prefix) const {
+        // Return NULL if no declaration in effect. The empty string signifies the null namespace.
+        if (!n || n->getNodeType()!=DOMNode::ELEMENT_NODE)
+            return NULL;    // we're done
+        DOMNamedNodeMap* attributes = static_cast<const DOMElement*>(n)->getAttributes();
+        if (!attributes)
+            return lookupNamespaceURI(n->getParentNode(),prefix);   // defer to parent
+        DOMNode* childNode;
+        DOMAttr* attribute;
+        for (XMLSize_t i=0; i<attributes->getLength(); i++) {
+            childNode = attributes->item(i);
+            if (childNode->getNodeType() != DOMNode::ATTRIBUTE_NODE)    // not an attribute?
+                continue;
+            attribute = static_cast<DOMAttr*>(childNode);
+            if (!XMLString::equals(attribute->getNamespaceURI(),XMLConstants::XMLNS_NS))
+                continue;   // not a namespace declaration
+            // Local name should be the prefix and the value would be the URI, except for the default namespace.
+            if (!prefix && XMLString::equals(attribute->getLocalName(),XMLConstants::XMLNS_PREFIX))
+                return attribute->getNodeValue();
+            else if (XMLString::equals(prefix,attribute->getLocalName()))
+                return attribute->getNodeValue();
+        }
+        // Defer to parent.
+        return lookupNamespaceURI(n->getParentNode(),prefix);
     }
 };
 

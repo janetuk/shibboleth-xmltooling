@@ -120,15 +120,13 @@ namespace xmltooling {
         }
     
      protected:
-         AbstractXMLObject() : m_typeQname(NULL), m_parent(NULL) {}
-
         /**
          * Constructor
          * 
          * @param namespaceURI the namespace the element is in
          * @param elementLocalName the local name of the XML element this Object represents
          */
-        AbstractXMLObject(const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix)
+        AbstractXMLObject(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL)
             : m_elementQname(namespaceURI,elementLocalName, namespacePrefix), m_typeQname(NULL), m_parent(NULL) {
             addNamespace(Namespace(namespaceURI, namespacePrefix));
         }

@@ -59,7 +59,10 @@ public:
     }
 
     void testUnmarshallingWithAttributes() {
-        ifstream fs("../xmltoolingtest/data/SimpleXMLObjectWithAttribute.xml");
+        TS_TRACE("testUnmarshallingWithAttributes");
+
+        string path=data_path + "SimpleXMLObjectWithAttribute.xml";
+        ifstream fs(path.c_str());
         DOMDocument* doc=nonvalidatingPool->parse(fs);
         TS_ASSERT(doc!=NULL);
 
@@ -69,7 +72,57 @@ public:
         auto_ptr<SimpleXMLObject> sxObject(dynamic_cast<SimpleXMLObject*>(u->unmarshall(doc->getDocumentElement(),true)));
         TS_ASSERT(sxObject.get()!=NULL);
 
-        auto_ptr_XMLCh expectedId("Firefly");
-        TSM_ASSERT_SAME_DATA("ID was not expected value", expectedId.get(), sxObject->getId(), XMLString::stringLen(expectedId.get()));
+        auto_ptr_XMLCh expected("Firefly");
+        TSM_ASSERT_SAME_DATA("ID was not expected value", expected.get(), sxObject->getId(), XMLString::stringLen(expected.get()));
+    }
+
+    void testUnmarshallingWithElementContent() {
+        TS_TRACE("testUnmarshallingWithElementContent");
+
+        string path=data_path + "SimpleXMLObjectWithContent.xml";
+        ifstream fs(path.c_str());
+        DOMDocument* doc=nonvalidatingPool->parse(fs);
+        TS_ASSERT(doc!=NULL);
+
+        const Unmarshaller* u = Unmarshaller::getUnmarshaller(doc->getDocumentElement());
+        TS_ASSERT(u!=NULL);
+
+        auto_ptr<SimpleXMLObject> sxObject(dynamic_cast<SimpleXMLObject*>(u->unmarshall(doc->getDocumentElement(),true)));
+        TS_ASSERT(sxObject.get()!=NULL);
+
+        auto_ptr_XMLCh expected("Sample Content");
+        TSM_ASSERT_SAME_DATA("Element content was not expected value", expected.get(), sxObject->getValue(), XMLString::stringLen(expected.get()));
+    }
+
+    void testUnmarshallingWithChildElements() {
+        TS_TRACE("testUnmarshallingWithChildElements");
+
+        string path=data_path + "SimpleXMLObjectWithChildren.xml";
+        ifstream fs(path.c_str());
+        DOMDocument* doc=nonvalidatingPool->parse(fs);
+        TS_ASSERT(doc!=NULL);
+
+        const Unmarshaller* u = Unmarshaller::getUnmarshaller(doc->getDocumentElement());
+        TS_ASSERT(u!=NULL);
+
+        auto_ptr<SimpleXMLObject> sxObject(dynamic_cast<SimpleXMLObject*>(u->unmarshall(doc->getDocumentElement(),true)));
+        TS_ASSERT(sxObject.get()!=NULL);
+
+        TSM_ASSERT_EQUALS("Number of child elements was not expected value", 2, sxObject->getSimpleXMLObjects().size());
+    }
+
+    void testUnmarshallingWithUnknownChild() {
+        TS_TRACE("testUnmarshallingWithUnknownChild");
+
+        string path=data_path + "SimpleXMLObjectWithUnknownChild.xml";
+        ifstream fs(path.c_str());
+        DOMDocument* doc=nonvalidatingPool->parse(fs);
+        TS_ASSERT(doc!=NULL);
+
+        const Unmarshaller* u = Unmarshaller::getUnmarshaller(doc->getDocumentElement());
+        TS_ASSERT(u!=NULL);
+
+        TS_ASSERT_THROWS(u->unmarshall(doc->getDocumentElement(),true),UnmarshallingException);
+        doc->release();
     }
 };

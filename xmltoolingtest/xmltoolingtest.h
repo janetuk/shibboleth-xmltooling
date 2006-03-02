@@ -24,6 +24,7 @@ using namespace xmltooling;
 
 ParserPool* validatingPool=NULL;
 ParserPool* nonvalidatingPool=NULL;
+std::string data_path = "../xmltoolingtest/data/";
 
 class ToolingFixture : public CxxTest::GlobalFixture
 {
@@ -34,6 +35,8 @@ public:
             return false;
         validatingPool = new ParserPool(true,true);
         nonvalidatingPool = new ParserPool();
+        if (getenv("XMLTOOLINGTEST_DATA"))
+            data_path=std::string(getenv("XMLTOOLINGTEST_DATA")) + "/";
         return true;
     }
     bool tearDownWorld() {
@@ -61,7 +64,8 @@ class CatalogTest : public CxxTest::TestSuite
 {
 public:
     void testCatalog(void) {
-        auto_ptr_XMLCh temp("../xmltoolingtest/data/catalog.xml");
+        std::string path=data_path + "catalog.xml";
+        auto_ptr_XMLCh temp(path.c_str());
         TS_ASSERT(validatingPool->loadCatalog(temp.get()));
     }
 };

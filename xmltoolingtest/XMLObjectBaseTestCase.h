@@ -29,6 +29,7 @@ using namespace std;
 
 extern ParserPool* validatingPool;
 extern ParserPool* nonvalidatingPool;
+extern string data_path;
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -136,6 +137,9 @@ private:
 
         if (XMLString::equals(attribute->getLocalName(),SimpleXMLObject::ID_ATTRIB_NAME)) {
             simpleXMLObject.setId(attribute->getValue());
+        }
+        else {
+            throw UnmarshallingException("Unknown attribute cannot be processed by parent object.");
         }
     }
 

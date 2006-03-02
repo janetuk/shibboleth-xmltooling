@@ -126,9 +126,16 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
         
         const XMLCh* nsuri=attribute->getNamespaceURI();
         if (XMLString::equals(nsuri,XMLConstants::XMLNS_NS)) {
-            XT_log.debug("found namespace declaration, adding it to the list of namespaces on the XMLObject");
-            xmlObject.addNamespace(Namespace(attribute->getValue(), attribute->getLocalName(), true));
-            continue;
+            if (XMLString::equals(attribute->getLocalName(),XMLConstants::XMLNS_PREFIX)) {
+                XT_log.debug("found default namespace declaration, adding it to the list of namespaces on the XMLObject");
+                xmlObject.addNamespace(Namespace(attribute->getValue(), NULL, true));
+                continue;
+            }
+            else {
+                XT_log.debug("found namespace declaration, adding it to the list of namespaces on the XMLObject");
+                xmlObject.addNamespace(Namespace(attribute->getValue(), attribute->getLocalName(), true));
+                continue;
+            }
         }
         else if (XMLString::equals(nsuri,XMLConstants::XSI_NS) && XMLString::equals(attribute->getLocalName(),type)) {
             XT_log.debug("found xsi:type declaration, setting the schema type of the XMLObject");

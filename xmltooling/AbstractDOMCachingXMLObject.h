@@ -36,7 +36,7 @@ namespace xmltooling {
     /**
      * Extension of AbstractXMLObject that implements a DOMCachingXMLObject.
      */
-    class XMLTOOL_API AbstractDOMCachingXMLObject : public virtual AbstractXMLObject, public virtual DOMCachingXMLObject
+    class XMLTOOL_API AbstractDOMCachingXMLObject : public AbstractXMLObject, public DOMCachingXMLObject
     {
     public:
         virtual ~AbstractDOMCachingXMLObject();
@@ -132,15 +132,13 @@ namespace xmltooling {
          */
         XMLObject* prepareForAssignment(const XMLObject* oldValue, XMLObject* newValue);
 
-        AbstractDOMCachingXMLObject() : m_dom(NULL), m_document(NULL) {}
-
         /**
          * Constructor
          * 
          * @param namespaceURI the namespace the element is in
          * @param elementLocalName the local name of the XML element this Object represents
          */
-        AbstractDOMCachingXMLObject(const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix)
+        AbstractDOMCachingXMLObject(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL)
             : AbstractXMLObject(namespaceURI,elementLocalName, namespacePrefix), m_dom(NULL), m_document(NULL) {}
 
     private:
