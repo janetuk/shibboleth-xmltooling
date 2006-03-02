@@ -199,4 +199,4 @@ AC_SUBST(CXXTESTFLAGS)
 AM_CONDITIONAL(BUILD_UNITTEST,test -f ${CXXTEST})
 
 # output makefiles
-AC_OUTPUT(Makefile xmltooling/Makefile schemas/Makefile)
+AC_OUTPUT(Makefile xmltooling/Makefile xmltoolingtest/Makefile schemas/Makefile)

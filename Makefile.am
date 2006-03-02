@@ -13,7 +13,7 @@ EXTRA_DIST =
 dist-hook:
 	rm -rf `find $(distdir)/schemas -name Makefile`
 
-SUBDIRS = schemas xmltooling
+SUBDIRS = schemas xmltooling xmltoolingtest
 
 #all-local: opensaml.spec pkginfo
 #
