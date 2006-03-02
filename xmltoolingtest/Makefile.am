@@ -3,13 +3,14 @@ AUTOMAKE_OPTIONS = foreign
 if BUILD_UNITTEST
 bin_PROGRAMS = xmltoolingtest
 xmltoolingtest_CXXFLAGS = $(CXXFLAGS) $(CXXTESTFLAGS)
+else
 bin_PROGRAMS = 
 endif
 
 xmltoolingtest_h = \
 	xmltoolingtest.h \
 	MarshallingTest.h \
-	UnknownText.h \
+	UnknownTest.h \
 	UnmarshallingTest.h
 
 noinst_HEADERS = \

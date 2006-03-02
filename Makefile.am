@@ -11,7 +11,10 @@ EXTRA_DIST =
 	config_win32.h
 
 dist-hook:
+	rm -rf `find $(distdir)/xmltoolingtest/data -name .svn`
+	rm -rf `find $(distdir)/schemas -name .svn`
 	rm -rf `find $(distdir)/schemas -name Makefile`
+
 
 SUBDIRS = schemas xmltooling xmltoolingtest
 
