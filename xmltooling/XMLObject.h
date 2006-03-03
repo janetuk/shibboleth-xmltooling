@@ -134,17 +134,16 @@ namespace xmltooling {
         virtual bool hasChildren() const=0;
         
         /**
-         * Stores an unmodifiable list of child objects in the order that they
-         * will appear in the serialized representation.
+         * Returns an unmodifiable list of child objects in the order that they
+         * should appear in the serialized representation.
          * 
-         * The validity of the returned objects is not maintained if any non-const
+         * The validity of the returned list is not maintained if any non-const
          * operations are performed on the parent object. 
          * 
-         * @param v     vector in which to store pointers to child objects
-         * @return the number of children
+         * @return the list of children
          */
-        virtual size_t getOrderedChildren(std::vector<XMLObject*>& v) const=0;
- };
+        virtual const std::list<XMLObject*>& getOrderedChildren() const=0;
+    };
 
 };
 

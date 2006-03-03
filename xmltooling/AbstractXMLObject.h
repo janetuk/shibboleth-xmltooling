@@ -23,6 +23,7 @@
 #if !defined(__xmltooling_abstractxmlobj_h__)
 #define __xmltooling_abstractxmlobj_h__
 
+#include <algorithm>
 #include <xmltooling/XMLObject.h>
 
 #if defined (_MSC_VER)
@@ -40,6 +41,7 @@ namespace xmltooling {
     public:
         virtual ~AbstractXMLObject() {
             delete m_typeQname;
+            std::for_each(m_children.begin(), m_children.end(), cleanup<XMLObject>());
         }
 
         /**
@@ -118,7 +120,21 @@ namespace xmltooling {
         void setParent(XMLObject* parent) {
             m_parent = parent;
         }
-    
+
+        /**
+         * @see XMLObject::hasChildren()
+         */
+        bool hasChildren() const {
+            return !m_children.empty();
+        }
+
+        /**
+         * @see XMLObject::getOrderedChildren()
+         */
+        const std::list<XMLObject*>& getOrderedChildren() const {
+            return m_children;
+        }
+
      protected:
         /**
          * Constructor
@@ -130,6 +146,12 @@ namespace xmltooling {
             : m_elementQname(namespaceURI,elementLocalName, namespacePrefix), m_typeQname(NULL), m_parent(NULL) {
             addNamespace(Namespace(namespaceURI, namespacePrefix));
         }
+
+        /**
+         * Underlying list of child objects.
+         * Manages the lifetime of the children.
+         */
+        std::list<XMLObject*> m_children;
         
     private:
         XMLObject* m_parent;

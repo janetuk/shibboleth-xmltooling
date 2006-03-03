@@ -35,6 +35,7 @@ namespace xmltooling {
 
     /**
      * Extension of AbstractXMLObject that implements a DOMCachingXMLObject.
+     * This is the primary base class for XMLObject implementation classes to use.
      */
     class XMLTOOL_API AbstractDOMCachingXMLObject : public AbstractXMLObject, public DOMCachingXMLObject
     {
@@ -97,7 +98,29 @@ namespace xmltooling {
             }
         }
     
+        /**
+         * @see XMLObject::clone()
+         */
+        XMLObject* clone() const;
+
      protected:
+        /**
+         * Constructor
+         * 
+         * @param namespaceURI the namespace the element is in
+         * @param elementLocalName the local name of the XML element this Object represents
+         */
+        AbstractDOMCachingXMLObject(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL)
+            : AbstractXMLObject(namespaceURI,elementLocalName, namespacePrefix), m_dom(NULL), m_document(NULL) {}
+
+        /**
+         * If a DOM representation exists, this clones it into a new document.
+         * 
+         * @param doc   the document to clone into, or NULL, in which case a new document is created
+         * @return  the cloned DOM
+         */
+        DOMElement* cloneDOM(DOMDocument* doc=NULL) const;
+
         /**
          * A helper function for derived classes.
          * This 'normalizes' newString and then if it is different from oldString
@@ -131,15 +154,6 @@ namespace xmltooling {
          * @throws IllegalArgumentException if the child already has a parent.
          */
         XMLObject* prepareForAssignment(const XMLObject* oldValue, XMLObject* newValue);
-
-        /**
-         * Constructor
-         * 
-         * @param namespaceURI the namespace the element is in
-         * @param elementLocalName the local name of the XML element this Object represents
-         */
-        AbstractDOMCachingXMLObject(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL)
-            : AbstractXMLObject(namespaceURI,elementLocalName, namespacePrefix), m_dom(NULL), m_document(NULL) {}
 
     private:
         DOMElement* m_dom;

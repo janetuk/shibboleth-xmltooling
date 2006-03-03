@@ -283,6 +283,8 @@ class _marshallchild : public binary_function<XMLObject*,DOMElement*,void> {
 public:
     _marshallchild(void* log) : m_log(log) {}
     void operator()(XMLObject* obj, DOMElement* element) const {
+        if (!obj)
+            return;
         if (XT_log.isDebugEnabled()) {
             XT_log.debug("getting marshaller for child XMLObject: %s", obj->getElementQName().toString().c_str());
         }
@@ -303,8 +305,6 @@ void AbstractXMLObjectMarshaller::marshallChildElements(const XMLObject& xmlObje
 {
     XT_log.debug("marshalling child elements for XMLObject");
 
-    vector<XMLObject*> children;
-    if (xmlObject.getOrderedChildren(children)) {
-        for_each(children.begin(),children.end(),bind2nd(_marshallchild(m_log),domElement));
-    }
+    const list<XMLObject*>& children=xmlObject.getOrderedChildren();
+    for_each(children.begin(),children.end(),bind2nd(_marshallchild(m_log),domElement));
 }

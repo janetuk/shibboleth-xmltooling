@@ -58,20 +58,6 @@ namespace xmltooling {
           */
         XMLObject* clone() const;
 
-        /**
-         * @see XMLObject::hasChildren()
-         */
-        bool hasChildren() const {
-            return false;
-        }
-
-        /**
-         * @see XMLObject::getOrderedChildren()
-         */
-        size_t getOrderedChildren(std::vector<XMLObject*>& v) const {
-            return 0;
-        }
-
     protected:
         /**
          * When needed, we can serialize the DOM into XML form and preserve it here.

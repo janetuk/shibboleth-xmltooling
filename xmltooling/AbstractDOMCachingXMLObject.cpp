@@ -23,6 +23,8 @@
 #include "internal.h"
 #include "exceptions.h"
 #include "AbstractDOMCachingXMLObject.h"
+#include "io/Unmarshaller.h"
+#include "util/XMLHelper.h"
 
 #include <algorithm>
 #include <functional>
@@ -50,23 +52,27 @@ void AbstractDOMCachingXMLObject::setDOM(DOMElement* dom, bool bindDocument)
 
 void AbstractDOMCachingXMLObject::releaseDOM()
 {
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".DOM");
-    if (log.isDebugEnabled()) {
-        string qname=getElementQName().toString();
-        log.debug("releasing cached DOM representation for (%s)", qname.empty() ? "unknown" : qname.c_str());
+    if (m_dom) {
+        Category& log=Category::getInstance(XMLTOOLING_LOGCAT".DOM");
+        if (log.isDebugEnabled()) {
+            string qname=getElementQName().toString();
+            log.debug("releasing cached DOM representation for (%s)", qname.empty() ? "unknown" : qname.c_str());
+        }
+        setDOM(NULL);
     }
-    setDOM(NULL);
 }
 
 void AbstractDOMCachingXMLObject::releaseParentDOM(bool propagateRelease)
 {
     DOMCachingXMLObject* domCachingParent = dynamic_cast<DOMCachingXMLObject*>(getParent());
     if (domCachingParent) {
-        Category::getInstance(XMLTOOLING_LOGCAT".DOM").debug(
-            "releasing cached DOM representation for parent object with propagation set to %s",
-            propagateRelease ? "true" : "false"
-            );
-        domCachingParent->releaseDOM();
+        if (domCachingParent->getDOM()) {
+            Category::getInstance(XMLTOOLING_LOGCAT".DOM").debug(
+                "releasing cached DOM representation for parent object with propagation set to %s",
+                propagateRelease ? "true" : "false"
+                );
+            domCachingParent->releaseDOM();
+        }
         if (propagateRelease)
             domCachingParent->releaseParentDOM(propagateRelease);
     }
@@ -86,13 +92,12 @@ public:
 
 void AbstractDOMCachingXMLObject::releaseChildrenDOM(bool propagateRelease)
 {
-    vector<XMLObject*> children;
-    if (getOrderedChildren(children)) {
+    if (hasChildren()) {
         Category::getInstance(XMLTOOLING_LOGCAT".DOM").debug(
             "releasing cached DOM representation for children with propagation set to %s",
             propagateRelease ? "true" : "false"
             );
-        for_each(children.begin(),children.end(),bind2nd(_release(),propagateRelease));
+        for_each(m_children.begin(),m_children.end(),bind2nd(_release(),propagateRelease));
     }
 }
 
@@ -119,4 +124,37 @@ XMLObject* AbstractDOMCachingXMLObject::prepareForAssignment(const XMLObject* ol
     }
 
     return newValue;
+}
+
+DOMElement* AbstractDOMCachingXMLObject::cloneDOM(DOMDocument* doc) const
+{
+    if (getDOM()) {
+        if (!doc)
+            doc=DOMImplementationRegistry::getDOMImplementation(NULL)->createDocument();
+        return static_cast<DOMElement*>(doc->importNode(getDOM(),true));
+    }
+    return NULL;
+}
+
+XMLObject* AbstractDOMCachingXMLObject::clone() const
+{
+    // See if we can clone via the DOM.
+    DOMElement* domCopy=cloneDOM();
+    if (domCopy) {
+        // Seemed to work, so now we unmarshall the DOM to produce the clone.
+        const Unmarshaller* u=Unmarshaller::getUnmarshaller(domCopy);
+        if (!u) {
+            auto_ptr<QName> q(XMLHelper::getNodeQName(domCopy));
+            Category::getInstance(XMLTOOLING_LOGCAT".DOM").error(
+                "DOM clone failed, unable to locate unmarshaller for element (%s)", q->toString().c_str()
+                );
+        }
+        try {
+            return u->unmarshall(domCopy, true);    // bind document
+        }
+        catch (...) {
+            domCopy->getOwnerDocument()->release();
+        }
+    }
+    return NULL;
 }

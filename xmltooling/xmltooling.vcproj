@@ -338,6 +338,10 @@
 					RelativePath=".\util\XMLHelper.h"
 					>
 				</File>
+				<File
+					RelativePath=".\util\XMLObjectChildrenList.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="io"

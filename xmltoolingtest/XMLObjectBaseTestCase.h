@@ -22,6 +22,7 @@
 #include <xmltooling/io/AbstractXMLObjectMarshaller.h>
 #include <xmltooling/io/AbstractXMLObjectUnmarshaller.h>
 #include <xmltooling/util/ParserPool.h>
+#include <xmltooling/util/XMLObjectChildrenList.h>
 #include <xmltooling/util/XMLHelper.h>
 
 using namespace xmltooling;
@@ -50,7 +51,6 @@ public:
     virtual ~SimpleXMLObject() {
         XMLString::release(&m_id);
         XMLString::release(&m_value);
-        for_each(m_children.begin(), m_children.end(), cleanup<SimpleXMLObject>());
     }
     
     const XMLCh* getId() const { return m_id; }
@@ -60,15 +60,19 @@ public:
     void setValue(const XMLCh* value) { m_value=prepareForAssignment(m_value,value); }
     
     // TODO: Leave non-const, but wrap STL container to intercept adds. 
-    list<SimpleXMLObject*>& getSimpleXMLObjects() { return m_children; }
-    
-    bool hasChildren() const { return !m_children.empty(); }
-    size_t getOrderedChildren(vector<XMLObject*>& children) const {
-        children.assign(m_children.begin(),m_children.end());
-        return children.size();
+    ListOf(SimpleXMLObject) getSimpleXMLObjects() {
+        return ListOf(SimpleXMLObject)(this, m_simples, m_children, m_children.end());
     }
+    
     SimpleXMLObject* clone() const {
-        SimpleXMLObject* ret=new SimpleXMLObject();
+        auto_ptr<XMLObject> domClone(AbstractDOMCachingXMLObject::clone());
+        SimpleXMLObject* ret=dynamic_cast<SimpleXMLObject*>(domClone.get());
+        if (ret) {
+            domClone.release();
+            return ret;
+        }
+
+        ret=new SimpleXMLObject();
         ret->setId(m_id);
         ret->setValue(m_value);
         xmltooling::clone(m_children, ret->m_children);
@@ -78,7 +82,7 @@ public:
 private:
     XMLCh* m_id;
     XMLCh* m_value;
-    list<SimpleXMLObject*> m_children;
+    vector<SimpleXMLObject*> m_simples;
     
     friend class SimpleXMLObjectUnmarshaller;
 };
@@ -127,6 +131,7 @@ private:
         SimpleXMLObject* child = dynamic_cast<SimpleXMLObject*>(childXMLObject);
         if (child) {
             simpleXMLObject.m_children.push_back(child);
+            simpleXMLObject.m_simples.push_back(child);
         }
         else {
             throw UnmarshallingException("Unknown child element cannot be added to parent object.");

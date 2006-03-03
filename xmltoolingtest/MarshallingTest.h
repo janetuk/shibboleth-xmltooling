@@ -81,8 +81,17 @@ public:
         
         auto_ptr<SimpleXMLObject> sxObject(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
         TS_ASSERT(sxObject.get()!=NULL);
-        sxObject->getSimpleXMLObjects().push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
-        sxObject->getSimpleXMLObjects().push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
+        ListOf(SimpleXMLObject) kids=sxObject->getSimpleXMLObjects();
+        kids.push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
+        kids.push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
+        kids.push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
+        
+        // Test some collection stuff
+        auto_ptr_XMLCh foo("Foo");
+        auto_ptr_XMLCh bar("Bar");
+        kids[0]->setId(foo.get());
+        kids.at(2)->setValue(bar.get());
+        kids.erase(kids.begin()+1);
         
         DOMElement* rootElement = Marshaller::getMarshaller(sxObject.get())->marshall(sxObject.get());
 
