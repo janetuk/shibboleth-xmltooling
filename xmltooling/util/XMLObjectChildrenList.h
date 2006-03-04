@@ -41,56 +41,56 @@ namespace xmltooling {
     class XMLObjectChildrenIterator
     {
         typename _Ty::iterator m_iter;
-        template <class _Tx, class _Ty> friend class XMLObjectChildrenList;
+        template <class _Tx, class _Tz> friend class XMLObjectChildrenList;
     public:
         typedef typename _Ty::iterator::iterator_category iterator_category;
         typedef typename _Ty::iterator::value_type value_type;
-	    typedef typename _Ty::iterator::reference reference;
-	    typedef typename _Ty::iterator::pointer pointer;
+        typedef typename _Ty::iterator::reference reference;
+        typedef typename _Ty::iterator::pointer pointer;
         typedef typename _Ty::const_iterator::reference const_reference;
-	    typedef typename _Ty::const_iterator::pointer const_pointer;
-	    typedef typename _Ty::iterator::difference_type difference_type;
+        typedef typename _Ty::const_iterator::pointer const_pointer;
+        typedef typename _Ty::iterator::difference_type difference_type;
 
-	    XMLObjectChildrenIterator() {
-	    }
+        XMLObjectChildrenIterator() {
+        }
 
-	    XMLObjectChildrenIterator(typename _Ty::iterator& iter) {
-		    m_iter=iter;
-	    }
+        XMLObjectChildrenIterator(typename _Ty::iterator iter) {
+            m_iter=iter;
+        }
 
-	    const_reference operator*() const {
-		    return *m_iter;
-	    }
+        const_reference operator*() const {
+            return *m_iter;
+        }
 
         pointer operator->() const {
             return (&**this);
-	    }
+        }
 
-	    XMLObjectChildrenIterator& operator++() {
-		    // preincrement
-		    ++m_iter;
-		    return (*this);
-	    }
+        XMLObjectChildrenIterator& operator++() {
+            // preincrement
+            ++m_iter;
+            return (*this);
+        }
 
-	    XMLObjectChildrenIterator& operator--() {
-		    // predecrement
-		    --m_iter;
-		    return (*this);
-	    }
+        XMLObjectChildrenIterator& operator--() {
+            // predecrement
+            --m_iter;
+            return (*this);
+        }
 
-	    XMLObjectChildrenIterator operator++(int) {
-		    // postincrement
-		    XMLObjectChildrenIterator _Tmp = *this;
-		    ++*this;
-		    return (_Tmp);
-	    }
+        XMLObjectChildrenIterator operator++(int) {
+            // postincrement
+            XMLObjectChildrenIterator _Tmp = *this;
+            ++*this;
+            return (_Tmp);
+        }
 
-	    XMLObjectChildrenIterator operator--(int) {
-		    // postdecrement
-		    XMLObjectChildrenIterator _Tmp = *this;
-		    --*this;
-		    return (_Tmp);
-	    }
+        XMLObjectChildrenIterator operator--(int) {
+            // postdecrement
+            XMLObjectChildrenIterator _Tmp = *this;
+            --*this;
+            return (_Tmp);
+        }
 
         XMLObjectChildrenIterator& operator+=(difference_type _Off) {
             // increment by integer
@@ -117,7 +117,7 @@ namespace xmltooling {
 
         difference_type operator-(const XMLObjectChildrenIterator& _Right) const {
             // return difference of iterators
-            return m_iter - _Right.m_iter);
+            return m_iter - _Right.m_iter;
         }
 
         const_reference operator[](difference_type _Off) const {
@@ -145,7 +145,7 @@ namespace xmltooling {
     class XMLObjectChildrenList
     {
         typedef typename std::vector<_Tx*> container;
-        typename container& m_vector;
+        typename XMLObjectChildrenList::container& m_vector;
         typename std::list<_Ty*>& m_list;
         typename std::list<_Ty*>::iterator m_fence;
         XMLObject* m_parent;
@@ -158,8 +158,8 @@ namespace xmltooling {
         typedef typename container::size_type size_type;
 
         // We override the iterator types with our constrained wrapper.
-        typedef XMLObjectChildrenIterator<typename container> iterator;
-	    typedef const XMLObjectChildrenIterator<typename container> const_iterator;
+        typedef XMLObjectChildrenIterator<typename XMLObjectChildrenList::container> iterator;
+        typedef const XMLObjectChildrenIterator<typename XMLObjectChildrenList::container> const_iterator;
 
         /**
          * Constructor to expose a typed collection of children backed by a list of a base type.
@@ -169,43 +169,43 @@ namespace xmltooling {
          * @param backing   backing list for children
          * @param ins_fence a marker designating where new children of this type should be added
          */
-	    XMLObjectChildrenList(
+        XMLObjectChildrenList(
             XMLObject* parent,
-            typename container& v,
+            typename XMLObjectChildrenList::container& v,
             typename std::list<_Ty*>& backing,
             typename std::list<_Ty*>::iterator ins_fence
             ) : m_parent(parent), m_vector(v), m_list(backing), m_fence(ins_fence) {
-	    }
+        }
 
-	    size_type size() const {
-		    // return length of sequence
-		    return m_vector.size();
-	    }
+        size_type size() const {
+            // return length of sequence
+            return m_vector.size();
+        }
 
-	    bool empty() const {
-		    // test if sequence is empty
-		    return m_vector.empty();
-	    }
+        bool empty() const {
+            // test if sequence is empty
+            return m_vector.empty();
+        }
 
-	    iterator begin() {
-		    // return iterator for beginning of mutable sequence
-		    return m_vector.begin();
-	    }
+        iterator begin() {
+            // return iterator for beginning of mutable sequence
+            return m_vector.begin();
+        }
 
-	    iterator end() {
-		    // return iterator for end of mutable sequence
-		    return m_vector.end();
-	    }
+        iterator end() {
+            // return iterator for end of mutable sequence
+            return m_vector.end();
+        }
 
-	    const_iterator begin() const {
-		    // return iterator for beginning of const sequence
-		    return m_vector.begin();
-	    }
+        const_iterator begin() const {
+            // return iterator for beginning of const sequence
+            return m_vector.begin();
+        }
 
-	    const_iterator end() const {
-		    // return iterator for end of const sequence
-		    return m_vector.end();
-	    }
+        const_iterator end() const {
+            // return iterator for end of const sequence
+            return m_vector.end();
+        }
 
         const_reference at(size_type _Pos) const {
             // subscript nonmutable sequence with checking
@@ -227,11 +227,11 @@ namespace xmltooling {
             return *(m_vector.back());
         }
 
-	    void push_back(const_reference _Val) {
-	        setParent(_Val);
+        void push_back(const_reference _Val) {
+            setParent(_Val);
             m_list.insert(m_fence,_Val);
             m_vector.push_back(_Val);
-	    }
+        }
 
         iterator erase(iterator _Where) {
             removeParent(*_Where);

@@ -28,36 +28,37 @@ utilinclude_HEADERS = \
     util/NDC.h \
     util/ParserPool.h \
     util/XMLConstants.h \
-    util/XMLHelper.h
+    util/XMLHelper.h \
+    util/XMLObjectChildrenList.h
 
 ioincludedir = \
     $(includedir)/xmltooling/io
 
 ioinclude_HEADERS = \
-	io/AbstractXMLObjectUnmarshaller.h \
+    io/AbstractXMLObjectUnmarshaller.h \
     io/Marshaller.h \
     io/Unmarshaller.h
 
 noinst_HEADERS = \
-	internal.h \
-	impl/UnknownElement.h
+    internal.h \
+    impl/UnknownElement.h
 
 libxmltooling_la_SOURCES = \
-	AbstractDOMCachingXMLObject.cpp \
-	Namespace.cpp \
-	QName.cpp \
-	unicode.cpp \
-	XMLObjectBuilder.cpp \
-	XMLToolingConfig.cpp \
-	impl/UnknownElement.cpp \
-	io/AbstractXMLObjectMarshaller.cpp \
-	io/AbstractXMLObjectUnmarshaller.cpp \
-	io/Marshaller.cpp \
-	io/Unmarshaller.cpp \
-	util/NDC.cpp \
-	util/ParserPool.cpp \
-	util/XMLConstants.cpp \
-	util/XMLHelper.cpp
+    AbstractDOMCachingXMLObject.cpp \
+    Namespace.cpp \
+    QName.cpp \
+    unicode.cpp \
+    XMLObjectBuilder.cpp \
+    XMLToolingConfig.cpp \
+    impl/UnknownElement.cpp \
+    io/AbstractXMLObjectMarshaller.cpp \
+    io/AbstractXMLObjectUnmarshaller.cpp \
+    io/Marshaller.cpp \
+    io/Unmarshaller.cpp \
+    util/NDC.cpp \
+    util/ParserPool.cpp \
+    util/XMLConstants.cpp \
+    util/XMLHelper.cpp
 
 # this is different from the project version
 # http://sources.redhat.com/autobook/autobook/autobook_91.html
