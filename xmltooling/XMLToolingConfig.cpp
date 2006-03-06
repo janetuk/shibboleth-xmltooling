@@ -58,9 +58,9 @@ XMLToolingInternalConfig& XMLToolingInternalConfig::getInternalConfig()
 bool XMLToolingInternalConfig::log_config(const char* config)
 {
     try {
-        if (!config && !*config)
+        if (!config || !*config)
             config=getenv("XMLTOOLING_LOG_CONFIG");
-        if (!config && !*config)
+        if (!config || !*config)
             config="WARN";
         
         bool level=false;
@@ -149,6 +149,11 @@ bool XMLToolingInternalConfig::init()
 
 void XMLToolingInternalConfig::term()
 {
+    // default registrations
+    XMLObjectBuilder::deregisterDefaultBuilder();
+    Marshaller::deregisterDefaultMarshaller();
+    Unmarshaller::deregisterDefaultUnmarshaller();
+
     for (vector<void*>::reverse_iterator i=m_libhandles.rbegin(); i!=m_libhandles.rend(); i++) {
 #if defined(WIN32)
         FARPROC fn=GetProcAddress(static_cast<HMODULE>(*i),"xmltooling_extension_term");

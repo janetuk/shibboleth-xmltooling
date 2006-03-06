@@ -69,7 +69,6 @@ namespace xmltooling {
             const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL
             ) : AbstractDOMCachingXMLObject(namespaceURI,elementLocalName, namespacePrefix) {}
 
-    private:
         std::map<QName,XMLCh*> m_attributeMap;
     };
     

@@ -30,7 +30,7 @@ class ToolingFixture : public CxxTest::GlobalFixture
 {
 public:
     bool setUpWorld() {
-        XMLToolingConfig::getConfig().log_config("DEBUG");
+        XMLToolingConfig::getConfig().log_config();
         if (!XMLToolingConfig::getConfig().init())
             return false;
         validatingPool = new ParserPool(true,true);

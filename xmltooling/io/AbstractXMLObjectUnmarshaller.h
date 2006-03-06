@@ -41,15 +41,7 @@ namespace xmltooling {
         XMLObject* unmarshall(DOMElement* element, bool bindDocument=false) const;
             
     protected:
-        /**
-         * Constructor.
-         * 
-         * @param targetNamespaceURI the namespace URI of either the schema type QName or element QName of the elements this
-         *            unmarshaller operates on
-         * @param targetLocalName the local name of either the schema type QName or element QName of the elements this
-         *            unmarshaller operates on
-         */
-        AbstractXMLObjectUnmarshaller(const XMLCh* targetNamespaceURI, const XMLCh* targetLocalName);
+        AbstractXMLObjectUnmarshaller();
 
         /**
          * Constructs the XMLObject that the given DOM Element will be unmarshalled into. If the DOM element has an XML
@@ -120,8 +112,6 @@ namespace xmltooling {
         virtual void processElementContent(XMLObject& xmlObject, const XMLCh* elementContent) const=0;
 
         void* m_log;
-    private:
-        QName m_targetQName;
     };
     
 };

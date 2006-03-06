@@ -15,7 +15,9 @@
  */
 
 #include <cxxtest/TestSuite.h>
+#include <xmltooling/AbstractAttributeExtensibleXMLObject.h>
 #include <xmltooling/AbstractDOMCachingXMLObject.h>
+#include <xmltooling/AbstractExtensibleXMLObject.h>
 #include <xmltooling/exceptions.h>
 #include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/XMLToolingConfig.h>
@@ -36,8 +38,6 @@ extern string data_path;
     #pragma warning( push )
     #pragma warning( disable : 4250 4251 )
 #endif
-
-class SimpleXMLObjectUnmarshaller;
 
 class SimpleXMLObject : public AbstractDOMCachingXMLObject
 {
@@ -87,7 +87,7 @@ private:
 class SimpleXMLObjectBuilder : public XMLObjectBuilder
 {
 public:
-    XMLObject* buildObject() const {
+    SimpleXMLObject* buildObject() const {
         return new SimpleXMLObject();
     }
 };
@@ -95,7 +95,7 @@ public:
 class SimpleXMLObjectMarshaller : public AbstractXMLObjectMarshaller
 {
 public:
-    SimpleXMLObjectMarshaller() : AbstractXMLObjectMarshaller(SimpleXMLObject::NAMESPACE, SimpleXMLObject::LOCAL_NAME) {}
+    SimpleXMLObjectMarshaller() {}
 
 private:
     void marshallAttributes(const XMLObject& xmlObject, DOMElement* domElement) const {
@@ -119,7 +119,7 @@ private:
 class SimpleXMLObjectUnmarshaller : public AbstractXMLObjectUnmarshaller
 {
 public:
-    SimpleXMLObjectUnmarshaller() : AbstractXMLObjectUnmarshaller(SimpleXMLObject::NAMESPACE, SimpleXMLObject::LOCAL_NAME) {}
+    SimpleXMLObjectUnmarshaller() {}
 
 private:
     void processChildElement(XMLObject& parentXMLObject, XMLObject* childXMLObject) const {
@@ -153,6 +153,112 @@ private:
 
 };
 
+class WildcardXMLObjectMarshaller;
+
+class WildcardXMLObject : public AbstractExtensibleXMLObject, public AbstractAttributeExtensibleXMLObject
+{
+    friend class WildcardXMLObjectMarshaller;
+public:
+    WildcardXMLObject(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix)
+        : AbstractDOMCachingXMLObject(nsURI, localName, prefix),
+        AbstractExtensibleXMLObject(nsURI, localName, prefix),
+        AbstractAttributeExtensibleXMLObject(nsURI, localName, prefix) {}
+    virtual ~WildcardXMLObject() {}
+    
+    WildcardXMLObject* clone() const {
+        auto_ptr<XMLObject> domClone(AbstractDOMCachingXMLObject::clone());
+        WildcardXMLObject* ret=dynamic_cast<WildcardXMLObject*>(domClone.get());
+        if (ret) {
+            domClone.release();
+            return ret;
+        }
+
+        ret=new WildcardXMLObject(
+            getElementQName().getNamespaceURI(),getElementQName().getLocalPart(),getElementQName().getPrefix()
+            );
+        for (map<QName,XMLCh*>::const_iterator i=m_attributeMap.begin(); i!=m_attributeMap.end(); i++) {
+            ret->m_attributeMap[i->first]=XMLString::replicate(i->second);
+        }
+        xmltooling::clone(m_children, ret->m_children);
+        return ret;
+    }
+};
+
+class WildcardXMLObjectBuilder : public XMLObjectBuilder
+{
+public:
+    XMLObject* buildObject() const {
+        throw XMLObjectException("No default builder available.");
+    }
+
+    WildcardXMLObject* buildObject(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix) const {
+        return new WildcardXMLObject(nsURI,localName,prefix);
+    }
+};
+
+class WildcardXMLObjectMarshaller : public AbstractXMLObjectMarshaller
+{
+public:
+    WildcardXMLObjectMarshaller() : AbstractXMLObjectMarshaller() {}
+
+private:
+    void marshallAttributes(const XMLObject& xmlObject, DOMElement* domElement) const {
+        const WildcardXMLObject& wcXMLObject = dynamic_cast<const WildcardXMLObject&>(xmlObject);
+
+        for (map<QName,XMLCh*>::const_iterator i=wcXMLObject.m_attributeMap.begin(); i!=wcXMLObject.m_attributeMap.end(); i++) {
+            DOMAttr* attr=domElement->getOwnerDocument()->createAttributeNS(i->first.getNamespaceURI(),i->first.getLocalPart());
+            if (i->first.hasPrefix())
+                attr->setPrefix(i->first.getPrefix());
+            attr->setNodeValue(i->second);
+            domElement->setAttributeNode(attr);
+        }
+    }
+
+    void marshallElementContent(const XMLObject& xmlObject, DOMElement* domElement) const {
+        const WildcardXMLObject& wcXMLObject = dynamic_cast<const WildcardXMLObject&>(xmlObject);
+
+        if(wcXMLObject.getTextContent()) {
+            domElement->appendChild(domElement->getOwnerDocument()->createTextNode(wcXMLObject.getTextContent()));
+        }
+    }
+};
+
+class WildcardXMLObjectUnmarshaller : public AbstractXMLObjectUnmarshaller
+{
+public:
+    WildcardXMLObjectUnmarshaller() {}
+
+private:
+    XMLObject* buildXMLObject(const DOMElement* domElement) const {
+        const WildcardXMLObjectBuilder* builder =
+            dynamic_cast<const WildcardXMLObjectBuilder*>(XMLObjectBuilder::getBuilder(domElement));
+        if (builder)
+            return builder->buildObject(domElement->getNamespaceURI(),domElement->getLocalName(),domElement->getPrefix());
+        throw UnmarshallingException("Failed to locate WildcardObjectBuilder for element.");
+    }
+
+    void processChildElement(XMLObject& parentXMLObject, XMLObject* childXMLObject) const {
+        WildcardXMLObject& wcXMLObject = dynamic_cast<WildcardXMLObject&>(parentXMLObject);
+
+        wcXMLObject.getXMLObjects().push_back(childXMLObject);
+    }
+
+    void processAttribute(XMLObject& xmlObject, const DOMAttr* attribute) const {
+        WildcardXMLObject& wcXMLObject = dynamic_cast<WildcardXMLObject&>(xmlObject);
+        
+        wcXMLObject.setAttribute(
+            QName(attribute->getNamespaceURI(),attribute->getLocalName(),attribute->getPrefix()),
+            attribute->getNodeValue()
+            );
+    }
+
+    void processElementContent(XMLObject& xmlObject, const XMLCh* elementContent) const {
+        WildcardXMLObject& wcXMLObject = dynamic_cast<WildcardXMLObject&>(xmlObject);
+        
+        wcXMLObject.setTextContent(elementContent);
+    }
+
+};
 
 #if defined (_MSC_VER)
     #pragma warning( pop )

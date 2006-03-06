@@ -117,6 +117,17 @@ DOMElement* XMLHelper::appendChildElement(DOMElement* parentElement, DOMElement*
     return childElement;
 }
 
+const XMLCh* XMLHelper::getTextContent(const DOMElement* e)
+{
+    DOMNode* child=e->getFirstChild();
+    while (child) {
+        if (child->getNodeType()==DOMNode::TEXT_NODE)
+            return child->getNodeValue();
+        child=child->getNextSibling();
+    }
+    return NULL;
+}
+
 void XMLHelper::serialize(const DOMElement* e, std::string& buf)
 {
     static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };

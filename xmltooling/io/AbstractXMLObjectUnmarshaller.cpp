@@ -38,12 +38,8 @@ using namespace std;
 
 #define XT_log (*static_cast<Category*>(m_log))
 
-AbstractXMLObjectUnmarshaller::AbstractXMLObjectUnmarshaller(const XMLCh* targetNamespaceURI, const XMLCh* targetLocalName)
-        : m_targetQName(targetNamespaceURI, targetLocalName),
-        m_log(&Category::getInstance(XMLTOOLING_LOGCAT".Unmarshaller")) {
-    if (!targetLocalName || !*targetLocalName)
-        throw UnmarshallingException("targetLocalName cannot be null or empty");
-}
+AbstractXMLObjectUnmarshaller::AbstractXMLObjectUnmarshaller()
+    : m_log(&Category::getInstance(XMLTOOLING_LOGCAT".Unmarshaller")) {}
 
 XMLObject* AbstractXMLObjectUnmarshaller::unmarshall(DOMElement* element, bool bindDocument) const
 {
@@ -60,12 +56,6 @@ XMLObject* AbstractXMLObjectUnmarshaller::unmarshall(DOMElement* element, bool b
 
     if (element->hasAttributes()) {
         unmarshallAttributes(element, *(xmlObject.get()));
-    }
-
-    const XMLCh* textContent=element->getTextContent();
-    if (textContent && *textContent) {
-        XT_log.debug("processing element content");
-        processElementContent(*(xmlObject.get()), textContent);
     }
 
     unmarshallChildElements(element, *(xmlObject.get()));
@@ -194,6 +184,10 @@ void AbstractXMLObjectUnmarshaller::unmarshallChildElements(const DOMElement* do
             auto_ptr<XMLObject> childObject(unmarshaller->unmarshall(static_cast<DOMElement*>(childNode)));
             processChildElement(xmlObject, childObject.get());
             childObject.release();
+        }
+        else if (childNode->getNodeType() == DOMNode::TEXT_NODE) {
+            XT_log.debug("processing element content");
+            processElementContent(xmlObject, childNode->getNodeValue());
         }
     }
 }

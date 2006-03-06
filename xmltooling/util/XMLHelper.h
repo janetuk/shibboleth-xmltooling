@@ -99,6 +99,16 @@ namespace xmltooling {
         }
 
         /**
+         * Returns the content of the first Text node found in the element, if any.
+         * This is roughly similar to the DOM getTextContent function, but only
+         * examples the immediate children of the element.
+         *
+         * @param e     element to examine
+         * @return the content of the first Text node found, or NULL
+         */
+        static const XMLCh* getTextContent(const DOMElement* e);
+
+        /**
          * Serializes the DOM Element provided into a buffer using UTF-8 encoding and
          * the default XML serializer available. No manipulation or formatting is applied.
          * 

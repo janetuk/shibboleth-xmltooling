@@ -39,12 +39,8 @@ using namespace std;
 
 #define XT_log (*static_cast<Category*>(m_log))
 
-AbstractXMLObjectMarshaller::AbstractXMLObjectMarshaller(const XMLCh* targetNamespaceURI, const XMLCh* targetLocalName)
-        : m_targetQName(targetNamespaceURI, targetLocalName),
-        m_log(&Category::getInstance(XMLTOOLING_LOGCAT".Marshaller")) {
-    if (!targetLocalName || !*targetLocalName)
-        throw MarshallingException("targetLocalName cannot be null or empty");
-}
+AbstractXMLObjectMarshaller::AbstractXMLObjectMarshaller()
+    : m_log(&Category::getInstance(XMLTOOLING_LOGCAT".Marshaller")) {}
 
 DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMDocument* document) const
 {

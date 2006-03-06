@@ -47,15 +47,7 @@ namespace xmltooling {
     
         
     protected:
-        /**
-         * Constructor.
-         * 
-         * @param targetNamespaceURI the namespace URI of either the schema type QName or element QName of the elements this
-         *            marshaller operates on
-         * @param targetLocalName the local name of either the schema type QName or element QName of the elements this
-         *            marshaller operates on
-         */
-        AbstractXMLObjectMarshaller(const XMLCh* targetNamespaceURI, const XMLCh* targetLocalName);
+        AbstractXMLObjectMarshaller();
 
         /**
          * Sets the given element as the Document Element of the given Document.
@@ -132,8 +124,6 @@ namespace xmltooling {
         virtual void marshallElementContent(const XMLObject& xmlObject, DOMElement* domElement) const=0;
 
         void* m_log;
-    private:
-        QName m_targetQName;
     };
     
 };
