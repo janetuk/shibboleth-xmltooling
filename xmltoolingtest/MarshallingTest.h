@@ -81,7 +81,7 @@ public:
         
         auto_ptr<SimpleXMLObject> sxObject(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
         TS_ASSERT(sxObject.get()!=NULL);
-        ListOf(SimpleXMLObject) kids=sxObject->getSimpleXMLObjects();
+        VectorOf(SimpleXMLObject) kids=sxObject->getSimpleXMLObjects();
         kids.push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
         kids.push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
         kids.push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
@@ -89,9 +89,10 @@ public:
         // Test some collection stuff
         auto_ptr_XMLCh foo("Foo");
         auto_ptr_XMLCh bar("Bar");
-        kids[0]->setId(foo.get());
+        kids.begin()->setId(foo.get());
         kids.at(2)->setValue(bar.get());
         kids.erase(kids.begin()+1);
+        TS_ASSERT_SAME_DATA(kids.back()->getValue(), bar.get(), XMLString::stringLen(bar.get()));
         
         DOMElement* rootElement = Marshaller::getMarshaller(sxObject.get())->marshall(sxObject.get());
 

@@ -46,7 +46,7 @@ public:
     static const XMLCh NAMESPACE_PREFIX[];
     static const XMLCh LOCAL_NAME[];
     static const XMLCh ID_ATTRIB_NAME[];
-    
+
     SimpleXMLObject() : AbstractDOMCachingXMLObject(NAMESPACE, LOCAL_NAME, NAMESPACE_PREFIX), m_id(NULL), m_value(NULL) {}
     virtual ~SimpleXMLObject() {
         XMLString::release(&m_id);
@@ -59,9 +59,8 @@ public:
     const XMLCh* getValue() const { return m_value; }
     void setValue(const XMLCh* value) { m_value=prepareForAssignment(m_value,value); }
     
-    // TODO: Leave non-const, but wrap STL container to intercept adds. 
-    ListOf(SimpleXMLObject) getSimpleXMLObjects() {
-        return ListOf(SimpleXMLObject)(this, m_simples, m_children, m_children.end());
+    VectorOf(SimpleXMLObject) getSimpleXMLObjects() {
+        return VectorOf(SimpleXMLObject)(this, m_simples, &m_children, m_children.end());
     }
     
     SimpleXMLObject* clone() const {
@@ -83,8 +82,6 @@ private:
     XMLCh* m_id;
     XMLCh* m_value;
     vector<SimpleXMLObject*> m_simples;
-    
-    friend class SimpleXMLObjectUnmarshaller;
 };
 
 class SimpleXMLObjectBuilder : public XMLObjectBuilder
@@ -130,8 +127,7 @@ private:
 
         SimpleXMLObject* child = dynamic_cast<SimpleXMLObject*>(childXMLObject);
         if (child) {
-            simpleXMLObject.m_children.push_back(child);
-            simpleXMLObject.m_simples.push_back(child);
+            simpleXMLObject.getSimpleXMLObjects().push_back(child);
         }
         else {
             throw UnmarshallingException("Unknown child element cannot be added to parent object.");

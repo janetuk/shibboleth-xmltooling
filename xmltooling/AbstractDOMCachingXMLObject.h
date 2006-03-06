@@ -109,6 +109,7 @@ namespace xmltooling {
          * 
          * @param namespaceURI the namespace the element is in
          * @param elementLocalName the local name of the XML element this Object represents
+         * @param namespacePrefix the namespace prefix to use
          */
         AbstractDOMCachingXMLObject(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL)
             : AbstractXMLObject(namespaceURI,elementLocalName, namespacePrefix), m_dom(NULL), m_document(NULL) {}
@@ -141,20 +142,6 @@ namespace xmltooling {
             return newString;
         }
     
-        /**
-         * A helper function for derived classes, for assignment of (singleton) XML objects.
-         * 
-         * It is indifferent to whether either the old or the new version of the value is null. 
-         * This method will do a safe compare of the objects and will also invalidate the DOM if appropriate
-         * 
-         * @param oldValue - current value
-         * @param newValue - proposed new value
-         * @return The value to assign to the saved Object.
-         * 
-         * @throws IllegalArgumentException if the child already has a parent.
-         */
-        XMLObject* prepareForAssignment(const XMLObject* oldValue, XMLObject* newValue);
-
     private:
         DOMElement* m_dom;
         DOMDocument* m_document;

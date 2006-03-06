@@ -3,23 +3,27 @@ AUTOMAKE_OPTIONS = foreign
 lib_LTLIBRARIES = libxmltooling.la
 
 libxmltoolingincludedir = \
-	$(includedir)/xmltooling
+    $(includedir)/xmltooling
 
 libxmltoolinginclude_HEADERS = \
-	AbstractDOMCachingXMLObject.h \
-	AbstractXMLObject.h \
-	base.h \
-	config_pub.h \
-	DOMCachingXMLObject.h \
-	exceptions.h \
-	ILockable.h \
-	Namespace.h \
-	QName.h \
-	unicode.h \
-	version.h \
-	XMLObject.h \
-	XMLObjectBuilder.h \
-	XMLToolingConfig.h
+    AbstractAttributeExtensibleXMLObject.h \
+    AbstractDOMCachingXMLObject.h \
+    AbstractExtensibleXMLObject.h \
+    AbstractXMLObject.h \
+    AttributeExtensibleXMLObject.h \
+    base.h \
+    config_pub.h \
+    DOMCachingXMLObject.h \
+    exceptions.h \
+    ExtensibleXMLObject.h \
+    ILockable.h \
+    Namespace.h \
+    QName.h \
+    unicode.h \
+    version.h \
+    XMLObject.h \
+    XMLObjectBuilder.h \
+    XMLToolingConfig.h
 
 utilincludedir = \
     $(includedir)/xmltooling/util
@@ -44,7 +48,9 @@ noinst_HEADERS = \
     impl/UnknownElement.h
 
 libxmltooling_la_SOURCES = \
+    AbstractAttributeExtensibleXMLObject.cpp \
     AbstractDOMCachingXMLObject.cpp \
+    AbstractExtensibleXMLObject.cpp \
     Namespace.cpp \
     QName.cpp \
     unicode.cpp \

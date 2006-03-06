@@ -72,9 +72,9 @@ void AbstractDOMCachingXMLObject::releaseParentDOM(bool propagateRelease)
                 propagateRelease ? "true" : "false"
                 );
             domCachingParent->releaseDOM();
+            if (propagateRelease)
+                domCachingParent->releaseParentDOM(propagateRelease);
         }
-        if (propagateRelease)
-            domCachingParent->releaseParentDOM(propagateRelease);
     }
 }
 
@@ -99,31 +99,6 @@ void AbstractDOMCachingXMLObject::releaseChildrenDOM(bool propagateRelease)
             );
         for_each(m_children.begin(),m_children.end(),bind2nd(_release(),propagateRelease));
     }
-}
-
-XMLObject* AbstractDOMCachingXMLObject::prepareForAssignment(const XMLObject* oldValue, XMLObject* newValue) {
-
-    if (newValue && newValue->hasParent())
-        throw XMLObjectException("Child XMLObject cannot be added - it is already the child of another XMLObject");
-
-    if (!oldValue) {
-        if (newValue) {
-            releaseThisandParentDOM();
-            newValue->setParent(this);
-            return newValue;
-        }
-        else {
-            return NULL;
-        }
-    }
-
-    if (oldValue != newValue) {
-        delete oldValue;
-        releaseThisandParentDOM();
-        newValue->setParent(this);
-    }
-
-    return newValue;
 }
 
 DOMElement* AbstractDOMCachingXMLObject::cloneDOM(DOMDocument* doc) const

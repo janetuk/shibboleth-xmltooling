@@ -26,7 +26,9 @@
 #include <xmltooling/DOMCachingXMLObject.h>
 #include <xmltooling/exceptions.h>
 
-#define ListOf(type) xmltooling::XMLObjectChildrenList<type>
+#define VectorOf(type) xmltooling::XMLObjectChildrenList< std::vector<type*> >
+#define ListOf(type) xmltooling::XMLObjectChildrenList< std::list<type*> >
+#define DequeOf(type) xmltooling::XMLObjectChildrenList< std::deque<type*> >
 
 namespace xmltooling {
 
@@ -62,8 +64,8 @@ namespace xmltooling {
             return *m_iter;
         }
 
-        pointer operator->() const {
-            return (&**this);
+        const_reference operator->() const {
+            return *(m_iter.operator->());
         }
 
         XMLObjectChildrenIterator& operator++() {
@@ -138,113 +140,119 @@ namespace xmltooling {
 
     /**
      * STL-compatible container that mediates access to underlying lists of typed XML children.
-     * @param _Tx   the subtype to expose a container over
+     * @param _Tx   the subtype container to encapsulate
      * @param _Ty   the base type in the underlying list (defaults to XMLObject)
      */
-    template <class _Tx, class _Ty>
+    template <class Container, class _Ty>
     class XMLObjectChildrenList
     {
-        typedef typename std::vector<_Tx*> container;
-        typename XMLObjectChildrenList::container& m_vector;
-        typename std::list<_Ty*>& m_list;
+        typename Container& m_container;
+        typename std::list<_Ty*>* m_list;
         typename std::list<_Ty*>::iterator m_fence;
         XMLObject* m_parent;
 
 	public:
-        typedef typename container::value_type value_type;
-        typedef typename container::reference reference;
-        typedef typename container::const_reference const_reference;
-        typedef typename container::difference_type difference_type;
-        typedef typename container::size_type size_type;
+        typedef typename Container::value_type value_type;
+        typedef typename Container::reference reference;
+        typedef typename Container::const_reference const_reference;
+        typedef typename Container::difference_type difference_type;
+        typedef typename Container::size_type size_type;
 
         // We override the iterator types with our constrained wrapper.
-        typedef XMLObjectChildrenIterator<typename XMLObjectChildrenList::container> iterator;
-        typedef const XMLObjectChildrenIterator<typename XMLObjectChildrenList::container> const_iterator;
+        typedef XMLObjectChildrenIterator<Container> iterator;
+        typedef const XMLObjectChildrenIterator<Container> const_iterator;
 
         /**
          * Constructor to expose a typed collection of children backed by a list of a base type.
          *
          * @param parent    parent object of the collection
-         * @param v         underlying vector of iterators that reference the children
-         * @param backing   backing list for children
+         * @param sublist   underlying container to expose
+         * @param backing   pointer to backing list for children, if any
          * @param ins_fence a marker designating where new children of this type should be added
          */
         XMLObjectChildrenList(
             XMLObject* parent,
-            typename XMLObjectChildrenList::container& v,
-            typename std::list<_Ty*>& backing,
+            Container& sublist,
+            typename std::list<_Ty*>* backing,
             typename std::list<_Ty*>::iterator ins_fence
-            ) : m_parent(parent), m_vector(v), m_list(backing), m_fence(ins_fence) {
+            ) : m_parent(parent), m_container(sublist), m_list(backing), m_fence(ins_fence) {
         }
 
         size_type size() const {
             // return length of sequence
-            return m_vector.size();
+            return m_container.size();
         }
 
         bool empty() const {
             // test if sequence is empty
-            return m_vector.empty();
+            return m_container.empty();
         }
 
         iterator begin() {
             // return iterator for beginning of mutable sequence
-            return m_vector.begin();
+            return m_container.begin();
         }
 
         iterator end() {
             // return iterator for end of mutable sequence
-            return m_vector.end();
+            return m_container.end();
         }
 
         const_iterator begin() const {
             // return iterator for beginning of const sequence
-            return m_vector.begin();
+            return m_container.begin();
         }
 
         const_iterator end() const {
             // return iterator for end of const sequence
-            return m_vector.end();
+            return m_container.end();
         }
 
         const_reference at(size_type _Pos) const {
             // subscript nonmutable sequence with checking
-            return m_vector.at(_Pos);
+            return m_container.at(_Pos);
         }
 
         const_reference operator[](size_type _Pos) const {
             // subscript nonmutable sequence
-            return m_vector[_Pos];
+            return m_container[_Pos];
         }
 
         const_reference front() const {
             // return first element of nonmutable sequence
-            return (*begin());
+            return m_container.front();
         }
 
         const_reference back() const {
             // return last element of nonmutable sequence
-            return *(m_vector.back());
+            return m_container.back();
         }
 
         void push_back(const_reference _Val) {
             setParent(_Val);
-            m_list.insert(m_fence,_Val);
-            m_vector.push_back(_Val);
+            if (m_list)
+                m_list->insert(m_fence,_Val);
+            m_container.push_back(_Val);
         }
 
         iterator erase(iterator _Where) {
             removeParent(*_Where);
-            removeChild(*_Where);
-            return m_vector.erase(_Where.m_iter);
+            if (m_list)
+                removeChild(*_Where);
+            return m_container.erase(_Where.m_iter);
         }
 
         iterator erase(iterator _First, iterator _Last) {
             for (iterator i=_First; i!=_Last; i++) {
                 removeParent(*i);
-                removeChild(*i);
+                if (m_list)
+                    removeChild(*i);
             }
-            return m_vector.erase(_First,_Last);
+            return m_container.erase(_First,_Last);
+        }
+
+        void clear() {
+            erase(begin(),end());
         }
 
     private:
@@ -269,9 +277,9 @@ namespace xmltooling {
         }
 
         void removeChild(const_reference _Val) {
-            for (typename std::list<_Ty*>::iterator i=m_list.begin(); i!=m_list.end(); i++) {
+            for (typename std::list<_Ty*>::iterator i=m_list->begin(); i!=m_list->end(); i++) {
                 if ((*i)==_Val) {
-                    m_list.erase(i);
+                    m_list->erase(i);
                     delete _Val;
                     return;
                 }

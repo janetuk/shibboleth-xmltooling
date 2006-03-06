@@ -108,7 +108,7 @@ public:
         auto_ptr<SimpleXMLObject> sxObject(dynamic_cast<SimpleXMLObject*>(u->unmarshall(doc->getDocumentElement(),true)));
         TS_ASSERT(sxObject.get()!=NULL);
 
-        ListOf(SimpleXMLObject) kids=sxObject->getSimpleXMLObjects();
+        VectorOf(SimpleXMLObject) kids=sxObject->getSimpleXMLObjects();
         TSM_ASSERT_EQUALS("Number of child elements was not expected value", 2, kids.size());
     }
 

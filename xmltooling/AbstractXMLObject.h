@@ -141,6 +141,7 @@ namespace xmltooling {
          * 
          * @param namespaceURI the namespace the element is in
          * @param elementLocalName the local name of the XML element this Object represents
+         * @param namespacePrefix the namespace prefix to use
          */
         AbstractXMLObject(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL)
             : m_elementQname(namespaceURI,elementLocalName, namespacePrefix), m_typeQname(NULL), m_parent(NULL) {

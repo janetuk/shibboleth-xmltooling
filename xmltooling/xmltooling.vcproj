@@ -182,7 +182,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\AbstractAttributeExtensibleXMLObject.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\AbstractDOMCachingXMLObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\AbstractExtensibleXMLObject.cpp"
 				>
 			</File>
 			<File
@@ -260,11 +268,23 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\AbstractAttributeExtensibleXMLObject.h"
+				>
+			</File>
+			<File
 				RelativePath=".\AbstractDOMCachingXMLObject.h"
 				>
 			</File>
 			<File
+				RelativePath=".\AbstractExtensibleXMLObject.h"
+				>
+			</File>
+			<File
 				RelativePath=".\AbstractXMLObject.h"
+				>
+			</File>
+			<File
+				RelativePath=".\AttributeExtensibleXMLObject.h"
 				>
 			</File>
 			<File
@@ -281,6 +301,10 @@
 			</File>
 			<File
 				RelativePath=".\exceptions.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ExtensibleXMLObject.h"
 				>
 			</File>
 			<File
