@@ -146,7 +146,7 @@ namespace xmltooling {
     template <class Container, class _Ty>
     class XMLObjectChildrenList
     {
-        typename Container& m_container;
+        Container& m_container;
         typename std::list<_Ty*>* m_list;
         typename std::list<_Ty*>::iterator m_fence;
         XMLObject* m_parent;

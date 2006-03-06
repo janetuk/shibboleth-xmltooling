@@ -245,11 +245,9 @@ private:
 
     void processAttribute(XMLObject& xmlObject, const DOMAttr* attribute) const {
         WildcardXMLObject& wcXMLObject = dynamic_cast<WildcardXMLObject&>(xmlObject);
-        
-        wcXMLObject.setAttribute(
-            QName(attribute->getNamespaceURI(),attribute->getLocalName(),attribute->getPrefix()),
-            attribute->getNodeValue()
-            );
+       
+        QName q(attribute->getNamespaceURI(),attribute->getLocalName(),attribute->getPrefix()); 
+        wcXMLObject.setAttribute(q,attribute->getNodeValue());
     }
 
     void processElementContent(XMLObject& xmlObject, const XMLCh* elementContent) const {
