@@ -72,6 +72,7 @@ public:
         }
 
         ret=new SimpleXMLObject();
+        ret->m_namespaces=m_namespaces;
         ret->setId(m_id);
         ret->setValue(m_value);
         xmltooling::clone(m_children, ret->m_children);
@@ -176,9 +177,11 @@ public:
         ret=new WildcardXMLObject(
             getElementQName().getNamespaceURI(),getElementQName().getLocalPart(),getElementQName().getPrefix()
             );
+        ret->m_namespaces=m_namespaces;
         for (map<QName,XMLCh*>::const_iterator i=m_attributeMap.begin(); i!=m_attributeMap.end(); i++) {
             ret->m_attributeMap[i->first]=XMLString::replicate(i->second);
         }
+        ret->setTextContent(getTextContent());
         xmltooling::clone(m_children, ret->m_children);
         return ret;
     }

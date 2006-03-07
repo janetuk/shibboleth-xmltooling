@@ -161,7 +161,8 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMEleme
         
 void AbstractXMLObjectMarshaller::marshallInto(XMLObject& xmlObject, DOMElement* targetElement) const
 {
-    targetElement->setPrefix(xmlObject.getElementQName().getPrefix());
+    if (xmlObject.getElementQName().hasPrefix())
+        targetElement->setPrefix(xmlObject.getElementQName().getPrefix());
     marshallElementType(xmlObject, targetElement);
     marshallNamespaces(xmlObject, targetElement);
     marshallAttributes(xmlObject, targetElement);
@@ -242,8 +243,12 @@ public:
 
     const XMLCh* lookupNamespaceURI(const DOMNode* n, const XMLCh* prefix) const {
         // Return NULL if no declaration in effect. The empty string signifies the null namespace.
-        if (!n || n->getNodeType()!=DOMNode::ELEMENT_NODE)
+        if (!n || n->getNodeType()!=DOMNode::ELEMENT_NODE) {
+            // At the root, the default namespace is set to the null namespace.
+            if (!prefix || !*prefix)
+                return &chNull;
             return NULL;    // we're done
+        }
         DOMNamedNodeMap* attributes = static_cast<const DOMElement*>(n)->getAttributes();
         if (!attributes)
             return lookupNamespaceURI(n->getParentNode(),prefix);   // defer to parent
@@ -257,7 +262,7 @@ public:
             if (!XMLString::equals(attribute->getNamespaceURI(),XMLConstants::XMLNS_NS))
                 continue;   // not a namespace declaration
             // Local name should be the prefix and the value would be the URI, except for the default namespace.
-            if (!prefix && XMLString::equals(attribute->getLocalName(),XMLConstants::XMLNS_PREFIX))
+            if ((!prefix || !*prefix) && XMLString::equals(attribute->getLocalName(),XMLConstants::XMLNS_PREFIX))
                 return attribute->getNodeValue();
             else if (XMLString::equals(prefix,attribute->getLocalName()))
                 return attribute->getNodeValue();

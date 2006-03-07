@@ -102,8 +102,7 @@ namespace xmltooling {
 
         XMLObjectChildrenIterator operator+(difference_type _Off) const {
             // return this + integer
-            XMLObjectChildrenIterator _Tmp = *this;
-            return (_Tmp += _Off);
+            return m_iter + _Off;
         }
 
         XMLObjectChildrenIterator& operator-=(difference_type _Off) {
@@ -160,7 +159,7 @@ namespace xmltooling {
 
         // We override the iterator types with our constrained wrapper.
         typedef XMLObjectChildrenIterator<Container> iterator;
-        typedef const XMLObjectChildrenIterator<Container> const_iterator;
+        typedef XMLObjectChildrenIterator<Container> const_iterator;
 
         /**
          * Constructor to expose a typed collection of children backed by a list of a base type.

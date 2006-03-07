@@ -153,12 +153,16 @@ namespace xmltooling {
          * Manages the lifetime of the children.
          */
         std::list<XMLObject*> m_children;
+
+        /**
+         * Set of namespaces associated with the object.
+         */
+        std::set<Namespace> m_namespaces;
         
     private:
         XMLObject* m_parent;
         QName m_elementQname;
         QName* m_typeQname;
-        std::set<Namespace> m_namespaces;
     };
 
 };

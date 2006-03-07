@@ -8,13 +8,14 @@ bin_PROGRAMS =
 endif
 
 xmltoolingtest_h = \
-	xmltoolingtest.h \
-	MarshallingTest.h \
-	UnknownTest.h \
-	UnmarshallingTest.h
+    ComplexXMLObjectTest.h \
+    MarshallingTest.h \
+    UnknownTest.h \
+    UnmarshallingTest.h \
+    xmltoolingtest.h
 
 noinst_HEADERS = \
-	XMLObjectBaseTestCase.h
+    XMLObjectBaseTestCase.h
 
 nodist_xmltoolingtest_SOURCES = $(xmltoolingtest_h:.h=.cpp)
 

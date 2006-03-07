@@ -34,6 +34,9 @@ namespace xmltooling {
     {
         /**  XML core namespace ("http://www.w3.org/XML/1998/namespace") */
         static const XMLCh XML_NS[]; 
+
+        /** XML namespace prefix for special xml attributes ("xml") */
+        static const XMLCh XML_PREFIX[];
     
         /**  XML namespace for xmlns attributes ("http://www.w3.org/2000/xmlns/") */
         static const XMLCh XMLNS_NS[];
