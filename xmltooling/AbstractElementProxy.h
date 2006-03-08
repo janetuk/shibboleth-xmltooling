@@ -15,16 +15,16 @@
  */
 
 /**
- * @file AbstractExtensibleXMLObject.h
+ * @file AbstractElementProxy.h
  * 
- * An abstract implementation of a DOM-caching ExtensibleXMLObject 
+ * An abstract implementation of a DOM-caching ElementProxy 
  */
 
-#if !defined(__xmltooling_absextxmlobj_h__)
-#define __xmltooling_absextxmlobj_h__
+#if !defined(__xmltooling_abseleproxy_h__)
+#define __xmltooling_abseleproxy_h__
 
 #include <xmltooling/AbstractDOMCachingXMLObject.h>
-#include <xmltooling/ExtensibleXMLObject.h>
+#include <xmltooling/ElementProxy.h>
 
 using namespace xercesc;
 
@@ -38,26 +38,26 @@ namespace xmltooling {
     /**
      * An abstract implementation of a DOM-caching ExtensibleXMLObject.
      */
-    class XMLTOOL_API AbstractExtensibleXMLObject : public virtual AbstractDOMCachingXMLObject
+    class XMLTOOL_API AbstractElementProxy : public virtual ElementProxy, public virtual AbstractDOMCachingXMLObject
     {
     public:
-        virtual ~AbstractExtensibleXMLObject() {}
+        virtual ~AbstractElementProxy() {}
         
         /**
-         * @see ExtensibleXMLObject::getTextContent()
+         * @see ElementProxy::getTextContent()
          */
         virtual const XMLCh* getTextContent() const {
             return m_value;
         }
         
         /**
-         * @see ExtensibleXMLObject::setTextContent()
+         * @see ElementProxy::setTextContent()
          */
         virtual void setTextContent(const XMLCh* value);
         
 
         /**
-         * @see ExtensibleXMLObject::getXMLObjects()
+         * @see ElementProxy::getXMLObjects()
          */
         virtual ListOf(XMLObject) getXMLObjects();
     
@@ -69,7 +69,7 @@ namespace xmltooling {
          * @param elementLocalName the local name of the XML element this Object represents
          * @param namespacePrefix the namespace prefix to use
          */
-        AbstractExtensibleXMLObject(
+        AbstractElementProxy(
             const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL
             ) : AbstractDOMCachingXMLObject(namespaceURI,elementLocalName, namespacePrefix), m_value(NULL) {}
 
@@ -83,4 +83,4 @@ namespace xmltooling {
     #pragma warning( pop )
 #endif
 
-#endif /* __xmltooling_absextxmlobj_h__ */
+#endif /* __xmltooling_abseleproxy_h__ */

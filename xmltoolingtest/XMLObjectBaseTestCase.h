@@ -17,7 +17,7 @@
 #include <cxxtest/TestSuite.h>
 #include <xmltooling/AbstractAttributeExtensibleXMLObject.h>
 #include <xmltooling/AbstractDOMCachingXMLObject.h>
-#include <xmltooling/AbstractExtensibleXMLObject.h>
+#include <xmltooling/AbstractElementProxy.h>
 #include <xmltooling/exceptions.h>
 #include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/XMLToolingConfig.h>
@@ -156,13 +156,13 @@ private:
 
 class WildcardXMLObjectMarshaller;
 
-class WildcardXMLObject : public AbstractExtensibleXMLObject, public AbstractAttributeExtensibleXMLObject
+class WildcardXMLObject : public AbstractElementProxy, public AbstractAttributeExtensibleXMLObject
 {
     friend class WildcardXMLObjectMarshaller;
 public:
     WildcardXMLObject(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix)
         : AbstractDOMCachingXMLObject(nsURI, localName, prefix),
-        AbstractExtensibleXMLObject(nsURI, localName, prefix),
+        AbstractElementProxy(nsURI, localName, prefix),
         AbstractAttributeExtensibleXMLObject(nsURI, localName, prefix) {}
     virtual ~WildcardXMLObject() {}
     

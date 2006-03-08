@@ -8,14 +8,14 @@ libxmltoolingincludedir = \
 libxmltoolinginclude_HEADERS = \
     AbstractAttributeExtensibleXMLObject.h \
     AbstractDOMCachingXMLObject.h \
-    AbstractExtensibleXMLObject.h \
+    AbstractElementProxy.h \
     AbstractXMLObject.h \
     AttributeExtensibleXMLObject.h \
     base.h \
     config_pub.h \
     DOMCachingXMLObject.h \
+    ElementProxy.h \
     exceptions.h \
-    ExtensibleXMLObject.h \
     ILockable.h \
     Namespace.h \
     QName.h \
@@ -50,7 +50,7 @@ noinst_HEADERS = \
 libxmltooling_la_SOURCES = \
     AbstractAttributeExtensibleXMLObject.cpp \
     AbstractDOMCachingXMLObject.cpp \
-    AbstractExtensibleXMLObject.cpp \
+    AbstractElementProxy.cpp \
     Namespace.cpp \
     QName.cpp \
     unicode.cpp \

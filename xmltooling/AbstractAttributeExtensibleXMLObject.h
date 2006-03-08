@@ -39,7 +39,7 @@ namespace xmltooling {
     /**
      * An abstract implementation of a DOM-caching AttributeExtensibleXMLObject.
      */
-    class XMLTOOL_API AbstractAttributeExtensibleXMLObject : public virtual AbstractDOMCachingXMLObject
+    class XMLTOOL_API AbstractAttributeExtensibleXMLObject : public virtual AttributeExtensibleXMLObject, public virtual AbstractDOMCachingXMLObject
     {
     public:
         virtual ~AbstractAttributeExtensibleXMLObject();

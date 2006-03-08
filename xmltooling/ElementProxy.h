@@ -15,13 +15,13 @@
  */
 
 /**
- * @file ExtensibleXMLObject.h
+ * @file ElementProxy.h
  * 
  * An XMLObject with an open content model 
  */
 
-#if !defined(__xmltooling_extxmlobj_h__)
-#define __xmltooling_extxmlobj_h__
+#if !defined(__xmltooling_eleproxy_h__)
+#define __xmltooling_eleproxy_h__
 
 #include <xmltooling/XMLObject.h>
 #include <xmltooling/util/XMLObjectChildrenList.h>
@@ -33,11 +33,11 @@ namespace xmltooling {
     /**
      * An XMLObject with an open content model.
      */
-    class XMLTOOL_API ExtensibleXMLObject : public virtual XMLObject
+    class XMLTOOL_API ElementProxy : public virtual XMLObject
     {
     public:
-        ExtensibleXMLObject() {}
-        virtual ~ExtensibleXMLObject() {}
+        ElementProxy() {}
+        virtual ~ElementProxy() {}
         
         /**
          * Gets the text content of the object
@@ -64,4 +64,4 @@ namespace xmltooling {
     
 };
 
-#endif /* __xmltooling_extxmlobj_h__ */
+#endif /* __xmltooling_eleproxy_h__ */

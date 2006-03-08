@@ -15,23 +15,23 @@
  */
 
 /**
- * AbstractExtensibleXMLObject.cpp
+ * AbstractElementProxy.cpp
  * 
- * Extension of AbstractDOMCachingXMLObject that implements an ExtensibleXMLObject. 
+ * Extension of AbstractDOMCachingXMLObject that implements an ElementProxy. 
  */
 
 #include "internal.h"
-#include "AbstractExtensibleXMLObject.h"
+#include "AbstractElementProxy.h"
 
 using namespace xmltooling;
 using namespace std;
 
-void AbstractExtensibleXMLObject::setTextContent(const XMLCh* value)
+void AbstractElementProxy::setTextContent(const XMLCh* value)
 {
     m_value=prepareForAssignment(m_value,value);
 }
 
-ListOf(XMLObject) AbstractExtensibleXMLObject::getXMLObjects()
+ListOf(XMLObject) AbstractElementProxy::getXMLObjects()
 {
     return ListOf(XMLObject)(this,m_children,NULL,m_children.end());
 }
