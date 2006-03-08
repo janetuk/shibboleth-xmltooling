@@ -60,11 +60,12 @@
 <pathentry kind="mac" name="WIN32" path="" value=""/>
 <pathentry kind="out" path=""/>
 <pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
-<pathentry excluding="util/|io/|impl/" kind="src" path="xmltooling"/>
+<pathentry excluding="util/|io/|impl/|validation/" kind="src" path="xmltooling"/>
 <pathentry kind="src" path="xmltooling/util"/>
 <pathentry kind="src" path="xmltooling/io"/>
 <pathentry kind="src" path="xmltooling/impl"/>
 <pathentry kind="src" path="xmltoolingtest"/>
+<pathentry kind="src" path="xmltooling/validation"/>
 </item>
 </data>
 </cdtproject>

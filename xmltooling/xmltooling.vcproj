@@ -261,6 +261,14 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="validation"
+				>
+				<File
+					RelativePath=".\validation\Validator.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -392,6 +400,14 @@
 				>
 				<File
 					RelativePath=".\impl\UnknownElement.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="validation"
+				>
+				<File
+					RelativePath=".\validation\Validator.h"
 					>
 				</File>
 			</Filter>

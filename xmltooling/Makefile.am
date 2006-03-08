@@ -2,8 +2,13 @@ AUTOMAKE_OPTIONS = foreign
 
 lib_LTLIBRARIES = libxmltooling.la
 
-libxmltoolingincludedir = \
-    $(includedir)/xmltooling
+libxmltoolingincludedir = $(includedir)/xmltooling
+
+ioincludedir = $(includedir)/xmltooling/io
+
+utilincludedir = $(includedir)/xmltooling/util
+
+valincludedir = $(includedir)/xmltooling/validation
 
 libxmltoolinginclude_HEADERS = \
     AbstractAttributeExtensibleXMLObject.h \
@@ -25,8 +30,10 @@ libxmltoolinginclude_HEADERS = \
     XMLObjectBuilder.h \
     XMLToolingConfig.h
 
-utilincludedir = \
-    $(includedir)/xmltooling/util
+ioinclude_HEADERS = \
+    io/AbstractXMLObjectUnmarshaller.h \
+    io/Marshaller.h \
+    io/Unmarshaller.h
 
 utilinclude_HEADERS = \
     util/NDC.h \
@@ -35,13 +42,8 @@ utilinclude_HEADERS = \
     util/XMLHelper.h \
     util/XMLObjectChildrenList.h
 
-ioincludedir = \
-    $(includedir)/xmltooling/io
-
-ioinclude_HEADERS = \
-    io/AbstractXMLObjectUnmarshaller.h \
-    io/Marshaller.h \
-    io/Unmarshaller.h
+valinclude_HEADERS = \
+    validation/Validator.h
 
 noinst_HEADERS = \
     internal.h \
@@ -64,7 +66,8 @@ libxmltooling_la_SOURCES = \
     util/NDC.cpp \
     util/ParserPool.cpp \
     util/XMLConstants.cpp \
-    util/XMLHelper.cpp
+    util/XMLHelper.cpp \
+    validation/Validator.cpp
 
 # this is different from the project version
 # http://sources.redhat.com/autobook/autobook/autobook_91.html
