@@ -238,6 +238,8 @@ namespace xmltooling {
             removeParent(*_Where);
             if (m_list)
                 removeChild(*_Where);
+            else
+                delete *_Where.m_iter;
             return m_container.erase(_Where.m_iter);
         }
 
@@ -246,6 +248,8 @@ namespace xmltooling {
                 removeParent(*i);
                 if (m_list)
                     removeChild(*i);
+                else
+                    delete *i.m_iter;
             }
             return m_container.erase(_First,_Last);
         }

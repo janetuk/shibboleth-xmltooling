@@ -60,6 +60,7 @@ namespace xmltooling {
     DECL_XMLTOOLING_EXCEPTION(UnknownElementException);
     DECL_XMLTOOLING_EXCEPTION(UnknownAttributeException);
     DECL_XMLTOOLING_EXCEPTION(ValidationException);
+    DECL_XMLTOOLING_EXCEPTION(SignatureException);
 
 };
 

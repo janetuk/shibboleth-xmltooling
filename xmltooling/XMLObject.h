@@ -37,7 +37,6 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(XMLObject);
     public:
-        XMLObject() {}
         virtual ~XMLObject() {}
         
         /**
@@ -143,6 +142,9 @@ namespace xmltooling {
          * @return the list of children
          */
         virtual const std::list<XMLObject*>& getOrderedChildren() const=0;
+
+    protected:
+        XMLObject() {}
     };
 
 };

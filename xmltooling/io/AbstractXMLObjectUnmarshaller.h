@@ -86,12 +86,13 @@ namespace xmltooling {
         /**
          * Called after a child element has been unmarshalled so that it can be added to the parent XMLObject.
          * 
-         * @param parent the parent XMLObject
-         * @param child pointer to the child XMLObject
+         * @param parent    the parent XMLObject
+         * @param child     pointer to the child XMLObject
+         * @param childRoot root element of the child (must not be stored, just a hint)
          * 
          * @throws UnmarshallingException thrown if there is a problem adding the child to the parent
          */
-        virtual void processChildElement(XMLObject& parent, XMLObject* child) const=0;
+        virtual void processChildElement(XMLObject& parent, XMLObject* child, const DOMElement* childRoot) const=0;
     
         /**
          * Called after an attribute has been unmarshalled so that it can be added to the XMLObject.

@@ -6,6 +6,8 @@ libxmltoolingincludedir = $(includedir)/xmltooling
 
 ioincludedir = $(includedir)/xmltooling/io
 
+sigincludedir = $(includedir)/xmltooling/signature
+
 utilincludedir = $(includedir)/xmltooling/util
 
 valincludedir = $(includedir)/xmltooling/validation
@@ -35,6 +37,11 @@ ioinclude_HEADERS = \
     io/Marshaller.h \
     io/Unmarshaller.h
 
+siginclude_HEADERS = \
+    signature/KeyInfo.h \
+    signature/Signature.h \
+    signature/SigningContext.h
+
 utilinclude_HEADERS = \
     util/NDC.h \
     util/ParserPool.h \
@@ -47,7 +54,8 @@ valinclude_HEADERS = \
 
 noinst_HEADERS = \
     internal.h \
-    impl/UnknownElement.h
+    impl/UnknownElement.h \
+    signature/impl/XMLSecSignature.h
 
 libxmltooling_la_SOURCES = \
     AbstractAttributeExtensibleXMLObject.cpp \
@@ -63,6 +71,7 @@ libxmltooling_la_SOURCES = \
     io/AbstractXMLObjectUnmarshaller.cpp \
     io/Marshaller.cpp \
     io/Unmarshaller.cpp \
+    signature/impl/XMLSecSignature.cpp \
     util/NDC.cpp \
     util/ParserPool.cpp \
     util/XMLConstants.cpp \

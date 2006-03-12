@@ -182,7 +182,7 @@ void AbstractXMLObjectUnmarshaller::unmarshallChildElements(const DOMElement* do
 
             // Retain ownership of the unmarshalled child until it's processed by the parent.
             auto_ptr<XMLObject> childObject(unmarshaller->unmarshall(static_cast<DOMElement*>(childNode)));
-            processChildElement(xmlObject, childObject.get());
+            processChildElement(xmlObject, childObject.get(), static_cast<DOMElement*>(childNode));
             childObject.release();
         }
         else if (childNode->getNodeType() == DOMNode::TEXT_NODE) {

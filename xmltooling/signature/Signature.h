@@ -1,0 +1,97 @@
+/*
+ *  Copyright 2001-2006 Internet2
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @file Signature.h
+ * 
+ * XMLObject representing XML Digital Signature, version 20020212, Signature element. 
+ */
+
+#if !defined(__xmltooling_sig_h__) && !defined(XMLTOOLING_NO_XMLSEC)
+#define __xmltooling_sig_h__
+
+#include <xmltooling/XMLObject.h>
+#include <xmltooling/signature/SigningContext.h>
+
+namespace xmltooling {
+
+    /**
+     * XMLObject representing XML Digital Signature, version 20020212, Signature element.
+     * The default signature settings include Exclusive c14n w/o comments, SHA-1 digests,
+     * and RSA-SHA1 signing. 
+     */
+    class XMLTOOL_API Signature : public virtual XMLObject
+    {
+    public:
+        virtual ~Signature() {}
+
+        /** Element prefix */
+        static const XMLCh PREFIX[];
+
+        /** Element local name */
+        static const XMLCh LOCAL_NAME[];
+
+        /**
+         * Gets the canonicalization method for the ds:SignedInfo element.
+         * 
+         * @return the canonicalization method
+         */
+        virtual const XMLCh* getCanonicalizationMethod() const=0;
+        
+        /**
+         * Gets the signing algorithm for the signature.
+         * 
+         * @return the signature algorithm
+         */
+        virtual const XMLCh* getSignatureAlgorithm() const=0;
+
+        /**
+         * Returns the ds:KeyInfo information attached to the signature.
+         * The Signature object must be marshalled before this will return anything.
+         * 
+         * @return the ds:KeyInfo information
+         */
+        virtual const DSIGKeyInfoList* getKeyInfo() const=0; 
+
+        /**
+         * Sets the canonicalization method for the ds:SignedInfo element
+         * 
+         * @param c14n  the canonicalization method
+         */
+        virtual void setCanonicalizationMethod(const XMLCh* c14n)=0;
+        
+        /**
+         * Sets the signing algorithm for the signature.
+         * 
+         * @param sm    the signature algorithm
+         */
+        virtual void setSignatureAlgorithm(const XMLCh* sm)=0;
+        
+        /**
+         * Applies an XML signature based on the supplied context.
+         * 
+         * @param ctx   the signing context that determines the signature's content
+         * @throws SignatureException   thrown if the signing operation fails
+         */
+        virtual void sign(const SigningContext* ctx)=0;
+        
+    protected:
+        Signature() {}
+    };
+
+};
+
+#endif /* __xmltooling_sig_h__ */

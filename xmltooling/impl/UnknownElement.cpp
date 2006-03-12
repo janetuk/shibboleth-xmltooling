@@ -70,7 +70,7 @@ void UnknownElementImpl::serialize(string& s) const
         XMLHelper::serialize(getDOM(),s);
 }
 
-DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMDocument* document) const
+DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMDocument* document, MarshallingContext* ctx) const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("marshall");
@@ -93,13 +93,19 @@ DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMDocument
             return cachedDOM;
         }
         
-        // We have a DOM but it doesn't match the document we were given. This both sucks and blows.
-        // Without an adoptNode option to maintain the child pointers, we rely on our custom
-        // implementation class to preserve the XML when we release the existing DOM.
-        unk->releaseDOM();
+        // We have a DOM but it doesn't match the document we were given, so we import
+        // it into the new document.
+        cachedDOM=static_cast<DOMElement*>(document->importNode(cachedDOM, true));
+
+        // Recache the DOM.
+        setDocumentElement(document, cachedDOM);
+        log.debug("caching imported DOM for XMLObject");
+        unk->setDOM(cachedDOM, false);
+        unk->releaseParentDOM(true);
+        return cachedDOM;
     }
     
-    // If we get here, we didn't have a usable DOM (and/or we flushed the one we had).
+    // If we get here, we didn't have a usable DOM.
     // We need to reparse the XML we saved off into a new DOM.
     bool bindDocument=false;
     MemBufInputSource src(reinterpret_cast<const XMLByte*>(unk->m_xml.c_str()),unk->m_xml.length(),"UnknownElementImpl");
@@ -129,7 +135,7 @@ DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMDocument
     return cachedDOM;
 }
 
-DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMElement* parentElement) const
+DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMElement* parentElement, MarshallingContext* ctx) const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("marshall");
@@ -151,10 +157,16 @@ DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMElement*
             return cachedDOM;
         }
         
-        // We have a DOM but it doesn't match the document we were given. This both sucks and blows.
-        // Without an adoptNode option to maintain the child pointers, we rely on our custom
-        // implementation class to preserve the XML when we release the existing DOM.
-        unk->releaseDOM();
+        // We have a DOM but it doesn't match the document we were given, so we import
+        // it into the new document.
+        cachedDOM=static_cast<DOMElement*>(parentElement->getOwnerDocument()->importNode(cachedDOM, true));
+
+        // Recache the DOM.
+        parentElement->appendChild(cachedDOM);
+        log.debug("caching imported DOM for XMLObject");
+        unk->setDOM(cachedDOM, false);
+        unk->releaseParentDOM(true);
+        return cachedDOM;
     }
     
     // If we get here, we didn't have a usable DOM (and/or we flushed the one we had).

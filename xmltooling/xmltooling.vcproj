@@ -269,6 +269,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="signature"
+				>
+				<Filter
+					Name="impl"
+					>
+					<File
+						RelativePath=".\signature\impl\XMLSecSignature.cpp"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -410,6 +422,30 @@
 					RelativePath=".\validation\Validator.h"
 					>
 				</File>
+			</Filter>
+			<Filter
+				Name="signature"
+				>
+				<File
+					RelativePath=".\signature\KeyInfo.h"
+					>
+				</File>
+				<File
+					RelativePath=".\signature\Signature.h"
+					>
+				</File>
+				<File
+					RelativePath=".\signature\SigningContext.h"
+					>
+				</File>
+				<Filter
+					Name="impl"
+					>
+					<File
+						RelativePath=".\signature\impl\XMLSecSignature.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 		</Filter>
 		<Filter

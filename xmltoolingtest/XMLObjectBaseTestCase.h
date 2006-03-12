@@ -23,9 +23,13 @@
 #include <xmltooling/XMLToolingConfig.h>
 #include <xmltooling/io/AbstractXMLObjectMarshaller.h>
 #include <xmltooling/io/AbstractXMLObjectUnmarshaller.h>
+#ifndef XMLTOOLING_NO_XMLSEC
+    #include <xmltooling/signature/Signature.h>
+#endif
 #include <xmltooling/util/ParserPool.h>
-#include <xmltooling/util/XMLObjectChildrenList.h>
+#include <xmltooling/util/XMLConstants.h>
 #include <xmltooling/util/XMLHelper.h>
+#include <xmltooling/util/XMLObjectChildrenList.h>
 
 using namespace xmltooling;
 using namespace std;
@@ -47,7 +51,11 @@ public:
     static const XMLCh LOCAL_NAME[];
     static const XMLCh ID_ATTRIB_NAME[];
 
-    SimpleXMLObject() : AbstractDOMCachingXMLObject(NAMESPACE, LOCAL_NAME, NAMESPACE_PREFIX), m_id(NULL), m_value(NULL) {}
+    SimpleXMLObject() : AbstractDOMCachingXMLObject(NAMESPACE, LOCAL_NAME, NAMESPACE_PREFIX), m_id(NULL), m_value(NULL) {
+        m_children.push_back(NULL);
+        m_signature=m_children.begin();
+    }
+
     virtual ~SimpleXMLObject() {
         XMLString::release(&m_id);
         XMLString::release(&m_value);
@@ -58,7 +66,17 @@ public:
 
     const XMLCh* getValue() const { return m_value; }
     void setValue(const XMLCh* value) { m_value=prepareForAssignment(m_value,value); }
-    
+
+#ifndef XMLTOOLING_NO_XMLSEC    
+    Signature* getSignature() const {
+        return dynamic_cast<Signature*>(*m_signature);
+    }
+
+    void setSignature(Signature* sig) {
+        *m_signature=prepareForAssignment(*m_signature,sig);
+    }
+#endif
+
     VectorOf(SimpleXMLObject) getSimpleXMLObjects() {
         return VectorOf(SimpleXMLObject)(this, m_simples, &m_children, m_children.end());
     }
@@ -83,6 +101,7 @@ private:
     XMLCh* m_id;
     XMLCh* m_value;
     vector<SimpleXMLObject*> m_simples;
+    list<XMLObject*>::iterator m_signature;
 };
 
 class SimpleXMLObjectBuilder : public XMLObjectBuilder
@@ -123,27 +142,24 @@ public:
     SimpleXMLObjectUnmarshaller() {}
 
 private:
-    void processChildElement(XMLObject& parentXMLObject, XMLObject* childXMLObject) const {
+    void processChildElement(XMLObject& parentXMLObject, XMLObject* childXMLObject, const DOMElement* root) const {
         SimpleXMLObject& simpleXMLObject = dynamic_cast<SimpleXMLObject&>(parentXMLObject);
 
-        SimpleXMLObject* child = dynamic_cast<SimpleXMLObject*>(childXMLObject);
-        if (child) {
-            simpleXMLObject.getSimpleXMLObjects().push_back(child);
-        }
-        else {
+        if (XMLHelper::isNodeNamed(root, SimpleXMLObject::NAMESPACE, SimpleXMLObject::LOCAL_NAME))
+            simpleXMLObject.getSimpleXMLObjects().push_back(dynamic_cast<SimpleXMLObject*>(childXMLObject));
+        else if (XMLHelper::isNodeNamed(root, XMLConstants::XMLSIG_NS, Signature::LOCAL_NAME))
+            simpleXMLObject.setSignature(dynamic_cast<Signature*>(childXMLObject));
+        else
             throw UnmarshallingException("Unknown child element cannot be added to parent object.");
-        }
     }
 
     void processAttribute(XMLObject& xmlObject, const DOMAttr* attribute) const {
         SimpleXMLObject& simpleXMLObject = dynamic_cast<SimpleXMLObject&>(xmlObject);
 
-        if (XMLString::equals(attribute->getLocalName(),SimpleXMLObject::ID_ATTRIB_NAME)) {
+        if (XMLHelper::isNodeNamed(attribute, NULL, SimpleXMLObject::ID_ATTRIB_NAME))
             simpleXMLObject.setId(attribute->getValue());
-        }
-        else {
+        else
             throw UnmarshallingException("Unknown attribute cannot be processed by parent object.");
-        }
     }
 
     void processElementContent(XMLObject& xmlObject, const XMLCh* elementContent) const {
@@ -240,7 +256,7 @@ private:
         throw UnmarshallingException("Failed to locate WildcardObjectBuilder for element.");
     }
 
-    void processChildElement(XMLObject& parentXMLObject, XMLObject* childXMLObject) const {
+    void processChildElement(XMLObject& parentXMLObject, XMLObject* childXMLObject, const DOMElement* root) const {
         WildcardXMLObject& wcXMLObject = dynamic_cast<WildcardXMLObject&>(parentXMLObject);
 
         wcXMLObject.getXMLObjects().push_back(childXMLObject);

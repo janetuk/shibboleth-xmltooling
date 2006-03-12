@@ -36,15 +36,14 @@ namespace xmltooling {
         virtual ~AbstractXMLObjectMarshaller() {}
 
         /**
-         * @see Marshaller::marshall(XMLObject*,DOMDocument*)
+         * @see Marshaller::marshall(XMLObject*,DOMDocument*,const MarshallingContext*)
          */
-        DOMElement* marshall(XMLObject* xmlObject, DOMDocument* document=NULL) const;
+        DOMElement* marshall(XMLObject* xmlObject, DOMDocument* document=NULL, MarshallingContext* ctx=NULL) const;
 
         /**
-         * @see Marshaller::marshall(XMLObject*,DOMElement*)
+         * @see Marshaller::marshall(XMLObject*,DOMElement*,const MarshallingContext*)
          */
-        DOMElement* marshall(XMLObject* xmlObject, DOMElement* parentElement) const;
-    
+        DOMElement* marshall(XMLObject* xmlObject, DOMElement* parentElement, MarshallingContext* ctx=NULL) const;
         
     protected:
         AbstractXMLObjectMarshaller();
@@ -70,9 +69,12 @@ namespace xmltooling {
          * 
          * @param xmlObject the XMLObject to marshall
          * @param targetElement the Element into which the XMLObject is marshalled into
+         * @param ctx           optional marshalling context
+         * 
          * @throws MarshallingException thrown if there is a problem marshalling the object
+         * @throws SignatureException thrown if a problem occurs during signature creation 
          */
-        void marshallInto(XMLObject& xmlObject, DOMElement* targetElement) const;
+        void marshallInto(XMLObject& xmlObject, DOMElement* targetElement, MarshallingContext* ctx) const;
     
         /**
          * Creates an xsi:type attribute, corresponding to the given type of the XMLObject, on the DOM element.

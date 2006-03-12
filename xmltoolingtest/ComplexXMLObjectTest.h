@@ -30,9 +30,9 @@ public:
     }
 
     void tearDown() {
-        XMLObjectBuilder::deregisterDefaultBuilder();
-        Marshaller::deregisterDefaultMarshaller();
-        Unmarshaller::deregisterDefaultUnmarshaller();
+        //XMLObjectBuilder::deregisterDefaultBuilder();
+        //Marshaller::deregisterDefaultMarshaller();
+        //Unmarshaller::deregisterDefaultUnmarshaller();
     }
 
     void testComplexUnmarshalling() {

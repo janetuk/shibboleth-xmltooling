@@ -123,6 +123,8 @@ XMLObject* AbstractDOMCachingXMLObject::clone() const
             Category::getInstance(XMLTOOLING_LOGCAT".DOM").error(
                 "DOM clone failed, unable to locate unmarshaller for element (%s)", q->toString().c_str()
                 );
+            domCopy->getOwnerDocument()->release();
+            throw UnmarshallingException("Unable to locate unmarshaller for cloned element.");
         }
         try {
             return u->unmarshall(domCopy, true);    // bind document
@@ -132,4 +134,29 @@ XMLObject* AbstractDOMCachingXMLObject::clone() const
         }
     }
     return NULL;
+}
+
+XMLObject* AbstractDOMCachingXMLObject::prepareForAssignment(XMLObject* oldValue, XMLObject* newValue) {
+
+    if (newValue && newValue->hasParent())
+        throw XMLObjectException("child XMLObject cannot be added - it is already the child of another XMLObject");
+
+    if (!oldValue) {
+        if (newValue) {
+            releaseThisandParentDOM();
+            newValue->setParent(this);
+            return newValue;
+        }
+        else {
+            return NULL;
+        }
+    }
+
+    if (oldValue != newValue) {
+        delete oldValue;
+        releaseThisandParentDOM();
+        newValue->setParent(this);
+    }
+
+    return newValue;
 }

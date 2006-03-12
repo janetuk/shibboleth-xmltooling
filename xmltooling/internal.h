@@ -38,6 +38,9 @@
 #include "util/ParserPool.h"
 
 #include <vector>
+#ifndef XMLTOOLING_NO_XMLSEC
+    #include <xsec/framework/XSECProvider.hpp>
+#endif
 
 #define XMLTOOLING_LOGCAT "XMLTooling"
 
@@ -46,7 +49,7 @@ namespace xmltooling {
     class XMLToolingInternalConfig : public xmltooling::XMLToolingConfig
     {
     public:
-        XMLToolingInternalConfig() : m_lock(NULL), m_parserPool(NULL) {}
+        XMLToolingInternalConfig() : m_lock(NULL), m_parserPool(NULL), m_xsecProvider(NULL) {}
 
         static XMLToolingInternalConfig& getInternalConfig();
 
@@ -64,11 +67,11 @@ namespace xmltooling {
 
         // internal parser pool
         xmltooling::ParserPool* m_parserPool;
+        XSECProvider* m_xsecProvider;
 
     private:
         std::vector<void*> m_libhandles;
         void* m_lock;
-        //XSECProvider* m_xsec;
         //PlugManager m_plugMgr;
     };
 };

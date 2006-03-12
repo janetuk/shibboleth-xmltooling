@@ -55,6 +55,17 @@ namespace xmltooling {
         virtual XMLObject* buildObject() const=0;
 
         /**
+         * Creates an empty XMLObject using the default build method, if a builder can be found.
+         * 
+         * @param key   the key used to locate a builder
+         * @return  the empty object or NULL if no builder is available 
+         */
+        static XMLObject* buildObject(const QName& key) {
+            const XMLObjectBuilder* b=getBuilder(key);
+            return b ? b->buildObject() : NULL;
+        }
+
+        /**
          * Retrieves an XMLObjectBuilder using the key it was registered with.
          * 
          * @param key the key used to register the builder

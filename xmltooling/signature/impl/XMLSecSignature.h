@@ -15,19 +15,18 @@
  */
 
 /**
- * @file UnknownElement.h
+ * @file XMLSecSignature.h
  * 
- * Basic implementations suitable for use as defaults for unrecognized content
+ * Signature classes for XMLSec-based signature-handling
  */
 
-#if !defined(__xmltooling_unkelement_h__)
-#define __xmltooling_unkelement_h__
+#if !defined(__xmltooling_xmlsecsig_h__) && !defined(XMLTOOLING_NO_XMLSEC)
+#define __xmltooling_xmlsecsig_h__
 
 #include "internal.h"
-#include "AbstractDOMCachingXMLObject.h"
-#include "XMLObjectBuilder.h"
-#include "io/Marshaller.h"
-#include "io/Unmarshaller.h"
+#include "impl/UnknownElement.h"
+#include "signature/Signature.h"
+#include "util/XMLConstants.h"
 
 #include <string>
 
@@ -39,57 +38,57 @@
 namespace xmltooling {
 
     /**
-     * Implementation class for unrecognized DOM elements.
-     * Purpose is to wrap the DOM and do any necessary caching/reconstruction
-     * when a DOM has to cross into a new document.
+     * XMLObject representing XML Digital Signature, version 20020212, Signature element.
+     * Manages an Apache XML Signature object and the associated DOM.  
      */
-    class XMLTOOL_DLLLOCAL UnknownElementImpl : public AbstractDOMCachingXMLObject
+    class XMLTOOL_DLLLOCAL XMLSecSignatureImpl : public UnknownElementImpl, public virtual Signature
     {
     public:
-        UnknownElementImpl(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL)
-            : AbstractDOMCachingXMLObject(namespaceURI, elementLocalName, namespacePrefix) {}
-    
-        /**
-         * Overridden to ensure XML content of DOM isn't lost.
-         * 
-         * @see DOMCachingXMLObject::releaseDOM()
-         */
+        XMLSecSignatureImpl() : UnknownElementImpl(XMLConstants::XMLSIG_NS, Signature::LOCAL_NAME),
+            m_signature(NULL), m_c14n(NULL), m_sm(NULL) {}
+        virtual ~XMLSecSignatureImpl();
+        
         void releaseDOM();
-
-        /**
-          * @see XMLObject::clone()
-          */
         XMLObject* clone() const;
 
-    protected:
-        /**
-         * When needed, we can serialize the DOM into XML form and preserve it here.
-         */
-        std::string m_xml;
+        // Getters
+        const XMLCh* getCanonicalizationMethod() const { return m_c14n ? m_c14n : DSIGConstants::s_unicodeStrURIEXC_C14N_NOC; }
+        const XMLCh* getSignatureAlgorithm() const { return m_sm ? m_sm : DSIGConstants::s_unicodeStrURIRSA_SHA1; }
+        const DSIGKeyInfoList* getKeyInfo() const;
 
-        void serialize(std::string& s) const;
+        // Setters
+        void setCanonicalizationMethod(const XMLCh* c14n) { m_c14n = prepareForAssignment(m_c14n,c14n); }
+        void setSignatureAlgorithm(const XMLCh* sm) { m_sm = prepareForAssignment(m_sm,sm); }
+
+        void sign(const SigningContext* ctx);
+
     private:
-        friend class XMLTOOL_DLLLOCAL UnknownElementMarshaller;
+        DSIGSignature* m_signature;
+        XMLCh* m_c14n;
+        XMLCh* m_sm;
+
+        friend class XMLTOOL_DLLLOCAL XMLSecSignatureMarshaller;
+        friend class XMLTOOL_DLLLOCAL XMLSecSignatureUnmarshaller;
     };
 
     /**
-     * Factory for UnknownElementImpl objects
+     * Factory for XMLSecSignatureImpl objects
      */
-    class XMLTOOL_DLLLOCAL UnknownElementBuilder : public virtual XMLObjectBuilder
+    class XMLTOOL_DLLLOCAL XMLSecSignatureBuilder : public virtual XMLObjectBuilder
     {
     public:
         /**
          * @see XMLObjectBuilder::buildObject()
          */
         XMLObject* buildObject() const {
-            return new UnknownElementImpl();
+            return new XMLSecSignatureImpl();
         }
     };
 
     /**
-     * Marshaller for UnknownElementImpl objects
+     * Marshaller for XMLSecSignatureImpl objects
      */
-    class XMLTOOL_DLLLOCAL UnknownElementMarshaller : public virtual Marshaller
+    class XMLTOOL_DLLLOCAL XMLSecSignatureMarshaller : public virtual Marshaller
     {
     public:
         /**
@@ -113,9 +112,9 @@ namespace xmltooling {
     };
 
     /**
-     * Unmarshaller for UnknownElementImpl objects
+     * Unmarshaller for XMLSecSignatureImpl objects
      */
-    class XMLTOOL_DLLLOCAL UnknownElementUnmarshaller : public virtual Unmarshaller
+    class XMLTOOL_DLLLOCAL XMLSecSignatureUnmarshaller : public virtual Unmarshaller
     {
     public:
         /**
@@ -123,10 +122,11 @@ namespace xmltooling {
          */
         XMLObject* unmarshall(DOMElement* element, bool bindDocument=false) const;
     };
+
 };
 
 #if defined (_MSC_VER)
     #pragma warning( pop )
 #endif
 
-#endif /* __xmltooling_unkelement_h__ */
+#endif /* __xmltooling_xmlsecsig_h__ */

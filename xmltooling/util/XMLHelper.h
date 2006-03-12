@@ -87,15 +87,15 @@ namespace xmltooling {
         static DOMElement* appendChildElement(DOMElement* parentElement, DOMElement* childElement);
         
         /**
-         * Checks the qualified name of an element.
+         * Checks the qualified name of a node.
          * 
-         * @param e     element to check
+         * @param n     node to check
          * @param ns    namespace to compare with
          * @param local local name to compare with
-         * @return  true iff the element's qualified name matches the other parameters
+         * @return  true iff the node's qualified name matches the other parameters
          */
-        static bool isElementNamed(const DOMElement* e, const XMLCh* ns, const XMLCh* local) {
-            return (e && XMLString::equals(ns,e->getNamespaceURI()) && XMLString::equals(local,e->getLocalName()));
+        static bool isNodeNamed(const DOMNode* n, const XMLCh* ns, const XMLCh* local) {
+            return (n && XMLString::equals(local,n->getLocalName()) && XMLString::equals(ns,n->getNamespaceURI()));
         }
 
         /**

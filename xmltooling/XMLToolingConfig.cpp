@@ -23,6 +23,7 @@
 #include "internal.h"
 #include "XMLToolingConfig.h"
 #include "impl/UnknownElement.h"
+#include "signature/impl/XMLSecSignature.h"
 #include "util/NDC.h"
 
 #ifdef HAVE_DLFCN_H
@@ -33,7 +34,9 @@
 #include <log4cpp/PropertyConfigurator.hh>
 #include <log4cpp/OstreamAppender.hh>
 #include <xercesc/util/PlatformUtils.hpp>
-#include <xsec/framework/XSECProvider.hpp>
+#ifndef XMLTOOLING_NO_XMLSEC
+    #include <xsec/framework/XSECProvider.hpp>
+#endif
 
 #include <stdexcept>
 
@@ -126,10 +129,12 @@ bool XMLToolingInternalConfig::init()
         xercesc::XMLPlatformUtils::Initialize();
         log.debug("Xerces initialization complete");
 
+#ifndef XMLTOOLING_NO_XMLSEC
         XSECPlatformUtils::Initialise();
-        //m_xsec=new XSECProvider();
+        m_xsecProvider=new XSECProvider();
         log.debug("XMLSec initialization complete");
-        
+#endif
+
         m_parserPool=new ParserPool();
         m_lock=xercesc::XMLPlatformUtils::makeMutex();
 
@@ -137,6 +142,11 @@ bool XMLToolingInternalConfig::init()
         XMLObjectBuilder::registerDefaultBuilder(new UnknownElementBuilder());
         Marshaller::registerDefaultMarshaller(new UnknownElementMarshaller());
         Unmarshaller::registerDefaultUnmarshaller(new UnknownElementUnmarshaller());
+        
+        QName dsig(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME);
+        XMLObjectBuilder::registerBuilder(dsig,new XMLSecSignatureBuilder());
+        Marshaller::registerMarshaller(dsig,new XMLSecSignatureMarshaller());
+        Unmarshaller::registerUnmarshaller(dsig,new XMLSecSignatureUnmarshaller());
     }
     catch (const xercesc::XMLException&) {
         log.fatal("caught exception while initializing Xerces");
@@ -149,10 +159,9 @@ bool XMLToolingInternalConfig::init()
 
 void XMLToolingInternalConfig::term()
 {
-    // default registrations
-    XMLObjectBuilder::deregisterDefaultBuilder();
-    Marshaller::deregisterDefaultMarshaller();
-    Unmarshaller::deregisterDefaultUnmarshaller();
+    XMLObjectBuilder::destroyBuilders();
+    Marshaller::destroyMarshallers();
+    Unmarshaller::destroyUnmarshallers();
 
     for (vector<void*>::reverse_iterator i=m_libhandles.rbegin(); i!=m_libhandles.rend(); i++) {
 #if defined(WIN32)
@@ -174,8 +183,12 @@ void XMLToolingInternalConfig::term()
     delete m_parserPool;
     m_parserPool=NULL;
 
-    //delete m_xsec; m_xsec=NULL;
+#ifndef XMLTOOLING_NO_XMLSEC
+    delete m_xsecProvider;
+    m_xsecProvider=NULL;
     XSECPlatformUtils::Terminate();
+#endif
+
     xercesc::XMLPlatformUtils::closeMutex(m_lock);
     m_lock=NULL;
     xercesc::XMLPlatformUtils::Terminate();

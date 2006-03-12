@@ -24,8 +24,12 @@
 #define __xmltooling_marshaller_h__
 
 #include <map>
+#include <vector>
 #include <xercesc/dom/DOM.hpp>
 #include <xmltooling/XMLObject.h>
+#ifndef XMLTOOLING_NO_XMLSEC
+    #include <xmltooling/signature/Signature.h>
+#endif
 
 using namespace xercesc;
 
@@ -35,6 +39,27 @@ using namespace xercesc;
 #endif
 
 namespace xmltooling {
+
+    /**
+     * Supplies additional information to the marshalling process.
+     * Currently this only consists of signature related information.
+     */
+    class XMLTOOL_API MarshallingContext
+    {
+        MAKE_NONCOPYABLE(MarshallingContext);
+    public:
+        MarshallingContext() {}
+        ~MarshallingContext() {}
+
+#ifndef XMLTOOLING_NO_XMLSEC
+        MarshallingContext(Signature* sig, const SigningContext* ctx) {
+            m_signingContexts.push_back(std::make_pair(sig,ctx));
+        }
+        
+        /** Array of signing contexts, keyed off of the associated Signature */
+        std::vector< std::pair<Signature*,const SigningContext*> > m_signingContexts;
+#endif
+    };
 
     /**
      * Marshallers are used to marshall an XMLObject into a W3C DOM element.
@@ -55,11 +80,14 @@ namespace xmltooling {
          * marshalled, unless an existing DOM can be reused without creating a new document. 
          * 
          * @param xmlObject the object to marshall
-         * @param document the DOM document the marshalled element will be placed in, or NULL
+         * @param document  the DOM document the marshalled element will be placed in, or NULL
+         * @param ctx       optional marshalling context
          * @return the DOM element representing this XMLObject
+         * 
          * @throws MarshallingException thrown if there is a problem marshalling the given object
+         * @throws SignatureException thrown if a problem occurs during signature creation 
          */
-        virtual DOMElement* marshall(XMLObject* xmlObject, DOMDocument* document=NULL) const=0;
+        virtual DOMElement* marshall(XMLObject* xmlObject, DOMDocument* document=NULL, MarshallingContext* ctx=NULL) const=0;
         
         /**
          * Marshall the given XMLObject and append it as a child of the given parent element.
@@ -69,10 +97,13 @@ namespace xmltooling {
          * 
          * @param xmlObject the XMLObject to be marshalled
          * @param parentElement the parent element to append the resulting DOM tree
+         * @param ctx       optional marshalling context
          * @return the marshalled element tree
+
          * @throws MarshallingException thrown if the given XMLObject can not be marshalled.
+         * @throws SignatureException thrown if a problem occurs during signature creation 
          */
-        virtual DOMElement* marshall(XMLObject* xmlObject, DOMElement* parentElement) const=0;
+        virtual DOMElement* marshall(XMLObject* xmlObject, DOMElement* parentElement, MarshallingContext* ctx=NULL) const=0;
 
         /**
          * Retrieves a Marshaller using the key it was registered with.

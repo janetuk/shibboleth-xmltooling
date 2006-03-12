@@ -166,7 +166,7 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
         
         // Check root element.
         const DOMElement* root=doc->getDocumentElement();
-        if (!XMLHelper::isElementNamed(root,CATALOG_NS,catalog)) {
+        if (!XMLHelper::isNodeNamed(root,CATALOG_NS,catalog)) {
             auto_ptr_char temp(pathname);
             log.error("unknown root element, failed to load XML catalog from %s", temp.get());
             return false;

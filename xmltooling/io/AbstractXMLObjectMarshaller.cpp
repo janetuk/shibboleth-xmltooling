@@ -42,7 +42,7 @@ using namespace std;
 AbstractXMLObjectMarshaller::AbstractXMLObjectMarshaller()
     : m_log(&Category::getInstance(XMLTOOLING_LOGCAT".Marshaller")) {}
 
-DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMDocument* document) const
+DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMDocument* document, MarshallingContext* ctx) const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("marshall");
@@ -88,7 +88,7 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMDocum
             xmlObject->getElementQName().getNamespaceURI(), xmlObject->getElementQName().getLocalPart()
             );
         setDocumentElement(document, domElement);
-        marshallInto(*xmlObject, domElement);
+        marshallInto(*xmlObject, domElement, ctx);
 
         //Recache the DOM.
         if (dc) {
@@ -108,7 +108,7 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMDocum
     }
 }
 
-DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMElement* parentElement) const
+DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMElement* parentElement, MarshallingContext* ctx) const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("marshall");
@@ -147,7 +147,7 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMEleme
         xmlObject->getElementQName().getNamespaceURI(), xmlObject->getElementQName().getLocalPart()
         );
     parentElement->appendChild(domElement);
-    marshallInto(*xmlObject, domElement);
+    marshallInto(*xmlObject, domElement, ctx);
 
     //Recache the DOM.
     if (dc) {
@@ -158,8 +158,19 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(XMLObject* xmlObject, DOMEleme
 
     return domElement;
 }
-        
-void AbstractXMLObjectMarshaller::marshallInto(XMLObject& xmlObject, DOMElement* targetElement) const
+
+#ifndef XMLTOOLING_NO_XMLSEC
+    class _signit : public unary_function<const pair<Signature*,const SigningContext*>&, void> {
+    public:
+        void operator()(const pair<Signature*,const SigningContext*>& p) const {
+            p.first->sign(p.second);
+        }
+    };
+#endif
+
+void AbstractXMLObjectMarshaller::marshallInto(
+    XMLObject& xmlObject, DOMElement* targetElement, MarshallingContext* ctx
+    ) const
 {
     if (xmlObject.getElementQName().hasPrefix())
         targetElement->setPrefix(xmlObject.getElementQName().getPrefix());
@@ -169,15 +180,11 @@ void AbstractXMLObjectMarshaller::marshallInto(XMLObject& xmlObject, DOMElement*
     marshallChildElements(xmlObject, targetElement);
     marshallElementContent(xmlObject, targetElement);
 
-    /* TODO Signing/Encryption
-    if (xmlObject instanceof SignableXMLObject) {
-        signElement(targetElement, xmlObject);
+#ifndef XMLTOOLING_NO_XMLSEC
+    if (ctx) {
+        for_each(ctx->m_signingContexts.begin(),ctx->m_signingContexts.end(),_signit());
     }
-
-    if (xmlObject instanceof EncryptableXMLObject) {
-        encryptElement(targetElement, xmlObject);
-    }
-    */
+#endif
 }
 
 void AbstractXMLObjectMarshaller::marshallElementType(XMLObject& xmlObject, DOMElement* domElement) const
@@ -298,7 +305,7 @@ public:
                 );
             throw MarshallingException("Marshaller found unknown child element, but no default marshaller was found.");
         }
-        element->appendChild(marshaller->marshall(obj, element));
+        marshaller->marshall(obj, element);
     }
 };
 

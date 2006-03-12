@@ -124,24 +124,41 @@ namespace xmltooling {
 
         /**
          * A helper function for derived classes.
-         * This 'normalizes' newString and then if it is different from oldString
-         * invalidates the DOM. It returns the normalized value.
+         * This 'normalizes' newString, and then if it is different from oldString,
+         * it invalidates the DOM, frees the old string, and return the new.
+         * If not different, it frees the new string and just returns the old value.
          * 
          * @param oldValue - the current value
          * @param newValue - the new value
          * 
          * @return the value that should be assigned
          */
-        XMLCh* prepareForAssignment(const XMLCh* oldValue, const XMLCh* newValue) {
+        XMLCh* prepareForAssignment(XMLCh* oldValue, const XMLCh* newValue) {
             XMLCh* newString = XMLString::replicate(newValue);
             XMLString::trim(newString);
-
-            if (!XMLString::equals(oldValue,newValue))
+            if (!XMLString::equals(oldValue,newValue)) {
                 releaseThisandParentDOM();
-    
-            return newString;
+                XMLString::release(&oldValue);
+                return newString;
+            }
+            XMLString::release(&newString);
+            return oldValue;            
         }
-    
+
+        /**
+         * A helper function for derived classes, for assignment of (singleton) XML objects.
+         * 
+         * It is indifferent to whether either the old or the new version of the value is null. 
+         * This method will do a safe compare of the objects and will also invalidate the DOM if appropriate
+         * 
+         * @param oldValue - current value
+         * @param newValue - proposed new value
+         * @return the value to assign 
+         * 
+         * @throws XMLObjectException if the new child already has a parent.
+         */
+        XMLObject* prepareForAssignment(XMLObject* oldValue, XMLObject* newValue);
+
     private:
         DOMElement* m_dom;
         DOMDocument* m_document;
