@@ -159,11 +159,8 @@ AC_TRY_LINK(
 
 # XML-Security settings
 AC_ARG_WITH(xmlsec,
-            AC_HELP_STRING([--with-xmlsec=PATH], [where xmlsec is installed]),
-            [if test x_$with_xmlsec != x_/usr; then
-                LDFLAGS="-L${with_xmlsec}/lib $LDFLAGS"
-                CPPFLAGS="-I${with_xmlsec}/include $CPPFLAGS"
-            fi])
+            AC_HELP_STRING([--with-xmlsec=PATH], [where xmlsec is installed]),,
+            [with_xmlsec=/usr])
 
 if test x_$with_xmlsec != x_no; then
     if test x_$with_xmlsec != x_/usr; then
@@ -188,8 +185,8 @@ int i = 0;
             [AC_MSG_ERROR([unable to link with XML-Sec])])
 else
     AC_MSG_WARN([xmlsec disabled, building without signature/encryption support])
-    [AC_DEFINE(XMLTOOLING_NO_XMLSEC,1,
-        [Define if you wish to disable XML-Security-dependent features.])]
+    AC_DEFINE(XMLTOOLING_NO_XMLSEC,1,
+        [Define if you wish to disable XML-Security-dependent features.])
 fi
 AM_CONDITIONAL(BUILD_XMLSEC,test x_$with_xmlsec != x_no)
 

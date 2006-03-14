@@ -142,11 +142,12 @@ bool XMLToolingInternalConfig::init()
         XMLObjectBuilder::registerDefaultBuilder(new UnknownElementBuilder());
         Marshaller::registerDefaultMarshaller(new UnknownElementMarshaller());
         Unmarshaller::registerDefaultUnmarshaller(new UnknownElementUnmarshaller());
-        
+#ifndef XMLTOOLING_NO_XMLSEC
         QName dsig(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME);
         XMLObjectBuilder::registerBuilder(dsig,new XMLSecSignatureBuilder());
         Marshaller::registerMarshaller(dsig,new XMLSecSignatureMarshaller());
         Unmarshaller::registerUnmarshaller(dsig,new XMLSecSignatureUnmarshaller());
+#endif
     }
     catch (const xercesc::XMLException&) {
         log.fatal("caught exception while initializing Xerces");

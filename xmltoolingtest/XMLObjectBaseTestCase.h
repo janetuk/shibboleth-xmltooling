@@ -52,8 +52,10 @@ public:
     static const XMLCh ID_ATTRIB_NAME[];
 
     SimpleXMLObject() : AbstractDOMCachingXMLObject(NAMESPACE, LOCAL_NAME, NAMESPACE_PREFIX), m_id(NULL), m_value(NULL) {
+#ifndef XMLTOOLING_NO_XMLSEC
         m_children.push_back(NULL);
         m_signature=m_children.begin();
+#endif
     }
 
     virtual ~SimpleXMLObject() {
@@ -101,7 +103,9 @@ private:
     XMLCh* m_id;
     XMLCh* m_value;
     vector<SimpleXMLObject*> m_simples;
+#ifndef XMLTOOLING_NO_XMLSEC
     list<XMLObject*>::iterator m_signature;
+#endif
 };
 
 class SimpleXMLObjectBuilder : public XMLObjectBuilder
@@ -147,8 +151,10 @@ private:
 
         if (XMLHelper::isNodeNamed(root, SimpleXMLObject::NAMESPACE, SimpleXMLObject::LOCAL_NAME))
             simpleXMLObject.getSimpleXMLObjects().push_back(dynamic_cast<SimpleXMLObject*>(childXMLObject));
+#ifndef XMLTOOLING_NO_XMLSEC
         else if (XMLHelper::isNodeNamed(root, XMLConstants::XMLSIG_NS, Signature::LOCAL_NAME))
             simpleXMLObject.setSignature(dynamic_cast<Signature*>(childXMLObject));
+#endif
         else
             throw UnmarshallingException("Unknown child element cannot be added to parent object.");
     }
