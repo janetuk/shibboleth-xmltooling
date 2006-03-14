@@ -7,13 +7,20 @@ else
 bin_PROGRAMS = 
 endif
 
+if BUILD_XMLSEC
+xmlsec_sources = \
+    Signature.h
+else
+xmlsec_sources =
+endif
+
 xmltoolingtest_h = \
     ComplexXMLObjectTest.h \
     MarshallingTest.h \
-    Signature.h \
     UnknownTest.h \
     UnmarshallingTest.h \
-    xmltoolingtest.h
+    xmltoolingtest.h \
+    ${xmlsec_sources}
 
 noinst_HEADERS = \
     XMLObjectBaseTestCase.h

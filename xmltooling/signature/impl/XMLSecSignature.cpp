@@ -84,7 +84,7 @@ XMLObject* XMLSecSignatureImpl::clone() const
     return ret;
 }
 
-const DSIGKeyInfoList* XMLSecSignatureImpl::getKeyInfo() const
+DSIGKeyInfoList* XMLSecSignatureImpl::getKeyInfo() const
 {
     return m_signature ? m_signature->getKeyInfoList() : NULL;
 }

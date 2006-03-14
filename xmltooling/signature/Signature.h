@@ -61,10 +61,11 @@ namespace xmltooling {
         /**
          * Returns the ds:KeyInfo information attached to the signature.
          * The Signature object must be marshalled before this will return anything.
+         * The caller MUST NOT mutate the information through the provided pointer.
          * 
          * @return the ds:KeyInfo information
          */
-        virtual const DSIGKeyInfoList* getKeyInfo() const=0; 
+        virtual DSIGKeyInfoList* getKeyInfo() const=0; 
 
         /**
          * Sets the canonicalization method for the ds:SignedInfo element

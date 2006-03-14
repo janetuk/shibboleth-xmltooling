@@ -2,3 +2,5 @@
    specialization. */
 #undef HAVE_GOOD_STL
 
+/* Define to 1 to disable XML-Security-dependent features. */
+#undef XMLTOOLING_NO_XMLSEC

@@ -38,7 +38,6 @@ ioinclude_HEADERS = \
     io/Unmarshaller.h
 
 siginclude_HEADERS = \
-    signature/KeyInfo.h \
     signature/Signature.h \
     signature/SigningContext.h
 
@@ -57,6 +56,13 @@ noinst_HEADERS = \
     impl/UnknownElement.h \
     signature/impl/XMLSecSignature.h
 
+if BUILD_XMLSEC
+xmlsec_sources = \
+    signature/impl/XMLSecSignature.cpp
+else
+xmlsec_sources =
+endif
+
 libxmltooling_la_SOURCES = \
     AbstractAttributeExtensibleXMLObject.cpp \
     AbstractDOMCachingXMLObject.cpp \
@@ -71,12 +77,12 @@ libxmltooling_la_SOURCES = \
     io/AbstractXMLObjectUnmarshaller.cpp \
     io/Marshaller.cpp \
     io/Unmarshaller.cpp \
-    signature/impl/XMLSecSignature.cpp \
     util/NDC.cpp \
     util/ParserPool.cpp \
     util/XMLConstants.cpp \
     util/XMLHelper.cpp \
-    validation/Validator.cpp
+    validation/Validator.cpp \
+    ${xmlsec_sources}
 
 # this is different from the project version
 # http://sources.redhat.com/autobook/autobook/autobook_91.html
