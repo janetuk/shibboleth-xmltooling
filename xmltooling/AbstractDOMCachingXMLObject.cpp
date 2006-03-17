@@ -21,9 +21,9 @@
  */
 
 #include "internal.h"
-#include "exceptions.h"
 #include "AbstractDOMCachingXMLObject.h"
-#include "io/Unmarshaller.h"
+#include "exceptions.h"
+#include "XMLObjectBuilder.h"
 #include "util/XMLHelper.h"
 
 #include <algorithm>
@@ -40,7 +40,7 @@ AbstractDOMCachingXMLObject::~AbstractDOMCachingXMLObject()
         m_document->release();
 }
 
-void AbstractDOMCachingXMLObject::setDOM(DOMElement* dom, bool bindDocument)
+void AbstractDOMCachingXMLObject::setDOM(DOMElement* dom, bool bindDocument) const
 {
     m_dom=dom;
     if (dom) {
@@ -50,7 +50,7 @@ void AbstractDOMCachingXMLObject::setDOM(DOMElement* dom, bool bindDocument)
     }
 }
 
-void AbstractDOMCachingXMLObject::releaseDOM()
+void AbstractDOMCachingXMLObject::releaseDOM() const
 {
     if (m_dom) {
         Category& log=Category::getInstance(XMLTOOLING_LOGCAT".DOM");
@@ -62,7 +62,7 @@ void AbstractDOMCachingXMLObject::releaseDOM()
     }
 }
 
-void AbstractDOMCachingXMLObject::releaseParentDOM(bool propagateRelease)
+void AbstractDOMCachingXMLObject::releaseParentDOM(bool propagateRelease) const
 {
     DOMCachingXMLObject* domCachingParent = dynamic_cast<DOMCachingXMLObject*>(getParent());
     if (domCachingParent) {
@@ -90,7 +90,7 @@ public:
     }
 };
 
-void AbstractDOMCachingXMLObject::releaseChildrenDOM(bool propagateRelease)
+void AbstractDOMCachingXMLObject::releaseChildrenDOM(bool propagateRelease) const
 {
     if (hasChildren()) {
         Category::getInstance(XMLTOOLING_LOGCAT".DOM").debug(
@@ -117,20 +117,23 @@ XMLObject* AbstractDOMCachingXMLObject::clone() const
     DOMElement* domCopy=cloneDOM();
     if (domCopy) {
         // Seemed to work, so now we unmarshall the DOM to produce the clone.
-        const Unmarshaller* u=Unmarshaller::getUnmarshaller(domCopy);
-        if (!u) {
+        const XMLObjectBuilder* b=XMLObjectBuilder::getBuilder(domCopy);
+        if (!b) {
             auto_ptr<QName> q(XMLHelper::getNodeQName(domCopy));
             Category::getInstance(XMLTOOLING_LOGCAT".DOM").error(
-                "DOM clone failed, unable to locate unmarshaller for element (%s)", q->toString().c_str()
+                "DOM clone failed, unable to locate builder for element (%s)", q->toString().c_str()
                 );
             domCopy->getOwnerDocument()->release();
-            throw UnmarshallingException("Unable to locate unmarshaller for cloned element.");
+            throw UnmarshallingException("Unable to locate builder for cloned element.");
         }
         try {
-            return u->unmarshall(domCopy, true);    // bind document
+            auto_ptr<XMLObject> objCopy(b->buildObject(domCopy));
+            objCopy->unmarshall(domCopy, true);    // bind document
+            return objCopy.release();
         }
         catch (...) {
             domCopy->getOwnerDocument()->release();
+            throw;
         }
     }
     return NULL;

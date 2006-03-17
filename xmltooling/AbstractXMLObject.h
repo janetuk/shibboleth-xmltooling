@@ -23,7 +23,6 @@
 #if !defined(__xmltooling_abstractxmlobj_h__)
 #define __xmltooling_abstractxmlobj_h__
 
-#include <algorithm>
 #include <xmltooling/XMLObject.h>
 
 #if defined (_MSC_VER)
@@ -39,10 +38,7 @@ namespace xmltooling {
     class XMLTOOL_API AbstractXMLObject : public virtual XMLObject
     {
     public:
-        virtual ~AbstractXMLObject() {
-            delete m_typeQname;
-            std::for_each(m_children.begin(), m_children.end(), cleanup<XMLObject>());
-        }
+        virtual ~AbstractXMLObject();
 
         /**
          * @see XMLObject::getElementQName()
@@ -68,7 +64,7 @@ namespace xmltooling {
         /**
          * @see XMLObject::addNamespace()
          */
-        void addNamespace(const Namespace& ns) {
+        void addNamespace(const Namespace& ns) const {
             if (ns.alwaysDeclare() || m_namespaces.find(ns)==m_namespaces.end()) {
                 m_namespaces.insert(ns);
             }
@@ -143,10 +139,7 @@ namespace xmltooling {
          * @param elementLocalName the local name of the XML element this Object represents
          * @param namespacePrefix the namespace prefix to use
          */
-        AbstractXMLObject(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL)
-            : m_elementQname(namespaceURI,elementLocalName, namespacePrefix), m_typeQname(NULL), m_parent(NULL) {
-            addNamespace(Namespace(namespaceURI, namespacePrefix));
-        }
+        AbstractXMLObject(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL);
 
         /**
          * Underlying list of child objects.
@@ -157,8 +150,13 @@ namespace xmltooling {
         /**
          * Set of namespaces associated with the object.
          */
-        std::set<Namespace> m_namespaces;
-        
+        mutable std::set<Namespace> m_namespaces;
+
+        /**
+         * Logging object.
+         */
+        void* m_log;
+
     private:
         XMLObject* m_parent;
         QName m_elementQname;

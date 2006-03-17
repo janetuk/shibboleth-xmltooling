@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-#include <cxxtest/TestSuite.h>
-#include <cxxtest/GlobalFixture.h>
+#include "XMLObjectBaseTestCase.h"
 
+#include <fstream>
+#include <cxxtest/GlobalFixture.h>
 #include <xmltooling/XMLToolingConfig.h>
 #include <xmltooling/util/ParserPool.h>
-
-using namespace xmltooling;
 
 ParserPool* validatingPool=NULL;
 ParserPool* nonvalidatingPool=NULL;
@@ -60,7 +59,7 @@ public:
 
 static ToolingFixture globalFixture;
 
-class CatalogTest : public CxxTest::TestSuite
+class GlobalTest : public CxxTest::TestSuite
 {
 public:
     void testCatalog(void) {
@@ -68,4 +67,58 @@ public:
         auto_ptr_XMLCh temp(path.c_str());
         TS_ASSERT(validatingPool->loadCatalog(temp.get()));
     }
+
+    void testUnknown() {
+        ifstream fs("../xmltoolingtest/data/SimpleXMLObjectWithChildren.xml");
+        DOMDocument* doc=nonvalidatingPool->parse(fs);
+        TS_ASSERT(doc!=NULL);
+
+        string buf1;
+        XMLHelper::serialize(doc->getDocumentElement(), buf1);
+
+        const XMLObjectBuilder* b=XMLObjectBuilder::getBuilder(doc->getDocumentElement());
+        TS_ASSERT(b!=NULL);
+
+        auto_ptr<XMLObject> xmlObject(b->buildObject(doc->getDocumentElement())->unmarshall(doc->getDocumentElement(),true)); // bind document
+        TS_ASSERT(xmlObject.get()!=NULL);
+
+        auto_ptr<XMLObject> clonedObject(xmlObject->clone());
+        TS_ASSERT(clonedObject.get()!=NULL);
+
+        DOMElement* rootElement=clonedObject->marshall();
+        TS_ASSERT(rootElement!=NULL);
+
+        // should reuse DOM
+        TS_ASSERT(rootElement==clonedObject->marshall());
+
+        string buf2;
+        XMLHelper::serialize(rootElement, buf2);
+        TS_ASSERT_EQUALS(buf1,buf2);
+    }
+
+    void testUnknownWithDocChange() {
+        ifstream fs("../xmltoolingtest/data/SimpleXMLObjectWithChildren.xml");
+        DOMDocument* doc=nonvalidatingPool->parse(fs);
+        TS_ASSERT(doc!=NULL);
+
+        string buf1;
+        XMLHelper::serialize(doc->getDocumentElement(), buf1);
+
+        const XMLObjectBuilder* b=XMLObjectBuilder::getBuilder(doc->getDocumentElement());
+        TS_ASSERT(b!=NULL);
+
+        auto_ptr<XMLObject> xmlObject(b->buildObject(doc->getDocumentElement())->unmarshall(doc->getDocumentElement(),true)); // bind document
+        TS_ASSERT(xmlObject.get()!=NULL);
+
+        DOMDocument* newDoc=nonvalidatingPool->newDocument();
+        DOMElement* rootElement=xmlObject->marshall(newDoc);
+        TS_ASSERT(rootElement!=NULL);
+
+        string buf2;
+        XMLHelper::serialize(rootElement, buf2);
+        TS_ASSERT_EQUALS(buf1,buf2);
+
+        newDoc->release();
+    }
 };
+

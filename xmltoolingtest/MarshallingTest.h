@@ -25,14 +25,10 @@ public:
 
     void setUp() {
         XMLObjectBuilder::registerBuilder(m_qname, new SimpleXMLObjectBuilder());
-        Marshaller::registerMarshaller(m_qname, new SimpleXMLObjectMarshaller());
-        Unmarshaller::registerUnmarshaller(m_qname, new SimpleXMLObjectUnmarshaller());
     }
 
     void tearDown() {
         XMLObjectBuilder::deregisterBuilder(m_qname);
-        Marshaller::deregisterMarshaller(m_qname);
-        Unmarshaller::deregisterUnmarshaller(m_qname);
     }
 
     void testMarshallingWithAttributes() {
@@ -43,7 +39,7 @@ public:
         TS_ASSERT(sxObject.get()!=NULL);
         sxObject->setId(expected.get());
         
-        DOMElement* rootElement = Marshaller::getMarshaller(sxObject.get())->marshall(sxObject.get());
+        DOMElement* rootElement = sxObject->marshall();
 
         string path=data_path + "SimpleXMLObjectWithAttribute.xml";
         ifstream fs(path.c_str());
@@ -62,7 +58,7 @@ public:
         TS_ASSERT(sxObject.get()!=NULL);
         sxObject->setValue(expected.get());
         
-        DOMElement* rootElement = Marshaller::getMarshaller(sxObject.get())->marshall(sxObject.get());
+        DOMElement* rootElement = sxObject->marshall();
 
         string path=data_path + "SimpleXMLObjectWithContent.xml";
         ifstream fs(path.c_str());
@@ -76,15 +72,15 @@ public:
     void testMarshallingWithChildElements() {
         TS_TRACE("testMarshallingWithChildElements");
 
-        const XMLObjectBuilder* b=XMLObjectBuilder::getBuilder(m_qname);
+        const SimpleXMLObjectBuilder* b=dynamic_cast<const SimpleXMLObjectBuilder*>(XMLObjectBuilder::getBuilder(m_qname));
         TS_ASSERT(b!=NULL);
         
-        auto_ptr<SimpleXMLObject> sxObject(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
+        auto_ptr<SimpleXMLObject> sxObject(b->buildObject());
         TS_ASSERT(sxObject.get()!=NULL);
         VectorOf(SimpleXMLObject) kids=sxObject->getSimpleXMLObjects();
-        kids.push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
-        kids.push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
-        kids.push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
+        kids.push_back(b->buildObject());
+        kids.push_back(b->buildObject());
+        kids.push_back(b->buildObject());
         
         // Test some collection stuff
         auto_ptr_XMLCh foo("Foo");
@@ -94,7 +90,7 @@ public:
         kids.erase(kids.begin()+1);
         TS_ASSERT_SAME_DATA(kids.back()->getValue(), bar.get(), XMLString::stringLen(bar.get()));
         
-        DOMElement* rootElement = Marshaller::getMarshaller(sxObject.get())->marshall(sxObject.get());
+        DOMElement* rootElement = sxObject->marshall();
 
         string path=data_path + "SimpleXMLObjectWithChildren.xml";
         ifstream fs(path.c_str());

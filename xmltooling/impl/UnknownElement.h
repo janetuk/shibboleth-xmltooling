@@ -15,7 +15,7 @@
  */
 
 /**
- * @file UnknownElement.h
+ * UnknownElement.h
  * 
  * Basic implementations suitable for use as defaults for unrecognized content
  */
@@ -24,10 +24,9 @@
 #define __xmltooling_unkelement_h__
 
 #include "internal.h"
-#include "AbstractDOMCachingXMLObject.h"
 #include "XMLObjectBuilder.h"
-#include "io/Marshaller.h"
-#include "io/Unmarshaller.h"
+#include "io/AbstractXMLObjectMarshaller.h"
+#include "io/AbstractXMLObjectUnmarshaller.h"
 
 #include <string>
 
@@ -38,69 +37,19 @@
 
 namespace xmltooling {
 
-    /**
-     * Implementation class for unrecognized DOM elements.
-     * Purpose is to wrap the DOM and do any necessary caching/reconstruction
-     * when a DOM has to cross into a new document.
-     */
     class XMLTOOL_DLLLOCAL UnknownElementImpl : public AbstractDOMCachingXMLObject
     {
     public:
         UnknownElementImpl(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL)
             : AbstractDOMCachingXMLObject(namespaceURI, elementLocalName, namespacePrefix) {}
     
-        /**
-         * Overridden to ensure XML content of DOM isn't lost.
-         * 
-         * @see DOMCachingXMLObject::releaseDOM()
-         */
         void releaseDOM();
 
-        /**
-          * @see XMLObject::clone()
-          */
         XMLObject* clone() const;
 
-    protected:
-        /**
-         * When needed, we can serialize the DOM into XML form and preserve it here.
-         */
-        std::string m_xml;
-
-        void serialize(std::string& s) const;
-    private:
-        friend class XMLTOOL_DLLLOCAL UnknownElementMarshaller;
-    };
-
-    /**
-     * Factory for UnknownElementImpl objects
-     */
-    class XMLTOOL_DLLLOCAL UnknownElementBuilder : public virtual XMLObjectBuilder
-    {
-    public:
-        /**
-         * @see XMLObjectBuilder::buildObject()
-         */
-        XMLObject* buildObject() const {
-            return new UnknownElementImpl();
-        }
-    };
-
-    /**
-     * Marshaller for UnknownElementImpl objects
-     */
-    class XMLTOOL_DLLLOCAL UnknownElementMarshaller : public virtual Marshaller
-    {
-    public:
-        /**
-         * @see Marshaller::marshall(XMLObject*,DOMDocument*, const MarshallingContext*)
-         */
-        DOMElement* marshall(XMLObject* xmlObject, DOMDocument* document=NULL, MarshallingContext* ctx=NULL) const;
-
-        /**
-         * @see Marshaller::marshall(XMLObject*,DOMElement*, const MarshallingContext* ctx)
-         */
-        DOMElement* marshall(XMLObject* xmlObject, DOMElement* parentElement, MarshallingContext* ctx=NULL) const;
+        DOMElement* marshall(DOMDocument* document=NULL, MarshallingContext* ctx=NULL) const;
+        DOMElement* marshall(DOMElement* parentElement, MarshallingContext* ctx=NULL) const;
+        XMLObject* unmarshall(DOMElement* element, bool bindDocument=false);
         
     protected:
         void setDocumentElement(DOMDocument* document, DOMElement* element) const {
@@ -110,19 +59,20 @@ namespace xmltooling {
             else
                 document->appendChild(element);
         }
+
+        mutable std::string m_xml;
+
+        void serialize(std::string& s) const;
     };
 
-    /**
-     * Unmarshaller for UnknownElementImpl objects
-     */
-    class XMLTOOL_DLLLOCAL UnknownElementUnmarshaller : public virtual Unmarshaller
+    class XMLTOOL_DLLLOCAL UnknownElementBuilder : public XMLObjectBuilder
     {
     public:
-        /**
-         * @see Unmarshaller::unmarshall()
-         */
-        XMLObject* unmarshall(DOMElement* element, bool bindDocument=false) const;
+        XMLObject* buildObject(const DOMElement* e=NULL) const {
+            return new UnknownElementImpl();
+        }
     };
+
 };
 
 #if defined (_MSC_VER)

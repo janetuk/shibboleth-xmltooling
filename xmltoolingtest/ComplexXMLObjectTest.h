@@ -25,14 +25,10 @@ public:
 
     void setUp() {
         XMLObjectBuilder::registerDefaultBuilder(new WildcardXMLObjectBuilder());
-        Marshaller::registerDefaultMarshaller(new WildcardXMLObjectMarshaller());
-        Unmarshaller::registerDefaultUnmarshaller(new WildcardXMLObjectUnmarshaller());
     }
 
     void tearDown() {
         //XMLObjectBuilder::deregisterDefaultBuilder();
-        //Marshaller::deregisterDefaultMarshaller();
-        //Unmarshaller::deregisterDefaultUnmarshaller();
     }
 
     void testComplexUnmarshalling() {
@@ -43,16 +39,17 @@ public:
         DOMDocument* doc=nonvalidatingPool->parse(fs);
         TS_ASSERT(doc!=NULL);
 
-        const Unmarshaller* u = Unmarshaller::getUnmarshaller(doc->getDocumentElement());
-        TS_ASSERT(u!=NULL);
+        const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
+        TS_ASSERT(b!=NULL);
 
-        auto_ptr<WildcardXMLObject> wcObject(dynamic_cast<WildcardXMLObject*>(u->unmarshall(doc->getDocumentElement(),true)));
+        auto_ptr<WildcardXMLObject> wcObject(
+            dynamic_cast<WildcardXMLObject*>(b->buildObject(doc->getDocumentElement())->unmarshall(doc->getDocumentElement(),true))
+            );
         TS_ASSERT(wcObject.get()!=NULL);
 
         ListOf(XMLObject) kids=wcObject->getXMLObjects();
         TSM_ASSERT_EQUALS("Number of child elements was not expected value", 2, kids.size());
         
-
         WildcardXMLObject* wc1=dynamic_cast<WildcardXMLObject*>(*(++kids.begin()));
         WildcardXMLObject* wc2=dynamic_cast<WildcardXMLObject*>(*(++(wc1->getXMLObjects().begin())));
         TSM_ASSERT_EQUALS("Number of child elements was not expected value", 3, wc2->getXMLObjects().size());

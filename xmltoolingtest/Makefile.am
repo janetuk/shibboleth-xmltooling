@@ -17,7 +17,6 @@ endif
 xmltoolingtest_h = \
     ComplexXMLObjectTest.h \
     MarshallingTest.h \
-    UnknownTest.h \
     UnmarshallingTest.h \
     xmltoolingtest.h \
     ${xmlsec_sources}

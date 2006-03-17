@@ -15,7 +15,7 @@
  */
 
 /**
- * @file XMLSecSignature.h
+ * XMLSecSignature.h
  * 
  * Signature classes for XMLSec-based signature-handling
  */
@@ -37,10 +37,6 @@
 
 namespace xmltooling {
 
-    /**
-     * XMLObject representing XML Digital Signature, version 20020212, Signature element.
-     * Manages an Apache XML Signature object and the associated DOM.  
-     */
     class XMLTOOL_DLLLOCAL XMLSecSignatureImpl : public UnknownElementImpl, public virtual Signature
     {
     public:
@@ -51,6 +47,10 @@ namespace xmltooling {
         void releaseDOM();
         XMLObject* clone() const;
 
+        DOMElement* marshall(DOMDocument* document=NULL, MarshallingContext* ctx=NULL) const;
+        DOMElement* marshall(DOMElement* parentElement, MarshallingContext* ctx=NULL) const;
+        XMLObject* unmarshall(DOMElement* element, bool bindDocument=false);
+        
         // Getters
         const XMLCh* getCanonicalizationMethod() const { return m_c14n ? m_c14n : DSIGConstants::s_unicodeStrURIEXC_C14N_NOC; }
         const XMLCh* getSignatureAlgorithm() const { return m_sm ? m_sm : DSIGConstants::s_unicodeStrURIRSA_SHA1; }
@@ -60,67 +60,21 @@ namespace xmltooling {
         void setCanonicalizationMethod(const XMLCh* c14n) { m_c14n = prepareForAssignment(m_c14n,c14n); }
         void setSignatureAlgorithm(const XMLCh* sm) { m_sm = prepareForAssignment(m_sm,sm); }
 
-        void sign(const SigningContext* ctx);
+        void sign(const SigningContext& ctx);
+        void verify(const VerifyingContext& ctx) const;
 
     private:
-        DSIGSignature* m_signature;
+        mutable DSIGSignature* m_signature;
         XMLCh* m_c14n;
         XMLCh* m_sm;
-
-        friend class XMLTOOL_DLLLOCAL XMLSecSignatureMarshaller;
-        friend class XMLTOOL_DLLLOCAL XMLSecSignatureUnmarshaller;
     };
 
-    /**
-     * Factory for XMLSecSignatureImpl objects
-     */
     class XMLTOOL_DLLLOCAL XMLSecSignatureBuilder : public virtual XMLObjectBuilder
     {
     public:
-        /**
-         * @see XMLObjectBuilder::buildObject()
-         */
-        XMLObject* buildObject() const {
+        XMLObject* buildObject(const DOMElement* e=NULL) const {
             return new XMLSecSignatureImpl();
         }
-    };
-
-    /**
-     * Marshaller for XMLSecSignatureImpl objects
-     */
-    class XMLTOOL_DLLLOCAL XMLSecSignatureMarshaller : public virtual Marshaller
-    {
-    public:
-        /**
-         * @see Marshaller::marshall(XMLObject*,DOMDocument*, const MarshallingContext*)
-         */
-        DOMElement* marshall(XMLObject* xmlObject, DOMDocument* document=NULL, MarshallingContext* ctx=NULL) const;
-
-        /**
-         * @see Marshaller::marshall(XMLObject*,DOMElement*, const MarshallingContext* ctx)
-         */
-        DOMElement* marshall(XMLObject* xmlObject, DOMElement* parentElement, MarshallingContext* ctx=NULL) const;
-        
-    protected:
-        void setDocumentElement(DOMDocument* document, DOMElement* element) const {
-            DOMElement* documentRoot = document->getDocumentElement();
-            if (documentRoot)
-                document->replaceChild(documentRoot, element);
-            else
-                document->appendChild(element);
-        }
-    };
-
-    /**
-     * Unmarshaller for XMLSecSignatureImpl objects
-     */
-    class XMLTOOL_DLLLOCAL XMLSecSignatureUnmarshaller : public virtual Unmarshaller
-    {
-    public:
-        /**
-         * @see Unmarshaller::unmarshall()
-         */
-        XMLObject* unmarshall(DOMElement* element, bool bindDocument=false) const;
     };
 
 };

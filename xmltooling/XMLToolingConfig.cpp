@@ -140,13 +140,8 @@ bool XMLToolingInternalConfig::init()
 
         // default registrations
         XMLObjectBuilder::registerDefaultBuilder(new UnknownElementBuilder());
-        Marshaller::registerDefaultMarshaller(new UnknownElementMarshaller());
-        Unmarshaller::registerDefaultUnmarshaller(new UnknownElementUnmarshaller());
 #ifndef XMLTOOLING_NO_XMLSEC
-        QName dsig(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME);
-        XMLObjectBuilder::registerBuilder(dsig,new XMLSecSignatureBuilder());
-        Marshaller::registerMarshaller(dsig,new XMLSecSignatureMarshaller());
-        Unmarshaller::registerUnmarshaller(dsig,new XMLSecSignatureUnmarshaller());
+        XMLObjectBuilder::registerBuilder(QName(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME),new XMLSecSignatureBuilder());
 #endif
     }
     catch (const xercesc::XMLException&) {
@@ -161,8 +156,6 @@ bool XMLToolingInternalConfig::init()
 void XMLToolingInternalConfig::term()
 {
     XMLObjectBuilder::destroyBuilders();
-    Marshaller::destroyMarshallers();
-    Unmarshaller::destroyUnmarshallers();
 
     for (vector<void*>::reverse_iterator i=m_libhandles.rbegin(); i!=m_libhandles.rend(); i++) {
 #if defined(WIN32)

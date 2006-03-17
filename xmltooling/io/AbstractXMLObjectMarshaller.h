@@ -23,30 +23,35 @@
 #if !defined(__xmltooling_xmlmarshaller_h__)
 #define __xmltooling_xmlmarshaller_h__
 
-#include <xmltooling/io/Marshaller.h>
+#include <xmltooling/AbstractDOMCachingXMLObject.h>
+
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4250 4251 )
+#endif
 
 namespace xmltooling {
 
     /**
      * A thread-safe abstract marshaller.
      */
-    class XMLTOOL_API AbstractXMLObjectMarshaller : public virtual Marshaller
+    class XMLTOOL_API AbstractXMLObjectMarshaller : public virtual AbstractDOMCachingXMLObject
     {
     public:
         virtual ~AbstractXMLObjectMarshaller() {}
 
         /**
-         * @see Marshaller::marshall(XMLObject*,DOMDocument*,const MarshallingContext*)
+         * @see XMLObject::marshall(DOMDocument*,const MarshallingContext*)
          */
-        DOMElement* marshall(XMLObject* xmlObject, DOMDocument* document=NULL, MarshallingContext* ctx=NULL) const;
+        DOMElement* marshall(DOMDocument* document=NULL, MarshallingContext* ctx=NULL) const;
 
         /**
-         * @see Marshaller::marshall(XMLObject*,DOMElement*,const MarshallingContext*)
+         * @see XMLObject::marshall(DOMElement*,const MarshallingContext*)
          */
-        DOMElement* marshall(XMLObject* xmlObject, DOMElement* parentElement, MarshallingContext* ctx=NULL) const;
+        DOMElement* marshall(DOMElement* parentElement, MarshallingContext* ctx=NULL) const;
         
     protected:
-        AbstractXMLObjectMarshaller();
+        AbstractXMLObjectMarshaller() {}
 
         /**
          * Sets the given element as the Document Element of the given Document.
@@ -64,70 +69,64 @@ namespace xmltooling {
         }
     
         /**
-         * Marshalls the given XMLObject into the given DOM Element.
+         * Marshalls the XMLObject into the given DOM Element.
          * The DOM Element must be within a DOM tree rooted in the owning Document.
          * 
-         * @param xmlObject the XMLObject to marshall
          * @param targetElement the Element into which the XMLObject is marshalled into
          * @param ctx           optional marshalling context
          * 
          * @throws MarshallingException thrown if there is a problem marshalling the object
          * @throws SignatureException thrown if a problem occurs during signature creation 
          */
-        void marshallInto(XMLObject& xmlObject, DOMElement* targetElement, MarshallingContext* ctx) const;
+        void marshallInto(DOMElement* targetElement, MarshallingContext* ctx) const;
     
         /**
          * Creates an xsi:type attribute, corresponding to the given type of the XMLObject, on the DOM element.
          * 
-         * @param xmlObject the XMLObject
          * @param domElement the DOM element
          * 
          * @throws MarshallingException thrown if the type on the XMLObject is doesn't contain
          * a local name, prefix, and namespace URI
          */
-        void marshallElementType(XMLObject& xmlObject, DOMElement* domElement) const;
+        void marshallElementType(DOMElement* domElement) const;
 
         /**
-         * Creates the xmlns attributes for any namespaces set on the given XMLObject.
+         * Creates the xmlns attributes for any namespaces set on the XMLObject.
          * 
-         * @param xmlObject the XMLObject
          * @param domElement the DOM element the namespaces will be added to
          */
-        void marshallNamespaces(const XMLObject& xmlObject, DOMElement* domElement) const;
+        void marshallNamespaces(DOMElement* domElement) const;
     
         /**
-         * Marshalls the child elements of the given XMLObject.
+         * Marshalls the child elements of the XMLObject.
          * 
-         * @param xmlObject the XMLObject whose children will be marshalled
          * @param domElement the DOM element that will recieved the marshalled children
          * 
          * @throws MarshallingException thrown if there is a problem marshalling a child element
          */
-        void marshallChildElements(const XMLObject& xmlObject, DOMElement* domElement) const;
+        void marshallChildElements(DOMElement* domElement) const;
 
         /**
-         * Marshalls the attributes from the given XMLObject into the given DOM element.
-         * The XMLObject passed to this method is guaranteed to be of the target name
-         * specified during this marshaller's construction.
+         * Marshalls the attributes from the XMLObject into the given DOM element.
          * 
-         * @param xmlObject the XMLObject being marshalled
          * @param domElement the DOM Element into which attributes will be marshalled
          * 
-         * @throws UnmarshallingException thrown if there is a problem unmarshalling an attribute
+         * @throws MarshallingException thrown if there is a problem marshalling an attribute
          */
-        virtual void marshallAttributes(const XMLObject& xmlObject, DOMElement* domElement) const=0;
+        virtual void marshallAttributes(DOMElement* domElement) const=0;
 
         /**
          * Marshalls data from the XMLObject into content of the DOM Element.
          * 
-         * @param xmlObject the XMLObject
          * @param domElement the DOM element recieving the content
          */
-        virtual void marshallElementContent(const XMLObject& xmlObject, DOMElement* domElement) const=0;
-
-        void* m_log;
+        virtual void marshallElementContent(DOMElement* domElement) const=0;
     };
     
 };
+
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
 
 #endif /* __xmltooling_xmlmarshaller_h__ */

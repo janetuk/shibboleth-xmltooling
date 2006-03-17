@@ -97,7 +97,7 @@ public:
     }
 };
 
-void XMLSecSignatureImpl::sign(const SigningContext* ctx)
+void XMLSecSignatureImpl::sign(const SigningContext& ctx)
 {
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Signature");
     log.debug("applying signature");
@@ -107,15 +107,15 @@ void XMLSecSignatureImpl::sign(const SigningContext* ctx)
 
     try {
         log.debug("creating signature content");
-        ctx->createSignature(m_signature);
-        const std::vector<XSECCryptoX509*>& certs=ctx->getX509Certificates();
+        ctx.createSignature(m_signature);
+        const std::vector<XSECCryptoX509*>& certs=ctx.getX509Certificates();
         if (!certs.empty()) {
             DSIGKeyInfoX509* x509Data=m_signature->appendX509Data();
             for_each(certs.begin(),certs.end(),bind1st(_addcert(),x509Data));
         }
         
         log.debug("computing signature");
-        m_signature->setSigningKey(ctx->getSigningKey());
+        m_signature->setSigningKey(ctx.getSigningKey());
         m_signature->sign();
     }
     catch(XSECException& e) {
@@ -127,26 +127,42 @@ void XMLSecSignatureImpl::sign(const SigningContext* ctx)
     }
 }
 
-DOMElement* XMLSecSignatureMarshaller::marshall(XMLObject* xmlObject, DOMDocument* document, MarshallingContext* ctx) const
+void XMLSecSignatureImpl::verify(const VerifyingContext& ctx) const
+{
+    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Signature");
+    log.debug("verifying signature");
+
+    if (!m_signature)
+        throw SignatureException("Only a marshalled Signature object can be verified.");
+
+    try {
+        ctx.verifySignature(m_signature);
+    }
+    catch(XSECException& e) {
+        auto_ptr_char temp(e.getMsg());
+        throw SignatureException(string("Caught an XMLSecurity exception verifying signature: ") + temp.get());
+    }
+    catch(XSECCryptoException& e) {
+        throw SignatureException(string("Caught an XMLSecurity exception verifying signature: ") + e.getMsg());
+    }
+}
+
+DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, MarshallingContext* ctx) const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("marshall");
 #endif
     
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Marshaller");
+    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Signature");
     log.debug("marshalling ds:Signature");
 
-    XMLSecSignatureImpl* sig=dynamic_cast<XMLSecSignatureImpl*>(xmlObject);
-    if (!sig)
-        throw MarshallingException("Only objects of class XMLSecSignatureImpl can be marshalled.");
-    
-    DOMElement* cachedDOM=sig->getDOM();
+    DOMElement* cachedDOM=getDOM();
     if (cachedDOM) {
         if (!document || document==cachedDOM->getOwnerDocument()) {
             log.debug("Signature has a usable cached DOM, reusing it");
             if (document)
                 setDocumentElement(cachedDOM->getOwnerDocument(),cachedDOM);
-            sig->releaseParentDOM(true);
+            releaseParentDOM(true);
             return cachedDOM;
         }
         
@@ -155,11 +171,12 @@ DOMElement* XMLSecSignatureMarshaller::marshall(XMLObject* xmlObject, DOMDocumen
         cachedDOM=static_cast<DOMElement*>(document->importNode(cachedDOM, true));
 
         try {
-            XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseSignature(sig->m_signature);
-            sig->m_signature=NULL;
-            sig->m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignatureFromDOM(
+            XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseSignature(m_signature);
+            m_signature=NULL;
+            m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignatureFromDOM(
                 document, cachedDOM
                 );
+            m_signature->load();
         }
         catch(XSECException& e) {
             auto_ptr_char temp(e.getMsg());
@@ -172,29 +189,27 @@ DOMElement* XMLSecSignatureMarshaller::marshall(XMLObject* xmlObject, DOMDocumen
         // Recache the DOM.
         setDocumentElement(document, cachedDOM);
         log.debug("caching imported DOM for Signature");
-        sig->setDOM(cachedDOM, false);
-        sig->releaseParentDOM(true);
+        setDOM(cachedDOM, false);
+        releaseParentDOM(true);
         return cachedDOM;
     }
     
     // If we get here, we didn't have a usable DOM.
     bool bindDocument=false;
-    if (sig->m_xml.empty()) {
+    if (m_xml.empty()) {
         // Fresh signature, so we just create an empty one.
         log.debug("creating empty Signature element");
         if (!document) {
             document=DOMImplementationRegistry::getDOMImplementation(NULL)->createDocument();
             bindDocument=true;
         }
-        sig->m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignature();
-        sig->m_signature->setDSIGNSPrefix(Signature::PREFIX);
-        cachedDOM=sig->m_signature->createBlankSignature(
-            document, sig->getCanonicalizationMethod(), sig->getSignatureAlgorithm()
-            );
+        m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignature();
+        m_signature->setDSIGNSPrefix(Signature::PREFIX);
+        cachedDOM=m_signature->createBlankSignature(document, getCanonicalizationMethod(), getSignatureAlgorithm());
     }
     else {
         // We need to reparse the XML we saved off into a new DOM.
-        MemBufInputSource src(reinterpret_cast<const XMLByte*>(sig->m_xml.c_str()),sig->m_xml.length(),"XMLSecSignatureImpl");
+        MemBufInputSource src(reinterpret_cast<const XMLByte*>(m_xml.c_str()),m_xml.length(),"XMLSecSignatureImpl");
         Wrapper4InputSource dsrc(&src,false);
         log.debug("parsing Signature XML back into DOM tree");
         DOMDocument* internalDoc=XMLToolingInternalConfig::getInternalConfig().m_parserPool->parse(dsrc);
@@ -214,9 +229,10 @@ DOMElement* XMLSecSignatureMarshaller::marshall(XMLObject* xmlObject, DOMDocumen
 
         // Now reload the signature from the DOM.
         try {
-            sig->m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignatureFromDOM(
+            m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignatureFromDOM(
                 document, cachedDOM
                 );
+            m_signature->load();
         }
         catch(XSECException& e) {
             if (bindDocument)
@@ -234,31 +250,27 @@ DOMElement* XMLSecSignatureMarshaller::marshall(XMLObject* xmlObject, DOMDocumen
     // Recache the DOM and clear the serialized copy.
     setDocumentElement(document, cachedDOM);
     log.debug("caching DOM for Signature (document is %sbound)", bindDocument ? "" : "not ");
-    sig->setDOM(cachedDOM, bindDocument);
-    sig->releaseParentDOM(true);
-    sig->m_xml.erase();
+    setDOM(cachedDOM, bindDocument);
+    releaseParentDOM(true);
+    m_xml.erase();
     return cachedDOM;
 }
 
-DOMElement* XMLSecSignatureMarshaller::marshall(XMLObject* xmlObject, DOMElement* parentElement, MarshallingContext* ctx) const
+DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, MarshallingContext* ctx) const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("marshall");
 #endif
     
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Marshaller");
+    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Signature");
     log.debug("marshalling ds:Signature");
 
-    XMLSecSignatureImpl* sig=dynamic_cast<XMLSecSignatureImpl*>(xmlObject);
-    if (!sig)
-        throw MarshallingException("Only objects of class XMLSecSignatureImpl can be marshalled.");
-    
-    DOMElement* cachedDOM=sig->getDOM();
+    DOMElement* cachedDOM=getDOM();
     if (cachedDOM) {
         if (parentElement->getOwnerDocument()==cachedDOM->getOwnerDocument()) {
             log.debug("Signature has a usable cached DOM, reusing it");
             parentElement->appendChild(cachedDOM);
-            sig->releaseParentDOM(true);
+            releaseParentDOM(true);
             return cachedDOM;
         }
         
@@ -267,11 +279,12 @@ DOMElement* XMLSecSignatureMarshaller::marshall(XMLObject* xmlObject, DOMElement
         cachedDOM=static_cast<DOMElement*>(parentElement->getOwnerDocument()->importNode(cachedDOM, true));
 
         try {
-            XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseSignature(sig->m_signature);
-            sig->m_signature=NULL;
-            sig->m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignatureFromDOM(
+            XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseSignature(m_signature);
+            m_signature=NULL;
+            m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignatureFromDOM(
                 parentElement->getOwnerDocument(), cachedDOM
                 );
+            m_signature->load();
         }
         catch(XSECException& e) {
             auto_ptr_char temp(e.getMsg());
@@ -284,36 +297,37 @@ DOMElement* XMLSecSignatureMarshaller::marshall(XMLObject* xmlObject, DOMElement
         // Recache the DOM.
         parentElement->appendChild(cachedDOM);
         log.debug("caching imported DOM for Signature");
-        sig->setDOM(cachedDOM, false);
-        sig->releaseParentDOM(true);
+        setDOM(cachedDOM, false);
+        releaseParentDOM(true);
         return cachedDOM;
     }
     
     // If we get here, we didn't have a usable DOM.
-    if (sig->m_xml.empty()) {
+    if (m_xml.empty()) {
         // Fresh signature, so we just create an empty one.
         log.debug("creating empty Signature element");
-        sig->m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignature();
-        sig->m_signature->setDSIGNSPrefix(Signature::PREFIX);
-        cachedDOM=sig->m_signature->createBlankSignature(
-            parentElement->getOwnerDocument(), sig->getCanonicalizationMethod(), sig->getSignatureAlgorithm()
+        m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignature();
+        m_signature->setDSIGNSPrefix(Signature::PREFIX);
+        cachedDOM=m_signature->createBlankSignature(
+            parentElement->getOwnerDocument(), getCanonicalizationMethod(), getSignatureAlgorithm()
             );
     }
     else {
-        MemBufInputSource src(reinterpret_cast<const XMLByte*>(sig->m_xml.c_str()),sig->m_xml.length(),"XMLSecSignatureImpl");
+        MemBufInputSource src(reinterpret_cast<const XMLByte*>(m_xml.c_str()),m_xml.length(),"XMLSecSignatureImpl");
         Wrapper4InputSource dsrc(&src,false);
         log.debug("parsing XML back into DOM tree");
         DOMDocument* internalDoc=XMLToolingInternalConfig::getInternalConfig().m_parserPool->parse(dsrc);
         
         log.debug("reimporting new DOM into caller-supplied document");
-        cachedDOM=static_cast<DOMElement*>(parentElement->getOwnerDocument()->importNode(internalDoc->getDocumentElement(), true));
+        cachedDOM=static_cast<DOMElement*>(parentElement->getOwnerDocument()->importNode(internalDoc->getDocumentElement(),true));
         internalDoc->release();
 
         // Now reload the signature from the DOM.
         try {
-            sig->m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignatureFromDOM(
+            m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignatureFromDOM(
                 parentElement->getOwnerDocument(), cachedDOM
                 );
+            m_signature->load();
         }
         catch(XSECException& e) {
             auto_ptr_char temp(e.getMsg());
@@ -327,21 +341,21 @@ DOMElement* XMLSecSignatureMarshaller::marshall(XMLObject* xmlObject, DOMElement
     // Recache the DOM and clear the serialized copy.
     parentElement->appendChild(cachedDOM);
     log.debug("caching DOM for Signature");
-    sig->setDOM(cachedDOM, false);
-    sig->releaseParentDOM(true);
-    sig->m_xml.erase();
+    setDOM(cachedDOM, false);
+    releaseParentDOM(true);
+    m_xml.erase();
     return cachedDOM;
 }
 
-XMLObject* XMLSecSignatureUnmarshaller::unmarshall(DOMElement* element, bool bindDocument) const
+XMLObject* XMLSecSignatureImpl::unmarshall(DOMElement* element, bool bindDocument)
 {
-    Category::getInstance(XMLTOOLING_LOGCAT".Unmarshaller").debug("unmarshalling ds:Signature");
+    Category::getInstance(XMLTOOLING_LOGCAT".Signature").debug("unmarshalling ds:Signature");
 
-    auto_ptr<XMLSecSignatureImpl> ret(new XMLSecSignatureImpl());
     try {
-        ret->m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignatureFromDOM(
+        m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignatureFromDOM(
             element->getOwnerDocument(), element
             );
+        m_signature->load();
     }
     catch(XSECException& e) {
         auto_ptr_char temp(e.getMsg());
@@ -351,6 +365,6 @@ XMLObject* XMLSecSignatureUnmarshaller::unmarshall(DOMElement* element, bool bin
         throw UnmarshallingException(string("Caught an XMLSecurity exception while loading signature: ") + e.getMsg());
     }
 
-    ret->setDOM(element, bindDocument);
-    return ret.release();
+    setDOM(element, bindDocument);
+    return this;
 }

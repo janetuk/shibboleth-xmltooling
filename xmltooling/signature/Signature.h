@@ -25,6 +25,7 @@
 
 #include <xmltooling/XMLObject.h>
 #include <xmltooling/signature/SigningContext.h>
+#include <xmltooling/signature/VerifyingContext.h>
 
 namespace xmltooling {
 
@@ -43,29 +44,6 @@ namespace xmltooling {
 
         /** Element local name */
         static const XMLCh LOCAL_NAME[];
-
-        /**
-         * Gets the canonicalization method for the ds:SignedInfo element.
-         * 
-         * @return the canonicalization method
-         */
-        virtual const XMLCh* getCanonicalizationMethod() const=0;
-        
-        /**
-         * Gets the signing algorithm for the signature.
-         * 
-         * @return the signature algorithm
-         */
-        virtual const XMLCh* getSignatureAlgorithm() const=0;
-
-        /**
-         * Returns the ds:KeyInfo information attached to the signature.
-         * The Signature object must be marshalled before this will return anything.
-         * The caller MUST NOT mutate the information through the provided pointer.
-         * 
-         * @return the ds:KeyInfo information
-         */
-        virtual DSIGKeyInfoList* getKeyInfo() const=0; 
 
         /**
          * Sets the canonicalization method for the ds:SignedInfo element
@@ -87,8 +65,16 @@ namespace xmltooling {
          * @param ctx   the signing context that determines the signature's content
          * @throws SignatureException   thrown if the signing operation fails
          */
-        virtual void sign(const SigningContext* ctx)=0;
+        virtual void sign(const SigningContext& ctx)=0;
         
+        /**
+         * Verifies an XML signature based on the supplied context.
+         * 
+         * @param ctx   the verifying context that validates the signature's content
+         * @throws SignatureException   thrown if the verifying operation fails
+         */
+        virtual void verify(const VerifyingContext& ctx) const=0;
+
     protected:
         Signature() {}
     };

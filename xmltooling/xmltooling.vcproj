@@ -194,6 +194,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\AbstractXMLObject.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Namespace.cpp"
 				>
 			</File>
@@ -242,14 +246,6 @@
 				</File>
 				<File
 					RelativePath=".\io\AbstractXMLObjectUnmarshaller.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\io\Marshaller.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\io\Unmarshaller.cpp"
 					>
 				</File>
 			</Filter>
@@ -396,14 +392,6 @@
 				</File>
 				<File
 					RelativePath=".\io\AbstractXMLObjectUnmarshaller.h"
-					>
-				</File>
-				<File
-					RelativePath=".\io\Marshaller.h"
-					>
-				</File>
-				<File
-					RelativePath=".\io\Unmarshaller.h"
 					>
 				</File>
 			</Filter>

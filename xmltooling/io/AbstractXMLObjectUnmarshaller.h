@@ -23,98 +23,84 @@
 #if !defined(__xmltooling_xmlunmarshaller_h__)
 #define __xmltooling_xmlunmarshaller_h__
 
-#include <xmltooling/io/Unmarshaller.h>
+#include <xmltooling/AbstractDOMCachingXMLObject.h>
+
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4250 4251 )
+#endif
 
 namespace xmltooling {
 
     /**
      * A thread-safe abstract unmarshaller.
      */
-    class XMLTOOL_API AbstractXMLObjectUnmarshaller : public virtual Unmarshaller
+    class XMLTOOL_API AbstractXMLObjectUnmarshaller : public virtual AbstractDOMCachingXMLObject
     {
     public:
         virtual ~AbstractXMLObjectUnmarshaller() {}
 
         /**
-         * @see Unmarshaller::unmarshall()
+         * @see XMLObject::unmarshall()
          */
-        XMLObject* unmarshall(DOMElement* element, bool bindDocument=false) const;
+        XMLObject* unmarshall(DOMElement* element, bool bindDocument=false);
             
     protected:
-        AbstractXMLObjectUnmarshaller();
+        AbstractXMLObjectUnmarshaller() {}
 
         /**
-         * Constructs the XMLObject that the given DOM Element will be unmarshalled into. If the DOM element has an XML
-         * Schema type defined this method will attempt to retrieve an XMLObjectBuilder using the schema type. If no
-         * schema type is present or no builder is registered for the schema type, the element's QName is used. Once
-         * the builder is found the XMLObject is created by invoking XMLObjectBuilder::buildObject().
-         * Extending classes may wish to override this logic if more than just schema type or element name
-         * (e.g. element attributes or content) need to be used to determine how to create the XMLObject.
-         * 
-         * @param domElement the DOM Element the created XMLObject will represent
-         * @return the empty XMLObject that DOM Element can be unmarshalled into
-         * 
-         * @throws UnmarshallingException thrown if there is now XMLObjectBuilder registered for the given DOM Element
-         */
-        virtual XMLObject* buildXMLObject(const DOMElement* domElement) const;
-        
-        /**
-         * Unmarshalls the attributes from the given DOM Element into the given XMLObject. If the attribute is an XML
-         * namespace declaration the namespace is added to the given element via XMLObject::addNamespace().
-         * If it is a schema type (xsi:type) the schema type is added to the element via XMLObject::setSchemaType().
+         * Unmarshalls the attributes from the given DOM Element into the XMLObject. If the attribute
+         * is an XML namespace declaration the namespace is added via XMLObject::addNamespace().
+         * If it is a schema type (xsi:type) the schema type is added via XMLObject::setSchemaType().
          * All other attributes are passed to the processAttribute hook.
          * 
          * @param domElement the DOM Element whose attributes will be unmarshalled
-         * @param xmlObject the XMLObject that will recieve information from the DOM attribute
          * 
          * @throws UnmarshallingException thrown if there is a problem unmarshalling an attribute
          */
-        virtual void unmarshallAttributes(const DOMElement* domElement, XMLObject& xmlObject) const;
+        virtual void unmarshallAttributes(const DOMElement* domElement);
 
         /**
-         * Unmarshalls a given Element's children. For each child an unmarshaller is retrieved using
-         * getUnmarshaller(). The unmarshaller is then used to unmarshall the child element and the
-         * resulting XMLObject is passed to processChildElement() for further processing.
+         * Unmarshalls a given Element's children. The resulting XMLObject child is passed to
+         * processChildElement() for further processing.
          * 
          * @param domElement the DOM Element whose children will be unmarshalled
-         * @param xmlObject the parent object of the unmarshalled children
          * 
          * @throws UnmarshallingException thrown if an error occurs unmarshalling the child elements
          */
-        virtual void unmarshallChildElements(const DOMElement* domElement, XMLObject& xmlObject) const;
+        virtual void unmarshallChildElements(const DOMElement* domElement);
 
         /**
          * Called after a child element has been unmarshalled so that it can be added to the parent XMLObject.
          * 
-         * @param parent    the parent XMLObject
          * @param child     pointer to the child XMLObject
          * @param childRoot root element of the child (must not be stored, just a hint)
          * 
          * @throws UnmarshallingException thrown if there is a problem adding the child to the parent
          */
-        virtual void processChildElement(XMLObject& parent, XMLObject* child, const DOMElement* childRoot) const=0;
+        virtual void processChildElement(XMLObject* child, const DOMElement* childRoot)=0;
     
         /**
          * Called after an attribute has been unmarshalled so that it can be added to the XMLObject.
          * 
-         * @param xmlObject the XMLObject
          * @param attribute the attribute being unmarshalled
          * 
          * @throws UnmarshallingException thrown if there is a problem adding the attribute to the XMLObject
          */
-        virtual void processAttribute(XMLObject& xmlObject, const DOMAttr* attribute) const=0;
+        virtual void processAttribute(const DOMAttr* attribute)=0;
     
         /**
          * Called if the element being unmarshalled contained textual content so that it can be added to the XMLObject.
          * 
-         * @param xmlObject XMLObject the content will be given to
          * @param elementContent the Element's text content
          */
-        virtual void processElementContent(XMLObject& xmlObject, const XMLCh* elementContent) const=0;
-
-        void* m_log;
+        virtual void processElementContent(const XMLCh* elementContent)=0;
     };
     
 };
+
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
 
 #endif /* __xmltooling_xmlunmarshaller_h__ */

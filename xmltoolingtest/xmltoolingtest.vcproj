@@ -192,10 +192,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\UnknownTest.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\UnmarshallingTest.cpp"
 				>
 			</File>
@@ -255,28 +251,6 @@
 			</File>
 			<File
 				RelativePath=".\SignatureTest.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="\perl\bin\perl.exe -w \cxxtest\cxxtestgen.pl --part --have-eh --have-std --abort-on-fail -o &quot;$(InputName)&quot;.cpp &quot;$(InputPath)&quot;"
-						Outputs="&quot;$(InputName)&quot;.cpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="\perl\bin\perl.exe -w \cxxtest\cxxtestgen.pl --part --have-eh --have-std --abort-on-fail -o &quot;$(InputName)&quot;.cpp &quot;$(InputPath)&quot;"
-						Outputs="&quot;$(InputName)&quot;.cpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\UnknownTest.h"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"

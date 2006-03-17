@@ -50,19 +50,21 @@ namespace xmltooling {
         /**
          * Creates an empty XMLObject.
          * 
+         * @param e     a construction hint based on the eventual unmarshalling source
          * @return the empty XMLObject
          */
-        virtual XMLObject* buildObject() const=0;
+        virtual XMLObject* buildObject(const DOMElement* e=NULL) const=0;
 
         /**
          * Creates an empty XMLObject using the default build method, if a builder can be found.
          * 
          * @param key   the key used to locate a builder
+         * @param e     a construction hint based on the eventual unmarshalling source
          * @return  the empty object or NULL if no builder is available 
          */
-        static XMLObject* buildObject(const QName& key) {
+        static XMLObject* buildObject(const QName& key, const DOMElement* e=NULL) {
             const XMLObjectBuilder* b=getBuilder(key);
-            return b ? b->buildObject() : NULL;
+            return b ? b->buildObject(e) : NULL;
         }
 
         /**

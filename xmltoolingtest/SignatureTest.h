@@ -20,10 +20,11 @@
 #include <openssl/pem.h>
 #include <xercesc/util/XMLUniDefs.hpp>
 #include <xsec/dsig/DSIGReference.hpp>
+#include <xsec/enc/XSECKeyInfoResolverDefault.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyRSA.hpp>
 
-class TestContext : public SigningContext
+class TestContext : public SigningContext, public VerifyingContext
 {
     XSECCryptoKey* m_key;
     vector<XSECCryptoX509*> m_certs;
@@ -69,6 +70,14 @@ public:
         ref->appendEnvelopedSignatureTransform();
         ref->appendCanonicalizationTransform(CANON_C14NE_NOC);
     }
+
+    void verifySignature(DSIGSignature* sig) const {
+        const XMLCh* uri=sig->getReferenceList()->item(0)->getURI();
+        TSM_ASSERT_SAME_DATA("Reference URI does not match.",uri,m_uri,XMLString::stringLen(uri));
+        XSECKeyInfoResolverDefault resolver;
+        sig->setKeyInfoResolver(&resolver); // It will clone the resolver for us.
+        sig->verify();
+    }
     
     const std::vector<XSECCryptoX509*>& getX509Certificates() const { return m_certs; }
     XSECCryptoKey* getSigningKey() const { return m_key->clone(); }
@@ -81,27 +90,23 @@ public:
 
     void setUp() {
         XMLObjectBuilder::registerBuilder(m_qname, new SimpleXMLObjectBuilder());
-        Marshaller::registerMarshaller(m_qname, new SimpleXMLObjectMarshaller());
-        Unmarshaller::registerUnmarshaller(m_qname, new SimpleXMLObjectUnmarshaller());
     }
 
     void tearDown() {
         XMLObjectBuilder::deregisterBuilder(m_qname);
-        Marshaller::deregisterMarshaller(m_qname);
-        Unmarshaller::deregisterUnmarshaller(m_qname);
     }
 
     void testSignature() {
         TS_TRACE("testSignature");
 
-        const XMLObjectBuilder* b=XMLObjectBuilder::getBuilder(m_qname);
+        const SimpleXMLObjectBuilder* b=dynamic_cast<const SimpleXMLObjectBuilder*>(XMLObjectBuilder::getBuilder(m_qname));
         TS_ASSERT(b!=NULL);
         
-        auto_ptr<SimpleXMLObject> sxObject(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
+        auto_ptr<SimpleXMLObject> sxObject(b->buildObject());
         TS_ASSERT(sxObject.get()!=NULL);
         VectorOf(SimpleXMLObject) kids=sxObject->getSimpleXMLObjects();
-        kids.push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
-        kids.push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
+        kids.push_back(b->buildObject());
+        kids.push_back(b->buildObject());
         
         // Test some collection stuff
         auto_ptr_XMLCh foo("Foo");
@@ -116,7 +121,7 @@ public:
         // Signing context for the whole document.
         TestContext tc(&chNull);
         MarshallingContext mctx(sig,&tc);
-        DOMElement* rootElement = Marshaller::getMarshaller(sxObject.get())->marshall(sxObject.get(),(DOMDocument*)NULL,&mctx);
+        DOMElement* rootElement = sxObject->marshall((DOMDocument*)NULL,&mctx);
         
         string buf;
         XMLHelper::serialize(rootElement, buf);
@@ -124,10 +129,17 @@ public:
 
         istringstream in(buf);
         DOMDocument* doc=nonvalidatingPool->parse(in);
-        const Unmarshaller* u = Unmarshaller::getUnmarshaller(doc->getDocumentElement());
-        auto_ptr<SimpleXMLObject> sxObject2(dynamic_cast<SimpleXMLObject*>(u->unmarshall(doc->getDocumentElement(),true)));
+        auto_ptr<SimpleXMLObject> sxObject2(dynamic_cast<SimpleXMLObject*>(b->buildObject()->unmarshall(doc->getDocumentElement(),true)));
         TS_ASSERT(sxObject2.get()!=NULL);
         TS_ASSERT(sxObject2->getSignature()!=NULL);
+        
+        try {
+            sxObject2->getSignature()->verify(tc);
+        }
+        catch (SignatureException& e) {
+            TS_TRACE(e.what());
+            throw;
+        }
     }
 
 };

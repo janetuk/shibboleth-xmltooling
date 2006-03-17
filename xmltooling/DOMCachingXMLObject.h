@@ -52,7 +52,7 @@ namespace xmltooling {
          * @param dom       DOM representation of this XMLObject
          * @param bindDocument  true if the object should take ownership of the associated Document
          */
-        virtual void setDOM(DOMElement* dom, bool bindDocument=false)=0;
+        virtual void setDOM(DOMElement* dom, bool bindDocument=false) const=0;
     
         /**
          * Assigns ownership of a DOM document to the XMLObject.
@@ -60,26 +60,26 @@ namespace xmltooling {
          * 
          * @param doc DOM document bound to this object 
          */
-        virtual void setDocument(DOMDocument* doc)=0;
+        virtual void setDocument(DOMDocument* doc) const=0;
 
         /**
          * Releases the DOM representation of this XMLObject, if there is one.
          */
-        virtual void releaseDOM()=0;
+        virtual void releaseDOM() const=0;
         
         /**
          * Releases the DOM representation of this XMLObject's parent.
          * 
          * @param propagateRelease true if all ancestors of this element should release their DOM
          */
-        virtual void releaseParentDOM(bool propagateRelease=true)=0;
+        virtual void releaseParentDOM(bool propagateRelease=true) const=0;
         
         /**
          * Releases the DOM representation of this XMLObject's children.
          * 
          * @param propagateRelease true if all descendants of this element should release their DOM
          */
-        virtual void releaseChildrenDOM(bool propagateRelease=true)=0;
+        virtual void releaseChildrenDOM(bool propagateRelease=true) const=0;
     };
     
 };

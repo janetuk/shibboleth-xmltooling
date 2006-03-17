@@ -70,7 +70,7 @@ void UnknownElementImpl::serialize(string& s) const
         XMLHelper::serialize(getDOM(),s);
 }
 
-DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMDocument* document, MarshallingContext* ctx) const
+DOMElement* UnknownElementImpl::marshall(DOMDocument* document, MarshallingContext* ctx) const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("marshall");
@@ -79,17 +79,13 @@ DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMDocument
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Marshaller");
     log.debug("marshalling unknown content");
 
-    UnknownElementImpl* unk=dynamic_cast<UnknownElementImpl*>(xmlObject);
-    if (!unk)
-        throw MarshallingException("Only objects of class UnknownElementImpl can be marshalled.");
-    
-    DOMElement* cachedDOM=unk->getDOM();
+    DOMElement* cachedDOM=getDOM();
     if (cachedDOM) {
         if (!document || document==cachedDOM->getOwnerDocument()) {
             log.debug("XMLObject has a usable cached DOM, reusing it");
             if (document)
                 setDocumentElement(cachedDOM->getOwnerDocument(),cachedDOM);
-            unk->releaseParentDOM(true);
+            releaseParentDOM(true);
             return cachedDOM;
         }
         
@@ -100,15 +96,15 @@ DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMDocument
         // Recache the DOM.
         setDocumentElement(document, cachedDOM);
         log.debug("caching imported DOM for XMLObject");
-        unk->setDOM(cachedDOM, false);
-        unk->releaseParentDOM(true);
+        setDOM(cachedDOM, false);
+        releaseParentDOM(true);
         return cachedDOM;
     }
     
     // If we get here, we didn't have a usable DOM.
     // We need to reparse the XML we saved off into a new DOM.
     bool bindDocument=false;
-    MemBufInputSource src(reinterpret_cast<const XMLByte*>(unk->m_xml.c_str()),unk->m_xml.length(),"UnknownElementImpl");
+    MemBufInputSource src(reinterpret_cast<const XMLByte*>(m_xml.c_str()),m_xml.length(),"UnknownElementImpl");
     Wrapper4InputSource dsrc(&src,false);
     log.debug("parsing XML back into DOM tree");
     DOMDocument* internalDoc=XMLToolingInternalConfig::getInternalConfig().m_parserPool->parse(dsrc);
@@ -129,13 +125,13 @@ DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMDocument
     // Recache the DOM and clear the serialized copy.
     setDocumentElement(document, cachedDOM);
     log.debug("caching DOM for XMLObject (document is %sbound)", bindDocument ? "" : "not ");
-    unk->setDOM(cachedDOM, bindDocument);
-    unk->releaseParentDOM(true);
-    unk->m_xml.erase();
+    setDOM(cachedDOM, bindDocument);
+    releaseParentDOM(true);
+    m_xml.erase();
     return cachedDOM;
 }
 
-DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMElement* parentElement, MarshallingContext* ctx) const
+DOMElement* UnknownElementImpl::marshall(DOMElement* parentElement, MarshallingContext* ctx) const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("marshall");
@@ -144,16 +140,12 @@ DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMElement*
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Marshaller");
     log.debug("marshalling unknown content");
 
-    UnknownElementImpl* unk=dynamic_cast<UnknownElementImpl*>(xmlObject);
-    if (!unk)
-        throw MarshallingException("Only objects of class UnknownElementImpl can be marshalled.");
-    
-    DOMElement* cachedDOM=unk->getDOM();
+    DOMElement* cachedDOM=getDOM();
     if (cachedDOM) {
         if (parentElement->getOwnerDocument()==cachedDOM->getOwnerDocument()) {
             log.debug("XMLObject has a usable cached DOM, reusing it");
             parentElement->appendChild(cachedDOM);
-            unk->releaseParentDOM(true);
+            releaseParentDOM(true);
             return cachedDOM;
         }
         
@@ -164,14 +156,14 @@ DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMElement*
         // Recache the DOM.
         parentElement->appendChild(cachedDOM);
         log.debug("caching imported DOM for XMLObject");
-        unk->setDOM(cachedDOM, false);
-        unk->releaseParentDOM(true);
+        setDOM(cachedDOM, false);
+        releaseParentDOM(true);
         return cachedDOM;
     }
     
     // If we get here, we didn't have a usable DOM (and/or we flushed the one we had).
     // We need to reparse the XML we saved off into a new DOM.
-    MemBufInputSource src(reinterpret_cast<const XMLByte*>(unk->m_xml.c_str()),unk->m_xml.length(),"UnknownElementImpl");
+    MemBufInputSource src(reinterpret_cast<const XMLByte*>(m_xml.c_str()),m_xml.length(),"UnknownElementImpl");
     Wrapper4InputSource dsrc(&src,false);
     log.debug("parsing XML back into DOM tree");
     DOMDocument* internalDoc=XMLToolingInternalConfig::getInternalConfig().m_parserPool->parse(dsrc);
@@ -183,15 +175,14 @@ DOMElement* UnknownElementMarshaller::marshall(XMLObject* xmlObject, DOMElement*
     // Recache the DOM and clear the serialized copy.
     parentElement->appendChild(cachedDOM);
     log.debug("caching DOM for XMLObject");
-    unk->setDOM(cachedDOM, false);
-    unk->releaseParentDOM(true);
-    unk->m_xml.erase();
+    setDOM(cachedDOM, false);
+    releaseParentDOM(true);
+    m_xml.erase();
     return cachedDOM;
 }
 
-XMLObject* UnknownElementUnmarshaller::unmarshall(DOMElement* element, bool bindDocument) const
+XMLObject* UnknownElementImpl::unmarshall(DOMElement* element, bool bindDocument)
 {
-    UnknownElementImpl* ret=new UnknownElementImpl();
-    ret->setDOM(element, bindDocument);
-    return ret;
+    setDOM(element, bindDocument);
+    return this;
 }

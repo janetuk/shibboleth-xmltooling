@@ -37,7 +37,7 @@ namespace xmltooling {
      * Extension of AbstractXMLObject that implements a DOMCachingXMLObject.
      * This is the primary base class for XMLObject implementation classes to use.
      */
-    class XMLTOOL_API AbstractDOMCachingXMLObject : public AbstractXMLObject, public DOMCachingXMLObject
+    class XMLTOOL_API AbstractDOMCachingXMLObject : public AbstractXMLObject, public virtual DOMCachingXMLObject
     {
     public:
         virtual ~AbstractDOMCachingXMLObject();
@@ -52,12 +52,12 @@ namespace xmltooling {
         /**
          * @see DOMCachingXMLObject::setDOM()
          */
-        void setDOM(DOMElement* dom, bool bindDocument=false);
+        void setDOM(DOMElement* dom, bool bindDocument=false) const;
         
         /**
          * @see DOMCachingXMLObject::setDocument()
          */
-        void setDocument(DOMDocument* doc) {
+        void setDocument(DOMDocument* doc) const {
             if (m_document)
                 m_document->release();
             m_document=doc;
@@ -66,22 +66,22 @@ namespace xmltooling {
         /**
          * @see DOMCachingXMLObject::releaseDOM()
          */
-        virtual void releaseDOM();
+        virtual void releaseDOM() const;
         
         /**
          * @see DOMCachingXMLObject::releaseParentDOM()
          */
-        virtual void releaseParentDOM(bool propagateRelease=true);
+        virtual void releaseParentDOM(bool propagateRelease=true) const;
         
         /**
          * @see DOMCachingXMLObject::releaseChildrenDOM()
          */
-        virtual void releaseChildrenDOM(bool propagateRelease=true);
+        virtual void releaseChildrenDOM(bool propagateRelease=true) const;
     
         /**
          * A convenience method that is equal to calling releaseDOM() then releaseParentDOM(true).
          */
-        void releaseThisandParentDOM() {
+        void releaseThisandParentDOM() const {
             if (m_dom) {
                 releaseDOM();
                 releaseParentDOM(true);
@@ -91,7 +91,7 @@ namespace xmltooling {
         /**
          * A convenience method that is equal to calling releaseChildrenDOM(true) then releaseDOM().
          */
-        void releaseThisAndChildrenDOM() {
+        void releaseThisAndChildrenDOM() const {
             if (m_dom) {
                 releaseChildrenDOM(true);
                 releaseDOM();
@@ -111,8 +111,9 @@ namespace xmltooling {
          * @param elementLocalName the local name of the XML element this Object represents
          * @param namespacePrefix the namespace prefix to use
          */
-        AbstractDOMCachingXMLObject(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL)
-            : AbstractXMLObject(namespaceURI,elementLocalName, namespacePrefix), m_dom(NULL), m_document(NULL) {}
+        AbstractDOMCachingXMLObject(
+            const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL
+            ) : AbstractXMLObject(namespaceURI,elementLocalName, namespacePrefix), m_dom(NULL), m_document(NULL) {}
 
         /**
          * If a DOM representation exists, this clones it into a new document.
@@ -160,8 +161,8 @@ namespace xmltooling {
         XMLObject* prepareForAssignment(XMLObject* oldValue, XMLObject* newValue);
 
     private:
-        DOMElement* m_dom;
-        DOMDocument* m_document;
+        mutable DOMElement* m_dom;
+        mutable DOMDocument* m_document;
     };
     
 };

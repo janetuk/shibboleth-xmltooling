@@ -47,7 +47,9 @@ namespace xmltooling {
          * appropriate signature transforms, references, etc.
          * This method MAY attach ds:KeyInfo information, or a set of X.509
          * certificates can be returned from the SigningContext::getX509Certificates()
-         * method instead.   
+         * method instead.
+         * 
+         * @param sig   native signature interface
          */
         virtual void createSignature(DSIGSignature* sig) const=0;
         
@@ -56,6 +58,8 @@ namespace xmltooling {
          * the ds:KeyInfo element in a ds:X509Data chain.
          * The certificate corresponding to the signing key SHOULD be
          * first, followed by any additional intermediates to append. 
+         * 
+         * @return  an immutable collection of certificates to embed
          */
         virtual const std::vector<XSECCryptoX509*>& getX509Certificates() const=0;
         
@@ -63,6 +67,8 @@ namespace xmltooling {
          * Gets the signing key to use.
          * Must be compatible with the intended signature algorithm. Ownership of the key
          * MUST be transferred to the caller.
+         * 
+         * @return  pointer to a signing key, will be freed by caller
          */
         virtual XSECCryptoKey* getSigningKey() const=0;
         

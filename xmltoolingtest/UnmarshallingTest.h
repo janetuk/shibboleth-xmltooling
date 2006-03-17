@@ -48,14 +48,10 @@ public:
 
     void setUp() {
         XMLObjectBuilder::registerBuilder(m_qname, new SimpleXMLObjectBuilder());
-        Marshaller::registerMarshaller(m_qname, new SimpleXMLObjectMarshaller());
-        Unmarshaller::registerUnmarshaller(m_qname, new SimpleXMLObjectUnmarshaller());
     }
 
     void tearDown() {
         XMLObjectBuilder::deregisterBuilder(m_qname);
-        Marshaller::deregisterMarshaller(m_qname);
-        Unmarshaller::deregisterUnmarshaller(m_qname);
     }
 
     void testUnmarshallingWithAttributes() {
@@ -66,10 +62,12 @@ public:
         DOMDocument* doc=nonvalidatingPool->parse(fs);
         TS_ASSERT(doc!=NULL);
 
-        const Unmarshaller* u = Unmarshaller::getUnmarshaller(doc->getDocumentElement());
-        TS_ASSERT(u!=NULL);
+        const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
+        TS_ASSERT(b!=NULL);
 
-        auto_ptr<SimpleXMLObject> sxObject(dynamic_cast<SimpleXMLObject*>(u->unmarshall(doc->getDocumentElement(),true)));
+        auto_ptr<SimpleXMLObject> sxObject(
+            dynamic_cast<SimpleXMLObject*>(b->buildObject()->unmarshall(doc->getDocumentElement(),true))
+            );
         TS_ASSERT(sxObject.get()!=NULL);
 
         auto_ptr_XMLCh expected("Firefly");
@@ -84,10 +82,12 @@ public:
         DOMDocument* doc=nonvalidatingPool->parse(fs);
         TS_ASSERT(doc!=NULL);
 
-        const Unmarshaller* u = Unmarshaller::getUnmarshaller(doc->getDocumentElement());
-        TS_ASSERT(u!=NULL);
+        const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
+        TS_ASSERT(b!=NULL);
 
-        auto_ptr<SimpleXMLObject> sxObject(dynamic_cast<SimpleXMLObject*>(u->unmarshall(doc->getDocumentElement(),true)));
+        auto_ptr<SimpleXMLObject> sxObject(
+            dynamic_cast<SimpleXMLObject*>(b->buildObject()->unmarshall(doc->getDocumentElement(),true))
+            );
         TS_ASSERT(sxObject.get()!=NULL);
 
         auto_ptr_XMLCh expected("Sample Content");
@@ -102,10 +102,12 @@ public:
         DOMDocument* doc=nonvalidatingPool->parse(fs);
         TS_ASSERT(doc!=NULL);
 
-        const Unmarshaller* u = Unmarshaller::getUnmarshaller(doc->getDocumentElement());
-        TS_ASSERT(u!=NULL);
+        const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
+        TS_ASSERT(b!=NULL);
 
-        auto_ptr<SimpleXMLObject> sxObject(dynamic_cast<SimpleXMLObject*>(u->unmarshall(doc->getDocumentElement(),true)));
+        auto_ptr<SimpleXMLObject> sxObject(
+            dynamic_cast<SimpleXMLObject*>(b->buildObject()->unmarshall(doc->getDocumentElement(),true))
+            );
         TS_ASSERT(sxObject.get()!=NULL);
 
         VectorOf(SimpleXMLObject) kids=sxObject->getSimpleXMLObjects();
@@ -120,10 +122,11 @@ public:
         DOMDocument* doc=nonvalidatingPool->parse(fs);
         TS_ASSERT(doc!=NULL);
 
-        const Unmarshaller* u = Unmarshaller::getUnmarshaller(doc->getDocumentElement());
-        TS_ASSERT(u!=NULL);
+        const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
+        TS_ASSERT(b!=NULL);
 
-        TS_ASSERT_THROWS(u->unmarshall(doc->getDocumentElement(),true),UnmarshallingException);
+        auto_ptr<XMLObject> sxObject(b->buildObject());
+        TS_ASSERT_THROWS(sxObject->unmarshall(doc->getDocumentElement(),true),UnmarshallingException);
         doc->release();
     }
 };
