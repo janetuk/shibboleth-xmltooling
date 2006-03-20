@@ -43,7 +43,7 @@ public:
         TS_ASSERT(b!=NULL);
 
         auto_ptr<WildcardXMLObject> wcObject(
-            dynamic_cast<WildcardXMLObject*>(b->buildObject(doc->getDocumentElement())->unmarshall(doc->getDocumentElement(),true))
+            dynamic_cast<WildcardXMLObject*>(b->buildFromDocument(doc))
             );
         TS_ASSERT(wcObject.get()!=NULL);
 

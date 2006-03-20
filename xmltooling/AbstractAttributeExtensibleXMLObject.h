@@ -27,8 +27,6 @@
 #include <xmltooling/AbstractDOMCachingXMLObject.h>
 #include <xmltooling/AttributeExtensibleXMLObject.h>
 
-using namespace xercesc;
-
 #if defined (_MSC_VER)
     #pragma warning( push )
     #pragma warning( disable : 4250 4251 )

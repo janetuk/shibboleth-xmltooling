@@ -43,6 +43,11 @@ XMLObject* AbstractXMLObjectUnmarshaller::unmarshall(DOMElement* element, bool b
     xmltooling::NDC ndc("unmarshall");
 #endif
 
+    if (!XMLString::equals(element->getNamespaceURI(),getElementQName().getNamespaceURI()) ||
+        !XMLString::equals(element->getLocalName(),getElementQName().getLocalPart())) {
+        throw UnmarshallingException("Unrecognized element supplied to implementation for unmarshalling.");
+    }
+
     if (XT_log.isDebugEnabled()) {
         auto_ptr_char dname(element->getNodeName());
         XT_log.debug("unmarshalling DOM element (%s)", dname.get());
@@ -159,8 +164,7 @@ void AbstractXMLObjectUnmarshaller::unmarshallChildElements(const DOMElement* do
             }
 
             // Retain ownership of the unmarshalled child until it's processed by the parent.
-            auto_ptr<XMLObject> childObject(builder->buildObject(static_cast<DOMElement*>(childNode)));
-            childObject->unmarshall(static_cast<DOMElement*>(childNode));
+            auto_ptr<XMLObject> childObject(builder->buildFromElement(static_cast<DOMElement*>(childNode)));
             processChildElement(childObject.get(), static_cast<DOMElement*>(childNode));
             childObject.release();
         }

@@ -115,7 +115,7 @@ public:
         kids[1]->setValue(bar.get());
         
         // Append a Signature.
-        Signature* sig=dynamic_cast<Signature*>(XMLObjectBuilder::buildObject(QName(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME)));
+        Signature* sig=dynamic_cast<Signature*>(XMLObjectBuilder::buildOne(QName(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME)));
         sxObject->setSignature(sig);
         
         // Signing context for the whole document.
@@ -129,7 +129,7 @@ public:
 
         istringstream in(buf);
         DOMDocument* doc=nonvalidatingPool->parse(in);
-        auto_ptr<SimpleXMLObject> sxObject2(dynamic_cast<SimpleXMLObject*>(b->buildObject()->unmarshall(doc->getDocumentElement(),true)));
+        auto_ptr<SimpleXMLObject> sxObject2(dynamic_cast<SimpleXMLObject*>(b->buildFromDocument(doc)));
         TS_ASSERT(sxObject2.get()!=NULL);
         TS_ASSERT(sxObject2->getSignature()!=NULL);
         

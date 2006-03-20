@@ -54,7 +54,6 @@ namespace xmltooling {
         // Getters
         const XMLCh* getCanonicalizationMethod() const { return m_c14n ? m_c14n : DSIGConstants::s_unicodeStrURIEXC_C14N_NOC; }
         const XMLCh* getSignatureAlgorithm() const { return m_sm ? m_sm : DSIGConstants::s_unicodeStrURIRSA_SHA1; }
-        DSIGKeyInfoList* getKeyInfo() const;
 
         // Setters
         void setCanonicalizationMethod(const XMLCh* c14n) { m_c14n = prepareForAssignment(m_c14n,c14n); }
@@ -72,7 +71,7 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL XMLSecSignatureBuilder : public virtual XMLObjectBuilder
     {
     public:
-        XMLObject* buildObject(const DOMElement* e=NULL) const {
+        XMLSecSignatureImpl* buildObject() const {
             return new XMLSecSignatureImpl();
         }
     };

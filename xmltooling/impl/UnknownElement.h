@@ -68,7 +68,7 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL UnknownElementBuilder : public XMLObjectBuilder
     {
     public:
-        XMLObject* buildObject(const DOMElement* e=NULL) const {
+        UnknownElementImpl* buildObject() const {
             return new UnknownElementImpl();
         }
     };

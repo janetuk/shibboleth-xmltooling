@@ -79,7 +79,7 @@ public:
         const XMLObjectBuilder* b=XMLObjectBuilder::getBuilder(doc->getDocumentElement());
         TS_ASSERT(b!=NULL);
 
-        auto_ptr<XMLObject> xmlObject(b->buildObject(doc->getDocumentElement())->unmarshall(doc->getDocumentElement(),true)); // bind document
+        auto_ptr<XMLObject> xmlObject(b->buildFromDocument(doc)); // bind document
         TS_ASSERT(xmlObject.get()!=NULL);
 
         auto_ptr<XMLObject> clonedObject(xmlObject->clone());
@@ -107,7 +107,7 @@ public:
         const XMLObjectBuilder* b=XMLObjectBuilder::getBuilder(doc->getDocumentElement());
         TS_ASSERT(b!=NULL);
 
-        auto_ptr<XMLObject> xmlObject(b->buildObject(doc->getDocumentElement())->unmarshall(doc->getDocumentElement(),true)); // bind document
+        auto_ptr<XMLObject> xmlObject(b->buildFromDocument(doc)); // bind document
         TS_ASSERT(xmlObject.get()!=NULL);
 
         DOMDocument* newDoc=nonvalidatingPool->newDocument();

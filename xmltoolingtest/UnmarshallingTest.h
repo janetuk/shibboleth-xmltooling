@@ -66,7 +66,7 @@ public:
         TS_ASSERT(b!=NULL);
 
         auto_ptr<SimpleXMLObject> sxObject(
-            dynamic_cast<SimpleXMLObject*>(b->buildObject()->unmarshall(doc->getDocumentElement(),true))
+            dynamic_cast<SimpleXMLObject*>(b->buildFromDocument(doc))
             );
         TS_ASSERT(sxObject.get()!=NULL);
 
@@ -86,7 +86,7 @@ public:
         TS_ASSERT(b!=NULL);
 
         auto_ptr<SimpleXMLObject> sxObject(
-            dynamic_cast<SimpleXMLObject*>(b->buildObject()->unmarshall(doc->getDocumentElement(),true))
+            dynamic_cast<SimpleXMLObject*>(b->buildFromDocument(doc))
             );
         TS_ASSERT(sxObject.get()!=NULL);
 
@@ -106,7 +106,7 @@ public:
         TS_ASSERT(b!=NULL);
 
         auto_ptr<SimpleXMLObject> sxObject(
-            dynamic_cast<SimpleXMLObject*>(b->buildObject()->unmarshall(doc->getDocumentElement(),true))
+            dynamic_cast<SimpleXMLObject*>(b->buildFromDocument(doc))
             );
         TS_ASSERT(sxObject.get()!=NULL);
 
@@ -125,8 +125,7 @@ public:
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
         TS_ASSERT(b!=NULL);
 
-        auto_ptr<XMLObject> sxObject(b->buildObject());
-        TS_ASSERT_THROWS(sxObject->unmarshall(doc->getDocumentElement(),true),UnmarshallingException);
+        TS_ASSERT_THROWS(b->buildFromDocument(doc),UnmarshallingException);
         doc->release();
     }
 };

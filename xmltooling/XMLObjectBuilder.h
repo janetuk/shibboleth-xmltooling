@@ -24,11 +24,8 @@
 #define __xmltooling_xmlobjbuilder_h__
 
 #include <map>
-#include <xercesc/dom/DOM.hpp>
 #include <xmltooling/QName.h>
 #include <xmltooling/XMLObject.h>
-
-using namespace xercesc;
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -50,21 +47,58 @@ namespace xmltooling {
         /**
          * Creates an empty XMLObject.
          * 
-         * @param e     a construction hint based on the eventual unmarshalling source
          * @return the empty XMLObject
          */
-        virtual XMLObject* buildObject(const DOMElement* e=NULL) const=0;
+        virtual XMLObject* buildObject() const=0;
+
+        /**
+         * Creates an unmarshalled XMLObject from a DOM Element.
+         * 
+         * @param element       the unmarshalling source
+         * @param bindDocument  true iff the XMLObject should take ownership of the DOM Document
+         * @return the unmarshalled XMLObject
+         */
+        virtual XMLObject* buildFromElement(DOMElement* element, bool bindDocument=false) const {
+            std::auto_ptr<XMLObject> ret(buildObject());
+            ret->unmarshall(element,bindDocument);
+            return ret.release();
+        }
+
+        /**
+         * Creates an unmarshalled XMLObject from the root of a DOM Document.
+         * 
+         * @param doc           the unmarshalling source
+         * @param bindDocument  true iff the XMLObject should take ownership of the DOM Document
+         * @return the unmarshalled XMLObject
+         */
+        virtual XMLObject* buildFromDocument(DOMDocument* doc, bool bindDocument=true) const {
+            return buildFromElement(doc->getDocumentElement(),bindDocument);
+        }
 
         /**
          * Creates an empty XMLObject using the default build method, if a builder can be found.
          * 
          * @param key   the key used to locate a builder
-         * @param e     a construction hint based on the eventual unmarshalling source
          * @return  the empty object or NULL if no builder is available 
          */
-        static XMLObject* buildObject(const QName& key, const DOMElement* e=NULL) {
+        static XMLObject* buildOne(const QName& key) {
             const XMLObjectBuilder* b=getBuilder(key);
-            return b ? b->buildObject(e) : NULL;
+            if (b)
+                return b->buildObject();
+            b=getDefaultBuilder();
+            return b ? b->buildObject() : NULL;
+        }
+
+        /**
+         * Creates an unmarshalled XMLObject using the default build method, if a builder can be found.
+         * 
+         * @param element       the unmarshalling source
+         * @param bindDocument  true iff the new XMLObject should take ownership of the DOM Document
+         * @return  the unmarshalled object or NULL if no builder is available 
+         */
+        static XMLObject* buildOneFromElement(DOMElement* element, bool bindDocument=false) {
+            const XMLObjectBuilder* b=getBuilder(element);
+            return b ? b->buildFromElement(element,bindDocument) : NULL;
         }
 
         /**
@@ -92,7 +126,7 @@ namespace xmltooling {
          * 
          * @return the default builder or NULL
          */
-        static const XMLObjectBuilder* getDefaultBuilder(const DOMElement* element) {
+        static const XMLObjectBuilder* getDefaultBuilder() {
             return m_default;
         }
 

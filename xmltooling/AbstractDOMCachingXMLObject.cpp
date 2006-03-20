@@ -127,9 +127,7 @@ XMLObject* AbstractDOMCachingXMLObject::clone() const
             throw UnmarshallingException("Unable to locate builder for cloned element.");
         }
         try {
-            auto_ptr<XMLObject> objCopy(b->buildObject(domCopy));
-            objCopy->unmarshall(domCopy, true);    // bind document
-            return objCopy.release();
+            return b->buildFromElement(domCopy,true); // bind document
         }
         catch (...) {
             domCopy->getOwnerDocument()->release();

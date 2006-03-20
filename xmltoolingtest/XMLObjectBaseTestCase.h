@@ -145,7 +145,7 @@ private:
 class SimpleXMLObjectBuilder : public XMLObjectBuilder
 {
 public:
-    SimpleXMLObject* buildObject(const DOMElement* e=NULL) const {
+    SimpleXMLObject* buildObject() const {
         return new SimpleXMLObject();
     }
 };
@@ -213,8 +213,18 @@ public:
 class WildcardXMLObjectBuilder : public XMLObjectBuilder
 {
 public:
-    WildcardXMLObject* buildObject(const DOMElement* e=NULL) const {
-        return new WildcardXMLObject(e->getNamespaceURI(),e->getLocalName(),e->getPrefix());
+    WildcardXMLObject* buildObject() const {
+        throw XMLObjectException("Default build operation is unsupported.");
+    }
+
+    WildcardXMLObject* buildObject(const QName& q) const {
+        return new WildcardXMLObject(q.getNamespaceURI(),q.getLocalPart(),q.getPrefix());
+    }
+
+    WildcardXMLObject* buildFromElement(DOMElement* e, bool bindDocument=false) const {
+        auto_ptr<WildcardXMLObject> ret(new WildcardXMLObject(e->getNamespaceURI(),e->getLocalName(),e->getPrefix()));
+        ret->unmarshall(e,bindDocument);
+        return ret.release();
     }
 };
 
