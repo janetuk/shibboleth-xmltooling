@@ -43,6 +43,9 @@ XMLObject* AbstractXMLObjectUnmarshaller::unmarshall(DOMElement* element, bool b
     xmltooling::NDC ndc("unmarshall");
 #endif
 
+    if (getDOM() || hasParent())
+        throw UnmarshallingException("Object already contains data, it cannot be unmarshalled at this stage.");
+
     if (!XMLString::equals(element->getNamespaceURI(),getElementQName().getNamespaceURI()) ||
         !XMLString::equals(element->getLocalName(),getElementQName().getLocalPart())) {
         throw UnmarshallingException("Unrecognized element supplied to implementation for unmarshalling.");
