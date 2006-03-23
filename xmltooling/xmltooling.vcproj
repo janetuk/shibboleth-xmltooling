@@ -253,6 +253,10 @@
 				Name="impl"
 				>
 				<File
+					RelativePath=".\impl\AnyElement.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\impl\UnknownElement.cpp"
 					>
 				</File>
@@ -398,6 +402,10 @@
 			<Filter
 				Name="impl"
 				>
+				<File
+					RelativePath=".\impl\AnyElement.h"
+					>
+				</File>
 				<File
 					RelativePath=".\impl\UnknownElement.h"
 					>

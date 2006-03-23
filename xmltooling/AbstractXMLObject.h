@@ -52,6 +52,7 @@ namespace xmltooling {
          */
         void setElementNamespacePrefix(const XMLCh* prefix) {
             m_elementQname.setPrefix(prefix);
+            addNamespace(Namespace(m_elementQname.getNamespaceURI(),prefix));
         }
 
         /**

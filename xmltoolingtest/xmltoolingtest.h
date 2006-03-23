@@ -62,6 +62,14 @@ static ToolingFixture globalFixture;
 class GlobalTest : public CxxTest::TestSuite
 {
 public:
+    void setUp() {
+        XMLObjectBuilder::registerDefaultBuilder(new UnknownElementBuilder());
+    }
+
+    void tearDown() {
+        XMLObjectBuilder::deregisterDefaultBuilder();
+    }
+
     void testCatalog(void) {
         std::string path=data_path + "catalog.xml";
         auto_ptr_XMLCh temp(path.c_str());

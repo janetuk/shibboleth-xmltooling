@@ -17,7 +17,7 @@
 /**
  * UnknownElement.cpp
  * 
- * Basic implementations suitable for use as defaults for unrecognized content
+ * Basic implementation suitable for use as default for unrecognized content
  */
 
 #include "internal.h"

@@ -15,18 +15,17 @@
  */
 
 /**
- * UnknownElement.h
+ * @file UnknownElement.h
  * 
- * Basic implementations suitable for use as defaults for unrecognized content
+ * Basic implementation suitable for use as default for unrecognized content
  */
 
 #if !defined(__xmltooling_unkelement_h__)
 #define __xmltooling_unkelement_h__
 
-#include "internal.h"
-#include "XMLObjectBuilder.h"
-#include "io/AbstractXMLObjectMarshaller.h"
-#include "io/AbstractXMLObjectUnmarshaller.h"
+#include <xmltooling/XMLObjectBuilder.h>
+#include <xmltooling/io/AbstractXMLObjectMarshaller.h>
+#include <xmltooling/io/AbstractXMLObjectUnmarshaller.h>
 
 #include <string>
 
@@ -37,6 +36,9 @@
 
 namespace xmltooling {
 
+    /**
+     * Implements a thin wrapper around unknown DOM content.
+     */
     class XMLTOOL_DLLLOCAL UnknownElementImpl : public AbstractDOMCachingXMLObject
     {
     public:
@@ -65,11 +67,16 @@ namespace xmltooling {
         void serialize(std::string& s) const;
     };
 
-    class XMLTOOL_DLLLOCAL UnknownElementBuilder : public XMLObjectBuilder
+    /**
+     * Factory for UnknownElementImpl objects.
+     */
+    class XMLTOOL_API UnknownElementBuilder : public XMLObjectBuilder
     {
     public:
-        UnknownElementImpl* buildObject() const {
-            return new UnknownElementImpl();
+        UnknownElementImpl* buildObject(
+            const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix=NULL
+            ) const {
+            return new UnknownElementImpl(namespaceURI,elementLocalName,namespacePrefix);
         }
     };
 

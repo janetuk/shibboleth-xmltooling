@@ -40,7 +40,7 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL XMLSecSignatureImpl : public UnknownElementImpl, public virtual Signature
     {
     public:
-        XMLSecSignatureImpl() : UnknownElementImpl(XMLConstants::XMLSIG_NS, Signature::LOCAL_NAME),
+        XMLSecSignatureImpl() : UnknownElementImpl(XMLConstants::XMLSIG_NS, Signature::LOCAL_NAME, XMLConstants::XMLSIG_PREFIX),
             m_signature(NULL), m_c14n(NULL), m_sm(NULL) {}
         virtual ~XMLSecSignatureImpl();
         
@@ -71,7 +71,9 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL XMLSecSignatureBuilder : public virtual XMLObjectBuilder
     {
     public:
-        XMLSecSignatureImpl* buildObject() const {
+        XMLSecSignatureImpl* buildObject(
+            const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix=NULL
+            ) const {
             return new XMLSecSignatureImpl();
         }
     };

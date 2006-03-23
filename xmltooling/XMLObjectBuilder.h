@@ -45,11 +45,35 @@ namespace xmltooling {
         virtual ~XMLObjectBuilder() {}
         
         /**
-         * Creates an empty XMLObject.
+         * Creates an empty XMLObject with a particular element name.
+         * 
+         * @param namespaceURI          namespace URI for element
+         * @param elementLocalName      local name of element
+         * @param namespacePrefix       prefix of element name
+         * @return the empty XMLObject
+         */
+        virtual XMLObject* buildObject(
+            const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix=NULL
+            ) const=0;
+
+        /**
+         * Creates an empty XMLObject with a defaulted element name.
          * 
          * @return the empty XMLObject
          */
-        virtual XMLObject* buildObject() const=0;
+        virtual XMLObject* buildObject() const {
+            return buildObject(NULL,NULL,NULL);
+        }
+
+        /**
+         * Creates an empty XMLObject with a particular element name.
+         * 
+         * @param q     QName of element for object
+         * @return the empty XMLObject
+         */
+        virtual XMLObject* buildObject(const QName& q) const {
+            return buildObject(q.getNamespaceURI(),q.getLocalPart(),q.getPrefix());
+        }
 
         /**
          * Creates an unmarshalled XMLObject from a DOM Element.
@@ -59,7 +83,7 @@ namespace xmltooling {
          * @return the unmarshalled XMLObject
          */
         virtual XMLObject* buildFromElement(DOMElement* element, bool bindDocument=false) const {
-            std::auto_ptr<XMLObject> ret(buildObject());
+            std::auto_ptr<XMLObject> ret(buildObject(element->getNamespaceURI(),element->getLocalName(),element->getPrefix()));
             ret->unmarshall(element,bindDocument);
             return ret.release();
         }

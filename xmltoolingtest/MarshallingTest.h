@@ -20,15 +20,19 @@
 
 class MarshallingTest : public CxxTest::TestSuite {
     QName m_qname;
+    QName m_qtype;
 public:
-    MarshallingTest() : m_qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME) {}
+    MarshallingTest() : m_qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME,SimpleXMLObject::NAMESPACE_PREFIX),
+        m_qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME,SimpleXMLObject::NAMESPACE_PREFIX) {}
 
     void setUp() {
         XMLObjectBuilder::registerBuilder(m_qname, new SimpleXMLObjectBuilder());
+        XMLObjectBuilder::registerBuilder(m_qtype, new SimpleXMLObjectBuilder());
     }
 
     void tearDown() {
         XMLObjectBuilder::deregisterBuilder(m_qname);
+        XMLObjectBuilder::deregisterBuilder(m_qtype);
     }
 
     void testMarshallingWithAttributes() {
@@ -85,10 +89,15 @@ public:
         // Test some collection stuff
         auto_ptr_XMLCh foo("Foo");
         auto_ptr_XMLCh bar("Bar");
+        auto_ptr_XMLCh baz("Baz");
         kids.begin()->setId(foo.get());
         kids.at(2)->setValue(bar.get());
         kids.erase(kids.begin()+1);
         TS_ASSERT_SAME_DATA(kids.back()->getValue(), bar.get(), XMLString::stringLen(bar.get()));
+        
+        kids.push_back(b->buildObject(SimpleXMLObject::NAMESPACE,SimpleXMLObject::DERIVED_NAME,SimpleXMLObject::NAMESPACE_PREFIX));
+        kids.back()->setSchemaType(&m_qtype);
+        kids.back()->setValue(baz.get());
         
         DOMElement* rootElement = sxObject->marshall();
 

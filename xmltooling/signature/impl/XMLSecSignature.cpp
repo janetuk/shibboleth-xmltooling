@@ -84,11 +84,6 @@ XMLObject* XMLSecSignatureImpl::clone() const
     return ret;
 }
 
-DSIGKeyInfoList* XMLSecSignatureImpl::getKeyInfo() const
-{
-    return m_signature ? m_signature->getKeyInfoList() : NULL;
-}
-
 class _addcert : public std::binary_function<DSIGKeyInfoX509*,XSECCryptoX509*,void> {
 public:
     void operator()(DSIGKeyInfoX509* bag, XSECCryptoX509* cert) const {

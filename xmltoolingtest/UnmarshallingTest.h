@@ -37,21 +37,36 @@ const XMLCh SimpleXMLObject::LOCAL_NAME[] = {
     chLatin_E, chLatin_l, chLatin_e, chLatin_m, chLatin_e, chLatin_n, chLatin_t, chNull
 };
 
+const XMLCh SimpleXMLObject::DERIVED_NAME[] = {
+    chLatin_D, chLatin_e, chLatin_r, chLatin_i, chLatin_v, chLatin_e, chLatin_d,
+    chLatin_E, chLatin_l, chLatin_e, chLatin_m, chLatin_e, chLatin_n, chLatin_t, chNull
+};
+
+const XMLCh SimpleXMLObject::TYPE_NAME[] = {
+    chLatin_S, chLatin_i, chLatin_m, chLatin_p, chLatin_l, chLatin_e,
+    chLatin_E, chLatin_l, chLatin_e, chLatin_m, chLatin_e, chLatin_n, chLatin_t, 
+    chLatin_T, chLatin_y, chLatin_p, chLatin_e, chNull
+};
+
 const XMLCh SimpleXMLObject::ID_ATTRIB_NAME[] = {
     chLatin_I, chLatin_d, chNull
 };
 
 class UnmarshallingTest : public CxxTest::TestSuite {
     QName m_qname;
+    QName m_qtype;
 public:
-    UnmarshallingTest() : m_qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME) {}
+    UnmarshallingTest() : m_qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME,SimpleXMLObject::NAMESPACE_PREFIX),
+        m_qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME,SimpleXMLObject::NAMESPACE_PREFIX) {}
 
     void setUp() {
         XMLObjectBuilder::registerBuilder(m_qname, new SimpleXMLObjectBuilder());
+        XMLObjectBuilder::registerBuilder(m_qtype, new SimpleXMLObjectBuilder());
     }
 
     void tearDown() {
         XMLObjectBuilder::deregisterBuilder(m_qname);
+        XMLObjectBuilder::deregisterBuilder(m_qtype);
     }
 
     void testUnmarshallingWithAttributes() {
@@ -111,7 +126,8 @@ public:
         TS_ASSERT(sxObject.get()!=NULL);
 
         VectorOf(SimpleXMLObject) kids=sxObject->getSimpleXMLObjects();
-        TSM_ASSERT_EQUALS("Number of child elements was not expected value", 2, kids.size());
+        TSM_ASSERT_EQUALS("Number of child elements was not expected value", 3, kids.size());
+        TSM_ASSERT_EQUALS("Child's schema type was not expected value", m_qtype, *(kids.back()->getSchemaType()));
     }
 
     void testUnmarshallingWithUnknownChild() {

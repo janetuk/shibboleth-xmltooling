@@ -24,11 +24,11 @@ public:
     ComplexXMLObjectTest() {}
 
     void setUp() {
-        XMLObjectBuilder::registerDefaultBuilder(new WildcardXMLObjectBuilder());
+        XMLObjectBuilder::registerDefaultBuilder(new AnyElementBuilder());
     }
 
     void tearDown() {
-        //XMLObjectBuilder::deregisterDefaultBuilder();
+        XMLObjectBuilder::deregisterDefaultBuilder();
     }
 
     void testComplexUnmarshalling() {
@@ -42,16 +42,16 @@ public:
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
         TS_ASSERT(b!=NULL);
 
-        auto_ptr<WildcardXMLObject> wcObject(
-            dynamic_cast<WildcardXMLObject*>(b->buildFromDocument(doc))
+        auto_ptr<ElementProxy> wcObject(
+            dynamic_cast<ElementProxy*>(b->buildFromDocument(doc))
             );
         TS_ASSERT(wcObject.get()!=NULL);
 
         ListOf(XMLObject) kids=wcObject->getXMLObjects();
         TSM_ASSERT_EQUALS("Number of child elements was not expected value", 2, kids.size());
         
-        WildcardXMLObject* wc1=dynamic_cast<WildcardXMLObject*>(*(++kids.begin()));
-        WildcardXMLObject* wc2=dynamic_cast<WildcardXMLObject*>(*(++(wc1->getXMLObjects().begin())));
+        ElementProxy* wc1=dynamic_cast<ElementProxy*>(*(++kids.begin()));
+        ElementProxy* wc2=dynamic_cast<ElementProxy*>(*(++(wc1->getXMLObjects().begin())));
         TSM_ASSERT_EQUALS("Number of child elements was not expected value", 3, wc2->getXMLObjects().size());
 
         static const XMLCh html[] = {chLatin_h, chLatin_t, chLatin_m, chLatin_l, chNull};

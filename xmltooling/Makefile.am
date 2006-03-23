@@ -32,6 +32,10 @@ libxmltoolinginclude_HEADERS = \
     XMLObjectBuilder.h \
     XMLToolingConfig.h
 
+implinclude_HEADERS = \
+    impl/AnyElement.h \
+    impl/UnknownElement.h
+
 ioinclude_HEADERS = \
     io/AbstractXMLObjectUnmarshaller.h \
 
@@ -52,7 +56,6 @@ valinclude_HEADERS = \
 
 noinst_HEADERS = \
     internal.h \
-    impl/UnknownElement.h \
     signature/impl/XMLSecSignature.h
 
 if BUILD_XMLSEC
@@ -72,6 +75,7 @@ libxmltooling_la_SOURCES = \
     unicode.cpp \
     XMLObjectBuilder.cpp \
     XMLToolingConfig.cpp \
+    impl/AnyElement.cpp \
     impl/UnknownElement.cpp \
     io/AbstractXMLObjectMarshaller.cpp \
     io/AbstractXMLObjectUnmarshaller.cpp \

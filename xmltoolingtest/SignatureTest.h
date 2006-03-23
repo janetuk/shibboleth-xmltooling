@@ -85,15 +85,19 @@ public:
 
 class SignatureTest : public CxxTest::TestSuite {
     QName m_qname;
+    QName m_qtype;
 public:
-    SignatureTest() : m_qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME) {}
+    SignatureTest() : m_qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME,SimpleXMLObject::NAMESPACE_PREFIX),
+        m_qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME,SimpleXMLObject::NAMESPACE_PREFIX) {}
 
     void setUp() {
         XMLObjectBuilder::registerBuilder(m_qname, new SimpleXMLObjectBuilder());
+        XMLObjectBuilder::registerBuilder(m_qtype, new SimpleXMLObjectBuilder());
     }
 
     void tearDown() {
         XMLObjectBuilder::deregisterBuilder(m_qname);
+        XMLObjectBuilder::deregisterBuilder(m_qtype);
     }
 
     void testSignature() {

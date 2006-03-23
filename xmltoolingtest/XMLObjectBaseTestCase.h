@@ -15,13 +15,14 @@
  */
 
 #include <cxxtest/TestSuite.h>
-#include <xmltooling/AbstractAttributeExtensibleXMLObject.h>
-#include <xmltooling/AbstractElementProxy.h>
+#include <xmltooling/ElementProxy.h>
 #include <xmltooling/exceptions.h>
 #include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/XMLToolingConfig.h>
 #include <xmltooling/io/AbstractXMLObjectMarshaller.h>
 #include <xmltooling/io/AbstractXMLObjectUnmarshaller.h>
+#include <xmltooling/impl/AnyElement.h>
+#include <xmltooling/impl/UnknownElement.h>
 #ifndef XMLTOOLING_NO_XMLSEC
     #include <xmltooling/signature/Signature.h>
 #endif
@@ -48,9 +49,13 @@ public:
     static const XMLCh NAMESPACE[];
     static const XMLCh NAMESPACE_PREFIX[];
     static const XMLCh LOCAL_NAME[];
+    static const XMLCh DERIVED_NAME[];
+    static const XMLCh TYPE_NAME[];
     static const XMLCh ID_ATTRIB_NAME[];
 
-    SimpleXMLObject() : AbstractDOMCachingXMLObject(NAMESPACE, LOCAL_NAME, NAMESPACE_PREFIX), m_id(NULL), m_value(NULL) {
+    SimpleXMLObject(
+        const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL
+        ) : AbstractDOMCachingXMLObject(namespaceURI, elementLocalName, namespacePrefix), m_id(NULL), m_value(NULL) {
 #ifndef XMLTOOLING_NO_XMLSEC
         m_children.push_back(NULL);
         m_signature=m_children.begin();
@@ -112,14 +117,21 @@ public:
     }
 
     void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-        if (XMLHelper::isNodeNamed(root, SimpleXMLObject::NAMESPACE, SimpleXMLObject::LOCAL_NAME))
-            getSimpleXMLObjects().push_back(dynamic_cast<SimpleXMLObject*>(childXMLObject));
+        SimpleXMLObject* simple=dynamic_cast<SimpleXMLObject*>(childXMLObject);
+        if (simple) {
+            getSimpleXMLObjects().push_back(simple);
+            return;
+        }
+        
 #ifndef XMLTOOLING_NO_XMLSEC
-        else if (XMLHelper::isNodeNamed(root, XMLConstants::XMLSIG_NS, Signature::LOCAL_NAME))
-            setSignature(dynamic_cast<Signature*>(childXMLObject));
+        Signature* sig=dynamic_cast<Signature*>(childXMLObject);
+        if (sig) {
+            setSignature(sig);
+            return;
+        }
 #endif
-        else
-            throw UnmarshallingException("Unknown child element cannot be added to parent object.");
+
+        throw UnmarshallingException("Unknown child element cannot be added to parent object.");
     }
 
     void processAttribute(const DOMAttr* attribute) {
@@ -146,85 +158,13 @@ class SimpleXMLObjectBuilder : public XMLObjectBuilder
 {
 public:
     SimpleXMLObject* buildObject() const {
-        return new SimpleXMLObject();
-    }
-};
-
-class WildcardXMLObject : public AbstractElementProxy, public AbstractAttributeExtensibleXMLObject,
-    public AbstractXMLObjectMarshaller, public AbstractXMLObjectUnmarshaller
-{
-public:
-    WildcardXMLObject(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix)
-        : AbstractDOMCachingXMLObject(nsURI, localName, prefix),
-        AbstractElementProxy(nsURI, localName, prefix),
-        AbstractAttributeExtensibleXMLObject(nsURI, localName, prefix) {}
-    virtual ~WildcardXMLObject() {}
-    
-    WildcardXMLObject* clone() const {
-        auto_ptr<XMLObject> domClone(AbstractDOMCachingXMLObject::clone());
-        WildcardXMLObject* ret=dynamic_cast<WildcardXMLObject*>(domClone.get());
-        if (ret) {
-            domClone.release();
-            return ret;
-        }
-
-        ret=new WildcardXMLObject(
-            getElementQName().getNamespaceURI(),getElementQName().getLocalPart(),getElementQName().getPrefix()
-            );
-        ret->m_namespaces=m_namespaces;
-        for (map<QName,XMLCh*>::const_iterator i=m_attributeMap.begin(); i!=m_attributeMap.end(); i++) {
-            ret->m_attributeMap[i->first]=XMLString::replicate(i->second);
-        }
-        ret->setTextContent(getTextContent());
-        xmltooling::clone(m_children, ret->m_children);
-        return ret;
+        return buildObject(SimpleXMLObject::NAMESPACE, SimpleXMLObject::LOCAL_NAME, SimpleXMLObject::NAMESPACE_PREFIX);
     }
 
-    void marshallAttributes(DOMElement* domElement) const {
-        for (map<QName,XMLCh*>::const_iterator i=m_attributeMap.begin(); i!=m_attributeMap.end(); i++) {
-            DOMAttr* attr=domElement->getOwnerDocument()->createAttributeNS(i->first.getNamespaceURI(),i->first.getLocalPart());
-            if (i->first.hasPrefix())
-                attr->setPrefix(i->first.getPrefix());
-            attr->setNodeValue(i->second);
-            domElement->setAttributeNode(attr);
-        }
-    }
-
-    void marshallElementContent(DOMElement* domElement) const {
-        if(getTextContent()) {
-            domElement->appendChild(domElement->getOwnerDocument()->createTextNode(getTextContent()));
-        }
-    }
-
-    void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-        getXMLObjects().push_back(childXMLObject);
-    }
-
-    void processAttribute(const DOMAttr* attribute) {
-        QName q(attribute->getNamespaceURI(),attribute->getLocalName(),attribute->getPrefix()); 
-        setAttribute(q,attribute->getNodeValue());
-    }
-
-    void processElementContent(const XMLCh* elementContent) {
-        setTextContent(elementContent);
-    }
-};
-
-class WildcardXMLObjectBuilder : public XMLObjectBuilder
-{
-public:
-    WildcardXMLObject* buildObject() const {
-        throw XMLObjectException("Default build operation is unsupported.");
-    }
-
-    WildcardXMLObject* buildObject(const QName& q) const {
-        return new WildcardXMLObject(q.getNamespaceURI(),q.getLocalPart(),q.getPrefix());
-    }
-
-    WildcardXMLObject* buildFromElement(DOMElement* e, bool bindDocument=false) const {
-        auto_ptr<WildcardXMLObject> ret(new WildcardXMLObject(e->getNamespaceURI(),e->getLocalName(),e->getPrefix()));
-        ret->unmarshall(e,bindDocument);
-        return ret.release();
+    SimpleXMLObject* buildObject(
+        const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix=NULL
+        ) const {
+        return new SimpleXMLObject(namespaceURI,elementLocalName,namespacePrefix);
     }
 };
 
