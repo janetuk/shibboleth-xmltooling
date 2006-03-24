@@ -265,6 +265,10 @@
 				Name="validation"
 				>
 				<File
+					RelativePath=".\validation\AbstractValidatingXMLObject.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\validation\Validator.cpp"
 					>
 				</File>
@@ -414,6 +418,14 @@
 			<Filter
 				Name="validation"
 				>
+				<File
+					RelativePath=".\validation\AbstractValidatingXMLObject.h"
+					>
+				</File>
+				<File
+					RelativePath=".\validation\ValidatingXMLObject.h"
+					>
+				</File>
 				<File
 					RelativePath=".\validation\Validator.h"
 					>

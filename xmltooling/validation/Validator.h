@@ -28,8 +28,6 @@
 #include <xmltooling/QName.h>
 #include <xmltooling/XMLObject.h>
 
-using namespace xercesc;
-
 #if defined (_MSC_VER)
     #pragma warning( push )
     #pragma warning( disable : 4250 4251 )

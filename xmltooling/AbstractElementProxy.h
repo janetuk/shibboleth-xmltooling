@@ -60,16 +60,7 @@ namespace xmltooling {
         virtual ListOf(XMLObject) getXMLObjects();
     
      protected:
-        /**
-         * Constructor
-         * 
-         * @param namespaceURI the namespace the element is in
-         * @param elementLocalName the local name of the XML element this Object represents
-         * @param namespacePrefix the namespace prefix to use
-         */
-        AbstractElementProxy(
-            const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL
-            ) : AbstractDOMCachingXMLObject(namespaceURI,elementLocalName, namespacePrefix), m_value(NULL) {}
+        AbstractElementProxy() : m_value(NULL) {}
 
     private:
         XMLCh* m_value;

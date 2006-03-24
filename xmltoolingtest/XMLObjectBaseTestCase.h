@@ -55,7 +55,7 @@ public:
 
     SimpleXMLObject(
         const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL
-        ) : AbstractDOMCachingXMLObject(namespaceURI, elementLocalName, namespacePrefix), m_id(NULL), m_value(NULL) {
+        ) : AbstractXMLObject(namespaceURI, elementLocalName, namespacePrefix), m_id(NULL), m_value(NULL) {
 #ifndef XMLTOOLING_NO_XMLSEC
         m_children.push_back(NULL);
         m_signature=m_children.begin();

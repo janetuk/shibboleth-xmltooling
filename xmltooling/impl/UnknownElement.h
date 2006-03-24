@@ -43,7 +43,7 @@ namespace xmltooling {
     {
     public:
         UnknownElementImpl(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL)
-            : AbstractDOMCachingXMLObject(namespaceURI, elementLocalName, namespacePrefix) {}
+            : AbstractXMLObject(namespaceURI, elementLocalName, namespacePrefix) {}
     
         void releaseDOM();
 

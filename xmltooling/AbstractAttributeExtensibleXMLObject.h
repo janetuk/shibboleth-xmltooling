@@ -56,16 +56,7 @@ namespace xmltooling {
         virtual void setAttribute(QName& qualifiedName, const XMLCh* value);
     
      protected:
-        /**
-         * Constructor
-         * 
-         * @param namespaceURI the namespace the element is in
-         * @param elementLocalName the local name of the XML element this Object represents
-         * @param namespacePrefix the namespace prefix to use
-         */
-        AbstractAttributeExtensibleXMLObject(
-            const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL
-            ) : AbstractDOMCachingXMLObject(namespaceURI,elementLocalName, namespacePrefix) {}
+        AbstractAttributeExtensibleXMLObject() {}
 
         std::map<QName,XMLCh*> m_attributeMap;
     };

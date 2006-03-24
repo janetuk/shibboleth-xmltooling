@@ -52,9 +52,7 @@ namespace xmltooling {
     {
     public:
         AnyElementImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix)
-            : AbstractDOMCachingXMLObject(nsURI, localName, prefix),
-            AbstractElementProxy(nsURI, localName, prefix),
-            AbstractAttributeExtensibleXMLObject(nsURI, localName, prefix) {}
+            : AbstractXMLObject(nsURI, localName, prefix) {}
         virtual ~AnyElementImpl() {}
         
         AnyElementImpl* clone() const {

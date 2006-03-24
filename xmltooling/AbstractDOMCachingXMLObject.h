@@ -35,9 +35,8 @@ namespace xmltooling {
 
     /**
      * Extension of AbstractXMLObject that implements a DOMCachingXMLObject.
-     * This is the primary base class for XMLObject implementation classes to use.
      */
-    class XMLTOOL_API AbstractDOMCachingXMLObject : public AbstractXMLObject, public virtual DOMCachingXMLObject
+    class XMLTOOL_API AbstractDOMCachingXMLObject : public virtual AbstractXMLObject, public virtual DOMCachingXMLObject
     {
     public:
         virtual ~AbstractDOMCachingXMLObject();
@@ -104,16 +103,7 @@ namespace xmltooling {
         XMLObject* clone() const;
 
      protected:
-        /**
-         * Constructor
-         * 
-         * @param namespaceURI the namespace the element is in
-         * @param elementLocalName the local name of the XML element this Object represents
-         * @param namespacePrefix the namespace prefix to use
-         */
-        AbstractDOMCachingXMLObject(
-            const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL
-            ) : AbstractXMLObject(namespaceURI,elementLocalName, namespacePrefix), m_dom(NULL), m_document(NULL) {}
+        AbstractDOMCachingXMLObject() : m_dom(NULL), m_document(NULL) {}
 
         /**
          * If a DOM representation exists, this clones it into a new document.
