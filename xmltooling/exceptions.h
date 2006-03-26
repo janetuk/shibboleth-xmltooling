@@ -69,6 +69,11 @@
  */
 #define REGISTER_EXCEPTION_FACTORY(name) XMLToolingException::registerFactory("xmltooling::"#name,name##Factory)
 
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4250 4251 )
+#endif
+
 namespace xmltooling {
     
     /**
@@ -331,5 +336,9 @@ namespace xmltooling {
     DECL_XMLTOOLING_EXCEPTION(SignatureException,XMLToolingException);
 
 };
+
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
 
 #endif /* __xmltooling_exceptions_h__ */

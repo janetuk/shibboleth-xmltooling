@@ -23,6 +23,7 @@
 #if !defined(__xmltooling_unkelement_h__)
 #define __xmltooling_unkelement_h__
 
+#include <xmltooling/exceptions.h>
 #include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/io/AbstractXMLObjectMarshaller.h>
 #include <xmltooling/io/AbstractXMLObjectUnmarshaller.h>
@@ -68,11 +69,14 @@ namespace xmltooling {
     };
 
     /**
-     * Factory for UnknownElementImpl objects.
+     * Builder for UnknownElementImpl objects.
      */
     class XMLTOOL_API UnknownElementBuilder : public XMLObjectBuilder
     {
     public:
+        /**
+         * @see XMLObjectBuilder::buildObject(const XMLCh*,const XMLCh*,const XMLCh*)
+         */
         UnknownElementImpl* buildObject(
             const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix=NULL
             ) const {

@@ -115,7 +115,5 @@ namespace xmltooling {
 XMLObject* AnyElementBuilder::buildObject(
     const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix
     ) const {
-    if (XMLString::stringLen(elementLocalName)==0)
-        throw XMLObjectException("Constructing this object requires an element name.");
     return new AnyElementImpl(namespaceURI,elementLocalName,namespacePrefix);
 }

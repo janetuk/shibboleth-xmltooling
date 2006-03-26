@@ -46,6 +46,7 @@ namespace xmltooling {
         
         /**
          * Creates an empty XMLObject with a particular element name.
+         * The results are undefined if elementLocalName is NULL or empty.
          * 
          * @param namespaceURI          namespace URI for element
          * @param elementLocalName      local name of element
@@ -57,21 +58,12 @@ namespace xmltooling {
             ) const=0;
 
         /**
-         * Creates an empty XMLObject with a defaulted element name.
-         * 
-         * @return the empty XMLObject
-         */
-        virtual XMLObject* buildObject() const {
-            return buildObject(NULL,NULL,NULL);
-        }
-
-        /**
          * Creates an empty XMLObject with a particular element name.
          * 
          * @param q     QName of element for object
          * @return the empty XMLObject
          */
-        virtual XMLObject* buildObject(const QName& q) const {
+        XMLObject* buildFromQName(const QName& q) const {
             return buildObject(q.getNamespaceURI(),q.getLocalPart(),q.getPrefix());
         }
 
@@ -82,7 +74,7 @@ namespace xmltooling {
          * @param bindDocument  true iff the XMLObject should take ownership of the DOM Document
          * @return the unmarshalled XMLObject
          */
-        virtual XMLObject* buildFromElement(DOMElement* element, bool bindDocument=false) const {
+        XMLObject* buildFromElement(DOMElement* element, bool bindDocument=false) const {
             std::auto_ptr<XMLObject> ret(buildObject(element->getNamespaceURI(),element->getLocalName(),element->getPrefix()));
             ret->unmarshall(element,bindDocument);
             return ret.release();
@@ -95,22 +87,22 @@ namespace xmltooling {
          * @param bindDocument  true iff the XMLObject should take ownership of the DOM Document
          * @return the unmarshalled XMLObject
          */
-        virtual XMLObject* buildFromDocument(DOMDocument* doc, bool bindDocument=true) const {
+        XMLObject* buildFromDocument(DOMDocument* doc, bool bindDocument=true) const {
             return buildFromElement(doc->getDocumentElement(),bindDocument);
         }
 
         /**
          * Creates an empty XMLObject using the default build method, if a builder can be found.
          * 
-         * @param key   the key used to locate a builder
+         * @param key   the element key used to locate a builder
          * @return  the empty object or NULL if no builder is available 
          */
         static XMLObject* buildOne(const QName& key) {
             const XMLObjectBuilder* b=getBuilder(key);
             if (b)
-                return b->buildObject();
+                return b->buildFromQName(key);
             b=getDefaultBuilder();
-            return b ? b->buildObject() : NULL;
+            return b ? b->buildFromQName(key) : NULL;
         }
 
         /**

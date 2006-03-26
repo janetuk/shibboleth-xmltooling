@@ -23,7 +23,7 @@
 #if !defined(__xmltooling_sig_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_sig_h__
 
-#include <xmltooling/XMLObject.h>
+#include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/signature/SigningContext.h>
 #include <xmltooling/signature/VerifyingContext.h>
 
@@ -79,6 +79,19 @@ namespace xmltooling {
         Signature() {}
     };
 
+    /**
+     * Builder for Signature objects.
+     */
+    class XMLTOOL_API SignatureBuilder : public XMLObjectBuilder
+    {
+    public:
+        virtual ~SignatureBuilder() {}
+
+        /**
+         * Default typed builder method.
+         */
+        virtual Signature* buildObject() const=0;
+    };
 };
 
 #endif /* __xmltooling_sig_h__ */

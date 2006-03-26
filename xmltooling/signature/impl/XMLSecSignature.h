@@ -74,6 +74,12 @@ namespace xmltooling {
         XMLSecSignatureImpl* buildObject(
             const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix=NULL
             ) const {
+            if (!XMLString::equals(namespaceURI,XMLConstants::XMLSIG_NS) || !XMLString::equals(elementLocalName, Signature::LOCAL_NAME))
+                throw XMLObjectException("XMLSecSignatureBuilder requires standard Signature element name.");
+            return buildObject();
+        }
+        
+        XMLSecSignatureImpl* buildObject() const {
             return new XMLSecSignatureImpl();
         }
     };

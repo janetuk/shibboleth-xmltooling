@@ -38,6 +38,9 @@ namespace xmltooling {
     class XMLTOOL_API AnyElementBuilder : public XMLObjectBuilder
     {
     public:
+        /**
+         * @see XMLObjectBuilder::buildObject(const XMLCh*,const XMLCh*,const XMLCh*)
+         */
         XMLObject* buildObject(
             const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix=NULL
             ) const;
