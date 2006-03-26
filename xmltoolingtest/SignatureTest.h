@@ -129,7 +129,7 @@ public:
         
         string buf;
         XMLHelper::serialize(rootElement, buf);
-        TS_TRACE(buf.c_str());
+        //TS_TRACE(buf.c_str());
 
         istringstream in(buf);
         DOMDocument* doc=nonvalidatingPool->parse(in);

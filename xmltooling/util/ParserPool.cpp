@@ -169,6 +169,7 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
         if (!XMLHelper::isNodeNamed(root,CATALOG_NS,catalog)) {
             auto_ptr_char temp(pathname);
             log.error("unknown root element, failed to load XML catalog from %s", temp.get());
+            doc->release();
             return false;
         }
         
@@ -194,6 +195,7 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
         for_each(m_schemaLocMap.begin(),m_schemaLocMap.end(),doubleit<string>(m_schemaLocations,' '));
 #endif
         XMLPlatformUtils::unlockMutex(m_lock);
+        doc->release();
     }
     catch (XMLParserException& e) {
         log.error("catalog loader caught XMLParserException: %s", e.what());

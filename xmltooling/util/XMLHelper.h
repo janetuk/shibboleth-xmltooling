@@ -99,6 +99,78 @@ namespace xmltooling {
         }
 
         /**
+         * Returns the first child element of the node if any.
+         * 
+         * @param n     node to check
+         * @return  the first child node of type Element, or NULL
+         */
+        static DOMElement* getFirstChildElement(const DOMNode* n);
+        
+        /**
+         * Returns the last child element of the node if any.
+         * 
+         * @param n     node to check
+         * @return  the last child node of type Element, or NULL
+         */
+        static DOMElement* getLastChildElement(const DOMNode* n);
+        
+        /**
+         * Returns the next sibling element of the node if any.
+         * 
+         * @param n     node to check
+         * @return  the next sibling node of type Element, or NULL
+         */
+        static DOMElement* getNextSiblingElement(const DOMNode* n);
+        
+        /**
+         * Returns the previous sibling element of the node if any.
+         * 
+         * @param n     node to check
+         * @return  the previous sibling node of type Element, or NULL
+         */
+        static DOMElement* getPreviousSiblingElement(const DOMNode* n);
+        
+        /**
+         * Returns the first matching child element of the node if any.
+         * 
+         * @param n         node to check
+         * @param ns        namespace to compare with
+         * @param localName local name to compare with
+         * @return  the first matching child node of type Element, or NULL
+         */
+        static DOMElement* getFirstChildElement(const DOMNode* n, const XMLCh* ns, const XMLCh* localName);
+        
+        /**
+         * Returns the last matching child element of the node if any.
+         * 
+         * @param n         node to check
+         * @param ns        namespace to compare with
+         * @param localName local name to compare with
+         * @return  the last matching child node of type Element, or NULL
+         */
+        static DOMElement* getLastChildElement(const DOMNode* n, const XMLCh* ns, const XMLCh* localName);
+        
+        /**
+         * Returns the next matching sibling element of the node if any.
+         * 
+         * @param n         node to check
+         * @param ns        namespace to compare with
+         * @param localName local name to compare with
+         * @return  the next matching sibling node of type Element, or NULL
+         */
+        static DOMElement* getNextSiblingElement(const DOMNode* n, const XMLCh* ns, const XMLCh* localName);
+        
+        /**
+         * Returns the previous matching sibling element of the node if any.
+         * 
+         * @param n         node to check
+         * @param ns        namespace to compare with
+         * @param localName local name to compare with
+         * @return  the previous matching sibling node of type Element, or NULL
+         */
+        static DOMElement* getPreviousSiblingElement(const DOMNode* n, const XMLCh* ns, const XMLCh* localName);
+
+        /**
          * Returns the content of the first Text node found in the element, if any.
          * This is roughly similar to the DOM getTextContent function, but only
          * examples the immediate children of the element.

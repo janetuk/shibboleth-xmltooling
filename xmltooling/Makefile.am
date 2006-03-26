@@ -72,6 +72,7 @@ libxmltooling_la_SOURCES = \
     AbstractDOMCachingXMLObject.cpp \
     AbstractElementProxy.cpp \
     AbstractXMLObject.cpp \
+    exceptions.cpp \
     Namespace.cpp \
     QName.cpp \
     unicode.cpp \

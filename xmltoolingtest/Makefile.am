@@ -16,6 +16,7 @@ endif
 
 xmltoolingtest_h = \
     ComplexXMLObjectTest.h \
+    ExceptionText.h \
     MarshallingTest.h \
     UnmarshallingTest.h \
     xmltoolingtest.h \

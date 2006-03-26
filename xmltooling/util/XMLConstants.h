@@ -67,6 +67,9 @@ namespace xmltooling {
         
         /**  XML Encryption QName prefix ("xenc") */
         static const XMLCh XMLENC_PREFIX[];
+        
+        /**  XML Tooling namespace ("http://www.opensaml.org/xmltooling") */
+        static const XMLCh XMLTOOLING_NS[];
     };
 
 };

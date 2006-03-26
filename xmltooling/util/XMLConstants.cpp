@@ -82,3 +82,11 @@ const XMLCh XMLConstants::XMLENC_NS[] = // http://www.w3.org/2001/04/xmlenc#
 };
 
 const XMLCh XMLConstants::XMLENC_PREFIX[] = { chLatin_x, chLatin_e, chLatin_n, chLatin_c, chNull };
+
+const XMLCh XMLConstants::XMLTOOLING_NS[] = // http://www.opensaml.org/xmltooling
+{ chLatin_h, chLatin_t, chLatin_t, chLatin_p, chColon, chForwardSlash, chForwardSlash,
+  chLatin_w, chLatin_w, chLatin_w, chPeriod,
+  chLatin_o, chLatin_p, chLatin_e, chLatin_n, chLatin_s, chLatin_a, chLatin_m, chLatin_l, chPeriod,
+  chLatin_o, chLatin_r, chLatin_g, chForwardSlash,
+  chLatin_x, chLatin_m, chLatin_l, chLatin_t, chLatin_o, chLatin_o, chLatin_l, chLatin_i, chLatin_n, chLatin_g, chNull
+};

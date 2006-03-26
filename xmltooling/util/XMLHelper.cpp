@@ -128,6 +128,78 @@ const XMLCh* XMLHelper::getTextContent(const DOMElement* e)
     return NULL;
 }
 
+DOMElement* XMLHelper::getFirstChildElement(const DOMNode* n)
+{
+    DOMNode* child = n->getFirstChild();
+    while (child && child->getNodeType() != DOMNode::ELEMENT_NODE)
+        child = child->getNextSibling();
+    if (child)
+        return static_cast<DOMElement*>(child);
+    return NULL;
+}    
+
+DOMElement* XMLHelper::getLastChildElement(const DOMNode* n)
+{
+    DOMNode* child = n->getLastChild();
+    while (child && child->getNodeType() != DOMNode::ELEMENT_NODE)
+        child = child->getPreviousSibling();
+    if (child)
+        return static_cast<DOMElement*>(child);
+    return NULL;
+}    
+
+DOMElement* XMLHelper::getFirstChildElement(const DOMNode* n, const XMLCh* ns, const XMLCh* localName)
+{
+    DOMElement* e = getFirstChildElement(n);
+    while (e && !isNodeNamed(e, ns, localName))
+        e = getNextSiblingElement(e);
+    return e;
+}
+
+DOMElement* XMLHelper::getLastChildElement(const DOMNode* n, const XMLCh* ns, const XMLCh* localName)
+{
+    DOMElement* e = getLastChildElement(n);
+    while (e && !isNodeNamed(e, ns, localName))
+        e = getPreviousSiblingElement(e);
+    return e;
+}
+
+DOMElement* XMLHelper::getNextSiblingElement(const DOMNode* n)
+{
+    DOMNode* sib = n->getNextSibling();
+    while (sib && sib->getNodeType() != DOMNode::ELEMENT_NODE)
+        sib = sib->getNextSibling();
+    if (sib)
+        return static_cast<DOMElement*>(sib);
+    return NULL;
+}
+
+DOMElement* XMLHelper::getPreviousSiblingElement(const DOMNode* n)
+{
+    DOMNode* sib = n->getPreviousSibling();
+    while (sib && sib->getNodeType() != DOMNode::ELEMENT_NODE)
+        sib = sib->getPreviousSibling();
+    if (sib)
+        return static_cast<DOMElement*>(sib);
+    return NULL;
+}
+
+DOMElement* XMLHelper::getNextSiblingElement(const DOMNode* n, const XMLCh* ns, const XMLCh* localName)
+{
+    DOMElement* e = getNextSiblingElement(n);
+    while (e && !isNodeNamed(e, ns, localName))
+        e = getNextSiblingElement(e);
+    return e;
+}
+
+DOMElement* XMLHelper::getPreviousSiblingElement(const DOMNode* n, const XMLCh* ns, const XMLCh* localName)
+{
+    DOMElement* e = getPreviousSiblingElement(n);
+    while (e && !isNodeNamed(e, ns, localName))
+        e = getPreviousSiblingElement(e);
+    return e;
+}
+
 void XMLHelper::serialize(const DOMElement* e, std::string& buf)
 {
     static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };

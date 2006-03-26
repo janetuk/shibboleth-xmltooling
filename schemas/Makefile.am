@@ -8,7 +8,8 @@ pkgxml_DATA = \
 	catalog.xml \
 	xenc-schema.xsd \
 	xmldsig-core-schema.xsd \
-	xml.xsd
+	xml.xsd \
+	xmltooling.xsd
 
 #
 # Some of these need building
@@ -26,8 +27,9 @@ catalog.xml: ${srcdir}/catalog.xml.in Makefile ${top_builddir}/config.status
 CLEANFILES = catalog.xml
 
 EXTRA_DIST = \
-	catalog.xml.in \
-        xenc-schema.xsd \
-        xmldsig-core-schema.xsd \
-        xml.xsd
+    catalog.xml.in \
+    xenc-schema.xsd \
+    xmldsig-core-schema.xsd \
+    xml.xsd \
+    xmltooling.xsd
 

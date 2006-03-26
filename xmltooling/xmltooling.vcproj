@@ -198,6 +198,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\exceptions.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Namespace.cpp"
 				>
 			</File>

@@ -21,6 +21,7 @@
  */
 
 #include "internal.h"
+#include "exceptions.h"
 #include "XMLToolingConfig.h"
 #include "impl/UnknownElement.h"
 #include "signature/impl/XMLSecSignature.h"
@@ -43,6 +44,15 @@
 using namespace log4cpp;
 using namespace xmltooling;
 using namespace std;
+
+DECL_EXCEPTION_FACTORY(XMLParserException);
+DECL_EXCEPTION_FACTORY(XMLObjectException);
+DECL_EXCEPTION_FACTORY(MarshallingException);
+DECL_EXCEPTION_FACTORY(UnmarshallingException);
+DECL_EXCEPTION_FACTORY(UnknownElementException);
+DECL_EXCEPTION_FACTORY(UnknownAttributeException);
+DECL_EXCEPTION_FACTORY(ValidationException);
+DECL_EXCEPTION_FACTORY(SignatureException);
 
 namespace {
    XMLToolingInternalConfig g_config;
@@ -143,6 +153,14 @@ bool XMLToolingInternalConfig::init()
 #ifndef XMLTOOLING_NO_XMLSEC
         XMLObjectBuilder::registerBuilder(QName(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME),new XMLSecSignatureBuilder());
 #endif
+        REGISTER_EXCEPTION_FACTORY(XMLParserException);
+        REGISTER_EXCEPTION_FACTORY(XMLObjectException);
+        REGISTER_EXCEPTION_FACTORY(MarshallingException);
+        REGISTER_EXCEPTION_FACTORY(UnmarshallingException);
+        REGISTER_EXCEPTION_FACTORY(UnknownElementException);
+        REGISTER_EXCEPTION_FACTORY(UnknownAttributeException);
+        REGISTER_EXCEPTION_FACTORY(ValidationException);
+        REGISTER_EXCEPTION_FACTORY(SignatureException);
     }
     catch (const xercesc::XMLException&) {
         log.fatal("caught exception while initializing Xerces");
