@@ -48,14 +48,6 @@ namespace xmltooling {
         }
 
         /**
-         * @see XMLObject::setElementNamespacePrefix()
-         */
-        void setElementNamespacePrefix(const XMLCh* prefix) {
-            m_elementQname.setPrefix(prefix);
-            addNamespace(Namespace(m_elementQname.getNamespaceURI(),prefix));
-        }
-
-        /**
          * @see XMLObject::getNamespaces()
          */
         const std::set<Namespace>& getNamespaces() const {

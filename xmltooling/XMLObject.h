@@ -91,13 +91,6 @@ namespace xmltooling {
         virtual const QName& getElementQName() const=0;
         
         /**
-         * Sets the namespace prefix for this element.
-         * 
-         * @param prefix the prefix for this element
-         */
-        virtual void setElementNamespacePrefix(const XMLCh* prefix)=0;
-        
-        /**
          * Gets the namespaces that are scoped to this element.
          * 
          * The caller MUST NOT modify the set returned, but may use any
