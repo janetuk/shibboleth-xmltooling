@@ -26,6 +26,7 @@
 #include <map>
 #include <xmltooling/QName.h>
 #include <xmltooling/XMLObject.h>
+#include <xmltooling/util/XMLHelper.h>
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -46,15 +47,16 @@ namespace xmltooling {
         
         /**
          * Creates an empty XMLObject with a particular element name.
-         * The results are undefined if elementLocalName is NULL or empty.
+         * The results are undefined if localName is NULL or empty.
          * 
-         * @param namespaceURI          namespace URI for element
-         * @param elementLocalName      local name of element
-         * @param namespacePrefix       prefix of element name
+         * @param nsURI         namespace URI for element
+         * @param localName     local name of element
+         * @param prefix        prefix of element name
+         * @param schemaType    xsi:type of the object
          * @return the empty XMLObject
          */
         virtual XMLObject* buildObject(
-            const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix=NULL
+            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL
             ) const=0;
 
         /**
@@ -75,7 +77,9 @@ namespace xmltooling {
          * @return the unmarshalled XMLObject
          */
         XMLObject* buildFromElement(DOMElement* element, bool bindDocument=false) const {
-            std::auto_ptr<XMLObject> ret(buildObject(element->getNamespaceURI(),element->getLocalName(),element->getPrefix()));
+            std::auto_ptr<XMLObject> ret(
+                buildObject(element->getNamespaceURI(),element->getLocalName(),element->getPrefix(),XMLHelper::getXSIType(element))
+                );
             ret->unmarshall(element,bindDocument);
             return ret.release();
         }

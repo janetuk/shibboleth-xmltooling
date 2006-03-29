@@ -62,15 +62,6 @@ namespace xmltooling {
             return m_typeQname;
         }
     
-        void setSchemaType(const QName* type) {
-            delete m_typeQname;
-            m_typeQname = NULL;
-            if (type) {
-                m_typeQname = new QName(*type);
-                addNamespace(Namespace(type->getNamespaceURI(), type->getPrefix()));
-            }
-        }
-    
         bool hasParent() const {
             return m_parent != NULL;
         }
@@ -95,11 +86,14 @@ namespace xmltooling {
         /**
          * Constructor
          * 
-         * @param namespaceURI the namespace the element is in
-         * @param elementLocalName the local name of the XML element this Object represents
-         * @param namespacePrefix the namespace prefix to use
+         * @param nsURI         the namespace of the element
+         * @param localName     the local name of the XML element this Object represents
+         * @param prefix        the namespace prefix to use
+         * @param schemaType    the xsi:type to use
          */
-        AbstractXMLObject(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL);
+        AbstractXMLObject(
+            const XMLCh* nsURI=NULL, const XMLCh* localName=NULL, const XMLCh* prefix=NULL, const QName* schemaType=NULL
+            );
 
         /** Copy constructor. */
         AbstractXMLObject(const AbstractXMLObject& src);

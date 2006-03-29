@@ -34,11 +34,15 @@ AbstractXMLObject::~AbstractXMLObject() {
     std::for_each(m_children.begin(), m_children.end(), cleanup<XMLObject>());
 }
 
-AbstractXMLObject::AbstractXMLObject(const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix)
-    : m_elementQname(namespaceURI,elementLocalName, namespacePrefix), m_typeQname(NULL), m_parent(NULL),
+AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+    : m_elementQname(nsURI, localName, prefix), m_typeQname(NULL), m_parent(NULL),
         m_log(&log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".XMLObject"))
 {
-    addNamespace(Namespace(namespaceURI, namespacePrefix));
+    addNamespace(Namespace(nsURI, prefix));
+    if (schemaType) {
+        m_typeQname = new QName(*schemaType);
+        addNamespace(Namespace(m_typeQname->getNamespaceURI(), m_typeQname->getPrefix()));
+    }
 }
 
 AbstractXMLObject::AbstractXMLObject(const AbstractXMLObject& src)

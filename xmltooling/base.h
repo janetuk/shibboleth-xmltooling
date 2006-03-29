@@ -186,7 +186,9 @@
 #define BEGIN_XMLOBJECTBUILDERIMPL(cname,namespaceURI) \
     class XMLTOOL_DLLLOCAL cname##BuilderImpl : public cname##Builder { \
     public: \
-        cname* buildObject(const XMLCh* ns, const XMLCh* name, const XMLCh* prefix=NULL) const; \
+        cname* buildObject( \
+            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL\
+            ) const; \
         cname* buildObject() const { \
             return buildObject(namespaceURI,cname::LOCAL_NAME,cname::PREFIX); \
         }

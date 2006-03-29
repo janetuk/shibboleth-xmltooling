@@ -95,8 +95,7 @@ public:
         kids.erase(kids.begin()+1);
         TS_ASSERT_SAME_DATA(kids.back()->getValue(), bar.get(), XMLString::stringLen(bar.get()));
         
-        kids.push_back(b->buildObject(SimpleXMLObject::NAMESPACE,SimpleXMLObject::DERIVED_NAME,SimpleXMLObject::NAMESPACE_PREFIX));
-        kids.back()->setSchemaType(&m_qtype);
+        kids.push_back(b->buildObject(SimpleXMLObject::NAMESPACE,SimpleXMLObject::DERIVED_NAME,SimpleXMLObject::NAMESPACE_PREFIX,&m_qtype));
         kids.back()->setValue(baz.get());
         
         DOMElement* rootElement = sxObject->marshall();

@@ -36,7 +36,7 @@ namespace xmltooling {
     {
     public:
         XMLObject* buildObject(
-            const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix=NULL
+            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL
             ) const;
     };
 

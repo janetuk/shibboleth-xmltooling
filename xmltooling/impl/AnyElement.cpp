@@ -54,8 +54,8 @@ namespace xmltooling {
     public:
         virtual ~AnyElementImpl() {}
 
-        AnyElementImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix)
-            : AbstractXMLObject(nsURI, localName, prefix) {}
+        AnyElementImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL)
+            : AbstractXMLObject(nsURI, localName, prefix, schemaType) {}
         
         AnyElementImpl* clone() const {
             auto_ptr<XMLObject> domClone(AbstractDOMCachingXMLObject::clone());
@@ -114,7 +114,7 @@ namespace xmltooling {
 
 
 XMLObject* AnyElementBuilder::buildObject(
-    const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix
+    const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType
     ) const {
-    return new AnyElementImpl(namespaceURI,elementLocalName,namespacePrefix);
+    return new AnyElementImpl(nsURI, localName, prefix, schemaType);
 }

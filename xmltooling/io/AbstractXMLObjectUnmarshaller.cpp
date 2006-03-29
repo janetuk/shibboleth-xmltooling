@@ -117,9 +117,7 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
             }
         }
         else if (XMLString::equals(nsuri,XMLConstants::XSI_NS) && XMLString::equals(attribute->getLocalName(),type)) {
-            XT_log.debug("found xsi:type declaration, setting the schema type of the XMLObject");
-            auto_ptr<QName> xsitype(XMLHelper::getAttributeValueAsQName(attribute));
-            setSchemaType(xsitype.get());
+            XT_log.debug("skipping xsi:type declaration");
             continue;
         }
         else if (nsuri && !XMLString::equals(nsuri,XMLConstants::XML_NS)) {

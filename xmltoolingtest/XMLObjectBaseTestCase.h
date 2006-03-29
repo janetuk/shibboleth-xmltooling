@@ -67,8 +67,8 @@ public:
     static const XMLCh ID_ATTRIB_NAME[];
 
     SimpleXMLObject(
-        const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL
-        ) : AbstractXMLObject(namespaceURI, elementLocalName, namespacePrefix), m_id(NULL), m_value(NULL) {
+        const XMLCh* nsURI=NULL, const XMLCh* localName=NULL, const XMLCh* prefix=NULL, const QName* schemaType=NULL
+        ) : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_id(NULL), m_value(NULL) {
 #ifndef XMLTOOLING_NO_XMLSEC
         m_children.push_back(NULL);
         m_signature=m_children.begin();
@@ -171,9 +171,9 @@ public:
     }
 
     SimpleXMLObject* buildObject(
-        const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix=NULL
+        const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL
         ) const {
-        return new SimpleXMLObject(namespaceURI,elementLocalName,namespacePrefix);
+        return new SimpleXMLObject(nsURI, localName, prefix, schemaType);
     }
 };
 

@@ -30,7 +30,9 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL XMLSecSignatureBuilder : public SignatureBuilder
     {
     public:
-        Signature* buildObject(const XMLCh* ns, const XMLCh* name, const XMLCh* prefix=NULL) const;
+        Signature* buildObject(
+            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL
+            ) const;
         Signature* buildObject() const;
     };
 

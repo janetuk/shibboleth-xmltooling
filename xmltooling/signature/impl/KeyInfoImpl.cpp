@@ -49,8 +49,8 @@ namespace xmltooling {
     public:
         virtual ~KeyInfoImpl() {}
 
-        KeyInfoImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix)
-            : AbstractXMLObject(nsURI, localName, prefix), m_Id(NULL) {}
+        KeyInfoImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Id(NULL) {}
             
         KeyInfoImpl(const KeyInfoImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src),
             AbstractElementProxy(src), AbstractValidatingXMLObject(src), m_Id(XMLString::replicate(src.m_Id)) {
@@ -96,7 +96,9 @@ namespace xmltooling {
     #pragma warning( pop )
 #endif
 
-KeyInfo* KeyInfoBuilderImpl::buildObject(const XMLCh* ns, const XMLCh* name, const XMLCh* prefix) const
+KeyInfo* KeyInfoBuilderImpl::buildObject(
+    const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType
+    ) const
 {
-    return new KeyInfoImpl(ns,name,prefix);
+    return new KeyInfoImpl(nsURI,localName,prefix,schemaType);
 }

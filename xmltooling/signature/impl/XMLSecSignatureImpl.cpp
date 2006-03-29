@@ -401,9 +401,11 @@ XMLObject* XMLSecSignatureImpl::unmarshall(DOMElement* element, bool bindDocumen
     return this;
 }
 
-Signature* XMLSecSignatureBuilder::buildObject(const XMLCh* ns, const XMLCh* name, const XMLCh* prefix) const
+Signature* XMLSecSignatureBuilder::buildObject(
+    const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType
+    ) const
 {
-    if (!XMLString::equals(ns,XMLConstants::XMLSIG_NS) || !XMLString::equals(name,Signature::LOCAL_NAME))
+    if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) || !XMLString::equals(localName,Signature::LOCAL_NAME))
         throw XMLObjectException("XMLSecSignatureBuilder requires standard Signature element name.");
     return buildObject();
 }

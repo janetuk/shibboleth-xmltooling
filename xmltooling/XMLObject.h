@@ -133,14 +133,6 @@ namespace xmltooling {
         virtual const QName* getSchemaType() const=0;
         
         /**
-         * Sets the XML schema type of this element.  This translates to contents the xsi:type
-         * attribute for the element.
-         * 
-         * @param type XML schema type of this element
-         */
-        virtual void setSchemaType(const QName* type)=0;
-        
-        /**
          * Checks to see if this object has a parent.
          * 
          * @return true if the object has a parent, false if not
