@@ -37,19 +37,19 @@
  * @param desc
  */
 #define DECL_XMLTOOLING_EXCEPTION(name,base,desc) \
-    /##** desc */ \
+    XMLTOOLING_DOXYGEN(desc) \
     class XMLTOOL_EXCEPTIONAPI(XMLTOOL_API) name : public xmltooling::base { \
     public: \
-        /##** base##::##base(const char*,const xmltooling::params&) */ \
+        XMLTOOLING_DOXYGEN(Constructor) \
         name(const char* msg=NULL, const xmltooling::params& p=xmltooling::params()) \
             : xmltooling::base(msg,p) {} \
-        /##** base##::##base(const char*,const xmltooling::namedparams&) */ \
+        XMLTOOLING_DOXYGEN(Constructor) \
         name(const char* msg, const xmltooling::namedparams& p) \
             : xmltooling::base(msg,p) {} \
-        /##** base##::##base(const std::string&,const xmltooling::params&) */ \
+        XMLTOOLING_DOXYGEN(Constructor) \
         name(const std::string& msg, const xmltooling::params& p=xmltooling::params()) \
             : xmltooling::base(msg,p) {} \
-        /##** base##::##base(const std::string&,const xmltooling::namedparams&) */ \
+        XMLTOOLING_DOXYGEN(Constructor) \
         name(const std::string& msg, const xmltooling::namedparams& p) \
             : xmltooling::base(msg,p) {} \
         virtual ~name() {} \

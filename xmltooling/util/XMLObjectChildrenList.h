@@ -194,7 +194,7 @@ namespace xmltooling {
             Container& sublist,
             typename std::list<_Ty*>* backing,
             typename std::list<_Ty*>::iterator ins_fence
-            ) : m_parent(parent), m_container(sublist), m_list(backing), m_fence(ins_fence) {
+            ) : m_container(sublist), m_list(backing), m_fence(ins_fence), m_parent(parent) {
         }
 
         /// @cond OFF

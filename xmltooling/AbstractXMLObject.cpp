@@ -35,8 +35,8 @@ AbstractXMLObject::~AbstractXMLObject() {
 }
 
 AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
-    : m_elementQname(nsURI, localName, prefix), m_typeQname(NULL), m_parent(NULL),
-        m_log(&log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".XMLObject"))
+    : m_log(&log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".XMLObject")),
+        m_parent(NULL), m_elementQname(nsURI, localName, prefix), m_typeQname(NULL)
 {
     addNamespace(Namespace(nsURI, prefix));
     if (schemaType) {

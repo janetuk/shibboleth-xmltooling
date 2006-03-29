@@ -148,7 +148,6 @@ void AbstractXMLObjectUnmarshaller::unmarshallChildElements(const DOMElement* do
         return;
     }
 
-    XMLToolingConfig& config=XMLToolingConfig::getConfig();
     for (XMLSize_t i = 0; i < childNodes->getLength(); i++) {
         childNode = childNodes->item(i);
         if (childNode->getNodeType() == DOMNode::ELEMENT_NODE) {

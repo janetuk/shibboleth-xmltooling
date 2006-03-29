@@ -137,7 +137,6 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".ParserPool");
 
     // XML constants
-    static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
     static const XMLCh catalog[] = { chLatin_c, chLatin_a, chLatin_t, chLatin_a, chLatin_l, chLatin_o, chLatin_g, chNull };
     static const XMLCh uri[] = { chLatin_u, chLatin_r, chLatin_i, chNull };
     static const XMLCh name[] = { chLatin_n, chLatin_a, chLatin_m, chLatin_e, chNull };

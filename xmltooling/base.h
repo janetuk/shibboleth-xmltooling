@@ -74,6 +74,12 @@
 #define NULL    0
 #endif
 
+#ifdef _MSC_VER
+    #define XMLTOOLING_DOXYGEN(desc) /##** desc */
+#else
+    #define XMLTOOLING_DOXYGEN(desc)
+#endif
+
 /**
  * Blocks copy c'tor and assignment operator for a class.
  */
@@ -96,11 +102,11 @@
         cname() {} \
     public: \
         virtual ~cname() {} \
-        /##** Type-specific clone method. */ \
+        XMLTOOLING_DOXYGEN(Type-specific clone method.) \
         virtual cname* clone##cname() const=0; \
-        /##** Element prefix */ \
+        XMLTOOLING_DOXYGEN(Element prefix) \
         static const XMLCh PREFIX[]; \
-        /##** Element local name */ \
+        XMLTOOLING_DOXYGEN(Element local name) \
         static const XMLCh LOCAL_NAME[]
 
 /**
@@ -115,11 +121,11 @@
  * @param upcased   the upcased name of the attribute
  */
 #define DECL_XMLOBJECT_ATTRIB(proper,upcased) \
-    /##** proper attribute name */ \
+    XMLTOOLING_DOXYGEN(proper attribute name) \
     static const XMLCh upcased##_ATTRIB_NAME[]; \
-    /##** Returns the proper attribute. */ \
+    XMLTOOLING_DOXYGEN(Returns the proper attribute.) \
     virtual const XMLCh* get##proper() const=0; \
-    /##** Sets the proper attribute. */ \
+    XMLTOOLING_DOXYGEN(Sets the proper attribute.) \
     virtual void set##proper(const XMLCh* proper)=0
 
 /**
@@ -165,11 +171,11 @@
  * @param cname the name of the XMLObject specialization
  */
 #define BEGIN_XMLOBJECTBUILDER(cname) \
-    /##** Builder for cname objects. */ \
+    XMLTOOLING_DOXYGEN(Builder for cname objects.) \
     class XMLTOOL_API cname##Builder : public xmltooling::XMLObjectBuilder { \
     public: \
         virtual ~cname##Builder() {} \
-        /##** Default builder. */ \
+        XMLTOOLING_DOXYGEN(Default builder.) \
         virtual cname* buildObject() const=0
 
 /**

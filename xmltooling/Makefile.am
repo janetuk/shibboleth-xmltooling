@@ -18,7 +18,6 @@ libxmltoolinginclude_HEADERS = \
     AbstractAttributeExtensibleXMLObject.h \
     AbstractDOMCachingXMLObject.h \
     AbstractElementProxy.h \
-    AbstractValidatingXMLObject.h \
     AbstractXMLObject.h \
     AttributeExtensibleXMLObject.h \
     base.h \
@@ -29,7 +28,6 @@ libxmltoolinginclude_HEADERS = \
     Namespace.h \
     QName.h \
     unicode.h \
-    ValidatingXMLObject.h \
     version.h \
     XMLObject.h \
     XMLObjectBuilder.h \
@@ -57,6 +55,8 @@ utilinclude_HEADERS = \
     util/XMLObjectChildrenList.h
 
 valinclude_HEADERS = \
+    validation/AbstractValidatingXMLObject.h \
+    validation/ValidatingXMLObject.h \
     validation/Validator.h
 
 noinst_HEADERS = \
@@ -66,7 +66,6 @@ noinst_HEADERS = \
 
 if BUILD_XMLSEC
 xmlsec_sources = \
-    signature/impl/KeyInfoImpl.cpp \
     signature/impl/XMLSecSignatureImpl.cpp
 else
 xmlsec_sources =
@@ -87,6 +86,7 @@ libxmltooling_la_SOURCES = \
     impl/UnknownElement.cpp \
     io/AbstractXMLObjectMarshaller.cpp \
     io/AbstractXMLObjectUnmarshaller.cpp \
+    signature/impl/KeyInfoImpl.cpp \
     util/NDC.cpp \
     util/ParserPool.cpp \
     util/XMLConstants.cpp \
