@@ -15,7 +15,7 @@
  */
 
 /**
- * @file AnyElement.h
+ * AnyElement.cpp
  * 
  * Advanced anyType implementation suitable for deep processing of unknown content.
  */
@@ -47,13 +47,15 @@ namespace xmltooling {
     /**
      * Implements a smart wrapper around unknown DOM content.
      */
-    class XMLTOOL_DLLLOCAL AnyElementImpl : public AbstractElementProxy, public AbstractAttributeExtensibleXMLObject,
+    class XMLTOOL_DLLLOCAL AnyElementImpl : public AbstractDOMCachingXMLObject,
+        public AbstractElementProxy, public AbstractAttributeExtensibleXMLObject,
         public AbstractXMLObjectMarshaller, public AbstractXMLObjectUnmarshaller
     {
     public:
+        virtual ~AnyElementImpl() {}
+
         AnyElementImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix)
             : AbstractXMLObject(nsURI, localName, prefix) {}
-        virtual ~AnyElementImpl() {}
         
         AnyElementImpl* clone() const {
             auto_ptr<XMLObject> domClone(AbstractDOMCachingXMLObject::clone());
@@ -63,18 +65,17 @@ namespace xmltooling {
                 return ret;
             }
 
-            ret=new AnyElementImpl(
-                getElementQName().getNamespaceURI(),getElementQName().getLocalPart(),getElementQName().getPrefix()
-                );
-            ret->m_namespaces=m_namespaces;
-            for (map<QName,XMLCh*>::const_iterator i=m_attributeMap.begin(); i!=m_attributeMap.end(); i++) {
-                ret->m_attributeMap[i->first]=XMLString::replicate(i->second);
-            }
-            ret->setTextContent(getTextContent());
-            xmltooling::clone(m_children, ret->m_children);
-            return ret;
+            return new AnyElementImpl(*this);
         }
 
+    protected:
+        AnyElementImpl(const AnyElementImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src),
+            AbstractElementProxy(src), AbstractAttributeExtensibleXMLObject(src) {
+            for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
+                getXMLObjects().push_back((*i) ? (*i)->clone() : NULL);
+            }
+        }       
+        
         void marshallAttributes(DOMElement* domElement) const {
             for (map<QName,XMLCh*>::const_iterator i=m_attributeMap.begin(); i!=m_attributeMap.end(); i++) {
                 DOMAttr* attr=domElement->getOwnerDocument()->createAttributeNS(i->first.getNamespaceURI(),i->first.getLocalPart());

@@ -22,6 +22,7 @@
 
 #include "internal.h"
 #include "AbstractXMLObject.h"
+#include "exceptions.h"
 
 #include <algorithm>
 #include <log4cpp/Category.hh>
@@ -38,4 +39,36 @@ AbstractXMLObject::AbstractXMLObject(const XMLCh* namespaceURI, const XMLCh* ele
         m_log(&log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".XMLObject"))
 {
     addNamespace(Namespace(namespaceURI, namespacePrefix));
+}
+
+AbstractXMLObject::AbstractXMLObject(const AbstractXMLObject& src)
+    : m_namespaces(src.m_namespaces), m_log(src.m_log), m_parent(NULL), m_elementQname(src.m_elementQname), m_typeQname(NULL)
+{
+    if (src.m_typeQname)
+        m_typeQname=new QName(*src.m_typeQname);
+}
+
+XMLObject* AbstractXMLObject::prepareForAssignment(XMLObject* oldValue, XMLObject* newValue) {
+
+    if (newValue && newValue->hasParent())
+        throw XMLObjectException("child XMLObject cannot be added - it is already the child of another XMLObject");
+
+    if (!oldValue) {
+        if (newValue) {
+            releaseThisandParentDOM();
+            newValue->setParent(this);
+            return newValue;
+        }
+        else {
+            return NULL;
+        }
+    }
+
+    if (oldValue != newValue) {
+        delete oldValue;
+        releaseThisandParentDOM();
+        newValue->setParent(this);
+    }
+
+    return newValue;
 }

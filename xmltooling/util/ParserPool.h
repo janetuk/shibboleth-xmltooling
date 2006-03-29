@@ -94,7 +94,7 @@ namespace xmltooling {
          */
         bool loadCatalog(const XMLCh* pathname);
         
-        /*
+        /**
          * Load a schema explicitly from a local file.
          * 
          * Note that "successful processing" does not imply that the schema is valid,
@@ -147,7 +147,10 @@ namespace xmltooling {
          * @param systemId  optional system identifier to attach to the stream
          */
         StreamInputSource(std::istream& is, const char* systemId=NULL) : InputSource(systemId), m_is(is) {}
+        /// @cond off
         virtual BinInputStream* makeStream() const { return new StreamBinInputStream(m_is); }
+        /// @endcond
+
 
     private:
         std::istream& m_is;

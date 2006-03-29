@@ -21,7 +21,6 @@ libxmltoolinginclude_HEADERS = \
     AttributeExtensibleXMLObject.h \
     base.h \
     config_pub.h \
-    DOMCachingXMLObject.h \
     ElementProxy.h \
     exceptions.h \
     ILockable.h \
@@ -42,6 +41,7 @@ ioinclude_HEADERS = \
     io/AbstractXMLObjectUnmarshaller.h \
 
 siginclude_HEADERS = \
+    signature/KeyInfo.h \
     signature/Signature.h \
     signature/SigningContext.h \
     signature/VerifyingContext.h
@@ -58,11 +58,13 @@ valinclude_HEADERS = \
 
 noinst_HEADERS = \
     internal.h \
-    signature/impl/XMLSecSignature.h
+    signature/impl/KeyInfoImpl.h \
+    signature/impl/XMLSecSignatureImpl.h \
 
 if BUILD_XMLSEC
 xmlsec_sources = \
-    signature/impl/XMLSecSignature.cpp
+    signature/impl/KeyInfoImpl.cpp \
+    signature/impl/XMLSecSignatureImpl.cpp
 else
 xmlsec_sources =
 endif

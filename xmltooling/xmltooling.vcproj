@@ -284,7 +284,11 @@
 					Name="impl"
 					>
 					<File
-						RelativePath=".\signature\impl\XMLSecSignature.cpp"
+						RelativePath=".\signature\impl\KeyInfoImpl.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\signature\impl\XMLSecSignatureImpl.cpp"
 						>
 					</File>
 				</Filter>
@@ -321,10 +325,6 @@
 			</File>
 			<File
 				RelativePath=".\config_pub_win32.h"
-				>
-			</File>
-			<File
-				RelativePath=".\DOMCachingXMLObject.h"
 				>
 			</File>
 			<File
@@ -454,7 +454,11 @@
 					Name="impl"
 					>
 					<File
-						RelativePath=".\signature\impl\XMLSecSignature.h"
+						RelativePath=".\signature\impl\KeyInfoImpl.h"
+						>
+					</File>
+					<File
+						RelativePath=".\signature\impl\XMLSecSignatureImpl.h"
 						>
 					</File>
 				</Filter>

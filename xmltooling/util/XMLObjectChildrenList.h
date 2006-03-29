@@ -20,14 +20,30 @@
  * STL-compatible container wrapper
  */
 
-#if !defined(__xmltooling_list_h__)
+#ifndef __xmltooling_list_h__
 #define __xmltooling_list_h__
 
-#include <xmltooling/DOMCachingXMLObject.h>
 #include <xmltooling/exceptions.h>
 
+/**
+ * Shorthand for an XMLObjectChildrenList wrapped around a vector
+ * 
+ * @param type  the type of object in the vector
+ */
 #define VectorOf(type) xmltooling::XMLObjectChildrenList< std::vector<type*> >
+
+/**
+ * Shorthand for an XMLObjectChildrenList wrapped around a list
+ * 
+ * @param type  the type of object in the list
+ */
 #define ListOf(type) xmltooling::XMLObjectChildrenList< std::list<type*> >
+
+/**
+ * Shorthand for an XMLObjectChildrenList wrapped around a deque
+ * 
+ * @param type  the type of object in the deque
+ */
 #define DequeOf(type) xmltooling::XMLObjectChildrenList< std::deque<type*> >
 
 namespace xmltooling {
@@ -42,6 +58,7 @@ namespace xmltooling {
     template <class _Ty>
     class XMLObjectChildrenIterator
     {
+        /// @cond OFF
         typename _Ty::iterator m_iter;
         template <class _Tx, class _Tz> friend class XMLObjectChildrenList;
     public:
@@ -135,6 +152,7 @@ namespace xmltooling {
 		    // test for iterator inequality
 		    return (!(m_iter == _Right.m_iter));
 	    }
+        /// @endcond
     };
 
     /**
@@ -151,6 +169,7 @@ namespace xmltooling {
         XMLObject* m_parent;
 
 	public:
+        /// @cond OFF
         typedef typename Container::value_type value_type;
         typedef typename Container::reference reference;
         typedef typename Container::const_reference const_reference;
@@ -160,6 +179,7 @@ namespace xmltooling {
         // We override the iterator types with our constrained wrapper.
         typedef XMLObjectChildrenIterator<Container> iterator;
         typedef XMLObjectChildrenIterator<Container> const_iterator;
+        /// @endcond
 
         /**
          * Constructor to expose a typed collection of children backed by a list of a base type.
@@ -176,6 +196,8 @@ namespace xmltooling {
             typename std::list<_Ty*>::iterator ins_fence
             ) : m_parent(parent), m_container(sublist), m_list(backing), m_fence(ins_fence) {
         }
+
+        /// @cond OFF
 
         size_type size() const {
             // return length of sequence
@@ -263,20 +285,14 @@ namespace xmltooling {
             if (_Val->getParent())
                 throw XMLObjectException("Child object already has a parent.");
             _Val->setParent(m_parent);
-            DOMCachingXMLObject* dc=dynamic_cast<DOMCachingXMLObject*>(_Val);
-            if (dc) {
-                dc->releaseParentDOM(true);
-            }
+            _Val->releaseParentDOM(true);
         }
 
         void removeParent(const_reference _Val) {
             if (_Val->getParent()!=m_parent)
                 throw XMLObjectException("Child object not owned by this parent.");
             _Val->setParent(NULL);
-            DOMCachingXMLObject* dc=dynamic_cast<DOMCachingXMLObject*>(m_parent);
-            if (dc) {
-                dc->releaseParentDOM(true);
-            }
+            m_parent->releaseParentDOM(true);
         }
 
         void removeChild(const_reference _Val) {
@@ -288,6 +304,7 @@ namespace xmltooling {
                 }
             }
         }
+        /// @endcond
     };
 
 };

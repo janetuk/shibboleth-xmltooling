@@ -41,6 +41,14 @@ AbstractAttributeExtensibleXMLObject::~AbstractAttributeExtensibleXMLObject()
     for_each(m_attributeMap.begin(),m_attributeMap.end(),_release());
 }
 
+AbstractAttributeExtensibleXMLObject::AbstractAttributeExtensibleXMLObject(const AbstractAttributeExtensibleXMLObject& src)
+    : AbstractXMLObject(src)
+{
+    for (map<QName,XMLCh*>::const_iterator i=src.m_attributeMap.begin(); i!=src.m_attributeMap.end(); i++) {
+        m_attributeMap[i->first] = XMLString::replicate(i->second);
+    }
+}
+
 void AbstractAttributeExtensibleXMLObject::setAttribute(QName& qualifiedName, const XMLCh* value)
 {
     map<QName,XMLCh*>::iterator i=m_attributeMap.find(qualifiedName);

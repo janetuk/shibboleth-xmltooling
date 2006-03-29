@@ -17,10 +17,10 @@
 /**
  * @file AbstractAttributeExtensibleXMLObject.h
  * 
- * An abstract implementation of a DOM-caching AttributeExtensibleXMLObject 
+ * An abstract implementation of an AttributeExtensibleXMLObject 
  */
 
-#if !defined(__xmltooling_absattrextxmlobj_h__)
+#ifndef __xmltooling_absattrextxmlobj_h__
 #define __xmltooling_absattrextxmlobj_h__
 
 #include <map>
@@ -35,29 +35,27 @@
 namespace xmltooling {
 
     /**
-     * An abstract implementation of a DOM-caching AttributeExtensibleXMLObject.
+     * An abstract implementation of an AttributeExtensibleXMLObject.
      */
-    class XMLTOOL_API AbstractAttributeExtensibleXMLObject : public virtual AttributeExtensibleXMLObject, public virtual AbstractDOMCachingXMLObject
+    class XMLTOOL_API AbstractAttributeExtensibleXMLObject : public virtual AttributeExtensibleXMLObject, public virtual AbstractXMLObject
     {
     public:
         virtual ~AbstractAttributeExtensibleXMLObject();
         
-        /**
-         * @see AttributeExtensibleXMLObject::getAttribute()
-         */
         virtual const XMLCh* getAttribute(QName& qualifiedName) const {
             std::map<QName,XMLCh*>::const_iterator i=m_attributeMap.find(qualifiedName);
             return (i==m_attributeMap.end()) ? NULL : i->second;
         }
         
-        /**
-         * @see AttributeExtensibleXMLObject::setAttribute()
-         */
         virtual void setAttribute(QName& qualifiedName, const XMLCh* value);
     
      protected:
         AbstractAttributeExtensibleXMLObject() {}
 
+        /** Copy constructor. */
+        AbstractAttributeExtensibleXMLObject(const AbstractAttributeExtensibleXMLObject& src);
+
+        /** Map of arbitrary attributes. */
         std::map<QName,XMLCh*> m_attributeMap;
     };
     

@@ -28,19 +28,13 @@
 namespace xmltooling {
 
     /**
-     * Implements a smart wrapper around unknown DOM content.
-     */
-    class XMLTOOL_DLLLOCAL AnyElementImpl;
-
-    /**
      * Builder for AnyElementImpl objects.
+     * Use as the default builder when you want to wrap each unknown element and
+     * process the DOM content through xmltooling interfaces. 
      */
     class XMLTOOL_API AnyElementBuilder : public XMLObjectBuilder
     {
     public:
-        /**
-         * @see XMLObjectBuilder::buildObject(const XMLCh*,const XMLCh*,const XMLCh*)
-         */
         XMLObject* buildObject(
             const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix=NULL
             ) const;

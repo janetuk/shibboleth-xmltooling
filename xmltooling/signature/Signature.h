@@ -79,6 +79,15 @@ namespace xmltooling {
         Signature() {}
     };
 
+#ifdef XMLTOOLING_DEFINE_CONSTANTS
+    const XMLCh Signature::LOCAL_NAME[] = {
+        chLatin_S, chLatin_i, chLatin_g, chLatin_n, chLatin_a, chLatin_t, chLatin_u, chLatin_r, chLatin_e, chNull
+    }; 
+    const XMLCh Signature::PREFIX[] = {
+        chLatin_d, chLatin_s, chNull
+    };
+#endif
+
     /**
      * Builder for Signature objects.
      */
@@ -88,7 +97,7 @@ namespace xmltooling {
         virtual ~SignatureBuilder() {}
 
         /**
-         * Default typed builder method.
+         * Default builder.
          */
         virtual Signature* buildObject() const=0;
     };

@@ -40,46 +40,28 @@ namespace xmltooling {
     public:
         virtual ~AbstractXMLObject();
 
-        /**
-         * @see XMLObject::getElementQName()
-         */
         const QName& getElementQName() const {
             return m_elementQname;
         }
 
-        /**
-         * @see XMLObject::getNamespaces()
-         */
         const std::set<Namespace>& getNamespaces() const {
             return m_namespaces;
         }
     
-        /**
-         * @see XMLObject::addNamespace()
-         */
         void addNamespace(const Namespace& ns) const {
             if (ns.alwaysDeclare() || m_namespaces.find(ns)==m_namespaces.end()) {
                 m_namespaces.insert(ns);
             }
         }
     
-        /**
-         * @see XMLObject::removeNamespace()
-         */
         void removeNamespace(const Namespace& ns) {
             m_namespaces.erase(ns);
         }
         
-        /**
-         * @see XMLObject::getSchemaType()
-         */
         const QName* getSchemaType() const {
             return m_typeQname;
         }
     
-        /**
-         * @see XMLObject::setSchemaType()
-         */
         void setSchemaType(const QName* type) {
             delete m_typeQname;
             m_typeQname = NULL;
@@ -89,37 +71,22 @@ namespace xmltooling {
             }
         }
     
-        /**
-         * @see XMLObject::hasParent()
-         */
         bool hasParent() const {
             return m_parent != NULL;
         }
      
-        /**
-         * @see XMLObject::getParent()
-         */
         XMLObject* getParent() const {
             return m_parent;
         }
     
-        /**
-         * @see XMLObject::setParent()
-         */
         void setParent(XMLObject* parent) {
             m_parent = parent;
         }
 
-        /**
-         * @see XMLObject::hasChildren()
-         */
         bool hasChildren() const {
             return !m_children.empty();
         }
 
-        /**
-         * @see XMLObject::getOrderedChildren()
-         */
         const std::list<XMLObject*>& getOrderedChildren() const {
             return m_children;
         }
@@ -133,6 +100,46 @@ namespace xmltooling {
          * @param namespacePrefix the namespace prefix to use
          */
         AbstractXMLObject(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL);
+
+        /** Copy constructor. */
+        AbstractXMLObject(const AbstractXMLObject& src);
+        
+        /**
+         * A helper function for derived classes.
+         * This 'normalizes' newString, and then if it is different from oldString,
+         * it invalidates the DOM, frees the old string, and return the new.
+         * If not different, it frees the new string and just returns the old value.
+         * 
+         * @param oldValue - the current value
+         * @param newValue - the new value
+         * 
+         * @return the value that should be assigned
+         */
+        XMLCh* prepareForAssignment(XMLCh* oldValue, const XMLCh* newValue) {
+            XMLCh* newString = XMLString::replicate(newValue);
+            XMLString::trim(newString);
+            if (!XMLString::equals(oldValue,newValue)) {
+                releaseThisandParentDOM();
+                XMLString::release(&oldValue);
+                return newString;
+            }
+            XMLString::release(&newString);
+            return oldValue;            
+        }
+
+        /**
+         * A helper function for derived classes, for assignment of (singleton) XML objects.
+         * 
+         * It is indifferent to whether either the old or the new version of the value is null. 
+         * This method will do a safe compare of the objects and will also invalidate the DOM if appropriate
+         * 
+         * @param oldValue - current value
+         * @param newValue - proposed new value
+         * @return the value to assign 
+         * 
+         * @throws XMLObjectException if the new child already has a parent.
+         */
+        XMLObject* prepareForAssignment(XMLObject* oldValue, XMLObject* newValue);
 
         /**
          * Underlying list of child objects.

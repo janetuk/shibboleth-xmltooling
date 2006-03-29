@@ -46,6 +46,7 @@
 
 namespace xmltooling {
     
+    /// @cond OFF
     class XMLToolingInternalConfig : public xmltooling::XMLToolingConfig
     {
     public:
@@ -80,6 +81,8 @@ namespace xmltooling {
         void* m_lock;
         //PlugManager m_plugMgr;
     };
+    /// @endcond
+
 };
 
 #endif /* __xmltooling_internal_h__ */

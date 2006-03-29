@@ -59,6 +59,9 @@ namespace xmltooling {
     protected:
         AbstractValidatingXMLObject() : m_validators(NULL) {}
 
+        /** Copy constructor. */
+        AbstractValidatingXMLObject(const AbstractValidatingXMLObject& src);
+
     private:
         struct XMLTOOL_DLLLOCAL ValidatorWrapper {
             ~ValidatorWrapper(); 

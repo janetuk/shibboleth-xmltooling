@@ -15,21 +15,22 @@
  */
 
 /**
- * XMLSecSignature.cpp
+ * XMLSecSignatureImpl.cpp
  * 
- * Signature classes for XMLSec-based signature-handling
+ * Signature class for XMLSec-based signature-handling
  */
 
 #include "internal.h"
 #include "exceptions.h"
-#include "signature/impl/XMLSecSignature.h"
+#include "impl/UnknownElement.h"
+#include "signature/impl/XMLSecSignatureImpl.h"
 #include "util/NDC.h"
+#include "util/XMLConstants.h"
 #include "util/XMLHelper.h"
 
 #include <log4cpp/Category.hh>
 #include <xercesc/framework/MemBufInputSource.hpp>
 #include <xercesc/framework/Wrapper4InputSource.hpp>
-#include <xercesc/util/XMLUniDefs.hpp>
 #include <xsec/dsig/DSIGKeyInfoX509.hpp>
 #include <xsec/enc/XSECCryptoException.hpp>
 #include <xsec/framework/XSECException.hpp>
@@ -38,13 +39,49 @@ using namespace xmltooling;
 using namespace log4cpp;
 using namespace std;
 
-const XMLCh xmltooling::Signature::LOCAL_NAME[] = {
-    chLatin_S, chLatin_i, chLatin_g, chLatin_n, chLatin_a, chLatin_t, chLatin_u, chLatin_r, chLatin_e, chNull
-}; 
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4250 4251 )
+#endif
 
-const XMLCh xmltooling::Signature::PREFIX[] = {
-    chLatin_d, chLatin_s, chNull
-}; 
+namespace xmltooling {
+    
+    class XMLTOOL_DLLLOCAL XMLSecSignatureImpl : public UnknownElementImpl, public virtual Signature
+    {
+    public:
+        XMLSecSignatureImpl() : UnknownElementImpl(XMLConstants::XMLSIG_NS, Signature::LOCAL_NAME, XMLConstants::XMLSIG_PREFIX),
+            m_signature(NULL), m_c14n(NULL), m_sm(NULL) {}
+        virtual ~XMLSecSignatureImpl();
+        
+        void releaseDOM();
+        XMLObject* clone() const;
+
+        DOMElement* marshall(DOMDocument* document=NULL, MarshallingContext* ctx=NULL) const;
+        DOMElement* marshall(DOMElement* parentElement, MarshallingContext* ctx=NULL) const;
+        XMLObject* unmarshall(DOMElement* element, bool bindDocument=false);
+        
+        // Getters
+        const XMLCh* getCanonicalizationMethod() const { return m_c14n ? m_c14n : DSIGConstants::s_unicodeStrURIEXC_C14N_NOC; }
+        const XMLCh* getSignatureAlgorithm() const { return m_sm ? m_sm : DSIGConstants::s_unicodeStrURIRSA_SHA1; }
+
+        // Setters
+        void setCanonicalizationMethod(const XMLCh* c14n) { m_c14n = prepareForAssignment(m_c14n,c14n); }
+        void setSignatureAlgorithm(const XMLCh* sm) { m_sm = prepareForAssignment(m_sm,sm); }
+
+        void sign(const SigningContext& ctx);
+        void verify(const VerifyingContext& ctx) const;
+
+    private:
+        mutable DSIGSignature* m_signature;
+        XMLCh* m_c14n;
+        XMLCh* m_sm;
+    };
+    
+};
+
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
 
 XMLSecSignatureImpl::~XMLSecSignatureImpl()
 {
@@ -362,4 +399,16 @@ XMLObject* XMLSecSignatureImpl::unmarshall(DOMElement* element, bool bindDocumen
 
     setDOM(element, bindDocument);
     return this;
+}
+
+Signature* XMLSecSignatureBuilder::buildObject(const XMLCh* ns, const XMLCh* name, const XMLCh* prefix) const
+{
+    if (!XMLString::equals(ns,XMLConstants::XMLSIG_NS) || !XMLString::equals(name,Signature::LOCAL_NAME))
+        throw XMLObjectException("XMLSecSignatureBuilder requires standard Signature element name.");
+    return buildObject();
+}
+
+Signature* XMLSecSignatureBuilder::buildObject() const
+{
+    return new XMLSecSignatureImpl();
 }

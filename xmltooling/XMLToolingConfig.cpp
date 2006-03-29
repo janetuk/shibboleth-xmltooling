@@ -21,11 +21,17 @@
  */
 
 #include "internal.h"
+
+#define XMLTOOLING_DEFINE_CONSTANTS
+#include <xercesc/util/XMLUniDefs.hpp>
+
 #include "exceptions.h"
 #include "XMLToolingConfig.h"
 #include "impl/UnknownElement.h"
-#include "signature/impl/XMLSecSignature.h"
+#include "signature/impl/KeyInfoImpl.h"
+#include "signature/impl/XMLSecSignatureImpl.h"
 #include "util/NDC.h"
+#include "util/XMLConstants.h"
 
 #ifdef HAVE_DLFCN_H
 # include <dlfcn.h>
@@ -54,7 +60,7 @@ DECL_EXCEPTION_FACTORY(UnknownAttributeException);
 DECL_EXCEPTION_FACTORY(ValidationException);
 DECL_EXCEPTION_FACTORY(SignatureException);
 
-namespace {
+namespace xmltooling {
    XMLToolingInternalConfig g_config;
 }
 
@@ -150,6 +156,7 @@ bool XMLToolingInternalConfig::init()
 
         // default registrations
         XMLObjectBuilder::registerDefaultBuilder(new UnknownElementBuilder());
+        XMLObjectBuilder::registerBuilder(QName(XMLConstants::XMLSIG_NS,KeyInfo::LOCAL_NAME),new KeyInfoBuilderImpl());
 #ifndef XMLTOOLING_NO_XMLSEC
         XMLObjectBuilder::registerBuilder(QName(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME),new XMLSecSignatureBuilder());
 #endif

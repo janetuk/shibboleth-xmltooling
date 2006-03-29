@@ -35,19 +35,13 @@ namespace xmltooling {
     /**
      * A thread-safe abstract marshaller.
      */
-    class XMLTOOL_API AbstractXMLObjectMarshaller : public virtual AbstractDOMCachingXMLObject
+    class XMLTOOL_API AbstractXMLObjectMarshaller : public virtual AbstractXMLObject
     {
     public:
         virtual ~AbstractXMLObjectMarshaller() {}
 
-        /**
-         * @see XMLObject::marshall(DOMDocument*,const MarshallingContext*)
-         */
         DOMElement* marshall(DOMDocument* document=NULL, MarshallingContext* ctx=NULL) const;
 
-        /**
-         * @see XMLObject::marshall(DOMElement*,const MarshallingContext*)
-         */
         DOMElement* marshall(DOMElement* parentElement, MarshallingContext* ctx=NULL) const;
         
     protected:

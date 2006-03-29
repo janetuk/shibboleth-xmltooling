@@ -55,6 +55,13 @@ namespace xmltooling {
         virtual void validate(const XMLObject* xmlObject) const=0;
 
         /**
+         * Returns a copy of the validator.
+         *
+         * @return the new validator
+         */
+        virtual Validator* clone() const=0;
+
+        /**
          * Evaluates the registered validators against the given XMLObject and it's children.
          * 
          * @param xmlObject the XMLObject tree to validate

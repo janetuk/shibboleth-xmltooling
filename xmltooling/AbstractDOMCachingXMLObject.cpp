@@ -64,28 +64,24 @@ void AbstractDOMCachingXMLObject::releaseDOM() const
 
 void AbstractDOMCachingXMLObject::releaseParentDOM(bool propagateRelease) const
 {
-    DOMCachingXMLObject* domCachingParent = dynamic_cast<DOMCachingXMLObject*>(getParent());
-    if (domCachingParent) {
-        if (domCachingParent->getDOM()) {
-            Category::getInstance(XMLTOOLING_LOGCAT".DOM").debug(
-                "releasing cached DOM representation for parent object with propagation set to %s",
-                propagateRelease ? "true" : "false"
-                );
-            domCachingParent->releaseDOM();
-            if (propagateRelease)
-                domCachingParent->releaseParentDOM(propagateRelease);
-        }
+    if (getParent() && getParent()->getDOM()) {
+        Category::getInstance(XMLTOOLING_LOGCAT".DOM").debug(
+            "releasing cached DOM representation for parent object with propagation set to %s",
+            propagateRelease ? "true" : "false"
+            );
+        getParent()->releaseDOM();
+        if (propagateRelease)
+            getParent()->releaseParentDOM(propagateRelease);
     }
 }
 
 class _release : public binary_function<XMLObject*,bool,void> {
 public:
     void operator()(XMLObject* obj, bool propagate) const {
-        DOMCachingXMLObject* domCaching = dynamic_cast<DOMCachingXMLObject*>(obj);
-        if (domCaching) {
-            domCaching->releaseDOM();
+        if (obj) {
+            obj->releaseDOM();
             if (propagate)
-                domCaching->releaseChildrenDOM(propagate);
+                obj->releaseChildrenDOM(propagate);
         }
     }
 };
@@ -135,29 +131,4 @@ XMLObject* AbstractDOMCachingXMLObject::clone() const
         }
     }
     return NULL;
-}
-
-XMLObject* AbstractDOMCachingXMLObject::prepareForAssignment(XMLObject* oldValue, XMLObject* newValue) {
-
-    if (newValue && newValue->hasParent())
-        throw XMLObjectException("child XMLObject cannot be added - it is already the child of another XMLObject");
-
-    if (!oldValue) {
-        if (newValue) {
-            releaseThisandParentDOM();
-            newValue->setParent(this);
-            return newValue;
-        }
-        else {
-            return NULL;
-        }
-    }
-
-    if (oldValue != newValue) {
-        delete oldValue;
-        releaseThisandParentDOM();
-        newValue->setParent(this);
-    }
-
-    return newValue;
 }

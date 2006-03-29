@@ -20,7 +20,7 @@
  * Exception classes
  */
  
-#if !defined(__xmltooling_exceptions_h__)
+#ifndef __xmltooling_exceptions_h__
 #define __xmltooling_exceptions_h__
 
 #include <map>
@@ -34,16 +34,22 @@
  * 
  * @param name  the exception class
  * @param base  the base class
+ * @param desc
  */
-#define DECL_XMLTOOLING_EXCEPTION(name,base) \
+#define DECL_XMLTOOLING_EXCEPTION(name,base,desc) \
+    /##** desc */ \
     class XMLTOOL_EXCEPTIONAPI(XMLTOOL_API) name : public xmltooling::base { \
     public: \
+        /##** base##::##base(const char*,const xmltooling::params&) */ \
         name(const char* msg=NULL, const xmltooling::params& p=xmltooling::params()) \
             : xmltooling::base(msg,p) {} \
+        /##** base##::##base(const char*,const xmltooling::namedparams&) */ \
         name(const char* msg, const xmltooling::namedparams& p) \
             : xmltooling::base(msg,p) {} \
+        /##** base##::##base(const std::string&,const xmltooling::params&) */ \
         name(const std::string& msg, const xmltooling::params& p=xmltooling::params()) \
             : xmltooling::base(msg,p) {} \
+        /##** base##::##base(const std::string&,const xmltooling::namedparams&) */ \
         name(const std::string& msg, const xmltooling::namedparams& p) \
             : xmltooling::base(msg,p) {} \
         virtual ~name() {} \
@@ -102,6 +108,7 @@ namespace xmltooling {
         const std::vector<const char*>& get() const {return v;}
         
     protected:
+        /** Contains the parameters being passed. */
         std::vector<const char*> v;
     };
     
@@ -124,14 +131,16 @@ namespace xmltooling {
         namedparams(int count,...);
     };
 
+    class XMLTOOL_EXCEPTIONAPI(XMLTOOL_API) XMLToolingException;
+    
+    /** A factory function that returns an empty exception object of a given type. */
+    typedef XMLToolingException* ExceptionFactory();
+    
     /**
      * Base exception class, supports parametrized messages and XML serialization.
      * Parameters are prefixed with a dollar sign ($) and can be positional ($1)
      * or named ($info).
      */
-    class XMLTOOL_EXCEPTIONAPI(XMLTOOL_API) XMLToolingException;
-    typedef XMLToolingException* ExceptionFactory();
-    
     class XMLTOOL_EXCEPTIONAPI(XMLTOOL_API) XMLToolingException
     {
     public:
@@ -326,14 +335,14 @@ namespace xmltooling {
         static ExceptionFactoryMap m_factoryMap;
     };
 
-    DECL_XMLTOOLING_EXCEPTION(XMLParserException,XMLToolingException);
-    DECL_XMLTOOLING_EXCEPTION(XMLObjectException,XMLToolingException);
-    DECL_XMLTOOLING_EXCEPTION(MarshallingException,XMLToolingException);
-    DECL_XMLTOOLING_EXCEPTION(UnmarshallingException,XMLToolingException);
-    DECL_XMLTOOLING_EXCEPTION(UnknownElementException,XMLToolingException);
-    DECL_XMLTOOLING_EXCEPTION(UnknownAttributeException,XMLToolingException);
-    DECL_XMLTOOLING_EXCEPTION(ValidationException,XMLToolingException);
-    DECL_XMLTOOLING_EXCEPTION(SignatureException,XMLToolingException);
+    DECL_XMLTOOLING_EXCEPTION(XMLParserException,XMLToolingException,Exceptions related to XML parsing);
+    DECL_XMLTOOLING_EXCEPTION(XMLObjectException,XMLToolingException,Exceptions in basic object usage);
+    DECL_XMLTOOLING_EXCEPTION(MarshallingException,XMLToolingException,Exceptions during object marshalling);
+    DECL_XMLTOOLING_EXCEPTION(UnmarshallingException,XMLToolingException,Exceptions during object unmarshalling);
+    DECL_XMLTOOLING_EXCEPTION(UnknownElementException,XMLToolingException,Exceptions due to processing of unknown element content);
+    DECL_XMLTOOLING_EXCEPTION(UnknownAttributeException,XMLToolingException,Exceptions due to processing of unknown attributes);
+    DECL_XMLTOOLING_EXCEPTION(ValidationException,XMLToolingException,Exceptions during object validation);
+    DECL_XMLTOOLING_EXCEPTION(SignatureException,XMLToolingException,Exceptions in signature processing);
 
 };
 

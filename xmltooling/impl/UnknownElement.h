@@ -37,9 +37,7 @@
 
 namespace xmltooling {
 
-    /**
-     * Implements a thin wrapper around unknown DOM content.
-     */
+    /// @cond off
     class XMLTOOL_DLLLOCAL UnknownElementImpl : public AbstractDOMCachingXMLObject
     {
     public:
@@ -67,17 +65,16 @@ namespace xmltooling {
 
         void serialize(std::string& s) const;
     };
-
+    /// @endcond
+    
     /**
      * Builder for UnknownElementImpl objects.
+     * Use as the default builder when you want unknown DOM content treated as raw/ignored XML.
      */
     class XMLTOOL_API UnknownElementBuilder : public XMLObjectBuilder
     {
     public:
-        /**
-         * @see XMLObjectBuilder::buildObject(const XMLCh*,const XMLCh*,const XMLCh*)
-         */
-        UnknownElementImpl* buildObject(
+        XMLObject* buildObject(
             const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix=NULL
             ) const {
             return new UnknownElementImpl(namespaceURI,elementLocalName,namespacePrefix);

@@ -35,14 +35,11 @@ namespace xmltooling {
     /**
      * A thread-safe abstract unmarshaller.
      */
-    class XMLTOOL_API AbstractXMLObjectUnmarshaller : public virtual AbstractDOMCachingXMLObject
+    class XMLTOOL_API AbstractXMLObjectUnmarshaller : public virtual AbstractXMLObject
     {
     public:
         virtual ~AbstractXMLObjectUnmarshaller() {}
 
-        /**
-         * @see XMLObject::unmarshall()
-         */
         XMLObject* unmarshall(DOMElement* element, bool bindDocument=false);
             
     protected:

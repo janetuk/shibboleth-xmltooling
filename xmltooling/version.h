@@ -15,7 +15,7 @@
  */
 
 /**
- * @file version.h
+ * version.h
  * 
  * Library version macros and constants 
  */

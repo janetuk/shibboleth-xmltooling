@@ -35,6 +35,14 @@ AbstractValidatingXMLObject::ValidatorWrapper::~ValidatorWrapper()
     for_each(v.begin(),v.end(),cleanup<Validator>());
 }
 
+AbstractValidatingXMLObject::AbstractValidatingXMLObject(const AbstractValidatingXMLObject& src) : AbstractXMLObject(src)
+{
+    if (src.m_validators) {
+        m_validators=new ValidatorWrapper();
+        xmltooling::clone(src.m_validators->v,m_validators->v);
+    }
+}
+
 AbstractValidatingXMLObject::~AbstractValidatingXMLObject()
 {
     delete m_validators;

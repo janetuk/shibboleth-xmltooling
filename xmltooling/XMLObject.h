@@ -52,10 +52,19 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(MarshallingContext);
     public:
+        /**
+         * Default constructor.
+         */
         MarshallingContext() {}
         ~MarshallingContext() {}
 
 #ifndef XMLTOOLING_NO_XMLSEC
+        /**
+         * Builds a marshalling context with an initial signature/context pair.
+         * 
+         * @param sig   a signature object
+         * @param ctx   the signing context to associate with the signature 
+         */
         MarshallingContext(Signature* sig, const SigningContext* ctx) {
             m_signingContexts.push_back(std::make_pair(sig,ctx));
         }
@@ -70,7 +79,6 @@ namespace xmltooling {
      */
     class XMLTOOL_API XMLObject
     {
-        MAKE_NONCOPYABLE(XMLObject);
     public:
         virtual ~XMLObject() {}
         
@@ -172,6 +180,68 @@ namespace xmltooling {
         virtual const std::list<XMLObject*>& getOrderedChildren() const=0;
 
         /**
+         * Gets the DOM representation of this XMLObject, if one exists.
+         * 
+         * @return the DOM representation of this XMLObject
+         */
+        virtual DOMElement* getDOM() const=0;
+        
+        /**
+         * Sets the DOM representation of this XMLObject.
+         * 
+         * @param dom       DOM representation of this XMLObject
+         * @param bindDocument  true if the object should take ownership of the associated Document
+         */
+        virtual void setDOM(DOMElement* dom, bool bindDocument=false) const=0;
+    
+        /**
+         * Assigns ownership of a DOM document to the XMLObject.
+         * This binds the lifetime of the document to the lifetime of the object.
+         * 
+         * @param doc DOM document bound to this object 
+         */
+        virtual void setDocument(DOMDocument* doc) const=0;
+
+        /**
+         * Releases the DOM representation of this XMLObject, if there is one.
+         */
+        virtual void releaseDOM() const=0;
+        
+        /**
+         * Releases the DOM representation of this XMLObject's parent.
+         * 
+         * @param propagateRelease true if all ancestors of this element should release their DOM
+         */
+        virtual void releaseParentDOM(bool propagateRelease=true) const=0;
+        
+        /**
+         * Releases the DOM representation of this XMLObject's children.
+         * 
+         * @param propagateRelease true if all descendants of this element should release their DOM
+         */
+        virtual void releaseChildrenDOM(bool propagateRelease=true) const=0;
+
+        /**
+         * A convenience method that is equal to calling releaseDOM() then releaseParentDOM(true).
+         */
+        void releaseThisandParentDOM() const {
+            if (getDOM()) {
+                releaseDOM();
+                releaseParentDOM(true);
+            }
+        }
+    
+        /**
+         * A convenience method that is equal to calling releaseChildrenDOM(true) then releaseDOM().
+         */
+        void releaseThisAndChildrenDOM() const {
+            if (getDOM()) {
+                releaseChildrenDOM(true);
+                releaseDOM();
+            }
+        }
+
+        /**
          * Marshalls the XMLObject, and its children, into a DOM element.
          * If a document is supplied, then it will be used to create the resulting elements.
          * If the document does not have a Document Element set, then the resulting
@@ -219,6 +289,8 @@ namespace xmltooling {
 
     protected:
         XMLObject() {}
+    private:
+        XMLObject& operator=(const XMLObject& src);
     };
 
 #if defined (_MSC_VER)

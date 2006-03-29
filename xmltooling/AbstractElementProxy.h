@@ -17,10 +17,10 @@
 /**
  * @file AbstractElementProxy.h
  * 
- * An abstract implementation of a DOM-caching ElementProxy 
+ * An abstract implementation of an ElementProxy 
  */
 
-#if !defined(__xmltooling_abseleproxy_h__)
+#ifndef __xmltooling_abseleproxy_h__
 #define __xmltooling_abseleproxy_h__
 
 #include <xmltooling/AbstractDOMCachingXMLObject.h>
@@ -34,33 +34,27 @@
 namespace xmltooling {
 
     /**
-     * An abstract implementation of a DOM-caching ExtensibleXMLObject.
+     * An abstract implementation of an ExtensibleXMLObject.
      */
-    class XMLTOOL_API AbstractElementProxy : public virtual ElementProxy, public virtual AbstractDOMCachingXMLObject
+    class XMLTOOL_API AbstractElementProxy : public virtual ElementProxy, public virtual AbstractXMLObject
     {
     public:
         virtual ~AbstractElementProxy() {}
         
-        /**
-         * @see ElementProxy::getTextContent()
-         */
         virtual const XMLCh* getTextContent() const {
             return m_value;
         }
         
-        /**
-         * @see ElementProxy::setTextContent()
-         */
         virtual void setTextContent(const XMLCh* value);
         
-
-        /**
-         * @see ElementProxy::getXMLObjects()
-         */
         virtual ListOf(XMLObject) getXMLObjects();
     
      protected:
         AbstractElementProxy() : m_value(NULL) {}
+        
+        /** Copy constructor. */
+        AbstractElementProxy(const AbstractElementProxy& src)
+            : AbstractXMLObject(src), m_value(XMLString::replicate(src.m_value)) {}
 
     private:
         XMLCh* m_value;

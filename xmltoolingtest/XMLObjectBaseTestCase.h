@@ -43,8 +43,21 @@ extern string data_path;
     #pragma warning( disable : 4250 4251 )
 #endif
 
-class SimpleXMLObject : public AbstractXMLObjectMarshaller, public AbstractXMLObjectUnmarshaller
+class SimpleXMLObject : public AbstractDOMCachingXMLObject, public AbstractXMLObjectMarshaller, public AbstractXMLObjectUnmarshaller
 {
+protected:
+    SimpleXMLObject(const SimpleXMLObject& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src),
+        m_id(XMLString::replicate(src.m_id)), m_value(XMLString::replicate(src.m_value)) {
+#ifndef XMLTOOLING_NO_XMLSEC
+        m_children.push_back(NULL);
+        m_signature=m_children.begin();
+#endif
+        VectorOf(SimpleXMLObject) mine=getSimpleXMLObjects();
+        for (vector<SimpleXMLObject*>::const_iterator i=src.m_simples.begin(); i!=src.m_simples.end(); i++) {
+            mine.push_back((*i) ? (*i)->clone() : NULL);
+        }
+    }
+
 public:
     static const XMLCh NAMESPACE[];
     static const XMLCh NAMESPACE_PREFIX[];
@@ -66,7 +79,18 @@ public:
         XMLString::release(&m_id);
         XMLString::release(&m_value);
     }
-    
+
+    SimpleXMLObject* clone() const {
+        auto_ptr<XMLObject> domClone(AbstractDOMCachingXMLObject::clone());
+        SimpleXMLObject* ret=dynamic_cast<SimpleXMLObject*>(domClone.get());
+        if (ret) {
+            domClone.release();
+            return ret;
+        }
+
+        return new SimpleXMLObject(*this);
+    }
+
     const XMLCh* getId() const { return m_id; }
     void setId(const XMLCh* id) { m_id=prepareForAssignment(m_id,id); }
 
@@ -86,23 +110,8 @@ public:
     VectorOf(SimpleXMLObject) getSimpleXMLObjects() {
         return VectorOf(SimpleXMLObject)(this, m_simples, &m_children, m_children.end());
     }
-    
-    SimpleXMLObject* clone() const {
-        auto_ptr<XMLObject> domClone(AbstractDOMCachingXMLObject::clone());
-        SimpleXMLObject* ret=dynamic_cast<SimpleXMLObject*>(domClone.get());
-        if (ret) {
-            domClone.release();
-            return ret;
-        }
 
-        ret=new SimpleXMLObject();
-        ret->m_namespaces=m_namespaces;
-        ret->setId(m_id);
-        ret->setValue(m_value);
-        xmltooling::clone(m_children, ret->m_children);
-        return ret;
-    }
-
+protected:
     void marshallAttributes(DOMElement* domElement) const {
         if(getId()) {
             domElement->setAttributeNS(NULL, SimpleXMLObject::ID_ATTRIB_NAME, getId());

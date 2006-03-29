@@ -130,6 +130,30 @@ public:
         TSM_ASSERT_EQUALS("Child's schema type was not expected value", m_qtype, *(kids.back()->getSchemaType()));
     }
 
+    void testUnmarshallingWithClone() {
+        TS_TRACE("testUnmarshallingWithClone");
+
+        string path=data_path + "SimpleXMLObjectWithChildren.xml";
+        ifstream fs(path.c_str());
+        DOMDocument* doc=nonvalidatingPool->parse(fs);
+        TS_ASSERT(doc!=NULL);
+
+        const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
+        TS_ASSERT(b!=NULL);
+
+        auto_ptr<SimpleXMLObject> sxObject(
+            dynamic_cast<SimpleXMLObject*>(b->buildFromDocument(doc))
+            );
+        TS_ASSERT(sxObject.get()!=NULL);
+
+        sxObject->releaseThisAndChildrenDOM();
+        auto_ptr<SimpleXMLObject> clonedObject(sxObject->clone());
+
+        VectorOf(SimpleXMLObject) kids=clonedObject->getSimpleXMLObjects();
+        TSM_ASSERT_EQUALS("Number of child elements was not expected value", 3, kids.size());
+        TSM_ASSERT_EQUALS("Child's schema type was not expected value", m_qtype, *(kids.back()->getSchemaType()));
+    }
+
     void testUnmarshallingWithUnknownChild() {
         TS_TRACE("testUnmarshallingWithUnknownChild");
 
