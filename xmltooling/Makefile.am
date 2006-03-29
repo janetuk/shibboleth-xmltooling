@@ -4,6 +4,8 @@ lib_LTLIBRARIES = libxmltooling.la
 
 libxmltoolingincludedir = $(includedir)/xmltooling
 
+implincludedir = $(includedir)/xmltooling/impl
+
 ioincludedir = $(includedir)/xmltooling/io
 
 sigincludedir = $(includedir)/xmltooling/signature
