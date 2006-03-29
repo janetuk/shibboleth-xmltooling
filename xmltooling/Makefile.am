@@ -40,7 +40,8 @@ implinclude_HEADERS = \
     impl/UnknownElement.h
 
 ioinclude_HEADERS = \
-    io/AbstractXMLObjectUnmarshaller.h \
+    io/AbstractXMLObjectMarshaller.h \
+    io/AbstractXMLObjectUnmarshaller.h
 
 siginclude_HEADERS = \
     signature/KeyInfo.h \
@@ -61,7 +62,7 @@ valinclude_HEADERS = \
 noinst_HEADERS = \
     internal.h \
     signature/impl/KeyInfoImpl.h \
-    signature/impl/XMLSecSignatureImpl.h \
+    signature/impl/XMLSecSignatureImpl.h
 
 if BUILD_XMLSEC
 xmlsec_sources = \
