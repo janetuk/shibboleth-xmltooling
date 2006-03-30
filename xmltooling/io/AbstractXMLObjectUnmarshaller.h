@@ -75,7 +75,7 @@ namespace xmltooling {
          * 
          * @throws UnmarshallingException thrown if there is a problem adding the child to the parent
          */
-        virtual void processChildElement(XMLObject* child, const DOMElement* childRoot)=0;
+        virtual void processChildElement(XMLObject* child, const DOMElement* childRoot) {}
     
         /**
          * Called after an attribute has been unmarshalled so that it can be added to the XMLObject.
@@ -84,14 +84,14 @@ namespace xmltooling {
          * 
          * @throws UnmarshallingException thrown if there is a problem adding the attribute to the XMLObject
          */
-        virtual void processAttribute(const DOMAttr* attribute)=0;
+        virtual void processAttribute(const DOMAttr* attribute) {}
     
         /**
          * Called if the element being unmarshalled contained textual content so that it can be added to the XMLObject.
          * 
          * @param elementContent the Element's text content
          */
-        virtual void processElementContent(const XMLCh* elementContent)=0;
+        virtual void processElementContent(const XMLCh* elementContent) {}
     };
     
 };

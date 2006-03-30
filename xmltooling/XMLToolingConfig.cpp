@@ -32,6 +32,7 @@
 #include "signature/impl/XMLSecSignatureImpl.h"
 #include "util/NDC.h"
 #include "util/XMLConstants.h"
+#include "validation/Validator.h"
 
 #ifdef HAVE_DLFCN_H
 # include <dlfcn.h>
@@ -156,10 +157,26 @@ bool XMLToolingInternalConfig::init()
 
         // default registrations
         XMLObjectBuilder::registerDefaultBuilder(new UnknownElementBuilder());
-        XMLObjectBuilder::registerBuilder(QName(XMLConstants::XMLSIG_NS,KeyInfo::LOCAL_NAME),new KeyInfoBuilderImpl());
+        
+        QName q(XMLConstants::XMLSIG_NS,KeyInfo::LOCAL_NAME);
+        XMLObjectBuilder::registerBuilder(q,new KeyInfoBuilderImpl());
+        Validator::registerValidator(q,new KeyInfoSchemaValidator());
+        q=QName(XMLConstants::XMLSIG_NS,KeyInfo::TYPE_NAME);
+        XMLObjectBuilder::registerBuilder(q,new KeyInfoBuilderImpl());
+        Validator::registerValidator(q,new KeyInfoSchemaValidator());
+
+        q=QName(XMLConstants::XMLSIG_NS,KeyName::LOCAL_NAME);
+        XMLObjectBuilder::registerBuilder(q,new KeyNameBuilderImpl());
+        Validator::registerValidator(q,new KeyNameSchemaValidator());
+
+        q=QName(XMLConstants::XMLSIG_NS,MgmtData::LOCAL_NAME);
+        XMLObjectBuilder::registerBuilder(q,new MgmtDataBuilderImpl());
+        Validator::registerValidator(q,new MgmtDataSchemaValidator());
+
 #ifndef XMLTOOLING_NO_XMLSEC
         XMLObjectBuilder::registerBuilder(QName(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME),new XMLSecSignatureBuilder());
 #endif
+
         REGISTER_EXCEPTION_FACTORY(XMLParserException);
         REGISTER_EXCEPTION_FACTORY(XMLObjectException);
         REGISTER_EXCEPTION_FACTORY(MarshallingException);

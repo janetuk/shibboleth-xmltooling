@@ -104,8 +104,6 @@
         virtual ~cname() {} \
         XMLTOOLING_DOXYGEN(Type-specific clone method.) \
         virtual cname* clone##cname() const=0; \
-        XMLTOOLING_DOXYGEN(Element prefix) \
-        static const XMLCh PREFIX[]; \
         XMLTOOLING_DOXYGEN(Element local name) \
         static const XMLCh LOCAL_NAME[]
 
@@ -143,6 +141,43 @@
         void set##proper(const XMLCh* proper) { \
             m_##proper = prepareForAssignment(m_##proper,proper); \
         }
+
+/**
+ * Declares abstract get/set methods for named XML element content.
+ * 
+ * @param proper    the proper name to label the element's content
+ */
+#define DECL_XMLOBJECT_CONTENT(proper) \
+    XMLTOOLING_DOXYGEN(Returns proper.) \
+    virtual const XMLCh* get##proper() const=0; \
+    XMLTOOLING_DOXYGEN(Sets proper.) \
+    virtual void set##proper(const XMLCh* proper)=0
+
+/**
+ * Implements get/set methods and a private member for named XML element content.
+ * 
+ * @param proper    the proper name to label the element's content
+ */
+#define IMPL_XMLOBJECT_CONTENT(proper) \
+    private: \
+        XMLCh* m_##proper; \
+    public: \
+        const XMLCh* get##proper() const { \
+            return m_##proper; \
+        } \
+        void set##proper(const XMLCh* proper) { \
+            m_##proper = prepareForAssignment(m_##proper,proper); \
+        } \
+    protected: \
+        void marshallElementContent(DOMElement* domElement) const { \
+            if(get##proper()) { \
+                domElement->appendChild(domElement->getOwnerDocument()->createTextNode(get##proper())); \
+            } \
+        } \
+        void processElementContent(const XMLCh* elementContent) { \
+            set##proper(elementContent); \
+        }
+
 
 /**
  * Implements cloning methods for an XMLObject specialization implementation class.
@@ -186,23 +221,58 @@
 /**
  * Begins the declaration of an XMLObjectBuilder specialization implementation class.
  * 
- * @param cname         the name of the XMLObject specialization
- * @param namespaceURI  the XML namespace of the default associated element
+ * @param cname             the name of the XMLObject specialization
+ * @param namespaceURI      the XML namespace of the default associated element
+ * @param namespacePrefix   the XML namespace prefix of the default associated element
  */
-#define BEGIN_XMLOBJECTBUILDERIMPL(cname,namespaceURI) \
+#define BEGIN_XMLOBJECTBUILDERIMPL(cname,namespaceURI,namespacePrefix) \
     class XMLTOOL_DLLLOCAL cname##BuilderImpl : public cname##Builder { \
     public: \
         cname* buildObject( \
-            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL\
+            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL \
             ) const; \
         cname* buildObject() const { \
-            return buildObject(namespaceURI,cname::LOCAL_NAME,cname::PREFIX); \
+            return buildObject(namespaceURI,cname::LOCAL_NAME,namespacePrefix); \
         }
+
+/**
+ * Begins the declaration of an XMLObjectBuilder specialization implementation class.
+ * 
+ * @param cname the name of the XMLObject specialization
+ */
+#define IMPL_XMLOBJECTBUILDER(cname) \
+    cname* cname##BuilderImpl::buildObject( \
+        const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType \
+        ) const \
+    { \
+        return new cname##Impl(nsURI,localName,prefix,schemaType); \
+    }
 
 /**
  * Ends the declaration of an XMLObjectBuilder specialization implementation class.
  */
 #define END_XMLOBJECTBUILDERIMPL }
+
+/**
+ * Begins the declaration of a Validator specialization.
+ * 
+ * @param cname the base name of the Validator specialization
+ */
+ #define BEGIN_XMLOBJECTVALIDATOR(cname) \
+    class cname##Validator : public Validator \
+    { \
+    public: \
+        virtual ~cname##Validator() {} \
+        Validator* clone() const { \
+            return new cname##Validator(); \
+        } \
+        void validate(const XMLObject* xmlObject) const
+
+/**
+ * Ends the declaration of a Validator specialization.
+ */
+#define END_XMLOBJECTVALIDATOR }
+
 
 #include <utility>
 

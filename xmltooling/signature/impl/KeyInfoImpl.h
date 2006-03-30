@@ -25,12 +25,30 @@
 
 #include <xmltooling/signature/KeyInfo.h>
 #include <xmltooling/util/XMLConstants.h>
+#include <xmltooling/validation/Validator.h>
+
+#define BEGIN_XMLSIGOBJECTBUILDERIMPL(cname) \
+    BEGIN_XMLOBJECTBUILDERIMPL(cname,XMLConstants::XMLSIG_NS,XMLConstants::XMLSIG_PREFIX)
 
 namespace xmltooling {
-
-    BEGIN_XMLOBJECTBUILDERIMPL(KeyInfo,XMLConstants::XMLSIG_NS);
+    
+    BEGIN_XMLSIGOBJECTBUILDERIMPL(KeyInfo);
     END_XMLOBJECTBUILDERIMPL;
 
+    BEGIN_XMLSIGOBJECTBUILDERIMPL(KeyName);
+    END_XMLOBJECTBUILDERIMPL;
+
+    BEGIN_XMLSIGOBJECTBUILDERIMPL(MgmtData);
+    END_XMLOBJECTBUILDERIMPL;
+    
+    BEGIN_XMLOBJECTVALIDATOR(KeyInfoSchema);
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR(KeyNameSchema);
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR(MgmtDataSchema);
+    END_XMLOBJECTVALIDATOR;
 };
 
 #endif /* __xmltooling_keyinfoimpl_h__ */

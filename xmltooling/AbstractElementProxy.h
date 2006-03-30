@@ -23,7 +23,7 @@
 #ifndef __xmltooling_abseleproxy_h__
 #define __xmltooling_abseleproxy_h__
 
-#include <xmltooling/AbstractDOMCachingXMLObject.h>
+#include <xmltooling/AbstractXMLObject.h>
 #include <xmltooling/ElementProxy.h>
 
 #if defined (_MSC_VER)

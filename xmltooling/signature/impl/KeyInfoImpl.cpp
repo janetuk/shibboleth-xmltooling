@@ -26,14 +26,12 @@
 #include "io/AbstractXMLObjectMarshaller.h"
 #include "io/AbstractXMLObjectUnmarshaller.h"
 #include "signature/impl/KeyInfoImpl.h"
-#include "util/NDC.h"
 #include "util/XMLHelper.h"
 #include "validation/AbstractValidatingXMLObject.h"
 
-#include <log4cpp/Category.hh>
+#include <typeinfo.h>
 
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
 
 #if defined (_MSC_VER)
@@ -43,24 +41,35 @@ using namespace std;
 
 namespace xmltooling {
     
-    class XMLTOOL_DLLLOCAL KeyInfoImpl : public KeyInfo, public AbstractDOMCachingXMLObject, public AbstractElementProxy,
-        public AbstractValidatingXMLObject, public AbstractXMLObjectMarshaller, public AbstractXMLObjectUnmarshaller
+    class XMLTOOL_DLLLOCAL KeyInfoImpl
+        : public KeyInfo,
+            public AbstractDOMCachingXMLObject,
+            public AbstractElementProxy,
+            public AbstractValidatingXMLObject,
+            public AbstractXMLObjectMarshaller,
+            public AbstractXMLObjectUnmarshaller
     {
     public:
         virtual ~KeyInfoImpl() {}
 
         KeyInfoImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
-            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Id(NULL) {}
+            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Id(NULL) {
+        }
             
-        KeyInfoImpl(const KeyInfoImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src),
-            AbstractElementProxy(src), AbstractValidatingXMLObject(src), m_Id(XMLString::replicate(src.m_Id)) {
+        KeyInfoImpl(const KeyInfoImpl& src)
+            : AbstractXMLObject(src),
+                AbstractDOMCachingXMLObject(src),
+                AbstractElementProxy(src),
+                AbstractValidatingXMLObject(src),
+                m_Id(XMLString::replicate(src.m_Id)) {
+                    
             for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
                 getXMLObjects().push_back((*i) ? (*i)->clone() : NULL);
             }
         }
         
-        IMPL_XMLOBJECT_ATTRIB(Id);
         IMPL_XMLOBJECT_CLONE(KeyInfo);
+        IMPL_XMLOBJECT_ATTRIB(Id);
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
@@ -76,29 +85,108 @@ namespace xmltooling {
             }
         }
 
+        void processElementContent(const XMLCh* elementContent) {
+            setTextContent(elementContent);
+        }
+
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
             getXMLObjects().push_back(childXMLObject);
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            if (XMLHelper::isNodeNamed(attribute, NULL, ID_ATTRIB_NAME))
+            if (XMLHelper::isNodeNamed(attribute, NULL, ID_ATTRIB_NAME)) {
                 setId(attribute->getValue());
-        }
-
-        void processElementContent(const XMLCh* elementContent) {
-            setTextContent(elementContent);
+                static_cast<DOMElement*>(attribute->getParentNode())->setIdAttributeNode(attribute);
+            }
         }
     };
     
+    class XMLTOOL_DLLLOCAL KeyNameImpl
+        : public KeyName,
+            public AbstractDOMCachingXMLObject,
+            public AbstractValidatingXMLObject,
+            public AbstractXMLObjectMarshaller,
+            public AbstractXMLObjectUnmarshaller
+    {
+    public:
+        virtual ~KeyNameImpl() {}
+
+        KeyNameImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Name(NULL) {
+        }
+            
+        KeyNameImpl(const KeyNameImpl& src)
+            : AbstractXMLObject(src),
+                AbstractDOMCachingXMLObject(src),
+                AbstractValidatingXMLObject(src),
+                m_Name(XMLString::replicate(src.m_Name)) {
+        }
+        
+        IMPL_XMLOBJECT_CLONE(KeyName);
+        IMPL_XMLOBJECT_CONTENT(Name);
+    };
+
+    class XMLTOOL_DLLLOCAL MgmtDataImpl
+        : public MgmtData,
+            public AbstractDOMCachingXMLObject,
+            public AbstractValidatingXMLObject,
+            public AbstractXMLObjectMarshaller,
+            public AbstractXMLObjectUnmarshaller
+    {
+    public:
+        virtual ~MgmtDataImpl() {}
+
+        MgmtDataImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Data(NULL) {
+        }
+            
+        MgmtDataImpl(const MgmtDataImpl& src)
+            : AbstractXMLObject(src),
+                AbstractDOMCachingXMLObject(src),
+                AbstractValidatingXMLObject(src),
+                m_Data(XMLString::replicate(src.m_Data)) {
+        }
+        
+        IMPL_XMLOBJECT_CLONE(MgmtData);
+        IMPL_XMLOBJECT_CONTENT(Data);
+    };
 };
 
 #if defined (_MSC_VER)
     #pragma warning( pop )
 #endif
 
-KeyInfo* KeyInfoBuilderImpl::buildObject(
-    const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType
-    ) const
+// Builder Implementations
+
+IMPL_XMLOBJECTBUILDER(KeyInfo);
+IMPL_XMLOBJECTBUILDER(KeyName);
+IMPL_XMLOBJECTBUILDER(MgmtData);
+
+// Validators
+
+void KeyInfoSchemaValidator::validate(const XMLObject* xmlObject) const
 {
-    return new KeyInfoImpl(nsURI,localName,prefix,schemaType);
+    const KeyInfo* ptr=dynamic_cast<const KeyInfo*>(xmlObject);
+    if (!ptr)
+        throw ValidationException("KeyInfoSchemaValidator: unsupported object type ($1)",params(1,typeid(xmlObject).name()));
+    if (!ptr->hasChildren())
+        throw ValidationException("KeyInfo is empty");
+}
+
+void KeyNameSchemaValidator::validate(const XMLObject* xmlObject) const
+{
+    const KeyName* ptr=dynamic_cast<const KeyName*>(xmlObject);
+    if (!ptr)
+        throw ValidationException("KeyNameSchemaValidator: unsupported object type ($1)",params(1,typeid(xmlObject).name()));
+    if (XMLString::stringLen(ptr->getName())==0)
+        throw ValidationException("KeyName is empty");
+}
+
+void MgmtDataSchemaValidator::validate(const XMLObject* xmlObject) const
+{
+    const MgmtData* ptr=dynamic_cast<const MgmtData*>(xmlObject);
+    if (!ptr)
+        throw ValidationException("MgmtDataSchemaValidator: unsupported object type ($1)",params(1,typeid(xmlObject).name()));
+    if (XMLString::stringLen(ptr->getData())==0)
+        throw ValidationException("MgmtData is empty");
 }

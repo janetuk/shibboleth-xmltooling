@@ -107,14 +107,14 @@ namespace xmltooling {
          * 
          * @throws MarshallingException thrown if there is a problem marshalling an attribute
          */
-        virtual void marshallAttributes(DOMElement* domElement) const=0;
+        virtual void marshallAttributes(DOMElement* domElement) const {}
 
         /**
          * Marshalls data from the XMLObject into content of the DOM Element.
          * 
          * @param domElement the DOM element recieving the content
          */
-        virtual void marshallElementContent(DOMElement* domElement) const=0;
+        virtual void marshallElementContent(DOMElement* domElement) const {}
     };
     
 };

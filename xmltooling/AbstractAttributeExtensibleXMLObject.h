@@ -24,7 +24,7 @@
 #define __xmltooling_absattrextxmlobj_h__
 
 #include <map>
-#include <xmltooling/AbstractDOMCachingXMLObject.h>
+#include <xmltooling/AbstractXMLObject.h>
 #include <xmltooling/AttributeExtensibleXMLObject.h>
 
 #if defined (_MSC_VER)
