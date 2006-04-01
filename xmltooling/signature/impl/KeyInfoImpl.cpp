@@ -25,11 +25,11 @@
 #include "exceptions.h"
 #include "io/AbstractXMLObjectMarshaller.h"
 #include "io/AbstractXMLObjectUnmarshaller.h"
-#include "signature/impl/KeyInfoImpl.h"
+#include "signature/KeyInfo.h"
 #include "util/XMLHelper.h"
 #include "validation/AbstractValidatingXMLObject.h"
 
-#include <typeinfo.h>
+#include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmltooling;
 using namespace std;
@@ -40,6 +40,53 @@ using namespace std;
 #endif
 
 namespace xmltooling {
+    
+    class XMLTOOL_DLLLOCAL RSAKeyValueImpl
+        : public RSAKeyValue,
+            public AbstractDOMCachingXMLObject,
+            public AbstractValidatingXMLObject,
+            public AbstractXMLObjectMarshaller,
+            public AbstractXMLObjectUnmarshaller
+    {
+    public:
+        virtual ~RSAKeyValueImpl() {}
+
+        RSAKeyValueImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+            : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
+            init();
+        }
+            
+        RSAKeyValueImpl(const RSAKeyValueImpl& src)
+            : AbstractXMLObject(src),
+                AbstractDOMCachingXMLObject(src),
+                AbstractValidatingXMLObject(src) {
+            init();
+            setModulus(src.getModulus());
+            setExponent(src.getExponent());
+        }
+        
+        void init() {
+            m_Modulus=NULL;
+            m_Exponent=NULL;
+            m_children.push_back(NULL);
+            m_children.push_back(NULL);
+            m_pos_Modulus=m_children.begin();
+            m_pos_Exponent=m_children.begin();
+            m_pos_Exponent++;
+        }
+        
+        IMPL_XMLOBJECT_CLONE(RSAKeyValue);
+        IMPL_XMLOBJECT_CHILD(Modulus);
+        IMPL_XMLOBJECT_CHILD(Exponent);
+
+    protected:
+        void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
+            PROC_XMLOBJECT_CHILD(Modulus,XMLConstants::XMLSIG_NS);
+            PROC_XMLOBJECT_CHILD(Exponent,XMLConstants::XMLSIG_NS);
+            
+            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString()));
+        }
+    };
     
     class XMLTOOL_DLLLOCAL KeyInfoImpl
         : public KeyInfo,
@@ -64,12 +111,26 @@ namespace xmltooling {
                 m_Id(XMLString::replicate(src.m_Id)) {
                     
             for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
-                getXMLObjects().push_back((*i) ? (*i)->clone() : NULL);
+                if (*i) {
+                    KeyName* kn=dynamic_cast<KeyName*>(*i);
+                    if (kn) {
+                        getKeyNames().push_back(kn->cloneKeyName());
+                        continue;
+                    }
+                    MgmtData* md=dynamic_cast<MgmtData*>(*i);
+                    if (md) {
+                        getMgmtDatas().push_back(md->cloneMgmtData());
+                        continue;
+                    }
+                    getXMLObjects().push_back((*i)->clone());
+                }
             }
         }
         
         IMPL_XMLOBJECT_CLONE(KeyInfo);
         IMPL_XMLOBJECT_ATTRIB(Id);
+        IMPL_XMLOBJECT_CHILDREN(KeyName,m_children.end());
+        IMPL_XMLOBJECT_CHILDREN(MgmtData,m_children.end());
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
@@ -90,7 +151,15 @@ namespace xmltooling {
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            getXMLObjects().push_back(childXMLObject);
+            PROC_XMLOBJECT_CHILDREN(KeyName,XMLConstants::XMLSIG_NS);
+            PROC_XMLOBJECT_CHILDREN(MgmtData,XMLConstants::XMLSIG_NS);
+            
+            // Unknown child.
+            const XMLCh* nsURI=childXMLObject->getElementQName().getNamespaceURI();
+            if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI)
+                getXMLObjects().push_back(childXMLObject);
+            
+            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString()));
         }
 
         void processAttribute(const DOMAttr* attribute) {
@@ -101,55 +170,10 @@ namespace xmltooling {
         }
     };
     
-    class XMLTOOL_DLLLOCAL KeyNameImpl
-        : public KeyName,
-            public AbstractDOMCachingXMLObject,
-            public AbstractValidatingXMLObject,
-            public AbstractXMLObjectMarshaller,
-            public AbstractXMLObjectUnmarshaller
-    {
-    public:
-        virtual ~KeyNameImpl() {}
-
-        KeyNameImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
-            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Name(NULL) {
-        }
-            
-        KeyNameImpl(const KeyNameImpl& src)
-            : AbstractXMLObject(src),
-                AbstractDOMCachingXMLObject(src),
-                AbstractValidatingXMLObject(src),
-                m_Name(XMLString::replicate(src.m_Name)) {
-        }
-        
-        IMPL_XMLOBJECT_CLONE(KeyName);
-        IMPL_XMLOBJECT_CONTENT(Name);
-    };
-
-    class XMLTOOL_DLLLOCAL MgmtDataImpl
-        : public MgmtData,
-            public AbstractDOMCachingXMLObject,
-            public AbstractValidatingXMLObject,
-            public AbstractXMLObjectMarshaller,
-            public AbstractXMLObjectUnmarshaller
-    {
-    public:
-        virtual ~MgmtDataImpl() {}
-
-        MgmtDataImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
-            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Data(NULL) {
-        }
-            
-        MgmtDataImpl(const MgmtDataImpl& src)
-            : AbstractXMLObject(src),
-                AbstractDOMCachingXMLObject(src),
-                AbstractValidatingXMLObject(src),
-                m_Data(XMLString::replicate(src.m_Data)) {
-        }
-        
-        IMPL_XMLOBJECT_CLONE(MgmtData);
-        IMPL_XMLOBJECT_CONTENT(Data);
-    };
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,KeyName,Name);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,MgmtData,Data);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,Modulus,Value);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,Exponent,Value);
 };
 
 #if defined (_MSC_VER)
@@ -161,32 +185,16 @@ namespace xmltooling {
 IMPL_XMLOBJECTBUILDER(KeyInfo);
 IMPL_XMLOBJECTBUILDER(KeyName);
 IMPL_XMLOBJECTBUILDER(MgmtData);
+IMPL_XMLOBJECTBUILDER(Modulus);
+IMPL_XMLOBJECTBUILDER(Exponent);
+IMPL_XMLOBJECTBUILDER(RSAKeyValue);
 
-// Validators
-
-void KeyInfoSchemaValidator::validate(const XMLObject* xmlObject) const
-{
-    const KeyInfo* ptr=dynamic_cast<const KeyInfo*>(xmlObject);
-    if (!ptr)
-        throw ValidationException("KeyInfoSchemaValidator: unsupported object type ($1)",params(1,typeid(xmlObject).name()));
-    if (!ptr->hasChildren())
-        throw ValidationException("KeyInfo is empty");
-}
-
-void KeyNameSchemaValidator::validate(const XMLObject* xmlObject) const
-{
-    const KeyName* ptr=dynamic_cast<const KeyName*>(xmlObject);
-    if (!ptr)
-        throw ValidationException("KeyNameSchemaValidator: unsupported object type ($1)",params(1,typeid(xmlObject).name()));
-    if (XMLString::stringLen(ptr->getName())==0)
-        throw ValidationException("KeyName is empty");
-}
-
-void MgmtDataSchemaValidator::validate(const XMLObject* xmlObject) const
-{
-    const MgmtData* ptr=dynamic_cast<const MgmtData*>(xmlObject);
-    if (!ptr)
-        throw ValidationException("MgmtDataSchemaValidator: unsupported object type ($1)",params(1,typeid(xmlObject).name()));
-    if (XMLString::stringLen(ptr->getData())==0)
-        throw ValidationException("MgmtData is empty");
-}
+const XMLCh KeyInfo::LOCAL_NAME[] =         UNICODE_LITERAL_7(K,e,y,I,n,f,o);
+const XMLCh KeyInfo::TYPE_NAME[] =          UNICODE_LITERAL_11(K,e,y,I,n,f,o,T,y,p,e);
+const XMLCh KeyInfo::ID_ATTRIB_NAME[] =     UNICODE_LITERAL_2(I,d);
+const XMLCh MgmtData::LOCAL_NAME[] =        UNICODE_LITERAL_8(M,g,m,t,D,a,t,a);
+const XMLCh KeyName::LOCAL_NAME[] =         UNICODE_LITERAL_7(K,e,y,N,a,m,e);
+const XMLCh Modulus::LOCAL_NAME[] =         UNICODE_LITERAL_7(M,o,d,u,l,u,s);
+const XMLCh Exponent::LOCAL_NAME[] =        UNICODE_LITERAL_8(E,x,p,o,n,e,n,t);
+const XMLCh RSAKeyValue::LOCAL_NAME[] =     UNICODE_LITERAL_11(R,S,A,K,e,y,V,a,l,u,e);
+const XMLCh RSAKeyValue::TYPE_NAME[] =      UNICODE_LITERAL_15(R,S,A,K,e,y,V,a,l,u,e,T,y,p,e);

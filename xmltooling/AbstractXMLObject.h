@@ -125,11 +125,13 @@ namespace xmltooling {
          * A helper function for derived classes, for assignment of (singleton) XML objects.
          * 
          * It is indifferent to whether either the old or the new version of the value is null. 
-         * This method will do a safe compare of the objects and will also invalidate the DOM if appropriate
+         * This method will do a safe compare of the objects and will also invalidate the DOM if appropriate.
+         * Note that since the new value (even if NULL) is always returned, it may be more efficient
+         * to discard the return value and just assign independently if a dynamic cast would be involved.
          * 
          * @param oldValue - current value
          * @param newValue - proposed new value
-         * @return the value to assign 
+         * @return the new value 
          * 
          * @throws XMLObjectException if the new child already has a parent.
          */

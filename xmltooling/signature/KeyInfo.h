@@ -25,66 +25,99 @@
 #define __xmltooling_keyinfo_h__
 
 #include <xmltooling/ElementProxy.h>
+#include <xmltooling/exceptions.h>
 #include <xmltooling/XMLObjectBuilder.h>
+#include <xmltooling/util/XMLConstants.h>
 #include <xmltooling/validation/ValidatingXMLObject.h>
+
+#include <typeinfo.h>
+
+#define DECL_XMLSIGOBJECTBUILDER(cname) \
+    DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,XMLConstants::XMLSIG_NS,XMLConstants::XMLSIG_PREFIX)
 
 namespace xmltooling {
 
     /**
-     * XMLObject representing XML Digital Signature, version 20020212, KeyInfo element.
-     */
-    BEGIN_XMLOBJECT(KeyInfo,ElementProxy);
-        DECL_XMLOBJECT_ATTRIB(Id,ID);
-        static const XMLCh TYPE_NAME[];
-    END_XMLOBJECT;
-
-    BEGIN_XMLOBJECTBUILDER(KeyInfo);
-    END_XMLOBJECTBUILDER;
-
-#ifdef XMLTOOLING_DEFINE_CONSTANTS
-    const XMLCh KeyInfo::LOCAL_NAME[] = {
-        chLatin_K, chLatin_e, chLatin_y, chLatin_I, chLatin_n, chLatin_f, chLatin_o, chNull
-    }; 
-    const XMLCh KeyInfo::TYPE_NAME[] = {
-        chLatin_K, chLatin_e, chLatin_y, chLatin_I, chLatin_n, chLatin_f, chLatin_o,
-        chLatin_T, chLatin_y, chLatin_p, chLatin_e, chNull
-    }; 
-    const XMLCh KeyInfo::ID_ATTRIB_NAME[] = {
-        chLatin_I, chLatin_d, chNull
-    };
-#endif
-
-    /**
      * XMLObject representing XML Digital Signature, version 20020212, KeyName element.
      */
-    BEGIN_XMLOBJECT(KeyName,XMLObject);
+    BEGIN_XMLOBJECT(XMLTOOL_API,KeyName,XMLObject);
         DECL_XMLOBJECT_CONTENT(Name);
     END_XMLOBJECT;
-
-    BEGIN_XMLOBJECTBUILDER(KeyName);
-    END_XMLOBJECTBUILDER;
-
-#ifdef XMLTOOLING_DEFINE_CONSTANTS
-    const XMLCh KeyName::LOCAL_NAME[] = {
-        chLatin_K, chLatin_e, chLatin_y, chLatin_N, chLatin_a, chLatin_m, chLatin_e, chNull
-    }; 
-#endif
 
     /**
      * XMLObject representing XML Digital Signature, version 20020212, MgmtData element.
      */
-    BEGIN_XMLOBJECT(MgmtData,XMLObject);
+    BEGIN_XMLOBJECT(XMLTOOL_API,MgmtData,XMLObject);
         DECL_XMLOBJECT_CONTENT(Data);
     END_XMLOBJECT;
 
-    BEGIN_XMLOBJECTBUILDER(MgmtData);
-    END_XMLOBJECTBUILDER;
+    /**
+     * XMLObject representing XML Digital Signature, version 20020212, Modulus element.
+     */
+    BEGIN_XMLOBJECT(XMLTOOL_API,Modulus,XMLObject);
+        DECL_XMLOBJECT_CONTENT(Value);
+    END_XMLOBJECT;
 
-#ifdef XMLTOOLING_DEFINE_CONSTANTS
-    const XMLCh MgmtData::LOCAL_NAME[] = {
-        chLatin_M, chLatin_g, chLatin_m, chLatin_t, chLatin_D, chLatin_a, chLatin_t, chLatin_a, chNull
-    }; 
-#endif
+    /**
+     * XMLObject representing XML Digital Signature, version 20020212, Exponent element.
+     */
+    BEGIN_XMLOBJECT(XMLTOOL_API,Exponent,XMLObject);
+        DECL_XMLOBJECT_CONTENT(Value);
+    END_XMLOBJECT;
+
+    /**
+     * XMLObject representing XML Digital Signature, version 20020212, RSAKeyValue element.
+     */
+    BEGIN_XMLOBJECT(XMLTOOL_API,RSAKeyValue,XMLObject);
+        DECL_XMLOBJECT_CHILD(Modulus);
+        DECL_XMLOBJECT_CHILD(Exponent);
+        /** RSAKeyValueType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
+    /**
+     * XMLObject representing XML Digital Signature, version 20020212, KeyInfo element.
+     */
+    BEGIN_XMLOBJECT(XMLTOOL_API,KeyInfo,ElementProxy);
+        DECL_XMLOBJECT_ATTRIB(Id,ID);
+        DECL_XMLOBJECT_CHILDREN(KeyName);
+        DECL_XMLOBJECT_CHILDREN(MgmtData);
+        /** KeyInfoType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
+    DECL_XMLSIGOBJECTBUILDER(KeyName);
+    DECL_XMLSIGOBJECTBUILDER(MgmtData);
+    DECL_XMLSIGOBJECTBUILDER(Modulus);
+    DECL_XMLSIGOBJECTBUILDER(Exponent);
+    DECL_XMLSIGOBJECTBUILDER(RSAKeyValue);
+    DECL_XMLSIGOBJECTBUILDER(KeyInfo);
+    
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,KeyName);
+        XMLOBJECTVALIDATOR_REQUIRE(KeyName,Name);
+    END_XMLOBJECTVALIDATOR;
+    
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,MgmtData);
+        XMLOBJECTVALIDATOR_REQUIRE(MgmtData,Data);
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,Modulus);
+        XMLOBJECTVALIDATOR_REQUIRE(Modulus,Value);
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,Exponent);
+        XMLOBJECTVALIDATOR_REQUIRE(Exponent,Value);
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,RSAKeyValue);
+        XMLOBJECTVALIDATOR_REQUIRE(RSAKeyValue,Modulus);
+        XMLOBJECTVALIDATOR_REQUIRE(RSAKeyValue,Exponent);
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,KeyInfo);
+        XMLOBJECTVALIDATOR_CHECKEMPTY(KeyInfo,XMLObject);
+    END_XMLOBJECTVALIDATOR;
+
 };
 
 #endif /* __xmltooling_keyinfo_h__ */

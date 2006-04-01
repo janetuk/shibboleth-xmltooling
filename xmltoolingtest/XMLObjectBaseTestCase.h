@@ -110,6 +110,10 @@ public:
     VectorOf(SimpleXMLObject) getSimpleXMLObjects() {
         return VectorOf(SimpleXMLObject)(this, m_simples, &m_children, m_children.end());
     }
+    
+    const std::vector<SimpleXMLObject*>& getSimpleXMLObjects() const {
+        return m_simples;
+    }
 
 protected:
     void marshallAttributes(DOMElement* domElement) const {

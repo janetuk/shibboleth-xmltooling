@@ -61,17 +61,15 @@ XMLObject* AbstractXMLObject::prepareForAssignment(XMLObject* oldValue, XMLObjec
         if (newValue) {
             releaseThisandParentDOM();
             newValue->setParent(this);
-            return newValue;
         }
-        else {
-            return NULL;
-        }
+        return newValue;
     }
 
     if (oldValue != newValue) {
         delete oldValue;
         releaseThisandParentDOM();
-        newValue->setParent(this);
+        if (newValue)
+            newValue->setParent(this);
     }
 
     return newValue;

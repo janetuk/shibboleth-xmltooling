@@ -46,7 +46,7 @@ public:
             dynamic_cast<ElementProxy*>(b->buildFromDocument(doc))
             );
         TS_ASSERT(wcObject.get()!=NULL);
-
+        
         ListOf(XMLObject) kids=wcObject->getXMLObjects();
         TSM_ASSERT_EQUALS("Number of child elements was not expected value", 2, kids.size());
         

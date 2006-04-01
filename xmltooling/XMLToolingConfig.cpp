@@ -21,15 +21,11 @@
  */
 
 #include "internal.h"
-
-#define XMLTOOLING_DEFINE_CONSTANTS
-#include <xercesc/util/XMLUniDefs.hpp>
-
 #include "exceptions.h"
 #include "XMLToolingConfig.h"
 #include "impl/UnknownElement.h"
-#include "signature/impl/KeyInfoImpl.h"
-#include "signature/impl/XMLSecSignatureImpl.h"
+#include "signature/KeyInfo.h"
+#include "signature/Signature.h"
 #include "util/NDC.h"
 #include "util/XMLConstants.h"
 #include "validation/Validator.h"
@@ -51,6 +47,17 @@
 using namespace log4cpp;
 using namespace xmltooling;
 using namespace std;
+
+#define REGISTER_ELEMENT(namespaceURI,cname) \
+    q=QName(namespaceURI,cname##::LOCAL_NAME); \
+    XMLObjectBuilder::registerBuilder(q,new cname##Builder()); \
+    Validator::registerValidator(q,new cname##SchemaValidator())
+    
+#define REGISTER_TYPE(namespaceURI,cname) \
+    q=QName(namespaceURI,cname##::TYPE_NAME); \
+    XMLObjectBuilder::registerBuilder(q,new cname##Builder()); \
+    Validator::registerValidator(q,new cname##SchemaValidator())
+
 
 DECL_EXCEPTION_FACTORY(XMLParserException);
 DECL_EXCEPTION_FACTORY(XMLObjectException);
@@ -158,23 +165,18 @@ bool XMLToolingInternalConfig::init()
         // default registrations
         XMLObjectBuilder::registerDefaultBuilder(new UnknownElementBuilder());
         
-        QName q(XMLConstants::XMLSIG_NS,KeyInfo::LOCAL_NAME);
-        XMLObjectBuilder::registerBuilder(q,new KeyInfoBuilderImpl());
-        Validator::registerValidator(q,new KeyInfoSchemaValidator());
-        q=QName(XMLConstants::XMLSIG_NS,KeyInfo::TYPE_NAME);
-        XMLObjectBuilder::registerBuilder(q,new KeyInfoBuilderImpl());
-        Validator::registerValidator(q,new KeyInfoSchemaValidator());
-
-        q=QName(XMLConstants::XMLSIG_NS,KeyName::LOCAL_NAME);
-        XMLObjectBuilder::registerBuilder(q,new KeyNameBuilderImpl());
-        Validator::registerValidator(q,new KeyNameSchemaValidator());
-
-        q=QName(XMLConstants::XMLSIG_NS,MgmtData::LOCAL_NAME);
-        XMLObjectBuilder::registerBuilder(q,new MgmtDataBuilderImpl());
-        Validator::registerValidator(q,new MgmtDataSchemaValidator());
+        QName q;
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,KeyInfo);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,KeyName);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,MgmtData);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,RSAKeyValue);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Exponent);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Modulus);
+        REGISTER_TYPE(XMLConstants::XMLSIG_NS,KeyInfo);
+        REGISTER_TYPE(XMLConstants::XMLSIG_NS,RSAKeyValue);
 
 #ifndef XMLTOOLING_NO_XMLSEC
-        XMLObjectBuilder::registerBuilder(QName(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME),new XMLSecSignatureBuilder());
+        XMLObjectBuilder::registerBuilder(QName(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME),new SignatureBuilder());
 #endif
 
         REGISTER_EXCEPTION_FACTORY(XMLParserException);

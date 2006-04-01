@@ -23,7 +23,7 @@
 #include "internal.h"
 #include "exceptions.h"
 #include "impl/UnknownElement.h"
-#include "signature/impl/XMLSecSignatureImpl.h"
+#include "signature/Signature.h"
 #include "util/NDC.h"
 #include "util/XMLConstants.h"
 #include "util/XMLHelper.h"
@@ -31,6 +31,7 @@
 #include <log4cpp/Category.hh>
 #include <xercesc/framework/MemBufInputSource.hpp>
 #include <xercesc/framework/Wrapper4InputSource.hpp>
+#include <xercesc/util/XMLUniDefs.hpp>
 #include <xsec/dsig/DSIGKeyInfoX509.hpp>
 #include <xsec/enc/XSECCryptoException.hpp>
 #include <xsec/framework/XSECException.hpp>
@@ -236,7 +237,7 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, MarshallingCont
             bindDocument=true;
         }
         m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignature();
-        m_signature->setDSIGNSPrefix(Signature::PREFIX);
+        m_signature->setDSIGNSPrefix(XMLConstants::XMLSIG_PREFIX);
         cachedDOM=m_signature->createBlankSignature(document, getCanonicalizationMethod(), getSignatureAlgorithm());
     }
     else {
@@ -339,7 +340,7 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, Marshalling
         // Fresh signature, so we just create an empty one.
         log.debug("creating empty Signature element");
         m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignature();
-        m_signature->setDSIGNSPrefix(Signature::PREFIX);
+        m_signature->setDSIGNSPrefix(XMLConstants::XMLSIG_PREFIX);
         cachedDOM=m_signature->createBlankSignature(
             parentElement->getOwnerDocument(), getCanonicalizationMethod(), getSignatureAlgorithm()
             );
@@ -401,7 +402,7 @@ XMLObject* XMLSecSignatureImpl::unmarshall(DOMElement* element, bool bindDocumen
     return this;
 }
 
-Signature* XMLSecSignatureBuilder::buildObject(
+Signature* SignatureBuilder::buildObject(
     const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType
     ) const
 {
@@ -410,7 +411,9 @@ Signature* XMLSecSignatureBuilder::buildObject(
     return buildObject();
 }
 
-Signature* XMLSecSignatureBuilder::buildObject() const
+Signature* SignatureBuilder::buildObject() const
 {
     return new XMLSecSignatureImpl();
 }
+
+const XMLCh Signature::LOCAL_NAME[] = UNICODE_LITERAL_9(S,i,g,n,a,t,u,r,e);

@@ -52,7 +52,6 @@ namespace xmltooling {
          * @param value         value to set, or NULL to clear
          */
         virtual void setTextContent(const XMLCh* value)=0;
-        
 
         /**
          * Gets a mutable list of child objects
@@ -60,6 +59,13 @@ namespace xmltooling {
          * @return  mutable list of child objects
          */
         virtual ListOf(XMLObject) getXMLObjects()=0;
+
+        /**
+         * Gets an immutable list of child objects
+         * 
+         * @return  immutable list of child objects
+         */
+        virtual const std::list<XMLObject*>& getXMLObjects() const=0;
     };
     
 };

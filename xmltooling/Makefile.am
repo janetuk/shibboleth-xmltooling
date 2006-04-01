@@ -60,9 +60,7 @@ valinclude_HEADERS = \
     validation/Validator.h
 
 noinst_HEADERS = \
-    internal.h \
-    signature/impl/KeyInfoImpl.h \
-    signature/impl/XMLSecSignatureImpl.h
+    internal.h
 
 if BUILD_XMLSEC
 xmlsec_sources = \

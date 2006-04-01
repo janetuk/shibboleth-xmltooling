@@ -450,18 +450,6 @@
 					RelativePath=".\signature\SigningContext.h"
 					>
 				</File>
-				<Filter
-					Name="impl"
-					>
-					<File
-						RelativePath=".\signature\impl\KeyInfoImpl.h"
-						>
-					</File>
-					<File
-						RelativePath=".\signature\impl\XMLSecSignatureImpl.h"
-						>
-					</File>
-				</Filter>
 			</Filter>
 		</Filter>
 		<Filter

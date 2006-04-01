@@ -39,9 +39,6 @@ namespace xmltooling {
     public:
         virtual ~Signature() {}
 
-        /** Element prefix */
-        static const XMLCh PREFIX[];
-
         /** Element local name */
         static const XMLCh LOCAL_NAME[];
 
@@ -79,28 +76,24 @@ namespace xmltooling {
         Signature() {}
     };
 
-#ifdef XMLTOOLING_DEFINE_CONSTANTS
-    const XMLCh Signature::LOCAL_NAME[] = {
-        chLatin_S, chLatin_i, chLatin_g, chLatin_n, chLatin_a, chLatin_t, chLatin_u, chLatin_r, chLatin_e, chNull
-    }; 
-    const XMLCh Signature::PREFIX[] = {
-        chLatin_d, chLatin_s, chNull
-    };
-#endif
-
     /**
      * Builder for Signature objects.
      */
     class XMLTOOL_API SignatureBuilder : public XMLObjectBuilder
     {
     public:
-        virtual ~SignatureBuilder() {}
-
+        virtual Signature* buildObject(
+            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL
+            ) const;
+            
         /**
-         * Default builder.
+         * Default builder
+         * 
+         * @return empty Signature object
          */
-        virtual Signature* buildObject() const=0;
+        virtual Signature* buildObject() const;
     };
+
 };
 
 #endif /* __xmltooling_sig_h__ */

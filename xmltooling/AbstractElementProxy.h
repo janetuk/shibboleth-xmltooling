@@ -49,7 +49,11 @@ namespace xmltooling {
         
         virtual ListOf(XMLObject) getXMLObjects();
     
-     protected:
+        virtual const std::list<XMLObject*>& getXMLObjects() const {
+            return m_children;
+        }
+
+    protected:
         AbstractElementProxy() : m_value(NULL) {}
         
         /** Copy constructor. */
