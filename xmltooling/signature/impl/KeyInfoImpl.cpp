@@ -84,7 +84,7 @@ namespace xmltooling {
             PROC_XMLOBJECT_CHILD(Modulus,XMLConstants::XMLSIG_NS);
             PROC_XMLOBJECT_CHILD(Exponent,XMLConstants::XMLSIG_NS);
             
-            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString()));
+            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString().c_str()));
         }
     };
     
@@ -159,7 +159,7 @@ namespace xmltooling {
             if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI)
                 getXMLObjects().push_back(childXMLObject);
             
-            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString()));
+            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString().c_str()));
         }
 
         void processAttribute(const DOMAttr* attribute) {

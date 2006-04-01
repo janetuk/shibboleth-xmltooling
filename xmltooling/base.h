@@ -282,7 +282,7 @@
  * @param namespaceURI  the XML namespace of the child element
  */
 #define PROC_XMLOBJECT_CHILDREN(proper,namespaceURI) \
-    if (XMLHelper::isNodeNamed(root,namespaceURI,proper##::LOCAL_NAME)) { \
+    if (XMLHelper::isNodeNamed(root,namespaceURI,proper::LOCAL_NAME)) { \
         proper* typesafe=dynamic_cast<proper*>(childXMLObject); \
         if (typesafe) { \
             get##proper##s().push_back(typesafe); \
@@ -297,7 +297,7 @@
  * @param namespaceURI  the XML namespace of the child element
  */
 #define PROC_XMLOBJECT_CHILD(proper,namespaceURI) \
-    if (XMLHelper::isNodeNamed(root,namespaceURI,proper##::LOCAL_NAME)) { \
+    if (XMLHelper::isNodeNamed(root,namespaceURI,proper::LOCAL_NAME)) { \
         proper* typesafe=dynamic_cast<proper*>(childXMLObject); \
         if (typesafe) { \
             set##proper(typesafe); \

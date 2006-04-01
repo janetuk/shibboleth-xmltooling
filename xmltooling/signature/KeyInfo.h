@@ -30,7 +30,7 @@
 #include <xmltooling/util/XMLConstants.h>
 #include <xmltooling/validation/ValidatingXMLObject.h>
 
-#include <typeinfo.h>
+#include <typeinfo>
 
 #define DECL_XMLSIGOBJECTBUILDER(cname) \
     DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,XMLConstants::XMLSIG_NS,XMLConstants::XMLSIG_PREFIX)

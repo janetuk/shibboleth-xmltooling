@@ -49,12 +49,12 @@ using namespace xmltooling;
 using namespace std;
 
 #define REGISTER_ELEMENT(namespaceURI,cname) \
-    q=QName(namespaceURI,cname##::LOCAL_NAME); \
+    q=QName(namespaceURI,cname::LOCAL_NAME); \
     XMLObjectBuilder::registerBuilder(q,new cname##Builder()); \
     Validator::registerValidator(q,new cname##SchemaValidator())
     
 #define REGISTER_TYPE(namespaceURI,cname) \
-    q=QName(namespaceURI,cname##::TYPE_NAME); \
+    q=QName(namespaceURI,cname::TYPE_NAME); \
     XMLObjectBuilder::registerBuilder(q,new cname##Builder()); \
     Validator::registerValidator(q,new cname##SchemaValidator())
 
