@@ -211,7 +211,8 @@ EXPAND_ONLY_PREDEF     = NO
 SEARCH_INCLUDES        = YES
 INCLUDE_PATH           = C:\cvs\cpp-xmltooling
 INCLUDE_FILE_PATTERNS  = 
-PREDEFINED             = _MSC_VER
+PREDEFINED             = _MSC_VER \
+                         DOXYGEN_SKIP
 EXPAND_AS_DEFINED      = 
 SKIP_FUNCTION_MACROS   = YES
 #---------------------------------------------------------------------------

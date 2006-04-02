@@ -37,36 +37,35 @@
 
 namespace xmltooling {
 
+    DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,KeyName,Name,XML Digital Signature version 20020212 KeyName element);
+    DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,MgmtData,Data,XML Digital Signature version 20020212 MgmtData element);
+    DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,Modulus,Value,XML Digital Signature version 20020212 Modulus element);
+    DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,Exponent,Value,XML Digital Signature version 20020212 Exponent element);
+    DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,Seed,Value,XML Digital Signature version 20020212 Seed element);
+    DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,PgenCounter,Value,XML Digital Signature version 20020212 PgenCounter element);
+    DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,P,Value,XML Digital Signature version 20020212 P element);
+    DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,Q,Value,XML Digital Signature version 20020212 Q element);
+    DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,G,Value,XML Digital Signature version 20020212 G element);
+    DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,Y,Value,XML Digital Signature version 20020212 Y element);
+    DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,J,Value,XML Digital Signature version 20020212 J element);
+
     /**
-     * XMLObject representing XML Digital Signature, version 20020212, KeyName element.
+     * XML Digital Signature version 20020212 DSAKeyValue element.
      */
-    BEGIN_XMLOBJECT(XMLTOOL_API,KeyName,XMLObject);
-        DECL_XMLOBJECT_CONTENT(Name);
+    BEGIN_XMLOBJECT(XMLTOOL_API,DSAKeyValue,XMLObject);
+        DECL_XMLOBJECT_CHILD(P);
+        DECL_XMLOBJECT_CHILD(Q);
+        DECL_XMLOBJECT_CHILD(G);
+        DECL_XMLOBJECT_CHILD(Y);
+        DECL_XMLOBJECT_CHILD(J);
+        DECL_XMLOBJECT_CHILD(Seed);
+        DECL_XMLOBJECT_CHILD(PgenCounter);
+        /** DSAKeyValueType local name */
+        static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
     /**
-     * XMLObject representing XML Digital Signature, version 20020212, MgmtData element.
-     */
-    BEGIN_XMLOBJECT(XMLTOOL_API,MgmtData,XMLObject);
-        DECL_XMLOBJECT_CONTENT(Data);
-    END_XMLOBJECT;
-
-    /**
-     * XMLObject representing XML Digital Signature, version 20020212, Modulus element.
-     */
-    BEGIN_XMLOBJECT(XMLTOOL_API,Modulus,XMLObject);
-        DECL_XMLOBJECT_CONTENT(Value);
-    END_XMLOBJECT;
-
-    /**
-     * XMLObject representing XML Digital Signature, version 20020212, Exponent element.
-     */
-    BEGIN_XMLOBJECT(XMLTOOL_API,Exponent,XMLObject);
-        DECL_XMLOBJECT_CONTENT(Value);
-    END_XMLOBJECT;
-
-    /**
-     * XMLObject representing XML Digital Signature, version 20020212, RSAKeyValue element.
+     * XML Digital Signature version 20020212 RSAKeyValue element.
      */
     BEGIN_XMLOBJECT(XMLTOOL_API,RSAKeyValue,XMLObject);
         DECL_XMLOBJECT_CHILD(Modulus);
@@ -76,7 +75,19 @@ namespace xmltooling {
     END_XMLOBJECT;
 
     /**
-     * XMLObject representing XML Digital Signature, version 20020212, KeyInfo element.
+     * XML Digital Signature version 20020212 KeyValue element.
+     */
+    BEGIN_XMLOBJECT(XMLTOOL_API,KeyValue,XMLObject);
+        DECL_XMLOBJECT_CHILD(DSAKeyValue);
+        DECL_XMLOBJECT_CHILD(RSAKeyValue);
+        DECL_XMLOBJECT_CHILD(XMLObject);
+        DECL_XMLOBJECT_CONTENT(TextContent);
+        /** KeyValueType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
+    /**
+     * XML Digital Signature version 20020212 KeyInfo element.
      */
     BEGIN_XMLOBJECT(XMLTOOL_API,KeyInfo,ElementProxy);
         DECL_XMLOBJECT_ATTRIB(Id,ID);
@@ -90,33 +101,50 @@ namespace xmltooling {
     DECL_XMLSIGOBJECTBUILDER(MgmtData);
     DECL_XMLSIGOBJECTBUILDER(Modulus);
     DECL_XMLSIGOBJECTBUILDER(Exponent);
+    DECL_XMLSIGOBJECTBUILDER(Seed);
+    DECL_XMLSIGOBJECTBUILDER(PgenCounter);
+    DECL_XMLSIGOBJECTBUILDER(P);
+    DECL_XMLSIGOBJECTBUILDER(Q);
+    DECL_XMLSIGOBJECTBUILDER(G);
+    DECL_XMLSIGOBJECTBUILDER(Y);
+    DECL_XMLSIGOBJECTBUILDER(J);
+    DECL_XMLSIGOBJECTBUILDER(DSAKeyValue);
     DECL_XMLSIGOBJECTBUILDER(RSAKeyValue);
+    DECL_XMLSIGOBJECTBUILDER(KeyValue);
     DECL_XMLSIGOBJECTBUILDER(KeyInfo);
-    
-    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,KeyName);
-        XMLOBJECTVALIDATOR_REQUIRE(KeyName,Name);
-    END_XMLOBJECTVALIDATOR;
-    
-    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,MgmtData);
-        XMLOBJECTVALIDATOR_REQUIRE(MgmtData,Data);
-    END_XMLOBJECTVALIDATOR;
 
-    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,Modulus);
-        XMLOBJECTVALIDATOR_REQUIRE(Modulus,Value);
-    END_XMLOBJECTVALIDATOR;
-
-    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,Exponent);
-        XMLOBJECTVALIDATOR_REQUIRE(Exponent,Value);
-    END_XMLOBJECTVALIDATOR;
+#ifdef XMLTOOLING_DECLARE_VALIDATORS
+    XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,KeyName,Name);
+    XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,MgmtData,Data);
+    XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,Modulus,Value);
+    XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,Exponent,Value);
+    XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,Seed,Value);
+    XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,PgenCounter,Value);
+    XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,P,Value);
+    XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,Q,Value);
+    XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,G,Value);
+    XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,Y,Value);
+    XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,J,Value);
 
     BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,RSAKeyValue);
         XMLOBJECTVALIDATOR_REQUIRE(RSAKeyValue,Modulus);
         XMLOBJECTVALIDATOR_REQUIRE(RSAKeyValue,Exponent);
     END_XMLOBJECTVALIDATOR;
 
-    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,KeyInfo);
-        XMLOBJECTVALIDATOR_CHECKEMPTY(KeyInfo,XMLObject);
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,DSAKeyValue);
+        XMLOBJECTVALIDATOR_REQUIRE(DSAKeyValue,Y);
+        XMLOBJECTVALIDATOR_NONEORBOTH(DSKeyValue,P,Q);
+        XMLOBJECTVALIDATOR_NONEORBOTH(DSKeyValue,Seed,PgenCounter);
     END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,KeyValue);
+        XMLOBJECTVALIDATOR_ONEOF3(KeyValue,DSAKeyValue,RSAKeyValue,XMLObject);
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,KeyInfo);
+        XMLOBJECTVALIDATOR_NONEMPTY(KeyInfo,XMLObject);
+    END_XMLOBJECTVALIDATOR;
+#endif /* XMLTOOLING_DECLARE_VALIDATORS */
 
 };
 

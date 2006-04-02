@@ -20,6 +20,8 @@
  * Library configuration 
  */
 
+#define XMLTOOLING_DECLARE_VALIDATORS
+
 #include "internal.h"
 #include "exceptions.h"
 #include "XMLToolingConfig.h"
@@ -168,11 +170,22 @@ bool XMLToolingInternalConfig::init()
         QName q;
         REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,KeyInfo);
         REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,KeyName);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,KeyValue);
         REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,MgmtData);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,DSAKeyValue);
         REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,RSAKeyValue);
         REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Exponent);
         REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Modulus);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,P);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Q);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,G);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Y);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,J);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Seed);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,PgenCounter);
         REGISTER_TYPE(XMLConstants::XMLSIG_NS,KeyInfo);
+        REGISTER_TYPE(XMLConstants::XMLSIG_NS,KeyValue);
+        REGISTER_TYPE(XMLConstants::XMLSIG_NS,DSAKeyValue);
         REGISTER_TYPE(XMLConstants::XMLSIG_NS,RSAKeyValue);
 
 #ifndef XMLTOOLING_NO_XMLSEC

@@ -70,10 +70,6 @@
   #define XMLTOOL_EXCEPTIONAPI(api)
 #endif
 
-#ifndef NULL
-#define NULL    0
-#endif
-
 #ifdef _MSC_VER
     #define XMLTOOLING_DOXYGEN(desc) /##** desc */
 #else
@@ -88,6 +84,10 @@
         type(const type&); \
         type& operator=(const type&);
 
+#ifndef DOXYGEN_SKIP
+#ifndef NULL
+#define NULL    0
+#endif
 #define UNICODE_LITERAL_1(a) {chLatin_##a, chNull}
 #define UNICODE_LITERAL_2(a,b) {chLatin_##a, chLatin_##b, chNull}
 #define UNICODE_LITERAL_3(a,b,c) {chLatin_##a, chLatin_##b, chLatin_##c, chNull}
@@ -159,6 +159,7 @@
     {chLatin_##a, chLatin_##b, chLatin_##c, chLatin_##d, chLatin_##e, chLatin_##f, chLatin_##g, chLatin_##h, chLatin_##i, \
         chLatin_##j, chLatin_##k, chLatin_##l, chLatin_##m, chLatin_##n, chLatin_##o, chLatin_##p, chLatin_##q, chLatin_##r, \
         chLatin_##s, chLatin_##t, chLatin_##u, chLatin_##v, chLatin_##w, chLatin_##x, chLatin_##y, chLatin_##z, chNull}
+#endif /* DOXYGEN_SKIP */
 
 /**
  * Begins the declaration of an XMLObject specialization.
@@ -362,6 +363,20 @@
     }
 
 /**
+ * Declares an XMLObject specialization with a simple content model and type,
+ * handling it as string data.
+ * 
+ * @param linkage   linkage specifier for the class
+ * @param cname     the name of the XMLObject specialization
+ * @param proper    the proper name to label the element's content
+ */
+#define DECL_XMLOBJECT_SIMPLE(linkage,cname,proper,desc) \
+    XMLTOOLING_DOXYGEN(desc) \
+    BEGIN_XMLOBJECT(linkage,cname,XMLObject); \
+        DECL_XMLOBJECT_CONTENT(proper); \
+    END_XMLOBJECT
+
+/**
  * Declares and defines an implementation class for an XMLObject with
  * a simple content model and type, handling it as string data.
  * 
@@ -490,14 +505,64 @@
         throw ValidationException(#cname" must have "#proper".")
 
 /**
+ * Validator code that checks for one of a pair of
+ * required attributes, content, or singletons.
+ * 
+ * @param cname     the name of the XMLObject specialization
+ * @param proper1   the proper name of the first attribute, content, or singleton member 
+ * @param proper2   the proper name of the second attribute, content, or singleton member 
+ */
+#define XMLOBJECTVALIDATOR_ONEOF(cname,proper1,proper2) \
+    if (!ptr->get##proper1() && !ptr->get##proper2()) \
+        throw ValidationException(#cname" must have "#proper1" or "#proper2".")
+
+/**
+ * Validator code that checks for one of a set of three
+ * required attributes, content, or singletons.
+ * 
+ * @param cname     the name of the XMLObject specialization
+ * @param proper1   the proper name of the first attribute, content, or singleton member
+ * @param proper2   the proper name of the second attribute, content, or singleton member
+ * @param proper3   the proper name of the third attribute, content, or singleton member
+ */
+#define XMLOBJECTVALIDATOR_ONEOF3(cname,proper1,proper2,proper3) \
+    if (!ptr->get##proper1() && !ptr->get##proper2() && !ptr->get##proper3()) \
+        throw ValidationException(#cname" must have "#proper1", "#proper2", or "#proper3".")
+
+/**
+ * Validator code that checks a co-constraint (if one present, the other must be)
+ * between a pair of attributes, content, or singletons.
+ * 
+ * @param cname     the name of the XMLObject specialization
+ * @param proper1   the proper name of the first attribute, content, or singleton member 
+ * @param proper2   the proper name of the second attribute, content, or singleton member 
+ */
+#define XMLOBJECTVALIDATOR_NONEORBOTH(cname,proper1,proper2) \
+    if ((ptr->get##proper1() && !ptr->get##proper2()) || (!ptr->get##proper1() && ptr->get##proper2())) \
+        throw ValidationException(#cname" cannot have "#proper1" without "#proper2".")
+
+/**
  * Validator code that checks for a non-empty collection.
  * 
  * @param cname     the name of the XMLObject specialization
  * @param proper    the proper name of the collection item 
  */
-#define XMLOBJECTVALIDATOR_CHECKEMPTY(cname,proper) \
+#define XMLOBJECTVALIDATOR_NONEMPTY(cname,proper) \
     if (ptr->get##proper##s().empty()) \
         throw ValidationException(#cname" must have at least one "#proper".")
+
+/**
+ * Declares/defines a Validator specialization that checks object type and
+ * a non-empty simple content model.
+ * 
+ * @param linkage   linkage specifier for the class
+ * @param cname     the name of the XMLObject specialization
+ * @param proper    the proper name to label the element's content
+ */
+#define XMLOBJECTVALIDATOR_SIMPLE(linkage,cname,proper) \
+    BEGIN_XMLOBJECTVALIDATOR(linkage,cname); \
+        XMLOBJECTVALIDATOR_REQUIRE(cname,proper); \
+    END_XMLOBJECTVALIDATOR
 
 #include <utility>
 
