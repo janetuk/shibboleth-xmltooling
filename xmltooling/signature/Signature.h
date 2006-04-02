@@ -27,14 +27,18 @@
 #include <xmltooling/signature/SigningContext.h>
 #include <xmltooling/signature/VerifyingContext.h>
 
-namespace xmltooling {
+/**
+ * @namespace xmlsignature
+ * Public namespace of XML Signature classes
+ */
+namespace xmlsignature {
 
     /**
      * XMLObject representing XML Digital Signature, version 20020212, Signature element.
      * The default signature settings include Exclusive c14n w/o comments, SHA-1 digests,
      * and RSA-SHA1 signing. 
      */
-    class XMLTOOL_API Signature : public virtual XMLObject
+    class XMLTOOL_API Signature : public virtual xmltooling::XMLObject
     {
     public:
         virtual ~Signature() {}
@@ -79,11 +83,11 @@ namespace xmltooling {
     /**
      * Builder for Signature objects.
      */
-    class XMLTOOL_API SignatureBuilder : public XMLObjectBuilder
+    class XMLTOOL_API SignatureBuilder : public xmltooling::XMLObjectBuilder
     {
     public:
         virtual Signature* buildObject(
-            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL
+            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const xmltooling::QName* schemaType=NULL
             ) const;
             
         /**

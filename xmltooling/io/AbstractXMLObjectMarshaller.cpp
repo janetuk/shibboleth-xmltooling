@@ -35,6 +35,7 @@
 #include <xercesc/util/XMLUniDefs.hpp>
 #include <log4cpp/Category.hh>
 
+using namespace xmlsignature;
 using namespace xmltooling;
 using namespace log4cpp;
 using namespace std;

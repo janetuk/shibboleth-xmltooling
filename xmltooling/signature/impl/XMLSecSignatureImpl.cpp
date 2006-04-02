@@ -36,6 +36,7 @@
 #include <xsec/enc/XSECCryptoException.hpp>
 #include <xsec/framework/XSECException.hpp>
 
+using namespace xmlsignature;
 using namespace xmltooling;
 using namespace log4cpp;
 using namespace std;
@@ -45,7 +46,7 @@ using namespace std;
     #pragma warning( disable : 4250 4251 )
 #endif
 
-namespace xmltooling {
+namespace xmlsignature {
     
     class XMLTOOL_DLLLOCAL XMLSecSignatureImpl : public UnknownElementImpl, public virtual Signature
     {

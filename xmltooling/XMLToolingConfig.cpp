@@ -46,8 +46,9 @@
 
 #include <stdexcept>
 
-using namespace log4cpp;
+using namespace xmlsignature;
 using namespace xmltooling;
+using namespace log4cpp;
 using namespace std;
 
 #define REGISTER_ELEMENT(namespaceURI,cname) \
@@ -183,10 +184,15 @@ bool XMLToolingInternalConfig::init()
         REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,J);
         REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Seed);
         REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,PgenCounter);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,XPath);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Transform);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Transforms);
         REGISTER_TYPE(XMLConstants::XMLSIG_NS,KeyInfo);
         REGISTER_TYPE(XMLConstants::XMLSIG_NS,KeyValue);
         REGISTER_TYPE(XMLConstants::XMLSIG_NS,DSAKeyValue);
         REGISTER_TYPE(XMLConstants::XMLSIG_NS,RSAKeyValue);
+        REGISTER_TYPE(XMLConstants::XMLSIG_NS,Transform);
+        REGISTER_TYPE(XMLConstants::XMLSIG_NS,Transforms);
 
 #ifndef XMLTOOLING_NO_XMLSEC
         XMLObjectBuilder::registerBuilder(QName(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME),new SignatureBuilder());

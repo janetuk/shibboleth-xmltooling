@@ -25,7 +25,7 @@
 
 #include <xsec/dsig/DSIGSignature.hpp>
 
-namespace xmltooling {
+namespace xmlsignature {
 
     /**
      * Interface to signature verification process supplied by a relying party

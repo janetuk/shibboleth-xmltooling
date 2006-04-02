@@ -30,11 +30,6 @@
   #include <xmltooling/config_pub.h>
 #endif
 
-/**
- * @namespace xmltooling
- * Public namespace of XML Tooling library
- */
-
 // Windows and GCC4 Symbol Visibility Macros
 #ifdef WIN32
   #define XMLTOOL_IMPORT __declspec(dllimport)
@@ -169,9 +164,11 @@
  * @param linkage   linkage specifier for the class
  * @param cname     the name of the class to declare
  * @param base      the base class to derive from using public virtual inheritance
+ * @param desc      documentation comment for class
  */
-#define BEGIN_XMLOBJECT(linkage,cname,base) \
-    class linkage cname : public virtual base, public virtual ValidatingXMLObject { \
+#define BEGIN_XMLOBJECT(linkage,cname,base,desc) \
+    XMLTOOLING_DOXYGEN(desc) \
+    class linkage cname : public virtual base, public virtual xmltooling::ValidatingXMLObject { \
     protected: \
         cname() {} \
     public: \
@@ -277,13 +274,65 @@
         } 
 
 /**
+ * Implements marshalling for an attribute
+ * 
+ * @param proper        the proper name of the attribute
+ * @param ucase         the upcased name of the attribute
+ * @param namespaceURI  the XML namespace of the attribute
+ */
+#define MARSHALL_XMLOBJECT_ATTRIB(proper,ucase,namespaceURI) \
+    if(get##proper()) { \
+        domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, get##proper()); \
+    }
+
+/**
+ * Implements marshalling for an ID attribute
+ * 
+ * @param proper        the proper name of the attribute
+ * @param ucase         the upcased name of the attribute
+ * @param namespaceURI  the XML namespace of the attribute
+ */
+#define MARSHALL_XMLOBJECT_ID_ATTRIB(proper,ucase,namespaceURI) \
+    if(get##proper()) { \
+        domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, get##proper()); \
+        domElement->setIdAttributeNS(namespaceURI, ucase##_ATTRIB_NAME); \
+    }
+
+/**
+ * Implements unmarshalling process branch for an attribute
+ * 
+ * @param proper        the proper name of the attribute
+ * @param ucase         the upcased name of the attribute
+ * @param namespaceURI  the XML namespace of the attribute
+ */
+#define PROC_XMLOBJECT_ATTRIB(proper,ucase,namespaceURI) \
+    if (xmltooling::XMLHelper::isNodeNamed(attribute, namespaceURI, ucase##_ATTRIB_NAME)) { \
+        set##proper(attribute->getValue()); \
+        return; \
+    }
+
+/**
+ * Implements unmarshalling process branch for an ID attribute
+ * 
+ * @param proper        the proper name of the attribute
+ * @param ucase         the upcased name of the attribute
+ * @param namespaceURI  the XML namespace of the attribute
+ */
+#define PROC_XMLOBJECT_ID_ATTRIB(proper,ucase,namespaceURI) \
+    if (xmltooling::XMLHelper::isNodeNamed(attribute, namespaceURI, ucase##_ATTRIB_NAME)) { \
+        set##proper(attribute->getValue()); \
+        static_cast<DOMElement*>(attribute->getParentNode())->setIdAttributeNode(attribute); \
+        return; \
+    }
+
+/**
  * Implements unmarshalling process branch for typed child collection element
  * 
  * @param proper        the proper name of the child type
  * @param namespaceURI  the XML namespace of the child element
  */
 #define PROC_XMLOBJECT_CHILDREN(proper,namespaceURI) \
-    if (XMLHelper::isNodeNamed(root,namespaceURI,proper::LOCAL_NAME)) { \
+    if (xmltooling::XMLHelper::isNodeNamed(root,namespaceURI,proper::LOCAL_NAME)) { \
         proper* typesafe=dynamic_cast<proper*>(childXMLObject); \
         if (typesafe) { \
             get##proper##s().push_back(typesafe); \
@@ -298,7 +347,7 @@
  * @param namespaceURI  the XML namespace of the child element
  */
 #define PROC_XMLOBJECT_CHILD(proper,namespaceURI) \
-    if (XMLHelper::isNodeNamed(root,namespaceURI,proper::LOCAL_NAME)) { \
+    if (xmltooling::XMLHelper::isNodeNamed(root,namespaceURI,proper::LOCAL_NAME)) { \
         proper* typesafe=dynamic_cast<proper*>(childXMLObject); \
         if (typesafe) { \
             set##proper(typesafe); \
@@ -353,7 +402,7 @@
         return clone(); \
     } \
     cname* clone() const { \
-        auto_ptr<XMLObject> domClone(AbstractDOMCachingXMLObject::clone()); \
+        std::auto_ptr<xmltooling::XMLObject> domClone(xmltooling::AbstractDOMCachingXMLObject::clone()); \
         cname##Impl* ret=dynamic_cast<cname##Impl*>(domClone.get()); \
         if (ret) { \
             domClone.release(); \
@@ -369,10 +418,10 @@
  * @param linkage   linkage specifier for the class
  * @param cname     the name of the XMLObject specialization
  * @param proper    the proper name to label the element's content
+ * @param desc      documentation for class
  */
 #define DECL_XMLOBJECT_SIMPLE(linkage,cname,proper,desc) \
-    XMLTOOLING_DOXYGEN(desc) \
-    BEGIN_XMLOBJECT(linkage,cname,XMLObject); \
+    BEGIN_XMLOBJECT(linkage,cname,xmltooling::XMLObject,desc); \
         DECL_XMLOBJECT_CONTENT(proper); \
     END_XMLOBJECT
 
@@ -387,20 +436,20 @@
 #define DECL_XMLOBJECTIMPL_SIMPLE(linkage,cname,proper) \
     class linkage cname##Impl \
         : public cname, \
-            public AbstractDOMCachingXMLObject, \
-            public AbstractValidatingXMLObject, \
-            public AbstractXMLObjectMarshaller, \
-            public AbstractXMLObjectUnmarshaller \
+            public xmltooling::AbstractDOMCachingXMLObject, \
+            public xmltooling::AbstractValidatingXMLObject, \
+            public xmltooling::AbstractXMLObjectMarshaller, \
+            public xmltooling::AbstractXMLObjectUnmarshaller \
     { \
     public: \
         virtual ~cname##Impl() {} \
         cname##Impl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType) \
-            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_##proper(NULL) { \
+            : xmltooling::AbstractXMLObject(nsURI, localName, prefix, schemaType), m_##proper(NULL) { \
         } \
         cname##Impl(const cname##Impl& src) \
-            : AbstractXMLObject(src), \
-                AbstractDOMCachingXMLObject(src), \
-                AbstractValidatingXMLObject(src), \
+            : xmltooling::AbstractXMLObject(src), \
+                xmltooling::AbstractDOMCachingXMLObject(src), \
+                xmltooling::AbstractValidatingXMLObject(src), \
                 m_##proper(XMLString::replicate(src.m_##proper)) { \
         } \
         IMPL_XMLOBJECT_CLONE(cname) \
@@ -427,7 +476,7 @@
             return buildObject(namespaceURI,cname::LOCAL_NAME,namespacePrefix); \
         } \
         virtual cname* buildObject( \
-            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL \
+            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const xmltooling::QName* schemaType=NULL \
             ) const
 
 /**
@@ -467,17 +516,17 @@
  * @param cname the base name of the Validator specialization
  */
  #define BEGIN_XMLOBJECTVALIDATOR(linkage,cname) \
-    class linkage cname##SchemaValidator : public Validator \
+    class linkage cname##SchemaValidator : public xmltooling::Validator \
     { \
     public: \
         virtual ~cname##SchemaValidator() {} \
         virtual cname##SchemaValidator* clone() const { \
             return new cname##SchemaValidator(); \
         } \
-        virtual void validate(const XMLObject* xmlObject) const { \
+        virtual void validate(const xmltooling::XMLObject* xmlObject) const { \
             const cname* ptr=dynamic_cast<const cname*>(xmlObject); \
             if (!ptr) \
-                throw ValidationException(#cname"SchemaValidator: unsupported object type ($1).",xmltooling::params(1,typeid(xmlObject).name()))
+                throw xmltooling::ValidationException(#cname"SchemaValidator: unsupported object type ($1).",xmltooling::params(1,typeid(xmlObject).name()))
 
 /**
  * Ends the declaration of a Validator specialization.
@@ -492,7 +541,7 @@
 #define XMLOBJECTVALIDATOR_CHECKTYPE(cname) \
     const cname* ptr=dynamic_cast<const cname*>(xmlObject); \
     if (!ptr) \
-        throw ValidationException(#cname"SchemaValidator: unsupported object type ($1).",xmltooling::params(1,typeid(xmlObject).name()))
+        throw xmltooling::ValidationException(#cname"SchemaValidator: unsupported object type ($1).",xmltooling::params(1,typeid(xmlObject).name()))
 
 /**
  * Validator code that checks for a required attribute, content, or singleton.
@@ -502,7 +551,7 @@
  */
 #define XMLOBJECTVALIDATOR_REQUIRE(cname,proper) \
     if (!ptr->get##proper()) \
-        throw ValidationException(#cname" must have "#proper".")
+        throw xmltooling::ValidationException(#cname" must have "#proper".")
 
 /**
  * Validator code that checks for one of a pair of
@@ -514,7 +563,7 @@
  */
 #define XMLOBJECTVALIDATOR_ONEOF(cname,proper1,proper2) \
     if (!ptr->get##proper1() && !ptr->get##proper2()) \
-        throw ValidationException(#cname" must have "#proper1" or "#proper2".")
+        throw xmltooling::ValidationException(#cname" must have "#proper1" or "#proper2".")
 
 /**
  * Validator code that checks for one of a set of three
@@ -527,7 +576,7 @@
  */
 #define XMLOBJECTVALIDATOR_ONEOF3(cname,proper1,proper2,proper3) \
     if (!ptr->get##proper1() && !ptr->get##proper2() && !ptr->get##proper3()) \
-        throw ValidationException(#cname" must have "#proper1", "#proper2", or "#proper3".")
+        throw xmltooling::ValidationException(#cname" must have "#proper1", "#proper2", or "#proper3".")
 
 /**
  * Validator code that checks a co-constraint (if one present, the other must be)
@@ -539,7 +588,7 @@
  */
 #define XMLOBJECTVALIDATOR_NONEORBOTH(cname,proper1,proper2) \
     if ((ptr->get##proper1() && !ptr->get##proper2()) || (!ptr->get##proper1() && ptr->get##proper2())) \
-        throw ValidationException(#cname" cannot have "#proper1" without "#proper2".")
+        throw xmltooling::ValidationException(#cname" cannot have "#proper1" without "#proper2".")
 
 /**
  * Validator code that checks for a non-empty collection.
@@ -549,7 +598,7 @@
  */
 #define XMLOBJECTVALIDATOR_NONEMPTY(cname,proper) \
     if (ptr->get##proper##s().empty()) \
-        throw ValidationException(#cname" must have at least one "#proper".")
+        throw xmltooling::ValidationException(#cname" must have at least one "#proper".")
 
 /**
  * Declares/defines a Validator specialization that checks object type and
@@ -566,6 +615,10 @@
 
 #include <utility>
 
+/**
+ * @namespace xmltooling
+ * Public namespace of XML Tooling library
+ */
 namespace xmltooling {
 
     /**

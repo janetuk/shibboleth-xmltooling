@@ -32,17 +32,19 @@
 
 using namespace xercesc;
 
+#ifndef XMLTOOLING_NO_XMLSEC
+namespace xmlsignature {
+    class XMLTOOL_API Signature;
+    class XMLTOOL_API SigningContext;
+};
+#endif
+
 #if defined (_MSC_VER)
     #pragma warning( push )
     #pragma warning( disable : 4250 4251 )
 #endif
 
 namespace xmltooling {
-
-#ifndef XMLTOOLING_NO_XMLSEC
-    class XMLTOOL_API Signature;
-    class XMLTOOL_API SigningContext;
-#endif
 
     /**
      * Supplies additional information to the marshalling process.
@@ -65,12 +67,12 @@ namespace xmltooling {
          * @param sig   a signature object
          * @param ctx   the signing context to associate with the signature 
          */
-        MarshallingContext(Signature* sig, const SigningContext* ctx) {
+        MarshallingContext(xmlsignature::Signature* sig, const xmlsignature::SigningContext* ctx) {
             m_signingContexts.push_back(std::make_pair(sig,ctx));
         }
         
         /** Array of signing contexts, keyed off of the associated Signature */
-        std::vector< std::pair<Signature*,const SigningContext*> > m_signingContexts;
+        std::vector< std::pair<xmlsignature::Signature*,const xmlsignature::SigningContext*> > m_signingContexts;
 #endif
     };
 

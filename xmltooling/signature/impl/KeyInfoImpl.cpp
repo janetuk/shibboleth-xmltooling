@@ -31,6 +31,7 @@
 
 #include <xercesc/util/XMLUniDefs.hpp>
 
+using namespace xmlsignature;
 using namespace xmltooling;
 using namespace std;
 
@@ -39,7 +40,7 @@ using namespace std;
     #pragma warning( disable : 4250 4251 )
 #endif
 
-namespace xmltooling {
+namespace xmlsignature {
     
     class XMLTOOL_DLLLOCAL DSAKeyValueImpl : public DSAKeyValue,
         public AbstractDOMCachingXMLObject,
@@ -219,7 +220,104 @@ namespace xmltooling {
             throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString().c_str()));
         }
     };
-    
+
+    class XMLTOOL_DLLLOCAL TransformImpl : public Transform,
+        public AbstractDOMCachingXMLObject,
+        public AbstractElementProxy,
+        public AbstractValidatingXMLObject,
+        public AbstractXMLObjectMarshaller,
+        public AbstractXMLObjectUnmarshaller
+    {
+    public:
+        virtual ~TransformImpl() {}
+
+        TransformImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Algorithm(NULL) {
+        }
+            
+        TransformImpl(const TransformImpl& src)
+                : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src), AbstractElementProxy(src),
+                    AbstractValidatingXMLObject(src), m_Algorithm(XMLString::replicate(src.m_Algorithm)) {
+            for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
+                if (*i) {
+                    XPath* x=dynamic_cast<XPath*>(*i);
+                    if (x) {
+                        getXPaths().push_back(x->cloneXPath());
+                        continue;
+                    }
+                    getXMLObjects().push_back((*i)->clone());
+                }
+            }
+        }
+        
+        IMPL_XMLOBJECT_CLONE(Transform);
+        IMPL_XMLOBJECT_ATTRIB(Algorithm);
+        IMPL_XMLOBJECT_CHILDREN(XPath,m_children.end());
+
+    protected:
+        void marshallAttributes(DOMElement* domElement) const {
+            MARSHALL_XMLOBJECT_ATTRIB(Algorithm,ALGORITHM,NULL);
+        }
+
+        void marshallElementContent(DOMElement* domElement) const {
+            if(getTextContent()) {
+                domElement->appendChild(domElement->getOwnerDocument()->createTextNode(getTextContent()));
+            }
+        }
+
+        void processElementContent(const XMLCh* elementContent) {
+            setTextContent(elementContent);
+        }
+
+        void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
+            PROC_XMLOBJECT_CHILDREN(XPath,XMLConstants::XMLSIG_NS);
+            
+            // Unknown child.
+            const XMLCh* nsURI=root->getNamespaceURI();
+            if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI)
+                getXMLObjects().push_back(childXMLObject);
+            
+            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString().c_str()));
+        }
+
+        void processAttribute(const DOMAttr* attribute) {
+            PROC_XMLOBJECT_ATTRIB(Algorithm,ALGORITHM,NULL);
+        }
+    };
+
+    class XMLTOOL_DLLLOCAL TransformsImpl : public Transforms,
+        public AbstractDOMCachingXMLObject,
+        public AbstractValidatingXMLObject,
+        public AbstractXMLObjectMarshaller,
+        public AbstractXMLObjectUnmarshaller
+    {
+    public:
+        virtual ~TransformsImpl() {}
+
+        TransformsImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+            : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
+        }
+            
+        TransformsImpl(const TransformsImpl& src)
+                : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src), AbstractValidatingXMLObject(src) {
+            VectorOf(Transform) v=getTransforms();
+            for (vector<Transform*>::const_iterator i=src.m_Transforms.begin(); i!=src.m_Transforms.end(); i++) {
+                if (*i) {
+                    v.push_back((*i)->cloneTransform());
+                }
+            }
+        }
+        
+        IMPL_XMLOBJECT_CLONE(Transforms);
+        IMPL_XMLOBJECT_CHILDREN(Transform,m_children.end());
+
+    protected:
+        void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
+            PROC_XMLOBJECT_CHILDREN(Transform,XMLConstants::XMLSIG_NS);
+            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString().c_str()));
+        }
+    };
+
     class XMLTOOL_DLLLOCAL KeyInfoImpl : public KeyInfo,
         public AbstractDOMCachingXMLObject,
         public AbstractElementProxy,
@@ -267,10 +365,7 @@ namespace xmltooling {
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            if(getId()) {
-                domElement->setAttributeNS(NULL, ID_ATTRIB_NAME, getId());
-                domElement->setIdAttributeNS(NULL, ID_ATTRIB_NAME);
-            }
+            MARSHALL_XMLOBJECT_ID_ATTRIB(Id,ID,NULL);
         }
 
         void marshallElementContent(DOMElement* domElement) const {
@@ -297,10 +392,7 @@ namespace xmltooling {
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            if (XMLHelper::isNodeNamed(attribute, NULL, ID_ATTRIB_NAME)) {
-                setId(attribute->getValue());
-                static_cast<DOMElement*>(attribute->getParentNode())->setIdAttributeNode(attribute);
-            }
+            PROC_XMLOBJECT_ID_ATTRIB(Id,ID,NULL);
         }
     };
     
@@ -315,6 +407,7 @@ namespace xmltooling {
     DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,G,Value);
     DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,Y,Value);
     DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,J,Value);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,XPath,Expression);
 };
 
 #if defined (_MSC_VER)
@@ -323,6 +416,9 @@ namespace xmltooling {
 
 // Builder Implementations
 
+IMPL_XMLOBJECTBUILDER(XPath);
+IMPL_XMLOBJECTBUILDER(Transform);
+IMPL_XMLOBJECTBUILDER(Transforms);
 IMPL_XMLOBJECTBUILDER(KeyName);
 IMPL_XMLOBJECTBUILDER(MgmtData);
 IMPL_XMLOBJECTBUILDER(Modulus);
@@ -359,3 +455,9 @@ const XMLCh Q::LOCAL_NAME[] =               UNICODE_LITERAL_1(Q);
 const XMLCh G::LOCAL_NAME[] =               UNICODE_LITERAL_1(G);
 const XMLCh Y::LOCAL_NAME[] =               UNICODE_LITERAL_1(Y);
 const XMLCh J::LOCAL_NAME[] =               UNICODE_LITERAL_1(J);
+const XMLCh XPath::LOCAL_NAME[] =           UNICODE_LITERAL_5(X,P,a,t,h);
+const XMLCh Transform::LOCAL_NAME[] =       UNICODE_LITERAL_9(T,r,a,n,s,f,o,r,m);
+const XMLCh Transform::TYPE_NAME[] =        UNICODE_LITERAL_13(T,r,a,n,s,f,o,r,m,T,y,p,e);
+const XMLCh Transform::ALGORITHM_ATTRIB_NAME[] = UNICODE_LITERAL_9(A,l,g,o,r,i,t,h,m);
+const XMLCh Transforms::LOCAL_NAME[] =      UNICODE_LITERAL_10(T,r,a,n,s,f,o,r,m,s);
+const XMLCh Transforms::TYPE_NAME[] =       UNICODE_LITERAL_14(T,r,a,n,s,f,o,r,m,s,T,y,p,e);

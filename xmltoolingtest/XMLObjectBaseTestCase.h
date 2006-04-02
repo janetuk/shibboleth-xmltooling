@@ -31,6 +31,7 @@
 #include <xmltooling/util/XMLHelper.h>
 #include <xmltooling/util/XMLObjectChildrenList.h>
 
+using namespace xmlsignature;
 using namespace xmltooling;
 using namespace std;
 

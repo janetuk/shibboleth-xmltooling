@@ -31,7 +31,7 @@
     #pragma warning( disable : 4250 4251 )
 #endif
 
-namespace xmltooling {
+namespace xmlsignature {
 
     /**
      * Interface to signing process supplied by a signing application
