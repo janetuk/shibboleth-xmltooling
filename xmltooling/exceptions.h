@@ -32,28 +32,25 @@
 /**
  * Declares a derived exception class
  * 
- * @param name  the exception class
- * @param base  the base class
- * @param desc
+ * @param name      the exception class
+ * @param ns        the exception class C++ namespace
+ * @param base      the base class
+ * @param desc      documentation comment for class
  */
-#define DECL_XMLTOOLING_EXCEPTION(name,base,desc) \
+#define DECL_XMLTOOLING_EXCEPTION(name,ns,base,desc) \
     XMLTOOLING_DOXYGEN(desc) \
-    class XMLTOOL_EXCEPTIONAPI(XMLTOOL_API) name : public xmltooling::base { \
+    class XMLTOOL_EXCEPTIONAPI(XMLTOOL_API) name : public base { \
     public: \
         XMLTOOLING_DOXYGEN(Constructor) \
-        name(const char* msg=NULL, const xmltooling::params& p=xmltooling::params()) \
-            : xmltooling::base(msg,p) {} \
+        name(const char* msg=NULL, const xmltooling::params& p=xmltooling::params()) : base(msg,p) {} \
         XMLTOOLING_DOXYGEN(Constructor) \
-        name(const char* msg, const xmltooling::namedparams& p) \
-            : xmltooling::base(msg,p) {} \
+        name(const char* msg, const xmltooling::namedparams& p) : base(msg,p) {} \
         XMLTOOLING_DOXYGEN(Constructor) \
-        name(const std::string& msg, const xmltooling::params& p=xmltooling::params()) \
-            : xmltooling::base(msg,p) {} \
+        name(const std::string& msg, const xmltooling::params& p=xmltooling::params()) : base(msg,p) {} \
         XMLTOOLING_DOXYGEN(Constructor) \
-        name(const std::string& msg, const xmltooling::namedparams& p) \
-            : xmltooling::base(msg,p) {} \
+        name(const std::string& msg, const xmltooling::namedparams& p) : base(msg,p) {} \
         virtual ~name() {} \
-        virtual const char* getClassName() const { return "xmltooling::"#name; } \
+        virtual const char* getClassName() const { return #ns"::"#name; } \
         void raise() const {throw *this;} \
     }
 
@@ -61,19 +58,21 @@
  * Declares a factory function for an exception class.
  * 
  * @param name  the exception class name
+ * @param ns    the exception class C++ namespace
  */
-#define DECL_EXCEPTION_FACTORY(name) \
+#define DECL_EXCEPTION_FACTORY(name,ns) \
     xmltooling::XMLToolingException* name##Factory() \
     { \
-        return new xmltooling::name(); \
+        return new ns::name(); \
     }
 
 /**
  * Registers a factory for an exception class.
  * 
- * @param name  the exception class name
+ * @param name      the exception class name
+ * @param ns        the exception class C++ namespace
  */
-#define REGISTER_EXCEPTION_FACTORY(name) XMLToolingException::registerFactory("xmltooling::"#name,name##Factory)
+#define REGISTER_EXCEPTION_FACTORY(name,ns) XMLToolingException::registerFactory(#ns".."#name,name##Factory)
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -335,14 +334,13 @@ namespace xmltooling {
         static ExceptionFactoryMap m_factoryMap;
     };
 
-    DECL_XMLTOOLING_EXCEPTION(XMLParserException,XMLToolingException,Exceptions related to XML parsing);
-    DECL_XMLTOOLING_EXCEPTION(XMLObjectException,XMLToolingException,Exceptions in basic object usage);
-    DECL_XMLTOOLING_EXCEPTION(MarshallingException,XMLToolingException,Exceptions during object marshalling);
-    DECL_XMLTOOLING_EXCEPTION(UnmarshallingException,XMLToolingException,Exceptions during object unmarshalling);
-    DECL_XMLTOOLING_EXCEPTION(UnknownElementException,XMLToolingException,Exceptions due to processing of unknown element content);
-    DECL_XMLTOOLING_EXCEPTION(UnknownAttributeException,XMLToolingException,Exceptions due to processing of unknown attributes);
-    DECL_XMLTOOLING_EXCEPTION(ValidationException,XMLToolingException,Exceptions during object validation);
-    DECL_XMLTOOLING_EXCEPTION(SignatureException,XMLToolingException,Exceptions in signature processing);
+    DECL_XMLTOOLING_EXCEPTION(XMLParserException,xmltooling,XMLToolingException,Exceptions related to XML parsing);
+    DECL_XMLTOOLING_EXCEPTION(XMLObjectException,xmltooling,XMLToolingException,Exceptions in basic object usage);
+    DECL_XMLTOOLING_EXCEPTION(MarshallingException,xmltooling,XMLToolingException,Exceptions during object marshalling);
+    DECL_XMLTOOLING_EXCEPTION(UnmarshallingException,xmltooling,XMLToolingException,Exceptions during object unmarshalling);
+    DECL_XMLTOOLING_EXCEPTION(UnknownElementException,xmltooling,XMLToolingException,Exceptions due to processing of unknown element content);
+    DECL_XMLTOOLING_EXCEPTION(UnknownAttributeException,xmltooling,XMLToolingException,Exceptions due to processing of unknown attributes);
+    DECL_XMLTOOLING_EXCEPTION(ValidationException,xmltooling,XMLToolingException,Exceptions during object validation);
 
 };
 

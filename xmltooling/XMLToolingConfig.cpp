@@ -62,14 +62,14 @@ using namespace std;
     Validator::registerValidator(q,new cname##SchemaValidator())
 
 
-DECL_EXCEPTION_FACTORY(XMLParserException);
-DECL_EXCEPTION_FACTORY(XMLObjectException);
-DECL_EXCEPTION_FACTORY(MarshallingException);
-DECL_EXCEPTION_FACTORY(UnmarshallingException);
-DECL_EXCEPTION_FACTORY(UnknownElementException);
-DECL_EXCEPTION_FACTORY(UnknownAttributeException);
-DECL_EXCEPTION_FACTORY(ValidationException);
-DECL_EXCEPTION_FACTORY(SignatureException);
+DECL_EXCEPTION_FACTORY(XMLParserException,xmltooling);
+DECL_EXCEPTION_FACTORY(XMLObjectException,xmltooling);
+DECL_EXCEPTION_FACTORY(MarshallingException,xmltooling);
+DECL_EXCEPTION_FACTORY(UnmarshallingException,xmltooling);
+DECL_EXCEPTION_FACTORY(UnknownElementException,xmltooling);
+DECL_EXCEPTION_FACTORY(UnknownAttributeException,xmltooling);
+DECL_EXCEPTION_FACTORY(ValidationException,xmltooling);
+DECL_EXCEPTION_FACTORY(SignatureException,xmlsignature);
 
 namespace xmltooling {
    XMLToolingInternalConfig g_config;
@@ -187,25 +187,44 @@ bool XMLToolingInternalConfig::init()
         REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,XPath);
         REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Transform);
         REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Transforms);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,RetrievalMethod);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509IssuerSerial);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509IssuerName);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509SerialNumber);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509SKI);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509SubjectName);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509Certificate);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509CRL);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509Data);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,SPKISexp);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,SPKIData);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,PGPKeyID);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,PGPKeyPacket);
+        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,PGPData);
         REGISTER_TYPE(XMLConstants::XMLSIG_NS,KeyInfo);
         REGISTER_TYPE(XMLConstants::XMLSIG_NS,KeyValue);
         REGISTER_TYPE(XMLConstants::XMLSIG_NS,DSAKeyValue);
         REGISTER_TYPE(XMLConstants::XMLSIG_NS,RSAKeyValue);
         REGISTER_TYPE(XMLConstants::XMLSIG_NS,Transform);
         REGISTER_TYPE(XMLConstants::XMLSIG_NS,Transforms);
+        REGISTER_TYPE(XMLConstants::XMLSIG_NS,RetrievalMethod);
+        REGISTER_TYPE(XMLConstants::XMLSIG_NS,X509IssuerSerial);
+        REGISTER_TYPE(XMLConstants::XMLSIG_NS,X509Data);
+        REGISTER_TYPE(XMLConstants::XMLSIG_NS,SPKIData);
+        REGISTER_TYPE(XMLConstants::XMLSIG_NS,PGPData);
 
 #ifndef XMLTOOLING_NO_XMLSEC
         XMLObjectBuilder::registerBuilder(QName(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME),new SignatureBuilder());
 #endif
 
-        REGISTER_EXCEPTION_FACTORY(XMLParserException);
-        REGISTER_EXCEPTION_FACTORY(XMLObjectException);
-        REGISTER_EXCEPTION_FACTORY(MarshallingException);
-        REGISTER_EXCEPTION_FACTORY(UnmarshallingException);
-        REGISTER_EXCEPTION_FACTORY(UnknownElementException);
-        REGISTER_EXCEPTION_FACTORY(UnknownAttributeException);
-        REGISTER_EXCEPTION_FACTORY(ValidationException);
-        REGISTER_EXCEPTION_FACTORY(SignatureException);
+        REGISTER_EXCEPTION_FACTORY(XMLParserException,xmltooling);
+        REGISTER_EXCEPTION_FACTORY(XMLObjectException,xmltooling);
+        REGISTER_EXCEPTION_FACTORY(MarshallingException,xmltooling);
+        REGISTER_EXCEPTION_FACTORY(UnmarshallingException,xmltooling);
+        REGISTER_EXCEPTION_FACTORY(UnknownElementException,xmltooling);
+        REGISTER_EXCEPTION_FACTORY(UnknownAttributeException,xmltooling);
+        REGISTER_EXCEPTION_FACTORY(ValidationException,xmltooling);
+        REGISTER_EXCEPTION_FACTORY(SignatureException,xmlsignature);
     }
     catch (const xercesc::XMLException&) {
         log.fatal("caught exception while initializing Xerces");

@@ -23,6 +23,7 @@
 #if !defined(__xmltooling_sig_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_sig_h__
 
+#include <xmltooling/exceptions.h>
 #include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/signature/SigningContext.h>
 #include <xmltooling/signature/VerifyingContext.h>
@@ -97,6 +98,8 @@ namespace xmlsignature {
          */
         virtual Signature* buildObject() const;
     };
+
+    DECL_XMLTOOLING_EXCEPTION(SignatureException,xmlsignature,xmltooling::XMLToolingException,Exceptions in signature processing);
 
 };
 
