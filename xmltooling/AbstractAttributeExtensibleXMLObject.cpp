@@ -29,16 +29,10 @@
 using namespace xmltooling;
 using namespace std;
 
-class _release : public unary_function<XMLCh*,void> {
-public:
-    void operator()(pair<QName,XMLCh*> p) const {
-        XMLString::release(&(p.second));
-    }
-};
-
 AbstractAttributeExtensibleXMLObject::~AbstractAttributeExtensibleXMLObject()
 {
-    for_each(m_attributeMap.begin(),m_attributeMap.end(),_release());
+    for (map<QName,XMLCh*>::iterator i=m_attributeMap.begin(); i!=m_attributeMap.end(); i++)
+        XMLString::release(&(i->second));
 }
 
 AbstractAttributeExtensibleXMLObject::AbstractAttributeExtensibleXMLObject(const AbstractAttributeExtensibleXMLObject& src)

@@ -93,7 +93,8 @@ void AbstractDOMCachingXMLObject::releaseChildrenDOM(bool propagateRelease) cons
             "releasing cached DOM representation for children with propagation set to %s",
             propagateRelease ? "true" : "false"
             );
-        for_each(m_children.begin(),m_children.end(),bind2nd(_release(),propagateRelease));
+        const list<XMLObject*>& children=getOrderedChildren();
+        for_each(children.begin(),children.end(),bind2nd(_release(),propagateRelease));
     }
 }
 

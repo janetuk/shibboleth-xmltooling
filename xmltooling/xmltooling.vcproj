@@ -186,11 +186,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\AbstractDOMCachingXMLObject.cpp"
+				RelativePath=".\AbstractChildlessElement.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\AbstractElementProxy.cpp"
+				RelativePath=".\AbstractComplexElement.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\AbstractDOMCachingXMLObject.cpp"
 				>
 			</File>
 			<File
@@ -304,11 +308,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\AbstractChildlessElement.h"
+				>
+			</File>
+			<File
+				RelativePath=".\AbstractComplexElement.h"
+				>
+			</File>
+			<File
 				RelativePath=".\AbstractDOMCachingXMLObject.h"
 				>
 			</File>
 			<File
 				RelativePath=".\AbstractElementProxy.h"
+				>
+			</File>
+			<File
+				RelativePath=".\AbstractSimpleElement.h"
 				>
 			</File>
 			<File
@@ -349,6 +365,10 @@
 			</File>
 			<File
 				RelativePath=".\QName.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SimpleElement.h"
 				>
 			</File>
 			<File

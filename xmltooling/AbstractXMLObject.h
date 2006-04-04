@@ -34,11 +34,17 @@ namespace xmltooling {
 
     /**
      * An abstract implementation of XMLObject.
+     * This is the primary concrete base class, and supplies basic namespace,
+     * type, and parent handling. Most implementation classes should not
+     * directly inherit from this class, but rather from the various mixins
+     * that supply the rest of the XMLObject interface, as required.
      */
     class XMLTOOL_API AbstractXMLObject : public virtual XMLObject
     {
     public:
-        virtual ~AbstractXMLObject();
+        virtual ~AbstractXMLObject() {
+            delete m_typeQname;
+        }
 
         const QName& getElementQName() const {
             return m_elementQname;
@@ -74,14 +80,6 @@ namespace xmltooling {
             m_parent = parent;
         }
 
-        bool hasChildren() const {
-            return !m_children.empty();
-        }
-
-        const std::list<XMLObject*>& getOrderedChildren() const {
-            return m_children;
-        }
-
      protected:
         /**
          * Constructor
@@ -109,17 +107,7 @@ namespace xmltooling {
          * 
          * @return the value that should be assigned
          */
-        XMLCh* prepareForAssignment(XMLCh* oldValue, const XMLCh* newValue) {
-            XMLCh* newString = XMLString::replicate(newValue);
-            XMLString::trim(newString);
-            if (!XMLString::equals(oldValue,newValue)) {
-                releaseThisandParentDOM();
-                XMLString::release(&oldValue);
-                return newString;
-            }
-            XMLString::release(&newString);
-            return oldValue;            
-        }
+        XMLCh* prepareForAssignment(XMLCh* oldValue, const XMLCh* newValue);
 
         /**
          * A helper function for derived classes, for assignment of (singleton) XML objects.
@@ -136,12 +124,6 @@ namespace xmltooling {
          * @throws XMLObjectException if the new child already has a parent.
          */
         XMLObject* prepareForAssignment(XMLObject* oldValue, XMLObject* newValue);
-
-        /**
-         * Underlying list of child objects.
-         * Manages the lifetime of the children.
-         */
-        std::list<XMLObject*> m_children;
 
         /**
          * Set of namespaces associated with the object.

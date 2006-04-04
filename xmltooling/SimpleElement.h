@@ -15,15 +15,14 @@
  */
 
 /**
- * @file ElementProxy.h
+ * @file SimpleElement.h
  * 
- * An XMLObject with an open content model 
+ * An XMLObject with a simple content model. 
  */
 
-#if !defined(__xmltooling_eleproxy_h__)
-#define __xmltooling_eleproxy_h__
+#ifndef __xmltooling_simpleel_h__
+#define __xmltooling_simpleel_h__
 
-#include <xmltooling/SimpleElement.h>
 #include <xmltooling/XMLObject.h>
 #include <xmltooling/util/XMLObjectChildrenList.h>
 
@@ -32,29 +31,29 @@ using namespace xercesc;
 namespace xmltooling {
 
     /**
-     * An XMLObject with an open content model.
+     * An XMLObject with a simple content model.
      */
-    class XMLTOOL_API ElementProxy : public virtual SimpleElement
+    class XMLTOOL_API SimpleElement : public virtual XMLObject
     {
     public:
-        ElementProxy() {}
-        virtual ~ElementProxy() {}
+        SimpleElement() {}
+        virtual ~SimpleElement() {}
         
         /**
-         * Gets a mutable list of child objects
+         * Gets the text content of the object
          * 
-         * @return  mutable list of child objects
+         * @return the text content, or NULL
          */
-        virtual ListOf(XMLObject) getXMLObjects()=0;
-
+        virtual const XMLCh* getTextContent() const=0;
+        
         /**
-         * Gets an immutable list of child objects
+         * Sets (or clears) the text content of the object 
          * 
-         * @return  immutable list of child objects
+         * @param value         value to set, or NULL to clear
          */
-        virtual const std::list<XMLObject*>& getXMLObjects() const=0;
+        virtual void setTextContent(const XMLCh* value)=0;
     };
     
 };
 
-#endif /* __xmltooling_eleproxy_h__ */
+#endif /* __xmltooling_simpleel_h__ */

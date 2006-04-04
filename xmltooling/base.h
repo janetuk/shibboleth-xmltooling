@@ -356,39 +356,32 @@
     }
 
 /**
- * Declares abstract get/set methods for named XML element content.
+ * Declares aliased get/set methods for named XML element content.
  * 
  * @param proper    the proper name to label the element's content
  */
 #define DECL_XMLOBJECT_CONTENT(proper) \
     XMLTOOLING_DOXYGEN(Returns proper.) \
-    virtual const XMLCh* get##proper() const=0; \
-    XMLTOOLING_DOXYGEN(Sets proper.) \
-    virtual void set##proper(const XMLCh* proper)=0
+    const XMLCh* get##proper() const { \
+        return getTextContent(); \
+    } \
+    XMLTOOLING_DOXYGEN(Sets or clears proper.) \
+    void set##proper(const XMLCh* proper) { \
+        setTextContent(proper); \
+    }
 
 /**
- * Implements get/set methods and a private member for named XML element content.
- * 
- * @param proper    the proper name to label the element's content
+ * Implements marshalling/unmarshalling for element content.
  */
-#define IMPL_XMLOBJECT_CONTENT(proper) \
-    private: \
-        XMLCh* m_##proper; \
-    public: \
-        const XMLCh* get##proper() const { \
-            return m_##proper; \
-        } \
-        void set##proper(const XMLCh* proper) { \
-            m_##proper = prepareForAssignment(m_##proper,proper); \
-        } \
+#define IMPL_XMLOBJECT_CONTENT \
     protected: \
         void marshallElementContent(DOMElement* domElement) const { \
-            if(get##proper()) { \
-                domElement->appendChild(domElement->getOwnerDocument()->createTextNode(get##proper())); \
+            if(getTextContent()) { \
+                domElement->appendChild(domElement->getOwnerDocument()->createTextNode(getTextContent())); \
             } \
         } \
         void processElementContent(const XMLCh* elementContent) { \
-            set##proper(elementContent); \
+            setTextContent(elementContent); \
         }
 
 
@@ -421,7 +414,7 @@
  * @param desc      documentation for class
  */
 #define DECL_XMLOBJECT_SIMPLE(linkage,cname,proper,desc) \
-    BEGIN_XMLOBJECT(linkage,cname,xmltooling::XMLObject,desc); \
+    BEGIN_XMLOBJECT(linkage,cname,xmltooling::SimpleElement,desc); \
         DECL_XMLOBJECT_CONTENT(proper); \
     END_XMLOBJECT
 
@@ -431,11 +424,12 @@
  * 
  * @param linkage   linkage specifier for the class
  * @param cname     the name of the XMLObject specialization
- * @param proper    the proper name to label the element's content
  */
-#define DECL_XMLOBJECTIMPL_SIMPLE(linkage,cname,proper) \
+#define DECL_XMLOBJECTIMPL_SIMPLE(linkage,cname) \
     class linkage cname##Impl \
         : public cname, \
+            public xmltooling::AbstractSimpleElement, \
+            public xmltooling::AbstractChildlessElement, \
             public xmltooling::AbstractDOMCachingXMLObject, \
             public xmltooling::AbstractValidatingXMLObject, \
             public xmltooling::AbstractXMLObjectMarshaller, \
@@ -444,16 +438,15 @@
     public: \
         virtual ~cname##Impl() {} \
         cname##Impl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType) \
-            : xmltooling::AbstractXMLObject(nsURI, localName, prefix, schemaType), m_##proper(NULL) { \
+            : xmltooling::AbstractXMLObject(nsURI, localName, prefix, schemaType) { \
         } \
         cname##Impl(const cname##Impl& src) \
             : xmltooling::AbstractXMLObject(src), \
+                xmltooling::AbstractSimpleElement(src), \
                 xmltooling::AbstractDOMCachingXMLObject(src), \
-                xmltooling::AbstractValidatingXMLObject(src), \
-                m_##proper(XMLString::replicate(src.m_##proper)) { \
-        } \
+                xmltooling::AbstractValidatingXMLObject(src) {} \
         IMPL_XMLOBJECT_CLONE(cname) \
-        IMPL_XMLOBJECT_CONTENT(proper) \
+        IMPL_XMLOBJECT_CONTENT \
     }
     
 /**
@@ -606,11 +599,10 @@
  * 
  * @param linkage   linkage specifier for the class
  * @param cname     the name of the XMLObject specialization
- * @param proper    the proper name to label the element's content
  */
-#define XMLOBJECTVALIDATOR_SIMPLE(linkage,cname,proper) \
+#define XMLOBJECTVALIDATOR_SIMPLE(linkage,cname) \
     BEGIN_XMLOBJECTVALIDATOR(linkage,cname); \
-        XMLOBJECTVALIDATOR_REQUIRE(cname,proper); \
+        XMLOBJECTVALIDATOR_REQUIRE(cname,TextContent); \
     END_XMLOBJECTVALIDATOR
 
 #include <utility>

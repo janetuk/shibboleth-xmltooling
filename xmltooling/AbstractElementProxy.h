@@ -17,13 +17,14 @@
 /**
  * @file AbstractElementProxy.h
  * 
- * An abstract implementation of an ElementProxy 
+ * AbstractXMLObject mixin that implements an open content model 
  */
 
 #ifndef __xmltooling_abseleproxy_h__
 #define __xmltooling_abseleproxy_h__
 
-#include <xmltooling/AbstractXMLObject.h>
+#include <xmltooling/AbstractComplexElement.h>
+#include <xmltooling/AbstractSimpleElement.h>
 #include <xmltooling/ElementProxy.h>
 
 #if defined (_MSC_VER)
@@ -34,34 +35,30 @@
 namespace xmltooling {
 
     /**
-     * An abstract implementation of an ExtensibleXMLObject.
+     * AbstractXMLObject mixin that implements an open content model.
+     * Inherit from this class to merge both simple and complex content
+     * and expose the underlying child collection in read/write mode.
      */
-    class XMLTOOL_API AbstractElementProxy : public virtual ElementProxy, public virtual AbstractXMLObject
+    class XMLTOOL_API AbstractElementProxy
+        : public virtual ElementProxy, public AbstractSimpleElement, public AbstractComplexElement
     {
     public:
         virtual ~AbstractElementProxy() {}
         
-        virtual const XMLCh* getTextContent() const {
-            return m_value;
+        virtual ListOf(XMLObject) getXMLObjects() {
+            return ListOf(XMLObject)(this,m_children,NULL,m_children.end());
         }
-        
-        virtual void setTextContent(const XMLCh* value);
-        
-        virtual ListOf(XMLObject) getXMLObjects();
     
         virtual const std::list<XMLObject*>& getXMLObjects() const {
             return m_children;
         }
 
     protected:
-        AbstractElementProxy() : m_value(NULL) {}
+        AbstractElementProxy() {}
         
         /** Copy constructor. */
         AbstractElementProxy(const AbstractElementProxy& src)
-            : AbstractXMLObject(src), m_value(XMLString::replicate(src.m_value)) {}
-
-    private:
-        XMLCh* m_value;
+            : AbstractXMLObject(src), AbstractSimpleElement(src) {}
     };
     
 };

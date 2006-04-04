@@ -44,7 +44,6 @@ public:
                 params(1,"OpenSSLCryptoProvider::getRandom - OpenSSL random not properly initialised"));
 
         string buf=e7.toString();
-        TS_TRACE(buf.c_str());
         auto_ptr<XMLToolingException> ptr(XMLToolingException::fromString(buf.c_str()));
         TS_ASSERT(typeid(*ptr)==typeid(MarshallingException));
         TS_ASSERT(!strcmp(ptr->what(),"Foo is a bar."));

@@ -21,7 +21,10 @@
  */
 
 #include "internal.h"
+#include "AbstractChildlessElement.h"
+#include "AbstractComplexElement.h"
 #include "AbstractElementProxy.h"
+#include "AbstractSimpleElement.h"
 #include "exceptions.h"
 #include "io/AbstractXMLObjectMarshaller.h"
 #include "io/AbstractXMLObjectUnmarshaller.h"
@@ -43,6 +46,7 @@ using namespace std;
 namespace xmlsignature {
     
     class XMLTOOL_DLLLOCAL DSAKeyValueImpl : public DSAKeyValue,
+        public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
@@ -128,6 +132,7 @@ namespace xmlsignature {
     };
 
     class XMLTOOL_DLLLOCAL RSAKeyValueImpl : public RSAKeyValue,
+        public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
@@ -173,6 +178,8 @@ namespace xmlsignature {
     };
 
     class XMLTOOL_DLLLOCAL KeyValueImpl : public KeyValue,
+        public AbstractSimpleElement,
+        public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
@@ -187,7 +194,8 @@ namespace xmlsignature {
         }
             
         KeyValueImpl(const KeyValueImpl& src)
-                : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src), AbstractValidatingXMLObject(src) {
+                : AbstractXMLObject(src), AbstractSimpleElement(src),
+                    AbstractDOMCachingXMLObject(src), AbstractValidatingXMLObject(src) {
             init();
             if (src.getDSAKeyValue())
                 setDSAKeyValue(src.getDSAKeyValue()->cloneDSAKeyValue());
@@ -195,11 +203,9 @@ namespace xmlsignature {
                 setRSAKeyValue(src.getRSAKeyValue()->cloneRSAKeyValue());
             if (src.getXMLObject())
                 setXMLObject(src.getXMLObject()->clone());
-            setTextContent(src.getTextContent());
         }
         
         void init() {
-            m_TextContent=NULL;
             m_DSAKeyValue=NULL;
             m_RSAKeyValue=NULL;
             m_XMLObject=NULL;
@@ -217,7 +223,7 @@ namespace xmlsignature {
         IMPL_XMLOBJECT_CHILD(DSAKeyValue);
         IMPL_XMLOBJECT_CHILD(RSAKeyValue);
         IMPL_XMLOBJECT_CHILD(XMLObject);
-        IMPL_XMLOBJECT_CONTENT(TextContent);
+        IMPL_XMLOBJECT_CONTENT;
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -241,7 +247,9 @@ namespace xmlsignature {
         public AbstractXMLObjectUnmarshaller
     {
     public:
-        virtual ~TransformImpl() {}
+        virtual ~TransformImpl() {
+            XMLString::release(&m_Algorithm);
+        }
 
         TransformImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Algorithm(NULL) {
@@ -265,20 +273,11 @@ namespace xmlsignature {
         IMPL_XMLOBJECT_CLONE(Transform);
         IMPL_XMLOBJECT_ATTRIB(Algorithm);
         IMPL_XMLOBJECT_CHILDREN(XPath,m_children.end());
+        IMPL_XMLOBJECT_CONTENT;
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
             MARSHALL_XMLOBJECT_ATTRIB(Algorithm,ALGORITHM,NULL);
-        }
-
-        void marshallElementContent(DOMElement* domElement) const {
-            if(getTextContent()) {
-                domElement->appendChild(domElement->getOwnerDocument()->createTextNode(getTextContent()));
-            }
-        }
-
-        void processElementContent(const XMLCh* elementContent) {
-            setTextContent(elementContent);
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -298,6 +297,7 @@ namespace xmlsignature {
     };
 
     class XMLTOOL_DLLLOCAL TransformsImpl : public Transforms,
+        public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
@@ -331,13 +331,17 @@ namespace xmlsignature {
     };
 
     class XMLTOOL_DLLLOCAL RetrievalMethodImpl : public RetrievalMethod,
+        public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
     public:
-        virtual ~RetrievalMethodImpl() {}
+        virtual ~RetrievalMethodImpl() {
+            XMLString::release(&m_URI);
+            XMLString::release(&m_Type);
+        }
 
         RetrievalMethodImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
@@ -383,6 +387,7 @@ namespace xmlsignature {
     };
 
     class XMLTOOL_DLLLOCAL X509IssuerSerialImpl : public X509IssuerSerial,
+        public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
@@ -428,6 +433,7 @@ namespace xmlsignature {
     };
 
     class XMLTOOL_DLLLOCAL X509DataImpl : public X509Data,
+        public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
@@ -505,6 +511,7 @@ namespace xmlsignature {
     };
 
     class XMLTOOL_DLLLOCAL SPKIDataImpl : public SPKIData,
+        public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
@@ -568,6 +575,7 @@ namespace xmlsignature {
     };
 
     class XMLTOOL_DLLLOCAL PGPDataImpl : public PGPData,
+        public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
@@ -626,22 +634,29 @@ namespace xmlsignature {
     };
 
     class XMLTOOL_DLLLOCAL KeyInfoImpl : public KeyInfo,
+        public AbstractComplexElement,
+        public AbstractSimpleElement,
         public AbstractDOMCachingXMLObject,
-        public AbstractElementProxy,
         public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
     public:
-        virtual ~KeyInfoImpl() {}
+        virtual ~KeyInfoImpl() {
+            XMLString::release(&m_Id);
+        }
 
         KeyInfoImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Id(NULL) {
         }
             
         KeyInfoImpl(const KeyInfoImpl& src)
-                : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src), AbstractElementProxy(src),
-                    AbstractValidatingXMLObject(src), m_Id(XMLString::replicate(src.m_Id)) {
+                : AbstractXMLObject(src),
+                    AbstractDOMCachingXMLObject(src),
+                    AbstractSimpleElement(src),
+                    AbstractValidatingXMLObject(src),
+                    m_Id(XMLString::replicate(src.m_Id)) {
+
             for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
                 if (*i) {
                     X509Data* xd=dynamic_cast<X509Data*>(*i);
@@ -700,20 +715,12 @@ namespace xmlsignature {
         IMPL_XMLOBJECT_CHILDREN(MgmtData,m_children.end());
         IMPL_XMLOBJECT_CHILDREN(SPKIData,m_children.end());
         IMPL_XMLOBJECT_CHILDREN(PGPData,m_children.end());
+        IMPL_XMLOBJECT_CHILDREN(XMLObject,m_children.end());
+        IMPL_XMLOBJECT_CONTENT;
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
             MARSHALL_XMLOBJECT_ID_ATTRIB(Id,ID,NULL);
-        }
-
-        void marshallElementContent(DOMElement* domElement) const {
-            if(getTextContent()) {
-                domElement->appendChild(domElement->getOwnerDocument()->createTextNode(getTextContent()));
-            }
-        }
-
-        void processElementContent(const XMLCh* elementContent) {
-            setTextContent(elementContent);
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -738,27 +745,27 @@ namespace xmlsignature {
         }
     };
     
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,KeyName,Name);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,MgmtData,Data);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,Modulus,Value);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,Exponent,Value);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,Seed,Value);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,PgenCounter,Value);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,P,Value);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,Q,Value);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,G,Value);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,Y,Value);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,J,Value);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,XPath,Expression);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,X509IssuerName,Name);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,X509SerialNumber,SerialNumber);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,X509SKI,Value);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,X509SubjectName,Name);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,X509Certificate,Value);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,X509CRL,Value);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,SPKISexp,Value);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,PGPKeyID,ID);
-    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,PGPKeyPacket,Packet);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,KeyName);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,MgmtData);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,Modulus);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,Exponent);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,Seed);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,PgenCounter);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,P);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,Q);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,G);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,Y);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,J);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,XPath);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,X509IssuerName);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,X509SerialNumber);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,X509SKI);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,X509SubjectName);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,X509Certificate);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,X509CRL);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,SPKISexp);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,PGPKeyID);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,PGPKeyPacket);
 };
 
 #if defined (_MSC_VER)

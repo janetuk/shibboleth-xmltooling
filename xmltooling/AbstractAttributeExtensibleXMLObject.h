@@ -17,7 +17,7 @@
 /**
  * @file AbstractAttributeExtensibleXMLObject.h
  * 
- * An abstract implementation of an AttributeExtensibleXMLObject 
+ * AbstractXMLObject mixin that implements AttributeExtensibleXMLObject
  */
 
 #ifndef __xmltooling_absattrextxmlobj_h__
@@ -35,7 +35,8 @@
 namespace xmltooling {
 
     /**
-     * An abstract implementation of an AttributeExtensibleXMLObject.
+     * AbstractXMLObject mixin that implements AttributeExtensibleXMLObject.
+     * Inherit from this class to add support for attribute wildcarding.
      */
     class XMLTOOL_API AbstractAttributeExtensibleXMLObject : public virtual AttributeExtensibleXMLObject, public virtual AbstractXMLObject
     {

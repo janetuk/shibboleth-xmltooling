@@ -72,7 +72,7 @@
  * @param name      the exception class name
  * @param ns        the exception class C++ namespace
  */
-#define REGISTER_EXCEPTION_FACTORY(name,ns) XMLToolingException::registerFactory(#ns".."#name,name##Factory)
+#define REGISTER_EXCEPTION_FACTORY(name,ns) XMLToolingException::registerFactory(#ns"::"#name,name##Factory)
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -327,6 +327,13 @@ namespace xmltooling {
          */
         static void deregisterFactory(const char* exceptionClass) {
             m_factoryMap.erase(exceptionClass);
+        }
+
+        /**
+         * Unregisters all factories.
+         */
+        static void deregisterFactories() {
+            m_factoryMap.clear();
         }
 
     private:

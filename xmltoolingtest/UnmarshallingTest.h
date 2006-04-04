@@ -53,20 +53,19 @@ const XMLCh SimpleXMLObject::ID_ATTRIB_NAME[] = {
 };
 
 class UnmarshallingTest : public CxxTest::TestSuite {
-    QName m_qname;
-    QName m_qtype;
 public:
-    UnmarshallingTest() : m_qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME,SimpleXMLObject::NAMESPACE_PREFIX),
-        m_qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME,SimpleXMLObject::NAMESPACE_PREFIX) {}
-
     void setUp() {
-        XMLObjectBuilder::registerBuilder(m_qname, new SimpleXMLObjectBuilder());
-        XMLObjectBuilder::registerBuilder(m_qtype, new SimpleXMLObjectBuilder());
+        QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
+        QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
+        XMLObjectBuilder::registerBuilder(qname, new SimpleXMLObjectBuilder());
+        XMLObjectBuilder::registerBuilder(qtype, new SimpleXMLObjectBuilder());
     }
 
     void tearDown() {
-        XMLObjectBuilder::deregisterBuilder(m_qname);
-        XMLObjectBuilder::deregisterBuilder(m_qtype);
+        QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
+        QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
+        XMLObjectBuilder::deregisterBuilder(qname);
+        XMLObjectBuilder::deregisterBuilder(qtype);
     }
 
     void testUnmarshallingWithAttributes() {
@@ -127,7 +126,8 @@ public:
 
         VectorOf(SimpleXMLObject) kids=sxObject->getSimpleXMLObjects();
         TSM_ASSERT_EQUALS("Number of child elements was not expected value", 3, kids.size());
-        TSM_ASSERT_EQUALS("Child's schema type was not expected value", m_qtype, *(kids.back()->getSchemaType()));
+        QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
+        TSM_ASSERT_EQUALS("Child's schema type was not expected value", qtype, *(kids.back()->getSchemaType()));
     }
 
     void testUnmarshallingWithClone() {
@@ -151,7 +151,8 @@ public:
 
         VectorOf(SimpleXMLObject) kids=clonedObject->getSimpleXMLObjects();
         TSM_ASSERT_EQUALS("Number of child elements was not expected value", 3, kids.size());
-        TSM_ASSERT_EQUALS("Child's schema type was not expected value", m_qtype, *(kids.back()->getSchemaType()));
+        QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
+        TSM_ASSERT_EQUALS("Child's schema type was not expected value", qtype, *(kids.back()->getSchemaType()));
     }
 
     void testUnmarshallingWithUnknownChild() {

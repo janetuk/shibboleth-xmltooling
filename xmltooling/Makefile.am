@@ -16,8 +16,11 @@ valincludedir = $(includedir)/xmltooling/validation
 
 libxmltoolinginclude_HEADERS = \
     AbstractAttributeExtensibleXMLObject.h \
+    AbstractChildlessElement.h \
+    AbstractComplexElement.h \
     AbstractDOMCachingXMLObject.h \
     AbstractElementProxy.h \
+    AbstractSimpleElement.h \
     AbstractXMLObject.h \
     AttributeExtensibleXMLObject.h \
     base.h \
@@ -27,6 +30,7 @@ libxmltoolinginclude_HEADERS = \
     ILockable.h \
     Namespace.h \
     QName.h \
+    SimpleElement.h \
     unicode.h \
     version.h \
     XMLObject.h \
@@ -71,8 +75,9 @@ endif
 
 libxmltooling_la_SOURCES = \
     AbstractAttributeExtensibleXMLObject.cpp \
+    AbstractChildlessElement.cpp \
+    AbstractComplexElement.cpp \
     AbstractDOMCachingXMLObject.cpp \
-    AbstractElementProxy.cpp \
     AbstractXMLObject.cpp \
     exceptions.cpp \
     Namespace.cpp \

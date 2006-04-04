@@ -15,6 +15,7 @@
  */
 
 #include <cxxtest/TestSuite.h>
+#include <xmltooling/AbstractComplexElement.h>
 #include <xmltooling/ElementProxy.h>
 #include <xmltooling/exceptions.h>
 #include <xmltooling/XMLObjectBuilder.h>
@@ -44,7 +45,11 @@ extern string data_path;
     #pragma warning( disable : 4250 4251 )
 #endif
 
-class SimpleXMLObject : public AbstractDOMCachingXMLObject, public AbstractXMLObjectMarshaller, public AbstractXMLObjectUnmarshaller
+class SimpleXMLObject
+    : public AbstractComplexElement,
+        public AbstractDOMCachingXMLObject,
+        public AbstractXMLObjectMarshaller,
+        public AbstractXMLObjectUnmarshaller
 {
 protected:
     SimpleXMLObject(const SimpleXMLObject& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src),

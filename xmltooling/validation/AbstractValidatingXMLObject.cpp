@@ -86,6 +86,7 @@ void AbstractValidatingXMLObject::validate(bool validateDescendants) const
     }
     
     if (validateDescendants && hasChildren()) {
-        for_each(m_children.begin(),m_children.end(),bind2nd(_validate(),validateDescendants));
+        const list<XMLObject*>& children=getOrderedChildren();
+        for_each(children.begin(),children.end(),bind2nd(_validate(),validateDescendants));
     }
 }

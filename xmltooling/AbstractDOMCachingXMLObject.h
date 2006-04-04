@@ -17,7 +17,7 @@
 /**
  * @file AbstractDOMCachingXMLObject.h
  * 
- * Extension of AbstractXMLObject that adds DOM caching methods
+ * AbstractXMLObject mixin that implements DOM caching
  */
 
 #if !defined(__xmltooling_abstractdomxmlobj_h__)
@@ -33,7 +33,8 @@
 namespace xmltooling {
 
     /**
-     * Extension of AbstractXMLObject that adds DOM caching methods
+     * AbstractXMLObject mixin that implements DOM caching.
+     * Inherit from this class to implement standard DOM caching behavior.
      */
     class XMLTOOL_API AbstractDOMCachingXMLObject : public virtual AbstractXMLObject
     {

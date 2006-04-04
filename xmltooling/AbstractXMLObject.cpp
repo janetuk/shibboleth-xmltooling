@@ -29,11 +29,6 @@
 
 using namespace xmltooling;
 
-AbstractXMLObject::~AbstractXMLObject() {
-    delete m_typeQname;
-    std::for_each(m_children.begin(), m_children.end(), cleanup<XMLObject>());
-}
-
 AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
     : m_log(&log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".XMLObject")),
         m_parent(NULL), m_elementQname(nsURI, localName, prefix), m_typeQname(NULL)
@@ -52,8 +47,21 @@ AbstractXMLObject::AbstractXMLObject(const AbstractXMLObject& src)
         m_typeQname=new QName(*src.m_typeQname);
 }
 
-XMLObject* AbstractXMLObject::prepareForAssignment(XMLObject* oldValue, XMLObject* newValue) {
+XMLCh* AbstractXMLObject::prepareForAssignment(XMLCh* oldValue, const XMLCh* newValue)
+{
+    XMLCh* newString = XMLString::replicate(newValue);
+    XMLString::trim(newString);
+    if (!XMLString::equals(oldValue,newValue)) {
+        releaseThisandParentDOM();
+        XMLString::release(&oldValue);
+        return newString;
+    }
+    XMLString::release(&newString);
+    return oldValue;            
+}
 
+XMLObject* AbstractXMLObject::prepareForAssignment(XMLObject* oldValue, XMLObject* newValue)
+{
     if (newValue && newValue->hasParent())
         throw XMLObjectException("child XMLObject cannot be added - it is already the child of another XMLObject");
 

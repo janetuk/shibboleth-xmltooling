@@ -15,23 +15,17 @@
  */
 
 /**
- * AbstractElementProxy.cpp
+ * AbstractChildlessElement.cpp
  * 
- * Extension of AbstractDOMCachingXMLObject that implements an ElementProxy. 
+ * Extension of AbstractXMLObject that implements childlessness 
  */
 
 #include "internal.h"
-#include "AbstractElementProxy.h"
+#include "AbstractChildlessElement.h"
 
 using namespace xmltooling;
 using namespace std;
 
-void AbstractElementProxy::setTextContent(const XMLCh* value)
-{
-    m_value=prepareForAssignment(m_value,value);
-}
+// shared "empty" list of children for childless objects
 
-ListOf(XMLObject) AbstractElementProxy::getXMLObjects()
-{
-    return ListOf(XMLObject)(this,m_children,NULL,m_children.end());
-}
+list<XMLObject*> AbstractChildlessElement::m_no_children;

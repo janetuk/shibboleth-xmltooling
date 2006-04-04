@@ -96,20 +96,6 @@ namespace xmltooling {
         }
 
         /**
-         * Creates an empty XMLObject using the default build method, if a builder can be found.
-         * 
-         * @param key   the element key used to locate a builder
-         * @return  the empty object or NULL if no builder is available 
-         */
-        static XMLObject* buildOne(const QName& key) {
-            const XMLObjectBuilder* b=getBuilder(key);
-            if (b)
-                return b->buildFromQName(key);
-            b=getDefaultBuilder();
-            return b ? b->buildFromQName(key) : NULL;
-        }
-
-        /**
          * Creates an unmarshalled XMLObject using the default build method, if a builder can be found.
          * 
          * @param element       the unmarshalling source

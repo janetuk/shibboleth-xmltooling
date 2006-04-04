@@ -19,28 +19,29 @@
 #include <fstream>
 
 class MarshallingTest : public CxxTest::TestSuite {
-    QName m_qname;
-    QName m_qtype;
 public:
-    MarshallingTest() : m_qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME,SimpleXMLObject::NAMESPACE_PREFIX),
-        m_qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME,SimpleXMLObject::NAMESPACE_PREFIX) {}
-
     void setUp() {
-        XMLObjectBuilder::registerBuilder(m_qname, new SimpleXMLObjectBuilder());
-        XMLObjectBuilder::registerBuilder(m_qtype, new SimpleXMLObjectBuilder());
+        QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
+        QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
+        XMLObjectBuilder::registerBuilder(qname, new SimpleXMLObjectBuilder());
+        XMLObjectBuilder::registerBuilder(qtype, new SimpleXMLObjectBuilder());
     }
 
     void tearDown() {
-        XMLObjectBuilder::deregisterBuilder(m_qname);
-        XMLObjectBuilder::deregisterBuilder(m_qtype);
+        QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
+        QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
+        XMLObjectBuilder::deregisterBuilder(qname);
+        XMLObjectBuilder::deregisterBuilder(qtype);
     }
 
     void testMarshallingWithAttributes() {
         TS_TRACE("testMarshallingWithAttributes");
 
-        auto_ptr_XMLCh expected("Firefly");
-        auto_ptr<SimpleXMLObject> sxObject(dynamic_cast<SimpleXMLObject*>(XMLObjectBuilder::buildOne(m_qname)));
+        QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
+        const SimpleXMLObjectBuilder* b=dynamic_cast<const SimpleXMLObjectBuilder*>(XMLObjectBuilder::getBuilder(qname));
+        auto_ptr<SimpleXMLObject> sxObject(b->buildObject());
         TS_ASSERT(sxObject.get()!=NULL);
+        auto_ptr_XMLCh expected("Firefly");
         sxObject->setId(expected.get());
         
         DOMElement* rootElement = sxObject->marshall();
@@ -57,9 +58,11 @@ public:
     void testMarshallingWithElementContent() {
         TS_TRACE("testMarshallingWithElementContent");
 
-        auto_ptr_XMLCh expected("Sample Content");
-        auto_ptr<SimpleXMLObject> sxObject(dynamic_cast<SimpleXMLObject*>(XMLObjectBuilder::buildOne(m_qname)));
+        QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
+        const SimpleXMLObjectBuilder* b=dynamic_cast<const SimpleXMLObjectBuilder*>(XMLObjectBuilder::getBuilder(qname));
+        auto_ptr<SimpleXMLObject> sxObject(b->buildObject());
         TS_ASSERT(sxObject.get()!=NULL);
+        auto_ptr_XMLCh expected("Sample Content");
         sxObject->setValue(expected.get());
         
         DOMElement* rootElement = sxObject->marshall();
@@ -76,7 +79,8 @@ public:
     void testMarshallingWithChildElements() {
         TS_TRACE("testMarshallingWithChildElements");
 
-        const SimpleXMLObjectBuilder* b=dynamic_cast<const SimpleXMLObjectBuilder*>(XMLObjectBuilder::getBuilder(m_qname));
+        QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
+        const SimpleXMLObjectBuilder* b=dynamic_cast<const SimpleXMLObjectBuilder*>(XMLObjectBuilder::getBuilder(qname));
         TS_ASSERT(b!=NULL);
         
         auto_ptr<SimpleXMLObject> sxObject(b->buildObject());
@@ -95,7 +99,10 @@ public:
         kids.erase(kids.begin()+1);
         TS_ASSERT_SAME_DATA(kids.back()->getValue(), bar.get(), XMLString::stringLen(bar.get()));
         
-        kids.push_back(b->buildObject(SimpleXMLObject::NAMESPACE,SimpleXMLObject::DERIVED_NAME,SimpleXMLObject::NAMESPACE_PREFIX,&m_qtype));
+        QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME,SimpleXMLObject::NAMESPACE_PREFIX);
+        kids.push_back(
+            b->buildObject(SimpleXMLObject::NAMESPACE,SimpleXMLObject::DERIVED_NAME,SimpleXMLObject::NAMESPACE_PREFIX,&qtype)
+            );
         kids.back()->setValue(baz.get());
         
         DOMElement* rootElement = sxObject->marshall();

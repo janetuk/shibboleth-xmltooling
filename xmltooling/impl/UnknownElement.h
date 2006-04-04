@@ -23,6 +23,7 @@
 #if !defined(__xmltooling_unkelement_h__)
 #define __xmltooling_unkelement_h__
 
+#include <xmltooling/AbstractChildlessElement.h>
 #include <xmltooling/exceptions.h>
 #include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/io/AbstractXMLObjectMarshaller.h>
@@ -38,7 +39,7 @@
 namespace xmltooling {
 
     /// @cond off
-    class XMLTOOL_DLLLOCAL UnknownElementImpl : public AbstractDOMCachingXMLObject
+    class XMLTOOL_DLLLOCAL UnknownElementImpl : public AbstractChildlessElement, public AbstractDOMCachingXMLObject
     {
     public:
         UnknownElementImpl(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL)

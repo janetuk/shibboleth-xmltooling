@@ -21,6 +21,8 @@
 #include <xmltooling/XMLToolingConfig.h>
 #include <xmltooling/util/ParserPool.h>
 
+//#define XMLTOOLINGTEST_LEAKCHECK
+
 ParserPool* validatingPool=NULL;
 ParserPool* nonvalidatingPool=NULL;
 std::string data_path = "../xmltoolingtest/data/";
