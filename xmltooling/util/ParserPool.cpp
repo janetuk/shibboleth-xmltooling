@@ -233,7 +233,8 @@ DOMInputSource* ParserPool::resolveEntity(const XMLCh* const publicId, const XML
 #endif    
 
     // Shortcircuit the request.
-    log.warn("unauthorized entity request, blocking it");
+    auto_ptr_char sysId(systemId);
+    log.warn("unauthorized entity request (%s), blocking it", sysId.get() ? sysId.get() : "no systemId");
     static const XMLByte nullbuf[] = {0};
     return new Wrapper4InputSource(new MemBufInputSource(nullbuf,0,systemId));
 }

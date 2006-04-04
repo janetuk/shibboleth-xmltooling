@@ -19,6 +19,8 @@
 #include <fstream>
 #include <xmltooling/signature/KeyInfo.h>
 
+using namespace xmlsignature;
+
 class KeyInfoTest : public CxxTest::TestSuite {
 public:
     KeyInfoTest() {}

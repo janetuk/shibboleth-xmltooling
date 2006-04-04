@@ -24,15 +24,16 @@
 #include <xmltooling/io/AbstractXMLObjectUnmarshaller.h>
 #include <xmltooling/impl/AnyElement.h>
 #include <xmltooling/impl/UnknownElement.h>
-#ifndef XMLTOOLING_NO_XMLSEC
-    #include <xmltooling/signature/Signature.h>
-#endif
 #include <xmltooling/util/ParserPool.h>
 #include <xmltooling/util/XMLConstants.h>
 #include <xmltooling/util/XMLHelper.h>
 #include <xmltooling/util/XMLObjectChildrenList.h>
 
-using namespace xmlsignature;
+#ifndef XMLTOOLING_NO_XMLSEC
+    #include <xmltooling/signature/Signature.h>
+    using namespace xmlsignature;
+#endif
+
 using namespace xmltooling;
 using namespace std;
 

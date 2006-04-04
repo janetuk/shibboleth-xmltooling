@@ -652,8 +652,8 @@ namespace xmlsignature {
             
         KeyInfoImpl(const KeyInfoImpl& src)
                 : AbstractXMLObject(src),
-                    AbstractDOMCachingXMLObject(src),
                     AbstractSimpleElement(src),
+                    AbstractDOMCachingXMLObject(src),
                     AbstractValidatingXMLObject(src),
                     m_Id(XMLString::replicate(src.m_Id)) {
 
@@ -882,4 +882,4 @@ const XMLCh X509Certificate::LOCAL_NAME[] = {
     XCH(C), XCH(e), XCH(r), XCH(t), XCH(i), XCH(f), XCH(i), XCH(c), XCH(a), XCH(t), XCH(e), chNull
     };
 const XMLCh X509CRL::LOCAL_NAME[] = { XCH(X), XNUM(5), XNUM(0), XNUM(9), XCH(C), XCH(R), XCH(L), chNull };
-    
+
