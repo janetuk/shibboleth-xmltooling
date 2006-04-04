@@ -69,7 +69,10 @@ DECL_EXCEPTION_FACTORY(UnmarshallingException,xmltooling);
 DECL_EXCEPTION_FACTORY(UnknownElementException,xmltooling);
 DECL_EXCEPTION_FACTORY(UnknownAttributeException,xmltooling);
 DECL_EXCEPTION_FACTORY(ValidationException,xmltooling);
-DECL_EXCEPTION_FACTORY(SignatureException,xmlsignature);
+
+#ifndef XMLTOOLING_NO_XMLSEC
+    DECL_EXCEPTION_FACTORY(SignatureException,xmlsignature);
+#endif
 
 namespace xmltooling {
    XMLToolingInternalConfig g_config;
@@ -213,10 +216,6 @@ bool XMLToolingInternalConfig::init()
         REGISTER_TYPE(XMLConstants::XMLSIG_NS,SPKIData);
         REGISTER_TYPE(XMLConstants::XMLSIG_NS,PGPData);
 
-#ifndef XMLTOOLING_NO_XMLSEC
-        XMLObjectBuilder::registerBuilder(QName(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME),new SignatureBuilder());
-#endif
-
         REGISTER_EXCEPTION_FACTORY(XMLParserException,xmltooling);
         REGISTER_EXCEPTION_FACTORY(XMLObjectException,xmltooling);
         REGISTER_EXCEPTION_FACTORY(MarshallingException,xmltooling);
@@ -224,7 +223,11 @@ bool XMLToolingInternalConfig::init()
         REGISTER_EXCEPTION_FACTORY(UnknownElementException,xmltooling);
         REGISTER_EXCEPTION_FACTORY(UnknownAttributeException,xmltooling);
         REGISTER_EXCEPTION_FACTORY(ValidationException,xmltooling);
+        
+#ifndef XMLTOOLING_NO_XMLSEC
+        XMLObjectBuilder::registerBuilder(QName(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME),new SignatureBuilder());
         REGISTER_EXCEPTION_FACTORY(SignatureException,xmlsignature);
+#endif
     }
     catch (const xercesc::XMLException&) {
         log.fatal("caught exception while initializing Xerces");
