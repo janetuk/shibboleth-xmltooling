@@ -5,6 +5,18 @@ AM_CONFIG_HEADER(xmltooling/config_pub.h)
 AM_INIT_AUTOMAKE([xmltooling], [1.0])
 
 sinclude(acx_pthread.m4)
+sinclude(doxygen.m4)
+
+# Docygen features
+DX_HTML_FEATURE(ON)
+DX_CHM_FEATURE(OFF)
+DX_CHI_FEATURE(OFF)
+DX_MAN_FEATURE(OFF)
+DX_RTF_FEATURE(OFF)
+DX_XML_FEATURE(OFF)
+DX_PDF_FEATURE(OFF)
+DX_PS_FEATURE(OFF)
+DX_INIT_DOXYGEN(xmltooling, doxygen.cfg, doc/api)
 
 AC_ARG_ENABLE(debug,
     AC_HELP_STRING(--enable-debug, [Have GCC compile with symbols (Default = no)]),
