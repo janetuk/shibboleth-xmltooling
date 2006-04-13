@@ -38,7 +38,9 @@ public:
         nonvalidatingPool = new ParserPool();
         if (getenv("XMLTOOLINGTEST_DATA"))
             data_path=std::string(getenv("XMLTOOLINGTEST_DATA")) + "/";
-        return true;
+        std::string catpath=data_path + "catalog.xml";
+        auto_ptr_XMLCh temp(catpath.c_str());
+        return validatingPool->loadCatalog(temp.get());
     }
     bool tearDownWorld() {
         delete validatingPool;
@@ -70,12 +72,6 @@ public:
 
     void tearDown() {
         XMLObjectBuilder::deregisterDefaultBuilder();
-    }
-
-    void testCatalog(void) {
-        std::string path=data_path + "catalog.xml";
-        auto_ptr_XMLCh temp(path.c_str());
-        TS_ASSERT(validatingPool->loadCatalog(temp.get()));
     }
 
     void testUnknown() {

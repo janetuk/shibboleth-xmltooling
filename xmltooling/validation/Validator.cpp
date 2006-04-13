@@ -31,6 +31,9 @@ map< QName, vector<Validator*> > Validator::m_map;
 
 void Validator::checkValidity(const XMLObject* xmlObject)
 {
+    if (!xmlObject)
+        return;
+
     map< QName, vector<Validator*> >::iterator i;
     if (xmlObject->getSchemaType()) {
         i=m_map.find(*(xmlObject->getSchemaType()));

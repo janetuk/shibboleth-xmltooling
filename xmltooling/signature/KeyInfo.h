@@ -261,7 +261,8 @@ namespace xmlsignature {
     END_XMLOBJECTVALIDATOR;
 
     BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,KeyInfo);
-        XMLOBJECTVALIDATOR_NONEMPTY(KeyInfo,XMLObject);
+        if (!ptr->hasChildren())
+            throw xmltooling::ValidationException("KeyInfo must have at least one child element.");
     END_XMLOBJECTVALIDATOR;
 #endif /* XMLTOOLING_DECLARE_VALIDATORS */
 

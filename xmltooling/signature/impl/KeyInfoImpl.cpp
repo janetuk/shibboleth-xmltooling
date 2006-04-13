@@ -561,10 +561,11 @@ namespace xmlsignature {
             // Unknown child (has to be paired with the last SPKISexp processed.
             const XMLCh* nsURI=root->getNamespaceURI();
             if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI) {
-                // Update second half of pair in vector, then add to master list.
-                if (m_SPKISexps.back().second==NULL) {
+                // Update second half of pair in vector, and in master list.
+                if (!m_SPKISexps.empty() && m_SPKISexps.back().second==NULL) {
                     m_SPKISexps.back().second=childXMLObject;
-                    m_children.push_back(childXMLObject);
+                    m_children.back()=childXMLObject;
+                    return;
                 }
                 else
                     throw UnmarshallingException("Extension element must follow ds:SPKISexp element.");

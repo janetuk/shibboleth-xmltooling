@@ -1,0 +1,6 @@
+<ds:KeyInfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://www.w3.org/2000/09/xmldsig# ../../schemas/xmldsig-core-schema.xsd"
+ xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+    <ds:RetrievalMethod URI="#foo"/>
+    <ds:X509Data/>
+</ds:KeyInfo>
