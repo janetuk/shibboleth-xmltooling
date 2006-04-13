@@ -1,0 +1,82 @@
+Name:		xmltooling
+Summary:	Open source XMLTooling library
+Version:	@-VERSION-@
+Release:	1
+Group:		System Environment/Libraries
+Vendor:		Internet2
+License:	Apache 2.0
+URL:		http://www.opensaml.org/
+Source0:	http://shibboleth.internet2.edu/downloads/%{name}-%{version}.tar.gz
+Source1:	http://shibboleth.internet2.edu/downloads/%{name}-%{version}.tar.gz.asc
+BuildRoot:	%{_tmppath}/%{name}-%{version}-root
+
+BuildRequires:	xerces-c-devel >= 2.6.1
+BuildRequires:	xml-security-c-devel >= 1.3.0
+BuildRequires:	log4cpp-devel >= 0.3.5, cxxtest 
+
+%description
+The XMLTooling library contains generic XML parsing and processing
+classes based on the Xerces-C DOM. It adds more powerful facilities
+for declaring element- and type-specific API and implementation
+classes to add value around the DOM, as well as signing and encryption
+support.
+
+This package contains the xmltooling runtime library.
+
+%package devel
+Summary: XMLTooling development Headers
+Group: Development/Libraries
+Requires: %{name} = %{version}
+
+%description devel
+The XMLTooling library contains generic XML parsing and processing
+classes based on the Xerces-C DOM. It adds more powerful facilities
+for declaring element- and type-specific API and implementation
+classes to add value around the DOM, as well as signing and encryption
+support.
+
+This package contains the headers and other necessary files to build
+applications or libraries that use or extend the xmltooling library.
+
+%prep
+%setup -q
+
+%build
+%configure %{?xmltooling_options}
+make
+
+%install
+[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
+rm -rf _docs
+
+make install DESTDIR=$RPM_BUILD_ROOT
+mv $RPM_BUILD_ROOT/usr/doc/xmltooling _docs
+
+%check || :
+make check
+
+%clean
+[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
+
+%post
+/sbin/ldconfig
+
+%postun
+/sbin/ldconfig
+
+%files
+%defattr(-,root,root,-)
+#%doc _docs/LICENSE.txt _docs/NEWS.txt _docs/README.txt _docs/TODO.txt
+%{_bindir}/xmltoolingtest
+%{_libdir}/libxmltooling.so.*
+%dir %{_datadir}/xml/xmltooling
+%{_datadir}/xml/xmltooling
+
+%files devel
+%defattr(-,root,root,-)
+%{_includedir}
+%{_libdir}/libxmltooling.so
+
+%changelog
+* Wed Apr 12 2006  Scott Cantor  <cantor.2@osu.edu>  - 1.0-1
+- First SPEC file based on various versions in existence.

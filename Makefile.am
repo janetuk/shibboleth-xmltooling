@@ -8,6 +8,7 @@ EXTRA_DIST =
 	libtool.m4 \
 	acx_pthread.m4 \
 	depcomp \
+	doxygen.cfg \
 	config_win32.h
 
 dist-hook:
@@ -18,18 +19,18 @@ dist-hook:
 
 SUBDIRS = schemas xmltooling xmltoolingtest
 
-#all-local: opensaml.spec pkginfo
-#
-#opensaml.spec: opensaml.spec.in Makefile
-#	rm -f $@.tmp
-#	sed < $< > $@.tmp \
-#	    -e 's:@-VERSION-@:${VERSION}:'
-#	mv $@.tmp $@
-#
-#pkginfo: pkginfo.in Makefile
-#	rm -f $@.tmp
-#	sed < $< > $@.tmp \
-#	    -e 's:@-VERSION-@:${VERSION}:'
-#	mv $@.tmp $@
-#
-#DISTCLEANFILES = opensaml.spec pkginfo
+all-local: xmltooling.spec pkginfo
+
+xmltooling.spec: xmltooling.spec.in Makefile
+	rm -f $@.tmp
+	sed < $< > $@.tmp \
+	    -e 's:@-VERSION-@:${VERSION}:'
+	mv $@.tmp $@
+
+pkginfo: pkginfo.in Makefile
+	rm -f $@.tmp
+	sed < $< > $@.tmp \
+	    -e 's:@-VERSION-@:${VERSION}:'
+	mv $@.tmp $@
+
+DISTCLEANFILES = xmltooling.spec pkginfo
