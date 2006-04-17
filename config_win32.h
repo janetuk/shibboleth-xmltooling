@@ -15,17 +15,8 @@
 #define HAVE_INTTYPES_H 1
 */
 
-/* Define to 1 if you have the `crypto' library (-lcrypto). */
-#define HAVE_LIBCRYPTO 1
-
-/* Define to 1 if you have the `curl' library (-lcurl). */
-#define HAVE_LIBCURL 1
-
 /* Define if log4cpp library was found */
 #define HAVE_LIBLOG4CPP 1
-
-/* Define to 1 if you have the `ssl' library (-lssl). */
-#define HAVE_LIBSSL 1
 
 /* Define if Xerces-C library was found */
 #define HAVE_LIBXERCESC 1
@@ -35,10 +26,6 @@
 
 /* define if the compiler implements namespaces */
 #define HAVE_NAMESPACES 1
-
-/* Define if you have POSIX threads libraries and header files.
-#define HAVE_PTHREAD 1
-*/
 
 /* Define to 1 if you have the <stdint.h> header file. */
 /* #undef HAVE_STDINT_H */
@@ -51,9 +38,6 @@
 
 /* Define to 1 if you have the `strdup' function. */
 #define HAVE_STRDUP 1
-
-/* Define to 1 if you have the `strftime' function. */
-/* #undef HAVE_STRFTIME */
 
 /* Define to 1 if you have the <strings.h> header file.
 #define HAVE_STRINGS_H 1
@@ -105,6 +89,9 @@
 
 /* Version number of package */
 #define VERSION "1.0"
+
+/* Define if you wish to disable XML-Security-dependent features. */
+/* #undef XMLTOOLING_NO_XMLSEC */
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */

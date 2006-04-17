@@ -56,6 +56,7 @@ AC_TYPE_SIZE_T
 # Checks for library functions.
 AC_CHECK_FUNCS([strchr strdup strstr])
 AC_CHECK_HEADERS([dlfcn.h])
+AC_CHECK_FUNC(dlclose, , [ AC_CHECK_LIB(dl, dlopen) ])
 
 AC_LANG(C++)
 
