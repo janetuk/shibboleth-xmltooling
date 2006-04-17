@@ -49,77 +49,13 @@ AC_CXX_NAMESPACES
 
 AC_LANG(C)
 
-# checks for pthreads
-ACX_PTHREAD([enable_threads="pthread"],[enable_threads="no"])
-if test $enable_threads != "pthread"; then
-    AC_MSG_ERROR([unable to find pthreads, currently this is required])
-else
-    AC_DEFINE(HAVE_PTHREAD,1,[Define if you have POSIX threads libraries and header files.])
-    LIBS="$PTHREAD_LIBS $LIBS"
-    CFLAGS="$PTHREAD_CFLAGS $CFLAGS"
-    CXXFLAGS="$PTHREAD_CFLAGS $CXXFLAGS"
-fi
-
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_SIZE_T
-AC_STRUCT_TM
-AC_STRUCT_TIMEZONE
 
 # Checks for library functions.
-AC_FUNC_STRFTIME
-AC_CHECK_FUNCS([strchr strdup strstr gmtime_r timegm])
+AC_CHECK_FUNCS([strchr strdup strstr])
 AC_CHECK_HEADERS([dlfcn.h])
-
-# OpenSSL settings
-AC_PATH_PROG(PKG_CONFIG, pkg-config)
-if test "x$PKG_CONFIG" = x || test "x$PKG_CONFIG" = "xno" ; then
-    AC_ARG_WITH(openssl, 
-            AC_HELP_STRING([--with-openssl=PATH], [where openssl is installed]),
-            [if test x_$with_openssl != x_/usr; then
-                SSLLIBS="-L${with_openssl}/lib"
-                SSLFLAGS="-I${with_openssl}/include"
-            fi])
-    SSLLIBS="$SSLLIBS -lssl -lcrypto"
-else
-    SSLLIBS="`$PKG_CONFIG --libs openssl`"
-    SSLFLAGS="`$PKG_CONFIG --cflags openssl`"
-fi
-AC_MSG_CHECKING(for OpenSSL libraries)
-AC_MSG_RESULT($SSLLIBS)
-LIBS="$LIBS $SSLLIBS"
-AC_MSG_CHECKING(for OpenSSL cflags)
-AC_MSG_RESULT($SSLFLAGS)
-CPPFLAGS="$SSLFLAGS $CPPFLAGS"
-
-AC_CHECK_HEADER([openssl/ssl.h],,
-                AC_MSG_ERROR([unable to find openssl header files]))
-AC_MSG_CHECKING(for ERR_load_CRYPTO_string)
-AC_TRY_LINK_FUNC([ERR_load_CRYPTO_strings],,
-             AC_MSG_ERROR([unable to link with openssl libraries]))
-AC_MSG_RESULT(yes)
-AC_MSG_CHECKING(for SSL_library_init)
-AC_TRY_LINK_FUNC([SSL_library_init],, 
-             AC_MSG_ERROR([unable to link with openssl libraries]))
-AC_MSG_RESULT(yes)
-
-# libcurl settings
-AC_PATH_PROG(CURL_CONFIG,curl-config)
-AC_ARG_WITH(curl,
-            AC_HELP_STRING([--with-curl=PATH], [where libcurl is installed]),
-            [CURL_CONFIG="${with_curl}/bin/curl-config"])
-if test -f "${CURL_CONFIG}"; then
-    LDFLAGS="`${CURL_CONFIG} --libs` $LDFLAGS"
-    CPPFLAGS="`${CURL_CONFIG} --cflags` $CPPFLAGS"
-else
-    AC_MSG_WARN([curl-config not found, guessing at libcurl build settings])
-fi
-AC_CHECK_HEADER([curl/curl.h],,AC_MSG_ERROR([unable to find libcurl header files]))
-AC_CHECK_LIB([curl],[curl_global_init],,AC_MSG_ERROR([unable to link with libcurl]))
-AC_MSG_CHECKING([for CURLOPT_SSL_CTX_FUNCTION in curl.h])
-AC_EGREP_HEADER([CURLOPT_SSL_CTX_FUNCTION], [curl/curl.h],
-		[AC_MSG_RESULT(yes)],
-		[AC_MSG_ERROR([need libcurl that supports CURLOPT_SSL_CTX_FUNCTION])])
 
 AC_LANG(C++)
 
