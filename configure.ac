@@ -4,7 +4,6 @@ AM_CONFIG_HEADER(config.h)
 AM_CONFIG_HEADER(xmltooling/config_pub.h)
 AM_INIT_AUTOMAKE([xmltooling], [1.0])
 
-sinclude(acx_pthread.m4)
 sinclude(doxygen.m4)
 
 # Docygen features
