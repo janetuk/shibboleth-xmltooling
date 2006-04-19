@@ -119,8 +119,7 @@ public:
         kids[1]->setValue(bar.get());
         
         // Append a Signature.
-        const SignatureBuilder* sigb=dynamic_cast<const SignatureBuilder*>(XMLObjectBuilder::getBuilder(QName(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME)));
-        Signature* sig=sigb->buildObject();
+        Signature* sig=SignatureBuilder::newSignature();
         sxObject->setSignature(sig);
         
         // Signing context for the whole document.

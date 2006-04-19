@@ -38,8 +38,7 @@ public:
         TS_TRACE("testMarshallingWithAttributes");
 
         QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
-        const SimpleXMLObjectBuilder* b=dynamic_cast<const SimpleXMLObjectBuilder*>(XMLObjectBuilder::getBuilder(qname));
-        auto_ptr<SimpleXMLObject> sxObject(b->buildObject());
+        auto_ptr<SimpleXMLObject> sxObject(SimpleXMLObjectBuilder::newSimpleXMLObject());
         TS_ASSERT(sxObject.get()!=NULL);
         auto_ptr_XMLCh expected("Firefly");
         sxObject->setId(expected.get());
@@ -59,8 +58,7 @@ public:
         TS_TRACE("testMarshallingWithElementContent");
 
         QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
-        const SimpleXMLObjectBuilder* b=dynamic_cast<const SimpleXMLObjectBuilder*>(XMLObjectBuilder::getBuilder(qname));
-        auto_ptr<SimpleXMLObject> sxObject(b->buildObject());
+        auto_ptr<SimpleXMLObject> sxObject(SimpleXMLObjectBuilder::newSimpleXMLObject());
         TS_ASSERT(sxObject.get()!=NULL);
         auto_ptr_XMLCh expected("Sample Content");
         sxObject->setValue(expected.get());

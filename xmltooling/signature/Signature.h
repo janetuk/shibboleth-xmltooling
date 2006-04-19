@@ -27,6 +27,7 @@
 #include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/signature/SigningContext.h>
 #include <xmltooling/signature/VerifyingContext.h>
+#include <xmltooling/util/XMLConstants.h>
 
 /**
  * @namespace xmlsignature
@@ -97,6 +98,17 @@ namespace xmlsignature {
          * @return empty Signature object
          */
         virtual Signature* buildObject() const;
+
+        static Signature* newSignature() {
+            const SignatureBuilder* b = dynamic_cast<const SignatureBuilder*>(
+                xmltooling::XMLObjectBuilder::getBuilder(
+                    xmltooling::QName(xmltooling::XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME)
+                    )
+                );
+            if (b)
+                return b->buildObject();
+            throw xmltooling::XMLObjectException("Unable to obtain typed builder for Signature.");
+        }
     };
 
     DECL_XMLTOOLING_EXCEPTION(SignatureException,xmlsignature,xmltooling::XMLToolingException,Exceptions in signature processing);

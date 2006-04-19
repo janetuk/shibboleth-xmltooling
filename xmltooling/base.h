@@ -487,6 +487,14 @@
  */
  #define DECL_XMLOBJECTBUILDER(linkage,cname,namespaceURI,namespacePrefix) \
     BEGIN_XMLOBJECTBUILDER(linkage,cname,namespaceURI,namespacePrefix); \
+    static cname* new##cname() { \
+        const cname##Builder* b = dynamic_cast<const cname##Builder*>( \
+            XMLObjectBuilder::getBuilder(xmltooling::QName(namespaceURI,cname::LOCAL_NAME)) \
+            ); \
+        if (b) \
+            return b->buildObject(); \
+        throw xmltooling::XMLObjectException("Unable to obtain typed builder for "#cname"."); \
+    } \
     END_XMLOBJECTBUILDER
 
 /**

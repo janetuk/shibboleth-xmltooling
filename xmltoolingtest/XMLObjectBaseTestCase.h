@@ -186,6 +186,15 @@ public:
         ) const {
         return new SimpleXMLObject(nsURI, localName, prefix, schemaType);
     }
+
+    static SimpleXMLObject* newSimpleXMLObject() {
+        const SimpleXMLObjectBuilder* b = dynamic_cast<const SimpleXMLObjectBuilder*>(
+            XMLObjectBuilder::getBuilder(QName(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME))
+            );
+        if (b)
+            return b->buildObject();
+        throw XMLObjectException("Unable to obtain typed builder for SimpleXMLObject.");
+    }
 };
 
 #if defined (_MSC_VER)
