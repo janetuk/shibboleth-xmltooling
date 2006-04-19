@@ -62,13 +62,18 @@ AC_LANG(C++)
 # log4cpp settings
 AC_PATH_PROG(LOG4CPP_CONFIG,log4cpp-config)
 AC_ARG_WITH(log4cpp,
-            AC_HELP_STRING([--with-log4cpp=PATH], [where log4cpp is installed]),
-            [LOG4CPP_CONFIG="${with_log4cpp}/bin/log4cpp-config"])
+    AC_HELP_STRING([--with-log4cpp=PATH], [where log4cpp-config is installed]),
+    [
+    LOG4CPP_CONFIG="${with_log4cpp}"
+    if ! test -f "${LOG4CPP_CONFIG}" ; then
+    	LOG4CPP_CONFIG="${with_log4cpp}/bin/log4cpp-config"
+    fi
+    ])
 if test -f "${LOG4CPP_CONFIG}"; then
     LDFLAGS="`${LOG4CPP_CONFIG} --libs` $LDFLAGS"
     CPPFLAGS="`${LOG4CPP_CONFIG} --cflags` $CPPFLAGS"
 else
-    AC_MSG_WARN([log4cpp-config not found, guessing at log4cpp build settings])
+    AC_MSG_ERROR([log4cpp-config not found, may need to use --with-log4cpp option])
     LIBS="-llog4cpp $LIBS"
 fi
 AC_CHECK_HEADER([log4cpp/Category.hh],,AC_MSG_ERROR([unable to find log4cpp header files]))

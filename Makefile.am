@@ -11,7 +11,6 @@ EXTRA_DIST = $(DX_CONFIG) \
 	schemas \
 	cpp-xmltooling.sln \
 	libtool.m4 \
-	acx_pthread.m4 \
 	doxygen.m4 \
 	depcomp \
 	config_win32.h
