@@ -20,7 +20,7 @@
  * Basic implementation suitable for use as default for unrecognized content
  */
 
-#if !defined(__xmltooling_unkelement_h__)
+#ifndef __xmltooling_unkelement_h__
 #define __xmltooling_unkelement_h__
 
 #include <xmltooling/AbstractChildlessElement.h>
@@ -77,9 +77,7 @@ namespace xmltooling {
     public:
         XMLObject* buildObject(
             const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL
-            ) const {
-            return new UnknownElementImpl(nsURI,localName,prefix);
-        }
+            ) const;
     };
 
 };

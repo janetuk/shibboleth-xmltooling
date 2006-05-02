@@ -186,3 +186,10 @@ XMLObject* UnknownElementImpl::unmarshall(DOMElement* element, bool bindDocument
     setDOM(element, bindDocument);
     return this;
 }
+
+XMLObject* UnknownElementBuilder::buildObject(
+            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType
+            ) const {
+            return new UnknownElementImpl(nsURI,localName,prefix);
+}
+

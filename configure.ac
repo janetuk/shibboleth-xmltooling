@@ -33,6 +33,13 @@ AC_PROG_CC([gcc gcc3 cc])
 AC_PROG_CXX([g++ g++3 c++ CC])
 
 if test "$GCC" = "yes" ; then
+#    AC_HAVE_GCC_VERSION(4,0,0,0,
+#        [
+#        AC_DEFINE(GCC_HASCLASSVISIBILITY,1,
+#            [Define to enable class visibility control in gcc.])
+#        GCC_CFLAGS="$GCC_CFLAGS -fvisibility=hidden -fvisibility-inlines-hidden"
+#        GCC_CXXFLAGS="$GCC_CXXFLAGS -fvisibility=hidden -fvisibility-inlines-hidden"
+#        ])
     CFLAGS="$GCC_CFLAGS"
     CXXFLAGS="$GCC_CXXFLAGS"
 fi

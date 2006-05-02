@@ -44,3 +44,32 @@ if test "x_$ac_cv_cxx_have_stl" != x_yes; then
 fi
 ])
 
+dnl Determine whether we have gcc of a particular version or later,
+dnl based on major, minor, patchlevel versions and date.
+dnl AC_HAVE_GCC_VERSION(MAJOR_VERSION, MINOR_VERSION, PATCH_LEVEL, 
+dnl 	SNAPSHOT_DATE [, ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+AC_DEFUN(AC_HAVE_GCC_VERSION,
+[AC_CACHE_CHECK([gcc is at least version $1.$2.$3.$4],
+          ac_cv_gcc_version_$1_$2_$3_$4,
+[
+  if test x$GCC = x ; then ac_cv_gcc_version_$1_$2_$3_$4=no
+  else 
+    ac_gcc_date=`$CC -v 2>&1 | grep '^gcc version ' | sed 's/ (.*//; s/.* //'`
+    if test 0$ac_gcc_date -eq 0 ; then ac_gcc_date=0 ; fi
+    AC_EGREP_CPP(yes, [#define HAVE_GCC_VERSION(MAJOR, MINOR, MICRO, DATE) \
+    (__GNUC__ > (MAJOR) \
+     || (__GNUC__ == (MAJOR) && __GNUC_MINOR__ > (MINOR)) \
+     || (__GNUC__ == (MAJOR) && __GNUC_MINOR__ == (MINOR) \
+         && __GNUC_PATCHLEVEL__ > (MICRO)) \
+     || (__GNUC__ == (MAJOR) && __GNUC_MINOR__ == (MINOR) \
+         && __GNUC_PATCHLEVEL__ == (MICRO) && ${ac_gcc_date}L >= (DATE)))
+#if HAVE_GCC_VERSION($1,$2,$3,$4)
+yes
+#endif],
+   AC_DEFINE_UNQUOTED(HAVE_GCC_VERSION_$1_$2_$3_$4, 1,
+     [Define to 1 if we have gcc $1.$2.$3 ($4)])
+   ac_cv_gcc_version_$1_$2_$3_$4=yes ; $5,
+   ac_cv_gcc_version_$1_$2_$3_$4=no ; $6)
+fi
+])])dnl
+
