@@ -13,7 +13,12 @@ EXTRA_DIST = $(DX_CONFIG) \
 	libtool.m4 \
 	doxygen.m4 \
 	depcomp \
-	config_win32.h
+	config_win32.h \
+	xmltooling.spec.in \
+	xmltooling.spec \
+	pkginfo.in \
+	pkginfo \
+	checkinstall
 
 dist-hook:
 	rm -rf `find $(distdir)/xmltoolingtest/data -name .svn`
