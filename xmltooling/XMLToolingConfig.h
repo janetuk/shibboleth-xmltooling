@@ -20,10 +20,10 @@
  * Library configuration 
  */
 
-#if !defined(__xmltooling_config_h__)
+#ifndef __xmltooling_config_h__
 #define __xmltooling_config_h__
 
-#include <xmltooling/ILockable.h>
+#include <xmltooling/Lockable.h>
 
 namespace xmltooling {
 
@@ -34,7 +34,7 @@ namespace xmltooling {
      * obtain a global system lock, but the actual configuration itself is not
      * synchronized.
      */
-    class XMLTOOL_API XMLToolingConfig : public ILockable
+    class XMLTOOL_API XMLToolingConfig : public Lockable
     {
     MAKE_NONCOPYABLE(XMLToolingConfig);
     public:

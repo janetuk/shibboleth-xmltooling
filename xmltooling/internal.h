@@ -26,6 +26,9 @@
 # define _CRT_NONSTDC_NO_DEPRECATE 1
 #endif
 
+// Export public APIs.
+#define XMLTOOLING_EXPORTS
+
 // eventually we might be able to support autoconf via cygwin...
 #if defined (_MSC_VER) || defined(__BORLANDC__)
 # include "config_win32.h"
@@ -63,7 +66,7 @@ namespace xmltooling {
         void term();
 
         // global mutex available to library applications
-        xmltooling::ILockable& lock();
+        Lockable& lock();
         void unlock();
 
         // configuration
@@ -79,7 +82,6 @@ namespace xmltooling {
     private:
         std::vector<void*> m_libhandles;
         void* m_lock;
-        //PlugManager m_plugMgr;
     };
     /// @endcond
 

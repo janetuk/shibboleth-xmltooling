@@ -15,12 +15,12 @@
  */
 
 /**
- * @file ILockable.h
+ * @file Lockable.h
  * 
  * Locking abstraction 
  */
 
-#if !defined(__xmltooling_lockable_h__)
+#ifndef __xmltooling_lockable_h__
 #define __xmltooling_lockable_h__
 
 #include <xmltooling/base.h>
@@ -30,16 +30,16 @@ namespace xmltooling {
     /**
      * Abstract mixin interface for interfaces that support locking
      */
-    struct XMLTOOL_API ILockable
+    struct XMLTOOL_API Lockable
     {
-        virtual ~ILockable() {}
+        virtual ~Lockable() {}
         
         /**
          * Lock the associated object for exclusive access.
          * 
          * @return a reference to the object being locked
          */
-        virtual ILockable& lock()=0;
+        virtual Lockable& lock()=0;
 
         /**
          * Unlock the associated object from exclusive access.
@@ -59,21 +59,21 @@ namespace xmltooling {
          * 
          * @param lockee    Pointer to an object to lock and hold
          */
-        Locker(ILockable* lockee) : m_lockee(lockee->lock()) {}
+        Locker(Lockable* lockee) : m_lockee(lockee->lock()) {}
         
         /**
          * Locks an object and stores it for later release.
          * 
          * @param lockee    Reference to an object to lock and hold
          */
-        Locker(ILockable& lockee) : m_lockee(lockee.lock()) {}
+        Locker(Lockable& lockee) : m_lockee(lockee.lock()) {}
 
         /**
          * Releases lock on held pointer, if any.
          */
         ~Locker() {m_lockee.unlock();}
     private:
-        ILockable& m_lockee;
+        Lockable& m_lockee;
     };
 
 };

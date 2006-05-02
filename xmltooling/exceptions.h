@@ -347,6 +347,7 @@ namespace xmltooling {
     DECL_XMLTOOLING_EXCEPTION(UnmarshallingException,xmltooling,XMLToolingException,Exceptions during object unmarshalling);
     DECL_XMLTOOLING_EXCEPTION(UnknownElementException,xmltooling,XMLToolingException,Exceptions due to processing of unknown element content);
     DECL_XMLTOOLING_EXCEPTION(UnknownAttributeException,xmltooling,XMLToolingException,Exceptions due to processing of unknown attributes);
+    DECL_XMLTOOLING_EXCEPTION(UnknownExtensionException,xmltooling,XMLToolingException,Exceptions from use of an unrecognized extension/plugin);
     DECL_XMLTOOLING_EXCEPTION(ValidationException,xmltooling,XMLToolingException,Exceptions during object validation);
 
 };

@@ -27,8 +27,9 @@ libxmltoolinginclude_HEADERS = \
     config_pub.h \
     ElementProxy.h \
     exceptions.h \
-    ILockable.h \
+    Lockable.h \
     Namespace.h \
+    PluginManager.h \
     QName.h \
     SimpleElement.h \
     unicode.h \

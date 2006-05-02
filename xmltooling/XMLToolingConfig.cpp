@@ -68,6 +68,7 @@ DECL_EXCEPTION_FACTORY(MarshallingException,xmltooling);
 DECL_EXCEPTION_FACTORY(UnmarshallingException,xmltooling);
 DECL_EXCEPTION_FACTORY(UnknownElementException,xmltooling);
 DECL_EXCEPTION_FACTORY(UnknownAttributeException,xmltooling);
+DECL_EXCEPTION_FACTORY(UnknownExtensionException,xmltooling);
 DECL_EXCEPTION_FACTORY(ValidationException,xmltooling);
 
 #ifndef XMLTOOLING_NO_XMLSEC
@@ -280,7 +281,7 @@ void XMLToolingInternalConfig::term()
    Category::getInstance(XMLTOOLING_LOGCAT".XMLToolingConfig").info("library shutdown complete");
 }
 
-ILockable& XMLToolingInternalConfig::lock()
+Lockable& XMLToolingInternalConfig::lock()
 {
     xercesc::XMLPlatformUtils::lockMutex(m_lock);
     return *this;
