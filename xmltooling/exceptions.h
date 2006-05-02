@@ -33,13 +33,14 @@
  * Declares a derived exception class
  * 
  * @param name      the exception class
+ * @param linkage   linkage specification for class
  * @param ns        the exception class C++ namespace
  * @param base      the base class
  * @param desc      documentation comment for class
  */
-#define DECL_XMLTOOLING_EXCEPTION(name,ns,base,desc) \
+#define DECL_XMLTOOLING_EXCEPTION(name,linkage,ns,base,desc) \
     XMLTOOLING_DOXYGEN(desc) \
-    class XMLTOOL_EXCEPTIONAPI(XMLTOOL_API) name : public base { \
+    class linkage name : public base { \
     public: \
         XMLTOOLING_DOXYGEN(Constructor) \
         name(const char* msg=NULL, const xmltooling::params& p=xmltooling::params()) : base(msg,p) {} \
@@ -341,14 +342,14 @@ namespace xmltooling {
         static ExceptionFactoryMap m_factoryMap;
     };
 
-    DECL_XMLTOOLING_EXCEPTION(XMLParserException,xmltooling,XMLToolingException,Exceptions related to XML parsing);
-    DECL_XMLTOOLING_EXCEPTION(XMLObjectException,xmltooling,XMLToolingException,Exceptions in basic object usage);
-    DECL_XMLTOOLING_EXCEPTION(MarshallingException,xmltooling,XMLToolingException,Exceptions during object marshalling);
-    DECL_XMLTOOLING_EXCEPTION(UnmarshallingException,xmltooling,XMLToolingException,Exceptions during object unmarshalling);
-    DECL_XMLTOOLING_EXCEPTION(UnknownElementException,xmltooling,XMLToolingException,Exceptions due to processing of unknown element content);
-    DECL_XMLTOOLING_EXCEPTION(UnknownAttributeException,xmltooling,XMLToolingException,Exceptions due to processing of unknown attributes);
-    DECL_XMLTOOLING_EXCEPTION(UnknownExtensionException,xmltooling,XMLToolingException,Exceptions from use of an unrecognized extension/plugin);
-    DECL_XMLTOOLING_EXCEPTION(ValidationException,xmltooling,XMLToolingException,Exceptions during object validation);
+    DECL_XMLTOOLING_EXCEPTION(XMLParserException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions related to XML parsing);
+    DECL_XMLTOOLING_EXCEPTION(XMLObjectException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions in basic object usage);
+    DECL_XMLTOOLING_EXCEPTION(MarshallingException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions during object marshalling);
+    DECL_XMLTOOLING_EXCEPTION(UnmarshallingException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions during object unmarshalling);
+    DECL_XMLTOOLING_EXCEPTION(UnknownElementException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions due to processing of unknown element content);
+    DECL_XMLTOOLING_EXCEPTION(UnknownAttributeException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions due to processing of unknown attributes);
+    DECL_XMLTOOLING_EXCEPTION(UnknownExtensionException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions from use of an unrecognized extension/plugin);
+    DECL_XMLTOOLING_EXCEPTION(ValidationException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions during object validation);
 
 };
 
