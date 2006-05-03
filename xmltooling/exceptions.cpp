@@ -236,7 +236,7 @@ XMLToolingException* XMLToolingException::fromStream(std::istream& in)
     static const XMLCh param[] = { chLatin_p, chLatin_a, chLatin_r, chLatin_a, chLatin_m, chNull };
     static const XMLCh type[] = { chLatin_t, chLatin_y, chLatin_p, chLatin_e, chNull };
 
-    DOMDocument* doc=XMLToolingInternalConfig::getInternalConfig().m_parserPool->parse(in);
+    DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(in);
     
     // Check root element.
     const DOMElement* root=doc->getDocumentElement();

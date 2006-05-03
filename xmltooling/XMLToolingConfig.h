@@ -24,6 +24,7 @@
 #define __xmltooling_config_h__
 
 #include <xmltooling/Lockable.h>
+#include <xmltooling/util/ParserPool.h>
 
 namespace xmltooling {
 
@@ -91,7 +92,24 @@ namespace xmltooling {
          * @return true iff configuration was successful
          */
         virtual bool log_config(const char* config=NULL)=0;
-        
+
+        /**
+         * Obtains a non-validating parser pool.
+         * Library must be initialized first.
+         *
+         * @return reference to a non-validating parser pool.
+         */
+        virtual ParserPool& getParser() const=0;
+
+        /**
+         * Obtains a validating parser pool.
+         * Library must be initialized first. Schema/catalog registration must be
+         * externally synchronized.
+         *
+         * @return reference to a validating parser pool.
+         */
+        virtual ParserPool& getValidatingParser() const=0;
+
     protected:
         XMLToolingConfig() {}
     };

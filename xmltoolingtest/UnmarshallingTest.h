@@ -73,7 +73,7 @@ public:
 
         string path=data_path + "SimpleXMLObjectWithAttribute.xml";
         ifstream fs(path.c_str());
-        DOMDocument* doc=nonvalidatingPool->parse(fs);
+        DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
         TS_ASSERT(doc!=NULL);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
@@ -93,7 +93,7 @@ public:
 
         string path=data_path + "SimpleXMLObjectWithContent.xml";
         ifstream fs(path.c_str());
-        DOMDocument* doc=nonvalidatingPool->parse(fs);
+        DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
         TS_ASSERT(doc!=NULL);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
@@ -113,7 +113,7 @@ public:
 
         string path=data_path + "SimpleXMLObjectWithChildren.xml";
         ifstream fs(path.c_str());
-        DOMDocument* doc=nonvalidatingPool->parse(fs);
+        DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
         TS_ASSERT(doc!=NULL);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
@@ -135,7 +135,7 @@ public:
 
         string path=data_path + "SimpleXMLObjectWithChildren.xml";
         ifstream fs(path.c_str());
-        DOMDocument* doc=nonvalidatingPool->parse(fs);
+        DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
         TS_ASSERT(doc!=NULL);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
@@ -160,7 +160,7 @@ public:
 
         string path=data_path + "SimpleXMLObjectWithUnknownChild.xml";
         ifstream fs(path.c_str());
-        DOMDocument* doc=nonvalidatingPool->parse(fs);
+        DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
         TS_ASSERT(doc!=NULL);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());

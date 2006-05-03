@@ -38,7 +38,7 @@ public:
 
         string path=data_path + "KeyInfo1.xml";
         ifstream fs(path.c_str());
-        DOMDocument* doc=validatingPool->parse(fs);
+        DOMDocument* doc=XMLToolingConfig::getConfig().getValidatingParser().parse(fs);
         TS_ASSERT(doc!=NULL);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
@@ -67,7 +67,7 @@ public:
 
         string path=data_path + "KeyInfo2.xml";
         ifstream fs(path.c_str());
-        DOMDocument* doc=validatingPool->parse(fs);
+        DOMDocument* doc=XMLToolingConfig::getConfig().getValidatingParser().parse(fs);
         TS_ASSERT(doc!=NULL);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
@@ -92,7 +92,7 @@ public:
 
         string path=data_path + "KeyInfo3.xml";
         ifstream fs(path.c_str());
-        DOMDocument* doc=nonvalidatingPool->parse(fs);
+        DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
         TS_ASSERT(doc!=NULL);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());

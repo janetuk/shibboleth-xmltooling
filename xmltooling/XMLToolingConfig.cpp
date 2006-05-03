@@ -167,6 +167,7 @@ bool XMLToolingInternalConfig::init()
 #endif
 
         m_parserPool=new ParserPool();
+        m_validatingPool=new ParserPool(true,true);
         m_lock=xercesc::XMLPlatformUtils::makeMutex();
 
         // default registrations
@@ -264,6 +265,8 @@ void XMLToolingInternalConfig::term()
     
     delete m_parserPool;
     m_parserPool=NULL;
+    delete m_validatingPool;
+    m_validatingPool=NULL;
 
 #ifndef XMLTOOLING_NO_XMLSEC
     delete m_xsecProvider;

@@ -36,7 +36,7 @@ public:
 
         string path=data_path + "ComplexXMLObject.xml";
         ifstream fs(path.c_str());
-        DOMDocument* doc=nonvalidatingPool->parse(fs);
+        DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
         TS_ASSERT(doc!=NULL);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());

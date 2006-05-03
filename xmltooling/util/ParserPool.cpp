@@ -161,7 +161,7 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
     LocalFileInputSource fsrc(NULL,pathname);
     Wrapper4InputSource domsrc(&fsrc,false);
     try {
-        DOMDocument* doc=XMLToolingInternalConfig::getInternalConfig().m_parserPool->parse(domsrc);
+        DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(domsrc);
         
         // Check root element.
         const DOMElement* root=doc->getDocumentElement();

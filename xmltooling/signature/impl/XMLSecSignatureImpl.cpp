@@ -246,7 +246,7 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, MarshallingCont
         MemBufInputSource src(reinterpret_cast<const XMLByte*>(m_xml.c_str()),m_xml.length(),"XMLSecSignatureImpl");
         Wrapper4InputSource dsrc(&src,false);
         log.debug("parsing Signature XML back into DOM tree");
-        DOMDocument* internalDoc=XMLToolingInternalConfig::getInternalConfig().m_parserPool->parse(dsrc);
+        DOMDocument* internalDoc=XMLToolingConfig::getConfig().getParser().parse(dsrc);
         if (document) {
             // The caller insists on using his own document, so we now have to import the thing
             // into it. Then we're just dumping the one we built.
@@ -350,7 +350,7 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, Marshalling
         MemBufInputSource src(reinterpret_cast<const XMLByte*>(m_xml.c_str()),m_xml.length(),"XMLSecSignatureImpl");
         Wrapper4InputSource dsrc(&src,false);
         log.debug("parsing XML back into DOM tree");
-        DOMDocument* internalDoc=XMLToolingInternalConfig::getInternalConfig().m_parserPool->parse(dsrc);
+        DOMDocument* internalDoc=XMLToolingConfig::getConfig().getParser().parse(dsrc);
         
         log.debug("reimporting new DOM into caller-supplied document");
         cachedDOM=static_cast<DOMElement*>(parentElement->getOwnerDocument()->importNode(internalDoc->getDocumentElement(),true));

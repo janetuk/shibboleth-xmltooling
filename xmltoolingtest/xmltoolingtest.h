@@ -23,8 +23,6 @@
 
 //#define XMLTOOLINGTEST_LEAKCHECK
 
-ParserPool* validatingPool=NULL;
-ParserPool* nonvalidatingPool=NULL;
 std::string data_path = "../xmltoolingtest/data/";
 
 class ToolingFixture : public CxxTest::GlobalFixture
@@ -34,17 +32,13 @@ public:
         XMLToolingConfig::getConfig().log_config();
         if (!XMLToolingConfig::getConfig().init())
             return false;
-        validatingPool = new ParserPool(true,true);
-        nonvalidatingPool = new ParserPool();
         if (getenv("XMLTOOLINGTEST_DATA"))
             data_path=std::string(getenv("XMLTOOLINGTEST_DATA")) + "/";
         std::string catpath=data_path + "catalog.xml";
         auto_ptr_XMLCh temp(catpath.c_str());
-        return validatingPool->loadCatalog(temp.get());
+        return XMLToolingConfig::getConfig().getValidatingParser().loadCatalog(temp.get());
     }
     bool tearDownWorld() {
-        delete validatingPool;
-        delete nonvalidatingPool;
         XMLToolingConfig::getConfig().term();
 #if defined(_MSC_VER ) && defined(XMLTOOLINGTEST_LEAKCHECK)
        _CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_FILE );
@@ -76,7 +70,7 @@ public:
 
     void testUnknown() {
         ifstream fs("../xmltoolingtest/data/SimpleXMLObjectWithChildren.xml");
-        DOMDocument* doc=nonvalidatingPool->parse(fs);
+        DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
         TS_ASSERT(doc!=NULL);
 
         string buf1;
@@ -104,7 +98,7 @@ public:
 
     void testUnknownWithDocChange() {
         ifstream fs("../xmltoolingtest/data/SimpleXMLObjectWithChildren.xml");
-        DOMDocument* doc=nonvalidatingPool->parse(fs);
+        DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
         TS_ASSERT(doc!=NULL);
 
         string buf1;
@@ -116,7 +110,7 @@ public:
         auto_ptr<XMLObject> xmlObject(b->buildFromDocument(doc)); // bind document
         TS_ASSERT(xmlObject.get()!=NULL);
 
-        DOMDocument* newDoc=nonvalidatingPool->newDocument();
+        DOMDocument* newDoc=XMLToolingConfig::getConfig().getParser().newDocument();
         DOMElement* rootElement=xmlObject->marshall(newDoc);
         TS_ASSERT(rootElement!=NULL);
 

@@ -132,7 +132,7 @@ public:
         //TS_TRACE(buf.c_str());
 
         istringstream in(buf);
-        DOMDocument* doc=nonvalidatingPool->parse(in);
+        DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(in);
         auto_ptr<SimpleXMLObject> sxObject2(dynamic_cast<SimpleXMLObject*>(b->buildFromDocument(doc)));
         TS_ASSERT(sxObject2.get()!=NULL);
         TS_ASSERT(sxObject2->getSignature()!=NULL);

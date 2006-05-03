@@ -53,7 +53,7 @@ namespace xmltooling {
     class XMLToolingInternalConfig : public xmltooling::XMLToolingConfig
     {
     public:
-        XMLToolingInternalConfig() : m_parserPool(NULL), m_lock(NULL) {
+        XMLToolingInternalConfig() : m_parserPool(NULL), m_validatingPool(NULL), m_lock(NULL) {
 #ifndef XMLTOOLING_NO_XMLSEC
             m_xsecProvider=NULL;
 #endif
@@ -73,8 +73,15 @@ namespace xmltooling {
         bool load_library(const char* path, void* context=NULL);
         bool log_config(const char* config=NULL);
 
-        // internal parser pool
-        xmltooling::ParserPool* m_parserPool;
+        // parser access
+        ParserPool& getParser() const {
+            return *m_parserPool;
+        }
+
+        ParserPool& getValidatingParser() const {
+            return *m_validatingPool;
+        }
+
 #ifndef XMLTOOLING_NO_XMLSEC
         XSECProvider* m_xsecProvider;
 #endif
@@ -82,6 +89,8 @@ namespace xmltooling {
     private:
         std::vector<void*> m_libhandles;
         void* m_lock;
+        ParserPool* m_parserPool;
+        ParserPool* m_validatingPool;
     };
     /// @endcond
 
