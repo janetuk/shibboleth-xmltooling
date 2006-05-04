@@ -20,8 +20,6 @@
  * Library configuration 
  */
 
-#define XMLTOOLING_DECLARE_VALIDATORS
-
 #include "internal.h"
 #include "exceptions.h"
 #include "XMLToolingConfig.h"
@@ -50,17 +48,6 @@ using namespace xmlsignature;
 using namespace xmltooling;
 using namespace log4cpp;
 using namespace std;
-
-#define REGISTER_ELEMENT(namespaceURI,cname) \
-    q=QName(namespaceURI,cname::LOCAL_NAME); \
-    XMLObjectBuilder::registerBuilder(q,new cname##Builder()); \
-    Validator::registerValidator(q,new cname##SchemaValidator())
-    
-#define REGISTER_TYPE(namespaceURI,cname) \
-    q=QName(namespaceURI,cname::TYPE_NAME); \
-    XMLObjectBuilder::registerBuilder(q,new cname##Builder()); \
-    Validator::registerValidator(q,new cname##SchemaValidator())
-
 
 DECL_EXCEPTION_FACTORY(XMLParserException,xmltooling);
 DECL_EXCEPTION_FACTORY(XMLObjectException,xmltooling);
@@ -172,52 +159,9 @@ bool XMLToolingInternalConfig::init()
 
         // default registrations
         XMLObjectBuilder::registerDefaultBuilder(new UnknownElementBuilder());
-        
-        QName q;
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,KeyInfo);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,KeyName);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,KeyValue);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,MgmtData);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,DSAKeyValue);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,RSAKeyValue);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Exponent);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Modulus);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,P);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Q);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,G);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Y);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,J);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Seed);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,PgenCounter);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,XPath);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Transform);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Transforms);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,RetrievalMethod);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509IssuerSerial);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509IssuerName);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509SerialNumber);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509SKI);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509SubjectName);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509Certificate);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509CRL);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509Data);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,SPKISexp);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,SPKIData);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,PGPKeyID);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,PGPKeyPacket);
-        REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,PGPData);
-        REGISTER_TYPE(XMLConstants::XMLSIG_NS,KeyInfo);
-        REGISTER_TYPE(XMLConstants::XMLSIG_NS,KeyValue);
-        REGISTER_TYPE(XMLConstants::XMLSIG_NS,DSAKeyValue);
-        REGISTER_TYPE(XMLConstants::XMLSIG_NS,RSAKeyValue);
-        REGISTER_TYPE(XMLConstants::XMLSIG_NS,Transform);
-        REGISTER_TYPE(XMLConstants::XMLSIG_NS,Transforms);
-        REGISTER_TYPE(XMLConstants::XMLSIG_NS,RetrievalMethod);
-        REGISTER_TYPE(XMLConstants::XMLSIG_NS,X509IssuerSerial);
-        REGISTER_TYPE(XMLConstants::XMLSIG_NS,X509Data);
-        REGISTER_TYPE(XMLConstants::XMLSIG_NS,SPKIData);
-        REGISTER_TYPE(XMLConstants::XMLSIG_NS,PGPData);
 
+        registerKeyInfoClasses();
+        
         REGISTER_EXCEPTION_FACTORY(XMLParserException,xmltooling);
         REGISTER_EXCEPTION_FACTORY(XMLObjectException,xmltooling);
         REGISTER_EXCEPTION_FACTORY(MarshallingException,xmltooling);

@@ -20,7 +20,7 @@
  * A thread-safe abstract unmarshaller.
  */
 
-#if !defined(__xmltooling_xmlunmarshaller_h__)
+#ifndef __xmltooling_xmlunmarshaller_h__
 #define __xmltooling_xmlunmarshaller_h__
 
 #include <xmltooling/AbstractDOMCachingXMLObject.h>
@@ -75,7 +75,7 @@ namespace xmltooling {
          * 
          * @throws UnmarshallingException thrown if there is a problem adding the child to the parent
          */
-        virtual void processChildElement(XMLObject* child, const DOMElement* childRoot) {}
+        virtual void processChildElement(XMLObject* child, const DOMElement* childRoot);
     
         /**
          * Called after an attribute has been unmarshalled so that it can be added to the XMLObject.

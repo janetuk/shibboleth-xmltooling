@@ -154,7 +154,58 @@
     {chLatin_##a, chLatin_##b, chLatin_##c, chLatin_##d, chLatin_##e, chLatin_##f, chLatin_##g, chLatin_##h, chLatin_##i, \
         chLatin_##j, chLatin_##k, chLatin_##l, chLatin_##m, chLatin_##n, chLatin_##o, chLatin_##p, chLatin_##q, chLatin_##r, \
         chLatin_##s, chLatin_##t, chLatin_##u, chLatin_##v, chLatin_##w, chLatin_##x, chLatin_##y, chLatin_##z, chNull}
+#define UNICODE_LITERAL_27(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa) \
+    {chLatin_##a, chLatin_##b, chLatin_##c, chLatin_##d, chLatin_##e, chLatin_##f, chLatin_##g, chLatin_##h, chLatin_##i, \
+        chLatin_##j, chLatin_##k, chLatin_##l, chLatin_##m, chLatin_##n, chLatin_##o, chLatin_##p, chLatin_##q, chLatin_##r, \
+        chLatin_##s, chLatin_##t, chLatin_##u, chLatin_##v, chLatin_##w, chLatin_##x, chLatin_##y, chLatin_##z, \
+        chLatin_##aa, chNull}
+#define UNICODE_LITERAL_28(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb) \
+    {chLatin_##a, chLatin_##b, chLatin_##c, chLatin_##d, chLatin_##e, chLatin_##f, chLatin_##g, chLatin_##h, chLatin_##i, \
+        chLatin_##j, chLatin_##k, chLatin_##l, chLatin_##m, chLatin_##n, chLatin_##o, chLatin_##p, chLatin_##q, chLatin_##r, \
+        chLatin_##s, chLatin_##t, chLatin_##u, chLatin_##v, chLatin_##w, chLatin_##x, chLatin_##y, chLatin_##z, \
+        chLatin_##aa, chLatin_##bb, chNull}
+#define UNICODE_LITERAL_29(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc) \
+    {chLatin_##a, chLatin_##b, chLatin_##c, chLatin_##d, chLatin_##e, chLatin_##f, chLatin_##g, chLatin_##h, chLatin_##i, \
+        chLatin_##j, chLatin_##k, chLatin_##l, chLatin_##m, chLatin_##n, chLatin_##o, chLatin_##p, chLatin_##q, chLatin_##r, \
+        chLatin_##s, chLatin_##t, chLatin_##u, chLatin_##v, chLatin_##w, chLatin_##x, chLatin_##y, chLatin_##z, \
+        chLatin_##aa, chLatin_##bb, chLatin_##cc, chNull}
+#define UNICODE_LITERAL_30(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd) \
+    {chLatin_##a, chLatin_##b, chLatin_##c, chLatin_##d, chLatin_##e, chLatin_##f, chLatin_##g, chLatin_##h, chLatin_##i, \
+        chLatin_##j, chLatin_##k, chLatin_##l, chLatin_##m, chLatin_##n, chLatin_##o, chLatin_##p, chLatin_##q, chLatin_##r, \
+        chLatin_##s, chLatin_##t, chLatin_##u, chLatin_##v, chLatin_##w, chLatin_##x, chLatin_##y, chLatin_##z, \
+        chLatin_##aa, chLatin_##bb, chLatin_##cc, chLatin_##dd, chNull}
+#define UNICODE_LITERAL_31(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee) \
+    {chLatin_##a, chLatin_##b, chLatin_##c, chLatin_##d, chLatin_##e, chLatin_##f, chLatin_##g, chLatin_##h, chLatin_##i, \
+        chLatin_##j, chLatin_##k, chLatin_##l, chLatin_##m, chLatin_##n, chLatin_##o, chLatin_##p, chLatin_##q, chLatin_##r, \
+        chLatin_##s, chLatin_##t, chLatin_##u, chLatin_##v, chLatin_##w, chLatin_##x, chLatin_##y, chLatin_##z, \
+        chLatin_##aa, chLatin_##bb, chLatin_##cc, chLatin_##dd, chLatin_##ee, chNull}
+#define UNICODE_LITERAL_32(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff) \
+    {chLatin_##a, chLatin_##b, chLatin_##c, chLatin_##d, chLatin_##e, chLatin_##f, chLatin_##g, chLatin_##h, chLatin_##i, \
+        chLatin_##j, chLatin_##k, chLatin_##l, chLatin_##m, chLatin_##n, chLatin_##o, chLatin_##p, chLatin_##q, chLatin_##r, \
+        chLatin_##s, chLatin_##t, chLatin_##u, chLatin_##v, chLatin_##w, chLatin_##x, chLatin_##y, chLatin_##z, \
+        chLatin_##aa, chLatin_##bb, chLatin_##cc, chLatin_##dd, chLatin_##ee, chLatin_##ff, chNull}
 #endif /* DOXYGEN_SKIP */
+
+/**
+ * Begins the declaration of an XMLObject specialization for an abstract element/type.
+ * Basic boilerplate includes a protected constructor, empty virtual destructor,
+ * and Unicode constants for the default associated element's name and prefix.
+ * 
+ * @param linkage   linkage specifier for the class
+ * @param cname     the name of the class to declare
+ * @param base      the base class to derive from using public virtual inheritance
+ * @param desc      documentation comment for class
+ */
+#define DECL_XMLOBJECT_ABSTRACT(linkage,cname,base,desc) \
+    XMLTOOLING_DOXYGEN(desc) \
+    class linkage cname : public virtual base { \
+    protected: \
+        cname() {} \
+    public: \
+        virtual ~cname() {} \
+        XMLTOOLING_DOXYGEN(Element local name) \
+        static const XMLCh LOCAL_NAME[]; \
+    }
 
 /**
  * Begins the declaration of an XMLObject specialization.

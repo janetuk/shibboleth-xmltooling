@@ -174,3 +174,8 @@ void AbstractXMLObjectUnmarshaller::unmarshallChildElements(const DOMElement* do
         }
     }
 }
+
+void AbstractXMLObjectUnmarshaller::processChildElement(XMLObject* child, const DOMElement* childRoot)
+{
+    throw UnmarshallingException("Child elements are not permitted on this object.");
+}

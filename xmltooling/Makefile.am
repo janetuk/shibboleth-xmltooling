@@ -91,6 +91,7 @@ libxmltooling_la_SOURCES = \
     io/AbstractXMLObjectMarshaller.cpp \
     io/AbstractXMLObjectUnmarshaller.cpp \
     signature/impl/KeyInfoImpl.cpp \
+    signature/impl/KeyInfoSchemaValidators.cpp \
     util/NDC.cpp \
     util/ParserPool.cpp \
     util/XMLConstants.cpp \

@@ -292,6 +292,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\signature\impl\KeyInfoSchemaValidators.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\signature\impl\XMLSecSignatureImpl.cpp"
 						>
 					</File>
