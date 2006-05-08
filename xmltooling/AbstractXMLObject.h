@@ -24,6 +24,7 @@
 #define __xmltooling_abstractxmlobj_h__
 
 #include <xmltooling/XMLObject.h>
+#include <xmltooling/util/DateTime.h>
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -97,9 +98,10 @@ namespace xmltooling {
         AbstractXMLObject(const AbstractXMLObject& src);
         
         /**
-         * A helper function for derived classes.
+         * A helper function for derived classes, for assignment of strings.
+         *
          * This 'normalizes' newString, and then if it is different from oldString,
-         * it invalidates the DOM, frees the old string, and return the new.
+         * it invalidates the DOM, frees the old string, and returns the new.
          * If not different, it frees the new string and just returns the old value.
          * 
          * @param oldValue - the current value
@@ -108,6 +110,54 @@ namespace xmltooling {
          * @return the value that should be assigned
          */
         XMLCh* prepareForAssignment(XMLCh* oldValue, const XMLCh* newValue);
+
+        /**
+         * A helper function for derived classes, for assignment of date/time data.
+         *
+         * It invalidates the DOM, frees the old object, and returns the new.
+         * 
+         * @param oldValue - the current value
+         * @param newValue - the new value
+         * 
+         * @return the value that should be assigned
+         */
+        DateTime* prepareForAssignment(DateTime* oldValue, const DateTime* newValue);
+
+        /**
+         * A helper function for derived classes, for assignment of date/time data.
+         *
+         * It invalidates the DOM, frees the old object, and returns the new.
+         * 
+         * @param oldValue - the current value
+         * @param newValue - the epoch to assign as the new value
+         * 
+         * @return the value that should be assigned
+         */
+        DateTime* prepareForAssignment(DateTime* oldValue, time_t newValue);
+
+        /**
+         * A helper function for derived classes, for assignment of date/time data.
+         *
+         * It invalidates the DOM, frees the old object, and returns the new.
+         * 
+         * @param oldValue - the current value
+         * @param newValue - the new value in string form
+         * 
+         * @return the value that should be assigned
+         */
+        DateTime* prepareForAssignment(DateTime* oldValue, const XMLCh* newValue);
+
+        /**
+         * A helper function for derived classes, for assignment of QName data.
+         *
+         * It invalidates the DOM, frees the old object, and returns the new.
+         * 
+         * @param oldValue - the current value
+         * @param newValue - the new value
+         * 
+         * @return the value that should be assigned
+         */
+        QName* prepareForAssignment(QName* oldValue, const QName* newValue);
 
         /**
          * A helper function for derived classes, for assignment of (singleton) XML objects.

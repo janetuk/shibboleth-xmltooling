@@ -60,6 +60,61 @@ XMLCh* AbstractXMLObject::prepareForAssignment(XMLCh* oldValue, const XMLCh* new
     return oldValue;            
 }
 
+QName* AbstractXMLObject::prepareForAssignment(QName* oldValue, const QName* newValue)
+{
+    if (!oldValue) {
+        if (newValue) {
+            releaseThisandParentDOM();
+            Namespace newNamespace(newValue->getNamespaceURI(), newValue->getPrefix());
+            addNamespace(newNamespace);
+            return new QName(*newValue);
+        }
+        return NULL;
+    }
+
+    delete oldValue;
+    releaseThisandParentDOM();
+    if (newValue) {
+        Namespace newNamespace(newValue->getNamespaceURI(), newValue->getPrefix());
+        addNamespace(newNamespace);
+        return new QName(*newValue);
+    }
+    return NULL;
+}
+
+DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, const DateTime* newValue)
+{
+    if (!oldValue) {
+        if (newValue) {
+            releaseThisandParentDOM();
+            return new DateTime(*newValue);
+        }
+        return NULL;
+    }
+
+    delete oldValue;
+    releaseThisandParentDOM();
+    return newValue ? new DateTime(*newValue) : NULL;
+}
+
+DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, time_t newValue)
+{
+    delete oldValue;
+    releaseThisandParentDOM();
+    DateTime* ret = new DateTime(newValue);
+    ret->parseDateTime();
+    return ret;
+}
+
+DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, const XMLCh* newValue)
+{
+    delete oldValue;
+    releaseThisandParentDOM();
+    DateTime* ret = new DateTime(newValue);
+    ret->parseDateTime();
+    return ret;
+}
+
 XMLObject* AbstractXMLObject::prepareForAssignment(XMLObject* oldValue, XMLObject* newValue)
 {
     if (newValue && newValue->hasParent())

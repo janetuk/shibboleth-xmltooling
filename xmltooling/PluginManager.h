@@ -27,9 +27,11 @@
 
 #include <map>
 #include <string>
-#include <xercesc/dom/DOM.hpp>
 
-using namespace xercesc;
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4250 4251 )
+#endif
 
 namespace xmltooling {
 
@@ -73,7 +75,7 @@ namespace xmltooling {
 
         /**
          * Builds a new instance of a plugin of a given type, configuring it
-         * with the supplied element, if any.
+         * with the supplied parameters.
          * 
          * @param type  the name of the plugin type
          * @param p     parameters to configure plugin
@@ -91,5 +93,9 @@ namespace xmltooling {
     };
 
 };
+
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
 
 #endif /* __xmltooling_plugin_h__ */

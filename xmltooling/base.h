@@ -235,42 +235,135 @@
 #define END_XMLOBJECT }
 
 /**
- * Declares abstract get/set methods for a named XML attribute.
+ * Declares abstract get/set methods for a typed XML attribute.
  * 
  * @param proper    the proper name of the attribute
  * @param upcased   the upcased name of the attribute
+ * @param type      the attribute's data type
  */
-#define DECL_XMLOBJECT_ATTRIB(proper,upcased) \
+#define DECL_XMLOBJECT_ATTRIB(proper,upcased,type) \
     public: \
         XMLTOOLING_DOXYGEN(proper attribute name) \
         static const XMLCh upcased##_ATTRIB_NAME[]; \
         XMLTOOLING_DOXYGEN(Returns the proper attribute.) \
-        virtual const XMLCh* get##proper() const=0; \
+        virtual const type* get##proper() const=0; \
         XMLTOOLING_DOXYGEN(Sets the proper attribute.) \
-        virtual void set##proper(const XMLCh* proper)=0
+        virtual void set##proper(const type* proper)=0
 
 /**
- * Implements get/set methods and a private member for a named XML attribute.
+ * Declares abstract get/set methods for a string XML attribute.
+ * 
+ * @param proper    the proper name of the attribute
+ * @param upcased   the upcased name of the attribute
+ */
+#define DECL_STRING_ATTRIB(proper,upcased) \
+    DECL_XMLOBJECT_ATTRIB(proper,upcased,XMLCh)
+
+/**
+ * Declares abstract get/set methods for a string XML attribute.
+ * 
+ * @param proper    the proper name of the attribute
+ * @param upcased   the upcased name of the attribute
+ */
+#define DECL_DATETIME_ATTRIB(proper,upcased) \
+    DECL_XMLOBJECT_ATTRIB(proper,upcased,xmltooling::DateTime); \
+    XMLTOOLING_DOXYGEN(Sets the proper attribute.) \
+    virtual void set##proper(time_t proper)=0; \
+    XMLTOOLING_DOXYGEN(Sets the proper attribute.) \
+    virtual void set##proper(const XMLCh* proper)=0
+
+/**
+ * Declares abstract get/set methods for an integer XML attribute.
+ * 
+ * @param proper    the proper name of the attribute
+ * @param upcased   the upcased name of the attribute
+ */
+#define DECL_INTEGER_ATTRIB(proper,upcased) \
+    public: \
+        XMLTOOLING_DOXYGEN(proper attribute name) \
+        static const XMLCh upcased##_ATTRIB_NAME[]; \
+        XMLTOOLING_DOXYGEN(Returns the proper attribute.) \
+        virtual int get##proper() const=0; \
+        XMLTOOLING_DOXYGEN(Sets the proper attribute.) \
+        virtual void set##proper(int proper)=0
+
+/**
+ * Implements get/set methods and a private member for a typed XML attribute.
+ * 
+ * @param proper    the proper name of the attribute
+ * @param type      the attribute's data type
+ */
+#define IMPL_XMLOBJECT_ATTRIB(proper,type) \
+    protected: \
+        type* m_##proper; \
+    public: \
+        const type* get##proper() const { \
+            return m_##proper; \
+        } \
+        void set##proper(const type* proper) { \
+            m_##proper = prepareForAssignment(m_##proper,proper); \
+        }
+
+/**
+ * Implements get/set methods and a private member for a string XML attribute.
  * 
  * @param proper    the proper name of the attribute
  */
-#define IMPL_XMLOBJECT_ATTRIB(proper) \
-    private: \
-        XMLCh* m_##proper; \
+#define IMPL_STRING_ATTRIB(proper) \
+    IMPL_XMLOBJECT_ATTRIB(proper,XMLCh)
+
+/**
+ * Implements get/set methods and a private member for a DateTime XML attribute.
+ * 
+ * @param proper    the proper name of the attribute
+ */
+#define IMPL_DATETIME_ATTRIB(proper) \
+    IMPL_XMLOBJECT_ATTRIB(proper,xmltooling::DateTime); \
+    void set##proper(time_t proper) { \
+        m_##proper = prepareForAssignment(m_##proper,proper); \
+    } \
+    void set##proper(const XMLCh* proper) { \
+        m_##proper = prepareForAssignment(m_##proper,proper); \
+    }
+
+/**
+ * Implements get/set methods and a private member for an integer XML attribute.
+ * 
+ * @param proper    the proper name of the attribute
+ */
+#define IMPL_INTEGER_ATTRIB(proper) \
+    protected: \
+        int m_##proper; \
     public: \
-        const XMLCh* get##proper() const { \
+        int get##proper() const { \
             return m_##proper; \
         } \
-        void set##proper(const XMLCh* proper) { \
-            m_##proper = prepareForAssignment(m_##proper,proper); \
+        void set##proper(int proper) { \
+            if (m_##proper != proper) { \
+                releaseThisandParentDOM(); \
+                m_##proper = proper; \
+            } \
         }
+
+/**
+ * Declares abstract get/set methods for a typed XML child object in a foreign namespace.
+ * 
+ * @param proper    the proper name of the child type
+ * @param ns        the C++ namespace for the type
+ */
+#define DECL_TYPED_FOREIGN_CHILD(proper,ns) \
+    public: \
+        XMLTOOLING_DOXYGEN(Returns the proper child.) \
+        virtual ns::proper* get##proper() const=0; \
+        XMLTOOLING_DOXYGEN(Sets the proper child.) \
+        virtual void set##proper(ns::proper* child)=0
 
 /**
  * Declares abstract get/set methods for a typed XML child object.
  * 
  * @param proper    the proper name of the child type
  */
-#define DECL_XMLOBJECT_CHILD(proper) \
+#define DECL_TYPED_CHILD(proper) \
     public: \
         XMLTOOLING_DOXYGEN(Returns the proper child.) \
         virtual proper* get##proper() const=0; \
@@ -278,14 +371,27 @@
         virtual void set##proper(proper* child)=0
 
 /**
+ * Declares abstract get/set methods for a generic XML child object.
+ * 
+ * @param proper    the proper name of the child
+ */
+#define DECL_XMLOBJECT_CHILD(proper) \
+    public: \
+        XMLTOOLING_DOXYGEN(Returns the proper child.) \
+        virtual xmltooling::XMLObject* get##proper() const=0; \
+        XMLTOOLING_DOXYGEN(Sets the proper child.) \
+        virtual void set##proper(xmltooling::XMLObject* child)=0
+
+
+/**
  * Implements get/set methods and a private list iterator member for a typed XML child object.
  * 
  * @param proper    the proper name of the child type
  */
-#define IMPL_XMLOBJECT_CHILD(proper) \
-    private: \
+#define IMPL_TYPED_CHILD(proper) \
+    protected: \
         proper* m_##proper; \
-        std::list<XMLObject*>::iterator m_pos_##proper; \
+        std::list<xmltooling::XMLObject*>::iterator m_pos_##proper; \
     public: \
         proper* get##proper() const { \
             return m_##proper; \
@@ -296,11 +402,29 @@
         }
 
 /**
+ * Implements get/set methods and a private list iterator member for a generic XML child object.
+ * 
+ * @param proper    the proper name of the child
+ */
+#define IMPL_XMLOBJECT_CHILD(proper) \
+    protected: \
+        xmltooling::XMLObject* m_##proper; \
+        std::list<xmltooling::XMLObject*>::iterator m_pos_##proper; \
+    public: \
+        xmltooling::XMLObject* get##proper() const { \
+            return m_##proper; \
+        } \
+        void set##proper(xmltooling::XMLObject* child) { \
+            prepareForAssignment(m_##proper,child); \
+            *m_pos_##proper = m_##proper = child; \
+        }
+
+/**
  * Declares abstract get/set methods for a typed XML child collection.
  * 
  * @param proper    the proper name of the child type
  */
-#define DECL_XMLOBJECT_CHILDREN(proper) \
+#define DECL_TYPED_CHILDREN(proper) \
     public: \
         XMLTOOLING_DOXYGEN(Returns modifiable proper collection.) \
         virtual VectorOf(proper) get##proper##s()=0; \
@@ -308,13 +432,25 @@
         virtual const std::vector<proper*>& get##proper##s() const=0
 
 /**
+ * Declares abstract get/set methods for a generic XML child collection.
+ * 
+ * @param proper    the proper name of the child
+ */
+#define DECL_XMLOBJECT_CHILDREN(proper) \
+    public: \
+        XMLTOOLING_DOXYGEN(Returns modifiable proper collection.) \
+        virtual VectorOf(xmltooling::XMLObject) get##proper##s()=0; \
+        XMLTOOLING_DOXYGEN(Returns reference to immutable proper collection.) \
+        virtual const std::vector<xmltooling::XMLObject*>& get##proper##s() const=0
+
+/**
  * Implements get method and a private vector member for a typed XML child collection.
  * 
  * @param proper    the proper name of the child type
  * @param fence     insertion fence for new objects of the child collection in backing list
  */
-#define IMPL_XMLOBJECT_CHILDREN(proper,fence) \
-    private: \
+#define IMPL_TYPED_CHILDREN(proper,fence) \
+    protected: \
         std::vector<proper*> m_##proper##s; \
     public: \
         VectorOf(proper) get##proper##s() { \
@@ -325,15 +461,70 @@
         } 
 
 /**
- * Implements marshalling for an attribute
+ * Implements get method and a private vector member for a generic XML child collection.
+ * 
+ * @param proper    the proper name of the child
+ * @param fence     insertion fence for new objects of the child collection in backing list
+ */
+#define IMPL_XMLOBJECT_CHILDREN(proper,fence) \
+    protected: \
+        std::vector<xmltooling::XMLObject*> m_##proper##s; \
+    public: \
+        VectorOf(xmltooling::XMLObject) get##proper##s() { \
+            return VectorOf(xmltooling::XMLObject)(this, m_##proper##s, &m_children, fence); \
+        } \
+        const std::vector<xmltooling::XMLObject*>& get##proper##s() const { \
+            return m_##proper##s; \
+        } 
+
+/**
+ * Implements marshalling for a string attribute
  * 
  * @param proper        the proper name of the attribute
  * @param ucase         the upcased name of the attribute
  * @param namespaceURI  the XML namespace of the attribute
  */
-#define MARSHALL_XMLOBJECT_ATTRIB(proper,ucase,namespaceURI) \
+#define MARSHALL_STRING_ATTRIB(proper,ucase,namespaceURI) \
     if(get##proper()) { \
         domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, get##proper()); \
+    }
+
+/**
+ * Implements marshalling for a DateTime attribute
+ * 
+ * @param proper        the proper name of the attribute
+ * @param ucase         the upcased name of the attribute
+ * @param namespaceURI  the XML namespace of the attribute
+ */
+#define MARSHALL_DATETIME_ATTRIB(proper,ucase,namespaceURI) \
+    if(get##proper()) { \
+        domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, get##proper()->getRawData()); \
+    }
+
+/**
+ * Implements marshalling for an integer attribute
+ * 
+ * @param proper        the proper name of the attribute
+ * @param ucase         the upcased name of the attribute
+ * @param namespaceURI  the XML namespace of the attribute
+ */
+#define MARSHALL_INTEGER_ATTRIB(proper,ucase,namespaceURI) \
+    char buf##proper[64]; \
+    sprintf(buf##proper,"%d",get##proper()); \
+    auto_ptr_XMLCh wide##proper(buf##proper); \
+    domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, wide##proper.get())
+
+/**
+ * Implements marshalling for a QName attribute
+ * 
+ * @param proper        the proper name of the attribute
+ * @param ucase         the upcased name of the attribute
+ * @param namespaceURI  the XML namespace of the attribute
+ */
+#define MARSHALL_QNAME_ATTRIB(proper,ucase,namespaceURI) \
+    if(get##proper()) { \
+        auto_ptr_XMLCh qstr(get##proper()->toString().c_str()); \
+        domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, qstr.get()); \
     }
 
 /**
@@ -343,20 +534,20 @@
  * @param ucase         the upcased name of the attribute
  * @param namespaceURI  the XML namespace of the attribute
  */
-#define MARSHALL_XMLOBJECT_ID_ATTRIB(proper,ucase,namespaceURI) \
+#define MARSHALL_ID_ATTRIB(proper,ucase,namespaceURI) \
     if(get##proper()) { \
         domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, get##proper()); \
         domElement->setIdAttributeNS(namespaceURI, ucase##_ATTRIB_NAME); \
     }
 
 /**
- * Implements unmarshalling process branch for an attribute
+ * Implements unmarshalling process branch for a string attribute
  * 
  * @param proper        the proper name of the attribute
  * @param ucase         the upcased name of the attribute
  * @param namespaceURI  the XML namespace of the attribute
  */
-#define PROC_XMLOBJECT_ATTRIB(proper,ucase,namespaceURI) \
+#define PROC_STRING_ATTRIB(proper,ucase,namespaceURI) \
     if (xmltooling::XMLHelper::isNodeNamed(attribute, namespaceURI, ucase##_ATTRIB_NAME)) { \
         set##proper(attribute->getValue()); \
         return; \
@@ -369,7 +560,7 @@
  * @param ucase         the upcased name of the attribute
  * @param namespaceURI  the XML namespace of the attribute
  */
-#define PROC_XMLOBJECT_ID_ATTRIB(proper,ucase,namespaceURI) \
+#define PROC_ID_ATTRIB(proper,ucase,namespaceURI) \
     if (xmltooling::XMLHelper::isNodeNamed(attribute, namespaceURI, ucase##_ATTRIB_NAME)) { \
         set##proper(attribute->getValue()); \
         static_cast<DOMElement*>(attribute->getParentNode())->setIdAttributeNode(attribute); \
@@ -377,13 +568,51 @@
     }
 
 /**
+ * Implements unmarshalling process branch for a DateTime attribute
+ * 
+ * @param proper        the proper name of the attribute
+ * @param ucase         the upcased name of the attribute
+ * @param namespaceURI  the XML namespace of the attribute
+ */
+#define PROC_DATETIME_ATTRIB(proper,ucase,namespaceURI) \
+    PROC_STRING_ATTRIB(proper,ucase,namespaceURI)
+
+/**
+ * Implements unmarshalling process branch for a DateTime attribute
+ * 
+ * @param proper        the proper name of the attribute
+ * @param ucase         the upcased name of the attribute
+ * @param namespaceURI  the XML namespace of the attribute
+ */
+#define PROC_QNAME_ATTRIB(proper,ucase,namespaceURI) \
+    if (xmltooling::XMLHelper::isNodeNamed(attribute, namespaceURI, ucase##_ATTRIB_NAME)) { \
+        set##proper(XMLHelper::getAttributeValueAsQName(attribute)); \
+        return; \
+    }
+
+/**
+ * Implements unmarshalling process branch for an integer attribute
+ * 
+ * @param proper        the proper name of the attribute
+ * @param ucase         the upcased name of the attribute
+ * @param namespaceURI  the XML namespace of the attribute
+ */
+#define PROC_INTEGER_ATTRIB(proper,ucase,namespaceURI) \
+    if (xmltooling::XMLHelper::isNodeNamed(attribute, namespaceURI, ucase##_ATTRIB_NAME)) { \
+        set##proper(XMLString::parseInt(attribute->getValue())); \
+        return; \
+    }
+
+
+/**
  * Implements unmarshalling process branch for typed child collection element
  * 
  * @param proper        the proper name of the child type
  * @param namespaceURI  the XML namespace of the child element
+ * @param force         bypass use of hint and just cast down to check child
  */
-#define PROC_XMLOBJECT_CHILDREN(proper,namespaceURI) \
-    if (xmltooling::XMLHelper::isNodeNamed(root,namespaceURI,proper::LOCAL_NAME)) { \
+#define PROC_TYPED_CHILDREN(proper,namespaceURI,force) \
+    if (force || xmltooling::XMLHelper::isNodeNamed(root,namespaceURI,proper::LOCAL_NAME)) { \
         proper* typesafe=dynamic_cast<proper*>(childXMLObject); \
         if (typesafe) { \
             get##proper##s().push_back(typesafe); \
@@ -396,9 +625,10 @@
  * 
  * @param proper        the proper name of the child type
  * @param namespaceURI  the XML namespace of the child element
+ * @param force         bypass use of hint and just cast down to check child
  */
-#define PROC_XMLOBJECT_CHILD(proper,namespaceURI) \
-    if (xmltooling::XMLHelper::isNodeNamed(root,namespaceURI,proper::LOCAL_NAME)) { \
+#define PROC_TYPED_CHILD(proper,namespaceURI,force) \
+    if (force || xmltooling::XMLHelper::isNodeNamed(root,namespaceURI,proper::LOCAL_NAME)) { \
         proper* typesafe=dynamic_cast<proper*>(childXMLObject); \
         if (typesafe) { \
             set##proper(typesafe); \
@@ -478,7 +708,7 @@
  */
 #define DECL_XMLOBJECTIMPL_SIMPLE(linkage,cname) \
     class linkage cname##Impl \
-        : public cname, \
+        : public virtual cname, \
             public xmltooling::AbstractSimpleElement, \
             public xmltooling::AbstractChildlessElement, \
             public xmltooling::AbstractDOMCachingXMLObject, \
@@ -619,6 +849,18 @@
         throw xmltooling::ValidationException(#cname" must have "#proper1" or "#proper2".")
 
 /**
+ * Validator code that checks for one of a pair of
+ * required attributes, content, or singletons, but disallows both.
+ * 
+ * @param cname     the name of the XMLObject specialization
+ * @param proper1   the proper name of the first attribute, content, or singleton member 
+ * @param proper2   the proper name of the second attribute, content, or singleton member 
+ */
+#define XMLOBJECTVALIDATOR_ONLYONEOF(cname,proper1,proper2) \
+    if ((!ptr->get##proper1() && !ptr->get##proper2()) || (ptr->get##proper1() && ptr->get##proper2())) \
+        throw xmltooling::ValidationException(#cname" must have "#proper1" or "#proper2" but not both.")
+
+/**
  * Validator code that checks for one of a set of three
  * required attributes, content, or singletons.
  * 
@@ -630,6 +872,26 @@
 #define XMLOBJECTVALIDATOR_ONEOF3(cname,proper1,proper2,proper3) \
     if (!ptr->get##proper1() && !ptr->get##proper2() && !ptr->get##proper3()) \
         throw xmltooling::ValidationException(#cname" must have "#proper1", "#proper2", or "#proper3".")
+
+/**
+ * Validator code that checks for one of a set of three
+ * required attributes, content, or singletons but disallows more than one.
+ * 
+ * @param cname     the name of the XMLObject specialization
+ * @param proper1   the proper name of the first attribute, content, or singleton member
+ * @param proper2   the proper name of the second attribute, content, or singleton member
+ * @param proper3   the proper name of the third attribute, content, or singleton member
+ */
+#define XMLOBJECTVALIDATOR_ONLYONEOF3(cname,proper1,proper2,proper3) \
+    int c##proper1##proper2##proper3=0; \
+    if (ptr->get##proper1()!=NULL) \
+        c##proper1##proper2##proper3++; \
+    if (ptr->get##proper2()!=NULL) \
+        c##proper1##proper2##proper3++; \
+    if (ptr->get##proper3()!=NULL) \
+        c##proper1##proper2##proper3++; \
+    if (c##proper1##proper2##proper3 != 1) \
+        throw xmltooling::ValidationException(#cname" must have only one of "#proper1", "#proper2", or "#proper3".")
 
 /**
  * Validator code that checks a co-constraint (if one present, the other must be)

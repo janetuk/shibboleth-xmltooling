@@ -229,6 +229,10 @@
 				Name="util"
 				>
 				<File
+					RelativePath=".\util\DateTime.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\util\NDC.cpp"
 					>
 				</File>
@@ -402,6 +406,10 @@
 			<Filter
 				Name="util"
 				>
+				<File
+					RelativePath=".\util\DateTime.h"
+					>
+				</File>
 				<File
 					RelativePath=".\util\NDC.h"
 					>

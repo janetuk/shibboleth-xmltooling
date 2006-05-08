@@ -1,7 +1,7 @@
 /*
-*  Copyright 2001-2006 Internet2
+ *  Copyright 2001-2006 Internet2
  * 
-* Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -45,7 +45,7 @@ using namespace std;
 
 namespace xmlsignature {
     
-    class XMLTOOL_DLLLOCAL DSAKeyValueImpl : public DSAKeyValue,
+    class XMLTOOL_DLLLOCAL DSAKeyValueImpl : public virtual DSAKeyValue,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractValidatingXMLObject,
@@ -110,28 +110,28 @@ namespace xmlsignature {
         }
         
         IMPL_XMLOBJECT_CLONE(DSAKeyValue);
-        IMPL_XMLOBJECT_CHILD(P);
-        IMPL_XMLOBJECT_CHILD(Q);
-        IMPL_XMLOBJECT_CHILD(G);
-        IMPL_XMLOBJECT_CHILD(Y);
-        IMPL_XMLOBJECT_CHILD(J);
-        IMPL_XMLOBJECT_CHILD(Seed);
-        IMPL_XMLOBJECT_CHILD(PgenCounter);
+        IMPL_TYPED_CHILD(P);
+        IMPL_TYPED_CHILD(Q);
+        IMPL_TYPED_CHILD(G);
+        IMPL_TYPED_CHILD(Y);
+        IMPL_TYPED_CHILD(J);
+        IMPL_TYPED_CHILD(Seed);
+        IMPL_TYPED_CHILD(PgenCounter);
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_XMLOBJECT_CHILD(P,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILD(Q,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILD(G,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILD(Y,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILD(J,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILD(Seed,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILD(PgenCounter,XMLConstants::XMLSIG_NS);
-            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString().c_str()));
+            PROC_TYPED_CHILD(P,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILD(Q,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILD(G,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILD(Y,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILD(J,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILD(Seed,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILD(PgenCounter,XMLConstants::XMLSIG_NS,false);
+            AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
     };
 
-    class XMLTOOL_DLLLOCAL RSAKeyValueImpl : public RSAKeyValue,
+    class XMLTOOL_DLLLOCAL RSAKeyValueImpl : public virtual RSAKeyValue,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractValidatingXMLObject,
@@ -166,18 +166,18 @@ namespace xmlsignature {
         }
         
         IMPL_XMLOBJECT_CLONE(RSAKeyValue);
-        IMPL_XMLOBJECT_CHILD(Modulus);
-        IMPL_XMLOBJECT_CHILD(Exponent);
+        IMPL_TYPED_CHILD(Modulus);
+        IMPL_TYPED_CHILD(Exponent);
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_XMLOBJECT_CHILD(Modulus,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILD(Exponent,XMLConstants::XMLSIG_NS);
-            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString().c_str()));
+            PROC_TYPED_CHILD(Modulus,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILD(Exponent,XMLConstants::XMLSIG_NS,false);
+            AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
     };
 
-    class XMLTOOL_DLLLOCAL KeyValueImpl : public KeyValue,
+    class XMLTOOL_DLLLOCAL KeyValueImpl : public virtual KeyValue,
         public AbstractSimpleElement,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
@@ -201,45 +201,45 @@ namespace xmlsignature {
                 setDSAKeyValue(src.getDSAKeyValue()->cloneDSAKeyValue());
             if (src.getRSAKeyValue())
                 setRSAKeyValue(src.getRSAKeyValue()->cloneRSAKeyValue());
-            if (src.getXMLObject())
-                setXMLObject(src.getXMLObject()->clone());
+            if (src.getOtherKeyValue())
+                setOtherKeyValue(src.getOtherKeyValue()->clone());
         }
         
         void init() {
             m_DSAKeyValue=NULL;
             m_RSAKeyValue=NULL;
-            m_XMLObject=NULL;
+            m_OtherKeyValue=NULL;
             m_children.push_back(NULL);
             m_children.push_back(NULL);
             m_children.push_back(NULL);
             m_pos_DSAKeyValue=m_children.begin();
             m_pos_RSAKeyValue=m_pos_DSAKeyValue;
             ++m_pos_RSAKeyValue;
-            m_pos_XMLObject=m_pos_RSAKeyValue;
-            ++m_pos_XMLObject;
+            m_pos_OtherKeyValue=m_pos_RSAKeyValue;
+            ++m_pos_OtherKeyValue;
         }
         
         IMPL_XMLOBJECT_CLONE(KeyValue);
-        IMPL_XMLOBJECT_CHILD(DSAKeyValue);
-        IMPL_XMLOBJECT_CHILD(RSAKeyValue);
-        IMPL_XMLOBJECT_CHILD(XMLObject);
+        IMPL_TYPED_CHILD(DSAKeyValue);
+        IMPL_TYPED_CHILD(RSAKeyValue);
+        IMPL_XMLOBJECT_CHILD(OtherKeyValue);
         IMPL_XMLOBJECT_CONTENT;
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_XMLOBJECT_CHILD(DSAKeyValue,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILD(RSAKeyValue,XMLConstants::XMLSIG_NS);
+            PROC_TYPED_CHILD(DSAKeyValue,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILD(RSAKeyValue,XMLConstants::XMLSIG_NS,false);
             
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
             if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI)
-                setXMLObject(childXMLObject);
+                setOtherKeyValue(childXMLObject);
             
-            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString().c_str()));
+            AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
     };
 
-    class XMLTOOL_DLLLOCAL TransformImpl : public Transform,
+    class XMLTOOL_DLLLOCAL TransformImpl : public virtual Transform,
         public AbstractDOMCachingXMLObject,
         public AbstractElementProxy,
         public AbstractValidatingXMLObject,
@@ -271,32 +271,32 @@ namespace xmlsignature {
         }
         
         IMPL_XMLOBJECT_CLONE(Transform);
-        IMPL_XMLOBJECT_ATTRIB(Algorithm);
-        IMPL_XMLOBJECT_CHILDREN(XPath,m_children.end());
+        IMPL_STRING_ATTRIB(Algorithm);
+        IMPL_TYPED_CHILDREN(XPath,m_children.end());
         IMPL_XMLOBJECT_CONTENT;
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_XMLOBJECT_ATTRIB(Algorithm,ALGORITHM,NULL);
+            MARSHALL_STRING_ATTRIB(Algorithm,ALGORITHM,NULL);
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_XMLOBJECT_CHILDREN(XPath,XMLConstants::XMLSIG_NS);
+            PROC_TYPED_CHILDREN(XPath,XMLConstants::XMLSIG_NS,false);
             
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
             if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI)
                 getXMLObjects().push_back(childXMLObject);
             
-            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString().c_str()));
+            AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            PROC_XMLOBJECT_ATTRIB(Algorithm,ALGORITHM,NULL);
+            PROC_STRING_ATTRIB(Algorithm,ALGORITHM,NULL);
         }
     };
 
-    class XMLTOOL_DLLLOCAL TransformsImpl : public Transforms,
+    class XMLTOOL_DLLLOCAL TransformsImpl : public virtual Transforms,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractValidatingXMLObject,
@@ -321,16 +321,16 @@ namespace xmlsignature {
         }
         
         IMPL_XMLOBJECT_CLONE(Transforms);
-        IMPL_XMLOBJECT_CHILDREN(Transform,m_children.end());
+        IMPL_TYPED_CHILDREN(Transform,m_children.end());
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_XMLOBJECT_CHILDREN(Transform,XMLConstants::XMLSIG_NS);
-            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString().c_str()));
+            PROC_TYPED_CHILDREN(Transform,XMLConstants::XMLSIG_NS,false);
+            AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
     };
 
-    class XMLTOOL_DLLLOCAL RetrievalMethodImpl : public RetrievalMethod,
+    class XMLTOOL_DLLLOCAL RetrievalMethodImpl : public virtual RetrievalMethod,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractValidatingXMLObject,
@@ -365,28 +365,28 @@ namespace xmlsignature {
         }
         
         IMPL_XMLOBJECT_CLONE(RetrievalMethod);
-        IMPL_XMLOBJECT_ATTRIB(URI);
-        IMPL_XMLOBJECT_ATTRIB(Type);
-        IMPL_XMLOBJECT_CHILD(Transforms);
+        IMPL_STRING_ATTRIB(URI);
+        IMPL_STRING_ATTRIB(Type);
+        IMPL_TYPED_CHILD(Transforms);
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_XMLOBJECT_ATTRIB(URI,URI,NULL);
-            MARSHALL_XMLOBJECT_ATTRIB(Type,TYPE,NULL);
+            MARSHALL_STRING_ATTRIB(URI,URI,NULL);
+            MARSHALL_STRING_ATTRIB(Type,TYPE,NULL);
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_XMLOBJECT_CHILD(Transforms,XMLConstants::XMLSIG_NS);
-            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString().c_str()));
+            PROC_TYPED_CHILD(Transforms,XMLConstants::XMLSIG_NS,false);
+            AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            PROC_XMLOBJECT_ATTRIB(URI,URI,NULL);
-            PROC_XMLOBJECT_ATTRIB(Type,TYPE,NULL);
+            PROC_STRING_ATTRIB(URI,URI,NULL);
+            PROC_STRING_ATTRIB(Type,TYPE,NULL);
         }
     };
 
-    class XMLTOOL_DLLLOCAL X509IssuerSerialImpl : public X509IssuerSerial,
+    class XMLTOOL_DLLLOCAL X509IssuerSerialImpl : public virtual X509IssuerSerial,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractValidatingXMLObject,
@@ -421,18 +421,18 @@ namespace xmlsignature {
         }
         
         IMPL_XMLOBJECT_CLONE(X509IssuerSerial);
-        IMPL_XMLOBJECT_CHILD(X509IssuerName);
-        IMPL_XMLOBJECT_CHILD(X509SerialNumber);
+        IMPL_TYPED_CHILD(X509IssuerName);
+        IMPL_TYPED_CHILD(X509SerialNumber);
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_XMLOBJECT_CHILD(X509IssuerName,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILD(X509SerialNumber,XMLConstants::XMLSIG_NS);
-            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString().c_str()));
+            PROC_TYPED_CHILD(X509IssuerName,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILD(X509SerialNumber,XMLConstants::XMLSIG_NS,false);
+            AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
     };
 
-    class XMLTOOL_DLLLOCAL X509DataImpl : public X509Data,
+    class XMLTOOL_DLLLOCAL X509DataImpl : public virtual X509Data,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractValidatingXMLObject,
@@ -480,37 +480,37 @@ namespace xmlsignature {
                         continue;
                     }
 
-                    getXMLObjects().push_back((*i)->clone());
+                    getOtherX509Datas().push_back((*i)->clone());
                 }
             }
         }
         
         IMPL_XMLOBJECT_CLONE(X509Data);
-        IMPL_XMLOBJECT_CHILDREN(X509IssuerSerial,m_children.end());
-        IMPL_XMLOBJECT_CHILDREN(X509SKI,m_children.end());
-        IMPL_XMLOBJECT_CHILDREN(X509SubjectName,m_children.end());
-        IMPL_XMLOBJECT_CHILDREN(X509Certificate,m_children.end());
-        IMPL_XMLOBJECT_CHILDREN(X509CRL,m_children.end());
-        IMPL_XMLOBJECT_CHILDREN(XMLObject,m_children.end());
+        IMPL_TYPED_CHILDREN(X509IssuerSerial,m_children.end());
+        IMPL_TYPED_CHILDREN(X509SKI,m_children.end());
+        IMPL_TYPED_CHILDREN(X509SubjectName,m_children.end());
+        IMPL_TYPED_CHILDREN(X509Certificate,m_children.end());
+        IMPL_TYPED_CHILDREN(X509CRL,m_children.end());
+        IMPL_XMLOBJECT_CHILDREN(OtherX509Data,m_children.end());
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_XMLOBJECT_CHILDREN(X509IssuerSerial,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILDREN(X509SKI,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILDREN(X509SubjectName,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILDREN(X509Certificate,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILDREN(X509CRL,XMLConstants::XMLSIG_NS);
+            PROC_TYPED_CHILDREN(X509IssuerSerial,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(X509SKI,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(X509SubjectName,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(X509Certificate,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(X509CRL,XMLConstants::XMLSIG_NS,false);
             
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
             if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI)
-                getXMLObjects().push_back(childXMLObject);
+                getOtherX509Datas().push_back(childXMLObject);
             
-            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString().c_str()));
+            AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
     };
 
-    class XMLTOOL_DLLLOCAL SPKIDataImpl : public SPKIData,
+    class XMLTOOL_DLLLOCAL SPKIDataImpl : public virtual SPKIData,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractValidatingXMLObject,
@@ -571,11 +571,11 @@ namespace xmlsignature {
                     throw UnmarshallingException("Extension element must follow ds:SPKISexp element.");
             }
             
-            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString().c_str()));
+            AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
     };
 
-    class XMLTOOL_DLLLOCAL PGPDataImpl : public PGPData,
+    class XMLTOOL_DLLLOCAL PGPDataImpl : public virtual PGPData,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractValidatingXMLObject,
@@ -597,8 +597,8 @@ namespace xmlsignature {
                 setPGPKeyID(src.getPGPKeyID()->clonePGPKeyID());
             if (src.getPGPKeyPacket())
                 setPGPKeyPacket(src.getPGPKeyPacket()->clonePGPKeyPacket());
-            VectorOf(XMLObject) v=getXMLObjects();
-            for (vector<XMLObject*>::const_iterator i=src.m_XMLObjects.begin(); i!=src.m_XMLObjects.end(); i++) {
+            VectorOf(XMLObject) v=getPGPDataExtensions();
+            for (vector<XMLObject*>::const_iterator i=src.m_PGPDataExtensions.begin(); i!=src.m_PGPDataExtensions.end(); i++) {
                 if (*i) {
                     v.push_back((*i)->clone());
                 }
@@ -616,25 +616,25 @@ namespace xmlsignature {
         }
         
         IMPL_XMLOBJECT_CLONE(PGPData);
-        IMPL_XMLOBJECT_CHILD(PGPKeyID);
-        IMPL_XMLOBJECT_CHILD(PGPKeyPacket);
-        IMPL_XMLOBJECT_CHILDREN(XMLObject,m_children.end());
+        IMPL_TYPED_CHILD(PGPKeyID);
+        IMPL_TYPED_CHILD(PGPKeyPacket);
+        IMPL_XMLOBJECT_CHILDREN(PGPDataExtension,m_children.end());
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_XMLOBJECT_CHILD(PGPKeyID,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILD(PGPKeyPacket,XMLConstants::XMLSIG_NS);
+            PROC_TYPED_CHILD(PGPKeyID,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILD(PGPKeyPacket,XMLConstants::XMLSIG_NS,false);
 
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
             if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI)
-                getXMLObjects().push_back(childXMLObject);
+                getPGPDataExtensions().push_back(childXMLObject);
 
-            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString().c_str()));
+            AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
     };
 
-    class XMLTOOL_DLLLOCAL KeyInfoImpl : public KeyInfo,
+    class XMLTOOL_DLLLOCAL KeyInfoImpl : public virtual KeyInfo,
         public AbstractComplexElement,
         public AbstractSimpleElement,
         public AbstractDOMCachingXMLObject,
@@ -702,47 +702,47 @@ namespace xmlsignature {
                         continue;
                     }
 
-                    getXMLObjects().push_back((*i)->clone());
+                    getOthers().push_back((*i)->clone());
                 }
             }
         }
         
         IMPL_XMLOBJECT_CLONE(KeyInfo);
-        IMPL_XMLOBJECT_ATTRIB(Id);
-        IMPL_XMLOBJECT_CHILDREN(KeyName,m_children.end());
-        IMPL_XMLOBJECT_CHILDREN(KeyValue,m_children.end());
-        IMPL_XMLOBJECT_CHILDREN(RetrievalMethod,m_children.end());
-        IMPL_XMLOBJECT_CHILDREN(X509Data,m_children.end());
-        IMPL_XMLOBJECT_CHILDREN(MgmtData,m_children.end());
-        IMPL_XMLOBJECT_CHILDREN(SPKIData,m_children.end());
-        IMPL_XMLOBJECT_CHILDREN(PGPData,m_children.end());
-        IMPL_XMLOBJECT_CHILDREN(XMLObject,m_children.end());
+        IMPL_STRING_ATTRIB(Id);
+        IMPL_TYPED_CHILDREN(KeyName,m_children.end());
+        IMPL_TYPED_CHILDREN(KeyValue,m_children.end());
+        IMPL_TYPED_CHILDREN(RetrievalMethod,m_children.end());
+        IMPL_TYPED_CHILDREN(X509Data,m_children.end());
+        IMPL_TYPED_CHILDREN(MgmtData,m_children.end());
+        IMPL_TYPED_CHILDREN(SPKIData,m_children.end());
+        IMPL_TYPED_CHILDREN(PGPData,m_children.end());
+        IMPL_XMLOBJECT_CHILDREN(Other,m_children.end());
         IMPL_XMLOBJECT_CONTENT;
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_XMLOBJECT_ID_ATTRIB(Id,ID,NULL);
+            MARSHALL_ID_ATTRIB(Id,ID,NULL);
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_XMLOBJECT_CHILDREN(X509Data,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILDREN(KeyName,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILDREN(KeyValue,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILDREN(RetrievalMethod,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILDREN(MgmtData,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILDREN(SPKIData,XMLConstants::XMLSIG_NS);
-            PROC_XMLOBJECT_CHILDREN(PGPData,XMLConstants::XMLSIG_NS);
+            PROC_TYPED_CHILDREN(X509Data,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(KeyName,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(KeyValue,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(RetrievalMethod,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(MgmtData,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(SPKIData,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(PGPData,XMLConstants::XMLSIG_NS,false);
             
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
             if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI)
-                getXMLObjects().push_back(childXMLObject);
+                getOthers().push_back(childXMLObject);
             
-            throw UnmarshallingException("Invalid child element: $1",params(1,childXMLObject->getElementQName().toString().c_str()));
+            AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            PROC_XMLOBJECT_ID_ATTRIB(Id,ID,NULL);
+            PROC_ID_ATTRIB(Id,ID,NULL);
         }
     };
     

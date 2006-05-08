@@ -59,67 +59,67 @@ namespace xmlsignature {
     DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,PGPKeyPacket,Packet,XML Digital Signature version 20020212 PGPKeyPacket element);
 
     BEGIN_XMLOBJECT(XMLTOOL_API,DSAKeyValue,xmltooling::XMLObject,XML Digital Signature version 20020212 DSAKeyValue element);
-        DECL_XMLOBJECT_CHILD(P);
-        DECL_XMLOBJECT_CHILD(Q);
-        DECL_XMLOBJECT_CHILD(G);
-        DECL_XMLOBJECT_CHILD(Y);
-        DECL_XMLOBJECT_CHILD(J);
-        DECL_XMLOBJECT_CHILD(Seed);
-        DECL_XMLOBJECT_CHILD(PgenCounter);
+        DECL_TYPED_CHILD(P);
+        DECL_TYPED_CHILD(Q);
+        DECL_TYPED_CHILD(G);
+        DECL_TYPED_CHILD(Y);
+        DECL_TYPED_CHILD(J);
+        DECL_TYPED_CHILD(Seed);
+        DECL_TYPED_CHILD(PgenCounter);
         /** DSAKeyValueType local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
     BEGIN_XMLOBJECT(XMLTOOL_API,RSAKeyValue,xmltooling::XMLObject,XML Digital Signature version 20020212 RSAKeyValue element);
-        DECL_XMLOBJECT_CHILD(Modulus);
-        DECL_XMLOBJECT_CHILD(Exponent);
+        DECL_TYPED_CHILD(Modulus);
+        DECL_TYPED_CHILD(Exponent);
         /** RSAKeyValueType local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
     BEGIN_XMLOBJECT(XMLTOOL_API,KeyValue,xmltooling::SimpleElement,XML Digital Signature version 20020212 KeyValue element);
-        DECL_XMLOBJECT_CHILD(DSAKeyValue);
-        DECL_XMLOBJECT_CHILD(RSAKeyValue);
-        DECL_XMLOBJECT_CHILD(XMLObject);
+        DECL_TYPED_CHILD(DSAKeyValue);
+        DECL_TYPED_CHILD(RSAKeyValue);
+        DECL_XMLOBJECT_CHILD(OtherKeyValue);
         /** KeyValueType local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
     BEGIN_XMLOBJECT(XMLTOOL_API,Transform,xmltooling::ElementProxy,XML Digital Signature version 20020212 Transform element);
-        DECL_XMLOBJECT_ATTRIB(Algorithm,ALGORITHM);
-        DECL_XMLOBJECT_CHILDREN(XPath);
+        DECL_STRING_ATTRIB(Algorithm,ALGORITHM);
+        DECL_TYPED_CHILDREN(XPath);
         /** TransformType local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
     BEGIN_XMLOBJECT(XMLTOOL_API,Transforms,xmltooling::XMLObject,XML Digital Signature version 20020212 Transforms element);
-        DECL_XMLOBJECT_CHILDREN(Transform);
+        DECL_TYPED_CHILDREN(Transform);
         /** TransformsType local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
     BEGIN_XMLOBJECT(XMLTOOL_API,RetrievalMethod,xmltooling::XMLObject,XML Digital Signature version 20020212 RetrievalMethod element);
-        DECL_XMLOBJECT_ATTRIB(URI,URI);
-        DECL_XMLOBJECT_ATTRIB(Type,TYPE);
-        DECL_XMLOBJECT_CHILD(Transforms);
+        DECL_STRING_ATTRIB(URI,URI);
+        DECL_STRING_ATTRIB(Type,TYPE);
+        DECL_TYPED_CHILD(Transforms);
         /** RetrievalMethodType local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
     BEGIN_XMLOBJECT(XMLTOOL_API,X509IssuerSerial,xmltooling::XMLObject,XML Digital Signature version 20020212 X509IssuerSerial element);
-        DECL_XMLOBJECT_CHILD(X509IssuerName);
-        DECL_XMLOBJECT_CHILD(X509SerialNumber);
+        DECL_TYPED_CHILD(X509IssuerName);
+        DECL_TYPED_CHILD(X509SerialNumber);
         /** X509IssuerSerialType local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
     BEGIN_XMLOBJECT(XMLTOOL_API,X509Data,xmltooling::XMLObject,XML Digital Signature version 20020212 X509Data element);
-        DECL_XMLOBJECT_CHILDREN(X509IssuerSerial);
-        DECL_XMLOBJECT_CHILDREN(X509SKI);
-        DECL_XMLOBJECT_CHILDREN(X509SubjectName);
-        DECL_XMLOBJECT_CHILDREN(X509Certificate);
-        DECL_XMLOBJECT_CHILDREN(X509CRL);
-        DECL_XMLOBJECT_CHILDREN(XMLObject);
+        DECL_TYPED_CHILDREN(X509IssuerSerial);
+        DECL_TYPED_CHILDREN(X509SKI);
+        DECL_TYPED_CHILDREN(X509SubjectName);
+        DECL_TYPED_CHILDREN(X509Certificate);
+        DECL_TYPED_CHILDREN(X509CRL);
+        DECL_XMLOBJECT_CHILDREN(OtherX509Data);
         /** X509DataType local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
@@ -136,23 +136,23 @@ namespace xmlsignature {
     END_XMLOBJECT;
 
     BEGIN_XMLOBJECT(XMLTOOL_API,PGPData,xmltooling::XMLObject,XML Digital Signature version 20020212 PGPData element);
-        DECL_XMLOBJECT_CHILD(PGPKeyID);
-        DECL_XMLOBJECT_CHILD(PGPKeyPacket);
-        DECL_XMLOBJECT_CHILDREN(XMLObject);
+        DECL_TYPED_CHILD(PGPKeyID);
+        DECL_TYPED_CHILD(PGPKeyPacket);
+        DECL_XMLOBJECT_CHILDREN(PGPDataExtension);
         /** PGPDataType local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
     BEGIN_XMLOBJECT(XMLTOOL_API,KeyInfo,xmltooling::XMLObject,XML Digital Signature version 20020212 KeyInfo element);
-        DECL_XMLOBJECT_ATTRIB(Id,ID);
-        DECL_XMLOBJECT_CHILDREN(X509Data);
-        DECL_XMLOBJECT_CHILDREN(KeyName);
-        DECL_XMLOBJECT_CHILDREN(KeyValue);
-        DECL_XMLOBJECT_CHILDREN(RetrievalMethod);
-        DECL_XMLOBJECT_CHILDREN(MgmtData);
-        DECL_XMLOBJECT_CHILDREN(PGPData);
-        DECL_XMLOBJECT_CHILDREN(SPKIData);
-        DECL_XMLOBJECT_CHILDREN(XMLObject);
+        DECL_STRING_ATTRIB(Id,ID);
+        DECL_TYPED_CHILDREN(X509Data);
+        DECL_TYPED_CHILDREN(KeyName);
+        DECL_TYPED_CHILDREN(KeyValue);
+        DECL_TYPED_CHILDREN(RetrievalMethod);
+        DECL_TYPED_CHILDREN(MgmtData);
+        DECL_TYPED_CHILDREN(PGPData);
+        DECL_TYPED_CHILDREN(SPKIData);
+        DECL_XMLOBJECT_CHILDREN(Other);
         /** KeyInfoType local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;

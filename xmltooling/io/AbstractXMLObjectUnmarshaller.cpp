@@ -177,5 +177,5 @@ void AbstractXMLObjectUnmarshaller::unmarshallChildElements(const DOMElement* do
 
 void AbstractXMLObjectUnmarshaller::processChildElement(XMLObject* child, const DOMElement* childRoot)
 {
-    throw UnmarshallingException("Child elements are not permitted on this object.");
+    throw UnmarshallingException("Invalid child element: $1",params(1,child->getElementQName().toString().c_str()));
 }

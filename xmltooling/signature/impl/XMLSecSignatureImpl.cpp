@@ -57,6 +57,7 @@ namespace xmlsignature {
         
         void releaseDOM();
         XMLObject* clone() const;
+        Signature* cloneSignature() const;
 
         DOMElement* marshall(DOMDocument* document=NULL, MarshallingContext* ctx=NULL) const;
         DOMElement* marshall(DOMElement* parentElement, MarshallingContext* ctx=NULL) const;
@@ -108,6 +109,11 @@ void XMLSecSignatureImpl::releaseDOM()
 }
 
 XMLObject* XMLSecSignatureImpl::clone() const
+{
+    return cloneSignature();
+}
+
+Signature* XMLSecSignatureImpl::cloneSignature() const
 {
     XMLSecSignatureImpl* ret=new XMLSecSignatureImpl();
 

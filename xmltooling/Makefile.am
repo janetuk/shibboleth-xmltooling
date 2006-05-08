@@ -53,6 +53,7 @@ siginclude_HEADERS = \
     signature/VerifyingContext.h
 
 utilinclude_HEADERS = \
+    util/DateTime.h \
     util/NDC.h \
     util/ParserPool.h \
     util/XMLConstants.h \
@@ -92,6 +93,7 @@ libxmltooling_la_SOURCES = \
     io/AbstractXMLObjectUnmarshaller.cpp \
     signature/impl/KeyInfoImpl.cpp \
     signature/impl/KeyInfoSchemaValidators.cpp \
+    util/DateTime.cpp \
     util/NDC.cpp \
     util/ParserPool.cpp \
     util/XMLConstants.cpp \

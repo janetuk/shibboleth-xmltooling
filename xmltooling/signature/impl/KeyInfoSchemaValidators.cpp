@@ -64,7 +64,7 @@ namespace xmlsignature {
     END_XMLOBJECTVALIDATOR;
 
     BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,KeyValue);
-        XMLOBJECTVALIDATOR_ONEOF3(KeyValue,DSAKeyValue,RSAKeyValue,XMLObject);
+        XMLOBJECTVALIDATOR_ONLYONEOF3(KeyValue,DSAKeyValue,RSAKeyValue,OtherKeyValue);
     END_XMLOBJECTVALIDATOR;
 
     BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,Transform);
@@ -90,7 +90,7 @@ namespace xmlsignature {
             const XMLCh* ns=xmlObject->getElementQName().getNamespaceURI();
             if (XMLString::equals(ns,XMLConstants::XMLSIG_NS) || !ns || !*ns) {
                 throw ValidationException(
-                    "X509Data contains an illegal extension element ($1).",
+                    "Object contains an illegal extension child element ($1).",
                     params(1,xmlObject->getElementQName().toString().c_str())
                     );
             }
@@ -100,7 +100,7 @@ namespace xmlsignature {
     BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,X509Data);
         if (!ptr->hasChildren())
             throw ValidationException("X509Data must have at least one child element.");
-        vector<XMLObject*> anys=ptr->getXMLObjects();
+        const vector<XMLObject*>& anys=ptr->getOtherX509Datas();
         for_each(anys.begin(),anys.end(),checkWildcardNS());
     END_XMLOBJECTVALIDATOR;
 
@@ -115,7 +115,7 @@ namespace xmlsignature {
     BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,KeyInfo);
         if (!ptr->hasChildren())
             throw ValidationException("KeyInfo must have at least one child element.");
-        vector<XMLObject*> anys=ptr->getXMLObjects();
+        const vector<XMLObject*>& anys=ptr->getOthers();
         for_each(anys.begin(),anys.end(),checkWildcardNS());
     END_XMLOBJECTVALIDATOR;
 
