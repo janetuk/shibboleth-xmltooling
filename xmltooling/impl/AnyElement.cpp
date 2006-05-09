@@ -21,12 +21,8 @@
  */
 
 #include "internal.h"
-#include "AbstractAttributeExtensibleXMLObject.h"
-#include "AbstractElementProxy.h"
 #include "exceptions.h"
 #include "impl/AnyElement.h"
-#include "io/AbstractXMLObjectMarshaller.h"
-#include "io/AbstractXMLObjectUnmarshaller.h"
 #include "util/NDC.h"
 #include "util/XMLHelper.h"
 
@@ -37,81 +33,52 @@ using namespace xmltooling;
 using namespace log4cpp;
 using namespace std;
 
-#if defined (_MSC_VER)
-    #pragma warning( push )
-    #pragma warning( disable : 4250 4251 )
-#endif
+XMLObject* AnyElementImpl::clone() const {
+    auto_ptr<XMLObject> domClone(AbstractDOMCachingXMLObject::clone());
+    AnyElementImpl* ret=dynamic_cast<AnyElementImpl*>(domClone.get());
+    if (ret) {
+        domClone.release();
+        return ret;
+    }
 
-namespace xmltooling {
+    return new AnyElementImpl(*this);
+}
 
-    /**
-     * Implements a smart wrapper around unknown DOM content.
-     */
-    class XMLTOOL_DLLLOCAL AnyElementImpl : public AbstractDOMCachingXMLObject,
-        public AbstractElementProxy, public AbstractAttributeExtensibleXMLObject,
-        public AbstractXMLObjectMarshaller, public AbstractXMLObjectUnmarshaller
-    {
-    public:
-        virtual ~AnyElementImpl() {}
+AnyElementImpl::AnyElementImpl(const AnyElementImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src),
+    AbstractElementProxy(src), AbstractAttributeExtensibleXMLObject(src) {
+    for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
+        getXMLObjects().push_back((*i) ? (*i)->clone() : NULL);
+    }
+}       
 
-        AnyElementImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL)
-            : AbstractXMLObject(nsURI, localName, prefix, schemaType) {}
-        
-        AnyElementImpl* clone() const {
-            auto_ptr<XMLObject> domClone(AbstractDOMCachingXMLObject::clone());
-            AnyElementImpl* ret=dynamic_cast<AnyElementImpl*>(domClone.get());
-            if (ret) {
-                domClone.release();
-                return ret;
-            }
+void AnyElementImpl::marshallAttributes(DOMElement* domElement) const {
+    for (map<QName,XMLCh*>::const_iterator i=m_attributeMap.begin(); i!=m_attributeMap.end(); i++) {
+        DOMAttr* attr=domElement->getOwnerDocument()->createAttributeNS(i->first.getNamespaceURI(),i->first.getLocalPart());
+        if (i->first.hasPrefix())
+            attr->setPrefix(i->first.getPrefix());
+        attr->setNodeValue(i->second);
+        domElement->setAttributeNode(attr);
+    }
+}
 
-            return new AnyElementImpl(*this);
-        }
+void AnyElementImpl::marshallElementContent(DOMElement* domElement) const {
+    if(getTextContent()) {
+        domElement->appendChild(domElement->getOwnerDocument()->createTextNode(getTextContent()));
+    }
+}
 
-    protected:
-        AnyElementImpl(const AnyElementImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src),
-            AbstractElementProxy(src), AbstractAttributeExtensibleXMLObject(src) {
-            for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
-                getXMLObjects().push_back((*i) ? (*i)->clone() : NULL);
-            }
-        }       
-        
-        void marshallAttributes(DOMElement* domElement) const {
-            for (map<QName,XMLCh*>::const_iterator i=m_attributeMap.begin(); i!=m_attributeMap.end(); i++) {
-                DOMAttr* attr=domElement->getOwnerDocument()->createAttributeNS(i->first.getNamespaceURI(),i->first.getLocalPart());
-                if (i->first.hasPrefix())
-                    attr->setPrefix(i->first.getPrefix());
-                attr->setNodeValue(i->second);
-                domElement->setAttributeNode(attr);
-            }
-        }
+void AnyElementImpl::processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
+    getXMLObjects().push_back(childXMLObject);
+}
 
-        void marshallElementContent(DOMElement* domElement) const {
-            if(getTextContent()) {
-                domElement->appendChild(domElement->getOwnerDocument()->createTextNode(getTextContent()));
-            }
-        }
+void AnyElementImpl::processAttribute(const DOMAttr* attribute) {
+    QName q(attribute->getNamespaceURI(),attribute->getLocalName(),attribute->getPrefix()); 
+    setAttribute(q,attribute->getNodeValue());
+}
 
-        void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            getXMLObjects().push_back(childXMLObject);
-        }
-
-        void processAttribute(const DOMAttr* attribute) {
-            QName q(attribute->getNamespaceURI(),attribute->getLocalName(),attribute->getPrefix()); 
-            setAttribute(q,attribute->getNodeValue());
-        }
-
-        void processElementContent(const XMLCh* elementContent) {
-            setTextContent(elementContent);
-        }
-    };
-
-};
-
-#if defined (_MSC_VER)
-    #pragma warning( pop )
-#endif
-
+void AnyElementImpl::processElementContent(const XMLCh* elementContent) {
+    setTextContent(elementContent);
+}
 
 XMLObject* AnyElementBuilder::buildObject(
     const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType

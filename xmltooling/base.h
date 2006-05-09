@@ -184,6 +184,16 @@
         chLatin_##j, chLatin_##k, chLatin_##l, chLatin_##m, chLatin_##n, chLatin_##o, chLatin_##p, chLatin_##q, chLatin_##r, \
         chLatin_##s, chLatin_##t, chLatin_##u, chLatin_##v, chLatin_##w, chLatin_##x, chLatin_##y, chLatin_##z, \
         chLatin_##aa, chLatin_##bb, chLatin_##cc, chLatin_##dd, chLatin_##ee, chLatin_##ff, chNull}
+#define UNICODE_LITERAL_33(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg) \
+    {chLatin_##a, chLatin_##b, chLatin_##c, chLatin_##d, chLatin_##e, chLatin_##f, chLatin_##g, chLatin_##h, chLatin_##i, \
+        chLatin_##j, chLatin_##k, chLatin_##l, chLatin_##m, chLatin_##n, chLatin_##o, chLatin_##p, chLatin_##q, chLatin_##r, \
+        chLatin_##s, chLatin_##t, chLatin_##u, chLatin_##v, chLatin_##w, chLatin_##x, chLatin_##y, chLatin_##z, \
+        chLatin_##aa, chLatin_##bb, chLatin_##cc, chLatin_##dd, chLatin_##ee, chLatin_##ff, chLatin_##gg, chNull}
+#define UNICODE_LITERAL_34(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh) \
+    {chLatin_##a, chLatin_##b, chLatin_##c, chLatin_##d, chLatin_##e, chLatin_##f, chLatin_##g, chLatin_##h, chLatin_##i, \
+        chLatin_##j, chLatin_##k, chLatin_##l, chLatin_##m, chLatin_##n, chLatin_##o, chLatin_##p, chLatin_##q, chLatin_##r, \
+        chLatin_##s, chLatin_##t, chLatin_##u, chLatin_##v, chLatin_##w, chLatin_##x, chLatin_##y, chLatin_##z, \
+        chLatin_##aa, chLatin_##bb, chLatin_##cc, chLatin_##dd, chLatin_##ee, chLatin_##ff, chLatin_##gg, chLatin_##hh, chNull}
 #endif /* DOXYGEN_SKIP */
 
 /**

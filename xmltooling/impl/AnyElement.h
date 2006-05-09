@@ -23,9 +23,45 @@
 #if !defined(__xmltooling_anyelement_h__)
 #define __xmltooling_anyelement_h__
 
+#include <xmltooling/AbstractAttributeExtensibleXMLObject.h>
+#include <xmltooling/AbstractElementProxy.h>
 #include <xmltooling/XMLObjectBuilder.h>
+#include <xmltooling/io/AbstractXMLObjectMarshaller.h>
+#include <xmltooling/io/AbstractXMLObjectUnmarshaller.h>
+
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4250 4251 )
+#endif
 
 namespace xmltooling {
+
+    /**
+     * Implements a smart wrapper around unknown or arbitrary DOM content.
+     */
+    class XMLTOOL_API AnyElementImpl : public AbstractDOMCachingXMLObject,
+        public AbstractElementProxy,
+        public AbstractAttributeExtensibleXMLObject,
+        public AbstractXMLObjectMarshaller,
+        public AbstractXMLObjectUnmarshaller
+    {
+    public:
+        virtual ~AnyElementImpl() {}
+
+        AnyElementImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL)
+            : AbstractXMLObject(nsURI, localName, prefix, schemaType) {}
+        
+        XMLObject* clone() const;
+        
+    protected:
+        AnyElementImpl(const AnyElementImpl& src);   
+        
+        void marshallAttributes(DOMElement* domElement) const;
+        void marshallElementContent(DOMElement* domElement) const;
+        void processChildElement(XMLObject* childXMLObject, const DOMElement* root);
+        void processAttribute(const DOMAttr* attribute);
+        void processElementContent(const XMLCh* elementContent);
+    };
 
     /**
      * Builder for AnyElementImpl objects.
@@ -41,5 +77,9 @@ namespace xmltooling {
     };
 
 };
+
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
 
 #endif /* __xmltooling_anyelement_h__ */
