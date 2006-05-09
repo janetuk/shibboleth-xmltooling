@@ -9,12 +9,13 @@ endif
 
 if BUILD_XMLSEC
 xmlsec_sources = \
-    Signature.h
+    SignatureTest.h
 else
 xmlsec_sources =
 endif
 
-xmltoolingtest_h = \
+noinst_HEADERS = \
+    XMLObjectBaseTestCase.h \
     ComplexXMLObjectTest.h \
     ExceptionTest.h \
     KeyInfoTest.h \
@@ -22,9 +23,6 @@ xmltoolingtest_h = \
     UnmarshallingTest.h \
     xmltoolingtest.h \
     ${xmlsec_sources}
-
-noinst_HEADERS = \
-    XMLObjectBaseTestCase.h
 
 nodist_xmltoolingtest_SOURCES = $(xmltoolingtest_h:.h=.cpp)
 
