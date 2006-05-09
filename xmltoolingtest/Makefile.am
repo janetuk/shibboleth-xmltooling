@@ -14,8 +14,7 @@ else
 xmlsec_sources =
 endif
 
-noinst_HEADERS = \
-    XMLObjectBaseTestCase.h \
+xmltoolingtest_h = \
     ComplexXMLObjectTest.h \
     ExceptionTest.h \
     KeyInfoTest.h \
@@ -23,6 +22,9 @@ noinst_HEADERS = \
     UnmarshallingTest.h \
     xmltoolingtest.h \
     ${xmlsec_sources}
+
+noinst_HEADERS = \
+    XMLObjectBaseTestCase.h
 
 nodist_xmltoolingtest_SOURCES = $(xmltoolingtest_h:.h=.cpp)
 
