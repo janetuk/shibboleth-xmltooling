@@ -53,7 +53,7 @@ namespace xmltooling {
     class XMLToolingInternalConfig : public xmltooling::XMLToolingConfig
     {
     public:
-        XMLToolingInternalConfig() : m_parserPool(NULL), m_validatingPool(NULL), m_lock(NULL) {
+        XMLToolingInternalConfig() : m_lock(NULL), m_parserPool(NULL), m_validatingPool(NULL) {
 #ifndef XMLTOOLING_NO_XMLSEC
             m_xsecProvider=NULL;
 #endif
