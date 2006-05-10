@@ -759,6 +759,7 @@
         virtual cname* buildObject() const { \
             return buildObject(namespaceURI,cname::LOCAL_NAME,namespacePrefix); \
         } \
+        XMLTOOLING_DOXYGEN(Builder that allows element/type override.) \
         virtual cname* buildObject( \
             const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const xmltooling::QName* schemaType=NULL \
             ) const
