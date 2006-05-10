@@ -573,7 +573,7 @@
 #define PROC_ID_ATTRIB(proper,ucase,namespaceURI) \
     if (xmltooling::XMLHelper::isNodeNamed(attribute, namespaceURI, ucase##_ATTRIB_NAME)) { \
         set##proper(attribute->getValue()); \
-        static_cast<DOMElement*>(attribute->getParentNode())->setIdAttributeNode(attribute); \
+        attribute->getOwnerElement()->setIdAttributeNode(attribute); \
         return; \
     }
 
