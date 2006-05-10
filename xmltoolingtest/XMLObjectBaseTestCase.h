@@ -37,8 +37,6 @@
 using namespace xmltooling;
 using namespace std;
 
-extern ParserPool* validatingPool;
-extern ParserPool* nonvalidatingPool;
 extern string data_path;
 
 #if defined (_MSC_VER)
