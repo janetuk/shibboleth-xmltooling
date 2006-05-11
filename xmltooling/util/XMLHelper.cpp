@@ -47,15 +47,20 @@ QName* XMLHelper::getXSIType(const DOMElement* e)
 {
     DOMAttr* attribute = e->getAttributeNodeNS(XMLConstants::XSI_NS, type);
     if (attribute) {
-        int i;
         const XMLCh* attributeValue = attribute->getTextContent();
-        if (attributeValue && (i=XMLString::indexOf(attributeValue,chColon))>0) {
-            XMLCh* prefix=new XMLCh[i+1];
-            XMLString::subString(prefix,attributeValue,0,i);
-            prefix[i]=chNull;
-            QName* ret=new QName(e->lookupNamespaceURI(prefix), attributeValue + i + 1, prefix);
-            delete[] prefix;
-            return ret;
+        if (attributeValue && *attributeValue) {
+            int i;
+            if ((i=XMLString::indexOf(attributeValue,chColon))>0) {
+                XMLCh* prefix=new XMLCh[i+1];
+                XMLString::subString(prefix,attributeValue,0,i);
+                prefix[i]=chNull;
+                QName* ret=new QName(e->lookupNamespaceURI(prefix), attributeValue + i + 1, prefix);
+                delete[] prefix;
+                return ret;
+            }
+            else {
+                return new QName(e->lookupNamespaceURI(&chNull), attributeValue);
+            }
         }
     }
 
