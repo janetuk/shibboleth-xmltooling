@@ -54,6 +54,7 @@ namespace xmltooling {
         XMLObject* clone() const;
         
     protected:
+        AnyElementImpl() {}
         AnyElementImpl(const AnyElementImpl& src);   
         
         void marshallAttributes(DOMElement* domElement) const;
