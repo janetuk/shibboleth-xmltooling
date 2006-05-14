@@ -148,10 +148,17 @@ void XMLSecSignatureImpl::sign(const SigningContext& ctx)
     try {
         log.debug("creating signature content");
         ctx.createSignature(m_signature);
-        const std::vector<XSECCryptoX509*>& certs=ctx.getX509Certificates();
-        if (!certs.empty()) {
+        const std::vector<XSECCryptoX509*>* certs=ctx.getX509Certificates();
+        if (certs && !certs->empty()) {
             DSIGKeyInfoX509* x509Data=m_signature->appendX509Data();
-            for_each(certs.begin(),certs.end(),bind1st(_addcert(),x509Data));
+            for_each(certs->begin(),certs->end(),bind1st(_addcert(),x509Data));
+        }
+        else {
+            auto_ptr<KeyInfo> keyInfo(ctx.getKeyInfo());
+            if (keyInfo.get()) {
+                DOMElement* domElement=keyInfo->marshall(m_signature->getParentDocument());
+                getDOM()->appendChild(domElement);
+            }
         }
         
         log.debug("computing signature");

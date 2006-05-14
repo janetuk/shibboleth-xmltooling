@@ -23,6 +23,8 @@
 #if !defined(__xmltooling_signctx_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_signctx_h__
 
+#include <xmltooling/signature/KeyInfo.h>
+
 #include <vector>
 #include <xsec/dsig/DSIGSignature.hpp>
 
@@ -61,8 +63,18 @@ namespace xmlsignature {
          * 
          * @return  an immutable collection of certificates to embed
          */
-        virtual const std::vector<XSECCryptoX509*>& getX509Certificates() const=0;
-        
+        virtual const std::vector<XSECCryptoX509*>* getX509Certificates() const=0;
+
+        /**
+         * Gets a KeyInfo structure to embed.
+         * Ownership of the object MUST be transferred to the caller.
+         * This method will only be called if no certificates are returned from
+         * the getX509Certificates() method.
+         * 
+         * @return  pointer to a KeyInfo structure, will be freed by caller
+         */
+        virtual KeyInfo* getKeyInfo() const=0;
+
         /**
          * Gets the signing key to use.
          * Must be compatible with the intended signature algorithm. Ownership of the key

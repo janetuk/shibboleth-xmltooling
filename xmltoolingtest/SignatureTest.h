@@ -79,7 +79,8 @@ public:
         sig->verify();
     }
     
-    const std::vector<XSECCryptoX509*>& getX509Certificates() const { return m_certs; }
+    const std::vector<XSECCryptoX509*>* getX509Certificates() const { return &m_certs; }
+    KeyInfo* getKeyInfo() const { return NULL; }
     XSECCryptoKey* getSigningKey() const { return m_key->clone(); }
 };
 
