@@ -68,7 +68,7 @@ namespace xmlsignature {
          * @param ctx   the signing context that determines the signature's content
          * @throws SignatureException   thrown if the signing operation fails
          */
-        virtual void sign(const SigningContext& ctx)=0;
+        virtual void sign(SigningContext& ctx)=0;
         
         /**
          * Verifies an XML signature based on the supplied context.

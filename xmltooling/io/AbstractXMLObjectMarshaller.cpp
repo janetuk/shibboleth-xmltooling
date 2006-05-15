@@ -152,9 +152,9 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(DOMElement* parentElement, Mar
 }
 
 #ifndef XMLTOOLING_NO_XMLSEC
-    class _signit : public unary_function<const pair<Signature*,const SigningContext*>&, void> {
+    class _signit : public unary_function<const pair<Signature*,SigningContext*>&, void> {
     public:
-        void operator()(const pair<Signature*,const SigningContext*>& p) const {
+        void operator()(const pair<Signature*,SigningContext*>& p) const {
             p.first->sign(*(p.second));
         }
     };

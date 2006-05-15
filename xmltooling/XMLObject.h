@@ -20,7 +20,7 @@
  * Abstract interface to objects that can be manipulated in and out of XML form. 
  */
 
-#if !defined(__xmltooling_xmlobj_h__)
+#ifndef __xmltooling_xmlobj_h__
 #define __xmltooling_xmlobj_h__
 
 #include <set>
@@ -67,12 +67,12 @@ namespace xmltooling {
          * @param sig   a signature object
          * @param ctx   the signing context to associate with the signature 
          */
-        MarshallingContext(xmlsignature::Signature* sig, const xmlsignature::SigningContext* ctx) {
+        MarshallingContext(xmlsignature::Signature* sig, xmlsignature::SigningContext* ctx) {
             m_signingContexts.push_back(std::make_pair(sig,ctx));
         }
         
         /** Array of signing contexts, keyed off of the associated Signature */
-        std::vector< std::pair<xmlsignature::Signature*,const xmlsignature::SigningContext*> > m_signingContexts;
+        std::vector< std::pair<xmlsignature::Signature*,xmlsignature::SigningContext*> > m_signingContexts;
 #endif
     };
 

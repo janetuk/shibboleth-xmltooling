@@ -53,6 +53,7 @@ siginclude_HEADERS = \
     signature/VerifyingContext.h
 
 utilinclude_HEADERS = \
+    util/CredentialResolver.h \
     util/DateTime.h \
     util/NDC.h \
     util/ParserPool.h \

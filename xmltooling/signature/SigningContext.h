@@ -24,6 +24,7 @@
 #define __xmltooling_signctx_h__
 
 #include <xmltooling/signature/KeyInfo.h>
+#include <xmltooling/util/CredentialResolver.h>
 
 #include <vector>
 #include <xsec/dsig/DSIGSignature.hpp>
@@ -46,44 +47,34 @@ namespace xmlsignature {
 
         /**
          * Given a "blank" native signature, asks the context to define the
-         * appropriate signature transforms, references, etc.
-         * This method MAY attach ds:KeyInfo information, or a set of X.509
-         * certificates can be returned from the SigningContext::getX509Certificates()
-         * method instead.
+         * appropriate signature transforms, references, etc. The context
+         * should return true iff the necessary ds:KeyInfo information was
+         * also attached.
          * 
          * @param sig   native signature interface
+         * @return      indicator whether ds:KeyInfo was created by context
          */
-        virtual void createSignature(DSIGSignature* sig) const=0;
+        virtual bool createSignature(DSIGSignature* sig)=0;
         
         /**
-         * Gets a reference to a collection of certificates to append to
-         * the ds:KeyInfo element in a ds:X509Data chain.
-         * The certificate corresponding to the signing key SHOULD be
-         * first, followed by any additional intermediates to append. 
+         * Gets a reference to a credential resolver.
+         * The resolver's certificates will be included in the signature only
+         * if the context returns false when creating the signature and returns
+         * NULL from the getKeyInfo() method.
          * 
-         * @return  an immutable collection of certificates to embed
+         * 
+         * @return  a resolver to the credentials to sign with
          */
-        virtual const std::vector<XSECCryptoX509*>* getX509Certificates() const=0;
+        virtual xmltooling::CredentialResolver& getCredentialResolver()=0;
 
         /**
          * Gets a KeyInfo structure to embed.
          * Ownership of the object MUST be transferred to the caller.
-         * This method will only be called if no certificates are returned from
-         * the getX509Certificates() method.
          * 
          * @return  pointer to a KeyInfo structure, will be freed by caller
          */
-        virtual KeyInfo* getKeyInfo() const=0;
+        virtual KeyInfo* getKeyInfo()=0;
 
-        /**
-         * Gets the signing key to use.
-         * Must be compatible with the intended signature algorithm. Ownership of the key
-         * MUST be transferred to the caller.
-         * 
-         * @return  pointer to a signing key, will be freed by caller
-         */
-        virtual XSECCryptoKey* getSigningKey() const=0;
-        
     protected:
         SigningContext() {}
     };

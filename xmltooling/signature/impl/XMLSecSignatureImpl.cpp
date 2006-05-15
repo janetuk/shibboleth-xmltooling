@@ -71,7 +71,7 @@ namespace xmlsignature {
         void setCanonicalizationMethod(const XMLCh* c14n) { m_c14n = prepareForAssignment(m_c14n,c14n); }
         void setSignatureAlgorithm(const XMLCh* sm) { m_sm = prepareForAssignment(m_sm,sm); }
 
-        void sign(const SigningContext& ctx);
+        void sign(SigningContext& ctx);
         void verify(const VerifyingContext& ctx) const;
 
     private:
@@ -137,7 +137,7 @@ public:
     }
 };
 
-void XMLSecSignatureImpl::sign(const SigningContext& ctx)
+void XMLSecSignatureImpl::sign(SigningContext& ctx)
 {
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Signature");
     log.debug("applying signature");
@@ -147,22 +147,29 @@ void XMLSecSignatureImpl::sign(const SigningContext& ctx)
 
     try {
         log.debug("creating signature content");
-        ctx.createSignature(m_signature);
-        const std::vector<XSECCryptoX509*>* certs=ctx.getX509Certificates();
-        if (certs && !certs->empty()) {
-            DSIGKeyInfoX509* x509Data=m_signature->appendX509Data();
-            for_each(certs->begin(),certs->end(),bind1st(_addcert(),x509Data));
-        }
-        else {
+        CredentialResolver& cr=ctx.getCredentialResolver();
+        if (!ctx.createSignature(m_signature)) {
             auto_ptr<KeyInfo> keyInfo(ctx.getKeyInfo());
             if (keyInfo.get()) {
                 DOMElement* domElement=keyInfo->marshall(m_signature->getParentDocument());
                 getDOM()->appendChild(domElement);
             }
+            else {
+                Locker locker1(cr);
+                const std::vector<XSECCryptoX509*>* certs=cr.getX509Certificates();
+                if (certs && !certs->empty()) {
+                    DSIGKeyInfoX509* x509Data=m_signature->appendX509Data();
+                    for_each(certs->begin(),certs->end(),bind1st(_addcert(),x509Data));
+                }
+            }
         }
         
         log.debug("computing signature");
-        m_signature->setSigningKey(ctx.getSigningKey());
+        Locker locker2(cr);
+        XSECCryptoKey* key=cr.getPrivateKey();
+        if (!key)
+            throw SignatureException(string("Unable to obtain signing key from CredentialResolver (") + cr.getId() + ")");
+        m_signature->setSigningKey(key->clone());
         m_signature->sign();
     }
     catch(XSECException& e) {

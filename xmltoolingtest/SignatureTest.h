@@ -24,7 +24,7 @@
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyRSA.hpp>
 
-class TestContext : public SigningContext, public VerifyingContext
+class TestContext : public SigningContext, public VerifyingContext, CredentialResolver
 {
     XSECCryptoKey* m_key;
     vector<XSECCryptoX509*> m_certs;
@@ -65,10 +65,11 @@ public:
         XMLString::release(&m_uri);
     }
 
-    void createSignature(DSIGSignature* sig) const {
+    bool createSignature(DSIGSignature* sig) {
         DSIGReference* ref=sig->createReference(m_uri);
         ref->appendEnvelopedSignatureTransform();
         ref->appendCanonicalizationTransform(CANON_C14NE_NOC);
+        return false;
     }
 
     void verifySignature(DSIGSignature* sig) const {
@@ -79,9 +80,14 @@ public:
         sig->verify();
     }
     
-    const std::vector<XSECCryptoX509*>* getX509Certificates() const { return &m_certs; }
-    KeyInfo* getKeyInfo() const { return NULL; }
-    XSECCryptoKey* getSigningKey() const { return m_key->clone(); }
+    KeyInfo* getKeyInfo() { return NULL; }
+    CredentialResolver& getCredentialResolver() { return *this; }
+    const char* getId() const { return "test"; }
+    const std::vector<XSECCryptoX509*>* getX509Certificates() { return &m_certs; }
+    XSECCryptoKey* getPublicKey() { return m_key; }
+    XSECCryptoKey* getPrivateKey() { return m_key; }
+    Lockable& lock() { return *this; }
+    void unlock() {}
 };
 
 class SignatureTest : public CxxTest::TestSuite {
