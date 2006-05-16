@@ -35,7 +35,8 @@ AbstractValidatingXMLObject::ValidatorWrapper::~ValidatorWrapper()
     for_each(v.begin(),v.end(),cleanup<Validator>());
 }
 
-AbstractValidatingXMLObject::AbstractValidatingXMLObject(const AbstractValidatingXMLObject& src) : AbstractXMLObject(src)
+AbstractValidatingXMLObject::AbstractValidatingXMLObject(const AbstractValidatingXMLObject& src)
+    : AbstractXMLObject(src), m_validators(NULL)
 {
     if (src.m_validators) {
         m_validators=new ValidatorWrapper();
