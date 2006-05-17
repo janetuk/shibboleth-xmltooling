@@ -186,6 +186,13 @@ namespace xmltooling {
      */
     extern XMLTOOL_API bool operator==(const QName& op1, const QName& op2);
 
+    /**
+     * Returns true iff op1's components are not equal to op2's components, excluding prefix.
+     * @param op1   First qname to compare
+     * @param op2   Second qname to compare
+     */
+    extern XMLTOOL_API bool operator!=(const QName& op1, const QName& op2);
+
 };
 
 #endif /* __xmltooling_qname_h__ */

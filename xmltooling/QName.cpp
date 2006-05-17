@@ -110,6 +110,11 @@ bool xmltooling::operator==(const QName& op1, const QName& op2)
             !XMLString::compareString(op1.getLocalPart(),op2.getLocalPart()));
 }
 
+bool xmltooling::operator!=(const QName& op1, const QName& op2)
+{
+    return !(op1==op2);
+}
+
 bool xmltooling::operator<(const QName& op1, const QName& op2)
 {
     int i=XMLString::compareString(op1.getNamespaceURI(),op2.getNamespaceURI());
