@@ -49,15 +49,26 @@ namespace xmltooling {
 
         XMLObject* clone() const;
 
-        DOMElement* marshall(DOMDocument* document=NULL, MarshallingContext* ctx=NULL) const;
-        DOMElement* marshall(DOMElement* parentElement, MarshallingContext* ctx=NULL) const;
+        DOMElement* marshall(
+            DOMDocument* document=NULL
+#ifndef XMLTOOLING_NO_XMLSEC
+            ,const std::vector<xmlsignature::Signature*>* sigs=NULL
+#endif
+            ) const;
+
+        DOMElement* marshall(
+            DOMElement* parentElement
+#ifndef XMLTOOLING_NO_XMLSEC
+            ,const std::vector<xmlsignature::Signature*>* sigs=NULL
+#endif
+            ) const;
         XMLObject* unmarshall(DOMElement* element, bool bindDocument=false);
         
     protected:
         void setDocumentElement(DOMDocument* document, DOMElement* element) const {
             DOMElement* documentRoot = document->getDocumentElement();
             if (documentRoot)
-                document->replaceChild(documentRoot, element);
+                document->replaceChild(element, documentRoot);
             else
                 document->appendChild(element);
         }

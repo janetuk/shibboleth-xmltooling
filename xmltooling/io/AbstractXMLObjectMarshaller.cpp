@@ -44,7 +44,12 @@ using namespace std;
 
 #define XT_log (*static_cast<Category*>(m_log))
 
-DOMElement* AbstractXMLObjectMarshaller::marshall(DOMDocument* document, MarshallingContext* ctx) const
+DOMElement* AbstractXMLObjectMarshaller::marshall(
+    DOMDocument* document
+#ifndef XMLTOOLING_NO_XMLSEC
+    ,const std::vector<xmlsignature::Signature*>* sigs
+#endif
+    ) const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("marshall");
@@ -87,8 +92,11 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(DOMDocument* document, Marshal
             getElementQName().getNamespaceURI(), getElementQName().getLocalPart()
             );
         setDocumentElement(document, domElement);
-        marshallInto(domElement, ctx);
-
+#ifndef XMLTOOLING_NO_XMLSEC
+        marshallInto(domElement, sigs);
+#else
+        marshallInto(domElement);
+#endif
         //Recache the DOM.
         XT_log.debug("caching DOM for XMLObject (document is %sbound)", bindDocument ? "" : "not ");
         setDOM(domElement, bindDocument);
@@ -105,7 +113,12 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(DOMDocument* document, Marshal
     }
 }
 
-DOMElement* AbstractXMLObjectMarshaller::marshall(DOMElement* parentElement, MarshallingContext* ctx) const
+DOMElement* AbstractXMLObjectMarshaller::marshall(
+    DOMElement* parentElement
+#ifndef XMLTOOLING_NO_XMLSEC
+    ,const std::vector<xmlsignature::Signature*>* sigs
+#endif
+    ) const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("marshall");
@@ -141,7 +154,11 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(DOMElement* parentElement, Mar
         getElementQName().getNamespaceURI(), getElementQName().getLocalPart()
         );
     parentElement->appendChild(domElement);
-    marshallInto(domElement, ctx);
+#ifndef XMLTOOLING_NO_XMLSEC
+    marshallInto(domElement, sigs);
+#else
+    marshallInto(domElement);
+#endif
 
     //Recache the DOM.
     XT_log.debug("caching DOM for XMLObject");
@@ -151,16 +168,12 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(DOMElement* parentElement, Mar
     return domElement;
 }
 
+void AbstractXMLObjectMarshaller::marshallInto(
+    DOMElement* targetElement
 #ifndef XMLTOOLING_NO_XMLSEC
-    class _signit : public unary_function<const pair<Signature*,SigningContext*>&, void> {
-    public:
-        void operator()(const pair<Signature*,SigningContext*>& p) const {
-            p.first->sign(*(p.second));
-        }
-    };
+    ,const std::vector<xmlsignature::Signature*>* sigs
 #endif
-
-void AbstractXMLObjectMarshaller::marshallInto(DOMElement* targetElement, MarshallingContext* ctx) const
+    ) const
 {
     if (getElementQName().hasPrefix())
         targetElement->setPrefix(getElementQName().getPrefix());
@@ -171,8 +184,8 @@ void AbstractXMLObjectMarshaller::marshallInto(DOMElement* targetElement, Marsha
     marshallElementContent(targetElement);
 
 #ifndef XMLTOOLING_NO_XMLSEC
-    if (ctx) {
-        for_each(ctx->m_signingContexts.begin(),ctx->m_signingContexts.end(),_signit());
+    if (sigs) {
+        for_each(sigs->begin(),sigs->end(),mem_fun<void,Signature>(&Signature::sign));
     }
 #endif
 }

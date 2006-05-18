@@ -475,15 +475,15 @@
 				Name="signature"
 				>
 				<File
+					RelativePath=".\signature\ContentReference.h"
+					>
+				</File>
+				<File
 					RelativePath=".\signature\KeyInfo.h"
 					>
 				</File>
 				<File
 					RelativePath=".\signature\Signature.h"
-					>
-				</File>
-				<File
-					RelativePath=".\signature\SigningContext.h"
 					>
 				</File>
 			</Filter>

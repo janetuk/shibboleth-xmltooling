@@ -49,8 +49,7 @@ ioinclude_HEADERS = \
 siginclude_HEADERS = \
     signature/KeyInfo.h \
     signature/Signature.h \
-    signature/SigningContext.h \
-    signature/VerifyingContext.h
+    signature/ContentReference.h
 
 utilinclude_HEADERS = \
     util/CredentialResolver.h \

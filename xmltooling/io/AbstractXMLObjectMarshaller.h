@@ -40,9 +40,19 @@ namespace xmltooling {
     public:
         virtual ~AbstractXMLObjectMarshaller() {}
 
-        DOMElement* marshall(DOMDocument* document=NULL, MarshallingContext* ctx=NULL) const;
+        DOMElement* marshall(
+            DOMDocument* document=NULL
+#ifndef XMLTOOLING_NO_XMLSEC
+            ,const std::vector<xmlsignature::Signature*>* sigs=NULL
+#endif
+            ) const;
 
-        DOMElement* marshall(DOMElement* parentElement, MarshallingContext* ctx=NULL) const;
+        DOMElement* marshall(
+            DOMElement* parentElement
+#ifndef XMLTOOLING_NO_XMLSEC
+            ,const std::vector<xmlsignature::Signature*>* sigs=NULL
+#endif
+            ) const;
         
     protected:
         AbstractXMLObjectMarshaller() {}
@@ -57,7 +67,7 @@ namespace xmltooling {
         void setDocumentElement(DOMDocument* document, DOMElement* element) const {
             DOMElement* documentRoot = document->getDocumentElement();
             if (documentRoot)
-                document->replaceChild(documentRoot, element);
+                document->replaceChild(element, documentRoot);
             else
                 document->appendChild(element);
         }
@@ -72,7 +82,12 @@ namespace xmltooling {
          * @throws MarshallingException thrown if there is a problem marshalling the object
          * @throws SignatureException thrown if a problem occurs during signature creation 
          */
-        void marshallInto(DOMElement* targetElement, MarshallingContext* ctx) const;
+        void marshallInto(
+            DOMElement* targetElement
+#ifndef XMLTOOLING_NO_XMLSEC
+            ,const std::vector<xmlsignature::Signature*>* sigs
+#endif
+            ) const;
     
         /**
          * Creates an xsi:type attribute, corresponding to the given type of the XMLObject, on the DOM element.

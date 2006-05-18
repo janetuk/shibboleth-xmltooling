@@ -25,9 +25,12 @@
 
 #include <xmltooling/exceptions.h>
 #include <xmltooling/XMLObjectBuilder.h>
-#include <xmltooling/signature/SigningContext.h>
-#include <xmltooling/signature/VerifyingContext.h>
+#include <xmltooling/signature/KeyInfo.h>
+#include <xmltooling/signature/ContentReference.h>
+#include <xmltooling/validation/ValidatingXMLObject.h>
 #include <xmltooling/util/XMLConstants.h>
+
+#include <xsec/dsig/DSIGSignature.hpp>
 
 /**
  * @namespace xmlsignature
@@ -40,7 +43,7 @@ namespace xmlsignature {
      * The default signature settings include Exclusive c14n w/o comments, SHA-1 digests,
      * and RSA-SHA1 signing. 
      */
-    class XMLTOOL_API Signature : public virtual xmltooling::XMLObject
+    class XMLTOOL_API Signature : public virtual xmltooling::ValidatingXMLObject
     {
     public:
         virtual ~Signature() {}
@@ -61,23 +64,67 @@ namespace xmlsignature {
          * @param sm    the signature algorithm
          */
         virtual void setSignatureAlgorithm(const XMLCh* sm)=0;
+
+        /**
+         * Sets the signing key used to create the signature.
+         * 
+         * @param signingKey the secret/private key used to create the signature
+         */
+        virtual void setSigningKey(XSECCryptoKey* signingKey)=0;
+
+        /**
+         * Sets a KeyInfo object to embed in the Signature.
+         * 
+         * @param keyInfo   pointer to a KeyInfo object, or NULL
+         */
+        virtual void setKeyInfo(KeyInfo* keyInfo)=0;
+
+        /**
+         * Gets the KeyInfo object associated with the Signature.
+         * This is <strong>NOT</strong> provided for access to the
+         * data associated with an unmarshalled signature. It is
+         * used only in the creation of signatures. Access to data
+         * for validation purposes is provided through the native
+         * DSIGSignature object.
+         * 
+         * @return  pointer to a KeyInfo object, or NULL
+         */
+        virtual KeyInfo* getKeyInfo() const=0;
+
+        /**
+         * Sets the ContentReference object to the Signature to be applied
+         * when the signature is created.
+         * 
+         * @param reference the reference to attach, or NULL 
+         */
+        virtual void setContentReference(ContentReference* reference)=0;
+
+        /**
+         * Gets the ContentReference object associated with the Signature.
+         * This is <strong>NOT</strong> provided for access to the
+         * data associated with an unmarshalled signature. It is
+         * used only in the creation of signatures. Access to data
+         * for validation purposes is provided through the native
+         * DSIGSignature object.
+         * 
+         * @return  pointer to a ContentReference object, or NULL
+         */
+        virtual ContentReference* getContentReference() const=0;
+
         
         /**
-         * Applies an XML signature based on the supplied context.
+         * Gets the native Apache signature object, if present.
          * 
-         * @param ctx   the signing context that determines the signature's content
-         * @throws SignatureException   thrown if the signing operation fails
+         * @return  the native Apache signature interface
          */
-        virtual void sign(SigningContext& ctx)=0;
-        
+        virtual DSIGSignature* getXMLSignature() const=0;
+
         /**
-         * Verifies an XML signature based on the supplied context.
-         * 
-         * @param ctx   the verifying context that validates the signature's content
-         * @throws SignatureException   thrown if the verifying operation fails
+         * Compute and append the signature based on the assigned
+         * ContentReference, KeyInfo, and signing key.
          */
-        virtual void verify(const VerifyingContext& ctx) const=0;
-        
+        virtual void sign()=0;
+
         /**
          * Type-safe clone operation.
          * 
@@ -106,7 +153,7 @@ namespace xmlsignature {
          */
         virtual Signature* buildObject() const;
 
-        static Signature* newSignature() {
+        static Signature* buildSignature() {
             const SignatureBuilder* b = dynamic_cast<const SignatureBuilder*>(
                 xmltooling::XMLObjectBuilder::getBuilder(
                     xmltooling::QName(xmltooling::XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME)

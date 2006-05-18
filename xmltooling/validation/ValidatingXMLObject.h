@@ -51,14 +51,19 @@ namespace xmltooling {
          * 
          * @param validator the validator
          */
-        virtual void registerValidator(Validator* validator) const=0;
+        virtual void registerValidator(Validator* validator)=0;
         
         /**
          * Deregisters a validator for this XMLObject.
          * 
          * @param validator the validator
          */
-        virtual void deregisterValidator(Validator* validator) const=0;
+        virtual void deregisterValidator(Validator* validator)=0;
+
+        /**
+         * Deregisters all validators for this XMLObject.
+         */
+        virtual void deregisterAll()=0;
         
         /**
          * Validates this XMLObject against all registered validators.

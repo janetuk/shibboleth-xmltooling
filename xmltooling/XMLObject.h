@@ -35,7 +35,6 @@ using namespace xercesc;
 #ifndef XMLTOOLING_NO_XMLSEC
 namespace xmlsignature {
     class XMLTOOL_API Signature;
-    class XMLTOOL_API SigningContext;
 };
 #endif
 
@@ -45,36 +44,6 @@ namespace xmlsignature {
 #endif
 
 namespace xmltooling {
-
-    /**
-     * Supplies additional information to the marshalling process.
-     * Currently this only consists of signature related information.
-     */
-    class XMLTOOL_API MarshallingContext
-    {
-        MAKE_NONCOPYABLE(MarshallingContext);
-    public:
-        /**
-         * Default constructor.
-         */
-        MarshallingContext() {}
-        ~MarshallingContext() {}
-
-#ifndef XMLTOOLING_NO_XMLSEC
-        /**
-         * Builds a marshalling context with an initial signature/context pair.
-         * 
-         * @param sig   a signature object
-         * @param ctx   the signing context to associate with the signature 
-         */
-        MarshallingContext(xmlsignature::Signature* sig, xmlsignature::SigningContext* ctx) {
-            m_signingContexts.push_back(std::make_pair(sig,ctx));
-        }
-        
-        /** Array of signing contexts, keyed off of the associated Signature */
-        std::vector< std::pair<xmlsignature::Signature*,xmlsignature::SigningContext*> > m_signingContexts;
-#endif
-    };
 
     /**
      * Object that represents an XML Element that has been unmarshalled into this C++ object.
@@ -244,13 +213,18 @@ namespace xmltooling {
          * marshalled, unless an existing DOM can be reused without creating a new document. 
          * 
          * @param document  the DOM document the marshalled element will be placed in, or NULL
-         * @param ctx       optional marshalling context
+         * @param sigs      ordered array of signatures to create after marshalling is complete
          * @return the DOM element representing this XMLObject
          * 
          * @throws MarshallingException thrown if there is a problem marshalling the given object
          * @throws SignatureException thrown if a problem occurs during signature creation 
          */
-        virtual DOMElement* marshall(DOMDocument* document=NULL, MarshallingContext* ctx=NULL) const=0;
+        virtual DOMElement* marshall(
+            DOMDocument* document=NULL
+#ifndef XMLTOOLING_NO_XMLSEC
+            ,const std::vector<xmlsignature::Signature*>* sigs=NULL
+#endif
+            ) const=0;
         
         /**
          * Marshalls the XMLObject and appends it as a child of the given parent element.
@@ -259,13 +233,18 @@ namespace xmltooling {
          * the Document owning the given Element.
          * 
          * @param parentElement the parent element to append the resulting DOM tree
-         * @param ctx       optional marshalling context
+         * @param sigs          ordered array of signatures to create after marshalling is complete
          * @return the marshalled element tree
 
          * @throws MarshallingException thrown if the given XMLObject can not be marshalled.
          * @throws SignatureException thrown if a problem occurs during signature creation 
          */
-        virtual DOMElement* marshall(DOMElement* parentElement, MarshallingContext* ctx=NULL) const=0;
+        virtual DOMElement* marshall(
+            DOMElement* parentElement
+#ifndef XMLTOOLING_NO_XMLSEC
+            ,const std::vector<xmlsignature::Signature*>* sigs=NULL
+#endif
+            ) const=0;
 
         /**
          * Unmarshalls the given W3C DOM element into the XMLObject.

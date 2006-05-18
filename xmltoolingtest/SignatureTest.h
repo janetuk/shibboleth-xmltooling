@@ -23,15 +23,91 @@
 #include <xsec/enc/XSECKeyInfoResolverDefault.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyRSA.hpp>
+#include <xsec/enc/XSECCryptoException.hpp>
+#include <xsec/framework/XSECException.hpp>
 
-class TestContext : public SigningContext, public VerifyingContext, CredentialResolver
+class TestContext : public ContentReference
 {
-    XSECCryptoKey* m_key;
-    vector<XSECCryptoX509*> m_certs;
     XMLCh* m_uri;
     
 public:
     TestContext(const XMLCh* uri) {
+        m_uri=XMLString::replicate(uri);
+    }
+    
+    virtual ~TestContext() {
+        XMLString::release(&m_uri);
+    }
+
+    ContentReference* clone() const {
+        return new TestContext(m_uri);
+    }
+
+    void createReferences(DSIGSignature* sig) {
+        DSIGReference* ref=sig->createReference(m_uri);
+        ref->appendEnvelopedSignatureTransform();
+        ref->appendCanonicalizationTransform(CANON_C14NE_NOC);
+    }
+};
+
+class TestValidator : public Validator
+{
+    XMLCh* m_uri;
+    
+public:
+    TestValidator(const XMLCh* uri) {
+        m_uri=XMLString::replicate(uri);
+    }
+    
+    virtual ~TestValidator() {
+        XMLString::release(&m_uri);
+    }
+
+    Validator* clone() const {
+        return new TestValidator(m_uri);
+    }
+
+    void validate(const XMLObject* xmlObject) const {
+        DSIGSignature* sig=dynamic_cast<const Signature*>(xmlObject)->getXMLSignature();
+        if (!sig)
+            throw SignatureException("Only a marshalled Signature object can be verified.");
+        const XMLCh* uri=sig->getReferenceList()->item(0)->getURI();
+        TSM_ASSERT_SAME_DATA("Reference URI does not match.",uri,m_uri,XMLString::stringLen(uri));
+        XSECKeyInfoResolverDefault resolver;
+        sig->setKeyInfoResolver(&resolver); // It will clone the resolver for us.
+        try {
+            if (!sig->verify())
+                throw SignatureException("Signature did not verify.");
+        }
+        catch(XSECException& e) {
+            auto_ptr_char temp(e.getMsg());
+            throw SignatureException(string("Caught an XMLSecurity exception verifying signature: ") + temp.get());
+        }
+        catch(XSECCryptoException& e) {
+            throw SignatureException(string("Caught an XMLSecurity exception verifying signature: ") + e.getMsg());
+        }
+    }
+};
+
+class _addcert : public std::binary_function<X509Data*,XSECCryptoX509*,void> {
+public:
+    void operator()(X509Data* bag, XSECCryptoX509* cert) const {
+        safeBuffer& buf=cert->getDEREncodingSB();
+        X509Certificate* x=X509CertificateBuilder::buildX509Certificate();
+        x->setValue(buf.sbStrToXMLCh());
+        bag->getX509Certificates().push_back(x);
+    }
+};
+
+class SignatureTest : public CxxTest::TestSuite {
+    XSECCryptoKey* m_key;
+    vector<XSECCryptoX509*> m_certs;
+public:
+    void setUp() {
+        QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
+        QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
+        XMLObjectBuilder::registerBuilder(qname, new SimpleXMLObjectBuilder());
+        XMLObjectBuilder::registerBuilder(qtype, new SimpleXMLObjectBuilder());
         string keypath=data_path + "key.pem";
         BIO* in=BIO_new(BIO_s_file_internal());
         if (in && BIO_read_filename(in,keypath.c_str())>0) {
@@ -56,47 +132,6 @@ public:
         if (in) BIO_free(in);
         TS_ASSERT(m_certs.size()>0);
         
-        m_uri=XMLString::replicate(uri);
-    }
-    
-    virtual ~TestContext() {
-        delete m_key;
-        for_each(m_certs.begin(),m_certs.end(),xmltooling::cleanup<XSECCryptoX509>());
-        XMLString::release(&m_uri);
-    }
-
-    bool createSignature(DSIGSignature* sig) {
-        DSIGReference* ref=sig->createReference(m_uri);
-        ref->appendEnvelopedSignatureTransform();
-        ref->appendCanonicalizationTransform(CANON_C14NE_NOC);
-        return false;
-    }
-
-    void verifySignature(DSIGSignature* sig) const {
-        const XMLCh* uri=sig->getReferenceList()->item(0)->getURI();
-        TSM_ASSERT_SAME_DATA("Reference URI does not match.",uri,m_uri,XMLString::stringLen(uri));
-        XSECKeyInfoResolverDefault resolver;
-        sig->setKeyInfoResolver(&resolver); // It will clone the resolver for us.
-        sig->verify();
-    }
-    
-    KeyInfo* getKeyInfo() { return NULL; }
-    CredentialResolver& getCredentialResolver() { return *this; }
-    const char* getId() const { return "test"; }
-    const std::vector<XSECCryptoX509*>* getX509Certificates() { return &m_certs; }
-    XSECCryptoKey* getPublicKey() { return m_key; }
-    XSECCryptoKey* getPrivateKey() { return m_key; }
-    Lockable& lock() { return *this; }
-    void unlock() {}
-};
-
-class SignatureTest : public CxxTest::TestSuite {
-public:
-    void setUp() {
-        QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
-        QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
-        XMLObjectBuilder::registerBuilder(qname, new SimpleXMLObjectBuilder());
-        XMLObjectBuilder::registerBuilder(qtype, new SimpleXMLObjectBuilder());
     }
 
     void tearDown() {
@@ -104,6 +139,8 @@ public:
         QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
         XMLObjectBuilder::deregisterBuilder(qname);
         XMLObjectBuilder::deregisterBuilder(qtype);
+        delete m_key;
+        for_each(m_certs.begin(),m_certs.end(),xmltooling::cleanup<XSECCryptoX509>());
     }
 
     void testSignature() {
@@ -126,13 +163,28 @@ public:
         kids[1]->setValue(bar.get());
         
         // Append a Signature.
-        Signature* sig=SignatureBuilder::newSignature();
+        Signature* sig=SignatureBuilder::buildSignature();
         sxObject->setSignature(sig);
+        sig->setContentReference(new TestContext(&chNull));
+        sig->setSigningKey(m_key->clone());
+        
+        // Build KeyInfo.
+        KeyInfo* keyInfo=KeyInfoBuilder::buildKeyInfo();
+        X509Data* x509Data=X509DataBuilder::buildX509Data();
+        keyInfo->getX509Datas().push_back(x509Data);
+        for_each(m_certs.begin(),m_certs.end(),bind1st(_addcert(),x509Data));
+        sig->setKeyInfo(keyInfo);
         
         // Signing context for the whole document.
-        TestContext tc(&chNull);
-        MarshallingContext mctx(sig,&tc);
-        DOMElement* rootElement = sxObject->marshall((DOMDocument*)NULL,&mctx);
+        vector<Signature*> sigs(1,sig);
+        DOMElement* rootElement = NULL;
+        try {
+            rootElement=sxObject->marshall((DOMDocument*)NULL,&sigs);
+        }
+        catch (XMLToolingException& e) {
+            TS_TRACE(e.what());
+            throw;
+        }
         
         string buf;
         XMLHelper::serialize(rootElement, buf);
@@ -143,11 +195,12 @@ public:
         auto_ptr<SimpleXMLObject> sxObject2(dynamic_cast<SimpleXMLObject*>(b->buildFromDocument(doc)));
         TS_ASSERT(sxObject2.get()!=NULL);
         TS_ASSERT(sxObject2->getSignature()!=NULL);
+        sxObject2->getSignature()->registerValidator(new TestValidator(&chNull));
         
         try {
-            sxObject2->getSignature()->verify(tc);
+            sxObject2->getSignature()->validate(false);
         }
-        catch (SignatureException& e) {
+        catch (XMLToolingException& e) {
             TS_TRACE(e.what());
             throw;
         }

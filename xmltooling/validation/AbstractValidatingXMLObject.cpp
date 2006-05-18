@@ -49,22 +49,29 @@ AbstractValidatingXMLObject::~AbstractValidatingXMLObject()
     delete m_validators;
 }
 
-void AbstractValidatingXMLObject::registerValidator(Validator* validator) const
+void AbstractValidatingXMLObject::registerValidator(Validator* validator)
 {
     if (!m_validators)
         m_validators=new ValidatorWrapper();
     m_validators->v.push_back(validator);
 }
 
-void AbstractValidatingXMLObject::deregisterValidator(Validator* validator) const
+void AbstractValidatingXMLObject::deregisterValidator(Validator* validator)
 {
     if (m_validators) {
         for (std::vector<Validator*>::iterator i=m_validators->v.begin(); i!=m_validators->v.end(); i++) {
-            if ((*i)==validator)
+            if ((*i)==validator) {
                 m_validators->v.erase(i);
                 return;
+            }
         }
     }
+}
+
+void AbstractValidatingXMLObject::deregisterAll()
+{
+    delete m_validators;
+    m_validators=NULL;
 }
 
 class _validate : public binary_function<const XMLObject*,bool,void> {

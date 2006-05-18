@@ -44,12 +44,17 @@ namespace xmltooling {
         /**
          * @see ValidatingXMLObject::registerValidator()
          */
-        void registerValidator(Validator* validator) const;
+        void registerValidator(Validator* validator);
         
         /**
          * @see ValidatingXMLObject::deregisterValidator()
          */
-        void deregisterValidator(Validator* validator) const;
+        void deregisterValidator(Validator* validator);
+
+        /**
+         * @see ValidatingXMLObject::deregisterAll()
+         */
+        void deregisterAll();
         
         /**
          * @see ValidatingXMLObject::validate()

@@ -70,7 +70,12 @@ void UnknownElementImpl::serialize(string& s) const
         XMLHelper::serialize(getDOM(),s);
 }
 
-DOMElement* UnknownElementImpl::marshall(DOMDocument* document, MarshallingContext* ctx) const
+DOMElement* UnknownElementImpl::marshall(
+    DOMDocument* document
+#ifndef XMLTOOLING_NO_XMLSEC
+    ,const std::vector<xmlsignature::Signature*>* sigs
+#endif
+    ) const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("marshall");
@@ -131,7 +136,13 @@ DOMElement* UnknownElementImpl::marshall(DOMDocument* document, MarshallingConte
     return cachedDOM;
 }
 
-DOMElement* UnknownElementImpl::marshall(DOMElement* parentElement, MarshallingContext* ctx) const
+
+DOMElement* UnknownElementImpl::marshall(
+    DOMElement* parentElement
+#ifndef XMLTOOLING_NO_XMLSEC
+    ,const std::vector<xmlsignature::Signature*>* sigs
+#endif
+    ) const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("marshall");

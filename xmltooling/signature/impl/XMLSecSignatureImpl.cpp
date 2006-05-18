@@ -27,6 +27,7 @@
 #include "util/NDC.h"
 #include "util/XMLConstants.h"
 #include "util/XMLHelper.h"
+#include "validation/ValidatingXMLObject.h"
 
 #include <log4cpp/Category.hh>
 #include <xercesc/framework/MemBufInputSource.hpp>
@@ -48,36 +49,70 @@ using namespace std;
 
 namespace xmlsignature {
     
-    class XMLTOOL_DLLLOCAL XMLSecSignatureImpl : public UnknownElementImpl, public virtual Signature
+    class XMLTOOL_DLLLOCAL XMLSecSignatureImpl
+        : public UnknownElementImpl, public virtual Signature, public virtual ValidatingXMLObject
     {
     public:
         XMLSecSignatureImpl() : UnknownElementImpl(XMLConstants::XMLSIG_NS, Signature::LOCAL_NAME, XMLConstants::XMLSIG_PREFIX),
-            m_signature(NULL), m_c14n(NULL), m_sm(NULL) {}
+            m_signature(NULL), m_c14n(NULL), m_sm(NULL), m_key(NULL), m_keyInfo(NULL), m_reference(NULL) {}
         virtual ~XMLSecSignatureImpl();
         
         void releaseDOM();
+        void releaseChildrenDOM(bool propagateRelease=true) {
+            if (m_keyInfo) {
+                m_keyInfo->releaseDOM();
+                if (propagateRelease)
+                    m_keyInfo->releaseChildrenDOM();
+            }
+        }
         XMLObject* clone() const;
         Signature* cloneSignature() const;
 
-        DOMElement* marshall(DOMDocument* document=NULL, MarshallingContext* ctx=NULL) const;
-        DOMElement* marshall(DOMElement* parentElement, MarshallingContext* ctx=NULL) const;
+        DOMElement* marshall(DOMDocument* document=NULL, const vector<Signature*>* sigs=NULL) const;
+        DOMElement* marshall(DOMElement* parentElement, const vector<Signature*>* sigs=NULL) const;
         XMLObject* unmarshall(DOMElement* element, bool bindDocument=false);
         
         // Getters
         const XMLCh* getCanonicalizationMethod() const { return m_c14n ? m_c14n : DSIGConstants::s_unicodeStrURIEXC_C14N_NOC; }
         const XMLCh* getSignatureAlgorithm() const { return m_sm ? m_sm : DSIGConstants::s_unicodeStrURIRSA_SHA1; }
-
+        KeyInfo* getKeyInfo() const { return m_keyInfo; }
+        ContentReference* getContentReference() const { return m_reference; }
+        DSIGSignature* getXMLSignature() const { return m_signature; }
+        
         // Setters
         void setCanonicalizationMethod(const XMLCh* c14n) { m_c14n = prepareForAssignment(m_c14n,c14n); }
         void setSignatureAlgorithm(const XMLCh* sm) { m_sm = prepareForAssignment(m_sm,sm); }
+        void setSigningKey(XSECCryptoKey* signingKey) {
+            delete m_key;
+            m_key=signingKey;
+            if (m_key)
+                releaseThisandParentDOM();
+        }
+        void setKeyInfo(KeyInfo* keyInfo) {
+            prepareForAssignment(m_keyInfo, keyInfo);
+            m_keyInfo=keyInfo;
+        }
+        void setContentReference(ContentReference* reference) {
+            delete m_reference;
+            m_reference=reference;
+            releaseThisandParentDOM();
+        }
+        
+        void sign();
 
-        void sign(SigningContext& ctx);
-        void verify(const VerifyingContext& ctx) const;
+        void registerValidator(Validator* validator);
+        void deregisterValidator(Validator* validator);
+        void deregisterAll();
+        void validate(bool validateDescendants) const;
 
     private:
         mutable DSIGSignature* m_signature;
         XMLCh* m_c14n;
         XMLCh* m_sm;
+        XSECCryptoKey* m_key;
+        KeyInfo* m_keyInfo;
+        ContentReference* m_reference;
+        vector<Validator*> m_validators;
     };
     
 };
@@ -94,6 +129,10 @@ XMLSecSignatureImpl::~XMLSecSignatureImpl()
 
     XMLString::release(&m_c14n);
     XMLString::release(&m_sm);
+    delete m_key;
+    delete m_keyInfo;
+    delete m_reference;
+    for_each(m_validators.begin(),m_validators.end(),cleanup<Validator>());
 }
 
 void XMLSecSignatureImpl::releaseDOM()
@@ -119,6 +158,14 @@ Signature* XMLSecSignatureImpl::cloneSignature() const
 
     ret->m_c14n=XMLString::replicate(m_c14n);
     ret->m_sm=XMLString::replicate(m_sm);
+    if (m_key)
+        ret->m_key=m_key->clone();
+    if (m_keyInfo)
+        ret->m_keyInfo=m_keyInfo->cloneKeyInfo();
+    if (m_reference)
+        ret->m_reference=m_reference->clone();
+
+    xmltooling::clone(m_validators,ret->m_validators);
 
     // If there's no XML locally, serialize this object into the new one, otherwise just copy it over.
     if (m_xml.empty())
@@ -129,47 +176,27 @@ Signature* XMLSecSignatureImpl::cloneSignature() const
     return ret;
 }
 
-class _addcert : public std::binary_function<DSIGKeyInfoX509*,XSECCryptoX509*,void> {
-public:
-    void operator()(DSIGKeyInfoX509* bag, XSECCryptoX509* cert) const {
-        safeBuffer& buf=cert->getDEREncodingSB();
-        bag->appendX509Certificate(buf.sbStrToXMLCh());
-    }
-};
-
-void XMLSecSignatureImpl::sign(SigningContext& ctx)
+void XMLSecSignatureImpl::sign()
 {
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Signature");
     log.debug("applying signature");
 
     if (!m_signature)
         throw SignatureException("Only a marshalled Signature object can be signed.");
+    else if (!m_key)
+        throw SignatureException("No signing key available for signature creation.");
+    else if (!m_reference)
+        throw SignatureException("No ContentReference object set for signature creation.");
 
     try {
-        log.debug("creating signature content");
-        CredentialResolver& cr=ctx.getCredentialResolver();
-        if (!ctx.createSignature(m_signature)) {
-            auto_ptr<KeyInfo> keyInfo(ctx.getKeyInfo());
-            if (keyInfo.get()) {
-                DOMElement* domElement=keyInfo->marshall(m_signature->getParentDocument());
-                getDOM()->appendChild(domElement);
-            }
-            else {
-                Locker locker1(cr);
-                const std::vector<XSECCryptoX509*>* certs=cr.getX509Certificates();
-                if (certs && !certs->empty()) {
-                    DSIGKeyInfoX509* x509Data=m_signature->appendX509Data();
-                    for_each(certs->begin(),certs->end(),bind1st(_addcert(),x509Data));
-                }
-            }
+        log.debug("creating signature reference(s)");
+        m_reference->createReferences(m_signature);
+        if (m_keyInfo) {
+            m_keyInfo->marshall(getDOM());
         }
         
         log.debug("computing signature");
-        Locker locker2(cr);
-        XSECCryptoKey* key=cr.getPrivateKey();
-        if (!key)
-            throw SignatureException(string("Unable to obtain signing key from CredentialResolver (") + cr.getId() + ")");
-        m_signature->setSigningKey(key->clone());
+        m_signature->setSigningKey(m_key->clone());
         m_signature->sign();
     }
     catch(XSECException& e) {
@@ -181,27 +208,7 @@ void XMLSecSignatureImpl::sign(SigningContext& ctx)
     }
 }
 
-void XMLSecSignatureImpl::verify(const VerifyingContext& ctx) const
-{
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Signature");
-    log.debug("verifying signature");
-
-    if (!m_signature)
-        throw SignatureException("Only a marshalled Signature object can be verified.");
-
-    try {
-        ctx.verifySignature(m_signature);
-    }
-    catch(XSECException& e) {
-        auto_ptr_char temp(e.getMsg());
-        throw SignatureException(string("Caught an XMLSecurity exception verifying signature: ") + temp.get());
-    }
-    catch(XSECCryptoException& e) {
-        throw SignatureException(string("Caught an XMLSecurity exception verifying signature: ") + e.getMsg());
-    }
-}
-
-DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, MarshallingContext* ctx) const
+DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, const vector<Signature*>* sigs) const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("marshall");
@@ -310,7 +317,7 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, MarshallingCont
     return cachedDOM;
 }
 
-DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, MarshallingContext* ctx) const
+DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, const vector<Signature*>* sigs) const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("marshall");
@@ -421,6 +428,49 @@ XMLObject* XMLSecSignatureImpl::unmarshall(DOMElement* element, bool bindDocumen
 
     setDOM(element, bindDocument);
     return this;
+}
+
+void XMLSecSignatureImpl::registerValidator(Validator* validator)
+{
+    m_validators.push_back(validator);
+}
+
+void XMLSecSignatureImpl::deregisterValidator(Validator* validator)
+{
+    for (vector<Validator*>::iterator i=m_validators.begin(); i!=m_validators.end(); i++) {
+        if ((*i)==validator) {
+            m_validators.erase(i);
+            return;
+        }
+    }
+}
+
+void XMLSecSignatureImpl::deregisterAll()
+{
+    for_each(m_validators.begin(),m_validators.end(),cleanup<Validator>());
+    m_validators.clear();
+}
+
+class _validate : public binary_function<const XMLObject*,bool,void> {
+public:
+    void operator()(const XMLObject* obj, bool propagate) const {
+        const ValidatingXMLObject* val = dynamic_cast<const ValidatingXMLObject*>(obj);
+        if (val) {
+            val->validate(propagate);
+        }
+    }
+};
+
+void XMLSecSignatureImpl::validate(bool validateDescendants) const
+{
+    for_each(
+        m_validators.begin(),m_validators.end(),
+        bind2nd(mem_fun<void,Validator,const XMLObject*>(&Validator::validate),this)
+        );
+    
+    if (validateDescendants && m_keyInfo) {
+        m_keyInfo->validate(validateDescendants);
+    }
 }
 
 Signature* SignatureBuilder::buildObject(
