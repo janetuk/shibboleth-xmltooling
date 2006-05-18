@@ -49,13 +49,6 @@ namespace xmlsignature {
          */
         virtual void createReferences(DSIGSignature* sig)=0;
         
-        /**
-         * Creates an independent copy of this object.
-         * 
-         * @return  the cloned object
-         */
-        virtual ContentReference* clone() const=0;
-
     protected:
         ContentReference() {}
     };

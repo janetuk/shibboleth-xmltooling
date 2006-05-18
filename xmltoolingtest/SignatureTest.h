@@ -39,10 +39,6 @@ public:
         XMLString::release(&m_uri);
     }
 
-    ContentReference* clone() const {
-        return new TestContext(m_uri);
-    }
-
     void createReferences(DSIGSignature* sig) {
         DSIGReference* ref=sig->createReference(m_uri);
         ref->appendEnvelopedSignatureTransform();

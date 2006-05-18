@@ -162,8 +162,6 @@ Signature* XMLSecSignatureImpl::cloneSignature() const
         ret->m_key=m_key->clone();
     if (m_keyInfo)
         ret->m_keyInfo=m_keyInfo->cloneKeyInfo();
-    if (m_reference)
-        ret->m_reference=m_reference->clone();
 
     xmltooling::clone(m_validators,ret->m_validators);
 
