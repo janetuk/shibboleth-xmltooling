@@ -35,7 +35,7 @@ using namespace xmltooling;
 using namespace log4cpp;
 using namespace std;
 
-void UnknownElementImpl::releaseDOM()
+void UnknownElementImpl::releaseDOM() const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("releaseDOM");

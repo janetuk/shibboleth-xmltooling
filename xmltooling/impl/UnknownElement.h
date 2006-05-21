@@ -45,7 +45,7 @@ namespace xmltooling {
         UnknownElementImpl(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL)
             : AbstractXMLObject(namespaceURI, elementLocalName, namespacePrefix) {}
     
-        void releaseDOM();
+        void releaseDOM() const;
 
         XMLObject* clone() const;
 

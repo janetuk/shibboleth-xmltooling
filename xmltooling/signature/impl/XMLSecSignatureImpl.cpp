@@ -57,8 +57,8 @@ namespace xmlsignature {
             m_signature(NULL), m_c14n(NULL), m_sm(NULL), m_key(NULL), m_keyInfo(NULL), m_reference(NULL) {}
         virtual ~XMLSecSignatureImpl();
         
-        void releaseDOM();
-        void releaseChildrenDOM(bool propagateRelease=true) {
+        void releaseDOM() const;
+        void releaseChildrenDOM(bool propagateRelease=true) const {
             if (m_keyInfo) {
                 m_keyInfo->releaseDOM();
                 if (propagateRelease)
@@ -135,15 +135,17 @@ XMLSecSignatureImpl::~XMLSecSignatureImpl()
     for_each(m_validators.begin(),m_validators.end(),cleanup<Validator>());
 }
 
-void XMLSecSignatureImpl::releaseDOM()
+void XMLSecSignatureImpl::releaseDOM() const
 {
-    // This should save off the DOM
-    UnknownElementImpl::releaseDOM();
-    
-    // Release the associated signature.
-    if (m_signature) {
-        XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseSignature(m_signature);
-        m_signature=NULL;
+    if (getDOM()) {
+        // This should save off the DOM
+        UnknownElementImpl::releaseDOM();
+        
+        // Release the associated signature.
+        if (m_signature) {
+            XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseSignature(m_signature);
+            m_signature=NULL;
+        }
     }
 }
 
@@ -189,9 +191,6 @@ void XMLSecSignatureImpl::sign()
     try {
         log.debug("creating signature reference(s)");
         m_reference->createReferences(m_signature);
-        if (m_keyInfo) {
-            m_keyInfo->marshall(getDOM());
-        }
         
         log.debug("computing signature");
         m_signature->setSigningKey(m_key->clone());
@@ -225,32 +224,13 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, const vector<Si
             return cachedDOM;
         }
         
-        // We have a DOM but it doesn't match the document we were given, so we import
-        // it into the new document.
-        cachedDOM=static_cast<DOMElement*>(document->importNode(cachedDOM, true));
-
-        try {
-            XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseSignature(m_signature);
-            m_signature=NULL;
-            m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignatureFromDOM(
-                document, cachedDOM
-                );
-            m_signature->load();
-        }
-        catch(XSECException& e) {
-            auto_ptr_char temp(e.getMsg());
-            throw MarshallingException(string("Caught an XMLSecurity exception while loading signature: ") + temp.get());
-        }
-        catch(XSECCryptoException& e) {
-            throw MarshallingException(string("Caught an XMLSecurity exception while loading signature: ") + e.getMsg());
-        }
-
-        // Recache the DOM.
-        setDocumentElement(document, cachedDOM);
-        log.debug("caching imported DOM for Signature");
-        setDOM(cachedDOM, false);
-        releaseParentDOM(true);
-        return cachedDOM;
+        // We have a DOM but it doesn't match the document we were given. This both sucks and blows.
+        // Without an adoptNode option to maintain the child pointers, we have to either import the
+        // DOM while somehow reassigning all the nested references (which amounts to a complete
+        // *unmarshall* operation), or we just release the existing DOM and hope that we can get
+        // it back. This depends on all objects being able to preserve their DOM at all costs.
+        releaseChildrenDOM(true);
+        releaseDOM();
     }
     
     // If we get here, we didn't have a usable DOM.
@@ -306,6 +286,11 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, const vector<Si
         }
     }
     
+    // Marshall KeyInfo data.
+    if (m_keyInfo && (!m_signature->getKeyInfoList() || m_signature->getKeyInfoList()->isEmpty())) {
+        m_keyInfo->marshall(cachedDOM);
+    }
+
     // Recache the DOM and clear the serialized copy.
     setDocumentElement(document, cachedDOM);
     log.debug("caching DOM for Signature (document is %sbound)", bindDocument ? "" : "not ");
@@ -328,37 +313,20 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, const vecto
     if (cachedDOM) {
         if (parentElement->getOwnerDocument()==cachedDOM->getOwnerDocument()) {
             log.debug("Signature has a usable cached DOM, reusing it");
-            parentElement->appendChild(cachedDOM);
-            releaseParentDOM(true);
+            if (parentElement!=cachedDOM->getParentNode()) {
+                parentElement->appendChild(cachedDOM);
+                releaseParentDOM(true);
+            }
             return cachedDOM;
         }
         
-        // We have a DOM but it doesn't match the document we were given, so we import
-        // it into the new document.
-        cachedDOM=static_cast<DOMElement*>(parentElement->getOwnerDocument()->importNode(cachedDOM, true));
-
-        try {
-            XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseSignature(m_signature);
-            m_signature=NULL;
-            m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignatureFromDOM(
-                parentElement->getOwnerDocument(), cachedDOM
-                );
-            m_signature->load();
-        }
-        catch(XSECException& e) {
-            auto_ptr_char temp(e.getMsg());
-            throw MarshallingException(string("Caught an XMLSecurity exception while loading signature: ") + temp.get());
-        }
-        catch(XSECCryptoException& e) {
-            throw MarshallingException(string("Caught an XMLSecurity exception while loading signature: ") + e.getMsg());
-        }
-
-        // Recache the DOM.
-        parentElement->appendChild(cachedDOM);
-        log.debug("caching imported DOM for Signature");
-        setDOM(cachedDOM, false);
-        releaseParentDOM(true);
-        return cachedDOM;
+        // We have a DOM but it doesn't match the document we were given. This both sucks and blows.
+        // Without an adoptNode option to maintain the child pointers, we have to either import the
+        // DOM while somehow reassigning all the nested references (which amounts to a complete
+        // *unmarshall* operation), or we just release the existing DOM and hope that we can get
+        // it back. This depends on all objects being able to preserve their DOM at all costs.
+        releaseChildrenDOM(true);
+        releaseDOM();
     }
     
     // If we get here, we didn't have a usable DOM.
@@ -395,6 +363,11 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, const vecto
         catch(XSECCryptoException& e) {
             throw MarshallingException(string("Caught an XMLSecurity exception while loading signature: ") + e.getMsg());
         }
+    }
+
+    // Marshall KeyInfo data.
+    if (m_keyInfo && (!m_signature->getKeyInfoList() || m_signature->getKeyInfoList()->isEmpty())) {
+        m_keyInfo->marshall(cachedDOM);
     }
 
     // Recache the DOM and clear the serialized copy.
