@@ -16,6 +16,8 @@
 
 #include "XMLObjectBaseTestCase.h"
 
+#include <xmltooling/signature/SignatureValidator.h>
+
 #include <fstream>
 #include <openssl/pem.h>
 #include <xercesc/util/XMLUniDefs.hpp>
@@ -46,12 +48,16 @@ public:
     }
 };
 
-class TestValidator : public Validator
+class TestValidator : public SignatureValidator
 {
     XMLCh* m_uri;
     
+    TestValidator(const TestValidator& src) : SignatureValidator(src) {
+        m_uri=XMLString::replicate(src.m_uri);
+    }
+
 public:
-    TestValidator(const XMLCh* uri) {
+    TestValidator(const XMLCh* uri, XSECCryptoKey* key) : SignatureValidator(key) {
         m_uri=XMLString::replicate(uri);
     }
     
@@ -59,29 +65,17 @@ public:
         XMLString::release(&m_uri);
     }
 
-    Validator* clone() const {
-        return new TestValidator(m_uri);
+    TestValidator* clone() const {
+        return new TestValidator(*this);
     }
 
-    void validate(const XMLObject* xmlObject) const {
-        DSIGSignature* sig=dynamic_cast<const Signature*>(xmlObject)->getXMLSignature();
+    void validate(const Signature* sigObj) const {
+        DSIGSignature* sig=sigObj->getXMLSignature();
         if (!sig)
             throw SignatureException("Only a marshalled Signature object can be verified.");
         const XMLCh* uri=sig->getReferenceList()->item(0)->getURI();
         TSM_ASSERT_SAME_DATA("Reference URI does not match.",uri,m_uri,XMLString::stringLen(uri));
-        XSECKeyInfoResolverDefault resolver;
-        sig->setKeyInfoResolver(&resolver); // It will clone the resolver for us.
-        try {
-            if (!sig->verify())
-                throw SignatureException("Signature did not verify.");
-        }
-        catch(XSECException& e) {
-            auto_ptr_char temp(e.getMsg());
-            throw SignatureException(string("Caught an XMLSecurity exception verifying signature: ") + temp.get());
-        }
-        catch(XSECCryptoException& e) {
-            throw SignatureException(string("Caught an XMLSecurity exception verifying signature: ") + e.getMsg());
-        }
+        SignatureValidator::validate(sigObj);
     }
 };
 
@@ -191,7 +185,7 @@ public:
         auto_ptr<SimpleXMLObject> sxObject2(dynamic_cast<SimpleXMLObject*>(b->buildFromDocument(doc)));
         TS_ASSERT(sxObject2.get()!=NULL);
         TS_ASSERT(sxObject2->getSignature()!=NULL);
-        sxObject2->getSignature()->registerValidator(new TestValidator(&chNull));
+        sxObject2->getSignature()->registerValidator(new TestValidator(&chNull,m_key->clone()));
         
         try {
             sxObject2->getSignature()->validate(false);

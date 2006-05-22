@@ -47,9 +47,10 @@ ioinclude_HEADERS = \
     io/AbstractXMLObjectUnmarshaller.h
 
 siginclude_HEADERS = \
+    signature/ContentReference.h \
     signature/KeyInfo.h \
     signature/Signature.h \
-    signature/ContentReference.h
+    signature/SignatureValidator.h
 
 utilinclude_HEADERS = \
     util/CredentialResolver.h \
@@ -70,6 +71,7 @@ noinst_HEADERS = \
 
 if BUILD_XMLSEC
 xmlsec_sources = \
+	signature/impl/SignatureValidator.cpp \
     signature/impl/XMLSecSignatureImpl.cpp
 else
 xmlsec_sources =

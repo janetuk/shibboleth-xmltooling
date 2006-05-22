@@ -300,6 +300,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\signature\impl\SignatureValidator.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\signature\impl\XMLSecSignatureImpl.cpp"
 						>
 					</File>
@@ -484,6 +488,10 @@
 				</File>
 				<File
 					RelativePath=".\signature\Signature.h"
+					>
+				</File>
+				<File
+					RelativePath=".\signature\SignatureValidator.h"
 					>
 				</File>
 			</Filter>
