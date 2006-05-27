@@ -25,7 +25,6 @@
 #define __xmltooling_keyinfo_h__
 
 #include <xmltooling/ElementProxy.h>
-#include <xmltooling/exceptions.h>
 #include <xmltooling/SimpleElement.h>
 #include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/util/XMLConstants.h>

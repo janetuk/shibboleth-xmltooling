@@ -4,6 +4,8 @@ lib_LTLIBRARIES = libxmltooling.la
 
 libxmltoolingincludedir = $(includedir)/xmltooling
 
+encincludedir = $(includedir)/xmltooling/encryption
+
 implincludedir = $(includedir)/xmltooling/impl
 
 ioincludedir = $(includedir)/xmltooling/io
@@ -37,6 +39,9 @@ libxmltoolinginclude_HEADERS = \
     XMLObject.h \
     XMLObjectBuilder.h \
     XMLToolingConfig.h
+
+encinclude_HEADERS = \
+    encryption/Encryption.h
 
 implinclude_HEADERS = \
     impl/AnyElement.h \
@@ -88,6 +93,8 @@ libxmltooling_la_SOURCES = \
     unicode.cpp \
     XMLObjectBuilder.cpp \
     XMLToolingConfig.cpp \
+    encryption/impl/EncryptionImpl.cpp \
+    encryption/impl/EncryptionSchemaValidators.cpp \
     impl/AnyElement.cpp \
     impl/UnknownElement.cpp \
     io/AbstractXMLObjectMarshaller.cpp \

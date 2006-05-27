@@ -60,7 +60,7 @@
 <pathentry kind="mac" name="WIN32" path="" value=""/>
 <pathentry kind="out" path=""/>
 <pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
-<pathentry excluding="util/|io/|impl/|validation/|signature/|signature/impl/" kind="src" path="xmltooling"/>
+<pathentry excluding="util/|io/|impl/|validation/|signature/|signature/impl/|encryption/|encryption/impl/" kind="src" path="xmltooling"/>
 <pathentry kind="src" path="xmltooling/util"/>
 <pathentry kind="src" path="xmltooling/io"/>
 <pathentry kind="src" path="xmltooling/impl"/>
@@ -68,6 +68,8 @@
 <pathentry kind="src" path="xmltooling/validation"/>
 <pathentry excluding="impl/" kind="src" path="xmltooling/signature"/>
 <pathentry kind="src" path="xmltooling/signature/impl"/>
+<pathentry excluding="impl/" kind="src" path="xmltooling/encryption"/>
+<pathentry kind="src" path="xmltooling/encryption/impl"/>
 </item>
 </data>
 </cdtproject>

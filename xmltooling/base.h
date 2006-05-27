@@ -240,6 +240,29 @@
         static const XMLCh LOCAL_NAME[]
 
 /**
+ * Begins the declaration of an XMLObject specialization with two base classes.
+ * Basic boilerplate includes a protected constructor, empty virtual destructor,
+ * and Unicode constants for the default associated element's name and prefix.
+ * 
+ * @param linkage   linkage specifier for the class
+ * @param cname     the name of the class to declare
+ * @param base      the first base class to derive from using public virtual inheritance
+ * @param base2     the second base class to derive from using public virtual inheritance
+ * @param desc      documentation comment for class
+ */
+#define BEGIN_XMLOBJECT2(linkage,cname,base,base2,desc) \
+    XMLTOOLING_DOXYGEN(desc) \
+    class linkage cname : public virtual base, public virtual base2, public virtual xmltooling::ValidatingXMLObject { \
+    protected: \
+        cname() {} \
+    public: \
+        virtual ~cname() {} \
+        XMLTOOLING_DOXYGEN(Type-specific clone method.) \
+        virtual cname* clone##cname() const=0; \
+        XMLTOOLING_DOXYGEN(Element local name) \
+        static const XMLCh LOCAL_NAME[]
+
+/**
  * Ends the declaration of an XMLObject specialization.
  */
 #define END_XMLOBJECT }
@@ -298,6 +321,21 @@
         virtual void set##proper(int proper)=0
 
 /**
+ * Declares abstract get/set methods for a boolean XML attribute.
+ * 
+ * @param proper    the proper name of the attribute
+ * @param upcased   the upcased name of the attribute
+ */
+#define DECL_BOOLEAN_ATTRIB(proper,upcased) \
+    public: \
+        XMLTOOLING_DOXYGEN(proper attribute name) \
+        static const XMLCh upcased##_ATTRIB_NAME[]; \
+        XMLTOOLING_DOXYGEN(Returns the proper attribute.) \
+        virtual bool proper() const=0; \
+        XMLTOOLING_DOXYGEN(Sets the proper attribute.) \
+        virtual void proper(bool value)=0
+
+/**
  * Implements get/set methods and a private member for a typed XML attribute.
  * 
  * @param proper    the proper name of the attribute
@@ -352,6 +390,25 @@
             if (m_##proper != proper) { \
                 releaseThisandParentDOM(); \
                 m_##proper = proper; \
+            } \
+        }
+
+/**
+ * Implements get/set methods and a private member for a boolean XML attribute.
+ * 
+ * @param proper    the proper name of the attribute
+ */
+#define IMPL_BOOLEAN_ATTRIB(proper) \
+    protected: \
+        bool m_##proper; \
+    public: \
+        bool proper() const { \
+            return m_##proper; \
+        } \
+        void proper(bool value) { \
+            if (m_##proper != value) { \
+                releaseThisandParentDOM(); \
+                m_##proper = value; \
             } \
         }
 
@@ -442,6 +499,19 @@
         virtual const std::vector<proper*>& get##proper##s() const=0
 
 /**
+ * Declares abstract get/set methods for a typed XML child collection in a foreign namespace.
+ * 
+ * @param proper    the proper name of the child type
+ * @param ns        the C++ namespace for the type
+ */
+#define DECL_TYPED_FOREIGN_CHILDREN(proper,ns) \
+    public: \
+        XMLTOOLING_DOXYGEN(Returns modifiable proper collection.) \
+        virtual VectorOf(ns::proper) get##proper##s()=0; \
+        XMLTOOLING_DOXYGEN(Returns reference to immutable proper collection.) \
+        virtual const std::vector<ns::proper*>& get##proper##s() const=0
+
+/**
  * Declares abstract get/set methods for a generic XML child collection.
  * 
  * @param proper    the proper name of the child
@@ -523,6 +593,19 @@
     sprintf(buf##proper,"%d",get##proper()); \
     auto_ptr_XMLCh wide##proper(buf##proper); \
     domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, wide##proper.get())
+
+/**
+ * Implements marshalling for a boolean attribute
+ * 
+ * @param proper        the proper name of the attribute
+ * @param ucase         the upcased name of the attribute
+ * @param namespaceURI  the XML namespace of the attribute
+ */
+#define MARSHALL_BOOLEAN_ATTRIB(proper,ucase,namespaceURI) \
+    XMLCh flag##proper[2]; \
+    flag##proper[0]=m_##proper ? chDigit_1 : chDigit_0; \
+    flag##proper[1]=chNull; \
+    domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, flag##proper)
 
 /**
  * Implements marshalling for a QName attribute
@@ -613,6 +696,24 @@
         return; \
     }
 
+/**
+ * Implements unmarshalling process branch for a boolean attribute
+ * 
+ * @param proper        the proper name of the attribute
+ * @param ucase         the upcased name of the attribute
+ * @param namespaceURI  the XML namespace of the attribute
+ */
+#define PROC_BOOLEAN_ATTRIB(proper,ucase,namespaceURI) \
+    if (xmltooling::XMLHelper::isNodeNamed(attribute, namespaceURI, ucase##_ATTRIB_NAME)) { \
+        const XMLCh* value=attribute->getValue(); \
+        if (value) { \
+            if (*value==chLatin_t || *value==chDigit_1) \
+                m_##proper=true; \
+            else if (*value==chLatin_f || *value==chDigit_0) \
+                m_##proper=false; \
+        } \
+        return; \
+    }
 
 /**
  * Implements unmarshalling process branch for typed child collection element
@@ -659,6 +760,24 @@
     XMLTOOLING_DOXYGEN(Sets or clears proper.) \
     void set##proper(const XMLCh* proper) { \
         setTextContent(proper); \
+    }
+
+/**
+ * Declares aliased get/set methods for named integer XML element content.
+ * 
+ * @param proper    the proper name to label the element's content
+ */
+#define DECL_INTEGER_CONTENT(proper) \
+    XMLTOOLING_DOXYGEN(Returns proper.) \
+    int get##proper() const { \
+        return XMLString::parseInt(getTextContent()); \
+    } \
+    XMLTOOLING_DOXYGEN(Sets or clears proper.) \
+    void set##proper(int proper) { \
+        char buf[64]; \
+        sprintf(buf,"%d",proper); \
+        xmltooling::auto_ptr_XMLCh widebuf(buf); \
+        setTextContent(widebuf.get()); \
     }
 
 /**

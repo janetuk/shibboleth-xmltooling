@@ -309,6 +309,22 @@
 					</File>
 				</Filter>
 			</Filter>
+			<Filter
+				Name="encryption"
+				>
+				<Filter
+					Name="impl"
+					>
+					<File
+						RelativePath=".\encryption\impl\EncryptionImpl.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\encryption\impl\EncryptionSchemaValidators.cpp"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -492,6 +508,14 @@
 				</File>
 				<File
 					RelativePath=".\signature\SignatureValidator.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="encryption"
+				>
+				<File
+					RelativePath=".\encryption\Encryption.h"
 					>
 				</File>
 			</Filter>

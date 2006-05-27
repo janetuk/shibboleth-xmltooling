@@ -23,6 +23,7 @@
 #include "internal.h"
 #include "exceptions.h"
 #include "XMLToolingConfig.h"
+#include "encryption/Encryption.h"
 #include "impl/UnknownElement.h"
 #include "signature/KeyInfo.h"
 #include "signature/Signature.h"
@@ -44,6 +45,7 @@
 
 #include <stdexcept>
 
+using namespace xmlencryption;
 using namespace xmlsignature;
 using namespace xmltooling;
 using namespace log4cpp;
@@ -161,6 +163,7 @@ bool XMLToolingInternalConfig::init()
         XMLObjectBuilder::registerDefaultBuilder(new UnknownElementBuilder());
 
         registerKeyInfoClasses();
+        registerEncryptionClasses();
         
         REGISTER_EXCEPTION_FACTORY(XMLParserException,xmltooling);
         REGISTER_EXCEPTION_FACTORY(XMLObjectException,xmltooling);
