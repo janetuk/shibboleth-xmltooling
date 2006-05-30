@@ -748,6 +748,18 @@
     }
 
 /**
+ * Implements unmarshalling process branch for a generic child singleton element
+ * 
+ * @param proper        the proper name of the child type
+ * @param namespaceURI  the XML namespace of the child element
+ */
+#define PROC_XMLOBJECT_CHILD(proper,namespaceURI) \
+    if (xmltooling::XMLHelper::isNodeNamed(root,namespaceURI,proper::LOCAL_NAME)) { \
+        set##proper(childXMLObject); \
+        return; \
+    }
+
+/**
  * Declares aliased get/set methods for named XML element content.
  * 
  * @param proper    the proper name to label the element's content
