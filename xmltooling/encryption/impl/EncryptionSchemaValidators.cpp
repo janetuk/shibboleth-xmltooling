@@ -30,6 +30,8 @@ using namespace std;
 
 namespace xmlencryption {
 
+    XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,CarriedKeyName);
+    XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,CipherValue);
     XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,KeySize);
     XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,OAEPparams);
     
@@ -37,6 +39,73 @@ namespace xmlencryption {
         XMLOBJECTVALIDATOR_REQUIRE(EncryptionMethod,Algorithm);
     END_XMLOBJECTVALIDATOR;
 
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,Transforms);
+        XMLOBJECTVALIDATOR_NONEMPTY(Transforms,Transform);
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,CipherReference);
+        XMLOBJECTVALIDATOR_REQUIRE(CipherReference,URI);
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,CipherData);
+        XMLOBJECTVALIDATOR_ONLYONEOF(CipherData,CipherValue,CipherReference);
+    END_XMLOBJECTVALIDATOR;
+
+    class XMLTOOL_DLLLOCAL checkWildcardNS {
+    public:
+        void operator()(const XMLObject* xmlObject) const {
+            const XMLCh* ns=xmlObject->getElementQName().getNamespaceURI();
+            if (XMLString::equals(ns,XMLConstants::XMLENC_NS) || !ns || !*ns) {
+                throw ValidationException(
+                    "Object contains an illegal extension child element ($1).",
+                    params(1,xmlObject->getElementQName().toString().c_str())
+                    );
+            }
+        }
+    };
+
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,EncryptionProperty);
+        if (!ptr->hasChildren())
+            throw ValidationException("EncryptionProperty must have at least one child element.");
+        const list<XMLObject*>& anys=ptr->getXMLObjects();
+        for_each(anys.begin(),anys.end(),checkWildcardNS());
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,EncryptionProperties);
+        XMLOBJECTVALIDATOR_NONEMPTY(EncryptionProperties,EncryptionProperty);
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,ReferenceType);
+        XMLOBJECTVALIDATOR_REQUIRE(DataReference,URI);
+        const list<XMLObject*>& anys=ptr->getXMLObjects();
+        for_each(anys.begin(),anys.end(),checkWildcardNS());
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR_SUB(XMLTOOL_DLLLOCAL,DataReference,ReferenceType);
+        ReferenceTypeSchemaValidator::validate(xmlObject);
+    END_XMLOBJECTVALIDATOR;
+    
+    BEGIN_XMLOBJECTVALIDATOR_SUB(XMLTOOL_DLLLOCAL,KeyReference,ReferenceType);
+        ReferenceTypeSchemaValidator::validate(xmlObject);
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,ReferenceList);
+        if (!ptr->hasChildren())
+            throw ValidationException("ReferenceList must have at least one child element.");
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,EncryptedType);
+        XMLOBJECTVALIDATOR_REQUIRE(EncryptedType,CipherData);
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR_SUB(XMLTOOL_DLLLOCAL,EncryptedData,EncryptedType);
+        EncryptedTypeSchemaValidator::validate(xmlObject);
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR_SUB(XMLTOOL_DLLLOCAL,EncryptedKey,EncryptedType);
+        EncryptedTypeSchemaValidator::validate(xmlObject);
+    END_XMLOBJECTVALIDATOR;
+    
 };
 
 #define REGISTER_ELEMENT(namespaceURI,cname) \
@@ -52,8 +121,25 @@ namespace xmlencryption {
 void xmlencryption::registerEncryptionClasses()
 {
     QName q;
+    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,CarriedKeyName);
+    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,CipherData);
+    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,CipherReference);
+    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,CipherValue);
+    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,DataReference);
+    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,EncryptedData);
+    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,EncryptedKey);
+    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,EncryptionMethod);
+    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,EncryptionProperties);
+    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,EncryptionProperty);
+    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,KeyReference);
     REGISTER_ELEMENT(XMLConstants::XMLENC_NS,KeySize);
     REGISTER_ELEMENT(XMLConstants::XMLENC_NS,OAEPparams);
-    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,EncryptionMethod);
+    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,ReferenceList);
+    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,Transforms);
+    REGISTER_TYPE(XMLConstants::XMLENC_NS,CipherData);
+    REGISTER_TYPE(XMLConstants::XMLENC_NS,CipherReference);
     REGISTER_TYPE(XMLConstants::XMLENC_NS,EncryptionMethod);
+    REGISTER_TYPE(XMLConstants::XMLENC_NS,EncryptionProperties);
+    REGISTER_TYPE(XMLConstants::XMLENC_NS,EncryptionProperty);
+    REGISTER_TYPE(XMLConstants::XMLENC_NS,Transforms);
 }

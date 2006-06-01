@@ -23,11 +23,8 @@
 #ifndef __xmltooling_encrypt_h__
 #define __xmltooling_encrypt_h__
 
-#include <xmltooling/ElementProxy.h>
-#include <xmltooling/SimpleElement.h>
-#include <xmltooling/XMLObjectBuilder.h>
-#include <xmltooling/util/XMLConstants.h>
-#include <xmltooling/validation/ValidatingXMLObject.h>
+#include <xmltooling/AttributeExtensibleXMLObject.h>
+#include <xmltooling/signature/KeyInfo.h>
 
 #define DECL_XMLENCOBJECTBUILDER(cname) \
     DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,xmltooling::XMLConstants::XMLENC_NS,xmltooling::XMLConstants::XMLENC_PREFIX)
@@ -38,6 +35,8 @@
  */
 namespace xmlencryption {
 
+    DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,CarriedKeyName,Name,XML Encryption CarriedKeyName element);
+    DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,CipherValue,Value,XML Encryption CipherValue element);
     DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,OAEPparams,Name,XML Encryption OAEPparams element);
 
     BEGIN_XMLOBJECT(XMLTOOL_API,KeySize,xmltooling::SimpleElement,XML Encryption KeySize element);
@@ -53,9 +52,98 @@ namespace xmlencryption {
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
-    DECL_XMLENCOBJECTBUILDER(OAEPparams);
-    DECL_XMLENCOBJECTBUILDER(KeySize);
+    BEGIN_XMLOBJECT(XMLTOOL_API,Transforms,xmltooling::XMLObject,XML Encryption Transforms element);
+        DECL_TYPED_FOREIGN_CHILDREN(Transform,xmlsignature);
+        /** TransformsType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
+    BEGIN_XMLOBJECT(XMLTOOL_API,CipherReference,xmltooling::XMLObject,XML Encryption CipherReference element);
+        DECL_STRING_ATTRIB(URI,URI);
+        DECL_TYPED_CHILD(Transforms);
+        /** CipherReferenceType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
+    BEGIN_XMLOBJECT(XMLTOOL_API,CipherData,xmltooling::XMLObject,XML Encryption CipherData element);
+        DECL_TYPED_CHILD(CipherValue);
+        DECL_TYPED_CHILD(CipherReference);
+        /** CipherDataType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
+    BEGIN_XMLOBJECT2(XMLTOOL_API,EncryptionProperty,xmltooling::ElementProxy,xmltooling::AttributeExtensibleXMLObject,XML Encryption EncryptionProperty element);
+        DECL_STRING_ATTRIB(Target,TARGET);
+        DECL_STRING_ATTRIB(Id,ID);
+        /** EncryptionPropertyType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
+    BEGIN_XMLOBJECT(XMLTOOL_API,EncryptionProperties,xmltooling::XMLObject,XML Encryption EncryptionProperties element);
+        DECL_STRING_ATTRIB(Id,ID);
+        DECL_TYPED_CHILDREN(EncryptionProperty);
+        /** EncryptionPropertiesType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
+    BEGIN_XMLOBJECT(XMLTOOL_API,ReferenceType,xmltooling::ElementProxy,XML Encryption ReferenceType type);
+        DECL_STRING_ATTRIB(URI,URI);
+        /** ReferenceType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
+    BEGIN_XMLOBJECT(XMLTOOL_API,DataReference,ReferenceType,XML Encryption DataReference element);
+    END_XMLOBJECT;
+
+    BEGIN_XMLOBJECT(XMLTOOL_API,KeyReference,ReferenceType,XML Encryption KeyReference element);
+    END_XMLOBJECT;
+
+    BEGIN_XMLOBJECT(XMLTOOL_API,ReferenceList,xmltooling::XMLObject,XML Encryption ReferenceList element);
+        DECL_TYPED_CHILDREN(DataReference);
+        DECL_TYPED_CHILDREN(KeyReference);
+    END_XMLOBJECT;
+
+    BEGIN_XMLOBJECT(XMLTOOL_API,EncryptedType,xmltooling::XMLObject,XML Encryption EncryptedType abstract type);
+        DECL_STRING_ATTRIB(Id,ID);
+        DECL_STRING_ATTRIB(Type,TYPE);
+        DECL_STRING_ATTRIB(MimeType,MIMETYPE);
+        DECL_STRING_ATTRIB(Encoding,ENCODING);
+        DECL_TYPED_CHILD(EncryptionMethod);
+        DECL_TYPED_FOREIGN_CHILD(KeyInfo,xmlsignature);
+        DECL_TYPED_CHILD(CipherData);
+        DECL_TYPED_CHILD(EncryptionProperties);
+        /** EncryptedType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
+    BEGIN_XMLOBJECT(XMLTOOL_API,EncryptedData,EncryptedType,XML Encryption EncryptedData element);
+        /** EncryptedDataType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
+    BEGIN_XMLOBJECT(XMLTOOL_API,EncryptedKey,EncryptedType,XML Encryption EncryptedKey element);
+        DECL_STRING_ATTRIB(Recipient,RECIPIENT);
+        DECL_TYPED_CHILD(ReferenceList);
+        DECL_TYPED_CHILD(CarriedKeyName);
+        /** EncryptedKeyType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
+    DECL_XMLENCOBJECTBUILDER(CarriedKeyName);
+    DECL_XMLENCOBJECTBUILDER(CipherData);
+    DECL_XMLENCOBJECTBUILDER(CipherReference);
+    DECL_XMLENCOBJECTBUILDER(CipherValue);
+    DECL_XMLENCOBJECTBUILDER(DataReference);
+    DECL_XMLENCOBJECTBUILDER(EncryptedData);
+    DECL_XMLENCOBJECTBUILDER(EncryptedKey);
     DECL_XMLENCOBJECTBUILDER(EncryptionMethod);
+    DECL_XMLENCOBJECTBUILDER(EncryptionProperties);
+    DECL_XMLENCOBJECTBUILDER(EncryptionProperty);
+    DECL_XMLENCOBJECTBUILDER(KeyReference);
+    DECL_XMLENCOBJECTBUILDER(KeySize);
+    DECL_XMLENCOBJECTBUILDER(OAEPparams);
+    DECL_XMLENCOBJECTBUILDER(ReferenceList);
+    DECL_XMLENCOBJECTBUILDER(Transforms);
 
     /**
      * Registers builders and validators for XML Encryption classes into the runtime.

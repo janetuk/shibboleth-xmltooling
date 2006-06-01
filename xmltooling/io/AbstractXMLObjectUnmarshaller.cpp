@@ -62,12 +62,6 @@ XMLObject* AbstractXMLObjectUnmarshaller::unmarshall(DOMElement* element, bool b
 
     unmarshallChildElements(element);
 
-    /* TODO: Signing
-    if (xmlObject instanceof SignableXMLObject) {
-        verifySignature(domElement, xmlObject);
-    }
-    */
-
     setDOM(element,bindDocument);
     return this;
 }
@@ -77,7 +71,6 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
 #ifdef _DEBUG
     xmltooling::NDC ndc("unmarshallAttributes");
 #endif
-    static const XMLCh type[]={chLatin_t, chLatin_y, chLatin_p, chLatin_e, chNull};
 
     if (XT_log.isDebugEnabled()) {
         auto_ptr_char dname(domElement->getNodeName());
@@ -116,9 +109,20 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
                 continue;
             }
         }
-        else if (XMLString::equals(nsuri,XMLConstants::XSI_NS) && XMLString::equals(attribute->getLocalName(),type)) {
-            XT_log.debug("skipping xsi:type declaration");
-            continue;
+        else if (XMLString::equals(nsuri,XMLConstants::XSI_NS)) {
+            static const XMLCh type[]= UNICODE_LITERAL_4(t,y,p,e);
+            static const XMLCh schemaLocation[]= UNICODE_LITERAL_14(s,c,h,e,m,a,L,o,c,a,t,i,o,n);
+            if (XMLString::equals(attribute->getLocalName(),type)) {
+                XT_log.debug("skipping xsi:type declaration");
+                continue;
+            }
+            else if (XMLString::equals(attribute->getLocalName(),schemaLocation)) {
+                XT_log.debug("storing off xsi:schemaLocation attribute");
+                if (m_schemaLocation)
+                    XMLString::release(&m_schemaLocation);
+                m_schemaLocation=XMLString::replicate(attribute->getValue());
+                continue;
+            }
         }
         else if (nsuri && !XMLString::equals(nsuri,XMLConstants::XML_NS)) {
             XT_log.debug("found namespace-qualified attribute, adding prefix to the list of namespaces on the XMLObject");
@@ -168,7 +172,7 @@ void AbstractXMLObjectUnmarshaller::unmarshallChildElements(const DOMElement* do
             processChildElement(childObject.get(), static_cast<DOMElement*>(childNode));
             childObject.release();
         }
-        else if (childNode->getNodeType() == DOMNode::TEXT_NODE) {
+        else if (childNode->getNodeType() == DOMNode::TEXT_NODE && !XMLString::isAllWhiteSpace(childNode->getNodeValue())) {
             XT_log.debug("processing element content");
             processElementContent(childNode->getNodeValue());
         }
@@ -178,4 +182,15 @@ void AbstractXMLObjectUnmarshaller::unmarshallChildElements(const DOMElement* do
 void AbstractXMLObjectUnmarshaller::processChildElement(XMLObject* child, const DOMElement* childRoot)
 {
     throw UnmarshallingException("Invalid child element: $1",params(1,child->getElementQName().toString().c_str()));
+}
+
+void AbstractXMLObjectUnmarshaller::processAttribute(const DOMAttr* attribute)
+{
+    auto_ptr<QName> q(XMLHelper::getNodeQName(attribute));
+    throw UnmarshallingException("Invalid attribute: $1",params(1,q->toString().c_str()));
+}
+
+void AbstractXMLObjectUnmarshaller::processElementContent(const XMLCh* elementContent)
+{
+    throw UnmarshallingException("Invalid text content in element."); 
 }

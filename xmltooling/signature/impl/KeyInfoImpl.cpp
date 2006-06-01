@@ -293,6 +293,7 @@ namespace xmlsignature {
 
         void processAttribute(const DOMAttr* attribute) {
             PROC_STRING_ATTRIB(Algorithm,ALGORITHM,NULL);
+            AbstractXMLObjectUnmarshaller::processAttribute(attribute);
         }
     };
 
@@ -383,6 +384,7 @@ namespace xmlsignature {
         void processAttribute(const DOMAttr* attribute) {
             PROC_STRING_ATTRIB(URI,URI,NULL);
             PROC_STRING_ATTRIB(Type,TYPE,NULL);
+            AbstractXMLObjectUnmarshaller::processAttribute(attribute);
         }
     };
 
@@ -743,6 +745,7 @@ namespace xmlsignature {
 
         void processAttribute(const DOMAttr* attribute) {
             PROC_ID_ATTRIB(Id,ID,NULL);
+            AbstractXMLObjectUnmarshaller::processAttribute(attribute);
         }
     };
     

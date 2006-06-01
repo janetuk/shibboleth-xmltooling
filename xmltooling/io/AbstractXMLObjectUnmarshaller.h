@@ -84,14 +84,14 @@ namespace xmltooling {
          * 
          * @throws UnmarshallingException thrown if there is a problem adding the attribute to the XMLObject
          */
-        virtual void processAttribute(const DOMAttr* attribute) {}
+        virtual void processAttribute(const DOMAttr* attribute);
     
         /**
          * Called if the element being unmarshalled contained textual content so that it can be added to the XMLObject.
          * 
          * @param elementContent the Element's text content
          */
-        virtual void processElementContent(const XMLCh* elementContent) {}
+        virtual void processElementContent(const XMLCh* elementContent);
     };
     
 };

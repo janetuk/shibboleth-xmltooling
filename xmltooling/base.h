@@ -469,6 +469,26 @@
         }
 
 /**
+ * Implements get/set methods and a private list iterator member for
+ * a typed XML child object in a foreign namespace
+ * 
+ * @param proper    the proper name of the child type
+ * @param ns        the C++ namespace for the type
+ */
+#define IMPL_TYPED_FOREIGN_CHILD(proper,ns) \
+    protected: \
+        ns::proper* m_##proper; \
+        std::list<xmltooling::XMLObject*>::iterator m_pos_##proper; \
+    public: \
+        ns::proper* get##proper() const { \
+            return m_##proper; \
+        } \
+        void set##proper(ns::proper* child) { \
+            prepareForAssignment(m_##proper,child); \
+            *m_pos_##proper = m_##proper = child; \
+        }
+
+/**
  * Implements get/set methods and a private list iterator member for a generic XML child object.
  * 
  * @param proper    the proper name of the child
@@ -537,6 +557,25 @@
             return VectorOf(proper)(this, m_##proper##s, &m_children, fence); \
         } \
         const std::vector<proper*>& get##proper##s() const { \
+            return m_##proper##s; \
+        } 
+
+/**
+ * Implements get method and a private vector member for a typed XML child collection
+ * in a foreign namespace.
+ * 
+ * @param proper    the proper name of the child type
+ * @param ns        the C++ namespace for the type
+ * @param fence     insertion fence for new objects of the child collection in backing list
+ */
+#define IMPL_TYPED_FOREIGN_CHILDREN(proper,ns,fence) \
+    protected: \
+        std::vector<ns::proper*> m_##proper##s; \
+    public: \
+        VectorOf(ns::proper) get##proper##s() { \
+            return VectorOf(ns::proper)(this, m_##proper##s, &m_children, fence); \
+        } \
+        const std::vector<ns::proper*>& get##proper##s() const { \
             return m_##proper##s; \
         } 
 
@@ -732,6 +771,24 @@
     }
 
 /**
+ * Implements unmarshalling process branch for typed child collection element
+ * in a foreign namespace.
+ * 
+ * @param proper        the proper name of the child type
+ * @param ns            the C++ namespace for the type
+ * @param namespaceURI  the XML namespace of the child element
+ * @param force         bypass use of hint and just cast down to check child
+ */
+#define PROC_TYPED_FOREIGN_CHILDREN(proper,ns,namespaceURI,force) \
+    if (force || xmltooling::XMLHelper::isNodeNamed(root,namespaceURI,ns::proper::LOCAL_NAME)) { \
+        ns::proper* typesafe=dynamic_cast<ns::proper*>(childXMLObject); \
+        if (typesafe) { \
+            get##proper##s().push_back(typesafe); \
+            return; \
+        } \
+    }
+
+/**
  * Implements unmarshalling process branch for typed child singleton element
  * 
  * @param proper        the proper name of the child type
@@ -741,6 +798,24 @@
 #define PROC_TYPED_CHILD(proper,namespaceURI,force) \
     if (force || xmltooling::XMLHelper::isNodeNamed(root,namespaceURI,proper::LOCAL_NAME)) { \
         proper* typesafe=dynamic_cast<proper*>(childXMLObject); \
+        if (typesafe) { \
+            set##proper(typesafe); \
+            return; \
+        } \
+    }
+
+/**
+ * Implements unmarshalling process branch for typed child singleton element
+ * in a foreign namespace.
+ * 
+ * @param proper        the proper name of the child type
+ * @param ns            the C++ namespace for the type
+ * @param namespaceURI  the XML namespace of the child element
+ * @param force         bypass use of hint and just cast down to check child
+ */
+#define PROC_TYPED_FOREIGN_CHILD(proper,ns,namespaceURI,force) \
+    if (force || xmltooling::XMLHelper::isNodeNamed(root,namespaceURI,ns::proper::LOCAL_NAME)) { \
+        ns::proper* typesafe=dynamic_cast<ns::proper*>(childXMLObject); \
         if (typesafe) { \
             set##proper(typesafe); \
             return; \
@@ -942,6 +1017,26 @@
  */
  #define BEGIN_XMLOBJECTVALIDATOR(linkage,cname) \
     class linkage cname##SchemaValidator : public xmltooling::Validator \
+    { \
+    public: \
+        virtual ~cname##SchemaValidator() {} \
+        virtual cname##SchemaValidator* clone() const { \
+            return new cname##SchemaValidator(); \
+        } \
+        virtual void validate(const xmltooling::XMLObject* xmlObject) const { \
+            const cname* ptr=dynamic_cast<const cname*>(xmlObject); \
+            if (!ptr) \
+                throw xmltooling::ValidationException(#cname"SchemaValidator: unsupported object type ($1).",xmltooling::params(1,typeid(xmlObject).name()))
+
+/**
+ * Begins the declaration of a Schema Validator specialization subclass.
+ * 
+ * @param linkage   linkage specifier for the class
+ * @param cname     the base name of the Validator specialization
+ * @param base      base class for the validator
+ */
+ #define BEGIN_XMLOBJECTVALIDATOR_SUB(linkage,cname,base) \
+    class linkage cname##SchemaValidator : public base##SchemaValidator \
     { \
     public: \
         virtual ~cname##SchemaValidator() {} \

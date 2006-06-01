@@ -45,6 +45,7 @@ namespace xmltooling {
     public:
         virtual ~AbstractXMLObject() {
             delete m_typeQname;
+            XMLString::release(&m_schemaLocation);
         }
 
         const QName& getElementQName() const {
@@ -184,6 +185,11 @@ namespace xmltooling {
          * Logging object.
          */
         void* m_log;
+
+        /**
+         * Stores off xsi:schemaLocation attribute.
+         */
+        XMLCh* m_schemaLocation;
 
     private:
         XMLObject* m_parent;
