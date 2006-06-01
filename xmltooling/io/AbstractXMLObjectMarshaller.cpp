@@ -177,12 +177,19 @@ void AbstractXMLObjectMarshaller::marshallInto(
 {
     if (getElementQName().hasPrefix())
         targetElement->setPrefix(getElementQName().getPrefix());
+
+    if (m_schemaLocation) {
+        static const XMLCh schemaLocation[]= UNICODE_LITERAL_14(s,c,h,e,m,a,L,o,c,a,t,i,o,n);
+        if (targetElement->getParentNode()==NULL || targetElement->getParentNode()->getNodeType()==DOMNode::DOCUMENT_NODE)
+            targetElement->setAttributeNS(XMLConstants::XSI_NS,schemaLocation,m_schemaLocation); 
+    }
+
     marshallElementType(targetElement);
     marshallNamespaces(targetElement);
     marshallAttributes(targetElement);
     marshallChildElements(targetElement);
     marshallElementContent(targetElement);
-
+    
 #ifndef XMLTOOLING_NO_XMLSEC
     if (sigs) {
         for_each(sigs->begin(),sigs->end(),mem_fun<void,Signature>(&Signature::sign));
