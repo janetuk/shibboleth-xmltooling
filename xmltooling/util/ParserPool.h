@@ -151,20 +151,29 @@ namespace xmltooling {
         virtual BinInputStream* makeStream() const { return new StreamBinInputStream(m_is); }
         /// @endcond
 
-
-    private:
-        std::istream& m_is;
-
+        /**
+         * A Xerces input stream that wraps a C++ input stream
+         */
         class XMLTOOL_API StreamBinInputStream : public BinInputStream
         {
         public:
+            /**
+             * Constructs a Xerces input stream around a C++ input stream reference.
+             * 
+             * @param is        reference to an input stream
+             */
             StreamBinInputStream(std::istream& is) : m_is(is), m_pos(0) {}
+            /// @cond off
             virtual unsigned int curPos() const { return m_pos; }
             virtual unsigned int readBytes(XMLByte* const toFill, const unsigned int maxToRead);
+            /// @endcond
         private:
             std::istream& m_is;
             unsigned int m_pos;
         };
+
+    private:
+        std::istream& m_is;
     };
 };
 

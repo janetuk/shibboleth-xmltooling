@@ -165,8 +165,7 @@ namespace xmlsignature {
         }
     };
 
-    DECL_XMLTOOLING_EXCEPTION(XMLSecurityException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmlsignature,xmltooling::XMLToolingException,Exceptions in XML Security processing);
-    DECL_XMLTOOLING_EXCEPTION(SignatureException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmlsignature,xmlsignature::XMLSecurityException,Exceptions in signature processing);
+    DECL_XMLTOOLING_EXCEPTION(SignatureException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmlsignature,xmltooling::XMLToolingException,Exceptions in signature processing);
 
 };
 

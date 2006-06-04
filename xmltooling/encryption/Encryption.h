@@ -20,8 +20,8 @@
  * XMLObjects representing XML Encryption content
  */
 
-#ifndef __xmltooling_encrypt_h__
-#define __xmltooling_encrypt_h__
+#ifndef __xmltooling_encryption_h__
+#define __xmltooling_encryption_h__
 
 #include <xmltooling/AttributeExtensibleXMLObject.h>
 #include <xmltooling/signature/KeyInfo.h>
@@ -151,4 +151,4 @@ namespace xmlencryption {
     void XMLTOOL_API registerEncryptionClasses();
 };
 
-#endif /* __xmltooling_encrypt_h__ */
+#endif /* __xmltooling_encryption_h__ */
