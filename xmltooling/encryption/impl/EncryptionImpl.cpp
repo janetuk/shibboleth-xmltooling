@@ -109,8 +109,10 @@ namespace xmlencryption {
             
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
-            if (!XMLString::equals(nsURI,XMLConstants::XMLENC_NS) && nsURI && *nsURI)
+            if (!XMLString::equals(nsURI,XMLConstants::XMLENC_NS) && nsURI && *nsURI) {
                 getOtherParameters().push_back(childXMLObject);
+                return;
+            }
             
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }

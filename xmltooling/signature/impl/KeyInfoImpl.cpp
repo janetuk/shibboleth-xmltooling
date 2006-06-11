@@ -232,8 +232,10 @@ namespace xmlsignature {
             
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
-            if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI)
+            if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI) {
                 setOtherKeyValue(childXMLObject);
+                return;
+            }
             
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
@@ -285,8 +287,10 @@ namespace xmlsignature {
             
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
-            if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI)
+            if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI) {
                 getXMLObjects().push_back(childXMLObject);
+                return;
+            }
             
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
@@ -505,8 +509,10 @@ namespace xmlsignature {
             
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
-            if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI)
+            if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI) {
                 getOtherX509Datas().push_back(childXMLObject);
+                return;
+            }
             
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
@@ -629,8 +635,10 @@ namespace xmlsignature {
 
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
-            if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI)
+            if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI) {
                 getPGPDataExtensions().push_back(childXMLObject);
+                return;
+            }
 
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
@@ -737,8 +745,10 @@ namespace xmlsignature {
             
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
-            if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI)
+            if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI) {
                 getOthers().push_back(childXMLObject);
+                return;
+            }
             
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
