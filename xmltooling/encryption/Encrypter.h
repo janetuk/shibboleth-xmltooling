@@ -129,54 +129,60 @@ namespace xmlencryption {
         
         /**
          * Encrypts the supplied element and returns the resulting object.
-         * The returned object will be unmarshalled around a DOM tree created
-         * using the encrypted element's owning document.
          * 
          * If an encryption algorithm is set, but no key, a random key will be
-         * generated iff keParams is non-NULL and the algorithm is known.
+         * generated iff kencParams is non-NULL and the algorithm is known.
          * 
          * If key encryption parameters are supplied, then the encryption key
          * is wrapped and the result placed into an EncryptedKey object in the
          * KeyInfo of the returned EncryptedData.
          * 
-         * @param element   the DOM element to encrypt
-         * @param keParams  key encryption settings, or NULL
+         * @param element       the DOM element to encrypt
+         * @param encParams     primary encryption settings
+         * @param kencParams    key encryption settings, or NULL
          */
         EncryptedData* encryptElement(DOMElement* element, EncryptionParams& encParams, KeyEncryptionParams* kencParams=NULL);
 
         /**
          * Encrypts the supplied element's children and returns the resulting object.
-         * The returned object will be unmarshalled around a DOM tree created
-         * using the encrypted content's owning document.
          * 
          * If an encryption algorithm is set, but no key, a random key will be
-         * generated iff keParams is non-NULL and the algorithm is known.
+         * generated iff kencParams is non-NULL and the algorithm is known.
 
          * If key encryption parameters are supplied, then the encryption key
          * is wrapped and the result placed into an EncryptedKey object in the
          * KeyInfo of the returned EncryptedData.
          * 
-         * @param element   parent element of children to encrypt
-         * @param keParams  key encryption settings, or NULL
+         * @param element       parent element of children to encrypt
+         * @param encParams     primary encryption settings
+         * @param kencParams    key encryption settings, or NULL
          */
         EncryptedData* encryptElementContent(DOMElement* element, EncryptionParams& encParams, KeyEncryptionParams* kencParams=NULL);
 
         /**
          * Encrypts the supplied input stream and returns the resulting object.
-         * The returned object will be unmarshalled around a DOM tree created
-         * using the encrypted element's owning document.
          * 
          * If an encryption algorithm is set, but no key, a random key will be
-         * generated iff keParams is non-NULL and the algorithm is known.
+         * generated iff kencParams is non-NULL and the algorithm is known.
 
          * If key encryption parameters are supplied, then the encryption key
          * is wrapped and the result placed into an EncryptedKey object in the
          * KeyInfo of the returned EncryptedData.
          * 
-         * @param input   the stream to encrypt
-         * @param keParams  key encryption settings, or NULL
+         * @param input         the stream to encrypt
+         * @param encParams     primary encryption settings
+         * @param kencParams    key encryption settings, or NULL
          */
         EncryptedData* encryptStream(std::istream& input, EncryptionParams& encParams, KeyEncryptionParams* kencParams=NULL);
+        
+        /**
+         * Encrypts the supplied key and returns the resulting object.
+         * 
+         * @param keyBuffer     raw key material to encrypt
+         * @param keyBufferSize size in bytes of raw key material
+         * @param kencParams    key encryption settings
+         */
+        EncryptedKey* encryptKey(const unsigned char* keyBuffer, unsigned int keyBufferSize, KeyEncryptionParams& kencParams);
         
     private:
         void checkParams(EncryptionParams& encParams, KeyEncryptionParams* kencParams);

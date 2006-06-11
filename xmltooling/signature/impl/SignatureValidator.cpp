@@ -43,9 +43,14 @@ void SignatureValidator::validate(const Signature* sigObj) const
     DSIGSignature* sig=sigObj->getXMLSignature();
     if (!sig)
         throw ValidationException("Signature does not exist yet.");
+    else if (!m_resolver)
+        throw ValidationException("No KeyResolver set on Validator.");
 
     try {
-        sig->setSigningKey(m_key->clone());
+        XSECCryptoKey* key=m_resolver->resolveKey(sig->getKeyInfoList());
+        if (!key)
+            throw ValidationException("Unable to resolve signing key.");
+        sig->setSigningKey(key);
         if (!sig->verify())
             throw ValidationException("Digital signature does not validate with the given key.");
     }

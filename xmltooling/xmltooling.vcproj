@@ -316,6 +316,10 @@
 					Name="impl"
 					>
 					<File
+						RelativePath=".\encryption\impl\Decrypter.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\encryption\impl\Encrypter.cpp"
 						>
 					</File>
@@ -507,6 +511,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\signature\KeyResolver.h"
+					>
+				</File>
+				<File
 					RelativePath=".\signature\Signature.h"
 					>
 				</File>
@@ -518,6 +526,10 @@
 			<Filter
 				Name="encryption"
 				>
+				<File
+					RelativePath=".\encryption\Decrypter.h"
+					>
+				</File>
 				<File
 					RelativePath=".\encryption\Encrypter.h"
 					>

@@ -41,6 +41,7 @@ libxmltoolinginclude_HEADERS = \
     XMLToolingConfig.h
 
 encinclude_HEADERS = \
+	encryption/Decrypter.h \
 	encryption/Encrypter.h \
     encryption/Encryption.h
 
@@ -55,6 +56,7 @@ ioinclude_HEADERS = \
 siginclude_HEADERS = \
     signature/ContentReference.h \
     signature/KeyInfo.h \
+    signature/KeyResolver.h \
     signature/Signature.h \
     signature/SignatureValidator.h
 
@@ -76,6 +78,7 @@ noinst_HEADERS = \
 
 if BUILD_XMLSEC
 xmlsec_sources = \
+    encryption/impl/Decrypter.cpp \
     encryption/impl/Encrypter.cpp \
 	signature/impl/SignatureValidator.cpp \
     signature/impl/XMLSecSignatureImpl.cpp

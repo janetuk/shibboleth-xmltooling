@@ -23,13 +23,14 @@
 #if !defined(__xmltooling_sigval_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_sigval_h__
 
+#include <xmltooling/signature/KeyResolver.h>
 #include <xmltooling/signature/Signature.h>
 #include <xmltooling/validation/Validator.h>
 
 namespace xmlsignature {
 
     /**
-     * Validator for signatures based on an externally-supplied key.
+     * Validator for signatures based on a KeyResolver
      */
     class XMLTOOL_API SignatureValidator : public virtual xmltooling::Validator
     {
@@ -37,15 +38,13 @@ namespace xmlsignature {
         /**
          * Constructor
          * 
-         * @param key   the verification key to use, will be freed by Validator
+         * @param resolver   the key resolver to use, will be freed by Validator
          */
-        SignatureValidator(XSECCryptoKey* key) : m_key(key) {
-            if (!key)
-                throw xmltooling::ValidationException("Verification key cannot be NULL.");
+        SignatureValidator(KeyResolver* resolver) : m_resolver(resolver) {
         }
         
         virtual ~SignatureValidator() {
-            delete m_key;
+            delete m_resolver;
         }
 
         void validate(const xmltooling::XMLObject* xmlObject) const;
@@ -55,14 +54,23 @@ namespace xmlsignature {
         SignatureValidator* clone() const {
             return new SignatureValidator(*this);
         }
+
+        /**
+         * Replace the current KeyResolver, if any, with a new one.
+         * 
+         * @param resolver  the KeyResolver to attach 
+         */
+        void setKeyResolver(KeyResolver* resolver) {
+            delete m_resolver;
+            m_resolver=resolver;
+        }
     
     protected:
         SignatureValidator(const SignatureValidator& src) {
-            m_key=src.m_key->clone();
+            m_resolver=src.m_resolver ? src.m_resolver->clone() : NULL;
         }
 
-    private:
-        XSECCryptoKey* m_key;
+        KeyResolver* m_resolver;
     };
 
 };

@@ -23,9 +23,10 @@
 #include "internal.h"
 #include "encryption/Encrypter.h"
 
-#include <xsec/enc/openssl/OpenSSLCryptoSymmetricKey.hpp>
 #include <xsec/enc/XSECCryptoException.hpp>
 #include <xsec/framework/XSECException.hpp>
+#include <xsec/framework/XSECAlgorithmMapper.hpp>
+#include <xsec/framework/XSECAlgorithmHandler.hpp>
 #include <xsec/xenc/XENCEncryptedData.hpp>
 #include <xsec/xenc/XENCEncryptedKey.hpp>
 
@@ -61,22 +62,14 @@ void Encrypter::checkParams(EncryptionParams& encParams, KeyEncryptionParams* ke
     
     if (!encParams.m_key) {
         // We have to have a raw key now, so we need to build a wrapper around it.
-        if (XMLString::equals(encParams.m_algorithm,DSIGConstants::s_unicodeStrURI3DES_CBC)) {
-            encParams.m_key=new OpenSSLCryptoSymmetricKey(XSECCryptoSymmetricKey::KEY_3DES_192);
-        }
-        else if (XMLString::equals(encParams.m_algorithm,DSIGConstants::s_unicodeStrURIAES128_CBC)) {
-            encParams.m_key=new OpenSSLCryptoSymmetricKey(XSECCryptoSymmetricKey::KEY_AES_128);
-        }
-        else if (XMLString::equals(encParams.m_algorithm,DSIGConstants::s_unicodeStrURIAES192_CBC)) {
-            encParams.m_key=new OpenSSLCryptoSymmetricKey(XSECCryptoSymmetricKey::KEY_AES_192);
-        }
-        else if (XMLString::equals(encParams.m_algorithm,DSIGConstants::s_unicodeStrURIAES256_CBC)) {
-            encParams.m_key=new OpenSSLCryptoSymmetricKey(XSECCryptoSymmetricKey::KEY_AES_256);
-        }
-        else {
-            throw EncryptionException("Unrecognized encryption algorithm, unable to build key wrapper.");
-        }
-        static_cast<OpenSSLCryptoSymmetricKey*>(encParams.m_key)->setKey(encParams.m_keyBuffer, encParams.m_keyBufferSize);
+        XSECAlgorithmHandler* handler =XSECPlatformUtils::g_algorithmMapper->mapURIToHandler(encParams.m_algorithm);
+        if (handler != NULL)
+            encParams.m_key = handler->createKeyForURI(
+                encParams.m_algorithm,const_cast<unsigned char*>(encParams.m_keyBuffer),encParams.m_keyBufferSize
+                );
+
+        if (!encParams.m_key)
+            throw EncryptionException("Unable to build wrapper for key, unknown algorithm?");
     }
     
     // Set the encryption key.
@@ -221,4 +214,52 @@ EncryptedData* Encrypter::decorateAndUnmarshall(EncryptionParams& encParams, Key
     
     xmlObject.release();
     return xmlEncData;
+}
+
+EncryptedKey* Encrypter::encryptKey(const unsigned char* keyBuffer, unsigned int keyBufferSize, KeyEncryptionParams& kencParams)
+{
+    // Get a fresh cipher object and document.
+
+    if (m_cipher) {
+        XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
+        m_cipher=NULL;
+    }
+    
+    DOMDocument* doc=NULL;
+    try {
+        doc=XMLToolingConfig::getConfig().getParser().newDocument();
+        m_cipher=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(doc);
+        m_cipher->setKEK(kencParams.m_key->clone());
+        auto_ptr<XENCEncryptedKey> encKey(m_cipher->encryptKey(keyBuffer, keyBufferSize, ENCRYPT_NONE, kencParams.m_algorithm));
+        
+        EncryptedKey* xmlEncKey=NULL;
+        auto_ptr<XMLObject> xmlObjectKey(XMLObjectBuilder::buildOneFromElement(encKey->getElement()));
+        if (!(xmlObjectKey.get()) || !(xmlEncKey=dynamic_cast<EncryptedKey*>(xmlObjectKey.get())))
+            throw EncryptionException("Unable to unmarshall into EncryptedKey object.");
+        
+        xmlEncKey->releaseThisAndChildrenDOM();
+        
+        // KeyInfo?
+        if (kencParams.m_keyInfo) {
+            xmlEncKey->setKeyInfo(kencParams.m_keyInfo);
+            kencParams.m_keyInfo=NULL;   // transfer ownership
+        }
+
+        doc->release();
+        xmlObjectKey.release();
+        return xmlEncKey;
+    }
+    catch(XSECException& e) {
+        doc->release();
+        auto_ptr_char temp(e.getMsg());
+        throw EncryptionException(string("XMLSecurity exception while encrypting: ") + temp.get());
+    }
+    catch(XSECCryptoException& e) {
+        doc->release();
+        throw EncryptionException(string("XMLSecurity exception while encrypting: ") + e.getMsg());
+    }
+    catch (...) {
+        doc->release();
+        throw;
+    }
 }

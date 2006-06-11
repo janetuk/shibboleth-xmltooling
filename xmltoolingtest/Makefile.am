@@ -9,6 +9,7 @@ endif
 
 if BUILD_XMLSEC
 xmlsec_sources = \
+    EncryptionTest.h \
     SignatureTest.h
 else
 xmlsec_sources =

@@ -57,7 +57,7 @@ class TestValidator : public SignatureValidator
     }
 
 public:
-    TestValidator(const XMLCh* uri, XSECCryptoKey* key) : SignatureValidator(key) {
+    TestValidator(const XMLCh* uri, XSECCryptoKey* key) : SignatureValidator(new KeyResolver(key)) {
         m_uri=XMLString::replicate(uri);
     }
     
