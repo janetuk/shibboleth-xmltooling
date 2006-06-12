@@ -192,7 +192,7 @@ namespace xmlencryption {
         unsigned char m_keyBuffer[32];
     };
 
-    DECL_XMLTOOLING_EXCEPTION(EncryptionException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmlencryption,xmltooling::XMLToolingException,Exceptions in encryption processing);
+    DECL_XMLTOOLING_EXCEPTION(EncryptionException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmlencryption,xmltooling::XMLSecurityException,Exceptions in encryption processing);
 
 };
 

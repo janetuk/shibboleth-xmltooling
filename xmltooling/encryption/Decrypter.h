@@ -41,8 +41,8 @@ namespace xmlencryption {
          * Constructor.
          * Resolvers will be deleted when Decrypter is.
          * 
-         * @param KEKresolver   resolves key decryption key based on KeyInfo information 
-         * @param resolver      resolves data decryption key based on KeyInfo information 
+         * @param KEKresolver   resolves key decryption key
+         * @param resolver      resolves data decryption key
          */
         Decrypter(xmlsignature::KeyResolver* KEKresolver=NULL, xmlsignature::KeyResolver* resolver=NULL)
             : m_cipher(NULL), m_resolver(resolver), m_KEKresolver(KEKresolver) {
@@ -51,7 +51,7 @@ namespace xmlencryption {
         ~Decrypter();
         
         /**
-         * Replace the current KeyResolver interface, if any, with a new one.
+         * Replace the current data encryption KeyResolver interface, if any, with a new one.
          * 
          * @param resolver  the KeyResolver to attach 
          */

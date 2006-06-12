@@ -531,6 +531,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\encryption\EncryptedKeyResolver.h"
+					>
+				</File>
+				<File
 					RelativePath=".\encryption\Encrypter.h"
 					>
 				</File>

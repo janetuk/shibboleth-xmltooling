@@ -22,6 +22,7 @@
 
 #include "internal.h"
 #include "encryption/Decrypter.h"
+#include "encryption/EncryptedKeyResolver.h"
 
 #include <log4cpp/Category.hh>
 #include <xsec/enc/XSECCryptoException.hpp>
@@ -63,8 +64,9 @@ DOMDocumentFragment* Decrypter::decryptData(EncryptedData* encryptedData)
         XSECCryptoKey* key=NULL;
         if (m_resolver)
             key=m_resolver->resolveKey(encryptedData->getKeyInfo());
-        if (!key) {
-            // See if there's an encrypted key present. We'll need the algorithm...
+
+        if (!key && m_KEKresolver) {
+            // See if there's an encrypted key available. We'll need the algorithm...
             const XMLCh* algorithm=
                 encryptedData->getEncryptionMethod() ? encryptedData->getEncryptionMethod()->getAlgorithm() : NULL;
             if (!algorithm)
@@ -85,9 +87,25 @@ DOMDocumentFragment* Decrypter::decryptData(EncryptedData* encryptedData)
                 }
             }
             
-            if (!key)
-                throw DecryptionException("Unable to resolve a decryption key.");
+            if (!key) {
+                // Check for a non-trivial resolver.
+                EncryptedKeyResolver* ekr=dynamic_cast<EncryptedKeyResolver*>(m_resolver);
+                if (ekr) {
+                    EncryptedKey* encKey=ekr->resolveKey(encryptedData);
+                    if (encKey) {
+                        try {
+                            key=decryptKey(encKey, algorithm);
+                        }
+                        catch (DecryptionException& e) {
+                            log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".Decrypter").warn(e.what());
+                        }
+                    }
+                }
+            }
         }
+
+        if (!key)
+            throw DecryptionException("Unable to resolve a decryption key.");
         
         m_cipher->setKey(key);
         DOMNode* ret=m_cipher->decryptElementDetached(encryptedData->getDOM());

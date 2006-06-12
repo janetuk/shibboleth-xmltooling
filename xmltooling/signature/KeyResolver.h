@@ -31,16 +31,15 @@
 namespace xmlsignature {
 
     /**
-     * An API for resolving decryption keys.
-     * Can be used during both data and key decryption.
+     * An API for resolving keys.
      */
     class XMLTOOL_API KeyResolver {
     public:
         /**
-         * Constructor based on a single externally supplied decryption key.
+         * Constructor based on a single externally supplied key.
          * The key will be destroyed when the resolver is. 
          * 
-         * @param key   external decryption key
+         * @param key   external key
          */
         KeyResolver(XSECCryptoKey* key=NULL) : m_key(key) {}
         

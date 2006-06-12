@@ -350,6 +350,7 @@ namespace xmltooling {
     DECL_XMLTOOLING_EXCEPTION(UnknownAttributeException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions due to processing of unknown attributes);
     DECL_XMLTOOLING_EXCEPTION(UnknownExtensionException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions from use of an unrecognized extension/plugin);
     DECL_XMLTOOLING_EXCEPTION(ValidationException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions during object validation);
+    DECL_XMLTOOLING_EXCEPTION(XMLSecurityException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions related to the XML security layer);
 
 };
 
