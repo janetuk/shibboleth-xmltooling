@@ -99,16 +99,21 @@ namespace xmlencryption {
             
             /**
              * Constructor.
-             * The algorithm constant <strong>MUST</strong> be accessible for the life of the structure.
-             * Using a static constant suffices for this. The other objects will be destroyed if need be
+             * The algorithm and recipient constants <strong>MUST</strong> be accessible for the life of the
+             * structure. Using a static constant suffices for this. The other objects will be destroyed if
              * when the structure is destroyed. 
              * 
              * @param algorithm     the XML Encryption key wrapping or transport algorithm constant
              * @param key           the key encryption key to use
+             * @param recipient     optional name of recipient of encrypted key
              * @param keyInfo       a KeyInfo object to place within the EncryptedKey structure that describes the KEK
              */
-            KeyEncryptionParams(const XMLCh* algorithm, XSECCryptoKey* key, xmlsignature::KeyInfo* keyInfo=NULL)
-                : m_key(key), m_keyInfo(keyInfo), m_algorithm(algorithm) {
+            KeyEncryptionParams(
+                const XMLCh* algorithm,
+                XSECCryptoKey* key,
+                const XMLCh* recipient=NULL,
+                xmlsignature::KeyInfo* keyInfo=NULL
+                ) : m_algorithm(algorithm), m_key(key), m_recipient(recipient), m_keyInfo(keyInfo) {
             }
         
             ~KeyEncryptionParams() {
@@ -116,9 +121,10 @@ namespace xmlencryption {
                 delete m_keyInfo;
             }
         private:
-            XSECCryptoKey* m_key;
-            xmlsignature::KeyInfo* m_keyInfo;
             const XMLCh* m_algorithm;
+            XSECCryptoKey* m_key;
+            const XMLCh* m_recipient;
+            xmlsignature::KeyInfo* m_keyInfo;
             
             friend class Encrypter;
         };
@@ -140,6 +146,7 @@ namespace xmlencryption {
          * @param element       the DOM element to encrypt
          * @param encParams     primary encryption settings
          * @param kencParams    key encryption settings, or NULL
+         * @return a stand-alone EncryptedData object, unconnected to the source DOM 
          */
         EncryptedData* encryptElement(DOMElement* element, EncryptionParams& encParams, KeyEncryptionParams* kencParams=NULL);
 
@@ -156,6 +163,7 @@ namespace xmlencryption {
          * @param element       parent element of children to encrypt
          * @param encParams     primary encryption settings
          * @param kencParams    key encryption settings, or NULL
+         * @return a stand-alone EncryptedData object, unconnected to the source DOM 
          */
         EncryptedData* encryptElementContent(DOMElement* element, EncryptionParams& encParams, KeyEncryptionParams* kencParams=NULL);
 
@@ -172,6 +180,7 @@ namespace xmlencryption {
          * @param input         the stream to encrypt
          * @param encParams     primary encryption settings
          * @param kencParams    key encryption settings, or NULL
+         * @return a stand-alone EncryptedData object, unconnected to any DOM 
          */
         EncryptedData* encryptStream(std::istream& input, EncryptionParams& encParams, KeyEncryptionParams* kencParams=NULL);
         
@@ -181,6 +190,7 @@ namespace xmlencryption {
          * @param keyBuffer     raw key material to encrypt
          * @param keyBufferSize size in bytes of raw key material
          * @param kencParams    key encryption settings
+         * @return a stand-alone EncryptedKey object, unconnected to any DOM 
          */
         EncryptedKey* encryptKey(const unsigned char* keyBuffer, unsigned int keyBufferSize, KeyEncryptionParams& kencParams);
         

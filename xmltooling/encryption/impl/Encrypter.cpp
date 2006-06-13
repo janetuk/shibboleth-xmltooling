@@ -199,6 +199,10 @@ EncryptedData* Encrypter::decorateAndUnmarshall(EncryptionParams& encParams, Key
         
         xmlEncKey->releaseThisAndChildrenDOM();
         
+        // Recipient?
+        if (kencParams->m_recipient)
+            xmlEncKey->setRecipient(kencParams->m_recipient);
+        
         // KeyInfo?
         if (kencParams->m_keyInfo) {
             xmlEncKey->setKeyInfo(kencParams->m_keyInfo);
@@ -239,6 +243,10 @@ EncryptedKey* Encrypter::encryptKey(const unsigned char* keyBuffer, unsigned int
         
         xmlEncKey->releaseThisAndChildrenDOM();
         
+        // Recipient?
+        if (kencParams.m_recipient)
+            xmlEncKey->setRecipient(kencParams.m_recipient);
+
         // KeyInfo?
         if (kencParams.m_keyInfo) {
             xmlEncKey->setKeyInfo(kencParams.m_keyInfo);
