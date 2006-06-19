@@ -297,10 +297,14 @@ namespace xmlencryption {
 
         void setAttribute(QName& qualifiedName, const XMLCh* value) {
             if (!qualifiedName.hasNamespaceURI()) {
-                if (XMLString::equals(qualifiedName.getLocalPart(),ID_ATTRIB_NAME))
+                if (XMLString::equals(qualifiedName.getLocalPart(),ID_ATTRIB_NAME)) {
                     setId(value);
-                else if (XMLString::equals(qualifiedName.getLocalPart(),TARGET_ATTRIB_NAME))
+                    return;
+                }
+                else if (XMLString::equals(qualifiedName.getLocalPart(),TARGET_ATTRIB_NAME)) {
                     setTarget(value);
+                    return;
+                }
             }
             AbstractAttributeExtensibleXMLObject::setAttribute(qualifiedName, value);
         }
