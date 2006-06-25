@@ -66,7 +66,7 @@ namespace xmltooling {
         void term();
 
         // global mutex available to library applications
-        Lockable& lock();
+        Lockable* lock();
         void unlock();
 
         // configuration

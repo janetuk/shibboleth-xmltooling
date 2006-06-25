@@ -37,9 +37,9 @@ namespace xmltooling {
         /**
          * Lock the associated object for exclusive access.
          * 
-         * @return a reference to the object being locked
+         * @return a pointer to the object being locked
          */
-        virtual Lockable& lock()=0;
+        virtual Lockable* lock()=0;
 
         /**
          * Unlock the associated object from exclusive access.
@@ -55,25 +55,45 @@ namespace xmltooling {
     MAKE_NONCOPYABLE(Locker);
     public:
         /**
-         * Locks an object and stores it for later release.
+         * Optionally locks an object and stores it for later release.
          * 
-         * @param lockee    Pointer to an object to lock and hold
+         * @param lockee    pointer to an object to hold, and optionally lock
+         * @param lock      true iff object is not yet locked
          */
-        Locker(Lockable* lockee) : m_lockee(lockee->lock()) {}
-        
-        /**
-         * Locks an object and stores it for later release.
-         * 
-         * @param lockee    Reference to an object to lock and hold
-         */
-        Locker(Lockable& lockee) : m_lockee(lockee.lock()) {}
+        Locker(Lockable* lockee=NULL, bool lock=true) {
+            if (lockee && lock)
+                m_lockee=lockee->lock();
+            else
+                m_lockee=lockee;
+        }
 
         /**
-         * Releases lock on held pointer, if any.
+         * Optionally locks an object and stores it for later release.
+         * If an object is already held, it is unlocked and detached.
+         * 
+         * @param lockee    pointer to an object to hold, and optionally lock
+         * @param lock      true iff object is not yet locked
          */
-        ~Locker() {m_lockee.unlock();}
+        void assign(Lockable* lockee=NULL, bool lock=true) {
+            if (m_lockee)
+                m_lockee->unlock();
+            m_lockee=NULL;
+            if (lockee && lock)
+                m_lockee=lockee->lock();
+            else
+                m_lockee=lockee;
+        }
+        
+        /**
+         * Destructor releases lock on held pointer, if any.
+         */
+        ~Locker() {
+            if (m_lockee)
+                m_lockee->unlock();
+         }
+        
     private:
-        Lockable& m_lockee;
+        Lockable* m_lockee;
     };
 
 };

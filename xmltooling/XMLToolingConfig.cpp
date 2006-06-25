@@ -231,10 +231,10 @@ void XMLToolingInternalConfig::term()
    Category::getInstance(XMLTOOLING_LOGCAT".XMLToolingConfig").info("library shutdown complete");
 }
 
-Lockable& XMLToolingInternalConfig::lock()
+Lockable* XMLToolingInternalConfig::lock()
 {
     xercesc::XMLPlatformUtils::lockMutex(m_lock);
-    return *this;
+    return this;
 }
 
 void XMLToolingInternalConfig::unlock()
