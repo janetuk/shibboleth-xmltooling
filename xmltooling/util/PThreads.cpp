@@ -24,6 +24,7 @@
 #include "util/Threads.h"
 
 #include <ctime>
+#include <signal.h>
 #include <log4cpp/Category.hh>
 
 #ifdef HAVE_PTHREAD
@@ -62,6 +63,7 @@ namespace xmltooling {
     
     class XMLTOOL_DLLLOCAL MutexImpl : public Mutex {
         pthread_mutex_t mutex;
+        friend class XMLTOOL_DLLLOCAL CondWaitImpl;
     public:
         MutexImpl();
         virtual ~MutexImpl() {

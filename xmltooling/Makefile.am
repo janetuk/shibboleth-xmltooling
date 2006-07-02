@@ -89,7 +89,7 @@ xmlsec_sources =
 endif
 
 if BUILD_PTHREAD
-thread_sources = PThread.cpp
+thread_sources = util/PThreads.cpp
 else
 thread_sources =
 endif

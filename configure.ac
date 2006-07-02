@@ -5,6 +5,7 @@ AM_CONFIG_HEADER(xmltooling/config_pub.h)
 AM_INIT_AUTOMAKE([xmltooling], [1.0])
 
 sinclude(doxygen.m4)
+sinclude(acx_pthread.m4)
 
 # Docygen features
 DX_HTML_FEATURE(ON)

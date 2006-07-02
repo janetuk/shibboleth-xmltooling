@@ -228,5 +228,14 @@ else
         acx_pthread_ok=no
         $2
 fi
+
+saveCFLAGS="$CFLAGS"
+saveLIBS="$LIBS"
+CFLAGS="$CFLAGS $PTHREAD_CFLAGS"
+LIBS="$LIBS $PTHREAD_LIBS"
+AC_CHECK_FUNCS([pthread_rwlock_init])
+LIBS="$saveLIBS"
+CFLAGS="$saveCFLAGS"
+
 AC_LANG_RESTORE
 ])dnl ACX_PTHREAD
