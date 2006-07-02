@@ -149,6 +149,11 @@ namespace xmlencryption {
      * Registers builders and validators for XML Encryption classes into the runtime.
      */
     void XMLTOOL_API registerEncryptionClasses();
+
+    /**
+     * Validator suite for XML Encryption schema validation.
+     */
+    extern XMLTOOL_API xmltooling::ValidatorSuite EncryptionSchemaValidators;
 };
 
 #endif /* __xmltooling_encryption_h__ */

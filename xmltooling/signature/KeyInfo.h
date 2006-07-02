@@ -29,6 +29,7 @@
 #include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/util/XMLConstants.h>
 #include <xmltooling/validation/ValidatingXMLObject.h>
+#include <xmltooling/validation/ValidatorSuite.h>
 
 #define DECL_XMLSIGOBJECTBUILDER(cname) \
     DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,xmltooling::XMLConstants::XMLSIG_NS,xmltooling::XMLConstants::XMLSIG_PREFIX)
@@ -193,6 +194,11 @@ namespace xmlsignature {
      * Registers builders and validators for KeyInfo classes into the runtime.
      */
     void XMLTOOL_API registerKeyInfoClasses();
+
+    /**
+     * Validator suite for KeyInfo schema validation.
+     */
+    extern XMLTOOL_API xmltooling::ValidatorSuite KeyInfoSchemaValidators;
 };
 
 #endif /* __xmltooling_keyinfo_h__ */

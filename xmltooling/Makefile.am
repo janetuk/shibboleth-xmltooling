@@ -73,7 +73,8 @@ utilinclude_HEADERS = \
 valinclude_HEADERS = \
 	validation/AbstractValidatingXMLObject.h \
 	validation/ValidatingXMLObject.h \
-	validation/Validator.h
+	validation/Validator.h \
+	validation/ValidatorSuite.h
 
 noinst_HEADERS = \
 	internal.h
@@ -120,7 +121,7 @@ libxmltooling_la_SOURCES = \
 	util/XMLConstants.cpp \
 	util/XMLHelper.cpp \
 	validation/AbstractValidatingXMLObject.cpp \
-	validation/Validator.cpp \
+	validation/ValidatorSuite.cpp \
 	${xmlsec_sources} \
 	$(thread_sources)
 

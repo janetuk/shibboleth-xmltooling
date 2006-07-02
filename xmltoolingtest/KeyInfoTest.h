@@ -59,7 +59,7 @@ public:
         TSM_ASSERT_SAME_DATA("KeyName was not expected value",
             expected.get(), kiObject->getKeyNames().front()->getName(), XMLString::stringLen(expected.get()));
 
-        Validator::checkValidity(kiObject.get());
+        KeyInfoSchemaValidators.validate(kiObject.get());
     }
 
     void testKeyInfo2() {
@@ -84,7 +84,7 @@ public:
         TSM_ASSERT_EQUALS("Number of child elements was not expected value",
             2, kiObject->getSPKIDatas().front()->getSPKISexps().size());
 
-        Validator::checkValidity(kiObject.get());
+        KeyInfoSchemaValidators.validate(kiObject.get());
     }
 
     void testKeyInfo3() {
@@ -102,6 +102,6 @@ public:
             dynamic_cast<KeyInfo*>(b->buildFromDocument(doc))
             );
         TS_ASSERT(kiObject.get()!=NULL);
-        TS_ASSERT_THROWS(Validator::checkValidity(kiObject.get()),ValidationException);
+        TS_ASSERT_THROWS(KeyInfoSchemaValidators.validate(kiObject.get()),ValidationException);
     }
 };

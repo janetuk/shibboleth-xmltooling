@@ -190,7 +190,8 @@ bool XMLToolingInternalConfig::init()
 void XMLToolingInternalConfig::term()
 {
     XMLObjectBuilder::destroyBuilders();
-    Validator::destroyValidators();
+    KeyInfoSchemaValidators.destroyValidators();
+    EncryptionSchemaValidators.destroyValidators();
     XMLToolingException::deregisterFactories();
 
     for (vector<void*>::reverse_iterator i=m_libhandles.rbegin(); i!=m_libhandles.rend(); i++) {

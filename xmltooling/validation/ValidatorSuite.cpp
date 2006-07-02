@@ -15,26 +15,49 @@
  */
 
 /**
- * Validator.cpp
+ * ValidatorSuite.cpp
  * 
- * Rules checking of XMLObjects 
+ * Groups of rule checkers of XMLObjects based on type or element name. 
  */
 
 #include "internal.h"
-#include "validation/Validator.h"
+#include "validation/ValidatorSuite.h"
 #include "util/XMLHelper.h"
 
 using namespace xmltooling;
 using namespace std;
 
-map< QName, vector<Validator*> > Validator::m_map;
+namespace {
+    class XMLTOOL_DLLLOCAL _clearvector {
+    public:
+        void operator()(const pair< QName, vector<Validator*> >& p) const {
+            for_each(p.second.begin(),p.second.end(),xmltooling::cleanup<Validator>());
+        }
+    };
+}
 
-void Validator::checkValidity(const XMLObject* xmlObject)
+void ValidatorSuite::deregisterValidators(const QName& key)
+{
+    map< QName, vector<Validator*> >::iterator i=m_map.find(key);
+    if (i!=m_map.end()) {
+        _clearvector f;
+        f(*i);
+        m_map.erase(i);
+    }
+}
+
+void ValidatorSuite::destroyValidators()
+{
+    for_each(m_map.begin(),m_map.end(),_clearvector());
+    m_map.clear();
+}
+
+void ValidatorSuite::validate(const XMLObject* xmlObject) const
 {
     if (!xmlObject)
         return;
 
-    map< QName, vector<Validator*> >::iterator i;
+    map< QName, vector<Validator*> >::const_iterator i;
     if (xmlObject->getSchemaType()) {
         i=m_map.find(*(xmlObject->getSchemaType()));
         if (i!=m_map.end())
@@ -45,28 +68,6 @@ void Validator::checkValidity(const XMLObject* xmlObject)
         for_each(i->second.begin(),i->second.end(),bind2nd(mem_fun<void,Validator,const XMLObject*>(&Validator::validate),xmlObject));
 
     const list<XMLObject*>& kids=xmlObject->getOrderedChildren();
-    for_each(kids.begin(),kids.end(),Validator::checkValidity);
-}
-
-class _clearvector {
-public:
-    void operator()(const pair< QName, vector<Validator*> >& p) const {
-        for_each(p.second.begin(),p.second.end(),xmltooling::cleanup<Validator>());
-    }
-};
-
-void Validator::deregisterValidators(const QName& key)
-{
-    map< QName, vector<Validator*> >::iterator i=m_map.find(key);
-    if (i!=m_map.end()) {
-        _clearvector f;
-        f(*i);
-        m_map.erase(i);
-    }
-}
-
-void Validator::destroyValidators()
-{
-    for_each(m_map.begin(),m_map.end(),_clearvector());
-    m_map.clear();
+    for (list<XMLObject*>::const_iterator j=kids.begin(); j!=kids.end(); j++)
+        validate(*j);
 }

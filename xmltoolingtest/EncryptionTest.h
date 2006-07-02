@@ -102,7 +102,7 @@ public:
             Decrypter decrypter(new KeyResolver(m_key->clone()));
             DOMDocumentFragment* frag = decrypter.decryptData(encData2.get());
             XMLHelper::serialize(static_cast<DOMElement*>(frag->getFirstChild()), buf);
-            TS_TRACE(buf.c_str());
+            //TS_TRACE(buf.c_str());
             TS_ASSERT(doc->getDocumentElement()->isEqualNode(frag->getFirstChild()));
             frag->release();
             doc->release();

@@ -285,7 +285,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\validation\Validator.cpp"
+					RelativePath=".\validation\ValidatorSuite.cpp"
 					>
 				</File>
 			</Filter>
@@ -504,6 +504,10 @@
 				</File>
 				<File
 					RelativePath=".\validation\Validator.h"
+					>
+				</File>
+				<File
+					RelativePath=".\validation\ValidatorSuite.h"
 					>
 				</File>
 			</Filter>

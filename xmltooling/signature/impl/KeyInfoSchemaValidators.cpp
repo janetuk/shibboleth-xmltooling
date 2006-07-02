@@ -124,12 +124,14 @@ namespace xmlsignature {
 #define REGISTER_ELEMENT(namespaceURI,cname) \
     q=QName(namespaceURI,cname::LOCAL_NAME); \
     XMLObjectBuilder::registerBuilder(q,new cname##Builder()); \
-    Validator::registerValidator(q,new cname##SchemaValidator())
+    KeyInfoSchemaValidators.registerValidator(q,new cname##SchemaValidator())
     
 #define REGISTER_TYPE(namespaceURI,cname) \
     q=QName(namespaceURI,cname::TYPE_NAME); \
     XMLObjectBuilder::registerBuilder(q,new cname##Builder()); \
-    Validator::registerValidator(q,new cname##SchemaValidator())
+    KeyInfoSchemaValidators.registerValidator(q,new cname##SchemaValidator())
+
+ValidatorSuite xmlsignature::KeyInfoSchemaValidators("KeyInfoSchemaValidators");
 
 void xmlsignature::registerKeyInfoClasses()
 {
