@@ -65,6 +65,7 @@ utilinclude_HEADERS = \
 	util/DateTime.h \
 	util/NDC.h \
 	util/ParserPool.h \
+	util/Threads.h \
 	util/XMLConstants.h \
 	util/XMLHelper.h \
 	util/XMLObjectChildrenList.h
@@ -85,6 +86,12 @@ xmlsec_sources = \
 	signature/impl/XMLSecSignatureImpl.cpp
 else
 xmlsec_sources =
+endif
+
+if BUILD_PTHREAD
+thread_sources = PThread.cpp
+else
+thread_sources =
 endif
 
 libxmltooling_la_SOURCES = \
@@ -114,7 +121,8 @@ libxmltooling_la_SOURCES = \
 	util/XMLHelper.cpp \
 	validation/AbstractValidatingXMLObject.cpp \
 	validation/Validator.cpp \
-	${xmlsec_sources}
+	${xmlsec_sources} \
+	$(thread_sources)
 
 # this is different from the project version
 # http://sources.redhat.com/autobook/autobook/autobook_91.html

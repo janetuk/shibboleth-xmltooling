@@ -47,14 +47,6 @@ fi
 AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
 
-AC_LANG(C++)
-
-# C++ requirements
-AC_CXX_REQUIRE_STL
-AC_CXX_NAMESPACES
-
-AC_LANG(C)
-
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_SIZE_T
@@ -64,7 +56,23 @@ AC_CHECK_FUNCS([strchr strdup strstr])
 AC_CHECK_HEADERS([dlfcn.h])
 AC_CHECK_FUNC(dlclose, , [ AC_CHECK_LIB(dl, dlopen) ])
 
+# checks for pthreads
+ACX_PTHREAD([enable_threads="pthread"],[enable_threads="no"])
+if test $enable_threads != "pthread"; then
+    AC_MSG_ERROR([unable to find pthreads, currently this is required])
+else
+    AC_DEFINE(HAVE_PTHREAD,1,[Define if you have POSIX threads libraries and header files.])
+	AM_CONDITIONAL(BUILD_PTHREAD,test "$enable_threads" = "pthread")
+    LIBS="$PTHREAD_LIBS $LIBS"
+    CFLAGS="$PTHREAD_CFLAGS $CFLAGS"
+    CXXFLAGS="$PTHREAD_CFLAGS $CXXFLAGS"
+fi
+
 AC_LANG(C++)
+
+# C++ requirements
+AC_CXX_REQUIRE_STL
+AC_CXX_NAMESPACES
 
 # log4cpp settings
 AC_PATH_PROG(LOG4CPP_CONFIG,log4cpp-config)

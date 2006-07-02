@@ -10,6 +10,8 @@ EXTRA_DIST = $(DX_CONFIG) \
 	doc \
 	schemas \
 	cpp-xmltooling.sln \
+	acx_pthread.m4 \
+	acinclude.m4 \
 	libtool.m4 \
 	doxygen.m4 \
 	depcomp \
