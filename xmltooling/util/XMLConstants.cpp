@@ -25,7 +25,6 @@
 #include "util/XMLConstants.h"
 #include <xercesc/util/XMLUniDefs.hpp>
 
-using namespace xercesc;
 using namespace xmltooling;
     
 const XMLCh XMLConstants::XML_NS[] = // http://www.w3.org/XML/1998/namespace
@@ -90,3 +89,11 @@ const XMLCh XMLConstants::XMLTOOLING_NS[] = // http://www.opensaml.org/xmltoolin
   chLatin_o, chLatin_r, chLatin_g, chForwardSlash,
   chLatin_x, chLatin_m, chLatin_l, chLatin_t, chLatin_o, chLatin_o, chLatin_l, chLatin_i, chLatin_n, chLatin_g, chNull
 };
+
+const XMLCh XMLConstants::XML_TRUE[] = { chLatin_t, chLatin_r, chLatin_u, chLatin_e, chNull };
+
+const XMLCh XMLConstants::XML_FALSE[] = { chLatin_f, chLatin_a, chLatin_l, chLatin_s, chLatin_e, chNull };
+
+const XMLCh XMLConstants::XML_ONE[] = { chDigit_1, chNull };
+
+const XMLCh XMLConstants::XML_ZERO[] = { chDigit_0, chNull };

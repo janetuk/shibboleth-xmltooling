@@ -70,6 +70,27 @@ namespace xmltooling {
         
         /**  XML Tooling namespace ("http://www.opensaml.org/xmltooling") */
         static const XMLCh XMLTOOLING_NS[];
+
+        /**  XML "true" boolean constant */
+        static const XMLCh XML_TRUE[];
+
+        /**  XML "false" boolean constant */
+        static const XMLCh XML_FALSE[];
+
+        /**  XML "1" boolean constant */
+        static const XMLCh XML_ONE[];
+
+        /**  XML "0" boolean constant */
+        static const XMLCh XML_ZERO[];
+        
+        /** Enumerations of the different values of a boolean attribute or element */
+        enum xmltooling_bool_t {
+            XML_BOOL_NULL,
+            XML_BOOL_TRUE,
+            XML_BOOL_FALSE,
+            XML_BOOL_ONE,
+            XML_BOOL_ZERO
+        };
     };
 
 };

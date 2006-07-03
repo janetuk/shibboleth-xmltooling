@@ -315,8 +315,10 @@
     public: \
         XMLTOOLING_DOXYGEN(proper attribute name) \
         static const XMLCh upcased##_ATTRIB_NAME[]; \
-        XMLTOOLING_DOXYGEN(Returns the proper attribute.) \
-        virtual int get##proper() const=0; \
+        XMLTOOLING_DOXYGEN(Returns the proper attribute after a NULL indicator.) \
+        virtual std::pair<bool,int> get##proper() const=0; \
+        XMLTOOLING_DOXYGEN(Sets the proper attribute using a string value.) \
+        virtual void set##proper(const XMLCh* proper)=0; \
         XMLTOOLING_DOXYGEN(Sets the proper attribute.) \
         virtual void set##proper(int proper)=0
 
@@ -330,10 +332,37 @@
     public: \
         XMLTOOLING_DOXYGEN(proper attribute name) \
         static const XMLCh upcased##_ATTRIB_NAME[]; \
-        XMLTOOLING_DOXYGEN(Returns the proper attribute.) \
-        virtual bool proper() const=0; \
+        XMLTOOLING_DOXYGEN(Returns the proper attribute after a NULL indicator.) \
+        virtual std::pair<bool,bool> proper() const=0; \
+        XMLTOOLING_DOXYGEN(Sets the proper attribute using an enumerated value.) \
+        virtual void proper(xmltooling::XMLConstants::xmltooling_bool_t value)=0; \
         XMLTOOLING_DOXYGEN(Sets the proper attribute.) \
-        virtual void proper(bool value)=0
+        void proper(bool value) { \
+            proper(value ? xmltooling::XMLConstants::XML_BOOL_ONE : xmltooling::XMLConstants::XML_BOOL_ZERO); \
+        } \
+        XMLTOOLING_DOXYGEN(Sets the proper attribute using a string constant.) \
+        void set##proper(const XMLCh* value) { \
+            if (value) { \
+                switch (*value) { \
+                    case chLatin_t: \
+                        proper(xmltooling::XMLConstants::XML_BOOL_TRUE); \
+                        break; \
+                    case chLatin_f: \
+                        proper(xmltooling::XMLConstants::XML_BOOL_FALSE); \
+                        break; \
+                    case chDigit_1: \
+                        proper(xmltooling::XMLConstants::XML_BOOL_ONE); \
+                        break; \
+                    case chDigit_0: \
+                        proper(xmltooling::XMLConstants::XML_BOOL_ZERO); \
+                        break; \
+                    default: \
+                        proper(xmltooling::XMLConstants::XML_BOOL_NULL); \
+                } \
+            } \
+            else \
+                proper(xmltooling::XMLConstants::XML_BOOL_NULL); \
+        }
 
 /**
  * Implements get/set methods and a private member for a typed XML attribute.
@@ -381,16 +410,19 @@
  */
 #define IMPL_INTEGER_ATTRIB(proper) \
     protected: \
-        int m_##proper; \
+        XMLCh* m_##proper; \
     public: \
-        int get##proper() const { \
-            return m_##proper; \
+        pair<bool,int> get##proper() const { \
+            return make_pair((m_##proper!=NULL),XMLString::parseInt(m_##proper)); \
+        } \
+        void set##proper(const XMLCh* proper) { \
+            m_##proper = prepareForAssignment(m_##proper,proper); \
         } \
         void set##proper(int proper) { \
-            if (m_##proper != proper) { \
-                releaseThisandParentDOM(); \
-                m_##proper = proper; \
-            } \
+            char buf##proper[64]; \
+            sprintf(buf##proper,"%d",proper); \
+            auto_ptr_XMLCh wide##proper(buf##proper); \
+            set##proper(wide##proper.get()); \
         }
 
 /**
@@ -400,12 +432,15 @@
  */
 #define IMPL_BOOLEAN_ATTRIB(proper) \
     protected: \
-        bool m_##proper; \
+        XMLConstants::xmltooling_bool_t m_##proper; \
     public: \
-        bool proper() const { \
-            return m_##proper; \
+        pair<bool,bool> proper() const { \
+            return make_pair( \
+                (m_##proper!=XMLConstants::XML_BOOL_NULL), \
+                (m_##proper==XMLConstants::XML_BOOL_TRUE || m_##proper==XMLConstants::XML_BOOL_ONE) \
+                ); \
         } \
-        void proper(bool value) { \
+        void proper(XMLConstants::xmltooling_bool_t value) { \
             if (m_##proper != value) { \
                 releaseThisandParentDOM(); \
                 m_##proper = value; \
@@ -604,8 +639,8 @@
  * @param namespaceURI  the XML namespace of the attribute
  */
 #define MARSHALL_STRING_ATTRIB(proper,ucase,namespaceURI) \
-    if(get##proper()) { \
-        domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, get##proper()); \
+    if (m_##proper) { \
+        domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, m_##proper); \
     }
 
 /**
@@ -616,8 +651,8 @@
  * @param namespaceURI  the XML namespace of the attribute
  */
 #define MARSHALL_DATETIME_ATTRIB(proper,ucase,namespaceURI) \
-    if(get##proper()) { \
-        domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, get##proper()->getRawData()); \
+    if (m_##proper) { \
+        domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, m_##proper->getRawData()); \
     }
 
 /**
@@ -628,10 +663,9 @@
  * @param namespaceURI  the XML namespace of the attribute
  */
 #define MARSHALL_INTEGER_ATTRIB(proper,ucase,namespaceURI) \
-    char buf##proper[64]; \
-    sprintf(buf##proper,"%d",get##proper()); \
-    auto_ptr_XMLCh wide##proper(buf##proper); \
-    domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, wide##proper.get())
+    if (m_##proper) { \
+        domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, m_##proper); \
+    }
 
 /**
  * Implements marshalling for a boolean attribute
@@ -641,10 +675,20 @@
  * @param namespaceURI  the XML namespace of the attribute
  */
 #define MARSHALL_BOOLEAN_ATTRIB(proper,ucase,namespaceURI) \
-    XMLCh flag##proper[2]; \
-    flag##proper[0]=m_##proper ? chDigit_1 : chDigit_0; \
-    flag##proper[1]=chNull; \
-    domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, flag##proper)
+    switch (m_##proper) { \
+        case XMLConstants::XML_BOOL_TRUE: \
+            domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, XMLConstants::XML_TRUE); \
+            break; \
+        case XMLConstants::XML_BOOL_ONE: \
+            domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, XMLConstants::XML_ONE); \
+            break; \
+        case XMLConstants::XML_BOOL_FALSE: \
+            domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, XMLConstants::XML_FALSE); \
+            break; \
+        case XMLConstants::XML_BOOL_ZERO: \
+            domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, XMLConstants::XML_ZERO); \
+            break; \
+    }
 
 /**
  * Implements marshalling for a QName attribute
@@ -654,8 +698,8 @@
  * @param namespaceURI  the XML namespace of the attribute
  */
 #define MARSHALL_QNAME_ATTRIB(proper,ucase,namespaceURI) \
-    if(get##proper()) { \
-        auto_ptr_XMLCh qstr(get##proper()->toString().c_str()); \
+    if (m_##proper) { \
+        auto_ptr_XMLCh qstr(m_##proper->toString().c_str()); \
         domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, qstr.get()); \
     }
 
@@ -667,8 +711,8 @@
  * @param namespaceURI  the XML namespace of the attribute
  */
 #define MARSHALL_ID_ATTRIB(proper,ucase,namespaceURI) \
-    if(get##proper()) { \
-        domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, get##proper()); \
+    if (m_##proper) { \
+        domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, m_##proper); \
         domElement->setIdAttributeNS(namespaceURI, ucase##_ATTRIB_NAME); \
     }
 
@@ -730,10 +774,7 @@
  * @param namespaceURI  the XML namespace of the attribute
  */
 #define PROC_INTEGER_ATTRIB(proper,ucase,namespaceURI) \
-    if (xmltooling::XMLHelper::isNodeNamed(attribute, namespaceURI, ucase##_ATTRIB_NAME)) { \
-        set##proper(XMLString::parseInt(attribute->getValue())); \
-        return; \
-    }
+    PROC_STRING_ATTRIB(proper,ucase,namespaceURI)
 
 /**
  * Implements unmarshalling process branch for a boolean attribute
@@ -743,16 +784,7 @@
  * @param namespaceURI  the XML namespace of the attribute
  */
 #define PROC_BOOLEAN_ATTRIB(proper,ucase,namespaceURI) \
-    if (xmltooling::XMLHelper::isNodeNamed(attribute, namespaceURI, ucase##_ATTRIB_NAME)) { \
-        const XMLCh* value=attribute->getValue(); \
-        if (value) { \
-            if (*value==chLatin_t || *value==chDigit_1) \
-                m_##proper=true; \
-            else if (*value==chLatin_f || *value==chDigit_0) \
-                m_##proper=false; \
-        } \
-        return; \
-    }
+    PROC_STRING_ATTRIB(proper,ucase,namespaceURI)
 
 /**
  * Implements unmarshalling process branch for typed child collection element
@@ -855,16 +887,20 @@
  * @param proper    the proper name to label the element's content
  */
 #define DECL_INTEGER_CONTENT(proper) \
-    XMLTOOLING_DOXYGEN(Returns proper.) \
-    int get##proper() const { \
-        return XMLString::parseInt(getTextContent()); \
+    XMLTOOLING_DOXYGEN(Returns proper in integer form after a NULL indicator.) \
+    std::pair<bool,int> get##proper() const { \
+        return std::make_pair((getTextContent()!=NULL), XMLString::parseInt(getTextContent())); \
     } \
-    XMLTOOLING_DOXYGEN(Sets or clears proper.) \
+    XMLTOOLING_DOXYGEN(Sets proper.) \
     void set##proper(int proper) { \
         char buf[64]; \
         sprintf(buf,"%d",proper); \
         xmltooling::auto_ptr_XMLCh widebuf(buf); \
         setTextContent(widebuf.get()); \
+    } \
+    XMLTOOLING_DOXYGEN(Sets or clears proper.) \
+    void set##proper(const XMLCh* proper) { \
+        setTextContent(proper); \
     }
 
 /**
@@ -1071,6 +1107,16 @@
  */
 #define XMLOBJECTVALIDATOR_REQUIRE(cname,proper) \
     if (!ptr->get##proper()) \
+        throw xmltooling::ValidationException(#cname" must have "#proper".")
+
+/**
+ * Validator code that checks for a required integer attribute
+ * 
+ * @param cname     the name of the XMLObject specialization
+ * @param proper    the proper name of the attribute, content, or singleton member 
+ */
+#define XMLOBJECTVALIDATOR_REQUIRE_INTEGER(cname,proper) \
+    if (!ptr->get##proper().first) \
         throw xmltooling::ValidationException(#cname" must have "#proper".")
 
 /**
