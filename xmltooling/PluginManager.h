@@ -42,7 +42,7 @@ namespace xmltooling {
      * @param T         class of plugin to manage
      * @param Params    parameters for plugin construction
      */
-    template <class T, typename Params> class XMLTOOL_API PluginManager
+    template <class T, typename Params> class PluginManager
     {
     public:
         PluginManager() {}
