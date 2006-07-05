@@ -413,7 +413,7 @@
         XMLCh* m_##proper; \
     public: \
         pair<bool,int> get##proper() const { \
-            return make_pair((m_##proper!=NULL),XMLString::parseInt(m_##proper)); \
+            return make_pair((m_##proper!=NULL),(m_##proper!=NULL ? XMLString::parseInt(m_##proper): NULL)); \
         } \
         void set##proper(const XMLCh* proper) { \
             m_##proper = prepareForAssignment(m_##proper,proper); \
@@ -688,6 +688,8 @@
         case XMLConstants::XML_BOOL_ZERO: \
             domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, XMLConstants::XML_ZERO); \
             break; \
+        case XMLConstants::XML_BOOL_NULL: \
+            break; \
     }
 
 /**
@@ -889,7 +891,7 @@
 #define DECL_INTEGER_CONTENT(proper) \
     XMLTOOLING_DOXYGEN(Returns proper in integer form after a NULL indicator.) \
     std::pair<bool,int> get##proper() const { \
-        return std::make_pair((getTextContent()!=NULL), XMLString::parseInt(getTextContent())); \
+        return std::make_pair((getTextContent()!=NULL), (getTextContent()!=NULL ? XMLString::parseInt(getTextContent()) : NULL)); \
     } \
     XMLTOOLING_DOXYGEN(Sets proper.) \
     void set##proper(int proper) { \
