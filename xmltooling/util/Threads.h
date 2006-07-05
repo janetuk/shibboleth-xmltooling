@@ -281,22 +281,24 @@ namespace xmltooling
     /**
      * RAII wrapper for a shared lock.
      */
-    class XMLTOOL_API ReadLock {
-        MAKE_NONCOPYABLE(ReadLock);
+    class XMLTOOL_API SharedLock {
+        MAKE_NONCOPYABLE(SharedLock);
     public:
         /**
          * Locks and wraps the designated shared lock.
          * 
-         * @param lock lock to acquire 
+         * @param lock      lock to acquire 
+         * @param lockit    true if the lock should be acquired here, false if already acquired
          */
-        ReadLock(RWLock* lock) : rwlock(lock) {
-            rwlock->rdlock();
+        SharedLock(RWLock* lock, bool lockit=true) : rwlock(lock) {
+            if (lockit)
+                rwlock->rdlock();
         }
         
         /**
          * Unlocks the wrapped shared lock.
          */
-        ~ReadLock() {
+        ~SharedLock() {
             rwlock->unlock();
         }
     
