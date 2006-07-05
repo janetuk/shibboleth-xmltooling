@@ -31,6 +31,33 @@ using namespace xercesc;
 namespace xmltooling {
     
     /**
+     * RAII wrapper for DOM Documents.
+     */
+    class XMLTOOL_API DocumentJanitor
+    {
+        MAKE_NONCOPYABLE(DocumentJanitor);
+        DOMDocument* m_doc;
+    public:
+        DocumentJanitor(DOMDocument* doc) : m_doc(doc) {}
+        
+        ~DocumentJanitor() {
+            if (m_doc)
+                m_doc->release();
+        }
+        
+        /**
+         * Returns any document held by this object and releases it to the caller.
+         * 
+         * @return  the document held or NULL
+         */
+        DOMDocument* release() {
+            DOMDocument* ret=m_doc;
+            m_doc=NULL;
+            return ret;
+        }
+    };
+    
+    /**
      * A helper class for working with W3C DOM objects. 
      */
     class XMLTOOL_API XMLHelper
