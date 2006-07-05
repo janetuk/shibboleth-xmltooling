@@ -85,32 +85,26 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(
         document=DOMImplementationRegistry::getDOMImplementation(NULL)->createDocument();
         bindDocument=true;
     }
+    
+    XercesJanitor<DOMDocument> janitor(bindDocument ? document : NULL);
 
-    try {
-        XT_log.debug("creating root element to marshall");
-        DOMElement* domElement = document->createElementNS(
-            getElementQName().getNamespaceURI(), getElementQName().getLocalPart()
-            );
-        setDocumentElement(document, domElement);
+    XT_log.debug("creating root element to marshall");
+    DOMElement* domElement = document->createElementNS(
+        getElementQName().getNamespaceURI(), getElementQName().getLocalPart()
+        );
+    setDocumentElement(document, domElement);
 #ifndef XMLTOOLING_NO_XMLSEC
-        marshallInto(domElement, sigs);
+    marshallInto(domElement, sigs);
 #else
-        marshallInto(domElement);
+    marshallInto(domElement);
 #endif
-        //Recache the DOM.
-        XT_log.debug("caching DOM for XMLObject (document is %sbound)", bindDocument ? "" : "not ");
-        setDOM(domElement, bindDocument);
-        releaseParentDOM(true);
+    //Recache the DOM.
+    XT_log.debug("caching DOM for XMLObject (document is %sbound)", bindDocument ? "" : "not ");
+    setDOM(domElement, bindDocument);
+    janitor.release();  // safely transferred
+    releaseParentDOM(true);
 
-        return domElement;
-    }
-    catch (...) {
-        // Delete the document if need be, and rethrow.
-        if (bindDocument) {
-            document->release();
-        }
-        throw;
-    }
+    return domElement;
 }
 
 DOMElement* AbstractXMLObjectMarshaller::marshall(

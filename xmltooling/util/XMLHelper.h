@@ -31,28 +31,28 @@ using namespace xercesc;
 namespace xmltooling {
     
     /**
-     * RAII wrapper for DOM Documents.
+     * RAII wrapper for Xerces resources.
      */
-    class XMLTOOL_API DocumentJanitor
+    template<class T> class XercesJanitor
     {
-        MAKE_NONCOPYABLE(DocumentJanitor);
-        DOMDocument* m_doc;
+        MAKE_NONCOPYABLE(XercesJanitor);
+        T* m_held;
     public:
-        DocumentJanitor(DOMDocument* doc) : m_doc(doc) {}
+        XercesJanitor(T* resource) : m_held(resource) {}
         
-        ~DocumentJanitor() {
-            if (m_doc)
-                m_doc->release();
+        ~XercesJanitor() {
+            if (m_held)
+                m_held->release();
         }
         
         /**
-         * Returns any document held by this object and releases it to the caller.
+         * Returns resource held by this object and releases it to the caller.
          * 
-         * @return  the document held or NULL
+         * @return  the resource held or NULL
          */
-        DOMDocument* release() {
-            DOMDocument* ret=m_doc;
-            m_doc=NULL;
+        T* release() {
+            T* ret=m_held;
+            m_held=NULL;
             return ret;
         }
     };

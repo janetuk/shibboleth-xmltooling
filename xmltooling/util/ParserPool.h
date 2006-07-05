@@ -24,6 +24,7 @@
 #define __xmltooling_pool_h__
 
 #include <xmltooling/unicode.h>
+#include <xmltooling/util/Threads.h>
 
 #include <map>
 #include <stack>
@@ -130,7 +131,7 @@ namespace xmltooling {
 #endif
         bool m_namespaceAware,m_schemaAware;
         std::stack<DOMBuilder*> m_pool;
-        void* m_lock;
+        Mutex* m_lock;
     };
 
     /**

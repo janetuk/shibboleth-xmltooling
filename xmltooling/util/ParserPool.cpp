@@ -43,7 +43,7 @@ using namespace std;
 using namespace log4cpp;
 
 ParserPool::ParserPool(bool namespaceAware, bool schemaAware)
-    : m_namespaceAware(namespaceAware), m_schemaAware(schemaAware), m_lock(XMLPlatformUtils::makeMutex()) {}
+    : m_namespaceAware(namespaceAware), m_schemaAware(schemaAware), m_lock(Mutex::create()) {}
 
 ParserPool::~ParserPool()
 {
@@ -51,7 +51,7 @@ ParserPool::~ParserPool()
         m_pool.top()->release();
         m_pool.pop();
     }
-    XMLPlatformUtils::closeMutex(m_lock);
+    delete m_lock;
 }
 
 DOMDocument* ParserPool::newDocument()
@@ -62,14 +62,19 @@ DOMDocument* ParserPool::newDocument()
 DOMDocument* ParserPool::parse(DOMInputSource& domsrc)
 {
     DOMBuilder* parser=checkoutBuilder();
+    XercesJanitor<DOMBuilder> janitor(parser);
     try {
         DOMDocument* doc=parser->parse(domsrc);
         parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument,true);
-        checkinBuilder(parser);
+        checkinBuilder(janitor.release());
         return doc;
     }
-    catch (...) {
-        checkinBuilder(parser);
+    catch (XMLException&) {
+        checkinBuilder(janitor.release());
+        throw;
+    }
+    catch (XMLToolingException&) {
+        checkinBuilder(janitor.release());
         throw;
     }
 }
@@ -113,7 +118,7 @@ bool ParserPool::loadSchema(const XMLCh* nsURI, const XMLCh* pathname)
         return false;
     }
 
-    XMLPlatformUtils::lockMutex(m_lock);
+    Lock lock(m_lock);
 #ifdef HAVE_GOOD_STL
     m_schemaLocMap[nsURI]=pathname;
     m_schemaLocations.erase();
@@ -124,7 +129,6 @@ bool ParserPool::loadSchema(const XMLCh* nsURI, const XMLCh* pathname)
     m_schemaLocations.erase();
     for_each(m_schemaLocMap.begin(),m_schemaLocMap.end(),doubleit<string>(m_schemaLocations,' '));
 #endif
-    XMLPlatformUtils::unlockMutex(m_lock);
 
     return true;
 }
@@ -162,19 +166,19 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
     Wrapper4InputSource domsrc(&fsrc,false);
     try {
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(domsrc);
+        XercesJanitor<DOMDocument> janitor(doc);
         
         // Check root element.
         const DOMElement* root=doc->getDocumentElement();
         if (!XMLHelper::isNodeNamed(root,CATALOG_NS,catalog)) {
             auto_ptr_char temp(pathname);
             log.error("unknown root element, failed to load XML catalog from %s", temp.get());
-            doc->release();
             return false;
         }
         
         // Fetch all the <uri> elements.
         DOMNodeList* mappings=root->getElementsByTagNameNS(CATALOG_NS,uri);
-        XMLPlatformUtils::lockMutex(m_lock);
+        Lock lock(m_lock);
         for (XMLSize_t i=0; i<mappings->getLength(); i++) {
             root=static_cast<DOMElement*>(mappings->item(i));
             const XMLCh* from=root->getAttributeNS(NULL,name);
@@ -193,8 +197,6 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
 #else
         for_each(m_schemaLocMap.begin(),m_schemaLocMap.end(),doubleit<string>(m_schemaLocations,' '));
 #endif
-        XMLPlatformUtils::unlockMutex(m_lock);
-        doc->release();
     }
     catch (XMLParserException& e) {
         log.error("catalog loader caught XMLParserException: %s", e.what());
@@ -300,38 +302,29 @@ DOMBuilder* ParserPool::createBuilder()
 
 DOMBuilder* ParserPool::checkoutBuilder()
 {
-    XMLPlatformUtils::lockMutex(m_lock);
-    try {
-        if (m_pool.empty()) {
-            DOMBuilder* builder=createBuilder();
-            XMLPlatformUtils::unlockMutex(m_lock);
-            return builder;
-        }
-        DOMBuilder* p=m_pool.top();
-        m_pool.pop();
-        if (m_schemaAware) {
+    Lock lock(m_lock);
+    if (m_pool.empty()) {
+        DOMBuilder* builder=createBuilder();
+        return builder;
+    }
+    DOMBuilder* p=m_pool.top();
+    m_pool.pop();
+    if (m_schemaAware) {
 #ifdef HAVE_GOOD_STL
-            p->setProperty(XMLUni::fgXercesSchemaExternalSchemaLocation,const_cast<XMLCh*>(m_schemaLocations.c_str()));
+        p->setProperty(XMLUni::fgXercesSchemaExternalSchemaLocation,const_cast<XMLCh*>(m_schemaLocations.c_str()));
 #else
-            auto_ptr_XMLCh temp2(m_schemaLocations.c_str());
-            p->setProperty(XMLUni::fgXercesSchemaExternalSchemaLocation,const_cast<XMLCh*>(temp2.get()));
+        auto_ptr_XMLCh temp2(m_schemaLocations.c_str());
+        p->setProperty(XMLUni::fgXercesSchemaExternalSchemaLocation,const_cast<XMLCh*>(temp2.get()));
 #endif
-        }
-        XMLPlatformUtils::unlockMutex(m_lock);
-        return p;
     }
-    catch(...) {
-        XMLPlatformUtils::unlockMutex(m_lock);
-        throw;
-    }
+    return p;
 }
 
 void ParserPool::checkinBuilder(DOMBuilder* builder)
 {
     if (builder) {
-        XMLPlatformUtils::lockMutex(m_lock);
+        Lock lock(m_lock);
         m_pool.push(builder);
-        XMLPlatformUtils::unlockMutex(m_lock);
     }
 }
 
@@ -341,15 +334,16 @@ unsigned int StreamInputSource::StreamBinInputStream::readBytes(XMLByte* const t
     unsigned int bytes_read=0,request=maxToRead;
 
     // Fulfill the rest by reading from the stream.
-    if (request && !m_is.eof()) {
+    if (request && !m_is.eof() && !m_is.fail()) {
         try {
             m_is.read(reinterpret_cast<char* const>(target),request);
             m_pos+=m_is.gcount();
             bytes_read+=m_is.gcount();
         }
-        catch(...) {
-            Category::getInstance(XMLTOOLING_LOGCAT".StreamInputSource").critStream() <<
-                "XML::StreamInputSource::StreamBinInputStream::readBytes caught an exception" << CategoryStream::ENDLINE;
+        catch(ios_base::failure& e) {
+            Category::getInstance(XMLTOOLING_LOGCAT".StreamInputSource").critStream()
+                << "XML::StreamInputSource::StreamBinInputStream::readBytes caught an exception: " << e.what()
+                << CategoryStream::ENDLINE;
             *toFill=0;
             return 0;
         }

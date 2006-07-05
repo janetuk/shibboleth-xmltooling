@@ -123,13 +123,10 @@ XMLObject* AbstractDOMCachingXMLObject::clone() const
             domCopy->getOwnerDocument()->release();
             throw UnmarshallingException("Unable to locate builder for cloned element.");
         }
-        try {
-            return b->buildFromElement(domCopy,true); // bind document
-        }
-        catch (...) {
-            domCopy->getOwnerDocument()->release();
-            throw;
-        }
+        XercesJanitor<DOMDocument> janitor(domCopy->getOwnerDocument());
+        XMLObject* ret = b->buildFromElement(domCopy,true); // bind document
+        janitor.release(); // safely transferred
+        return ret;
     }
     return NULL;
 }

@@ -140,27 +140,21 @@ EncryptedData* Encrypter::encryptStream(istream& input, EncryptionParams& encPar
     DOMDocument* doc=NULL;
     try {
         doc=XMLToolingConfig::getConfig().getParser().newDocument();
+        XercesJanitor<DOMDocument> janitor(doc);
         m_cipher=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(doc);
         
         checkParams(encParams,kencParams);
         StreamInputSource::StreamBinInputStream xstream(input);
         m_cipher->encryptBinInputStream(&xstream, ENCRYPT_NONE, encParams.m_algorithm);
         EncryptedData* xmlEncData = decorateAndUnmarshall(encParams, kencParams);
-        doc->release();
         return xmlEncData;
     }
     catch(XSECException& e) {
-        doc->release();
         auto_ptr_char temp(e.getMsg());
         throw EncryptionException(string("XMLSecurity exception while encrypting: ") + temp.get());
     }
     catch(XSECCryptoException& e) {
-        doc->release();
         throw EncryptionException(string("XMLSecurity exception while encrypting: ") + e.getMsg());
-    }
-    catch (...) {
-        doc->release();
-        throw;
     }
 }
 
@@ -232,6 +226,7 @@ EncryptedKey* Encrypter::encryptKey(const unsigned char* keyBuffer, unsigned int
     DOMDocument* doc=NULL;
     try {
         doc=XMLToolingConfig::getConfig().getParser().newDocument();
+        XercesJanitor<DOMDocument> janitor(doc);
         m_cipher=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(doc);
         m_cipher->setKEK(kencParams.m_key->clone());
         auto_ptr<XENCEncryptedKey> encKey(m_cipher->encryptKey(keyBuffer, keyBufferSize, ENCRYPT_NONE, kencParams.m_algorithm));
@@ -253,21 +248,14 @@ EncryptedKey* Encrypter::encryptKey(const unsigned char* keyBuffer, unsigned int
             kencParams.m_keyInfo=NULL;   // transfer ownership
         }
 
-        doc->release();
         xmlObjectKey.release();
         return xmlEncKey;
     }
     catch(XSECException& e) {
-        doc->release();
         auto_ptr_char temp(e.getMsg());
         throw EncryptionException(string("XMLSecurity exception while encrypting: ") + temp.get());
     }
     catch(XSECCryptoException& e) {
-        doc->release();
         throw EncryptionException(string("XMLSecurity exception while encrypting: ") + e.getMsg());
-    }
-    catch (...) {
-        doc->release();
-        throw;
     }
 }
