@@ -263,6 +263,57 @@
         static const XMLCh LOCAL_NAME[]
 
 /**
+ * Begins the declaration of an XMLObject specialization with three base classes.
+ * Basic boilerplate includes a protected constructor, empty virtual destructor,
+ * and Unicode constants for the default associated element's name and prefix.
+ * 
+ * @param linkage   linkage specifier for the class
+ * @param cname     the name of the class to declare
+ * @param base      the first base class to derive from using public virtual inheritance
+ * @param base2     the second base class to derive from using public virtual inheritance
+ * @param base3     the third base class to derive from using public virtual inheritance
+ * @param desc      documentation comment for class
+ */
+#define BEGIN_XMLOBJECT3(linkage,cname,base,base2,base3,desc) \
+    XMLTOOLING_DOXYGEN(desc) \
+    class linkage cname : public virtual base, public virtual base2, public virtual base3, \
+        public virtual xmltooling::ValidatingXMLObject { \
+    protected: \
+        cname() {} \
+    public: \
+        virtual ~cname() {} \
+        XMLTOOLING_DOXYGEN(Type-specific clone method.) \
+        virtual cname* clone##cname() const=0; \
+        XMLTOOLING_DOXYGEN(Element local name) \
+        static const XMLCh LOCAL_NAME[]
+
+/**
+ * Begins the declaration of an XMLObject specialization with four base classes.
+ * Basic boilerplate includes a protected constructor, empty virtual destructor,
+ * and Unicode constants for the default associated element's name and prefix.
+ * 
+ * @param linkage   linkage specifier for the class
+ * @param cname     the name of the class to declare
+ * @param base      the first base class to derive from using public virtual inheritance
+ * @param base2     the second base class to derive from using public virtual inheritance
+ * @param base3     the third base class to derive from using public virtual inheritance
+ * @param base4     the fourth base class to derive from using public virtual inheritance
+ * @param desc      documentation comment for class
+ */
+#define BEGIN_XMLOBJECT4(linkage,cname,base,base2,base3,base4,desc) \
+    XMLTOOLING_DOXYGEN(desc) \
+    class linkage cname : public virtual base, public virtual base2, public virtual base3, \
+        public virtual base4, public virtual xmltooling::ValidatingXMLObject { \
+    protected: \
+        cname() {} \
+    public: \
+        virtual ~cname() {} \
+        XMLTOOLING_DOXYGEN(Type-specific clone method.) \
+        virtual cname* clone##cname() const=0; \
+        XMLTOOLING_DOXYGEN(Element local name) \
+        static const XMLCh LOCAL_NAME[]
+
+/**
  * Ends the declaration of an XMLObject specialization.
  */
 #define END_XMLOBJECT }
@@ -300,6 +351,8 @@
  */
 #define DECL_DATETIME_ATTRIB(proper,upcased) \
     DECL_XMLOBJECT_ATTRIB(proper,upcased,xmltooling::DateTime); \
+    XMLTOOLING_DOXYGEN(Returns the proper attribute in epoch form.) \
+    virtual time_t get##proper##Epoch() const=0; \
     XMLTOOLING_DOXYGEN(Sets the proper attribute.) \
     virtual void set##proper(time_t proper)=0; \
     XMLTOOLING_DOXYGEN(Sets the proper attribute.) \
@@ -393,15 +446,33 @@
  * Implements get/set methods and a private member for a DateTime XML attribute.
  * 
  * @param proper    the proper name of the attribute
+ * @param fallback  epoch to return when attribute is NULL
  */
-#define IMPL_DATETIME_ATTRIB(proper) \
-    IMPL_XMLOBJECT_ATTRIB(proper,xmltooling::DateTime); \
-    void set##proper(time_t proper) { \
-        m_##proper = prepareForAssignment(m_##proper,proper); \
-    } \
-    void set##proper(const XMLCh* proper) { \
-        m_##proper = prepareForAssignment(m_##proper,proper); \
-    }
+#define IMPL_DATETIME_ATTRIB(proper,fallback) \
+    protected: \
+        DateTime* m_##proper; \
+        time_t m_##proper##Epoch; \
+    public: \
+        const DateTime* get##proper() const { \
+            return m_##proper; \
+        } \
+        time_t get##proper##Epoch() const { \
+            return m_##proper ? m_##proper##Epoch : fallback; \
+        } \
+        void set##proper(const DateTime* proper) { \
+            m_##proper = prepareForAssignment(m_##proper,proper); \
+            if (m_##proper) \
+                m_##proper##Epoch=m_##proper->getEpoch(); \
+        } \
+        void set##proper(time_t proper) { \
+            m_##proper = prepareForAssignment(m_##proper,proper); \
+            m_##proper##Epoch = proper; \
+        } \
+        void set##proper(const XMLCh* proper) { \
+            m_##proper = prepareForAssignment(m_##proper,proper); \
+            if (m_##proper) \
+                m_##proper##Epoch=m_##proper->getEpoch(); \
+        }
 
 /**
  * Implements get/set methods and a private member for an integer XML attribute.
