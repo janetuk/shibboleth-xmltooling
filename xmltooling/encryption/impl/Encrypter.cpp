@@ -85,8 +85,10 @@ EncryptedData* Encrypter::encryptElement(DOMElement* element, EncryptionParams& 
         m_cipher=NULL;
     }
     
-    if (!m_cipher)
+    if (!m_cipher) {
         m_cipher=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(element->getOwnerDocument());
+        m_cipher->setExclusiveC14nSerialisation(false);
+    }
     
     try {
         checkParams(encParams,kencParams);
@@ -111,8 +113,10 @@ EncryptedData* Encrypter::encryptElementContent(DOMElement* element, EncryptionP
         m_cipher=NULL;
     }
     
-    if (!m_cipher)
+    if (!m_cipher) {
         m_cipher=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(element->getOwnerDocument());
+        m_cipher->setExclusiveC14nSerialisation(false);
+    }
     
     try {
         checkParams(encParams,kencParams);
@@ -142,6 +146,7 @@ EncryptedData* Encrypter::encryptStream(istream& input, EncryptionParams& encPar
         doc=XMLToolingConfig::getConfig().getParser().newDocument();
         XercesJanitor<DOMDocument> janitor(doc);
         m_cipher=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(doc);
+        m_cipher->setExclusiveC14nSerialisation(false);
         
         checkParams(encParams,kencParams);
         StreamInputSource::StreamBinInputStream xstream(input);
@@ -228,6 +233,7 @@ EncryptedKey* Encrypter::encryptKey(const unsigned char* keyBuffer, unsigned int
         doc=XMLToolingConfig::getConfig().getParser().newDocument();
         XercesJanitor<DOMDocument> janitor(doc);
         m_cipher=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(doc);
+        m_cipher->setExclusiveC14nSerialisation(false);
         m_cipher->setKEK(kencParams.m_key->clone());
         auto_ptr<XENCEncryptedKey> encKey(m_cipher->encryptKey(keyBuffer, keyBufferSize, ENCRYPT_NONE, kencParams.m_algorithm));
         
