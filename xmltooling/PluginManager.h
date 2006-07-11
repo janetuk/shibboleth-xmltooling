@@ -49,7 +49,7 @@ namespace xmltooling {
         ~PluginManager() {}
 
         /** Factory function for plugin. */
-        typedef T* Factory(typename Params&);
+        typedef T* Factory(typename const Params&);
 
         /**
          * Registers the factory for a given type.
@@ -81,7 +81,7 @@ namespace xmltooling {
          * @param p     parameters to configure plugin
          * @return      the constructed plugin  
          */
-        T* newPlugin(const char* type, typename Params& p) {
+        T* newPlugin(const char* type, typename const Params& p) {
             std::map<std::string, typename Factory*>::const_iterator i=m_map.find(type);
             if (i==m_map.end())
                 throw UnknownExtensionException("Unable to build plugin of type '$1'",params(1,type));
