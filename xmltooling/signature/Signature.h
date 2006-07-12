@@ -27,7 +27,6 @@
 #include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/signature/KeyInfo.h>
 #include <xmltooling/signature/ContentReference.h>
-#include <xmltooling/validation/ValidatingXMLObject.h>
 #include <xmltooling/util/XMLConstants.h>
 
 #include <xsec/dsig/DSIGSignature.hpp>
@@ -43,7 +42,7 @@ namespace xmlsignature {
      * The default signature settings include Exclusive c14n w/o comments, SHA-1 digests,
      * and RSA-SHA1 signing. 
      */
-    class XMLTOOL_API Signature : public virtual xmltooling::ValidatingXMLObject
+    class XMLTOOL_API Signature : public virtual xmltooling::XMLObject
     {
     public:
         virtual ~Signature() {}

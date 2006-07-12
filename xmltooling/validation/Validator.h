@@ -46,13 +46,6 @@ namespace xmltooling {
          */
         virtual void validate(const XMLObject* xmlObject) const=0;
 
-        /**
-         * Returns a copy of the validator.
-         *
-         * @return the new validator
-         */
-        virtual Validator* clone() const=0;
-
     protected:
         Validator() {}
     };

@@ -28,7 +28,6 @@
 #include <xmltooling/SimpleElement.h>
 #include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/util/XMLConstants.h>
-#include <xmltooling/validation/ValidatingXMLObject.h>
 #include <xmltooling/validation/ValidatorSuite.h>
 
 #define DECL_XMLSIGOBJECTBUILDER(cname) \

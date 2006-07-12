@@ -52,10 +52,6 @@ class TestValidator : public SignatureValidator
 {
     XMLCh* m_uri;
     
-    TestValidator(const TestValidator& src) : SignatureValidator(src) {
-        m_uri=XMLString::replicate(src.m_uri);
-    }
-
 public:
     TestValidator(const XMLCh* uri, XSECCryptoKey* key) : SignatureValidator(new KeyResolver(key)) {
         m_uri=XMLString::replicate(uri);
@@ -63,10 +59,6 @@ public:
     
     virtual ~TestValidator() {
         XMLString::release(&m_uri);
-    }
-
-    TestValidator* clone() const {
-        return new TestValidator(*this);
     }
 
     void validate(const Signature* sigObj) const {
@@ -185,10 +177,10 @@ public:
         auto_ptr<SimpleXMLObject> sxObject2(dynamic_cast<SimpleXMLObject*>(b->buildFromDocument(doc)));
         TS_ASSERT(sxObject2.get()!=NULL);
         TS_ASSERT(sxObject2->getSignature()!=NULL);
-        sxObject2->getSignature()->registerValidator(new TestValidator(&chNull,m_key->clone()));
         
         try {
-            sxObject2->getSignature()->validate(false);
+            TestValidator tv(&chNull,m_key->clone());
+            tv.validate(sxObject2->getSignature());
         }
         catch (XMLToolingException& e) {
             TS_TRACE(e.what());

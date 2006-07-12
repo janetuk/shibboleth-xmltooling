@@ -229,7 +229,7 @@
  */
 #define BEGIN_XMLOBJECT(linkage,cname,base,desc) \
     XMLTOOLING_DOXYGEN(desc) \
-    class linkage cname : public virtual base, public virtual xmltooling::ValidatingXMLObject { \
+    class linkage cname : public virtual base { \
     protected: \
         cname() {} \
     public: \
@@ -252,7 +252,7 @@
  */
 #define BEGIN_XMLOBJECT2(linkage,cname,base,base2,desc) \
     XMLTOOLING_DOXYGEN(desc) \
-    class linkage cname : public virtual base, public virtual base2, public virtual xmltooling::ValidatingXMLObject { \
+    class linkage cname : public virtual base, public virtual base2 { \
     protected: \
         cname() {} \
     public: \
@@ -276,8 +276,7 @@
  */
 #define BEGIN_XMLOBJECT3(linkage,cname,base,base2,base3,desc) \
     XMLTOOLING_DOXYGEN(desc) \
-    class linkage cname : public virtual base, public virtual base2, public virtual base3, \
-        public virtual xmltooling::ValidatingXMLObject { \
+    class linkage cname : public virtual base, public virtual base2, public virtual base3 { \
     protected: \
         cname() {} \
     public: \
@@ -302,8 +301,7 @@
  */
 #define BEGIN_XMLOBJECT4(linkage,cname,base,base2,base3,base4,desc) \
     XMLTOOLING_DOXYGEN(desc) \
-    class linkage cname : public virtual base, public virtual base2, public virtual base3, \
-        public virtual base4, public virtual xmltooling::ValidatingXMLObject { \
+    class linkage cname : public virtual base, public virtual base2, public virtual base3, public virtual base4 { \
     protected: \
         cname() {} \
     public: \
@@ -1037,7 +1035,6 @@
             public xmltooling::AbstractSimpleElement, \
             public xmltooling::AbstractChildlessElement, \
             public xmltooling::AbstractDOMCachingXMLObject, \
-            public xmltooling::AbstractValidatingXMLObject, \
             public xmltooling::AbstractXMLObjectMarshaller, \
             public xmltooling::AbstractXMLObjectUnmarshaller \
     { \
@@ -1049,8 +1046,7 @@
         cname##Impl(const cname##Impl& src) \
             : xmltooling::AbstractXMLObject(src), \
                 xmltooling::AbstractSimpleElement(src), \
-                xmltooling::AbstractDOMCachingXMLObject(src), \
-                xmltooling::AbstractValidatingXMLObject(src) {} \
+                xmltooling::AbstractDOMCachingXMLObject(src) {} \
         IMPL_XMLOBJECT_CLONE(cname) \
         IMPL_XMLOBJECT_CONTENT \
     }
@@ -1129,9 +1125,6 @@
     { \
     public: \
         virtual ~cname##SchemaValidator() {} \
-        virtual cname##SchemaValidator* clone() const { \
-            return new cname##SchemaValidator(); \
-        } \
         virtual void validate(const xmltooling::XMLObject* xmlObject) const { \
             const cname* ptr=dynamic_cast<const cname*>(xmlObject); \
             if (!ptr) \
@@ -1149,9 +1142,6 @@
     { \
     public: \
         virtual ~cname##SchemaValidator() {} \
-        virtual cname##SchemaValidator* clone() const { \
-            return new cname##SchemaValidator(); \
-        } \
         virtual void validate(const xmltooling::XMLObject* xmlObject) const { \
             const cname* ptr=dynamic_cast<const cname*>(xmlObject); \
             if (!ptr) \

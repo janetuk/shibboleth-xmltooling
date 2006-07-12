@@ -27,7 +27,6 @@
 #include "util/NDC.h"
 #include "util/XMLConstants.h"
 #include "util/XMLHelper.h"
-#include "validation/ValidatingXMLObject.h"
 
 #include <log4cpp/Category.hh>
 #include <xercesc/framework/MemBufInputSource.hpp>
@@ -49,8 +48,7 @@ using namespace std;
 
 namespace xmlsignature {
     
-    class XMLTOOL_DLLLOCAL XMLSecSignatureImpl
-        : public UnknownElementImpl, public virtual Signature, public virtual ValidatingXMLObject
+    class XMLTOOL_DLLLOCAL XMLSecSignatureImpl : public UnknownElementImpl, public virtual Signature
     {
     public:
         XMLSecSignatureImpl() : UnknownElementImpl(XMLConstants::XMLSIG_NS, Signature::LOCAL_NAME, XMLConstants::XMLSIG_PREFIX),
@@ -100,11 +98,6 @@ namespace xmlsignature {
         
         void sign();
 
-        void registerValidator(Validator* validator);
-        void deregisterValidator(Validator* validator);
-        void deregisterAll();
-        void validate(bool validateDescendants) const;
-
     private:
         mutable DSIGSignature* m_signature;
         XMLCh* m_c14n;
@@ -112,7 +105,6 @@ namespace xmlsignature {
         XSECCryptoKey* m_key;
         KeyInfo* m_keyInfo;
         ContentReference* m_reference;
-        vector<Validator*> m_validators;
     };
     
 };
@@ -132,7 +124,6 @@ XMLSecSignatureImpl::~XMLSecSignatureImpl()
     delete m_key;
     delete m_keyInfo;
     delete m_reference;
-    for_each(m_validators.begin(),m_validators.end(),cleanup<Validator>());
 }
 
 void XMLSecSignatureImpl::releaseDOM() const
@@ -164,8 +155,6 @@ Signature* XMLSecSignatureImpl::cloneSignature() const
         ret->m_key=m_key->clone();
     if (m_keyInfo)
         ret->m_keyInfo=m_keyInfo->cloneKeyInfo();
-
-    xmltooling::clone(m_validators,ret->m_validators);
 
     // If there's no XML locally, serialize this object into the new one, otherwise just copy it over.
     if (m_xml.empty())
@@ -399,49 +388,6 @@ XMLObject* XMLSecSignatureImpl::unmarshall(DOMElement* element, bool bindDocumen
 
     setDOM(element, bindDocument);
     return this;
-}
-
-void XMLSecSignatureImpl::registerValidator(Validator* validator)
-{
-    m_validators.push_back(validator);
-}
-
-void XMLSecSignatureImpl::deregisterValidator(Validator* validator)
-{
-    for (vector<Validator*>::iterator i=m_validators.begin(); i!=m_validators.end(); i++) {
-        if ((*i)==validator) {
-            m_validators.erase(i);
-            return;
-        }
-    }
-}
-
-void XMLSecSignatureImpl::deregisterAll()
-{
-    for_each(m_validators.begin(),m_validators.end(),cleanup<Validator>());
-    m_validators.clear();
-}
-
-class _validate : public binary_function<const XMLObject*,bool,void> {
-public:
-    void operator()(const XMLObject* obj, bool propagate) const {
-        const ValidatingXMLObject* val = dynamic_cast<const ValidatingXMLObject*>(obj);
-        if (val) {
-            val->validate(propagate);
-        }
-    }
-};
-
-void XMLSecSignatureImpl::validate(bool validateDescendants) const
-{
-    for_each(
-        m_validators.begin(),m_validators.end(),
-        bind2nd(mem_fun<void,Validator,const XMLObject*>(&Validator::validate),this)
-        );
-    
-    if (validateDescendants && m_keyInfo) {
-        m_keyInfo->validate(validateDescendants);
-    }
 }
 
 Signature* SignatureBuilder::buildObject(

@@ -51,10 +51,6 @@ namespace xmlsignature {
 
         virtual void validate(const Signature* signature) const;
         
-        SignatureValidator* clone() const {
-            return new SignatureValidator(*this);
-        }
-
         /**
          * Replace the current KeyResolver, if any, with a new one.
          * 
@@ -66,10 +62,6 @@ namespace xmlsignature {
         }
     
     protected:
-        SignatureValidator(const SignatureValidator& src) {
-            m_resolver=src.m_resolver ? src.m_resolver->clone() : NULL;
-        }
-
         KeyResolver* m_resolver;
     };
 

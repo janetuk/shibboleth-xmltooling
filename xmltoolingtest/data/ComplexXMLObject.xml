@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<products>
+<products xmlns:p="http://example.com/product-info">
     <product id="1144" xmlns="http://example.com/product-info">
         <name xml:lang="en">Python Perfect IDE</name>
         <description>
@@ -9,7 +9,7 @@
             the year 3000.  Works well with <code>1166</code>.
         </description>
     </product>
-    <p:product id="1166" xmlns:p="http://example.com/product-info">
+    <p:product id="1166">
         <p:name>XSLT Perfect IDE</p:name>
         <p:description>
             <p:code>red</p:code>

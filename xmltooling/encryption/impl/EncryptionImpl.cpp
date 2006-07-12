@@ -29,7 +29,6 @@
 #include "io/AbstractXMLObjectMarshaller.h"
 #include "io/AbstractXMLObjectUnmarshaller.h"
 #include "util/XMLHelper.h"
-#include "validation/AbstractValidatingXMLObject.h"
 
 #include <xercesc/util/XMLUniDefs.hpp>
 
@@ -52,7 +51,6 @@ namespace xmlencryption {
     class XMLTOOL_DLLLOCAL EncryptionMethodImpl : public virtual EncryptionMethod,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
-        public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
@@ -76,8 +74,7 @@ namespace xmlencryption {
             init();
         }
             
-        EncryptionMethodImpl(const EncryptionMethodImpl& src)
-                : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src), AbstractValidatingXMLObject(src) {
+        EncryptionMethodImpl(const EncryptionMethodImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
             init();
             setAlgorithm(src.getAlgorithm());
             if (src.getKeySize())
@@ -126,7 +123,6 @@ namespace xmlencryption {
     class XMLTOOL_DLLLOCAL TransformsImpl : public virtual Transforms,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
-        public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
@@ -137,8 +133,7 @@ namespace xmlencryption {
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
         }
             
-        TransformsImpl(const TransformsImpl& src)
-                : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src), AbstractValidatingXMLObject(src) {
+        TransformsImpl(const TransformsImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
             VectorOf(xmlsignature::Transform) v=getTransforms();
             for (vector<xmlsignature::Transform*>::const_iterator i=src.m_Transforms.begin(); i!=src.m_Transforms.end(); i++) {
                 if (*i) {
@@ -160,7 +155,6 @@ namespace xmlencryption {
     class XMLTOOL_DLLLOCAL CipherReferenceImpl : public virtual CipherReference,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
-        public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
@@ -180,8 +174,7 @@ namespace xmlencryption {
             init();
         }
             
-        CipherReferenceImpl(const CipherReferenceImpl& src)
-                : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src), AbstractValidatingXMLObject(src) {
+        CipherReferenceImpl(const CipherReferenceImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
             init();
             setURI(src.getURI());
             if (src.getTransforms())
@@ -211,7 +204,6 @@ namespace xmlencryption {
     class XMLTOOL_DLLLOCAL CipherDataImpl : public virtual CipherData,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
-        public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
@@ -232,8 +224,7 @@ namespace xmlencryption {
             init();
         }
             
-        CipherDataImpl(const CipherDataImpl& src)
-                : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src), AbstractValidatingXMLObject(src) {
+        CipherDataImpl(const CipherDataImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
             init();
             if (src.getCipherValue())
                 setCipherValue(src.getCipherValue()->cloneCipherValue());
@@ -257,7 +248,6 @@ namespace xmlencryption {
         public AbstractElementProxy,
         public AbstractAttributeExtensibleXMLObject,
         public AbstractDOMCachingXMLObject,
-        public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
@@ -279,8 +269,7 @@ namespace xmlencryption {
                 : AbstractXMLObject(src),
                     AbstractElementProxy(src),
                     AbstractAttributeExtensibleXMLObject(src),
-                    AbstractDOMCachingXMLObject(src),
-                    AbstractValidatingXMLObject(src) {
+                    AbstractDOMCachingXMLObject(src) {
             init();
             setId(src.getId());
             setTarget(src.getTarget());
@@ -338,7 +327,6 @@ namespace xmlencryption {
     class XMLTOOL_DLLLOCAL EncryptionPropertiesImpl : public virtual EncryptionProperties,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
-        public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
@@ -355,10 +343,7 @@ namespace xmlencryption {
             init();
         }
             
-        EncryptionPropertiesImpl(const EncryptionPropertiesImpl& src)
-                : AbstractXMLObject(src),
-                    AbstractDOMCachingXMLObject(src),
-                    AbstractValidatingXMLObject(src) {
+        EncryptionPropertiesImpl(const EncryptionPropertiesImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
             init();
             setId(src.getId());
             VectorOf(EncryptionProperty) v=getEncryptionPropertys();
@@ -392,7 +377,6 @@ namespace xmlencryption {
     class XMLTOOL_DLLLOCAL ReferenceTypeImpl : public virtual ReferenceType,
         public AbstractElementProxy,
         public AbstractDOMCachingXMLObject,
-        public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
@@ -416,10 +400,7 @@ namespace xmlencryption {
         }
             
         ReferenceTypeImpl(const ReferenceTypeImpl& src)
-                : AbstractXMLObject(src),
-                    AbstractElementProxy(src),
-                    AbstractDOMCachingXMLObject(src),
-                    AbstractValidatingXMLObject(src) {
+                : AbstractXMLObject(src), AbstractElementProxy(src), AbstractDOMCachingXMLObject(src) {
             init();
             setURI(src.getURI());
             for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
@@ -482,7 +463,6 @@ namespace xmlencryption {
     class XMLTOOL_DLLLOCAL ReferenceListImpl : public virtual ReferenceList,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
-        public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
@@ -493,8 +473,7 @@ namespace xmlencryption {
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
         }
             
-        ReferenceListImpl(const ReferenceListImpl& src)
-                : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src), AbstractValidatingXMLObject(src) {
+        ReferenceListImpl(const ReferenceListImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
             for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
                 if (*i) {
                     DataReference* data=dynamic_cast<DataReference*>(*i);
@@ -527,7 +506,6 @@ namespace xmlencryption {
     class XMLTOOL_DLLLOCAL EncryptedTypeImpl : public virtual EncryptedType,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
-        public AbstractValidatingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
@@ -567,8 +545,7 @@ namespace xmlencryption {
             init();
         }
             
-        EncryptedTypeImpl(const EncryptedTypeImpl& src)
-                : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src), AbstractValidatingXMLObject(src) {
+        EncryptedTypeImpl(const EncryptedTypeImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
             init();
             setId(src.getId());
             setType(src.getType());
