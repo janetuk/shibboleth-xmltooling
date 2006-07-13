@@ -299,7 +299,7 @@ namespace xmltooling {
                 else
                     delete *i.m_iter;
             }
-            return m_container.erase(_First,_Last);
+            return m_container.erase(_First.m_iter,_Last.m_iter);
         }
 
         void clear() {
