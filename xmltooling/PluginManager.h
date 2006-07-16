@@ -24,6 +24,7 @@
 #define __xmltooling_plugin_h__
 
 #include <xmltooling/base.h>
+#include <xmltooling/exceptions.h>
 
 #include <map>
 #include <string>
