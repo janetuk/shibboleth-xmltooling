@@ -69,6 +69,44 @@ else
     CXXFLAGS="$PTHREAD_CFLAGS $CXXFLAGS"
 fi
 
+# OpenSSL settings
+AC_ARG_WITH(openssl,
+    AC_HELP_STRING([--with-openssl=PATH], [where openssl is installed]),
+    [if test x_$with_openssl != x_/usr; then
+        SSLLIBS="-L${with_openssl}/lib -lcrypto"
+        SSLFLAGS="-I${with_openssl}/include"
+    fi])
+
+if test "x$SSLLIBS" = "x" ; then
+    AC_PATH_PROG(PKG_CONFIG, pkg-config)
+    if test "x$PKG_CONFIG" != x && test "x$PKG_CONFIG" != "xno" ; then
+        if pkg-config openssl ; then
+            SSLLIBS="`$PKG_CONFIG --libs openssl`"
+            SSLFLAGS="`$PKG_CONFIG --cflags openssl`"
+        else
+            AC_MSG_ERROR([OpenSSL not supported by pkg-config, try --with-openssl instead])
+        fi
+    fi
+fi
+
+if test "x$SSLLIBS" = "x" ; then
+    SSLLIBS="-lcrypto"
+fi
+
+AC_MSG_CHECKING(for OpenSSL libraries)
+AC_MSG_RESULT($SSLLIBS)
+LIBS="$LIBS $SSLLIBS"
+AC_MSG_CHECKING(for OpenSSL cflags)
+AC_MSG_RESULT($SSLFLAGS)
+CPPFLAGS="$SSLFLAGS $CPPFLAGS"
+
+AC_CHECK_HEADER([openssl/pem.h],,
+                AC_MSG_ERROR([unable to find openssl header files]))
+AC_MSG_CHECKING(for ERR_load_CRYPTO_string)
+AC_TRY_LINK_FUNC([ERR_load_CRYPTO_strings],,
+             AC_MSG_ERROR([unable to link with openssl libraries]))
+AC_MSG_RESULT(yes)
+
 AC_LANG(C++)
 
 # C++ requirements
