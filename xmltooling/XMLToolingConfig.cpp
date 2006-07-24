@@ -25,6 +25,7 @@
 #include "XMLToolingConfig.h"
 #include "encryption/Encryption.h"
 #include "impl/UnknownElement.h"
+#include "signature/CredentialResolver.h"
 #include "signature/KeyInfo.h"
 #include "signature/Signature.h"
 #include "util/NDC.h"
@@ -35,15 +36,15 @@
 # include <dlfcn.h>
 #endif
 
+#include <stdexcept>
 #include <log4cpp/Category.hh>
 #include <log4cpp/PropertyConfigurator.hh>
 #include <log4cpp/OstreamAppender.hh>
 #include <xercesc/util/PlatformUtils.hpp>
 #ifndef XMLTOOLING_NO_XMLSEC
     #include <xsec/framework/XSECProvider.hpp>
+    #include <openssl/err.h>
 #endif
-
-#include <stdexcept>
 
 using namespace xmlencryption;
 using namespace xmlsignature;
@@ -176,6 +177,7 @@ bool XMLToolingInternalConfig::init()
 #ifndef XMLTOOLING_NO_XMLSEC
         XMLObjectBuilder::registerBuilder(QName(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME),new SignatureBuilder());
         REGISTER_EXCEPTION_FACTORY(SignatureException,xmlsignature);
+        registerCredentialResolvers();
 #endif
     }
     catch (const xercesc::XMLException&) {
@@ -193,6 +195,11 @@ void XMLToolingInternalConfig::term()
     KeyInfoSchemaValidators.destroyValidators();
     EncryptionSchemaValidators.destroyValidators();
     XMLToolingException::deregisterFactories();
+
+#ifndef XMLTOOLING_NO_XMLSEC
+    CredentialResolverManager.deregisterFactories();
+    KeyResolverManager.deregisterFactories();
+#endif
 
     for (vector<void*>::reverse_iterator i=m_libhandles.rbegin(); i!=m_libhandles.rend(); i++) {
 #if defined(WIN32)
@@ -318,3 +325,21 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
     log.info("loaded extension: %s", path);
     return true;
 }
+
+#ifndef XMLTOOLING_NO_XMLSEC
+void xmltooling::log_openssl()
+{
+    const char* file;
+    const char* data;
+    int flags,line;
+
+    unsigned long code=ERR_get_error_line_data(&file,&line,&data,&flags);
+    while (code) {
+        Category& log=Category::getInstance("OpenSSL");
+        log.errorStream() << "error code: " << code << " in " << file << ", line " << line << CategoryStream::ENDLINE;
+        if (data && (flags & ERR_TXT_STRING))
+            log.errorStream() << "error data: " << data << CategoryStream::ENDLINE;
+        code=ERR_get_error_line_data(&file,&line,&data,&flags);
+    }
+}
+#endif

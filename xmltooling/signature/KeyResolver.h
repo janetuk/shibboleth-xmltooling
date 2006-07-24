@@ -34,6 +34,7 @@ namespace xmlsignature {
      * An API for resolving keys.
      */
     class XMLTOOL_API KeyResolver {
+        MAKE_NONCOPYABLE(KeyResolver);
     public:
         /**
          * Constructor based on a single externally supplied key.
@@ -67,15 +68,6 @@ namespace xmlsignature {
          */
         virtual XSECCryptoKey* resolveKey(DSIGKeyInfoList* keyInfo=NULL) {
             return m_key ? m_key->clone() : NULL;
-        }
-        
-        /**
-         * Creates a copy of the resolver.
-         * 
-         * @return the cloned resolver
-         */
-        virtual KeyResolver* clone() const {
-            return new KeyResolver(m_key ? m_key->clone() : NULL);
         }
         
     protected:

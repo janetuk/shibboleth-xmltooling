@@ -92,6 +92,11 @@ namespace xmltooling {
         ParserPool* m_parserPool;
         ParserPool* m_validatingPool;
     };
+    
+#ifndef XMLTOOLING_NO_XMLSEC
+    void log_openssl();
+#endif
+    
     /// @endcond
 
 };

@@ -56,8 +56,10 @@ ioinclude_HEADERS = \
 
 siginclude_HEADERS = \
 	signature/ContentReference.h \
+	signature/CredentialResolver.h \
 	signature/KeyInfo.h \
 	signature/KeyResolver.h \
+	signature/OpenSSLCredentialResolver.h \
 	signature/Signature.h \
 	signature/SignatureValidator.h
 
@@ -81,6 +83,8 @@ if BUILD_XMLSEC
 xmlsec_sources = \
 	encryption/impl/Decrypter.cpp \
 	encryption/impl/Encrypter.cpp \
+	signature/impl/CredentialResolver.cpp \
+	signature/impl/FilesystemCredentialResolver.cpp \
 	signature/impl/SignatureValidator.cpp \
 	signature/impl/XMLSecSignatureImpl.cpp
 else

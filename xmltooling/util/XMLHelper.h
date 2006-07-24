@@ -20,7 +20,7 @@
  * A helper class for working with W3C DOM objects. 
  */
 
-#if !defined(__xmltooling_xmlhelper_h__)
+#ifndef __xmltooling_xmlhelper_h__
 #define __xmltooling_xmlhelper_h__
 
 #include <xmltooling/QName.h>
@@ -126,36 +126,40 @@ namespace xmltooling {
         }
 
         /**
-         * Returns the first child element of the node if any.
+         * Returns the first matching child element of the node if any.
          * 
-         * @param n     node to check
-         * @return  the first child node of type Element, or NULL
+         * @param n         node to check
+         * @param localName local name to compare with or NULL for any match
+         * @return  the first matching child node of type Element, or NULL
          */
-        static DOMElement* getFirstChildElement(const DOMNode* n);
+        static DOMElement* getFirstChildElement(const DOMNode* n, const XMLCh* localName=NULL);
         
         /**
-         * Returns the last child element of the node if any.
+         * Returns the last matching child element of the node if any.
          * 
          * @param n     node to check
-         * @return  the last child node of type Element, or NULL
+         * @param localName local name to compare with or NULL for any match
+         * @return  the last matching child node of type Element, or NULL
          */
-        static DOMElement* getLastChildElement(const DOMNode* n);
+        static DOMElement* getLastChildElement(const DOMNode* n, const XMLCh* localName=NULL);
         
         /**
-         * Returns the next sibling element of the node if any.
+         * Returns the next matching sibling element of the node if any.
          * 
          * @param n     node to check
-         * @return  the next sibling node of type Element, or NULL
+         * @param localName local name to compare with or NULL for any match
+         * @return  the next matching sibling node of type Element, or NULL
          */
-        static DOMElement* getNextSiblingElement(const DOMNode* n);
+        static DOMElement* getNextSiblingElement(const DOMNode* n, const XMLCh* localName=NULL);
         
         /**
-         * Returns the previous sibling element of the node if any.
+         * Returns the previous matching sibling element of the node if any.
          * 
          * @param n     node to check
-         * @return  the previous sibling node of type Element, or NULL
+         * @param localName local name to compare with or NULL for any match
+         * @return  the previous matching sibling node of type Element, or NULL
          */
-        static DOMElement* getPreviousSiblingElement(const DOMNode* n);
+        static DOMElement* getPreviousSiblingElement(const DOMNode* n, const XMLCh* localName=NULL);
         
         /**
          * Returns the first matching child element of the node if any.

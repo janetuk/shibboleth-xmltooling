@@ -73,7 +73,7 @@ fi
 AC_ARG_WITH(openssl,
     AC_HELP_STRING([--with-openssl=PATH], [where openssl is installed]),
     [if test x_$with_openssl != x_/usr; then
-        SSLLIBS="-L${with_openssl}/lib -lcrypto"
+        SSLLIBS="-L${with_openssl}/lib -lcrypto -lssl"
         SSLFLAGS="-I${with_openssl}/include"
     fi])
 
@@ -90,7 +90,7 @@ if test "x$SSLLIBS" = "x" ; then
 fi
 
 if test "x$SSLLIBS" = "x" ; then
-    SSLLIBS="-lcrypto"
+    SSLLIBS="-lcrypto -lssl"
 fi
 
 AC_MSG_CHECKING(for OpenSSL libraries)

@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="log4cppD.lib xerces-c_2D.lib xsec_1D.lib"
+				AdditionalDependencies="log4cppD.lib xerces-c_2D.lib xsec_1D.lib libeay32_0_9_8D.lib ssleay32_0_9_8D.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_1D.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -138,7 +138,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="log4cpp.lib xerces-c_2.lib xsec_1.lib"
+				AdditionalDependencies="log4cpp.lib xerces-c_2.lib xsec_1.lib libeay32_0_9_8.lib ssleay32_0_9_8.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_1.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -291,6 +291,14 @@
 				<Filter
 					Name="impl"
 					>
+					<File
+						RelativePath=".\signature\impl\CredentialResolver.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\signature\impl\FilesystemCredentialResolver.cpp"
+						>
+					</File>
 					<File
 						RelativePath=".\signature\impl\KeyInfoImpl.cpp"
 						>
@@ -507,11 +515,19 @@
 					>
 				</File>
 				<File
+					RelativePath=".\signature\CredentialResolver.h"
+					>
+				</File>
+				<File
 					RelativePath=".\signature\KeyInfo.h"
 					>
 				</File>
 				<File
 					RelativePath=".\signature\KeyResolver.h"
+					>
+				</File>
+				<File
+					RelativePath=".\signature\OpenSSLCredentialResolver.h"
 					>
 				</File>
 				<File

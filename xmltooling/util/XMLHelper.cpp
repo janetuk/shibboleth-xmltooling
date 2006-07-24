@@ -133,75 +133,83 @@ const XMLCh* XMLHelper::getTextContent(const DOMElement* e)
     return NULL;
 }
 
-DOMElement* XMLHelper::getFirstChildElement(const DOMNode* n)
+DOMElement* XMLHelper::getFirstChildElement(const DOMNode* n, const XMLCh* localName)
 {
     DOMNode* child = n->getFirstChild();
     while (child && child->getNodeType() != DOMNode::ELEMENT_NODE)
         child = child->getNextSibling();
-    if (child)
-        return static_cast<DOMElement*>(child);
-    return NULL;
+    if (child && localName) {
+        if (!XMLString::equals(localName,child->getLocalName()))
+            return getNextSiblingElement(child, localName);
+    }
+    return static_cast<DOMElement*>(child);
 }    
 
-DOMElement* XMLHelper::getLastChildElement(const DOMNode* n)
+DOMElement* XMLHelper::getLastChildElement(const DOMNode* n, const XMLCh* localName)
 {
     DOMNode* child = n->getLastChild();
     while (child && child->getNodeType() != DOMNode::ELEMENT_NODE)
         child = child->getPreviousSibling();
-    if (child)
-        return static_cast<DOMElement*>(child);
-    return NULL;
+    if (child && localName) {
+        if (!XMLString::equals(localName,child->getLocalName()))
+            return getPreviousSiblingElement(child, localName);
+    }
+    return static_cast<DOMElement*>(child);
 }    
 
 DOMElement* XMLHelper::getFirstChildElement(const DOMNode* n, const XMLCh* ns, const XMLCh* localName)
 {
-    DOMElement* e = getFirstChildElement(n);
-    while (e && !isNodeNamed(e, ns, localName))
-        e = getNextSiblingElement(e);
+    DOMElement* e = getFirstChildElement(n, localName);
+    while (e && !XMLString::equals(e->getNamespaceURI(),ns))
+        e = getNextSiblingElement(e, localName);
     return e;
 }
 
 DOMElement* XMLHelper::getLastChildElement(const DOMNode* n, const XMLCh* ns, const XMLCh* localName)
 {
-    DOMElement* e = getLastChildElement(n);
-    while (e && !isNodeNamed(e, ns, localName))
-        e = getPreviousSiblingElement(e);
+    DOMElement* e = getLastChildElement(n, localName);
+    while (e && !XMLString::equals(e->getNamespaceURI(),ns))
+        e = getPreviousSiblingElement(e, localName);
     return e;
 }
 
-DOMElement* XMLHelper::getNextSiblingElement(const DOMNode* n)
+DOMElement* XMLHelper::getNextSiblingElement(const DOMNode* n, const XMLCh* localName)
 {
     DOMNode* sib = n->getNextSibling();
     while (sib && sib->getNodeType() != DOMNode::ELEMENT_NODE)
         sib = sib->getNextSibling();
-    if (sib)
-        return static_cast<DOMElement*>(sib);
-    return NULL;
+    if (sib && localName) {
+        if (!XMLString::equals(localName,sib->getLocalName()))
+            return getNextSiblingElement(sib, localName);
+    }   
+    return static_cast<DOMElement*>(sib);
 }
 
-DOMElement* XMLHelper::getPreviousSiblingElement(const DOMNode* n)
+DOMElement* XMLHelper::getPreviousSiblingElement(const DOMNode* n, const XMLCh* localName)
 {
     DOMNode* sib = n->getPreviousSibling();
     while (sib && sib->getNodeType() != DOMNode::ELEMENT_NODE)
         sib = sib->getPreviousSibling();
-    if (sib)
-        return static_cast<DOMElement*>(sib);
-    return NULL;
+    if (sib && localName) {
+        if (!XMLString::equals(localName,sib->getLocalName()))
+            return getPreviousSiblingElement(sib, localName);
+    }   
+    return static_cast<DOMElement*>(sib);
 }
 
 DOMElement* XMLHelper::getNextSiblingElement(const DOMNode* n, const XMLCh* ns, const XMLCh* localName)
 {
-    DOMElement* e = getNextSiblingElement(n);
-    while (e && !isNodeNamed(e, ns, localName))
-        e = getNextSiblingElement(e);
+    DOMElement* e = getNextSiblingElement(n, localName);
+    while (e && !XMLString::equals(e->getNamespaceURI(),ns))
+        e = getNextSiblingElement(e, localName);
     return e;
 }
 
 DOMElement* XMLHelper::getPreviousSiblingElement(const DOMNode* n, const XMLCh* ns, const XMLCh* localName)
 {
-    DOMElement* e = getPreviousSiblingElement(n);
-    while (e && !isNodeNamed(e, ns, localName))
-        e = getPreviousSiblingElement(e);
+    DOMElement* e = getPreviousSiblingElement(n, localName);
+    while (e && !XMLString::equals(e->getNamespaceURI(),ns))
+        e = getPreviousSiblingElement(e, localName);
     return e;
 }
 

@@ -24,7 +24,20 @@
 #define __xmltooling_config_h__
 
 #include <xmltooling/Lockable.h>
+#include <xmltooling/PluginManager.h>
 #include <xmltooling/util/ParserPool.h>
+
+#ifndef XMLTOOLING_NO_XMLSEC
+namespace xmlsignature {
+    class XMLTOOL_API CredentialResolver;
+    class XMLTOOL_API KeyResolver;
+};
+#endif
+
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4251 )
+#endif
 
 namespace xmltooling {
 
@@ -110,10 +123,26 @@ namespace xmltooling {
          */
         virtual ParserPool& getValidatingParser() const=0;
 
+#ifndef XMLTOOLING_NO_XMLSEC
+        /**
+         * Manages factories for KeyResolver plugins.
+         */
+        xmltooling::PluginManager<xmlsignature::KeyResolver,const DOMElement*> KeyResolverManager;
+
+        /**
+         * Manages factories for CredentialResolver plugins.
+         */
+        xmltooling::PluginManager<xmlsignature::CredentialResolver,const DOMElement*> CredentialResolverManager;
+#endif
+
     protected:
         XMLToolingConfig() {}
     };
 
 };
+
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
 
 #endif /* __xmltooling_config_h__ */

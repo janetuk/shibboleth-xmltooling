@@ -69,9 +69,15 @@ namespace xmltooling {
          * @param type  the name of the plugin type
          */
         void deregisterFactory(const char* type) {
-            if (type) {
+            if (type)
                 m_map.erase(type);
-            }
+        }
+
+        /**
+         * Unregisters all registered factories.
+         */
+        void deregisterFactories() {
+            m_map.clear();
         }
 
         /**
