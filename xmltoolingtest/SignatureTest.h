@@ -16,17 +16,12 @@
 
 #include "XMLObjectBaseTestCase.h"
 
+#include <xmltooling/signature/CredentialResolver.h>
 #include <xmltooling/signature/SignatureValidator.h>
 
 #include <fstream>
-#include <openssl/pem.h>
 #include <xercesc/util/XMLUniDefs.hpp>
 #include <xsec/dsig/DSIGReference.hpp>
-#include <xsec/enc/XSECKeyInfoResolverDefault.hpp>
-#include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
-#include <xsec/enc/OpenSSL/OpenSSLCryptoKeyRSA.hpp>
-#include <xsec/enc/XSECCryptoException.hpp>
-#include <xsec/framework/XSECException.hpp>
 
 class TestContext : public ContentReference
 {
@@ -82,38 +77,22 @@ public:
 };
 
 class SignatureTest : public CxxTest::TestSuite {
-    XSECCryptoKey* m_key;
-    vector<XSECCryptoX509*> m_certs;
+    CredentialResolver* m_resolver;
 public:
     void setUp() {
+        m_resolver=NULL;
         QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
         QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
         XMLObjectBuilder::registerBuilder(qname, new SimpleXMLObjectBuilder());
         XMLObjectBuilder::registerBuilder(qtype, new SimpleXMLObjectBuilder());
-        string keypath=data_path + "key.pem";
-        BIO* in=BIO_new(BIO_s_file_internal());
-        if (in && BIO_read_filename(in,keypath.c_str())>0) {
-            EVP_PKEY* pkey=PEM_read_bio_PrivateKey(in, NULL, NULL, NULL);
-            if (pkey) {
-                m_key=new OpenSSLCryptoKeyRSA(pkey);
-                EVP_PKEY_free(pkey);
-            }
-        }
-        if (in) BIO_free(in);
-        TS_ASSERT(m_key!=NULL);
 
-        string certpath=data_path + "cert.pem";
-        in=BIO_new(BIO_s_file_internal());
-        if (in && BIO_read_filename(in,certpath.c_str())>0) {
-            X509* x=NULL;
-            while (x=PEM_read_bio_X509(in,NULL,NULL,NULL)) {
-                m_certs.push_back(new OpenSSLCryptoX509(x));
-                X509_free(x);
-            }
-        }
-        if (in) BIO_free(in);
-        TS_ASSERT(m_certs.size()>0);
-        
+        string config = data_path + "FilesystemCredentialResolver.xml";
+        ifstream in(config.c_str());
+        DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(in);
+        XercesJanitor<DOMDocument> janitor(doc);
+        m_resolver = XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(
+            FILESYSTEM_CREDENTIAL_RESOLVER,doc->getDocumentElement()
+            );
     }
 
     void tearDown() {
@@ -121,13 +100,10 @@ public:
         QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
         XMLObjectBuilder::deregisterBuilder(qname);
         XMLObjectBuilder::deregisterBuilder(qtype);
-        delete m_key;
-        for_each(m_certs.begin(),m_certs.end(),xmltooling::cleanup<XSECCryptoX509>());
+        delete m_resolver;
     }
 
     void testSignature() {
-        TS_TRACE("testSignature");
-
         QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
         const SimpleXMLObjectBuilder* b=dynamic_cast<const SimpleXMLObjectBuilder*>(XMLObjectBuilder::getBuilder(qname));
         TS_ASSERT(b!=NULL);
@@ -148,13 +124,15 @@ public:
         Signature* sig=SignatureBuilder::buildSignature();
         sxObject->setSignature(sig);
         sig->setContentReference(new TestContext(&chNull));
-        sig->setSigningKey(m_key->clone());
+
+        Locker locker(m_resolver);
+        sig->setSigningKey(m_resolver->getKey());
         
         // Build KeyInfo.
         KeyInfo* keyInfo=KeyInfoBuilder::buildKeyInfo();
         X509Data* x509Data=X509DataBuilder::buildX509Data();
         keyInfo->getX509Datas().push_back(x509Data);
-        for_each(m_certs.begin(),m_certs.end(),bind1st(_addcert(),x509Data));
+        for_each(m_resolver->getCertificates().begin(),m_resolver->getCertificates().end(),bind1st(_addcert(),x509Data));
         sig->setKeyInfo(keyInfo);
         
         // Signing context for the whole document.
@@ -179,7 +157,7 @@ public:
         TS_ASSERT(sxObject2->getSignature()!=NULL);
         
         try {
-            TestValidator tv(&chNull,m_key->clone());
+            TestValidator tv(&chNull,m_resolver->getKey());
             tv.validate(sxObject2->getSignature());
         }
         catch (XMLToolingException& e) {

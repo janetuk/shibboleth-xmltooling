@@ -18,16 +18,11 @@
 
 #include <xmltooling/encryption/Decrypter.h>
 #include <xmltooling/encryption/Encrypter.h>
+#include <xmltooling/signature/CredentialResolver.h>
 
 #include <fstream>
-#include <openssl/pem.h>
 #include <xercesc/util/XMLUniDefs.hpp>
 #include <xsec/dsig/DSIGReference.hpp>
-#include <xsec/enc/XSECKeyInfoResolverDefault.hpp>
-#include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
-#include <xsec/enc/OpenSSL/OpenSSLCryptoKeyRSA.hpp>
-#include <xsec/enc/XSECCryptoException.hpp>
-#include <xsec/framework/XSECException.hpp>
 
 using namespace xmlencryption;
 
@@ -42,53 +37,34 @@ public:
 };
 
 class EncryptionTest : public CxxTest::TestSuite {
-    XSECCryptoKey* m_key;
-    vector<XSECCryptoX509*> m_certs;
+    CredentialResolver* m_resolver;
 public:
     void setUp() {
-        string keypath=data_path + "key.pem";
-        BIO* in=BIO_new(BIO_s_file_internal());
-        if (in && BIO_read_filename(in,keypath.c_str())>0) {
-            EVP_PKEY* pkey=PEM_read_bio_PrivateKey(in, NULL, NULL, NULL);
-            if (pkey) {
-                m_key=new OpenSSLCryptoKeyRSA(pkey);
-                EVP_PKEY_free(pkey);
-            }
-        }
-        if (in) BIO_free(in);
-        TS_ASSERT(m_key!=NULL);
-
-        string certpath=data_path + "cert.pem";
-        in=BIO_new(BIO_s_file_internal());
-        if (in && BIO_read_filename(in,certpath.c_str())>0) {
-            X509* x=NULL;
-            while (x=PEM_read_bio_X509(in,NULL,NULL,NULL)) {
-                m_certs.push_back(new OpenSSLCryptoX509(x));
-                X509_free(x);
-            }
-        }
-        if (in) BIO_free(in);
-        TS_ASSERT(m_certs.size()>0);
-        
+        m_resolver=NULL;
+        string config = data_path + "FilesystemCredentialResolver.xml";
+        ifstream in(config.c_str());
+        DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(in);
+        XercesJanitor<DOMDocument> janitor(doc);
+        m_resolver = XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(
+            FILESYSTEM_CREDENTIAL_RESOLVER,doc->getDocumentElement()
+            );
     }
 
     void tearDown() {
-        delete m_key;
-        for_each(m_certs.begin(),m_certs.end(),xmltooling::cleanup<XSECCryptoX509>());
+        delete m_resolver;
     }
 
-    void testBasic() {
-        TS_TRACE("testBasic");
-
+    void testEncryption() {
         string path=data_path + "ComplexXMLObject.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
         TS_ASSERT(doc!=NULL);
 
         try {
+            Locker locker(m_resolver);
             Encrypter encrypter;
             Encrypter::EncryptionParams ep;
-            Encrypter::KeyEncryptionParams kep(DSIGConstants::s_unicodeStrURIRSA_1_5,m_key->clone());
+            Encrypter::KeyEncryptionParams kep(DSIGConstants::s_unicodeStrURIRSA_1_5,m_resolver->getKey());
             auto_ptr<EncryptedData> encData(encrypter.encryptElement(doc->getDocumentElement(),ep,&kep));
 
             string buf;
@@ -99,7 +75,7 @@ public:
                 dynamic_cast<EncryptedData*>(XMLObjectBuilder::buildOneFromElement(doc2->getDocumentElement(),true))
                 );
 
-            Decrypter decrypter(new KeyResolver(m_key->clone()));
+            Decrypter decrypter(new KeyResolver(m_resolver->getKey()));
             DOMDocumentFragment* frag = decrypter.decryptData(encData2.get());
             XMLHelper::serialize(static_cast<DOMElement*>(frag->getFirstChild()), buf);
             //TS_TRACE(buf.c_str());
