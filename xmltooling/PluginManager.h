@@ -58,8 +58,8 @@ namespace xmltooling {
          * @param type      the name of the plugin type
          * @param factory   the factory function for the plugin type
          */
-        void registerFactory(const char* type, typename PluginManager::Factory* factory) {
-            if (type && factory)
+        void registerFactory(const std::string& type, typename PluginManager::Factory* factory) {
+            if (!type.empty() && factory)
                 m_map[type]=factory;
         }
 
@@ -68,8 +68,8 @@ namespace xmltooling {
          * 
          * @param type  the name of the plugin type
          */
-        void deregisterFactory(const char* type) {
-            if (type)
+        void deregisterFactory(const std::string& type) {
+            if (!type.empty())
                 m_map.erase(type);
         }
 
@@ -88,10 +88,10 @@ namespace xmltooling {
          * @param p     parameters to configure plugin
          * @return      the constructed plugin  
          */
-        T* newPlugin(const char* type, const Params& p) {
+        T* newPlugin(const std::string& type, const Params& p) {
             typename std::map<std::string, typename PluginManager::Factory*>::const_iterator i=m_map.find(type);
             if (i==m_map.end())
-                throw UnknownExtensionException("Unable to build plugin of type '$1'",params(1,type));
+                throw UnknownExtensionException("Unable to build plugin of type '$1'",params(1,type.c_str()));
             return i->second(p);
         }
         
