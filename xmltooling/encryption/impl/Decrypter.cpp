@@ -15,9 +15,9 @@
  */
 
 /**
- * Encrypter.cpp
+ * Decrypter.cpp
  * 
- * Methods for encrypting XMLObjects and other data.
+ * Methods for decrypting XMLObjects and other data.
  */
 
 #include "internal.h"
@@ -39,7 +39,8 @@ using namespace std;
 
 Decrypter::~Decrypter()
 {
-    XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
+    if (m_cipher)
+        XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
     delete m_resolver;
     delete m_KEKresolver;
 }
