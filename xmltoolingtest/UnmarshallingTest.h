@@ -69,8 +69,6 @@ public:
     }
 
     void testUnmarshallingWithAttributes() {
-        TS_TRACE("testUnmarshallingWithAttributes");
-
         string path=data_path + "SimpleXMLObjectWithAttribute.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
@@ -85,12 +83,10 @@ public:
         TS_ASSERT(sxObject.get()!=NULL);
 
         auto_ptr_XMLCh expected("Firefly");
-        TSM_ASSERT_SAME_DATA("ID was not expected value", expected.get(), sxObject->getId(), XMLString::stringLen(expected.get()));
+        TSM_ASSERT("ID was not expected value", XMLString::equals(expected.get(), sxObject->getId()));
     }
 
     void testUnmarshallingWithElementContent() {
-        TS_TRACE("testUnmarshallingWithElementContent");
-
         string path=data_path + "SimpleXMLObjectWithContent.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
@@ -105,12 +101,10 @@ public:
         TS_ASSERT(sxObject.get()!=NULL);
 
         auto_ptr_XMLCh expected("Sample Content");
-        TSM_ASSERT_SAME_DATA("Element content was not expected value", expected.get(), sxObject->getValue(), XMLString::stringLen(expected.get()));
+        TSM_ASSERT("Element content was not expected value", XMLString::equals(expected.get(), sxObject->getValue()));
     }
 
     void testUnmarshallingWithChildElements() {
-        TS_TRACE("testUnmarshallingWithChildElements");
-
         string path=data_path + "SimpleXMLObjectWithChildren.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
@@ -131,8 +125,6 @@ public:
     }
 
     void testUnmarshallingWithClone() {
-        TS_TRACE("testUnmarshallingWithClone");
-
         string path=data_path + "SimpleXMLObjectWithChildren.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
@@ -156,8 +148,6 @@ public:
     }
 
     void testUnmarshallingWithUnknownChild() {
-        TS_TRACE("testUnmarshallingWithUnknownChild");
-
         string path=data_path + "SimpleXMLObjectWithUnknownChild.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);

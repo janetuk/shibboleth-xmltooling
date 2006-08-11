@@ -34,8 +34,6 @@ public:
     }
 
     void testKeyInfo1() {
-        TS_TRACE("testKeyInfo1");
-
         string path=data_path + "KeyInfo1.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getValidatingParser().parse(fs);
@@ -44,9 +42,7 @@ public:
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
         TS_ASSERT(b!=NULL);
 
-        auto_ptr<KeyInfo> kiObject(
-            dynamic_cast<KeyInfo*>(b->buildFromDocument(doc))
-            );
+        auto_ptr<KeyInfo> kiObject(dynamic_cast<KeyInfo*>(b->buildFromDocument(doc)));
         TS_ASSERT(kiObject.get()!=NULL);
         TSM_ASSERT_EQUALS("Number of child elements was not expected value",
             3, kiObject->getOrderedChildren().size());
@@ -56,15 +52,12 @@ public:
             1, kiObject->getX509Datas().front()->getX509Certificates().size());
 
         auto_ptr_XMLCh expected("Public Key for CN=xmldap.org, OU=Domain Control Validated, O=xmldap.org");
-        TSM_ASSERT_SAME_DATA("KeyName was not expected value",
-            expected.get(), kiObject->getKeyNames().front()->getName(), XMLString::stringLen(expected.get()));
+        TSM_ASSERT("KeyName was not expected value", XMLString::equals(expected.get(), kiObject->getKeyNames().front()->getName()));
 
         KeyInfoSchemaValidators.validate(kiObject.get());
     }
 
     void testKeyInfo2() {
-        TS_TRACE("testKeyInfo2");
-
         string path=data_path + "KeyInfo2.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getValidatingParser().parse(fs);
@@ -73,9 +66,7 @@ public:
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
         TS_ASSERT(b!=NULL);
 
-        auto_ptr<KeyInfo> kiObject(
-            dynamic_cast<KeyInfo*>(b->buildFromDocument(doc))
-            );
+        auto_ptr<KeyInfo> kiObject(dynamic_cast<KeyInfo*>(b->buildFromDocument(doc)));
         TS_ASSERT(kiObject.get()!=NULL);
         TSM_ASSERT_EQUALS("Number of child elements was not expected value",
             2, kiObject->getOrderedChildren().size());
@@ -88,8 +79,6 @@ public:
     }
 
     void testKeyInfo3() {
-        TS_TRACE("testKeyInfo3");
-
         string path=data_path + "KeyInfo3.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
@@ -98,9 +87,7 @@ public:
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
         TS_ASSERT(b!=NULL);
 
-        auto_ptr<KeyInfo> kiObject(
-            dynamic_cast<KeyInfo*>(b->buildFromDocument(doc))
-            );
+        auto_ptr<KeyInfo> kiObject(dynamic_cast<KeyInfo*>(b->buildFromDocument(doc)));
         TS_ASSERT(kiObject.get()!=NULL);
         TS_ASSERT_THROWS(KeyInfoSchemaValidators.validate(kiObject.get()),ValidationException);
     }

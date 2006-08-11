@@ -23,8 +23,6 @@ class ExceptionTest : public CxxTest::TestSuite {
 public:
 
     void testException(void) {
-        TS_TRACE("testException");
-
 #define TEST(n,b,a) XMLToolingException e##n(b); \
                 TS_ASSERT(!strcmp(a,e##n.what()))
 

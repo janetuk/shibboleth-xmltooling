@@ -48,7 +48,7 @@ class TestValidator : public SignatureValidator
     XMLCh* m_uri;
     
 public:
-    TestValidator(const XMLCh* uri, XSECCryptoKey* key) : SignatureValidator(new KeyResolver(key)) {
+    TestValidator(const XMLCh* uri) : SignatureValidator(XMLToolingConfig::getConfig().KeyResolverManager.newPlugin(INLINE_KEY_RESOLVER,NULL)) {
         m_uri=XMLString::replicate(uri);
     }
     
@@ -157,7 +157,7 @@ public:
         TS_ASSERT(sxObject2->getSignature()!=NULL);
         
         try {
-            TestValidator tv(&chNull,m_resolver->getKey());
+            TestValidator tv(&chNull);
             tv.validate(sxObject2->getSignature());
         }
         catch (XMLToolingException& e) {

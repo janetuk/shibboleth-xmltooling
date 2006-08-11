@@ -35,8 +35,6 @@ public:
     }
 
     void testMarshallingWithAttributes() {
-        TS_TRACE("testMarshallingWithAttributes");
-
         QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
         auto_ptr<SimpleXMLObject> sxObject(SimpleXMLObjectBuilder::newSimpleXMLObject());
         TS_ASSERT(sxObject.get()!=NULL);
@@ -55,8 +53,6 @@ public:
     }
 
     void testMarshallingWithElementContent() {
-        TS_TRACE("testMarshallingWithElementContent");
-
         QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
         auto_ptr<SimpleXMLObject> sxObject(SimpleXMLObjectBuilder::newSimpleXMLObject());
         TS_ASSERT(sxObject.get()!=NULL);
@@ -75,8 +71,6 @@ public:
     }
 
     void testMarshallingWithChildElements() {
-        TS_TRACE("testMarshallingWithChildElements");
-
         QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
         const SimpleXMLObjectBuilder* b=dynamic_cast<const SimpleXMLObjectBuilder*>(XMLObjectBuilder::getBuilder(qname));
         TS_ASSERT(b!=NULL);
@@ -95,7 +89,7 @@ public:
         kids.begin()->setId(foo.get());
         kids.at(2)->setValue(bar.get());
         kids.erase(kids.begin()+1);
-        TS_ASSERT_SAME_DATA(kids.back()->getValue(), bar.get(), XMLString::stringLen(bar.get()));
+        TS_ASSERT(XMLString::equals(kids.back()->getValue(), bar.get()));
         
         QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME,SimpleXMLObject::NAMESPACE_PREFIX);
         kids.push_back(

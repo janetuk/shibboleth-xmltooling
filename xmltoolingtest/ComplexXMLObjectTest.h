@@ -32,8 +32,6 @@ public:
     }
 
     void testComplexUnmarshalling() {
-        TS_TRACE("testComplexUnmarshalling");
-
         string path=data_path + "ComplexXMLObject.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
