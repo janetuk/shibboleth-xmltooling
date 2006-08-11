@@ -85,6 +85,8 @@ xmlsec_sources = \
 	encryption/impl/Encrypter.cpp \
 	signature/impl/CredentialResolver.cpp \
 	signature/impl/FilesystemCredentialResolver.cpp \
+	signature/impl/InlineKeyResolver.cpp \
+	signature/impl/KeyResolver.cpp \
 	signature/impl/SignatureValidator.cpp \
 	signature/impl/XMLSecSignatureImpl.cpp
 else

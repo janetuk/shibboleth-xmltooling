@@ -17,7 +17,8 @@
 /**
  * @file KeyResolver.h
  * 
- * Resolves keys based on KeyInfo information or other external factors. 
+ * Resolves public keys and certificates based on KeyInfo information or
+ * external factors. 
  */
 
 #if !defined(__xmltooling_keyres_h__) && !defined(XMLTOOLING_NO_XMLSEC)
@@ -27,11 +28,17 @@
 
 #include <xsec/dsig/DSIGKeyInfoList.hpp>
 #include <xsec/enc/XSECCryptoKey.hpp>
+#include <xsec/enc/XSECCryptoX509.hpp>
+
+#include <vector>
 
 namespace xmlsignature {
 
     /**
-     * An API for resolving keys.
+     * An API for resolving keys. The default/simple implementation
+     * allows a hard-wired key to be supplied. This is mostly
+     * useful for testing, or to adapt another mechanism for supplying
+     * keys to this interface.
      */
     class XMLTOOL_API KeyResolver {
         MAKE_NONCOPYABLE(KeyResolver);
@@ -55,7 +62,7 @@ namespace xmlsignature {
          * @param keyInfo   the key information
          * @return  the resolved key
          */
-        virtual XSECCryptoKey* resolveKey(KeyInfo* keyInfo) {
+        virtual XSECCryptoKey* resolveKey(const KeyInfo* keyInfo) const {
             return m_key ? m_key->clone() : NULL;
         }
 
@@ -66,14 +73,48 @@ namespace xmlsignature {
          * @param keyInfo   the key information
          * @return  the resolved key
          */
-        virtual XSECCryptoKey* resolveKey(DSIGKeyInfoList* keyInfo=NULL) {
+        virtual XSECCryptoKey* resolveKey(DSIGKeyInfoList* keyInfo) const {
             return m_key ? m_key->clone() : NULL;
         }
+
+        /**
+         * Returns a set of certificates based on the supplied KeyInfo information.
+         * The certificates must be cloned if kept beyond the lifetime of the KeyInfo source.
+         * 
+         * @param keyInfo   the key information
+         * @param certs     reference to vector to store certificates
+         * @return  number of certificates returned
+         */
+        virtual std::vector<XSECCryptoX509*>::size_type resolveCertificates(
+            const KeyInfo* keyInfo, std::vector<XSECCryptoX509*>& certs
+            ) const;
         
+        /**
+         * Returns a set of certificates based on the supplied KeyInfo information.
+         * The certificates must be cloned if kept beyond the lifetime of the KeyInfo source.
+         * 
+         * @param keyInfo   the key information
+         * @param certs     reference to vector to store certificates
+         * @return  number of certificates returned
+         */
+        virtual std::vector<XSECCryptoX509*>::size_type resolveCertificates(
+            DSIGKeyInfoList* keyInfo, std::vector<XSECCryptoX509*>& certs 
+            ) const;
+
     protected:
         XSECCryptoKey* m_key;
     };
 
+    /**
+     * Registers KeyResolver classes into the runtime.
+     */
+    void XMLTOOL_API registerKeyResolvers();
+
+    /** KeyResolver based on hard-wired key */
+    #define FILESYSTEM_KEY_RESOLVER  "org.opensaml.xmlooling.FilesystemKeyResolver"
+
+    /** KeyResolver based on extracting information directly out of a KeyInfo */
+    #define INLINE_KEY_RESOLVER  "org.opensaml.xmlooling.InlineKeyResolver"
 };
 
 #endif /* __xmltooling_keyres_h__ */

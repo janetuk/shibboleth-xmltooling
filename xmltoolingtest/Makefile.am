@@ -11,6 +11,7 @@ if BUILD_XMLSEC
 xmlsec_sources = \
     EncryptionTest.h \
     FilesystemCredentialResolverTest.h \
+    InlineKeyResolverTest.h \
     SignatureTest.h
 else
 xmlsec_sources =

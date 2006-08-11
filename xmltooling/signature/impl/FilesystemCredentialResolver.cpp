@@ -21,12 +21,10 @@
  */
 
 #include "internal.h"
+#include "signature/KeyResolver.h"
 #include "signature/OpenSSLCredentialResolver.h"
 #include "util/NDC.h"
 #include "util/XMLHelper.h"
-
-using namespace xmlsignature;
-using namespace xmltooling;
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -58,20 +56,31 @@ static int passwd_callback(char* buf, int len, int verify, void* passwd)
 }
 
 namespace xmlsignature {
-    class FilesystemCredentialResolver : public CredentialResolver
+    class FilesystemCredentialResolver : public OpenSSLCredentialResolver, public KeyResolver
     {
     public:
         FilesystemCredentialResolver(const DOMElement* e);
-        ~FilesystemCredentialResolver();
+        virtual ~FilesystemCredentialResolver();
 
         Lockable* lock() { return this; }
         void unlock() {}
         
         XSECCryptoKey* loadKey();
         
-        void attach(SSL_CTX* ctx) const;
-        XSECCryptoKey* getKey() const { return m_key->clone(); }
+        XSECCryptoKey* getKey() const { return m_key ? m_key->clone() : NULL; }
         const vector<XSECCryptoX509*>& getCertificates() const { return m_xseccerts; }
+        void attach(SSL_CTX* ctx) const;
+        
+        XSECCryptoKey* resolveKey(const KeyInfo* keyInfo) const { return m_key ? m_key->clone() : NULL; }
+        XSECCryptoKey* resolveKey(DSIGKeyInfoList* keyInfo) const { return m_key ? m_key->clone() : NULL; }
+        vector<XSECCryptoX509*>::size_type resolveCertificates(const KeyInfo* keyInfo, vector<XSECCryptoX509*>& certs) const {
+            certs.assign(m_xseccerts.begin(), m_xseccerts.end());
+            return certs.size();
+        }
+        vector<XSECCryptoX509*>::size_type resolveCertificates(DSIGKeyInfoList* keyInfo, vector<XSECCryptoX509*>& certs) const {
+            certs.assign(m_xseccerts.begin(), m_xseccerts.end());
+            return certs.size();
+        }
         
     private:
         enum format_t { PEM=SSL_FILETYPE_PEM, DER=SSL_FILETYPE_ASN1, _PKCS12, UNKNOWN };
@@ -91,6 +100,11 @@ namespace xmlsignature {
     {
         return new FilesystemCredentialResolver(e);
     }
+
+    KeyResolver* XMLTOOL_DLLLOCAL FilesystemKeyResolverFactory(const DOMElement* const & e)
+    {
+        return new FilesystemCredentialResolver(e);
+    }
 };
 
 static const XMLCh CAPath[] =           UNICODE_LITERAL_6(C,A,P,a,t,h);
@@ -100,7 +114,7 @@ static const XMLCh Key[] =              UNICODE_LITERAL_3(K,e,y);
 static const XMLCh password[] =         UNICODE_LITERAL_8(p,a,s,s,w,o,r,d);
 static const XMLCh Path[] =             UNICODE_LITERAL_4(P,a,t,h);
 
-FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
+FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) : m_key(NULL)
 {
 #ifdef _DEBUG
     NDC ndc("FilesystemCredentialResolver");
@@ -399,6 +413,7 @@ XSECCryptoKey* FilesystemCredentialResolver::loadKey()
 
 FilesystemCredentialResolver::~FilesystemCredentialResolver()
 {
+    delete m_key;
     for_each(m_certs.begin(),m_certs.end(),X509_free);
     for_each(m_xseccerts.begin(),m_xseccerts.end(),xmltooling::cleanup<XSECCryptoX509>());
 }

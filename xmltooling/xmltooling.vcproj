@@ -300,11 +300,19 @@
 						>
 					</File>
 					<File
+						RelativePath=".\signature\impl\InlineKeyResolver.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\signature\impl\KeyInfoImpl.cpp"
 						>
 					</File>
 					<File
 						RelativePath=".\signature\impl\KeyInfoSchemaValidators.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\signature\impl\KeyResolver.cpp"
 						>
 					</File>
 					<File

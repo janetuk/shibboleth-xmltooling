@@ -26,7 +26,7 @@
 #include "encryption/Encryption.h"
 #include "impl/UnknownElement.h"
 #include "signature/CredentialResolver.h"
-#include "signature/KeyInfo.h"
+#include "signature/KeyResolver.h"
 #include "signature/Signature.h"
 #include "util/NDC.h"
 #include "util/XMLConstants.h"
@@ -177,6 +177,7 @@ bool XMLToolingInternalConfig::init()
 #ifndef XMLTOOLING_NO_XMLSEC
         XMLObjectBuilder::registerBuilder(QName(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME),new SignatureBuilder());
         REGISTER_EXCEPTION_FACTORY(SignatureException,xmlsignature);
+        registerKeyResolvers();
         registerCredentialResolvers();
 #endif
     }
