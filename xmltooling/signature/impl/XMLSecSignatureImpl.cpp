@@ -33,6 +33,7 @@
 #include <xercesc/framework/Wrapper4InputSource.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
 #include <xsec/dsig/DSIGKeyInfoX509.hpp>
+#include <xsec/dsig/DSIGReference.hpp>
 #include <xsec/enc/XSECCryptoException.hpp>
 #include <xsec/framework/XSECException.hpp>
 
@@ -83,8 +84,6 @@ namespace xmlsignature {
         void setSigningKey(XSECCryptoKey* signingKey) {
             delete m_key;
             m_key=signingKey;
-            if (m_key)
-                releaseThisandParentDOM();
         }
         void setKeyInfo(KeyInfo* keyInfo) {
             prepareForAssignment(m_keyInfo, keyInfo);
@@ -93,7 +92,6 @@ namespace xmlsignature {
         void setContentReference(ContentReference* reference) {
             delete m_reference;
             m_reference=reference;
-            releaseThisandParentDOM();
         }
         
         void sign();
@@ -179,6 +177,10 @@ void XMLSecSignatureImpl::sign()
 
     try {
         log.debug("creating signature reference(s)");
+        // TODO: Need XML-Sec fixed to clear references.
+        //DSIGReferenceList* refs = m_signature->getReferenceList();
+        //while (refs && refs->getSize())
+        //    delete refs->removeReference(0);
         m_reference->createReferences(m_signature);
         
         log.debug("computing signature");

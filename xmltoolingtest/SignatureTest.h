@@ -135,11 +135,10 @@ public:
         for_each(m_resolver->getCertificates().begin(),m_resolver->getCertificates().end(),bind1st(_addcert(),x509Data));
         sig->setKeyInfo(keyInfo);
         
-        // Signing context for the whole document.
-        vector<Signature*> sigs(1,sig);
         DOMElement* rootElement = NULL;
         try {
-            rootElement=sxObject->marshall((DOMDocument*)NULL,&sigs);
+            rootElement=sxObject->marshall((DOMDocument*)NULL);
+            sig->sign();
         }
         catch (XMLToolingException& e) {
             TS_TRACE(e.what());
