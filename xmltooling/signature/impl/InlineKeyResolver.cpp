@@ -21,7 +21,7 @@
  */
 
 #include "internal.h"
-#include "signature/KeyResolver.h"
+#include "signature/CachingKeyResolver.h"
 #include "util/NDC.h"
 #include "util/Threads.h"
 
@@ -42,7 +42,7 @@ using namespace log4cpp;
 using namespace std;
 
 namespace xmlsignature {
-    class XMLTOOL_DLLLOCAL InlineKeyResolver : public KeyResolver
+    class XMLTOOL_DLLLOCAL InlineKeyResolver : public CachingKeyResolver
     {
     public:
         InlineKeyResolver(const DOMElement* e);
@@ -52,6 +52,14 @@ namespace xmlsignature {
         XSECCryptoKey* resolveKey(DSIGKeyInfoList* keyInfo) const;
         vector<XSECCryptoX509*>::size_type resolveCertificates(const KeyInfo* keyInfo, vector<XSECCryptoX509*>& certs) const;
         vector<XSECCryptoX509*>::size_type resolveCertificates(DSIGKeyInfoList* keyInfo, vector<XSECCryptoX509*>& certs) const;
+        
+        void clearCache() {
+            if (m_lock)
+                m_lock->wrlock();
+            m_cache.clear();
+            if (m_lock)
+                m_lock->unlock();
+        }
         
     private:
         struct XMLTOOL_DLLLOCAL CacheEntry {
@@ -89,7 +97,7 @@ InlineKeyResolver::InlineKeyResolver(const DOMElement* e) : m_lock(NULL)
 
 InlineKeyResolver::~InlineKeyResolver()
 {
-    m_cache.clear();
+    clearCache();
     delete m_lock;
 }
 

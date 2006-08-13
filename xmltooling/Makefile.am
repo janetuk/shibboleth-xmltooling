@@ -55,6 +55,7 @@ ioinclude_HEADERS = \
 	io/AbstractXMLObjectUnmarshaller.h
 
 siginclude_HEADERS = \
+	signature/CachingKeyResolver.h \
 	signature/ContentReference.h \
 	signature/CredentialResolver.h \
 	signature/KeyInfo.h \

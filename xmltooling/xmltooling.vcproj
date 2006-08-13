@@ -519,6 +519,10 @@
 				Name="signature"
 				>
 				<File
+					RelativePath=".\signature\CachingKeyResolver.h"
+					>
+				</File>
+				<File
 					RelativePath=".\signature\ContentReference.h"
 					>
 				</File>
