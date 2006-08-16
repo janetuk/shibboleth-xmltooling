@@ -205,6 +205,9 @@ AC_TRY_LINK(
             [Define if you have an STL implementation that supports useful string specialization.])],
         )
 
+# check for timegm() support
+AC_CHECK_FUNC(timegm, AC_DEFINE(HAVE_TIMEGM,1,[Define to 1 if timegm is available]))
+
 # Check for unit test support
 CXXTEST="/usr/bin/cxxtestgen.pl"
 CXXTESTFLAGS=""
