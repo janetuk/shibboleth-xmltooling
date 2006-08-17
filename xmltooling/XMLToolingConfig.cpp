@@ -25,9 +25,8 @@
 #include "XMLToolingConfig.h"
 #include "encryption/Encryption.h"
 #include "impl/UnknownElement.h"
+#include "security/TrustEngine.h"
 #include "signature/CredentialResolver.h"
-#include "signature/KeyResolver.h"
-#include "signature/Signature.h"
 #include "util/NDC.h"
 #include "util/XMLConstants.h"
 #include "validation/Validator.h"
@@ -179,6 +178,7 @@ bool XMLToolingInternalConfig::init()
         REGISTER_EXCEPTION_FACTORY(SignatureException,xmlsignature);
         registerKeyResolvers();
         registerCredentialResolvers();
+        registerTrustEngines();
 #endif
     }
     catch (const xercesc::XMLException&) {
@@ -198,6 +198,7 @@ void XMLToolingInternalConfig::term()
     XMLToolingException::deregisterFactories();
 
 #ifndef XMLTOOLING_NO_XMLSEC
+    TrustEngineManager.deregisterFactories();
     CredentialResolverManager.deregisterFactories();
     KeyResolverManager.deregisterFactories();
 #endif

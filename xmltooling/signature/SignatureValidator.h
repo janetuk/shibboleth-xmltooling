@@ -30,38 +30,62 @@
 namespace xmlsignature {
 
     /**
-     * Validator for signatures based on a KeyResolver
+     * Validator for signatures based on a Key or a KeyResolver
      */
-    class XMLTOOL_API SignatureValidator : public virtual xmltooling::Validator
+    class XMLTOOL_API SignatureValidator : public xmltooling::Validator
     {
     public:
         /**
-         * Constructor
+         * Constructor using a KeyResolver
          * 
-         * @param resolver   the key resolver to use, will be freed by Validator
+         * @param resolver the key resolver to use, will be freed by Validator
          */
-        SignatureValidator(KeyResolver* resolver) : m_resolver(resolver) {
+        SignatureValidator(KeyResolver* resolver) : m_key(NULL), m_resolver(resolver) {
+        }
+
+        /**
+         * Constructor using a Key
+         * 
+         * @param key the verification key to use, will be freed by Validator
+         */
+        SignatureValidator(XSECCryptoKey* key=NULL) : m_key(key), m_resolver(NULL) {
         }
         
         virtual ~SignatureValidator() {
+            delete m_key;
             delete m_resolver;
         }
 
-        void validate(const xmltooling::XMLObject* xmlObject) const;
+        virtual void validate(const xmltooling::XMLObject* xmlObject) const;
 
         virtual void validate(const Signature* signature) const;
         
+        /**
+         * Replace the current Key, if any, with a new one.
+         * 
+         * @param key  the Key to attach 
+         */
+        void setKey(XSECCryptoKey* key) {
+            delete m_key;
+            delete m_resolver;
+            m_resolver=NULL;
+            m_key=key;
+        }
+
         /**
          * Replace the current KeyResolver, if any, with a new one.
          * 
          * @param resolver  the KeyResolver to attach 
          */
         void setKeyResolver(KeyResolver* resolver) {
+            delete m_key;
             delete m_resolver;
+            m_key=NULL;
             m_resolver=resolver;
         }
     
     protected:
+        XSECCryptoKey* m_key;
         KeyResolver* m_resolver;
     };
 

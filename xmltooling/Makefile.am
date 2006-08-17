@@ -54,6 +54,10 @@ ioinclude_HEADERS = \
 	io/AbstractXMLObjectMarshaller.h \
 	io/AbstractXMLObjectUnmarshaller.h
 
+secinclude_HEADERS = \
+	security/TrustEngine.h \
+	security/X509TrustEngine.h
+
 siginclude_HEADERS = \
 	signature/CachingKeyResolver.h \
 	signature/ContentReference.h \
@@ -84,6 +88,8 @@ if BUILD_XMLSEC
 xmlsec_sources = \
 	encryption/impl/Decrypter.cpp \
 	encryption/impl/Encrypter.cpp \
+	security/impl/TrustEngine.cpp \
+	security/impl/ExplicitKeyTrustEngine.cpp \
 	signature/impl/CredentialResolver.cpp \
 	signature/impl/FilesystemCredentialResolver.cpp \
 	signature/impl/InlineKeyResolver.cpp \

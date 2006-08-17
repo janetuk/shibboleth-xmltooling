@@ -40,6 +40,8 @@ namespace xmlsignature {
 #endif
 
 namespace xmltooling {
+    
+    class XMLTOOL_API TrustEngine;
 
     /**
      * Singleton object that manages library startup/shutdown.configuration.
@@ -133,6 +135,11 @@ namespace xmltooling {
          * Manages factories for CredentialResolver plugins.
          */
         xmltooling::PluginManager<xmlsignature::CredentialResolver,const DOMElement*> CredentialResolverManager;
+
+        /**
+         * Manages factories for TrustEngine plugins.
+         */
+        xmltooling::PluginManager<TrustEngine,const DOMElement*> TrustEngineManager;
 #endif
 
     protected:
