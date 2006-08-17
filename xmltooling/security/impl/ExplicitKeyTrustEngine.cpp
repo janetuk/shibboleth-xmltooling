@@ -27,7 +27,7 @@
 
 #include <log4cpp/Category.hh>
 #include <xercesc/util/XMLUniDefs.hpp>
-#include <xsec/enc/openssl/OpenSSLCryptoX509.hpp>
+#include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
 
 using namespace xmlsignature;
 using namespace xmltooling;

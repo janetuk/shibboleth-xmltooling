@@ -10,6 +10,8 @@ implincludedir = $(includedir)/xmltooling/impl
 
 ioincludedir = $(includedir)/xmltooling/io
 
+secincludedir = $(includedir)/xmltooling/security
+
 sigincludedir = $(includedir)/xmltooling/signature
 
 utilincludedir = $(includedir)/xmltooling/util
