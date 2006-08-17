@@ -53,7 +53,7 @@ AC_C_CONST
 AC_TYPE_SIZE_T
 
 # Checks for library functions.
-AC_CHECK_FUNCS([strchr strdup strstr])
+AC_CHECK_FUNCS([strchr strdup strstr timegm])
 AC_CHECK_HEADERS([dlfcn.h])
 AC_CHECK_FUNC(dlclose, , [ AC_CHECK_LIB(dl, dlopen) ])
 
@@ -204,9 +204,6 @@ AC_TRY_LINK(
         [AC_DEFINE(HAVE_GOOD_STL,1,
             [Define if you have an STL implementation that supports useful string specialization.])],
         )
-
-# check for timegm() support
-AC_CHECK_FUNC(timegm, AC_DEFINE(HAVE_TIMEGM,1,[Define to 1 if timegm is available]))
 
 # Check for unit test support
 CXXTEST="/usr/bin/cxxtestgen.pl"
