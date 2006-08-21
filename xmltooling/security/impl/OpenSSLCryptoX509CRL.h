@@ -32,7 +32,7 @@
 namespace xmltooling {
     class XMLTOOL_DLLLOCAL OpenSSLCryptoX509CRL : public XSECCryptoX509CRL {
     public:
-    	OpenSSLCryptoX509CRL() : m_DERX509CRL(""), mp_X509CRL(NULL) {}
+    	OpenSSLCryptoX509CRL() : mp_X509CRL(NULL), m_DERX509CRL("") {}
     	virtual ~OpenSSLCryptoX509CRL();
 
     	virtual const XMLCh* getProviderName() const {
