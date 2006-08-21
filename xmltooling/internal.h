@@ -83,6 +83,8 @@ namespace xmltooling {
         }
 
 #ifndef XMLTOOLING_NO_XMLSEC
+        XSECCryptoX509CRL* X509CRL() const;
+
         XSECProvider* m_xsecProvider;
 #endif
 

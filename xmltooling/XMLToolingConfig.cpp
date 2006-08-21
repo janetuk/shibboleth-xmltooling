@@ -26,6 +26,7 @@
 #include "encryption/Encryption.h"
 #include "impl/UnknownElement.h"
 #include "security/TrustEngine.h"
+#include "security/impl/OpenSSLCryptoX509CRL.h"
 #include "signature/CredentialResolver.h"
 #include "util/NDC.h"
 #include "util/XMLConstants.h"
@@ -343,5 +344,10 @@ void xmltooling::log_openssl()
             log.errorStream() << "error data: " << data << CategoryStream::ENDLINE;
         code=ERR_get_error_line_data(&file,&line,&data,&flags);
     }
+}
+
+XSECCryptoX509CRL* XMLToolingInternalConfig::X509CRL() const
+{
+    return new OpenSSLCryptoX509CRL();
 }
 #endif

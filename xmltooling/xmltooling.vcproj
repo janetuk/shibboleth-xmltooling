@@ -360,7 +360,19 @@
 						>
 					</File>
 					<File
+						RelativePath=".\security\impl\OpenSSLCryptoX509CRL.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\security\impl\OpenSSLCryptoX509CRL.h"
+						>
+					</File>
+					<File
 						RelativePath=".\security\impl\TrustEngine.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\security\impl\XSECCryptoX509CRL.cpp"
 						>
 					</File>
 				</Filter>
@@ -596,6 +608,10 @@
 				</File>
 				<File
 					RelativePath=".\security\X509TrustEngine.h"
+					>
+				</File>
+				<File
+					RelativePath=".\security\XSECCryptoX509CRL.h"
 					>
 				</File>
 			</Filter>
