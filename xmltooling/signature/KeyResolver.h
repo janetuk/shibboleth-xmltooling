@@ -24,6 +24,7 @@
 #if !defined(__xmltooling_keyres_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_keyres_h__
 
+#include <xmltooling/security/XSECCryptoX509CRL.h>
 #include <xmltooling/signature/KeyInfo.h>
 
 #include <xsec/dsig/DSIGKeyInfoList.hpp>
@@ -100,6 +101,24 @@ namespace xmlsignature {
         virtual std::vector<XSECCryptoX509*>::size_type resolveCertificates(
             DSIGKeyInfoList* keyInfo, std::vector<XSECCryptoX509*>& certs 
             ) const;
+
+        /**
+         * Returns a CRL based on the supplied KeyInfo information.
+         * The caller must delete the CRL when done with it.
+         * 
+         * @param keyInfo   the key information
+         * @return  the resolved CRL
+         */
+        virtual xmltooling::XSECCryptoX509CRL* resolveCRL(const KeyInfo* keyInfo) const;
+        
+        /**
+         * Returns a CRL based on the supplied KeyInfo information.
+         * The caller must delete the CRL when done with it.
+         * 
+         * @param keyInfo   the key information
+         * @return  the resolved CRL
+         */
+        virtual xmltooling::XSECCryptoX509CRL* resolveCRL(DSIGKeyInfoList* keyInfo) const;
 
     protected:
         XSECCryptoKey* m_key;

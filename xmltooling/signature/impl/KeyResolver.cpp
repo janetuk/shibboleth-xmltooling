@@ -52,3 +52,13 @@ vector<XSECCryptoX509*>::size_type KeyResolver::resolveCertificates(
 {
     return 0;
 }
+
+XSECCryptoX509CRL* KeyResolver::resolveCRL(const KeyInfo* keyInfo) const
+{
+    return NULL;
+}
+
+XSECCryptoX509CRL* KeyResolver::resolveCRL(DSIGKeyInfoList* keyInfo) const
+{
+    return NULL;
+}

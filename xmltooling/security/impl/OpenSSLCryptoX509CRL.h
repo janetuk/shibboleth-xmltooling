@@ -48,6 +48,13 @@ namespace xmltooling {
     	X509_CRL* getOpenSSLX509CRL(void) {
             return mp_X509CRL;
         }
+
+        XSECCryptoX509CRL* clone() const {
+            OpenSSLCryptoX509CRL* copy = new OpenSSLCryptoX509CRL();
+            copy->mp_X509CRL = X509_CRL_dup(mp_X509CRL);
+            copy->m_DERX509CRL = m_DERX509CRL;
+            return copy;
+        }
     
     private:
     	X509_CRL* mp_X509CRL;

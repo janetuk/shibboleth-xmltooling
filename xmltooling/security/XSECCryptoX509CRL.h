@@ -23,6 +23,8 @@
 #if !defined(__xmltooling_x509crl_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_x509crl_h__
 
+#include <xmltooling/base.h>
+
 #include <xsec/framework/XSECDefs.hpp>
 #include <xsec/utils/XSECSafeBuffer.hpp>
 
@@ -53,6 +55,13 @@ namespace xmltooling {
     	 * @param len number of bytes of data in the CRL buffer
     	 */
     
+        /**
+         * Returns a duplicate of the original object.
+         *
+         * @return  the duplicate
+         */
+        virtual XSECCryptoX509CRL* clone() const=0;
+
     	virtual void loadX509CRLBase64Bin(const char* buf, unsigned int len)=0;
     
     	/**
