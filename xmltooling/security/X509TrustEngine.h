@@ -15,7 +15,7 @@
  */
 
 /**
- * @file security/X509TrustEngine.h
+ * @file xmltooling/security/X509TrustEngine.h
  * 
  * Extended TrustEngine interface that adds validation of X.509 credentials.
  */

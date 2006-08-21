@@ -15,7 +15,7 @@
  */
 
 /**
- * @file security/TrustEngine.h
+ * @file xmltooling/security/TrustEngine.h
  * 
  * Evaluates the trustworthiness and validity of XML Signatures against
  * implementation-specific requirements.
