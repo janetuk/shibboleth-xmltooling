@@ -23,14 +23,14 @@
 #if !defined(__xmltooling_opensslx509crl_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_opensslx509crl_h__
 
-#include "security/XSECCryptoX509CRL.h"
+#include <xmltooling/security/XSECCryptoX509CRL.h>
 
 #include <openssl/bio.h>
 #include <openssl/x509v3.h>
 #include <xsec/utils/XSECSafeBuffer.hpp>
 
 namespace xmltooling {
-    class XMLTOOL_DLLLOCAL OpenSSLCryptoX509CRL : public XSECCryptoX509CRL {
+    class XMLTOOL_API OpenSSLCryptoX509CRL : public XSECCryptoX509CRL {
     public:
     	OpenSSLCryptoX509CRL() : mp_X509CRL(NULL), m_DERX509CRL("") {}
     	virtual ~OpenSSLCryptoX509CRL();

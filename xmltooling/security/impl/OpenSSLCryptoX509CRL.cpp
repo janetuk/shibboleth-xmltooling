@@ -21,7 +21,7 @@
  */
 
 #include "internal.h"
-#include "security/impl/OpenSSLCryptoX509CRL.h"
+#include "security/OpenSSLCryptoX509CRL.h"
 
 #include <xsec/framework/XSECError.hpp>
 #include <xsec/enc/XSECCryptoException.hpp>

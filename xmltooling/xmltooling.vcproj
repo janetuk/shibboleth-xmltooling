@@ -364,10 +364,6 @@
 						>
 					</File>
 					<File
-						RelativePath=".\security\impl\OpenSSLCryptoX509CRL.h"
-						>
-					</File>
-					<File
 						RelativePath=".\security\impl\TrustEngine.cpp"
 						>
 					</File>
@@ -602,6 +598,10 @@
 			<Filter
 				Name="security"
 				>
+				<File
+					RelativePath=".\security\OpenSSLCryptoX509CRL.h"
+					>
+				</File>
 				<File
 					RelativePath=".\security\TrustEngine.h"
 					>

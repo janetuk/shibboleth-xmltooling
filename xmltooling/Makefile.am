@@ -59,7 +59,8 @@ ioinclude_HEADERS = \
 secinclude_HEADERS = \
 	security/TrustEngine.h \
 	security/X509TrustEngine.h \
-	security/XSECCryptoX509CRL.h
+	security/XSECCryptoX509CRL.h \
+	security/OpenSSLCryptoX509CRL.h
 
 siginclude_HEADERS = \
 	signature/CachingKeyResolver.h \
@@ -85,8 +86,7 @@ valinclude_HEADERS = \
 	validation/ValidatorSuite.h
 
 noinst_HEADERS = \
-	internal.h \
-	security/impl/OpenSSLCryptoX509CRL.h
+	internal.h
 
 if BUILD_XMLSEC
 xmlsec_sources = \

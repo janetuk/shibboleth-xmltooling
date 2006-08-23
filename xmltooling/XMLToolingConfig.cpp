@@ -26,7 +26,7 @@
 #include "encryption/Encryption.h"
 #include "impl/UnknownElement.h"
 #include "security/TrustEngine.h"
-#include "security/impl/OpenSSLCryptoX509CRL.h"
+#include "security/OpenSSLCryptoX509CRL.h"
 #include "signature/CredentialResolver.h"
 #include "util/NDC.h"
 #include "util/XMLConstants.h"
