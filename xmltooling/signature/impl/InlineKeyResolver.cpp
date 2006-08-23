@@ -50,8 +50,8 @@ namespace xmlsignature {
 
         XSECCryptoKey* resolveKey(const KeyInfo* keyInfo) const;
         XSECCryptoKey* resolveKey(DSIGKeyInfoList* keyInfo) const;
-        vector<XSECCryptoX509*>::size_type resolveCertificates(const KeyInfo* keyInfo, vector<XSECCryptoX509*>& certs) const;
-        vector<XSECCryptoX509*>::size_type resolveCertificates(DSIGKeyInfoList* keyInfo, vector<XSECCryptoX509*>& certs) const;
+        vector<XSECCryptoX509*>::size_type resolveCertificates(const KeyInfo* keyInfo, ResolvedCertificates& certs) const;
+        vector<XSECCryptoX509*>::size_type resolveCertificates(DSIGKeyInfoList* keyInfo, ResolvedCertificates& certs) const;
         XSECCryptoX509CRL* resolveCRL(const KeyInfo* keyInfo) const;
         XSECCryptoX509CRL* resolveCRL(DSIGKeyInfoList* keyInfo) const;
         
@@ -337,7 +337,7 @@ XSECCryptoX509CRL* InlineKeyResolver::resolveCRL(const KeyInfo* keyInfo) const
 }
 
 vector<XSECCryptoX509*>::size_type InlineKeyResolver::resolveCertificates(
-    const KeyInfo* keyInfo, vector<XSECCryptoX509*>& certs
+    const KeyInfo* keyInfo, ResolvedCertificates& certs
     ) const
 {
     // Caching?
@@ -348,8 +348,9 @@ vector<XSECCryptoX509*>::size_type InlineKeyResolver::resolveCertificates(
         if (i != m_cache.end()) {
             // Found in cache, so just return the results.
             SharedLock locker(m_lock,false);
-            certs.assign(i->second.m_certs.begin(), i->second.m_certs.end());
-            return certs.size();
+            accessCertificates(certs).assign(i->second.m_certs.begin(), i->second.m_certs.end());
+            accessOwned(certs) = false;
+            return accessCertificates(certs).size();
         }
         else {
             // Elevate lock.
@@ -362,11 +363,13 @@ vector<XSECCryptoX509*>::size_type InlineKeyResolver::resolveCertificates(
                 i = m_cache.insert(make_pair(keyInfo,CacheEntry())).first;
                 _resolve(i->first, i->second);
             }
-            certs.assign(i->second.m_certs.begin(), i->second.m_certs.end());
-            return certs.size();
+            accessCertificates(certs).assign(i->second.m_certs.begin(), i->second.m_certs.end());
+            accessOwned(certs) = false;
+            return accessCertificates(certs).size();
         }
     }
-    return _resolveCertificates(keyInfo, certs);
+    accessOwned(certs) = true;
+    return _resolveCertificates(keyInfo, accessCertificates(certs));
 }
 
 XSECCryptoKey* InlineKeyResolver::resolveKey(DSIGKeyInfoList* keyInfo) const
@@ -391,21 +394,22 @@ XSECCryptoKey* InlineKeyResolver::resolveKey(DSIGKeyInfoList* keyInfo) const
 }
 
 vector<XSECCryptoX509*>::size_type InlineKeyResolver::resolveCertificates(
-    DSIGKeyInfoList* keyInfo, vector<XSECCryptoX509*>& certs
+    DSIGKeyInfoList* keyInfo, ResolvedCertificates& certs
     ) const
 {
-    certs.clear();
+    accessCertificates(certs).clear();
+    accessOwned(certs) = false;
 	DSIGKeyInfoList::size_type sz = keyInfo->getSize();
-    for (DSIGKeyInfoList::size_type i=0; certs.empty() && i<sz; ++i) {
+    for (DSIGKeyInfoList::size_type i=0; accessCertificates(certs).empty() && i<sz; ++i) {
         if (keyInfo->item(i)->getKeyInfoType()==DSIGKeyInfo::KEYINFO_X509) {
             DSIGKeyInfoX509* x509 = static_cast<DSIGKeyInfoX509*>(keyInfo->item(i));
             int count = x509->getCertificateListSize();
             for (int j=0; j<count; ++j) {
-                certs.push_back(x509->getCertificateCryptoItem(j));
+                accessCertificates(certs).push_back(x509->getCertificateCryptoItem(j));
             }
         }
     }
-    return certs.size();
+    return accessCertificates(certs).size();
 }
 
 XSECCryptoX509CRL* InlineKeyResolver::resolveCRL(DSIGKeyInfoList* keyInfo) const

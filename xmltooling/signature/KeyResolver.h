@@ -79,15 +79,35 @@ namespace xmlsignature {
         }
 
         /**
+         * A wrapper that handles disposal of certificates when required.
+         */
+        class XMLTOOL_API ResolvedCertificates {
+            MAKE_NONCOPYABLE(ResolvedCertificates);
+            bool m_owned;
+            std::vector<XSECCryptoX509*> m_certs;
+        public:
+            ResolvedCertificates() : m_owned(false) {}
+            ~ResolvedCertificates() {
+                if (m_owned) {
+                    std::for_each(m_certs.begin(), m_certs.end(), xmltooling::cleanup<XSECCryptoX509>());
+                }
+            }
+            const std::vector<XSECCryptoX509*>& v() const {
+                return m_certs;
+            }
+            friend class XMLTOOL_API KeyResolver;
+        };
+
+        /**
          * Returns a set of certificates based on the supplied KeyInfo information.
          * The certificates must be cloned if kept beyond the lifetime of the KeyInfo source.
          * 
          * @param keyInfo   the key information
-         * @param certs     reference to vector to store certificates
+         * @param certs     reference to object to hold certificates
          * @return  number of certificates returned
          */
         virtual std::vector<XSECCryptoX509*>::size_type resolveCertificates(
-            const KeyInfo* keyInfo, std::vector<XSECCryptoX509*>& certs
+            const KeyInfo* keyInfo, ResolvedCertificates& certs
             ) const;
         
         /**
@@ -95,11 +115,11 @@ namespace xmlsignature {
          * The certificates must be cloned if kept beyond the lifetime of the KeyInfo source.
          * 
          * @param keyInfo   the key information
-         * @param certs     reference to vector to store certificates
+         * @param certs     reference to object to hold certificates
          * @return  number of certificates returned
          */
         virtual std::vector<XSECCryptoX509*>::size_type resolveCertificates(
-            DSIGKeyInfoList* keyInfo, std::vector<XSECCryptoX509*>& certs 
+            DSIGKeyInfoList* keyInfo, ResolvedCertificates& certs 
             ) const;
 
         /**
@@ -122,6 +142,26 @@ namespace xmlsignature {
 
     protected:
         XSECCryptoKey* m_key;
+
+        /**
+         * Accessor for certificate vector from derived KeyResolver classes.
+         *
+         * @param certs certificate wrapper to access
+         * @return modifiable reference to vector inside wrapper
+         */
+        std::vector<XSECCryptoX509*>& accessCertificates(ResolvedCertificates& certs) const {
+            return certs.m_certs;
+        }
+
+        /**
+         * Accessor for certificate ownership flag from derived KeyResolver classes.
+         *
+         * @param certs certificate wrapper to access
+         * @return modifiable reference to ownership flag inside wrapper
+         */
+        bool& accessOwned(ResolvedCertificates& certs) const {
+            return certs.m_owned;
+        }
     };
 
     /**

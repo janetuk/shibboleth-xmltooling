@@ -56,7 +56,7 @@ public:
         auto_ptr<XSECCryptoX509CRL> crl(m_resolver->resolveCRL(kiObject.get()));
         TSM_ASSERT("Unable to resolve CRL.", crl.get()!=NULL);
 
-        vector<XSECCryptoX509*> certs;
+        KeyResolver::ResolvedCertificates certs;
         TSM_ASSERT_EQUALS("Wrong certificate count.", m_resolver->resolveCertificates(kiObject.get(), certs), 1);
     }
 };

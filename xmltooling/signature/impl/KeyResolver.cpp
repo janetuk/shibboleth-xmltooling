@@ -40,14 +40,14 @@ void XMLTOOL_API xmlsignature::registerKeyResolvers()
 }
 
 vector<XSECCryptoX509*>::size_type KeyResolver::resolveCertificates(
-    const KeyInfo* keyInfo, vector<XSECCryptoX509*>& certs
+    const KeyInfo* keyInfo, ResolvedCertificates& certs
     ) const
 {
     return 0;
 }
 
 vector<XSECCryptoX509*>::size_type KeyResolver::resolveCertificates(
-    DSIGKeyInfoList* keyInfo, vector<XSECCryptoX509*>& certs
+    DSIGKeyInfoList* keyInfo, ResolvedCertificates& certs
     ) const
 {
     return 0;

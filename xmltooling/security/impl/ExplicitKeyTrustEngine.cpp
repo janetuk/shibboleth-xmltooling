@@ -136,20 +136,19 @@ bool ExplicitKeyTrustEngine::validate(
     // role interface to verify the EE certificate.
 
     log.debug("attempting to match key information from peer with end-entity certificate");
-    vector<XSECCryptoX509*> resolvedCerts;
     while (keyInfoSource.hasNext()) {
-        resolvedCerts.clear();
+        KeyResolver::ResolvedCertificates resolvedCerts;
         if (0 == (keyResolver ? keyResolver : m_keyResolver)->resolveCertificates(keyInfoSource.next(),resolvedCerts)) {
             log.debug("key information does not resolve to a certificate, skipping it");
             continue;
         }
 
         log.debug("checking if certificates contained within key information match end-entity certificate");
-        if (resolvedCerts.front()->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
+        if (resolvedCerts.v().front()->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
             log.error("only the OpenSSL XSEC provider is supported");
             continue;
         }
-        else if (!X509_cmp(static_cast<OpenSSLCryptoX509*>(certEE)->getOpenSSLX509(),static_cast<OpenSSLCryptoX509*>(resolvedCerts.front())->getOpenSSLX509())) {
+        else if (!X509_cmp(static_cast<OpenSSLCryptoX509*>(certEE)->getOpenSSLX509(),static_cast<OpenSSLCryptoX509*>(resolvedCerts.v().front())->getOpenSSLX509())) {
             log.info("end-entity certificate matches certificate from peer key information");
             return true;
         }

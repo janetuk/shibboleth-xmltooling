@@ -73,13 +73,15 @@ namespace xmlsignature {
         
         XSECCryptoKey* resolveKey(const KeyInfo* keyInfo) const { return m_key ? m_key->clone() : NULL; }
         XSECCryptoKey* resolveKey(DSIGKeyInfoList* keyInfo) const { return m_key ? m_key->clone() : NULL; }
-        vector<XSECCryptoX509*>::size_type resolveCertificates(const KeyInfo* keyInfo, vector<XSECCryptoX509*>& certs) const {
-            certs.assign(m_xseccerts.begin(), m_xseccerts.end());
-            return certs.size();
+        vector<XSECCryptoX509*>::size_type resolveCertificates(const KeyInfo* keyInfo, ResolvedCertificates& certs) const {
+            accessCertificates(certs).assign(m_xseccerts.begin(), m_xseccerts.end());
+            accessOwned(certs) = false;
+            return accessCertificates(certs).size();
         }
-        vector<XSECCryptoX509*>::size_type resolveCertificates(DSIGKeyInfoList* keyInfo, vector<XSECCryptoX509*>& certs) const {
-            certs.assign(m_xseccerts.begin(), m_xseccerts.end());
-            return certs.size();
+        vector<XSECCryptoX509*>::size_type resolveCertificates(DSIGKeyInfoList* keyInfo, ResolvedCertificates& certs) const {
+            accessCertificates(certs).assign(m_xseccerts.begin(), m_xseccerts.end());
+            accessOwned(certs) = false;
+            return accessCertificates(certs).size();
         }
         
     private:
