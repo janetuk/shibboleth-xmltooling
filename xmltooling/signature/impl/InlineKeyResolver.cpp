@@ -122,6 +122,9 @@ XSECCryptoKey* InlineKeyResolver::_resolveKey(const KeyInfo* keyInfo) const
 #endif
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver");
 
+    if (!keyInfo)
+        return NULL;
+
     // Check for ds:X509Data
     const vector<X509Data*>& x509Datas=keyInfo->getX509Datas();
     for (vector<X509Data*>::const_iterator j=x509Datas.begin(); j!=x509Datas.end(); ++j) {
@@ -210,6 +213,9 @@ vector<XSECCryptoX509*>::size_type InlineKeyResolver::_resolveCertificates(
 #endif
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver");
 
+    if (!keyInfo)
+        return 0;
+
     // Check for ds:X509Data
     const vector<X509Data*>& x509Datas=keyInfo->getX509Datas();
     for (vector<X509Data*>::const_iterator j=x509Datas.begin(); certs.empty() && j!=x509Datas.end(); ++j) {
@@ -248,6 +254,9 @@ XSECCryptoX509CRL* InlineKeyResolver::_resolveCRL(const KeyInfo* keyInfo) const
     NDC ndc("_resolveCRL");
 #endif
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver");
+
+    if (!keyInfo)
+        return NULL;
 
     // Check for ds:X509Data
     const vector<X509Data*>& x509Datas=keyInfo->getX509Datas();
@@ -378,6 +387,9 @@ XSECCryptoKey* InlineKeyResolver::resolveKey(DSIGKeyInfoList* keyInfo) const
     NDC ndc("resolveKey");
 #endif
 
+    if (!keyInfo)
+        return NULL;
+
     // Default resolver handles RSA/DSAKeyValue and X509Certificate elements.
     try {
         XSECKeyInfoResolverDefault def;
@@ -399,6 +411,10 @@ vector<XSECCryptoX509*>::size_type InlineKeyResolver::resolveCertificates(
 {
     accessCertificates(certs).clear();
     accessOwned(certs) = false;
+
+    if (!keyInfo)
+        return 0;
+
 	DSIGKeyInfoList::size_type sz = keyInfo->getSize();
     for (DSIGKeyInfoList::size_type i=0; accessCertificates(certs).empty() && i<sz; ++i) {
         if (keyInfo->item(i)->getKeyInfoType()==DSIGKeyInfo::KEYINFO_X509) {
@@ -417,6 +433,9 @@ XSECCryptoX509CRL* InlineKeyResolver::resolveCRL(DSIGKeyInfoList* keyInfo) const
 #ifdef _DEBUG
     NDC ndc("resolveCRL");
 #endif
+
+    if (!keyInfo)
+        return NULL;
 
     DSIGKeyInfoList::size_type sz = keyInfo->getSize();
     for (DSIGKeyInfoList::size_type i=0; i<sz; ++i) {
