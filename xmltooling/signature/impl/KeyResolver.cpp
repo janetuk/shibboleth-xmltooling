@@ -46,12 +46,7 @@ XSECCryptoKey* KeyResolver::resolveKey(const Signature* sig) const
     if (keyInfo)
         return resolveKey(keyInfo);
     DSIGSignature* native = sig->getXMLSignature();
-    if (native) {
-        DSIGKeyInfoList* nativeK = native->getKeyInfoList();
-        if (nativeK)
-            return resolveKey(nativeK);
-    }
-    return NULL;
+    return resolveKey(native ? native->getKeyInfoList() : (DSIGKeyInfoList*)NULL);
 }
 
 vector<XSECCryptoX509*>::size_type KeyResolver::resolveCertificates(
@@ -76,12 +71,7 @@ vector<XSECCryptoX509*>::size_type KeyResolver::resolveCertificates(
     if (keyInfo)
         return resolveCertificates(keyInfo, certs);
     DSIGSignature* native = sig->getXMLSignature();
-    if (native) {
-        DSIGKeyInfoList* nativeK = native->getKeyInfoList();
-        if (nativeK)
-            return resolveCertificates(nativeK, certs);
-    }
-    return NULL;
+    return resolveCertificates(native ? native->getKeyInfoList() : (DSIGKeyInfoList*)NULL, certs);
 }
 
 XSECCryptoX509CRL* KeyResolver::resolveCRL(const KeyInfo* keyInfo) const
@@ -100,10 +90,5 @@ XSECCryptoX509CRL* KeyResolver::resolveCRL(const Signature* sig) const
     if (keyInfo)
         return resolveCRL(keyInfo);
     DSIGSignature* native = sig->getXMLSignature();
-    if (native) {
-        DSIGKeyInfoList* nativeK = native->getKeyInfoList();
-        if (nativeK)
-            return resolveCRL(nativeK);
-    }
-    return NULL;
+    return resolveCRL(native ? native->getKeyInfoList() : (DSIGKeyInfoList*)NULL);
 }
