@@ -22,6 +22,7 @@
 
 #include "internal.h"
 #include "signature/KeyResolver.h"
+#include "signature/Signature.h"
 
 using namespace xmlsignature;
 using namespace xmltooling;
@@ -39,6 +40,20 @@ void XMLTOOL_API xmlsignature::registerKeyResolvers()
     conf.KeyResolverManager.registerFactory(INLINE_KEY_RESOLVER, InlineKeyResolverFactory);
 }
 
+XSECCryptoKey* KeyResolver::resolveKey(const Signature* sig) const
+{
+    const KeyInfo* keyInfo = sig->getKeyInfo();
+    if (keyInfo)
+        return resolveKey(keyInfo);
+    DSIGSignature* native = sig->getXMLSignature();
+    if (native) {
+        DSIGKeyInfoList* nativeK = native->getKeyInfoList();
+        if (nativeK)
+            return resolveKey(nativeK);
+    }
+    return NULL;
+}
+
 vector<XSECCryptoX509*>::size_type KeyResolver::resolveCertificates(
     const KeyInfo* keyInfo, ResolvedCertificates& certs
     ) const
@@ -53,6 +68,22 @@ vector<XSECCryptoX509*>::size_type KeyResolver::resolveCertificates(
     return 0;
 }
 
+vector<XSECCryptoX509*>::size_type KeyResolver::resolveCertificates(
+    const Signature* sig, ResolvedCertificates& certs
+    ) const
+{
+    const KeyInfo* keyInfo = sig->getKeyInfo();
+    if (keyInfo)
+        return resolveCertificates(keyInfo, certs);
+    DSIGSignature* native = sig->getXMLSignature();
+    if (native) {
+        DSIGKeyInfoList* nativeK = native->getKeyInfoList();
+        if (nativeK)
+            return resolveCertificates(nativeK, certs);
+    }
+    return NULL;
+}
+
 XSECCryptoX509CRL* KeyResolver::resolveCRL(const KeyInfo* keyInfo) const
 {
     return NULL;
@@ -60,5 +91,19 @@ XSECCryptoX509CRL* KeyResolver::resolveCRL(const KeyInfo* keyInfo) const
 
 XSECCryptoX509CRL* KeyResolver::resolveCRL(DSIGKeyInfoList* keyInfo) const
 {
+    return NULL;
+}
+
+XSECCryptoX509CRL* KeyResolver::resolveCRL(const Signature* sig) const
+{
+    const KeyInfo* keyInfo = sig->getKeyInfo();
+    if (keyInfo)
+        return resolveCRL(keyInfo);
+    DSIGSignature* native = sig->getXMLSignature();
+    if (native) {
+        DSIGKeyInfoList* nativeK = native->getKeyInfoList();
+        if (nativeK)
+            return resolveCRL(nativeK);
+    }
     return NULL;
 }

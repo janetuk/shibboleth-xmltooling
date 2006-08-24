@@ -34,6 +34,7 @@
 #include <vector>
 
 namespace xmlsignature {
+    class XMLTOOL_API Signature;
 
     /**
      * An API for resolving keys. The default/simple implementation
@@ -77,6 +78,15 @@ namespace xmlsignature {
         virtual XSECCryptoKey* resolveKey(DSIGKeyInfoList* keyInfo) const {
             return m_key ? m_key->clone() : NULL;
         }
+
+        /**
+         * Returns a key based on the supplied KeyInfo information.
+         * The caller must delete the key when done with it.
+         * 
+         * @param sig   signature containing the key information
+         * @return  the resolved key
+         */
+        XSECCryptoKey* resolveKey(const Signature* sig) const;
 
         /**
          * A wrapper that handles disposal of certificates when required.
@@ -123,6 +133,18 @@ namespace xmlsignature {
             ) const;
 
         /**
+         * Returns a set of certificates based on the supplied KeyInfo information.
+         * The certificates must be cloned if kept beyond the lifetime of the KeyInfo source.
+         * 
+         * @param sig   signature containing the key information
+         * @param certs     reference to object to hold certificates
+         * @return  number of certificates returned
+         */
+        std::vector<XSECCryptoX509*>::size_type resolveCertificates(
+            const Signature* sig, ResolvedCertificates& certs
+            ) const;
+
+        /**
          * Returns a CRL based on the supplied KeyInfo information.
          * The caller must delete the CRL when done with it.
          * 
@@ -139,6 +161,15 @@ namespace xmlsignature {
          * @return  the resolved CRL
          */
         virtual xmltooling::XSECCryptoX509CRL* resolveCRL(DSIGKeyInfoList* keyInfo) const;
+
+        /**
+         * Returns a CRL based on the supplied KeyInfo information.
+         * The caller must delete the CRL when done with it.
+         * 
+         * @param sig   signature containing the key information
+         * @return  the resolved CRL
+         */
+        xmltooling::XSECCryptoX509CRL* resolveCRL(const Signature* sig) const;
 
     protected:
         XSECCryptoKey* m_key;
