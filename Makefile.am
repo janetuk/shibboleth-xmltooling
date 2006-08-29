@@ -32,7 +32,11 @@ dist-hook:
 
 SUBDIRS = schemas xmltooling xmltoolingtest
 
-all-local: xmltooling.spec pkginfo doxygen-doc
+all-local: xmltooling.spec pkginfo
+
+if DX_COND_doc
+all-local: doxygen-doc
+endif
 
 xmltooling.spec: xmltooling.spec.in Makefile
 	rm -f $@.tmp
