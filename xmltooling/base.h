@@ -378,13 +378,27 @@
  * 
  * @param proper    the proper name of the attribute
  * @param upcased   the upcased name of the attribute
+ * @param def       the default/presumed value, if no explicit value has been set
  */
-#define DECL_BOOLEAN_ATTRIB(proper,upcased) \
+#define DECL_BOOLEAN_ATTRIB(proper,upcased,def) \
     public: \
         XMLTOOLING_DOXYGEN(proper attribute name) \
         static const XMLCh upcased##_ATTRIB_NAME[]; \
-        XMLTOOLING_DOXYGEN(Returns the proper attribute after a NULL indicator.) \
-        virtual std::pair<bool,bool> proper() const=0; \
+        XMLTOOLING_DOXYGEN(Returns the proper attribute or def if not set.) \
+        bool proper() const { \
+            switch (get##proper()) { \
+                case xmltooling::XMLConstants::XML_BOOL_TRUE: \
+                case xmltooling::XMLConstants::XML_BOOL_ONE: \
+                    return true; \
+                case xmltooling::XMLConstants::XML_BOOL_FALSE: \
+                case xmltooling::XMLConstants::XML_BOOL_ZERO: \
+                    return false; \
+                default: \
+                    return def; \
+            } \
+        } \
+        XMLTOOLING_DOXYGEN(Returns the proper attribute as an explicit enumerated value.) \
+        virtual xmltooling::XMLConstants::xmltooling_bool_t get##proper() const=0; \
         XMLTOOLING_DOXYGEN(Sets the proper attribute using an enumerated value.) \
         virtual void proper(xmltooling::XMLConstants::xmltooling_bool_t value)=0; \
         XMLTOOLING_DOXYGEN(Sets the proper attribute.) \
@@ -482,7 +496,7 @@
         XMLCh* m_##proper; \
     public: \
         pair<bool,int> get##proper() const { \
-            return make_pair((m_##proper!=NULL),(m_##proper!=NULL ? XMLString::parseInt(m_##proper): NULL)); \
+            return make_pair((m_##proper!=NULL),(m_##proper!=NULL ? XMLString::parseInt(m_##proper): 0)); \
         } \
         void set##proper(const XMLCh* proper) { \
             m_##proper = prepareForAssignment(m_##proper,proper); \
@@ -503,11 +517,8 @@
     protected: \
         XMLConstants::xmltooling_bool_t m_##proper; \
     public: \
-        pair<bool,bool> proper() const { \
-            return make_pair( \
-                (m_##proper!=XMLConstants::XML_BOOL_NULL), \
-                (m_##proper==XMLConstants::XML_BOOL_TRUE || m_##proper==XMLConstants::XML_BOOL_ONE) \
-                ); \
+        XMLConstants::xmltooling_bool_t get##proper() const { \
+            return m_##proper; \
         } \
         void proper(XMLConstants::xmltooling_bool_t value) { \
             if (m_##proper != value) { \
