@@ -17,6 +17,7 @@
 #include "XMLObjectBaseTestCase.h"
 
 #include <fstream>
+#include <xmltooling/signature/KeyInfo.h>
 #include <xmltooling/signature/KeyResolver.h>
 
 using namespace xmlsignature;

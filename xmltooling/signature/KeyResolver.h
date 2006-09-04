@@ -25,15 +25,16 @@
 #define __xmltooling_keyres_h__
 
 #include <xmltooling/security/XSECCryptoX509CRL.h>
-#include <xmltooling/signature/KeyInfo.h>
 
 #include <xsec/dsig/DSIGKeyInfoList.hpp>
 #include <xsec/enc/XSECCryptoKey.hpp>
 #include <xsec/enc/XSECCryptoX509.hpp>
 
+#include <algorithm>
 #include <vector>
 
 namespace xmlsignature {
+    class XMLTOOL_API KeyInfo;
     class XMLTOOL_API Signature;
 
     /**

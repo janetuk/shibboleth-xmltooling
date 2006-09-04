@@ -23,6 +23,7 @@
 #include "internal.h"
 #include "exceptions.h"
 #include "impl/UnknownElement.h"
+#include "signature/KeyInfo.h"
 #include "signature/Signature.h"
 #include "util/NDC.h"
 #include "util/XMLConstants.h"
@@ -177,10 +178,9 @@ void XMLSecSignatureImpl::sign()
 
     try {
         log.debug("creating signature reference(s)");
-        // TODO: Need XML-Sec fixed to clear references.
-        //DSIGReferenceList* refs = m_signature->getReferenceList();
-        //while (refs && refs->getSize())
-        //    delete refs->removeReference(0);
+        DSIGReferenceList* refs = m_signature->getReferenceList();
+        while (refs && refs->getSize())
+            delete refs->removeReference(0);
         m_reference->createReferences(m_signature);
         
         log.debug("computing signature");

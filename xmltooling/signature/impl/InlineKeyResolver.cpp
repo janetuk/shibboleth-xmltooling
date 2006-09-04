@@ -22,10 +22,11 @@
 
 #include "internal.h"
 #include "signature/CachingKeyResolver.h"
+#include "signature/KeyInfo.h"
 #include "util/NDC.h"
 #include "util/Threads.h"
+#include "util/XMLConstants.h"
 
-#include <algorithm>
 #include <log4cpp/Category.hh>
 #include <xercesc/util/XMLUniDefs.hpp>
 #include <xsec/dsig/DSIGKeyInfoX509.hpp>

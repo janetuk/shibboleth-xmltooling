@@ -25,7 +25,6 @@
 
 #include <xmltooling/exceptions.h>
 #include <xmltooling/XMLObjectBuilder.h>
-#include <xmltooling/signature/KeyInfo.h>
 #include <xmltooling/signature/ContentReference.h>
 #include <xmltooling/util/XMLConstants.h>
 
@@ -36,6 +35,8 @@
  * Public namespace of XML Signature classes
  */
 namespace xmlsignature {
+
+    class XMLTOOL_API KeyInfo;
 
     /**
      * XMLObject representing XML Digital Signature, version 20020212, Signature element.
