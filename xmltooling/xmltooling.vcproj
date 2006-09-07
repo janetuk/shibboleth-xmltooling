@@ -373,6 +373,22 @@
 					</File>
 				</Filter>
 			</Filter>
+			<Filter
+				Name="soap"
+				>
+				<Filter
+					Name="impl"
+					>
+					<File
+						RelativePath=".\soap\impl\SOAPImpl.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\soap\impl\SOAPSchemaValidators.cpp"
+						>
+					</File>
+				</Filter>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -612,6 +628,14 @@
 				</File>
 				<File
 					RelativePath=".\security\XSECCryptoX509CRL.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="soap"
+				>
+				<File
+					RelativePath=".\soap\SOAP.h"
 					>
 				</File>
 			</Filter>

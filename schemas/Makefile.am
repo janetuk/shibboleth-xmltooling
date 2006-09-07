@@ -28,8 +28,9 @@ CLEANFILES = catalog.xml
 
 EXTRA_DIST = \
     catalog.xml.in \
+    soap-envelope.xsd \
     xenc-schema.xsd \
     xmldsig-core-schema.xsd \
     xml.xsd \
     xmltooling.xsd
-
+    

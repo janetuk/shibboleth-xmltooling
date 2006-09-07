@@ -68,6 +68,12 @@ namespace xmltooling {
         /**  XML Encryption QName prefix ("xenc") */
         static const XMLCh XMLENC_PREFIX[];
         
+        /**  SOAP 1.1 Envelope XML namespace ("http://schemas.xmlsoap.org/soap/envelope/") */
+        static const XMLCh SOAP11ENV_NS[]; 
+
+        /**  SOAP 1.1 Envelope QName prefix ("S") */
+        static const XMLCh SOAP11ENV_PREFIX[];
+    
         /**  XML Tooling namespace ("http://www.opensaml.org/xmltooling") */
         static const XMLCh XMLTOOLING_NS[];
 

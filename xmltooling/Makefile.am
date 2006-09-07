@@ -72,6 +72,9 @@ siginclude_HEADERS = \
 	signature/Signature.h \
 	signature/SignatureValidator.h
 
+soapinclude_HEADERS = \
+	soap/SOAP.h
+
 utilinclude_HEADERS = \
 	util/DateTime.h \
 	util/NDC.h \
@@ -132,6 +135,8 @@ libxmltooling_la_SOURCES = \
 	io/AbstractXMLObjectUnmarshaller.cpp \
 	signature/impl/KeyInfoImpl.cpp \
 	signature/impl/KeyInfoSchemaValidators.cpp \
+	soap/impl/SOAPImpl.cpp \
+	soap/impl/SOAPSchemaValidators.cpp \
 	util/DateTime.cpp \
 	util/NDC.cpp \
 	util/ParserPool.cpp \

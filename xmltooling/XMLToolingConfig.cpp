@@ -28,6 +28,7 @@
 #include "security/TrustEngine.h"
 #include "security/OpenSSLCryptoX509CRL.h"
 #include "signature/CredentialResolver.h"
+#include "soap/SOAP.h"
 #include "util/NDC.h"
 #include "util/XMLConstants.h"
 #include "validation/Validator.h"
@@ -46,6 +47,7 @@
     #include <openssl/err.h>
 #endif
 
+using namespace soap11;
 using namespace xmlencryption;
 using namespace xmlsignature;
 using namespace xmltooling;
@@ -165,6 +167,7 @@ bool XMLToolingInternalConfig::init()
 
         registerKeyInfoClasses();
         registerEncryptionClasses();
+        registerSOAPClasses();
         
         REGISTER_EXCEPTION_FACTORY(XMLParserException,xmltooling);
         REGISTER_EXCEPTION_FACTORY(XMLObjectException,xmltooling);

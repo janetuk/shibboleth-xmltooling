@@ -82,6 +82,17 @@ const XMLCh XMLConstants::XMLENC_NS[] = // http://www.w3.org/2001/04/xmlenc#
 
 const XMLCh XMLConstants::XMLENC_PREFIX[] = { chLatin_x, chLatin_e, chLatin_n, chLatin_c, chNull };
 
+const XMLCh XMLConstants::SOAP11ENV_NS[] = // http://schemas.xmlsoap.org/soap/envelope/
+{ chLatin_h, chLatin_t, chLatin_t, chLatin_p, chColon, chForwardSlash, chForwardSlash,
+  chLatin_s, chLatin_c, chLatin_h, chLatin_e, chLatin_m, chLatin_a, chLatin_s, chPeriod,
+      chLatin_x, chLatin_m, chLatin_l, chLatin_s, chLatin_o, chLatin_a, chLatin_p, chPeriod,
+      chLatin_o, chLatin_r, chLatin_g, chForwardSlash,
+  chLatin_s, chLatin_o, chLatin_a, chLatin_p, chForwardSlash,
+  chLatin_e, chLatin_n, chLatin_v, chLatin_e, chLatin_l, chLatin_o, chLatin_p, chLatin_e, chForwardSlash, chNull
+};
+
+const XMLCh XMLConstants::SOAP11ENV_PREFIX[] = UNICODE_LITERAL_1(S);
+
 const XMLCh XMLConstants::XMLTOOLING_NS[] = // http://www.opensaml.org/xmltooling
 { chLatin_h, chLatin_t, chLatin_t, chLatin_p, chColon, chForwardSlash, chForwardSlash,
   chLatin_w, chLatin_w, chLatin_w, chPeriod,
