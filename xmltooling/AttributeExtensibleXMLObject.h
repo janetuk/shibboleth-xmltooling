@@ -27,6 +27,11 @@
 
 using namespace xercesc;
 
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4250 4251 )
+#endif
+
 namespace xmltooling {
 
     /**
@@ -34,27 +39,80 @@ namespace xmltooling {
      */
     class XMLTOOL_API AttributeExtensibleXMLObject : public virtual XMLObject
     {
-    public:
+    protected:
         AttributeExtensibleXMLObject() {}
+        
+    public:
         virtual ~AttributeExtensibleXMLObject() {}
         
         /**
-         * Gets the value of an XML attribute of the object
+         * Gets the value of an XML attribute of the object.
          * 
          * @param   qualifiedName   qualified name of the attribute   
          * @return the attribute value, or NULL
          */
-        virtual const XMLCh* getAttribute(QName& qualifiedName) const=0;
+        virtual const XMLCh* getAttribute(const QName& qualifiedName) const=0;
         
         /**
-         * Sets (or clears) an XML attribute of the object 
+         * Sets (or clears) an XML attribute of the object.
          * 
          * @param qualifiedName qualified name of the attribute   
          * @param value         value to set, or NULL to clear
+         * @param ID            true iff the attribute is an XML ID
          */
-        virtual void setAttribute(QName& qualifiedName, const XMLCh* value)=0;
+        virtual void setAttribute(const QName& qualifiedName, const XMLCh* value, bool ID=false)=0;
+
+        /**
+         * Gets an immutable map of the extended XML attributes of the object.
+         * 
+         * This set is not guaranteed to (and generally will not) include
+         * attributes defined directly on the object's "type".
+         */
+        virtual const std::map<QName,XMLCh*>& getExtensionAttributes() const=0;
+        
+        /**
+         * Gets an immutable list of all the ID attributes currently registered.
+         * 
+         * @return list of all the ID attributes currently registered
+         */
+        static const std::set<QName>& getRegisteredIDAttributes() {
+            return m_idAttributeSet;
+        }
+    
+        /**
+         * Registers a new attribute as being of XML ID type.
+         * 
+         * @param name the qualified attribute name
+         */
+        static void registerIDAttribute(const QName& name) {
+            m_idAttributeSet.insert(name);
+        }
+
+        /**
+         * Deregisters an ID attribute.
+         * 
+         * @param name the qualified attribute name
+         */
+        static void deregisterIDAttribute(const QName& name) {
+            m_idAttributeSet.erase(name);
+        }
+        
+        /**
+         * Deregisters all ID attributes.
+         */
+        static void deregisterIDAttributes() {
+            m_idAttributeSet.clear();
+        }
+
+    private:
+        /** Set of attributes to treat as XML IDs. */
+        static std::set<QName> m_idAttributeSet;
     };
     
 };
+
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
 
 #endif /* __xmltooling_attrextxmlobj_h__ */

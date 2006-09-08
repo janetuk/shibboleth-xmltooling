@@ -184,6 +184,10 @@ bool XMLToolingInternalConfig::init()
         registerCredentialResolvers();
         registerTrustEngines();
 #endif
+
+        // Register xml:id as an ID attribute.        
+        static const XMLCh xmlid[] = UNICODE_LITERAL_2(i,d);
+        AttributeExtensibleXMLObject::registerIDAttribute(QName(XMLConstants::XML_NS, xmlid)); 
     }
     catch (const xercesc::XMLException&) {
         log.fatal("caught exception while initializing Xerces");
@@ -200,6 +204,7 @@ void XMLToolingInternalConfig::term()
     KeyInfoSchemaValidators.destroyValidators();
     EncryptionSchemaValidators.destroyValidators();
     XMLToolingException::deregisterFactories();
+    AttributeExtensibleXMLObject::deregisterIDAttributes();
 
 #ifndef XMLTOOLING_NO_XMLSEC
     TrustEngineManager.deregisterFactories();

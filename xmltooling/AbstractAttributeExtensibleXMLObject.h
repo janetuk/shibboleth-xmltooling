@@ -38,26 +38,40 @@ namespace xmltooling {
      * AbstractXMLObject mixin that implements AttributeExtensibleXMLObject.
      * Inherit from this class to add support for attribute wildcarding.
      */
-    class XMLTOOL_API AbstractAttributeExtensibleXMLObject : public virtual AttributeExtensibleXMLObject, public virtual AbstractXMLObject
+    class XMLTOOL_API AbstractAttributeExtensibleXMLObject
+        : public virtual AttributeExtensibleXMLObject, public virtual AbstractXMLObject
     {
     public:
         virtual ~AbstractAttributeExtensibleXMLObject();
         
-        virtual const XMLCh* getAttribute(QName& qualifiedName) const {
+        const XMLCh* getAttribute(const QName& qualifiedName) const {
             std::map<QName,XMLCh*>::const_iterator i=m_attributeMap.find(qualifiedName);
             return (i==m_attributeMap.end()) ? NULL : i->second;
         }
         
-        virtual void setAttribute(QName& qualifiedName, const XMLCh* value);
+        void setAttribute(const QName& qualifiedName, const XMLCh* value, bool ID=false);
+    
+        const std::map<QName,XMLCh*>& getExtensionAttributes() const {
+            return m_attributeMap;
+        }
+        
+        const XMLCh* getXMLID() const {
+            return (m_idAttribute == m_attributeMap.end()) ? NULL : m_idAttribute->second;
+        }
     
      protected:
-        AbstractAttributeExtensibleXMLObject() {}
+        AbstractAttributeExtensibleXMLObject() {
+            m_idAttribute = m_attributeMap.end();
+        }
 
         /** Copy constructor. */
         AbstractAttributeExtensibleXMLObject(const AbstractAttributeExtensibleXMLObject& src);
 
         /** Map of arbitrary attributes. */
         std::map<QName,XMLCh*> m_attributeMap;
+        
+        /** Points to the last attribute designated as an XML ID. */
+        std::map<QName,XMLCh*>::const_iterator m_idAttribute;
     };
     
 };

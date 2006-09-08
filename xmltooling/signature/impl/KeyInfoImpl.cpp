@@ -694,7 +694,7 @@ namespace xmlsignature {
         }
         
         IMPL_XMLOBJECT_CLONE(KeyInfo);
-        IMPL_STRING_ATTRIB(Id);
+        IMPL_ID_ATTRIB(Id);
         IMPL_TYPED_CHILDREN(KeyName,m_children.end());
         IMPL_TYPED_CHILDREN(KeyValue,m_children.end());
         IMPL_TYPED_CHILDREN(RetrievalMethod,m_children.end());

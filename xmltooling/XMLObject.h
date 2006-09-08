@@ -104,6 +104,13 @@ namespace xmltooling {
         virtual const QName* getSchemaType() const=0;
         
         /**
+         * Gets the value of the ID attribute set on this object, if any.
+         * 
+         * @return an ID value or NULL 
+         */
+        virtual const XMLCh* getXMLID() const=0;
+        
+        /**
          * Checks to see if this object has a parent.
          * 
          * @return true if the object has a parent, false if not

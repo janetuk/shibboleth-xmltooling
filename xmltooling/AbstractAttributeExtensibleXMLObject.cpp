@@ -29,6 +29,8 @@
 using namespace xmltooling;
 using namespace std;
 
+set<QName> AttributeExtensibleXMLObject::m_idAttributeSet;
+
 AbstractAttributeExtensibleXMLObject::~AbstractAttributeExtensibleXMLObject()
 {
     for (map<QName,XMLCh*>::iterator i=m_attributeMap.begin(); i!=m_attributeMap.end(); i++)
@@ -38,12 +40,16 @@ AbstractAttributeExtensibleXMLObject::~AbstractAttributeExtensibleXMLObject()
 AbstractAttributeExtensibleXMLObject::AbstractAttributeExtensibleXMLObject(const AbstractAttributeExtensibleXMLObject& src)
     : AbstractXMLObject(src)
 {
+    m_idAttribute = m_attributeMap.end();
     for (map<QName,XMLCh*>::const_iterator i=src.m_attributeMap.begin(); i!=src.m_attributeMap.end(); i++) {
         m_attributeMap[i->first] = XMLString::replicate(i->second);
     }
+    if (src.m_idAttribute != src.m_attributeMap.end()) {
+        m_idAttribute = m_attributeMap.find(src.m_idAttribute->first);
+    }
 }
 
-void AbstractAttributeExtensibleXMLObject::setAttribute(QName& qualifiedName, const XMLCh* value)
+void AbstractAttributeExtensibleXMLObject::setAttribute(const QName& qualifiedName, const XMLCh* value, bool ID)
 {
     map<QName,XMLCh*>::iterator i=m_attributeMap.find(qualifiedName);
     if (i!=m_attributeMap.end()) {
@@ -53,11 +59,20 @@ void AbstractAttributeExtensibleXMLObject::setAttribute(QName& qualifiedName, co
             i->second=XMLString::replicate(value);
         }
         else {
+            if (m_idAttribute==i)
+                m_idAttribute=m_attributeMap.end();
             m_attributeMap.erase(i);
+        }
+        
+        if (ID) {
+            m_idAttribute=i;
         }
     }
     else if (value) {
         releaseThisandParentDOM();
         m_attributeMap[qualifiedName]=XMLString::replicate(value);
+        if (ID) {
+            m_idAttribute = m_attributeMap.find(qualifiedName);
+        } 
     }
 }

@@ -96,6 +96,7 @@ public:
         return new SimpleXMLObject(*this);
     }
 
+    const XMLCh* getXMLID() const { return getId(); }
     const XMLCh* getId() const { return m_id; }
     void setId(const XMLCh* id) { m_id=prepareForAssignment(m_id,id); }
 

@@ -455,6 +455,18 @@
     IMPL_XMLOBJECT_ATTRIB(proper,XMLCh)
 
 /**
+ * Implements get/set methods and a private member for a string XML attribute,
+ * plus a getXMLID override.
+ * 
+ * @param proper    the proper name of the attribute
+ */
+#define IMPL_ID_ATTRIB(proper) \
+    IMPL_XMLOBJECT_ATTRIB(proper,XMLCh) \
+    const XMLCh* getXMLID() const { \
+        return m_##proper; \
+    }
+
+/**
  * Implements get/set methods and a private member for a DateTime XML attribute.
  * 
  * @param proper    the proper name of the attribute

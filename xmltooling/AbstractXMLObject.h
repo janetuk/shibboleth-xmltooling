@@ -69,6 +69,10 @@ namespace xmltooling {
         const QName* getSchemaType() const {
             return m_typeQname;
         }
+        
+        const XMLCh* getXMLID() const {
+            return NULL;
+        }
     
         bool hasParent() const {
             return m_parent != NULL;
