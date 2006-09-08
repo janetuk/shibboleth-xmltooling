@@ -116,14 +116,7 @@ namespace {
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            // Take care of wildcard.
-            for (map<QName,XMLCh*>::const_iterator i=m_attributeMap.begin(); i!=m_attributeMap.end(); i++) {
-                DOMAttr* attr=domElement->getOwnerDocument()->createAttributeNS(i->first.getNamespaceURI(),i->first.getLocalPart());
-                if (i->first.hasPrefix())
-                    attr->setPrefix(i->first.getPrefix());
-                attr->setNodeValue(i->second);
-                domElement->setAttributeNode(attr);
-            }
+            marshallExtensionAttributes(domElement);
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -131,8 +124,7 @@ namespace {
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            QName q(attribute->getNamespaceURI(),attribute->getLocalName(),attribute->getPrefix()); 
-            setAttribute(q,attribute->getNodeValue());
+            unmarshallExtensionAttribute(attribute);
         }
     };
 
@@ -250,15 +242,7 @@ namespace {
     protected:
         void marshallAttributes(DOMElement* domElement) const {
             MARSHALL_STRING_ATTRIB(EncodingStyle,ENCODINGSTYLE,XMLConstants::SOAP11ENV_NS);
-
-            // Take care of wildcard.
-            for (map<QName,XMLCh*>::const_iterator i=m_attributeMap.begin(); i!=m_attributeMap.end(); i++) {
-                DOMAttr* attr=domElement->getOwnerDocument()->createAttributeNS(i->first.getNamespaceURI(),i->first.getLocalPart());
-                if (i->first.hasPrefix())
-                    attr->setPrefix(i->first.getPrefix());
-                attr->setNodeValue(i->second);
-                domElement->setAttributeNode(attr);
-            }
+            marshallExtensionAttributes(domElement);
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -266,8 +250,7 @@ namespace {
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            QName q(attribute->getNamespaceURI(),attribute->getLocalName(),attribute->getPrefix()); 
-            setAttribute(q,attribute->getNodeValue());
+            unmarshallExtensionAttribute(attribute);
         }
     };
 
@@ -329,15 +312,7 @@ namespace {
         void marshallAttributes(DOMElement* domElement) const {
             MARSHALL_STRING_ATTRIB(Actor,ACTOR,XMLConstants::SOAP11ENV_NS);
             MARSHALL_BOOLEAN_ATTRIB(MustUnderstand,MUSTUNDERSTAND,XMLConstants::SOAP11ENV_NS);
-
-            // Take care of wildcard.
-            for (map<QName,XMLCh*>::const_iterator i=m_attributeMap.begin(); i!=m_attributeMap.end(); i++) {
-                DOMAttr* attr=domElement->getOwnerDocument()->createAttributeNS(i->first.getNamespaceURI(),i->first.getLocalPart());
-                if (i->first.hasPrefix())
-                    attr->setPrefix(i->first.getPrefix());
-                attr->setNodeValue(i->second);
-                domElement->setAttributeNode(attr);
-            }
+            marshallExtensionAttributes(domElement);
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -345,8 +320,7 @@ namespace {
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            QName q(attribute->getNamespaceURI(),attribute->getLocalName(),attribute->getPrefix()); 
-            setAttribute(q,attribute->getNodeValue());
+            unmarshallExtensionAttribute(attribute);
         }
     };
 
@@ -389,14 +363,7 @@ namespace {
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            // Take care of wildcard.
-            for (map<QName,XMLCh*>::const_iterator i=m_attributeMap.begin(); i!=m_attributeMap.end(); i++) {
-                DOMAttr* attr=domElement->getOwnerDocument()->createAttributeNS(i->first.getNamespaceURI(),i->first.getLocalPart());
-                if (i->first.hasPrefix())
-                    attr->setPrefix(i->first.getPrefix());
-                attr->setNodeValue(i->second);
-                domElement->setAttributeNode(attr);
-            }
+            marshallExtensionAttributes(domElement);
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -406,8 +373,7 @@ namespace {
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            QName q(attribute->getNamespaceURI(),attribute->getLocalName(),attribute->getPrefix()); 
-            setAttribute(q,attribute->getNodeValue());
+            unmarshallExtensionAttribute(attribute);
         }
     };
 };

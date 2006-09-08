@@ -78,6 +78,15 @@ namespace xmltooling {
         static const std::set<QName>& getRegisteredIDAttributes() {
             return m_idAttributeSet;
         }
+        
+        /**
+         * Tests whether an XML attribute is registered as an XML ID.
+         * 
+         * @return true iff the attribute name matches a registered XML ID attribute 
+         */
+        static bool isRegisteredIDAttribute(const QName& name) {
+            return m_idAttributeSet.find(name)!=m_idAttributeSet.end();
+        }
     
         /**
          * Registers a new attribute as being of XML ID type.

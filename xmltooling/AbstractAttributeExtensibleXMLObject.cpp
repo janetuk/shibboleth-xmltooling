@@ -76,3 +76,26 @@ void AbstractAttributeExtensibleXMLObject::setAttribute(const QName& qualifiedNa
         } 
     }
 }
+
+void AbstractAttributeExtensibleXMLObject::unmarshallExtensionAttribute(const DOMAttr* attribute)
+{
+    QName q(attribute->getNamespaceURI(),attribute->getLocalName(),attribute->getPrefix());
+    bool ID = isRegisteredIDAttribute(q); 
+    setAttribute(q,attribute->getNodeValue(),ID);
+    if (ID) {
+        attribute->getOwnerElement()->setIdAttributeNode(attribute);
+    }
+}
+
+void AbstractAttributeExtensibleXMLObject::marshallExtensionAttributes(DOMElement* domElement) const
+{
+    for (map<QName,XMLCh*>::const_iterator i=m_attributeMap.begin(); i!=m_attributeMap.end(); i++) {
+        DOMAttr* attr=domElement->getOwnerDocument()->createAttributeNS(i->first.getNamespaceURI(),i->first.getLocalPart());
+        if (i->first.hasPrefix())
+            attr->setPrefix(i->first.getPrefix());
+        attr->setNodeValue(i->second);
+        domElement->setAttributeNode(attr);
+        if (m_idAttribute==i)
+            domElement->setIdAttributeNode(attr);
+    }
+}

@@ -67,6 +67,21 @@ namespace xmltooling {
         /** Copy constructor. */
         AbstractAttributeExtensibleXMLObject(const AbstractAttributeExtensibleXMLObject& src);
 
+        /**
+         * Assists in the unmarshalling of extension attributes.
+         * 
+         * @param attribute the DOM attribute node being unmarshalled
+         */
+        void unmarshallExtensionAttribute(const DOMAttr* attribute);
+
+        /**
+         * Assists in the marshalling of extension attributes.
+         * 
+         * @param domElement    the DOM element against which to marshall the attributes
+         */
+        void marshallExtensionAttributes(DOMElement* domElement) const;
+    
+    private:
         /** Map of arbitrary attributes. */
         std::map<QName,XMLCh*> m_attributeMap;
         

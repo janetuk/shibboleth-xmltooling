@@ -281,7 +281,7 @@ namespace xmlencryption {
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptionProperty);
-        IMPL_STRING_ATTRIB(Id);
+        IMPL_ID_ATTRIB(Id);
         IMPL_STRING_ATTRIB(Target);
 
         void setAttribute(QName& qualifiedName, const XMLCh* value) {
@@ -302,15 +302,7 @@ namespace xmlencryption {
         void marshallAttributes(DOMElement* domElement) const {
             MARSHALL_ID_ATTRIB(Id,ID,NULL);
             MARSHALL_STRING_ATTRIB(Target,TARGET,NULL);
-
-            // Take care of wildcard.
-            for (map<QName,XMLCh*>::const_iterator i=m_attributeMap.begin(); i!=m_attributeMap.end(); i++) {
-                DOMAttr* attr=domElement->getOwnerDocument()->createAttributeNS(i->first.getNamespaceURI(),i->first.getLocalPart());
-                if (i->first.hasPrefix())
-                    attr->setPrefix(i->first.getPrefix());
-                attr->setNodeValue(i->second);
-                domElement->setAttributeNode(attr);
-            }
+            marshallExtensionAttributes(domElement);
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -319,8 +311,7 @@ namespace xmlencryption {
 
         void processAttribute(const DOMAttr* attribute) {
             PROC_ID_ATTRIB(Id,ID,NULL);
-            QName q(attribute->getNamespaceURI(),attribute->getLocalName(),attribute->getPrefix()); 
-            setAttribute(q,attribute->getNodeValue());
+            unmarshallExtensionAttribute(attribute);
         }
     };
 
@@ -355,7 +346,7 @@ namespace xmlencryption {
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptionProperties);
-        IMPL_STRING_ATTRIB(Id);
+        IMPL_ID_ATTRIB(Id);
         IMPL_TYPED_CHILDREN(EncryptionProperty,m_children.end());
 
     protected:
@@ -562,7 +553,7 @@ namespace xmlencryption {
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptedType);
-        IMPL_STRING_ATTRIB(Id);
+        IMPL_ID_ATTRIB(Id);
         IMPL_STRING_ATTRIB(Type);
         IMPL_STRING_ATTRIB(MimeType);
         IMPL_STRING_ATTRIB(Encoding);
