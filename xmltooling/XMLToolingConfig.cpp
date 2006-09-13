@@ -161,6 +161,22 @@ bool XMLToolingInternalConfig::init()
         m_parserPool=new ParserPool();
         m_validatingPool=new ParserPool(true,true);
         m_lock=xercesc::XMLPlatformUtils::makeMutex();
+        
+        // Load catalogs from path.
+        if (!catalog_path.empty()) {
+            char* catpath=strdup(catalog_path.c_str());
+            char* sep=NULL;
+            char* start=catpath;
+            while (start && *start) {
+                sep=strchr(start,PATH_SEPARATOR_CHAR);
+                if (sep)
+                    *sep=0;
+                auto_ptr_XMLCh temp(start);
+                m_validatingPool->loadCatalog(temp.get());
+                start = sep ? sep + 1 : NULL;
+            }
+            free(catpath);
+        }
 
         // default registrations
         XMLObjectBuilder::registerDefaultBuilder(new UnknownElementBuilder());

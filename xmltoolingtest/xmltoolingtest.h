@@ -30,13 +30,15 @@ class ToolingFixture : public CxxTest::GlobalFixture
 public:
     bool setUpWorld() {
         XMLToolingConfig::getConfig().log_config();
-        if (!XMLToolingConfig::getConfig().init())
-            return false;
+
         if (getenv("XMLTOOLINGTEST_DATA"))
             data_path=std::string(getenv("XMLTOOLINGTEST_DATA")) + "/";
-        std::string catpath=data_path + "catalog.xml";
-        auto_ptr_XMLCh temp(catpath.c_str());
-        return XMLToolingConfig::getConfig().getValidatingParser().loadCatalog(temp.get());
+        XMLToolingConfig::getConfig().catalog_path = data_path + "catalog.xml";
+
+        if (!XMLToolingConfig::getConfig().init())
+            return false;
+        
+        return true;
     }
     bool tearDownWorld() {
         XMLToolingConfig::getConfig().term();

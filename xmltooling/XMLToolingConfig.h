@@ -125,6 +125,13 @@ namespace xmltooling {
          * @return reference to a validating parser pool.
          */
         virtual ParserPool& getValidatingParser() const=0;
+        
+        /**
+         * Set to catalog files to load into validating parser pool at initialization time.
+         * Like other path settings, the separator depends on the platform
+         * (semicolon on Windows, colon otherwise). 
+         */
+        std::string catalog_path;
 
 #ifndef XMLTOOLING_NO_XMLSEC
         /**
