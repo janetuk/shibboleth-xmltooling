@@ -14,6 +14,8 @@ secincludedir = $(includedir)/xmltooling/security
 
 sigincludedir = $(includedir)/xmltooling/signature
 
+soapincludedir = $(includedir)/xmltooling/soap
+
 utilincludedir = $(includedir)/xmltooling/util
 
 valincludedir = $(includedir)/xmltooling/validation
