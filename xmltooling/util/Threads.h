@@ -78,7 +78,13 @@ namespace xmltooling
          * @param return_val    the return value for the thread
          */
         static void exit(void* return_val);
-        
+
+        /**
+         * Sleeps the current thread for the specified amount of time.
+         * 
+         * @param seconds   time to sleep
+         */
+        static void sleep(int secounds);        
 #ifndef WIN32
         /**
          * Masks all signals from a thread. 

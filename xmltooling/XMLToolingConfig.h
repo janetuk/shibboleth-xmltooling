@@ -41,6 +41,7 @@ namespace xmlsignature {
 
 namespace xmltooling {
     
+    class XMLTOOL_API StorageService;
     class XMLTOOL_API TrustEngine;
     class XMLTOOL_API XSECCryptoX509CRL;
 
@@ -53,7 +54,9 @@ namespace xmltooling {
      */
     class XMLTOOL_API XMLToolingConfig : public Lockable
     {
-    MAKE_NONCOPYABLE(XMLToolingConfig);
+        MAKE_NONCOPYABLE(XMLToolingConfig);
+    protected:
+        XMLToolingConfig() : clock_skew_secs(180) {}
     public:
         virtual ~XMLToolingConfig() {}
 
@@ -127,11 +130,17 @@ namespace xmltooling {
         virtual ParserPool& getValidatingParser() const=0;
         
         /**
-         * Set to catalog files to load into validating parser pool at initialization time.
+         * List of catalog files to load into validating parser pool at initialization time.
          * Like other path settings, the separator depends on the platform
          * (semicolon on Windows, colon otherwise). 
          */
         std::string catalog_path;
+        
+        /**
+         * Adjusts any clock comparisons to be more liberal/permissive by the
+         * indicated number of seconds.
+         */
+        unsigned int clock_skew_secs;
 
 #ifndef XMLTOOLING_NO_XMLSEC
         /**
@@ -155,8 +164,10 @@ namespace xmltooling {
         PluginManager<TrustEngine,const DOMElement*> TrustEngineManager;
 #endif
 
-    protected:
-        XMLToolingConfig() {}
+        /**
+         * Manages factories for StorageService plugins.
+         */
+        PluginManager<StorageService,const DOMElement*> StorageServiceManager;
     };
 
 };

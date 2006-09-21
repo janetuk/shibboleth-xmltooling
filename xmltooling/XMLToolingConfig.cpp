@@ -30,6 +30,7 @@
 #include "signature/CredentialResolver.h"
 #include "soap/SOAP.h"
 #include "util/NDC.h"
+#include "util/StorageService.h"
 #include "util/XMLConstants.h"
 #include "validation/Validator.h"
 
@@ -62,6 +63,8 @@ DECL_EXCEPTION_FACTORY(UnknownElementException,xmltooling);
 DECL_EXCEPTION_FACTORY(UnknownAttributeException,xmltooling);
 DECL_EXCEPTION_FACTORY(UnknownExtensionException,xmltooling);
 DECL_EXCEPTION_FACTORY(ValidationException,xmltooling);
+DECL_EXCEPTION_FACTORY(XMLSecurityException,xmltooling);
+DECL_EXCEPTION_FACTORY(IOException,xmltooling);
 
 #ifndef XMLTOOLING_NO_XMLSEC
     DECL_EXCEPTION_FACTORY(SignatureException,xmlsignature);
@@ -192,6 +195,8 @@ bool XMLToolingInternalConfig::init()
         REGISTER_EXCEPTION_FACTORY(UnknownElementException,xmltooling);
         REGISTER_EXCEPTION_FACTORY(UnknownAttributeException,xmltooling);
         REGISTER_EXCEPTION_FACTORY(ValidationException,xmltooling);
+        REGISTER_EXCEPTION_FACTORY(XMLSecurityException,xmltooling);
+        REGISTER_EXCEPTION_FACTORY(IOException,xmltooling);
         
 #ifndef XMLTOOLING_NO_XMLSEC
         XMLObjectBuilder::registerBuilder(QName(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME),new SignatureBuilder());
@@ -200,6 +205,7 @@ bool XMLToolingInternalConfig::init()
         registerCredentialResolvers();
         registerTrustEngines();
 #endif
+        registerStorageServices();
 
         // Register xml:id as an ID attribute.        
         static const XMLCh xmlid[] = UNICODE_LITERAL_2(i,d);

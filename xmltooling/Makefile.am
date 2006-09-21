@@ -81,6 +81,7 @@ utilinclude_HEADERS = \
 	util/DateTime.h \
 	util/NDC.h \
 	util/ParserPool.h \
+	util/StorageService.h \
 	util/Threads.h \
 	util/XMLConstants.h \
 	util/XMLHelper.h \
@@ -132,6 +133,7 @@ libxmltooling_la_SOURCES = \
 	encryption/impl/EncryptionImpl.cpp \
 	encryption/impl/EncryptionSchemaValidators.cpp \
 	impl/AnyElement.cpp \
+	impl/MemoryStorageService.cpp \
 	impl/UnknownElement.cpp \
 	io/AbstractXMLObjectMarshaller.cpp \
 	io/AbstractXMLObjectUnmarshaller.cpp \
@@ -142,6 +144,7 @@ libxmltooling_la_SOURCES = \
 	util/DateTime.cpp \
 	util/NDC.cpp \
 	util/ParserPool.cpp \
+	util/StorageService.cpp \
 	util/XMLConstants.cpp \
 	util/XMLHelper.cpp \
 	validation/ValidatorSuite.cpp \

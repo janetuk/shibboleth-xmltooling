@@ -383,6 +383,11 @@ void Thread::exit(void* return_val)
     ExitThread((DWORD)return_val);
 }
 
+void Thread::sleep(int seconds)
+{
+    Sleep(seconds * 1000);
+}
+
 Mutex * Mutex::create()
 {
     return new MutexImpl();

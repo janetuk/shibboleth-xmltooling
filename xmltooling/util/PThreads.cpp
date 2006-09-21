@@ -269,7 +269,12 @@ void Thread::exit(void* return_val)
 {
     pthread_exit(return_val);
 }
-    
+
+void Thread::sleep(int seconds)
+{
+    sleep(seconds);
+}
+
 void Thread::mask_all_signals(void)
 {
     sigset_t sigmask;
