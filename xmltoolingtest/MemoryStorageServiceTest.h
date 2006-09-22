@@ -30,18 +30,19 @@ public:
         auto_ptr<StorageService> storage(
             XMLToolingConfig::getConfig().StorageServiceManager.newPlugin(MEMORY_STORAGE_SERVICE,NULL)
             );
+        auto_ptr<StorageService::StorageHandle> handle(storage->createHandle());
 
         string data;
-        TSM_ASSERT("Record found in storage.", !storage->readString("foo1", data));
-        storage->createString("foo1", "bar1", time(NULL) - 300);
-        storage->createString("foo2", "bar2", time(NULL));
-        TSM_ASSERT("Record not found in storage.", storage->readString("foo1", data));
+        TSM_ASSERT("Record found in storage.", !storage->readString(handle.get(), "foo1", data));
+        storage->createString(handle.get(), "foo1", "bar1", time(NULL) - 300);
+        storage->createString(handle.get(), "foo2", "bar2", time(NULL));
+        TSM_ASSERT("Record not found in storage.", storage->readString(handle.get(), "foo1", data));
         TSM_ASSERT_EQUALS("Record value doesn't match.", data, "bar1");
-        TSM_ASSERT("Update failed.", storage->updateString("foo2", "bar1"));
-        TSM_ASSERT("Record not found in storage.", storage->readString("foo2", data));
+        TSM_ASSERT("Update failed.", storage->updateString(handle.get(), "foo2", "bar1"));
+        TSM_ASSERT("Record not found in storage.", storage->readString(handle.get(), "foo2", data));
         TSM_ASSERT_EQUALS("Record value doesn't match.", data, "bar1");
-        TSM_ASSERT("Delete failed.", storage->deleteString("foo2"));
-        storage->reap();
+        TSM_ASSERT("Delete failed.", storage->deleteString(handle.get(), "foo2"));
+        storage->reap(handle.get());
         Thread::sleep(1);
     }
 };

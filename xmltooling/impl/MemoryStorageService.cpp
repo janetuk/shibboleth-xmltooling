@@ -40,27 +40,29 @@ namespace xmltooling {
         MemoryStorageService(const DOMElement* e);
         virtual ~MemoryStorageService();
         
-        void createString(const char* key, const char* value, time_t expiration);
-        bool readString(const char* key, string& value, time_t modifiedSince=0);
-        bool updateString(const char* key, const char* value=NULL, time_t expiration=0);
-        bool deleteString(const char* key);
+        StorageHandle* createHandle();
         
-        void createText(const char* key, const char* value, time_t expiration) {
-            return createString(key, value, expiration);
+        void createString(StorageHandle* handle, const char* key, const char* value, time_t expiration);
+        bool readString(StorageHandle* handle, const char* key, string& value, time_t modifiedSince=0);
+        bool updateString(StorageHandle* handle, const char* key, const char* value=NULL, time_t expiration=0);
+        bool deleteString(StorageHandle* handle, const char* key);
+        
+        void createText(StorageHandle* handle, const char* key, const char* value, time_t expiration) {
+            return createString(handle, key, value, expiration);
         }
-        bool readText(const char* key, string& value, time_t modifiedSince=0) {
-            return readString(key, value, modifiedSince);
+        bool readText(StorageHandle* handle, const char* key, string& value, time_t modifiedSince=0) {
+            return readString(handle, key, value, modifiedSince);
         }
-        bool updateText(const char* key, const char* value=NULL, time_t expiration=0) {
-            return updateString(key, value, expiration);
+        bool updateText(StorageHandle* handle, const char* key, const char* value=NULL, time_t expiration=0) {
+            return updateString(handle, key, value, expiration);
         }
-        bool deleteText(const char* key) {
-            return deleteString(key);
+        bool deleteText(StorageHandle* handle, const char* key) {
+            return deleteString(handle, key);
         }
         
-        void reap() {
-            shutdown_wait->signal();
-        }
+        void reap(StorageHandle* handle);
+
+        void removeHandle(StorageHandle* handle);
 
     private:
         void cleanup();
@@ -72,9 +74,20 @@ namespace xmltooling {
             time_t modified, expiration;
         };
         
-        map<string,Record> m_dataMap;
-        multimap<time_t,string> m_expMap;
-        RWLock* m_lock;
+        struct XMLTOOL_DLLLOCAL MemoryHandle : public StorageHandle {
+            MemoryHandle(StorageService* storage) : StorageHandle(storage), m_lock(RWLock::create()) {}
+            virtual ~MemoryHandle() {
+                delete m_lock;
+                static_cast<MemoryStorageService*>(m_storage)->removeHandle(this);
+            }
+            map<string,Record> m_dataMap;
+            multimap<time_t,string> m_expMap;
+            RWLock* m_lock;
+            unsigned long reap();
+        };
+        
+        vector<MemoryHandle*> m_handles;
+        Mutex* mutex;
         CondWait* shutdown_wait;
         Thread* cleanup_thread;
         static void* cleanup_fn(void*);
@@ -93,10 +106,10 @@ namespace xmltooling {
 static const XMLCh cleanupInterval[] = UNICODE_LITERAL_15(c,l,e,a,n,u,p,I,n,t,e,r,v,a,l);
 
 MemoryStorageService::MemoryStorageService(const DOMElement* e)
-    : m_lock(NULL), shutdown_wait(NULL), cleanup_thread(NULL), shutdown(false), m_cleanupInterval(0),
+    : mutex(NULL), shutdown_wait(NULL), cleanup_thread(NULL), shutdown(false), m_cleanupInterval(0),
         m_log(Category::getInstance(XMLTOOLING_LOGCAT".StorageService"))
 {
-    m_lock = RWLock::create();
+    mutex = Mutex::create();
     shutdown_wait = CondWait::create();
     cleanup_thread = Thread::create(&cleanup_fn, (void*)this);
 
@@ -115,8 +128,28 @@ MemoryStorageService::~MemoryStorageService()
     shutdown_wait->signal();
     cleanup_thread->join(NULL);
 
-    delete m_lock;
     delete shutdown_wait;
+    delete mutex;
+    for_each(m_handles.begin(), m_handles.end(), xmltooling::cleanup<MemoryHandle>());
+}
+
+StorageService::StorageHandle* MemoryStorageService::createHandle()
+{
+    Lock wrapper(mutex);
+    MemoryHandle* ret = new MemoryHandle(this);
+    m_handles.push_back(ret);
+    return ret;
+}
+
+void MemoryStorageService::removeHandle(StorageHandle* handle)
+{
+    Lock wrapper(mutex);
+    for (vector<MemoryHandle*>::iterator i=m_handles.begin(); i!=m_handles.end(); ++i) {
+        if (*i == handle) {
+            m_handles.erase(i);
+            return;
+        }
+    }
 }
 
 void* MemoryStorageService::cleanup_fn(void* cache_p)
@@ -149,20 +182,10 @@ void MemoryStorageService::cleanup()
         shutdown_wait->timedwait(mutex, m_cleanupInterval);
         if (shutdown)
             break;
-
-        // Lock the "database".
-        m_lock->wrlock();
         
-        // Garbage collect any expired entries.
-        unsigned int count=0;
-        time_t now=time(NULL)-XMLToolingConfig::getConfig().clock_skew_secs;
-        multimap<time_t,string>::iterator stop=m_expMap.upper_bound(now);
-        for (multimap<time_t,string>::iterator i=m_expMap.begin(); i!=stop; m_expMap.erase(i++)) {
-            m_dataMap.erase(i->second);
-            ++count;
-        }
-        
-        m_lock->unlock();
+        unsigned long count=0;
+        for (vector<MemoryHandle*>::iterator i=m_handles.begin(); i!=m_handles.end(); ++i)
+            count += (*i)->reap();
         
         if (count)
             m_log.info("purged %d record(s) from storage", count);
@@ -175,28 +198,61 @@ void MemoryStorageService::cleanup()
     Thread::exit(NULL);
 }
 
-void MemoryStorageService::createString(const char* key, const char* value, time_t expiration)
+void MemoryStorageService::reap(StorageHandle* handle)
 {
-    // Lock the maps.
+    if (!isValid(handle))
+        throw IOException("Invalid storage handle.");
+    static_cast<MemoryHandle*>(handle)->reap();
+}
+
+unsigned long MemoryStorageService::MemoryHandle::reap()
+{
+    // Lock the "database".
     m_lock->wrlock();
     SharedLock wrapper(m_lock, false);
     
+    // Garbage collect any expired entries.
+    unsigned long count=0;
+    time_t now=time(NULL)-XMLToolingConfig::getConfig().clock_skew_secs;
+    multimap<time_t,string>::iterator stop=m_expMap.upper_bound(now);
+    for (multimap<time_t,string>::iterator i=m_expMap.begin(); i!=stop; m_expMap.erase(i++)) {
+        m_dataMap.erase(i->second);
+        ++count;
+    }
+
+    return count;
+}
+
+void MemoryStorageService::createString(StorageHandle* handle, const char* key, const char* value, time_t expiration)
+{
+    if (!isValid(handle))
+        throw IOException("Invalid storage handle.");
+    MemoryHandle* h = static_cast<MemoryHandle*>(handle);
+
+    // Lock the maps.
+    h->m_lock->wrlock();
+    SharedLock wrapper(h->m_lock, false);
+    
     // Check for a duplicate.
-    map<string,Record>::iterator i=m_dataMap.find(key);
-    if (i!=m_dataMap.end())
+    map<string,Record>::iterator i=h->m_dataMap.find(key);
+    if (i!=h->m_dataMap.end())
         throw IOException("attempted to insert a record with duplicate key ($1)", params(1,key));
     
-    m_dataMap[key]=Record(value,time(NULL),expiration);
-    m_expMap.insert(multimap<time_t,string>::value_type(expiration,key));
+    h->m_dataMap[key]=Record(value,time(NULL),expiration);
+    h->m_expMap.insert(multimap<time_t,string>::value_type(expiration,key));
     
     m_log.debug("inserted record (%s)", key);
 }
 
-bool MemoryStorageService::readString(const char* key, string& value, time_t modifiedSince)
+bool MemoryStorageService::readString(StorageHandle* handle, const char* key, string& value, time_t modifiedSince)
 {
-    SharedLock wrapper(m_lock);
-    map<string,Record>::iterator i=m_dataMap.find(key);
-    if (i==m_dataMap.end())
+    if (!isValid(handle))
+        throw IOException("Invalid storage handle.");
+    MemoryHandle* h = static_cast<MemoryHandle*>(handle);
+
+    SharedLock wrapper(h->m_lock);
+    map<string,Record>::iterator i=h->m_dataMap.find(key);
+    if (i==h->m_dataMap.end())
         return false;
     else if (modifiedSince >= i->second.modified)
         return false;
@@ -204,14 +260,18 @@ bool MemoryStorageService::readString(const char* key, string& value, time_t mod
     return true;
 }
 
-bool MemoryStorageService::updateString(const char* key, const char* value, time_t expiration)
+bool MemoryStorageService::updateString(StorageHandle* handle, const char* key, const char* value, time_t expiration)
 {
-    // Lock the maps.
-    m_lock->wrlock();
-    SharedLock wrapper(m_lock, false);
+    if (!isValid(handle))
+        throw IOException("Invalid storage handle.");
+    MemoryHandle* h = static_cast<MemoryHandle*>(handle);
 
-    map<string,Record>::iterator i=m_dataMap.find(key);
-    if (i==m_dataMap.end())
+    // Lock the maps.
+    h->m_lock->wrlock();
+    SharedLock wrapper(h->m_lock, false);
+
+    map<string,Record>::iterator i=h->m_dataMap.find(key);
+    if (i==h->m_dataMap.end())
         return false;
         
     if (value)
@@ -219,15 +279,16 @@ bool MemoryStorageService::updateString(const char* key, const char* value, time
         
     if (expiration && expiration != i->second.expiration) {
         // Update secondary map.
-        pair<multimap<time_t,string>::iterator,multimap<time_t,string>::iterator> range=m_expMap.equal_range(i->second.expiration);
+        pair<multimap<time_t,string>::iterator,multimap<time_t,string>::iterator> range =
+            h->m_expMap.equal_range(i->second.expiration);
         for (; range.first != range.second; ++range.first) {
             if (range.first->second == i->first) {
-                m_expMap.erase(range.first);
+                h->m_expMap.erase(range.first);
                 break;
             }
         }
         i->second.expiration = expiration;
-        m_expMap.insert(multimap<time_t,string>::value_type(expiration,key));
+       h->m_expMap.insert(multimap<time_t,string>::value_type(expiration,key));
     }
 
     i->second.modified = time(NULL);
@@ -235,25 +296,30 @@ bool MemoryStorageService::updateString(const char* key, const char* value, time
     return true;
 }
 
-bool MemoryStorageService::deleteString(const char* key)
+bool MemoryStorageService::deleteString(StorageHandle* handle, const char* key)
 {
+    if (!isValid(handle))
+        throw IOException("Invalid storage handle.");
+    MemoryHandle* h = static_cast<MemoryHandle*>(handle);
+
     // Lock the maps.
-    m_lock->wrlock();
-    SharedLock wrapper(m_lock, false);
+    h->m_lock->wrlock();
+    SharedLock wrapper(h->m_lock, false);
     
     // Find the record.
-    map<string,Record>::iterator i=m_dataMap.find(key);
-    if (i!=m_dataMap.end()) {
+    map<string,Record>::iterator i=h->m_dataMap.find(key);
+    if (i!=h->m_dataMap.end()) {
         // Now find the reversed index of expiration to key, so we can clear it.
-        pair<multimap<time_t,string>::iterator,multimap<time_t,string>::iterator> range=m_expMap.equal_range(i->second.expiration);
+        pair<multimap<time_t,string>::iterator,multimap<time_t,string>::iterator> range =
+            h->m_expMap.equal_range(i->second.expiration);
         for (; range.first != range.second; ++range.first) {
             if (range.first->second == i->first) {
-                m_expMap.erase(range.first);
+                h->m_expMap.erase(range.first);
                 break;
             }
         }
         // And finally delete the record itself.
-        m_dataMap.erase(i);
+        h->m_dataMap.erase(i);
         m_log.debug("deleted record (%s)", key);
         return true;
     }
