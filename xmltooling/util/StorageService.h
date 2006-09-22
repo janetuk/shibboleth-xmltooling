@@ -17,7 +17,7 @@
 /**
  * @file xmltooling/util/StorageService.h
  * 
- * Generic data storage facility for use by services that require persistence.
+ * Generic data storage interface
  */
 
 #ifndef __xmltooling_storage_h__
@@ -30,7 +30,14 @@
 namespace xmltooling {
 
     /**
-     * Generic data storage facility for use by services that require persistence.
+     * Generic data storage facility for use by services that require
+     * some degree of persistence. Implementations will vary in how much
+     * persistence they can supply.
+     * 
+     * <p>Storage is divided into "contexts" identified by a string label.
+     * Keys need to be unique only within a given context, so multiple
+     * components can share a single storage service safely as long as they
+     * use different labels.
      */
     class XMLTOOL_API StorageService
     {
@@ -39,47 +46,21 @@ namespace xmltooling {
         virtual ~StorageService() {}
         
         /**
-         * A "context" for accessing a StorageService instance.
-         * Handles are created and freed using the StorageService interface,
-         * and can be kept for the life of the service, and shared by multiple
-         * threads.
-         */
-        class XMLTOOL_API StorageHandle {
-            MAKE_NONCOPYABLE(StorageHandle);
-            friend class XMLTOOL_API StorageService;
-        public:
-            virtual ~StorageHandle() {}
-        protected:
-            StorageHandle(StorageService* storage) : m_storage(storage) {}
-            StorageService* m_storage;
-        };
-        
-        
-        /**
-         * Returns a new handle for the storage service.
-         * The caller <strong>MUST</strong> delete the handle
-         * before freeing the StorageService itself.
-         * 
-         * @return  a new handle
-         */
-        virtual StorageHandle* createHandle()=0;
-        
-        /**
          * Creates a new "short" record in the storage service.
          * 
-         * @param handle        a valid storage handle
+         * @param context       a storage context label
          * @param key           null-terminated unique key of up to 255 bytes
          * @param value         null-terminated value of up to 255 bytes to store
          * @param expiration    an expiration timestamp, after which the record can be purged
          * 
          * @throws IOException  raised if errors occur in the insertion process 
          */
-        virtual void createString(StorageHandle* handle, const char* key, const char* value, time_t expiration)=0;
+        virtual void createString(const char* context, const char* key, const char* value, time_t expiration)=0;
         
         /**
          * Returns an existing "short" record from the storage service.
          * 
-         * @param handle        a valid storage handle
+         * @param context       a storage context label
          * @param key           null-terminated unique key of up to 255 bytes
          * @param value         location in which to return the record value
          * @param modifiedSince the record should not be returned if unmodified since this time,
@@ -88,12 +69,12 @@ namespace xmltooling {
          * 
          * @throws IOException  raised if errors occur in the read process 
          */
-        virtual bool readString(StorageHandle* handle, const char* key, std::string& value, time_t modifiedSince=0)=0;
+        virtual bool readString(const char* context, const char* key, std::string& value, time_t modifiedSince=0)=0;
 
         /**
          * Updates an existing "short" record in the storage service.
          * 
-         * @param handle        a valid storage handle
+         * @param context       a storage context label
          * @param key           null-terminated unique key of up to 255 bytes
          * @param value         null-terminated value of up to 255 bytes to store, or NULL to leave alone
          * @param expiration    a new expiration timestamp, or 0 to leave alone
@@ -101,35 +82,35 @@ namespace xmltooling {
          *    
          * @throws IOException  raised if errors occur in the update process 
          */
-        virtual bool updateString(StorageHandle* handle, const char* key, const char* value=NULL, time_t expiration=0)=0;
+        virtual bool updateString(const char* context, const char* key, const char* value=NULL, time_t expiration=0)=0;
         
         /**
          * Deletes an existing "short" record from the storage service.
          * 
-         * @param handle        a valid storage handle
+         * @param context       a storage context label
          * @param key           null-terminated unique key of up to 255 bytes
          * @return true iff the record existed and was deleted
          *    
          * @throws IOException  raised if errors occur in the deletion process 
          */
-        virtual bool deleteString(StorageHandle* handle, const char* key)=0;
+        virtual bool deleteString(const char* context, const char* key)=0;
         
         /**
          * Creates a new "long" record in the storage service.
          * 
-         * @param handle        a valid storage handle
+         * @param context       a storage context label
          * @param key           null-terminated unique key of up to 255 bytes
          * @param value         null-terminated value of arbitrary length
          * @param expiration    an expiration timestamp, after which the record can be purged
          * 
          * @throws IOException  raised if errors occur in the insertion process 
          */
-        virtual void createText(StorageHandle* handle, const char* key, const char* value, time_t expiration)=0;
+        virtual void createText(const char* context, const char* key, const char* value, time_t expiration)=0;
         
         /**
          * Returns an existing "long" record from the storage service.
          * 
-         * @param handle        a valid storage handle
+         * @param context       a storage context label
          * @param key           null-terminated unique key of up to 255 bytes
          * @param value         location in which to return the record value
          * @param modifiedSince the record should not be returned if unmodified since this time,
@@ -138,12 +119,12 @@ namespace xmltooling {
          *    
          * @throws IOException  raised if errors occur in the read process 
          */
-        virtual bool readText(StorageHandle* handle, const char* key, std::string& value, time_t modifiedSince=0)=0;
+        virtual bool readText(const char* context, const char* key, std::string& value, time_t modifiedSince=0)=0;
 
         /**
          * Updates an existing "long" record in the storage service.
          * 
-         * @param handle        a valid storage handle
+         * @param context       a storage context label
          * @param key           null-terminated unique key of up to 255 bytes
          * @param value         null-terminated value of arbitrary length to store, or NULL to leave alone
          * @param expiration    a new expiration timestamp, or 0 to leave alone
@@ -151,34 +132,38 @@ namespace xmltooling {
          *    
          * @throws IOException  raised if errors occur in the update process 
          */
-        virtual bool updateText(StorageHandle* handle, const char* key, const char* value=NULL, time_t expiration=0)=0;
+        virtual bool updateText(const char* context, const char* key, const char* value=NULL, time_t expiration=0)=0;
         
         /**
          * Deletes an existing "long" record from the storage service.
          * 
-         * @param handle        a valid storage handle
+         * @param context       a storage context label
          * @param key           null-terminated unique key of up to 255 bytes
          * @return true iff the record existed and was deleted
          *    
          * @throws IOException  raised if errors occur in the deletion process 
          */
-        virtual bool deleteText(StorageHandle* handle, const char* key)=0;
+        virtual bool deleteText(const char* context, const char* key)=0;
         
         /**
          * Manually trigger a cleanup of expired records.
          * The method <strong>MAY</strong> return without guaranteeing that
          * cleanup has already occurred.
          * 
-         * @param handle        a valid storage handle
+         * @param context       a storage context label
          */
-        virtual void reap(StorageHandle* handle)=0;
+        virtual void reap(const char* context)=0;
+        
+        /**
+         * Forcibly removes all records in a given context along with any
+         * associated resources devoted to maintaining the context.
+         * 
+         * @param context       a storage context label
+         */
+        virtual void deleteContext(const char* context)=0;
 
     protected:
         StorageService() {}
-        
-        virtual bool isValid(StorageHandle* handle) {
-            return this == (handle ? handle->m_storage : NULL);
-        }
     };
 
     /**
