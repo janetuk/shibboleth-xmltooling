@@ -41,15 +41,15 @@ namespace xmltooling {
         virtual ~MemoryStorageService();
         
         void createString(const char* context, const char* key, const char* value, time_t expiration);
-        bool readString(const char* context, const char* key, string& value, time_t modifiedSince=0);
+        bool readString(const char* context, const char* key, string* pvalue=NULL, time_t* pexpiration=NULL);
         bool updateString(const char* context, const char* key, const char* value=NULL, time_t expiration=0);
         bool deleteString(const char* context, const char* key);
         
         void createText(const char* context, const char* key, const char* value, time_t expiration) {
             return createString(context, key, value, expiration);
         }
-        bool readText(const char* context, const char* key, string& value, time_t modifiedSince=0) {
-            return readString(context, key, value, modifiedSince);
+        bool readText(const char* context, const char* key, string* pvalue=NULL, time_t* pexpiration=NULL) {
+            return readString(context, key, pvalue, pexpiration);
         }
         bool updateText(const char* context, const char* key, const char* value=NULL, time_t expiration=0) {
             return updateString(context, key, value, expiration);
@@ -68,10 +68,10 @@ namespace xmltooling {
         void cleanup();
     
         struct XMLTOOL_DLLLOCAL Record {
-            Record() : modified(0), expiration(0) {}
-            Record(string s, time_t t1, time_t t2) : data(s), modified(t1), expiration(t2) {}
+            Record() : expiration(0) {}
+            Record(string s, time_t t) : data(s), expiration(t) {}
             string data;
-            time_t modified, expiration;
+            time_t expiration;
         };
         
         struct XMLTOOL_DLLLOCAL Context {
@@ -116,16 +116,16 @@ MemoryStorageService::MemoryStorageService(const DOMElement* e)
     : contextLock(NULL), shutdown_wait(NULL), cleanup_thread(NULL), shutdown(false), m_cleanupInterval(0),
         m_log(Category::getInstance(XMLTOOLING_LOGCAT".StorageService"))
 {
-    contextLock = Mutex::create();
-    shutdown_wait = CondWait::create();
-    cleanup_thread = Thread::create(&cleanup_fn, (void*)this);
-
     const XMLCh* tag=e ? e->getAttributeNS(NULL,cleanupInterval) : NULL;
     if (tag && *tag) {
         m_cleanupInterval = XMLString::parseInt(tag);
     }
     if (!m_cleanupInterval)
         m_cleanupInterval=300;
+
+    contextLock = Mutex::create();
+    shutdown_wait = CondWait::create();
+    cleanup_thread = Thread::create(&cleanup_fn, (void*)this);
 }
 
 MemoryStorageService::~MemoryStorageService()
@@ -199,8 +199,7 @@ unsigned long MemoryStorageService::Context::reap()
     
     // Garbage collect any expired entries.
     unsigned long count=0;
-    time_t now=time(NULL)-XMLToolingConfig::getConfig().clock_skew_secs;
-    multimap<time_t,string>::iterator stop=m_expMap.upper_bound(now);
+    multimap<time_t,string>::iterator stop=m_expMap.upper_bound(time(NULL));
     for (multimap<time_t,string>::iterator i=m_expMap.begin(); i!=stop; m_expMap.erase(i++)) {
         m_dataMap.erase(i->second);
         ++count;
@@ -222,13 +221,13 @@ void MemoryStorageService::createString(const char* context, const char* key, co
     if (i!=ctx.m_dataMap.end())
         throw IOException("attempted to insert a record with duplicate key ($1)", params(1,key));
     
-    ctx.m_dataMap[key]=Record(value,time(NULL),expiration);
+    ctx.m_dataMap[key]=Record(value,expiration);
     ctx.m_expMap.insert(multimap<time_t,string>::value_type(expiration,key));
     
     m_log.debug("inserted record (%s) in context (%s)", key, context);
 }
 
-bool MemoryStorageService::readString(const char* context, const char* key, string& value, time_t modifiedSince)
+bool MemoryStorageService::readString(const char* context, const char* key, string* pvalue, time_t* pexpiration)
 {
     Context& ctx = getContext(context);
 
@@ -236,9 +235,12 @@ bool MemoryStorageService::readString(const char* context, const char* key, stri
     map<string,Record>::iterator i=ctx.m_dataMap.find(key);
     if (i==ctx.m_dataMap.end())
         return false;
-    else if (modifiedSince >= i->second.modified)
+    else if (time(NULL) >= i->second.expiration)
         return false;
-    value = i->second.data;
+    if (pvalue)
+        *pvalue = i->second.data;
+    if (pexpiration)
+        *pexpiration = i->second.expiration;
     return true;
 }
 
@@ -268,10 +270,9 @@ bool MemoryStorageService::updateString(const char* context, const char* key, co
             }
         }
         i->second.expiration = expiration;
-       ctx.m_expMap.insert(multimap<time_t,string>::value_type(expiration,key));
+        ctx.m_expMap.insert(multimap<time_t,string>::value_type(expiration,key));
     }
 
-    i->second.modified = time(NULL);
     m_log.debug("updated record (%s) in context (%s)", key, context);
     return true;
 }

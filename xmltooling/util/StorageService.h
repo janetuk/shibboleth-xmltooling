@@ -62,14 +62,13 @@ namespace xmltooling {
          * 
          * @param context       a storage context label
          * @param key           null-terminated unique key of up to 255 bytes
-         * @param value         location in which to return the record value
-         * @param modifiedSince the record should not be returned if unmodified since this time,
-         *  or 0 to always return
-         * @return  true iff the record exists and was returned (based on the modifiedSince value)   
+         * @param pvalue        location in which to return the record value
+         * @param pexpiration   location in which to return the expiration timestamp
+         * @return  true iff a valid record exists and was returned   
          * 
          * @throws IOException  raised if errors occur in the read process 
          */
-        virtual bool readString(const char* context, const char* key, std::string& value, time_t modifiedSince=0)=0;
+        virtual bool readString(const char* context, const char* key, std::string* pvalue=NULL, time_t* pexpiration=NULL)=0;
 
         /**
          * Updates an existing "short" record in the storage service.
@@ -112,14 +111,13 @@ namespace xmltooling {
          * 
          * @param context       a storage context label
          * @param key           null-terminated unique key of up to 255 bytes
-         * @param value         location in which to return the record value
-         * @param modifiedSince the record should not be returned if unmodified since this time,
-         *  or 0 to always return
-         * @return  true iff the record exists and was returned (based on the modifiedSince value)
-         *    
+         * @param pvalue        location in which to return the record value
+         * @param pexpiration   location in which to return the expiration timestamp
+         * @return  true iff a valid record exists and was returned   
+         * 
          * @throws IOException  raised if errors occur in the read process 
          */
-        virtual bool readText(const char* context, const char* key, std::string& value, time_t modifiedSince=0)=0;
+        virtual bool readText(const char* context, const char* key, std::string* pvalue=NULL, time_t* pexpiration=NULL)=0;
 
         /**
          * Updates an existing "long" record in the storage service.
