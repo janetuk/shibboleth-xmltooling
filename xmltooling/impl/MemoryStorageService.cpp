@@ -225,7 +225,7 @@ void MemoryStorageService::createString(const char* context, const char* key, co
     ctx.m_dataMap[key]=Record(value,time(NULL),expiration);
     ctx.m_expMap.insert(multimap<time_t,string>::value_type(expiration,key));
     
-    m_log.debug("inserted record (%s)", key);
+    m_log.debug("inserted record (%s) in context (%s)", key, context);
 }
 
 bool MemoryStorageService::readString(const char* context, const char* key, string& value, time_t modifiedSince)
@@ -272,7 +272,7 @@ bool MemoryStorageService::updateString(const char* context, const char* key, co
     }
 
     i->second.modified = time(NULL);
-    m_log.debug("updated record (%s)", key);
+    m_log.debug("updated record (%s) in context (%s)", key, context);
     return true;
 }
 
@@ -298,10 +298,10 @@ bool MemoryStorageService::deleteString(const char* context, const char* key)
         }
         // And finally delete the record itself.
         ctx.m_dataMap.erase(i);
-        m_log.debug("deleted record (%s)", key);
+        m_log.debug("deleted record (%s) in context (%s)", key, context);
         return true;
     }
 
-    m_log.debug("deleting record (%s)....not found", key);
+    m_log.debug("deleting record (%s) in context (%s)....not found", key, context);
     return false;
 }
