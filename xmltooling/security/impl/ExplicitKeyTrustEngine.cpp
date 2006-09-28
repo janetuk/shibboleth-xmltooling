@@ -45,16 +45,14 @@ namespace xmltooling {
             Signature& sig,
             TrustEngine::KeyInfoIterator& keyInfoSource,
             const KeyResolver* keyResolver=NULL
-            );
+            ) const;
         virtual bool validate(
             XSECCryptoX509* certEE,
             const vector<XSECCryptoX509*>& certChain,
             TrustEngine::KeyInfoIterator& keyInfoSource,
             bool checkName=true,
             const KeyResolver* keyResolver=NULL
-            );
-
-    private:
+            ) const;
     };
 
     TrustEngine* XMLTOOL_DLLLOCAL ExplicitKeyTrustEngineFactory(const DOMElement* const & e)
@@ -67,7 +65,7 @@ bool ExplicitKeyTrustEngine::validate(
     Signature& sig,
     TrustEngine::KeyInfoIterator& keyInfoSource,
     const KeyResolver* keyResolver
-    )
+    ) const
 {
 #ifdef _DEBUG
     NDC ndc("validate");
@@ -112,7 +110,7 @@ bool ExplicitKeyTrustEngine::validate(
     TrustEngine::KeyInfoIterator& keyInfoSource,
     bool checkName,
     const KeyResolver* keyResolver
-    )
+    ) const
 {
 #ifdef _DEBUG
     NDC ndc("validate");

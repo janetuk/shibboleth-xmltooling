@@ -103,7 +103,7 @@ namespace xmltooling {
             xmlsignature::Signature& sig,
             KeyInfoIterator& keyInfoSource,
             const xmlsignature::KeyResolver* keyResolver=NULL
-            )=0;
+            ) const=0;
     };
 
     /**

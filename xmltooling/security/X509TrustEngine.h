@@ -72,7 +72,7 @@ namespace xmltooling {
             TrustEngine::KeyInfoIterator& keyInfoSource,
             bool checkName=true,
             const xmlsignature::KeyResolver* keyResolver=NULL
-            )=0;
+            ) const=0;
     };
     
 };
