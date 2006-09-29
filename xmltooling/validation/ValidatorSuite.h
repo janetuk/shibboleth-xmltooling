@@ -23,10 +23,10 @@
 #ifndef __xmltooling_valsuite_h__
 #define __xmltooling_valsuite_h__
 
-#include <map>
-#include <vector>
 #include <xmltooling/QName.h>
 #include <xmltooling/validation/Validator.h>
+
+#include <map>
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -39,7 +39,7 @@ namespace xmltooling {
      * A collection of validators that can be applied to an XMLObject and its children. These collections can represent
      * usage specific checks, such as those outlined in schemas or profiles of specific XML specifications.
      * 
-     * Registered Validators must be stateless and cloneable. Validators are fetched based on schema type and
+     * Registered Validators must be stateless. Validators are fetched based on schema type and
      * element name, in that order.
      */
     class XMLTOOL_API ValidatorSuite
@@ -82,11 +82,7 @@ namespace xmltooling {
          * @param validator the validator
          */
         void registerValidator(const QName& key, Validator* validator) {
-            std::map< QName, std::vector<Validator*> >::iterator i=m_map.find(key);
-            if (i==m_map.end())
-                m_map.insert(std::make_pair(key,std::vector<Validator*>(1,validator)));
-            else
-                i->second.push_back(validator);
+            m_map.insert(std::make_pair(key,validator));
         }
 
         /**
@@ -103,7 +99,7 @@ namespace xmltooling {
 
     private:
         std::string m_id;
-        std::map< QName, std::vector<Validator*> > m_map;
+        std::multimap<QName,Validator*> m_map;
     };
 
     /**

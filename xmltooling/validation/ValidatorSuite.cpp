@@ -29,28 +29,16 @@ using namespace std;
 
 ValidatorSuite xmltooling::SchemaValidators("SchemaValidators");
 
-namespace {
-    class XMLTOOL_DLLLOCAL _clearvector {
-    public:
-        void operator()(const pair< QName, vector<Validator*> >& p) const {
-            for_each(p.second.begin(),p.second.end(),xmltooling::cleanup<Validator>());
-        }
-    };
-}
-
 void ValidatorSuite::deregisterValidators(const QName& key)
 {
-    map< QName, vector<Validator*> >::iterator i=m_map.find(key);
-    if (i!=m_map.end()) {
-        _clearvector f;
-        f(*i);
-        m_map.erase(i);
-    }
+    pair<multimap<QName,Validator*>::iterator,multimap<QName,Validator*>::iterator> range=m_map.equal_range(key);
+    for_each(range.first, range.second, xmltooling::cleanup_pair<QName,Validator>());
+    m_map.erase(range.first, range.second);
 }
 
 void ValidatorSuite::destroyValidators()
 {
-    for_each(m_map.begin(),m_map.end(),_clearvector());
+    for_each(m_map.begin(),m_map.end(),xmltooling::cleanup_pair<QName,Validator>());
     m_map.clear();
 }
 
@@ -59,15 +47,19 @@ void ValidatorSuite::validate(const XMLObject* xmlObject) const
     if (!xmlObject)
         return;
 
-    map< QName, vector<Validator*> >::const_iterator i;
+    pair<multimap<QName,Validator*>::const_iterator,multimap<QName,Validator*>::const_iterator> range;
     if (xmlObject->getSchemaType()) {
-        i=m_map.find(*(xmlObject->getSchemaType()));
-        if (i!=m_map.end())
-            for_each(i->second.begin(),i->second.end(),bind2nd(mem_fun<void,Validator,const XMLObject*>(&Validator::validate),xmlObject));
+        range=m_map.equal_range(*(xmlObject->getSchemaType()));
+        while (range.first!=range.second) {
+            range.first->second->validate(xmlObject);
+            ++range.first;
+        }
     }
-    i=m_map.find(xmlObject->getElementQName());
-    if (i!=m_map.end())
-        for_each(i->second.begin(),i->second.end(),bind2nd(mem_fun<void,Validator,const XMLObject*>(&Validator::validate),xmlObject));
+    range=m_map.equal_range(xmlObject->getElementQName());
+    while (range.first!=range.second) {
+        range.first->second->validate(xmlObject);
+        ++range.first;
+    }
 
     const list<XMLObject*>& kids=xmlObject->getOrderedChildren();
     for (list<XMLObject*>::const_iterator j=kids.begin(); j!=kids.end(); j++)
