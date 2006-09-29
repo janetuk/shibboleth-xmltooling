@@ -218,8 +218,23 @@ void MemoryStorageService::createString(const char* context, const char* key, co
     
     // Check for a duplicate.
     map<string,Record>::iterator i=ctx.m_dataMap.find(key);
-    if (i!=ctx.m_dataMap.end())
-        throw IOException("attempted to insert a record with duplicate key ($1)", params(1,key));
+    if (i!=ctx.m_dataMap.end()) {
+        // Not yet expired?
+        if (time(NULL) < i->second.expiration)
+            throw IOException("attempted to insert a record with duplicate key ($1)", params(1,key));
+        // It's dead, so we can just remove it now and create the new record.
+        // Now find the reversed index of expiration to key, so we can clear it.
+        pair<multimap<time_t,string>::iterator,multimap<time_t,string>::iterator> range =
+            ctx.m_expMap.equal_range(i->second.expiration);
+        for (; range.first != range.second; ++range.first) {
+            if (range.first->second == i->first) {
+                ctx.m_expMap.erase(range.first);
+                break;
+            }
+        }
+        // And finally delete the record itself.
+        ctx.m_dataMap.erase(i);
+    }
     
     ctx.m_dataMap[key]=Record(value,expiration);
     ctx.m_expMap.insert(multimap<time_t,string>::value_type(expiration,key));
@@ -254,6 +269,8 @@ bool MemoryStorageService::updateString(const char* context, const char* key, co
 
     map<string,Record>::iterator i=ctx.m_dataMap.find(key);
     if (i==ctx.m_dataMap.end())
+        return false;
+    else if (time(NULL) >= i->second.expiration)
         return false;
         
     if (value)
