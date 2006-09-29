@@ -106,6 +106,15 @@ namespace xmltooling {
         std::map< QName, std::vector<Validator*> > m_map;
     };
 
+    /**
+     * Validator suite for schema-style structural validation.
+     * 
+     * This is <strong>NOT</strong> a comprehensive replacement for real
+     * schema validation, but it does basic structural checking of overall
+     * element relationships and some basic attribute presence checking.
+     */
+    extern XMLTOOL_API xmltooling::ValidatorSuite SchemaValidators;
+    
 };
 
 #if defined (_MSC_VER)

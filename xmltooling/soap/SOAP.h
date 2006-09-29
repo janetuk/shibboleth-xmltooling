@@ -97,11 +97,6 @@ namespace soap11 {
      * Registers builders and validators for SOAP 1.1 classes into the runtime.
      */
     void XMLTOOL_API registerSOAPClasses();
-
-    /**
-     * Validator suite for SOAP 1.1 schema validation.
-     */
-    extern XMLTOOL_API xmltooling::ValidatorSuite SOAPSchemaValidators;
 };
 
 #endif /* __xmltooling_soap_h__ */

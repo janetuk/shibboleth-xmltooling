@@ -157,7 +157,7 @@ XSECCryptoKey* InlineKeyResolver::_resolveKey(const KeyInfo* keyInfo) const
     const vector<KeyValue*>& keyValues = keyInfo->getKeyValues();
     for (vector<KeyValue*>::const_iterator i=keyValues.begin(); i!=keyValues.end(); ++i) {
         try {
-            KeyInfoSchemaValidators.validate(*i);    // see if it's a "valid" key
+            SchemaValidators.validate(*i);    // see if it's a "valid" key
             RSAKeyValue* rsakv = (*i)->getRSAKeyValue();
             if (rsakv) {
                 log.debug("resolving ds:RSAKeyValue");

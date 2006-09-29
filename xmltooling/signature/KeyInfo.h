@@ -194,10 +194,6 @@ namespace xmlsignature {
      */
     void XMLTOOL_API registerKeyInfoClasses();
 
-    /**
-     * Validator suite for KeyInfo schema validation.
-     */
-    extern XMLTOOL_API xmltooling::ValidatorSuite KeyInfoSchemaValidators;
 };
 
 #endif /* __xmltooling_keyinfo_h__ */

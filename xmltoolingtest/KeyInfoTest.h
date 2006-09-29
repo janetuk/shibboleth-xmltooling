@@ -54,7 +54,7 @@ public:
         auto_ptr_XMLCh expected("Public Key for CN=xmldap.org, OU=Domain Control Validated, O=xmldap.org");
         TSM_ASSERT("KeyName was not expected value", XMLString::equals(expected.get(), kiObject->getKeyNames().front()->getName()));
 
-        KeyInfoSchemaValidators.validate(kiObject.get());
+        SchemaValidators.validate(kiObject.get());
     }
 
     void testKeyInfo2() {
@@ -75,7 +75,7 @@ public:
         TSM_ASSERT_EQUALS("Number of child elements was not expected value",
             2, kiObject->getSPKIDatas().front()->getSPKISexps().size());
 
-        KeyInfoSchemaValidators.validate(kiObject.get());
+        SchemaValidators.validate(kiObject.get());
     }
 
     void testKeyInfo3() {
@@ -89,6 +89,6 @@ public:
 
         auto_ptr<KeyInfo> kiObject(dynamic_cast<KeyInfo*>(b->buildFromDocument(doc)));
         TS_ASSERT(kiObject.get()!=NULL);
-        TS_ASSERT_THROWS(KeyInfoSchemaValidators.validate(kiObject.get()),ValidationException);
+        TS_ASSERT_THROWS(SchemaValidators.validate(kiObject.get()),ValidationException);
     }
 };

@@ -51,12 +51,12 @@ namespace {
 #define REGISTER_ELEMENT(namespaceURI,cname) \
     q=QName(namespaceURI,cname::LOCAL_NAME); \
     XMLObjectBuilder::registerBuilder(q,new cname##Builder()); \
-    SOAPSchemaValidators.registerValidator(q,new cname##SchemaValidator())
+    SchemaValidators.registerValidator(q,new cname##SchemaValidator())
     
 #define REGISTER_TYPE(namespaceURI,cname) \
     q=QName(namespaceURI,cname::TYPE_NAME); \
     XMLObjectBuilder::registerBuilder(q,new cname##Builder()); \
-    SOAPSchemaValidators.registerValidator(q,new cname##SchemaValidator())
+    SchemaValidators.registerValidator(q,new cname##SchemaValidator())
 
 #define REGISTER_ELEMENT_NOVAL(namespaceURI,cname) \
     q=QName(namespaceURI,cname::LOCAL_NAME); \
@@ -65,8 +65,6 @@ namespace {
 #define REGISTER_TYPE_NOVAL(namespaceURI,cname) \
     q=QName(namespaceURI,cname::TYPE_NAME); \
     XMLObjectBuilder::registerBuilder(q,new cname##Builder());
-
-ValidatorSuite soap11::SOAPSchemaValidators("SOAPSchemaValidators");
 
 void soap11::registerSOAPClasses()
 {

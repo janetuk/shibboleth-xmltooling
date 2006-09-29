@@ -222,9 +222,8 @@ bool XMLToolingInternalConfig::init()
 
 void XMLToolingInternalConfig::term()
 {
+    SchemaValidators.destroyValidators();
     XMLObjectBuilder::destroyBuilders();
-    KeyInfoSchemaValidators.destroyValidators();
-    EncryptionSchemaValidators.destroyValidators();
     XMLToolingException::deregisterFactories();
     AttributeExtensibleXMLObject::deregisterIDAttributes();
 

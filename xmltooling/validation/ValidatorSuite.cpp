@@ -27,6 +27,8 @@
 using namespace xmltooling;
 using namespace std;
 
+ValidatorSuite xmltooling::SchemaValidators("SchemaValidators");
+
 namespace {
     class XMLTOOL_DLLLOCAL _clearvector {
     public:
