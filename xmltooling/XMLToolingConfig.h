@@ -41,6 +41,7 @@ namespace xmlsignature {
 
 namespace xmltooling {
     
+    class XMLTOOL_API ReplayCache;
     class XMLTOOL_API StorageService;
     class XMLTOOL_API TrustEngine;
     class XMLTOOL_API XSECCryptoX509CRL;
@@ -56,7 +57,10 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(XMLToolingConfig);
     protected:
-        XMLToolingConfig() : clock_skew_secs(180) {}
+        XMLToolingConfig() : m_replayCache(NULL), clock_skew_secs(180) {}
+        
+        /** Global ReplayCache instance. */
+        ReplayCache* m_replayCache;
     public:
         virtual ~XMLToolingConfig() {}
 
@@ -128,7 +132,25 @@ namespace xmltooling {
          * @return reference to a validating parser pool.
          */
         virtual ParserPool& getValidatingParser() const=0;
-        
+
+        /**
+         * Sets the global ReplayCache instance.
+         * This method must be externally synchronized with any code that uses the object.
+         * Any previously set object is destroyed.
+         * 
+         * @param replayCache   new ReplayCache instance to store
+         */
+        void setReplayCache(ReplayCache* replayCache);
+
+        /**
+         * Returns the global ReplayCache instance.
+         * 
+         * @return  global ReplayCache or NULL
+         */
+        ReplayCache* getReplayCache() const {
+            return m_replayCache;
+        }
+                
         /**
          * List of catalog files to load into validating parser pool at initialization time.
          * Like other path settings, the separator depends on the platform

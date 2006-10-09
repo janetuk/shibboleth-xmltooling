@@ -30,6 +30,7 @@
 #include "signature/CredentialResolver.h"
 #include "soap/SOAP.h"
 #include "util/NDC.h"
+#include "util/ReplayCache.h"
 #include "util/StorageService.h"
 #include "util/XMLConstants.h"
 #include "validation/Validator.h"
@@ -143,6 +144,12 @@ bool XMLToolingInternalConfig::log_config(const char* config)
     return true;
 }
 
+void XMLToolingConfig::setReplayCache(ReplayCache* replayCache)
+{
+    delete m_replayCache;
+    m_replayCache = replayCache;
+}
+
 bool XMLToolingInternalConfig::init()
 {
 #ifdef _DEBUG
@@ -232,6 +239,9 @@ void XMLToolingInternalConfig::term()
     CredentialResolverManager.deregisterFactories();
     KeyResolverManager.deregisterFactories();
 #endif
+
+    delete m_replayCache;
+    m_replayCache = NULL;
 
     for (vector<void*>::reverse_iterator i=m_libhandles.rbegin(); i!=m_libhandles.rend(); i++) {
 #if defined(WIN32)

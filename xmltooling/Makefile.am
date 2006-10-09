@@ -81,6 +81,7 @@ utilinclude_HEADERS = \
 	util/DateTime.h \
 	util/NDC.h \
 	util/ParserPool.h \
+	util/ReplayCache.h \
 	util/StorageService.h \
 	util/Threads.h \
 	util/XMLConstants.h \
@@ -144,6 +145,7 @@ libxmltooling_la_SOURCES = \
 	util/DateTime.cpp \
 	util/NDC.cpp \
 	util/ParserPool.cpp \
+	util/ReplayCache.cpp \
 	util/StorageService.cpp \
 	util/XMLConstants.cpp \
 	util/XMLHelper.cpp \
