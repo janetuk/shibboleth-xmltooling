@@ -241,6 +241,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\util\ReplayCache.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\util\StorageService.cpp"
 					>
 				</File>
@@ -508,6 +512,10 @@
 				</File>
 				<File
 					RelativePath=".\util\ParserPool.h"
+					>
+				</File>
+				<File
+					RelativePath=".\util\ReplayCache.h"
 					>
 				</File>
 				<File
