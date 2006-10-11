@@ -61,6 +61,8 @@ namespace xmltooling {
     
         XMLObject* clone() const;
 
+        void detach();
+
      protected:
         AbstractDOMCachingXMLObject() : m_dom(NULL), m_document(NULL) {}
 

@@ -138,3 +138,16 @@ XMLObject* AbstractXMLObject::prepareForAssignment(XMLObject* oldValue, XMLObjec
 
     return newValue;
 }
+
+void AbstractXMLObject::detach()
+{
+    if (!getParent())
+        return;
+    else if (getParent()->hasParent())
+        throw XMLObjectException("Cannot detach an object whose parent is itself a child.");
+
+    // Pull ourselves out of the parent and then blast him.
+    getParent()->removeChild(this);
+    delete m_parent;
+    m_parent = NULL;
+}

@@ -30,3 +30,8 @@ using namespace xmltooling;
 AbstractComplexElement::~AbstractComplexElement() {
     std::for_each(m_children.begin(), m_children.end(), cleanup<XMLObject>());
 }
+
+void AbstractComplexElement::removeChild(XMLObject* child)
+{
+    m_children.erase(std::remove(m_children.begin(), m_children.end(), child), m_children.end());
+}

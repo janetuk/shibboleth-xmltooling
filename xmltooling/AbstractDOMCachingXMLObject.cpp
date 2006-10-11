@@ -130,3 +130,24 @@ XMLObject* AbstractDOMCachingXMLObject::clone() const
     }
     return NULL;
 }
+
+void AbstractDOMCachingXMLObject::detach()
+{
+    // This is an override that duplicates some of the checking in the base class but
+    // adds document management in preparation for deletion of the parent.
+
+    if (!getParent())
+        return;
+
+    if (getParent()->hasParent())
+        throw XMLObjectException("Cannot detach an object whose parent is itself a child.");
+
+    AbstractDOMCachingXMLObject* parent = dynamic_cast<AbstractDOMCachingXMLObject*>(getParent());
+    if (parent && parent->m_document) {
+        // Transfer control of document to me...
+        setDocument(parent->m_document);
+        parent->m_document = NULL;
+    }
+    // The rest is done by the base.
+    AbstractXMLObject::detach();
+}

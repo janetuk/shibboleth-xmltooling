@@ -49,6 +49,8 @@ namespace xmltooling {
             return m_no_children;
         }
 
+        void removeChild(XMLObject* child);
+
     protected:
         AbstractChildlessElement() {}
         

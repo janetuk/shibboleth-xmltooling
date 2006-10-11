@@ -62,6 +62,18 @@ namespace xmltooling {
         virtual XMLObject* clone() const=0;
         
         /**
+         * Specialized function for detaching a child object from its parent
+         * <strong>while disposing of the parent</strong>.
+         *
+         * This is not a generic way of detaching any child object, but only of
+         * pruning a single child from the root of an XMLObject tree. If the
+         * detached XMLObject's parent is itself a child, an exception will be
+         * thrown. It's mainly useful for turning a child into the new root of
+         * the tree without having to clone the child.
+         */
+        virtual void detach()=0;
+
+        /**
          * Gets the QName for this element.  This QName <strong>MUST</strong> 
          * contain the namespace URI, namespace prefix, and local element name.
          * 
@@ -148,6 +160,15 @@ namespace xmltooling {
          * @return the list of children
          */
         virtual const std::list<XMLObject*>& getOrderedChildren() const=0;
+
+        /**
+         * Used by a child's detach method to isolate the child from
+         * this parent object in preparation for destroying the parent
+         * (this object).
+         * 
+         * @param child the child object to remove
+         */
+        virtual void removeChild(XMLObject* child)=0;
 
         /**
          * Gets the DOM representation of this XMLObject, if one exists.

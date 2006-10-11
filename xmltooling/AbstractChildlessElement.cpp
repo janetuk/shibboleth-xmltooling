@@ -29,3 +29,8 @@ using namespace std;
 // shared "empty" list of children for childless objects
 
 list<XMLObject*> AbstractChildlessElement::m_no_children;
+
+void AbstractChildlessElement::removeChild(XMLObject* child)
+{
+    throw XMLObjectException("Cannot remove child from a childless object.");
+}

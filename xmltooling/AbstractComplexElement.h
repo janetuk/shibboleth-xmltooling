@@ -50,6 +50,8 @@ namespace xmltooling {
             return m_children;
         }
 
+        void removeChild(XMLObject* child);
+
     protected:
         AbstractComplexElement() {}
         

@@ -48,6 +48,8 @@ namespace xmltooling {
             XMLString::release(&m_schemaLocation);
         }
 
+        void detach();
+
         const QName& getElementQName() const {
             return m_elementQname;
         }
@@ -57,9 +59,11 @@ namespace xmltooling {
         }
     
         void addNamespace(const Namespace& ns) const {
-            if (ns.alwaysDeclare() || m_namespaces.find(ns)==m_namespaces.end()) {
+            std::set<Namespace>::iterator i = m_namespaces.find(ns);
+            if (i == m_namespaces.end())
                 m_namespaces.insert(ns);
-            }
+            else if (ns.alwaysDeclare())
+                i->setAlwaysDeclare(true);
         }
     
         void removeNamespace(const Namespace& ns) {
