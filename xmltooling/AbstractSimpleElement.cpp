@@ -15,22 +15,22 @@
  */
 
 /**
- * AbstractChildlessElement.cpp
+ * AbstractSimpleElement.cpp
  * 
- * Extension of AbstractXMLObject that implements childlessness 
+ * Extension of AbstractXMLObject that implements simple elements 
  */
 
 #include "internal.h"
-#include "AbstractChildlessElement.h"
+#include "AbstractSimpleElement.h"
 
 using namespace xmltooling;
 using namespace std;
 
 // shared "empty" list of children for childless objects
 
-list<XMLObject*> AbstractChildlessElement::m_no_children;
+list<XMLObject*> AbstractSimpleElement::m_no_children;
 
-void AbstractChildlessElement::removeChild(XMLObject* child)
+void AbstractSimpleElement::removeChild(XMLObject* child)
 {
     throw XMLObjectException("Cannot remove child from a childless object.");
 }

@@ -36,12 +36,13 @@ public:
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
         TS_ASSERT(doc!=NULL);
+        XercesJanitor<DOMDocument> janitor(doc);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
         TS_ASSERT(b!=NULL);
 
         auto_ptr<ElementProxy> wcObject(
-            dynamic_cast<ElementProxy*>(b->buildFromDocument(doc))
+            dynamic_cast<ElementProxy*>(b->buildFromDocument(doc, false))
             );
         TS_ASSERT(wcObject.get()!=NULL);
         
@@ -59,6 +60,10 @@ public:
         ListOf(XMLObject)::const_iterator it=wc2->getXMLObjects().begin();
         ++it; ++it;
         TSM_ASSERT_EQUALS("Element QName unexpected", it->getElementQName(),q);
+
+        DOMElement* rebuilt = wcObject->marshall(XMLToolingConfig::getConfig().getParser().newDocument());
+        wcObject->setDocument(rebuilt->getOwnerDocument());
+        TS_ASSERT(rebuilt->isEqualNode(doc->getDocumentElement()));
     }
 
 };

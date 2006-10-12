@@ -171,6 +171,24 @@ namespace xmltooling {
         virtual void removeChild(XMLObject* child)=0;
 
         /**
+         * Returns the text content at the specified position relative to
+         * any child elements. A zero represents leading text, 1 comes after
+         * the first child, and so forth.
+         *
+         * @param position  the relative child element position of the text  
+         * @return the designated text value
+         */
+        virtual const XMLCh* getTextContent(unsigned int position=0) const=0;
+
+        /**
+         * Sets (or clears) text content relative to a child element's position. 
+         * 
+         * @param value         value to set, or NULL to clear
+         * @param position      position relative to child element 
+         */
+        virtual void setTextContent(const XMLCh* value, unsigned int position=0)=0;
+
+        /**
          * Gets the DOM representation of this XMLObject, if one exists.
          * 
          * @return the DOM representation of this XMLObject

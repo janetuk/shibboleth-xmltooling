@@ -15,7 +15,7 @@
  */
 
 /**
- * @file Encryption.h
+ * @file xmltooling/encryption/Encryption.h
  * 
  * XMLObjects representing XML Encryption content
  */
@@ -39,7 +39,7 @@ namespace xmlencryption {
     DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,CipherValue,Value,XML Encryption CipherValue element);
     DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,OAEPparams,Name,XML Encryption OAEPparams element);
 
-    BEGIN_XMLOBJECT(XMLTOOL_API,KeySize,xmltooling::SimpleElement,XML Encryption KeySize element);
+    BEGIN_XMLOBJECT(XMLTOOL_API,KeySize,xmltooling::XMLObject,XML Encryption KeySize element);
         DECL_INTEGER_CONTENT(Size);
     END_XMLOBJECT;
 

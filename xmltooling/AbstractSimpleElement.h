@@ -15,7 +15,7 @@
  */
 
 /**
- * @file AbstractSimpleElement.h
+ * @file xmltooling/AbstractSimpleElement.h
  * 
  * AbstractXMLObject mixin that implements a simple string-based content model 
  */
@@ -24,7 +24,6 @@
 #define __xmltooling_abssimpleel_h__
 
 #include <xmltooling/AbstractXMLObject.h>
-#include <xmltooling/SimpleElement.h>
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -37,18 +36,30 @@ namespace xmltooling {
      * AbstractXMLObject mixin that implements a simple string-based content model.
      * Inherit from this class to support string-based element content.
      */
-    class XMLTOOL_API AbstractSimpleElement : public virtual SimpleElement, public virtual AbstractXMLObject
+    class XMLTOOL_API AbstractSimpleElement : public virtual AbstractXMLObject
     {
     public:
         virtual ~AbstractSimpleElement() {
             XMLString::release(&m_value);
         }
         
-        virtual const XMLCh* getTextContent() const {
-            return m_value;
+        bool hasChildren() const {
+            return false;
+        }
+
+        const std::list<XMLObject*>& getOrderedChildren() const {
+            return m_no_children;
+        }
+
+        void removeChild(XMLObject* child);
+
+        virtual const XMLCh* getTextContent(unsigned int position=0) const {
+            return (position==0) ? m_value : NULL;
         }
         
-        virtual void setTextContent(const XMLCh* value) {
+        virtual void setTextContent(const XMLCh* value, unsigned int position=0) {
+            if (position > 0)
+                throw XMLObjectException("Cannot set text content in simple element at position > 0.");
             m_value=prepareForAssignment(m_value,value);
         }
         
@@ -61,6 +72,8 @@ namespace xmltooling {
 
     private:
         XMLCh* m_value;
+
+        static std::list<XMLObject*> m_no_children;
     };
     
 };

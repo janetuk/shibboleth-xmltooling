@@ -60,7 +60,7 @@ XMLObject* AbstractXMLObjectUnmarshaller::unmarshall(DOMElement* element, bool b
         unmarshallAttributes(element);
     }
 
-    unmarshallChildElements(element);
+    unmarshallContent(element);
 
     setDOM(element,bindDocument);
     return this;
@@ -134,26 +134,25 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
     }
 }
 
-void AbstractXMLObjectUnmarshaller::unmarshallChildElements(const DOMElement* domElement)
+void AbstractXMLObjectUnmarshaller::unmarshallContent(const DOMElement* domElement)
 {
 #ifdef _DEBUG
-    xmltooling::NDC ndc("unmarshallChildElements");
+    xmltooling::NDC ndc("unmarshallContent");
 #endif
 
     if (XT_log.isDebugEnabled()) {
         auto_ptr_char dname(domElement->getNodeName());
-        XT_log.debug("unmarshalling child elements of DOM element (%s)", dname.get());
+        XT_log.debug("unmarshalling child nodes of DOM element (%s)", dname.get());
     }
 
-    DOMNodeList* childNodes = domElement->getChildNodes();
-    DOMNode* childNode;
-    if (!childNodes || childNodes->getLength()==0) {
+    DOMNode* childNode = domElement->getFirstChild();
+    if (!childNode) {
         XT_log.debug("element had no children");
         return;
     }
 
-    for (XMLSize_t i = 0; i < childNodes->getLength(); i++) {
-        childNode = childNodes->item(i);
+    unsigned int position = 0;
+    while (childNode) {
         if (childNode->getNodeType() == DOMNode::ELEMENT_NODE) {
             const XMLObjectBuilder* builder = XMLObjectBuilder::getBuilder(static_cast<DOMElement*>(childNode));
             if (!builder) {
@@ -171,11 +170,16 @@ void AbstractXMLObjectUnmarshaller::unmarshallChildElements(const DOMElement* do
             auto_ptr<XMLObject> childObject(builder->buildFromElement(static_cast<DOMElement*>(childNode)));
             processChildElement(childObject.get(), static_cast<DOMElement*>(childNode));
             childObject.release();
+            
+            // Advance the text node position marker.
+            ++position;
         }
-        else if (childNode->getNodeType() == DOMNode::TEXT_NODE && !XMLString::isAllWhiteSpace(childNode->getNodeValue())) {
-            XT_log.debug("processing element content");
-            processElementContent(childNode->getNodeValue());
+        else if (childNode->getNodeType() == DOMNode::TEXT_NODE) {
+            XT_log.debug("processing text content at position (%d)", position);
+            setTextContent(childNode->getNodeValue(), position);
         }
+        
+        childNode = childNode->getNextSibling();
     }
 }
 
@@ -188,9 +192,4 @@ void AbstractXMLObjectUnmarshaller::processAttribute(const DOMAttr* attribute)
 {
     auto_ptr<QName> q(XMLHelper::getNodeQName(attribute));
     throw UnmarshallingException("Invalid attribute: $1",params(1,q->toString().c_str()));
-}
-
-void AbstractXMLObjectUnmarshaller::processElementContent(const XMLCh* elementContent)
-{
-    throw UnmarshallingException("Invalid text content in element."); 
 }

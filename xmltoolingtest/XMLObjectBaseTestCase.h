@@ -51,8 +51,9 @@ class SimpleXMLObject
         public AbstractXMLObjectUnmarshaller
 {
 protected:
-    SimpleXMLObject(const SimpleXMLObject& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src),
-        m_id(XMLString::replicate(src.m_id)), m_value(XMLString::replicate(src.m_value)) {
+    SimpleXMLObject(const SimpleXMLObject& src)
+            : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src),
+                m_id(XMLString::replicate(src.m_id)) {
 #ifndef XMLTOOLING_NO_XMLSEC
         m_children.push_back(NULL);
         m_signature=m_children.begin();
@@ -73,7 +74,7 @@ public:
 
     SimpleXMLObject(
         const XMLCh* nsURI=NULL, const XMLCh* localName=NULL, const XMLCh* prefix=NULL, const QName* schemaType=NULL
-        ) : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_id(NULL), m_value(NULL) {
+        ) : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_id(NULL) {
 #ifndef XMLTOOLING_NO_XMLSEC
         m_children.push_back(NULL);
         m_signature=m_children.begin();
@@ -82,7 +83,6 @@ public:
 
     virtual ~SimpleXMLObject() {
         XMLString::release(&m_id);
-        XMLString::release(&m_value);
     }
 
     SimpleXMLObject* clone() const {
@@ -100,8 +100,8 @@ public:
     const XMLCh* getId() const { return m_id; }
     void setId(const XMLCh* id) { m_id=prepareForAssignment(m_id,id); }
 
-    const XMLCh* getValue() const { return m_value; }
-    void setValue(const XMLCh* value) { m_value=prepareForAssignment(m_value,value); }
+    const XMLCh* getValue() const { return getTextContent(); }
+    void setValue(const XMLCh* value) { setTextContent(value); }
 
 #ifndef XMLTOOLING_NO_XMLSEC    
     Signature* getSignature() const {
@@ -126,12 +126,6 @@ protected:
         if(getId()) {
             domElement->setAttributeNS(NULL, SimpleXMLObject::ID_ATTRIB_NAME, getId());
             domElement->setIdAttributeNS(NULL, SimpleXMLObject::ID_ATTRIB_NAME);
-        }
-    }
-
-    void marshallElementContent(DOMElement* domElement) const {
-        if(getValue()) {
-            domElement->setTextContent(getValue());
         }
     }
 
@@ -160,13 +154,8 @@ protected:
             throw UnmarshallingException("Unknown attribute cannot be processed by parent object.");
     }
 
-    void processElementContent(const XMLCh* elementContent) {
-        setValue(elementContent);
-    }
-
 private:
     XMLCh* m_id;
-    XMLCh* m_value;
     vector<SimpleXMLObject*> m_simples;
 #ifndef XMLTOOLING_NO_XMLSEC
     list<XMLObject*>::iterator m_signature;

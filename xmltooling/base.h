@@ -961,11 +961,11 @@
     }
 
 /**
- * Declares aliased get/set methods for named XML element content.
+ * Declares aliased get/set methods for named XML element simple content.
  * 
  * @param proper    the proper name to label the element's content
  */
-#define DECL_XMLOBJECT_CONTENT(proper) \
+#define DECL_SIMPLE_CONTENT(proper) \
     XMLTOOLING_DOXYGEN(Returns proper.) \
     const XMLCh* get##proper() const { \
         return getTextContent(); \
@@ -998,21 +998,6 @@
     }
 
 /**
- * Implements marshalling/unmarshalling for element content.
- */
-#define IMPL_XMLOBJECT_CONTENT \
-    protected: \
-        void marshallElementContent(DOMElement* domElement) const { \
-            if(getTextContent()) { \
-                domElement->appendChild(domElement->getOwnerDocument()->createTextNode(getTextContent())); \
-            } \
-        } \
-        void processElementContent(const XMLCh* elementContent) { \
-            setTextContent(elementContent); \
-        }
-
-
-/**
  * Implements cloning methods for an XMLObject specialization implementation class.
  * 
  * @param cname    the name of the XMLObject specialization
@@ -1041,8 +1026,8 @@
  * @param desc      documentation for class
  */
 #define DECL_XMLOBJECT_SIMPLE(linkage,cname,proper,desc) \
-    BEGIN_XMLOBJECT(linkage,cname,xmltooling::SimpleElement,desc); \
-        DECL_XMLOBJECT_CONTENT(proper); \
+    BEGIN_XMLOBJECT(linkage,cname,xmltooling::XMLObject,desc); \
+        DECL_SIMPLE_CONTENT(proper); \
     END_XMLOBJECT
 
 /**
@@ -1056,7 +1041,6 @@
     class linkage cname##Impl \
         : public virtual cname, \
             public xmltooling::AbstractSimpleElement, \
-            public xmltooling::AbstractChildlessElement, \
             public xmltooling::AbstractDOMCachingXMLObject, \
             public xmltooling::AbstractXMLObjectMarshaller, \
             public xmltooling::AbstractXMLObjectUnmarshaller \
@@ -1071,7 +1055,6 @@
                 xmltooling::AbstractSimpleElement(src), \
                 xmltooling::AbstractDOMCachingXMLObject(src) {} \
         IMPL_XMLOBJECT_CLONE(cname) \
-        IMPL_XMLOBJECT_CONTENT \
     }
     
 /**

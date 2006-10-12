@@ -22,7 +22,7 @@
 
 #include "internal.h"
 #include "AbstractAttributeExtensibleXMLObject.h"
-#include "AbstractChildlessElement.h"
+#include "AbstractSimpleElement.h"
 #include "AbstractElementProxy.h"
 #include "exceptions.h"
 #include "encryption/Encryption.h"
@@ -74,7 +74,8 @@ namespace xmlencryption {
             init();
         }
             
-        EncryptionMethodImpl(const EncryptionMethodImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
+        EncryptionMethodImpl(const EncryptionMethodImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
             setAlgorithm(src.getAlgorithm());
             if (src.getKeySize())
@@ -133,7 +134,8 @@ namespace xmlencryption {
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
         }
             
-        TransformsImpl(const TransformsImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
+        TransformsImpl(const TransformsImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             VectorOf(xmlsignature::Transform) v=getTransforms();
             for (vector<xmlsignature::Transform*>::const_iterator i=src.m_Transforms.begin(); i!=src.m_Transforms.end(); i++) {
                 if (*i) {
@@ -174,7 +176,8 @@ namespace xmlencryption {
             init();
         }
             
-        CipherReferenceImpl(const CipherReferenceImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
+        CipherReferenceImpl(const CipherReferenceImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
             setURI(src.getURI());
             if (src.getTransforms())
@@ -224,7 +227,8 @@ namespace xmlencryption {
             init();
         }
             
-        CipherDataImpl(const CipherDataImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
+        CipherDataImpl(const CipherDataImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
             if (src.getCipherValue())
                 setCipherValue(src.getCipherValue()->cloneCipherValue());
@@ -334,7 +338,8 @@ namespace xmlencryption {
             init();
         }
             
-        EncryptionPropertiesImpl(const EncryptionPropertiesImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
+        EncryptionPropertiesImpl(const EncryptionPropertiesImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
             setId(src.getId());
             VectorOf(EncryptionProperty) v=getEncryptionPropertys();
@@ -464,7 +469,8 @@ namespace xmlencryption {
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
         }
             
-        ReferenceListImpl(const ReferenceListImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
+        ReferenceListImpl(const ReferenceListImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
                 if (*i) {
                     DataReference* data=dynamic_cast<DataReference*>(*i);
@@ -536,7 +542,8 @@ namespace xmlencryption {
             init();
         }
             
-        EncryptedTypeImpl(const EncryptedTypeImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
+        EncryptedTypeImpl(const EncryptedTypeImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
             setId(src.getId());
             setType(src.getType());

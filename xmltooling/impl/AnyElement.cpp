@@ -55,22 +55,12 @@ void AnyElementImpl::marshallAttributes(DOMElement* domElement) const {
     marshallExtensionAttributes(domElement);
 }
 
-void AnyElementImpl::marshallElementContent(DOMElement* domElement) const {
-    if(getTextContent()) {
-        domElement->appendChild(domElement->getOwnerDocument()->createTextNode(getTextContent()));
-    }
-}
-
 void AnyElementImpl::processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
     getXMLObjects().push_back(childXMLObject);
 }
 
 void AnyElementImpl::processAttribute(const DOMAttr* attribute) {
     unmarshallExtensionAttribute(attribute);
-}
-
-void AnyElementImpl::processElementContent(const XMLCh* elementContent) {
-    setTextContent(elementContent);
 }
 
 XMLObject* AnyElementBuilder::buildObject(

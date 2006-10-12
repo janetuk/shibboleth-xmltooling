@@ -107,13 +107,13 @@ namespace xmltooling {
         void marshallNamespaces(DOMElement* domElement) const;
     
         /**
-         * Marshalls the child elements of the XMLObject.
+         * Marshalls the text content and/or child elements of the XMLObject.
          * 
          * @param domElement the DOM element that will recieved the marshalled children
          * 
          * @throws MarshallingException thrown if there is a problem marshalling a child element
          */
-        void marshallChildElements(DOMElement* domElement) const;
+        void marshallContent(DOMElement* domElement) const;
 
         /**
          * Marshalls the attributes from the XMLObject into the given DOM element.
@@ -123,13 +123,6 @@ namespace xmltooling {
          * @throws MarshallingException thrown if there is a problem marshalling an attribute
          */
         virtual void marshallAttributes(DOMElement* domElement) const {}
-
-        /**
-         * Marshalls data from the XMLObject into content of the DOM Element.
-         * 
-         * @param domElement the DOM element recieving the content
-         */
-        virtual void marshallElementContent(DOMElement* domElement) const {}
     };
     
 };

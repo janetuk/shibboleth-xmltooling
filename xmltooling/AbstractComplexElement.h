@@ -15,7 +15,7 @@
  */
 
 /**
- * @file AbstractComplexElement.h
+ * @file xmltooling/AbstractComplexElement.h
  * 
  * AbstractXMLObject mixin that implements children
  */
@@ -34,8 +34,7 @@ namespace xmltooling {
 
     /**
      * AbstractXMLObject mixin that implements children.
-     * Inherit from this class to implement an element with child objects.
-     * No unprotected access to them is supplied here.
+     * Inherit from this class to implement an element with child objects and mixed content.
      */
     class XMLTOOL_API AbstractComplexElement : public virtual AbstractXMLObject
     {
@@ -52,17 +51,29 @@ namespace xmltooling {
 
         void removeChild(XMLObject* child);
 
+        const XMLCh* getTextContent(unsigned int position=0) const {
+            return (m_text.size() > position) ? m_text[position] : NULL; 
+        }
+        
+        void setTextContent(const XMLCh* value, unsigned int position=0);
+
     protected:
         AbstractComplexElement() {}
         
         /** Copy constructor. */
-        AbstractComplexElement(const AbstractComplexElement& src) {}
+        AbstractComplexElement(const AbstractComplexElement& src);
 
         /**
          * Underlying list of child objects.
          * Manages the lifetime of the children.
          */
         std::list<XMLObject*> m_children;
+        
+        /**
+         * Interstitial text nodes.
+         * Needed to support mixed content, and preserve DOM whitespace across rebuilds.
+         */
+        std::vector<XMLCh*> m_text;
     };
     
 };

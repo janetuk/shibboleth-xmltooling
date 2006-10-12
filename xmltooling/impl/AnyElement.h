@@ -15,7 +15,7 @@
  */
 
 /**
- * @file AnyElement.h
+ * @file xmltooling/impl/AnyElement.h
  * 
  * Advanced anyType implementation suitable for deep processing of unknown content.
  */
@@ -58,10 +58,8 @@ namespace xmltooling {
         AnyElementImpl(const AnyElementImpl& src);   
         
         void marshallAttributes(DOMElement* domElement) const;
-        void marshallElementContent(DOMElement* domElement) const;
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root);
         void processAttribute(const DOMAttr* attribute);
-        void processElementContent(const XMLCh* elementContent);
     };
 
     /**

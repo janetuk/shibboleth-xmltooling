@@ -15,7 +15,7 @@
  */
 
 /**
- * @file KeyInfo.h
+ * @file xmltooling/signature/KeyInfo.h
  * 
  * XMLObjects representing XML Digital Signature, version 20020212, KeyInfo element
  * and related content.
@@ -25,10 +25,8 @@
 #define __xmltooling_keyinfo_h__
 
 #include <xmltooling/ElementProxy.h>
-#include <xmltooling/SimpleElement.h>
 #include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/util/XMLConstants.h>
-#include <xmltooling/validation/ValidatorSuite.h>
 
 #define DECL_XMLSIGOBJECTBUILDER(cname) \
     DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,xmltooling::XMLConstants::XMLSIG_NS,xmltooling::XMLConstants::XMLSIG_PREFIX)
@@ -76,7 +74,7 @@ namespace xmlsignature {
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
-    BEGIN_XMLOBJECT(XMLTOOL_API,KeyValue,xmltooling::SimpleElement,XML Digital Signature version 20020212 KeyValue element);
+    BEGIN_XMLOBJECT(XMLTOOL_API,KeyValue,xmltooling::XMLObject,XML Digital Signature version 20020212 KeyValue element);
         DECL_TYPED_CHILD(DSAKeyValue);
         DECL_TYPED_CHILD(RSAKeyValue);
         DECL_XMLOBJECT_CHILD(OtherKeyValue);

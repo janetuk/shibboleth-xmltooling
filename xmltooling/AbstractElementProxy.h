@@ -15,7 +15,7 @@
  */
 
 /**
- * @file AbstractElementProxy.h
+ * @file xmltooling/AbstractElementProxy.h
  * 
  * AbstractXMLObject mixin that implements an open content model 
  */
@@ -24,7 +24,6 @@
 #define __xmltooling_abseleproxy_h__
 
 #include <xmltooling/AbstractComplexElement.h>
-#include <xmltooling/AbstractSimpleElement.h>
 #include <xmltooling/ElementProxy.h>
 
 #if defined (_MSC_VER)
@@ -35,12 +34,11 @@
 namespace xmltooling {
 
     /**
-     * AbstractXMLObject mixin that implements an open content model.
-     * Inherit from this class to merge both simple and complex content
+     * AbstractXMLObject mixin that layers ElementProxy on top of a complex element.
+     * Inherit from this class to implement complex content
      * and expose the underlying child collection in read/write mode.
      */
-    class XMLTOOL_API AbstractElementProxy
-        : public virtual ElementProxy, public AbstractSimpleElement, public AbstractComplexElement
+    class XMLTOOL_API AbstractElementProxy : public virtual ElementProxy, public AbstractComplexElement
     {
     public:
         virtual ~AbstractElementProxy() {}
@@ -57,8 +55,7 @@ namespace xmltooling {
         AbstractElementProxy() {}
         
         /** Copy constructor. */
-        AbstractElementProxy(const AbstractElementProxy& src)
-            : AbstractXMLObject(src), AbstractSimpleElement(src) {}
+        AbstractElementProxy(const AbstractElementProxy& src) : AbstractXMLObject(src), AbstractComplexElement(src) {}
     };
     
 };

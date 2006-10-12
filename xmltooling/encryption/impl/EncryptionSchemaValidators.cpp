@@ -23,6 +23,7 @@
 #include "internal.h"
 #include "exceptions.h"
 #include "encryption/Encryption.h"
+#include "validation/ValidatorSuite.h"
 
 using namespace xmlencryption;
 using namespace xmltooling;

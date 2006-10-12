@@ -96,10 +96,10 @@ namespace xmltooling {
         static QName* getNodeQName(const DOMNode* domNode);
 
         /**
-         * Constructs a QName from an attributes value.
+         * Constructs a QName from an attribute's value.
          * 
          * @param attribute the attribute with a QName value
-         * @return a QName from an attributes value, or null if the given attribute is null
+         * @return a QName from an attribute's value, or null if the given attribute is null
          */
         static QName* getAttributeValueAsQName(const DOMAttr* attribute);
 

@@ -21,7 +21,7 @@
  */
 
 #include "internal.h"
-#include "AbstractChildlessElement.h"
+#include "AbstractSimpleElement.h"
 #include "AbstractComplexElement.h"
 #include "AbstractElementProxy.h"
 #include "AbstractSimpleElement.h"
@@ -58,7 +58,8 @@ namespace xmlsignature {
             init();
         }
             
-        DSAKeyValueImpl(const DSAKeyValueImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
+        DSAKeyValueImpl(const DSAKeyValueImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
             if (src.getP())
                 setP(src.getP()->cloneP());
@@ -142,7 +143,8 @@ namespace xmlsignature {
             init();
         }
             
-        RSAKeyValueImpl(const RSAKeyValueImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
+        RSAKeyValueImpl(const RSAKeyValueImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
             if (src.getModulus())
                 setModulus(src.getModulus()->cloneModulus());
@@ -173,7 +175,6 @@ namespace xmlsignature {
     };
 
     class XMLTOOL_DLLLOCAL KeyValueImpl : public virtual KeyValue,
-        public AbstractSimpleElement,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractXMLObjectMarshaller,
@@ -188,7 +189,7 @@ namespace xmlsignature {
         }
             
         KeyValueImpl(const KeyValueImpl& src)
-                : AbstractXMLObject(src), AbstractSimpleElement(src), AbstractDOMCachingXMLObject(src) {
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
             if (src.getDSAKeyValue())
                 setDSAKeyValue(src.getDSAKeyValue()->cloneDSAKeyValue());
@@ -216,7 +217,6 @@ namespace xmlsignature {
         IMPL_TYPED_CHILD(DSAKeyValue);
         IMPL_TYPED_CHILD(RSAKeyValue);
         IMPL_XMLOBJECT_CHILD(OtherKeyValue);
-        IMPL_XMLOBJECT_CONTENT;
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -267,7 +267,6 @@ namespace xmlsignature {
         IMPL_XMLOBJECT_CLONE(Transform);
         IMPL_STRING_ATTRIB(Algorithm);
         IMPL_TYPED_CHILDREN(XPath,m_children.end());
-        IMPL_XMLOBJECT_CONTENT;
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
@@ -306,7 +305,8 @@ namespace xmlsignature {
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
         }
             
-        TransformsImpl(const TransformsImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
+        TransformsImpl(const TransformsImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             VectorOf(Transform) v=getTransforms();
             for (vector<Transform*>::const_iterator i=src.m_Transforms.begin(); i!=src.m_Transforms.end(); i++) {
                 if (*i) {
@@ -342,7 +342,8 @@ namespace xmlsignature {
             init();
         }
             
-        RetrievalMethodImpl(const RetrievalMethodImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
+        RetrievalMethodImpl(const RetrievalMethodImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
             setURI(getURI());
             setType(getType());
@@ -394,7 +395,8 @@ namespace xmlsignature {
             init();
         }
             
-        X509IssuerSerialImpl(const X509IssuerSerialImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
+        X509IssuerSerialImpl(const X509IssuerSerialImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
             if (src.getX509IssuerName())
                 setX509IssuerName(src.getX509IssuerName()->cloneX509IssuerName());
@@ -437,7 +439,8 @@ namespace xmlsignature {
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
         }
             
-        X509DataImpl(const X509DataImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
+        X509DataImpl(const X509DataImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
                 if (*i) {
                     X509Certificate* xcert=dynamic_cast<X509Certificate*>(*i);
@@ -515,7 +518,8 @@ namespace xmlsignature {
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
         }
             
-        SPKIDataImpl(const SPKIDataImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
+        SPKIDataImpl(const SPKIDataImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             VectorOfPairs(SPKISexp,XMLObject) v=getSPKISexps();
             for (vector< pair<SPKISexp*,XMLObject*> >::const_iterator i=src.m_SPKISexps.begin(); i!=src.m_SPKISexps.end(); i++) {
                 if (i->first) {
@@ -579,7 +583,8 @@ namespace xmlsignature {
             init();
         }
             
-        PGPDataImpl(const PGPDataImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
+        PGPDataImpl(const PGPDataImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
             if (src.getPGPKeyID())
                 setPGPKeyID(src.getPGPKeyID()->clonePGPKeyID());
@@ -626,7 +631,6 @@ namespace xmlsignature {
 
     class XMLTOOL_DLLLOCAL KeyInfoImpl : public virtual KeyInfo,
         public AbstractComplexElement,
-        public AbstractSimpleElement,
         public AbstractDOMCachingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
@@ -641,7 +645,7 @@ namespace xmlsignature {
         }
             
         KeyInfoImpl(const KeyInfoImpl& src)
-                : AbstractXMLObject(src), AbstractSimpleElement(src), AbstractDOMCachingXMLObject(src),
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src),
                     m_Id(XMLString::replicate(src.m_Id)) {
 
             for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
@@ -703,7 +707,6 @@ namespace xmlsignature {
         IMPL_TYPED_CHILDREN(SPKIData,m_children.end());
         IMPL_TYPED_CHILDREN(PGPData,m_children.end());
         IMPL_XMLOBJECT_CHILDREN(Other,m_children.end());
-        IMPL_XMLOBJECT_CONTENT;
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {

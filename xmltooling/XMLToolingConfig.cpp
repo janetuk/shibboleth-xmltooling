@@ -33,7 +33,7 @@
 #include "util/ReplayCache.h"
 #include "util/StorageService.h"
 #include "util/XMLConstants.h"
-#include "validation/Validator.h"
+#include "validation/ValidatorSuite.h"
 
 #ifdef HAVE_DLFCN_H
 # include <dlfcn.h>

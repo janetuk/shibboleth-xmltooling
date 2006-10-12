@@ -23,6 +23,7 @@
 #include "internal.h"
 #include "exceptions.h"
 #include "soap/SOAP.h"
+#include "validation/ValidatorSuite.h"
 
 using namespace soap11;
 using namespace xmltooling;

@@ -50,15 +50,13 @@ AbstractXMLObject::AbstractXMLObject(const AbstractXMLObject& src)
 
 XMLCh* AbstractXMLObject::prepareForAssignment(XMLCh* oldValue, const XMLCh* newValue)
 {
-    XMLCh* newString = XMLString::replicate(newValue);
-    XMLString::trim(newString);
     if (!XMLString::equals(oldValue,newValue)) {
         releaseThisandParentDOM();
+        XMLCh* newString = XMLString::replicate(newValue);
         XMLString::release(&oldValue);
         return newString;
     }
-    XMLString::release(&newString);
-    return oldValue;            
+    return oldValue;
 }
 
 QName* AbstractXMLObject::prepareForAssignment(QName* oldValue, const QName* newValue)

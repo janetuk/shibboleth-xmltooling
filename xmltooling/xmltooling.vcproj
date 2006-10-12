@@ -186,15 +186,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\AbstractChildlessElement.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\AbstractComplexElement.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\AbstractDOMCachingXMLObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\AbstractSimpleElement.cpp"
 				>
 			</File>
 			<File
@@ -412,10 +412,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\AbstractChildlessElement.h"
-				>
-			</File>
-			<File
 				RelativePath=".\AbstractComplexElement.h"
 				>
 			</File>
@@ -461,6 +457,10 @@
 			</File>
 			<File
 				RelativePath=".\Lockable.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MixedElement.h"
 				>
 			</File>
 			<File

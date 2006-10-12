@@ -58,14 +58,14 @@ namespace xmltooling {
         virtual void unmarshallAttributes(const DOMElement* domElement);
 
         /**
-         * Unmarshalls a given Element's children. The resulting XMLObject child is passed to
-         * processChildElement() for further processing.
+         * Unmarshalls a given Element's child nodes. The resulting XMLObject children and content
+         * are passed to processChildElement() or processText() for further processing.
          * 
          * @param domElement the DOM Element whose children will be unmarshalled
          * 
          * @throws UnmarshallingException thrown if an error occurs unmarshalling the child elements
          */
-        virtual void unmarshallChildElements(const DOMElement* domElement);
+        virtual void unmarshallContent(const DOMElement* domElement);
 
         /**
          * Called after a child element has been unmarshalled so that it can be added to the parent XMLObject.
@@ -85,13 +85,6 @@ namespace xmltooling {
          * @throws UnmarshallingException thrown if there is a problem adding the attribute to the XMLObject
          */
         virtual void processAttribute(const DOMAttr* attribute);
-    
-        /**
-         * Called if the element being unmarshalled contained textual content so that it can be added to the XMLObject.
-         * 
-         * @param elementContent the Element's text content
-         */
-        virtual void processElementContent(const XMLCh* elementContent);
     };
     
 };

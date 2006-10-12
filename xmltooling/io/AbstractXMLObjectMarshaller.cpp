@@ -181,8 +181,7 @@ void AbstractXMLObjectMarshaller::marshallInto(
     marshallElementType(targetElement);
     marshallNamespaces(targetElement);
     marshallAttributes(targetElement);
-    marshallChildElements(targetElement);
-    marshallElementContent(targetElement);
+    marshallContent(targetElement);
     
 #ifndef XMLTOOLING_NO_XMLSEC
     if (sigs) {
@@ -290,17 +289,21 @@ void AbstractXMLObjectMarshaller::marshallNamespaces(DOMElement* domElement) con
     for_each(namespaces.begin(),namespaces.end(),bind1st(_addns(),domElement));
 }
 
-class _marshallit : public binary_function<const XMLObject*,DOMElement*,void> {
-public:
-    void operator()(const XMLObject* xo, DOMElement* e) const {
-        if (xo) xo->marshall(e);
-    }
-};
-
-void AbstractXMLObjectMarshaller::marshallChildElements(DOMElement* domElement) const
+void AbstractXMLObjectMarshaller::marshallContent(DOMElement* domElement) const
 {
-    XT_log.debug("marshalling child elements for XMLObject");
-
+    XT_log.debug("marshalling text and child elements for XMLObject");
+    
+    const XMLCh* val;
+    unsigned int pos=0;
     const list<XMLObject*>& children=getOrderedChildren();
-    for_each(children.begin(),children.end(),bind2nd(_marshallit(),domElement));
+    for (list<XMLObject*>::const_iterator i=children.begin(); i!=children.end(); ++i, ++pos) {
+        val = getTextContent(pos);
+        if (val && *val)
+            domElement->appendChild(domElement->getOwnerDocument()->createTextNode(val));
+        if (*i)
+            (*i)->marshall(domElement);
+    }
+    val = getTextContent(pos);
+    if (val && *val)
+        domElement->appendChild(domElement->getOwnerDocument()->createTextNode(val));
 }

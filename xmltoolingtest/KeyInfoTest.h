@@ -18,6 +18,7 @@
 
 #include <fstream>
 #include <xmltooling/signature/KeyInfo.h>
+#include <xmltooling/validation/ValidatorSuite.h>
 
 using namespace xmlsignature;
 

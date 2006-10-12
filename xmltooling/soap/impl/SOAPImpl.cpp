@@ -22,7 +22,7 @@
 
 #include "internal.h"
 #include "AbstractAttributeExtensibleXMLObject.h"
-#include "AbstractChildlessElement.h"
+#include "AbstractSimpleElement.h"
 #include "AbstractElementProxy.h"
 #include "exceptions.h"
 #include "io/AbstractXMLObjectMarshaller.h"
@@ -47,8 +47,7 @@ namespace {
     DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,Faultactor);
 
     class XMLTOOL_DLLLOCAL FaultcodeImpl : public virtual Faultcode,
-        protected AbstractSimpleElement,
-        public AbstractChildlessElement,
+        public AbstractSimpleElement,
         public AbstractDOMCachingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
@@ -83,7 +82,6 @@ namespace {
         }
         
         IMPL_XMLOBJECT_CLONE(Faultcode);
-        IMPL_XMLOBJECT_CONTENT;
     };
 
     class XMLTOOL_DLLLOCAL DetailImpl : public virtual Detail,
@@ -164,7 +162,8 @@ namespace {
             init();
         }
             
-        FaultImpl(const FaultImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src) {
+        FaultImpl(const FaultImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
             if (src.getFaultcode())
                 setFaultcode(src.getFaultcode()->cloneFaultcode());
@@ -349,7 +348,8 @@ namespace {
         }
             
         EnvelopeImpl(const EnvelopeImpl& src)
-                : AbstractXMLObject(src), AbstractAttributeExtensibleXMLObject(src), AbstractDOMCachingXMLObject(src) {
+                : AbstractXMLObject(src), AbstractComplexElement(src),
+                    AbstractAttributeExtensibleXMLObject(src), AbstractDOMCachingXMLObject(src) {
             init();
             if (src.getHeader())
                 setHeader(src.getHeader()->cloneHeader());

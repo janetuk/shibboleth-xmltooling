@@ -15,7 +15,7 @@
  */
 
 /**
- * @file SOAP.h
+ * @file xmltooling/soap/SOAP.h
  * 
  * XMLObjects representing SOAP content
  */
@@ -25,10 +25,8 @@
 
 #include <xmltooling/AttributeExtensibleXMLObject.h>
 #include <xmltooling/ElementProxy.h>
-#include <xmltooling/SimpleElement.h>
 #include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/util/XMLConstants.h>
-#include <xmltooling/validation/ValidatorSuite.h>
 #include <xercesc/util/XMLUniDefs.hpp>
 
 #define DECL_SOAP11OBJECTBUILDER(cname) \

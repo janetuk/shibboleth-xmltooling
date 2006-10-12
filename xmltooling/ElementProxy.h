@@ -15,15 +15,14 @@
  */
 
 /**
- * @file ElementProxy.h
+ * @file xmltooling/ElementProxy.h
  * 
  * An XMLObject with an open content model 
  */
 
-#if !defined(__xmltooling_eleproxy_h__)
+#ifndef __xmltooling_eleproxy_h__
 #define __xmltooling_eleproxy_h__
 
-#include <xmltooling/SimpleElement.h>
 #include <xmltooling/XMLObject.h>
 #include <xmltooling/util/XMLObjectChildrenList.h>
 
@@ -32,9 +31,9 @@ using namespace xercesc;
 namespace xmltooling {
 
     /**
-     * An XMLObject with an open content model.
+     * An XMLObject that exposes its children via mutable list.
      */
-    class XMLTOOL_API ElementProxy : public virtual SimpleElement
+    class XMLTOOL_API ElementProxy : public virtual XMLObject
     {
     public:
         ElementProxy() {}

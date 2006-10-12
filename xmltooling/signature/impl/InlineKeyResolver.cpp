@@ -26,6 +26,7 @@
 #include "util/NDC.h"
 #include "util/Threads.h"
 #include "util/XMLConstants.h"
+#include "validation/ValidatorSuite.h"
 
 #include <log4cpp/Category.hh>
 #include <xercesc/util/XMLUniDefs.hpp>

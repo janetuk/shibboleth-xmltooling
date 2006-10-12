@@ -15,7 +15,7 @@
  */
 
 /**
- * @file UnknownElement.h
+ * @file xmltooling/impl/UnknownElement.h
  * 
  * Basic implementation suitable for use as default for unrecognized content
  */
@@ -23,7 +23,7 @@
 #ifndef __xmltooling_unkelement_h__
 #define __xmltooling_unkelement_h__
 
-#include <xmltooling/AbstractChildlessElement.h>
+#include <xmltooling/AbstractSimpleElement.h>
 #include <xmltooling/exceptions.h>
 #include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/io/AbstractXMLObjectMarshaller.h>
@@ -39,7 +39,7 @@
 namespace xmltooling {
 
     /// @cond off
-    class XMLTOOL_DLLLOCAL UnknownElementImpl : public AbstractChildlessElement, public AbstractDOMCachingXMLObject
+    class XMLTOOL_DLLLOCAL UnknownElementImpl : public AbstractSimpleElement, public AbstractDOMCachingXMLObject
     {
     public:
         UnknownElementImpl(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL)
@@ -48,6 +48,14 @@ namespace xmltooling {
         void releaseDOM() const;
 
         XMLObject* clone() const;
+
+        const XMLCh* getTextContent(unsigned int position=0) const {
+            throw XMLObjectException("Direct access to content is not permitted.");
+        }
+
+        void setTextContent(const XMLCh*, unsigned int position=0) {
+            throw XMLObjectException("Direct access to content is not permitted.");
+        }
 
         DOMElement* marshall(
             DOMDocument* document=NULL

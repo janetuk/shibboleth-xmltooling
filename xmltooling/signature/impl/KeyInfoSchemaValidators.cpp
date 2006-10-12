@@ -23,6 +23,7 @@
 #include "internal.h"
 #include "exceptions.h"
 #include "signature/KeyInfo.h"
+#include "validation/ValidatorSuite.h"
 
 using namespace xmlsignature;
 using namespace xmltooling;
