@@ -63,7 +63,7 @@ namespace xmltooling {
             if (i == m_namespaces.end())
                 m_namespaces.insert(ns);
             else if (ns.alwaysDeclare())
-                i->setAlwaysDeclare(true);
+                const_cast<Namespace&>(*i).setAlwaysDeclare(true);
         }
     
         void removeNamespace(const Namespace& ns) {

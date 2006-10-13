@@ -348,8 +348,8 @@ namespace {
         }
             
         EnvelopeImpl(const EnvelopeImpl& src)
-                : AbstractXMLObject(src), AbstractComplexElement(src),
-                    AbstractAttributeExtensibleXMLObject(src), AbstractDOMCachingXMLObject(src) {
+                : AbstractXMLObject(src), AbstractAttributeExtensibleXMLObject(src),
+                    AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
             if (src.getHeader())
                 setHeader(src.getHeader()->cloneHeader());
