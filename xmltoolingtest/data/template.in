@@ -1,0 +1,13 @@
+This is a template containing tags for substitution by the template engine.
+
+<mlp foo1/> <mlp foo2/> <mlp foo3/>
+
+<mlpif foo1><mlp foo3/></mlpif>
+
+<mlpif foo2><mlp foo1/></mlpif>
+
+<mlpif foo1>
+	<mlpifnot foo2>
+		<mlp foo3/>
+	</mlpifnot>
+</mlpif>

@@ -249,6 +249,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\util\TemplateEngine.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\util\Win32Threads.cpp"
 					>
 				</File>
@@ -520,6 +524,10 @@
 				</File>
 				<File
 					RelativePath=".\util\StorageService.h"
+					>
+				</File>
+				<File
+					RelativePath=".\util\TemplateEngine.h"
 					>
 				</File>
 				<File

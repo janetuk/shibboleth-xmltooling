@@ -81,6 +81,7 @@ utilinclude_HEADERS = \
 	util/ParserPool.h \
 	util/ReplayCache.h \
 	util/StorageService.h \
+	util/TemplateEngine.h \
 	util/Threads.h \
 	util/XMLConstants.h \
 	util/XMLHelper.h \
@@ -145,6 +146,7 @@ libxmltooling_la_SOURCES = \
 	util/ParserPool.cpp \
 	util/ReplayCache.cpp \
 	util/StorageService.cpp \
+	util/TemplateEngine.cpp \
 	util/XMLConstants.cpp \
 	util/XMLHelper.cpp \
 	validation/ValidatorSuite.cpp \

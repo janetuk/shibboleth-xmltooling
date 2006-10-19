@@ -22,7 +22,9 @@ xmltoolingtest_h = \
     ExceptionTest.h \
     KeyInfoTest.h \
     MarshallingTest.h \
+    MemoryStorageServiceTest.h \
     UnmarshallingTest.h \
+    TemplateEngineTest.h \
     xmltoolingtest.h \
     ${xmlsec_sources}
 

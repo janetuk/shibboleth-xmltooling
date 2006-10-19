@@ -43,6 +43,7 @@ namespace xmltooling {
     
     class XMLTOOL_API ReplayCache;
     class XMLTOOL_API StorageService;
+    class XMLTOOL_API TemplateEngine;
     class XMLTOOL_API TrustEngine;
     class XMLTOOL_API XSECCryptoX509CRL;
 
@@ -61,6 +62,9 @@ namespace xmltooling {
         
         /** Global ReplayCache instance. */
         ReplayCache* m_replayCache;
+        
+        /** Global TemplateEngine instance. */
+        TemplateEngine* m_templateEngine;
     public:
         virtual ~XMLToolingConfig() {}
 
@@ -149,6 +153,24 @@ namespace xmltooling {
          */
         ReplayCache* getReplayCache() const {
             return m_replayCache;
+        }
+
+        /**
+         * Sets the global TemplateEngine instance.
+         * This method must be externally synchronized with any code that uses the object.
+         * Any previously set object is destroyed.
+         * 
+         * @param templateEngine   new TemplateEngine instance to store
+         */
+        void setTemplateEngine(TemplateEngine* templateEngine);
+
+        /**
+         * Returns the global TemplateEngine instance.
+         * 
+         * @return  global TemplateEngine or NULL
+         */
+        TemplateEngine* getTemplateEngine() const {
+            return m_templateEngine;
         }
                 
         /**

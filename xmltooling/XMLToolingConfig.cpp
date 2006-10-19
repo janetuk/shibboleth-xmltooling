@@ -32,6 +32,7 @@
 #include "util/NDC.h"
 #include "util/ReplayCache.h"
 #include "util/StorageService.h"
+#include "util/TemplateEngine.h"
 #include "util/XMLConstants.h"
 #include "validation/ValidatorSuite.h"
 
@@ -150,6 +151,12 @@ void XMLToolingConfig::setReplayCache(ReplayCache* replayCache)
     m_replayCache = replayCache;
 }
 
+void XMLToolingConfig::setTemplateEngine(TemplateEngine* templateEngine)
+{
+    delete m_templateEngine;
+    m_templateEngine = templateEngine;
+}
+
 bool XMLToolingInternalConfig::init()
 {
 #ifdef _DEBUG
@@ -242,6 +249,9 @@ void XMLToolingInternalConfig::term()
 
     delete m_replayCache;
     m_replayCache = NULL;
+    
+    delete m_templateEngine;
+    m_templateEngine = NULL;
 
     for (vector<void*>::reverse_iterator i=m_libhandles.rbegin(); i!=m_libhandles.rend(); i++) {
 #if defined(WIN32)
