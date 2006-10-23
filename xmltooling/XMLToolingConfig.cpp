@@ -213,7 +213,7 @@ bool XMLToolingInternalConfig::init()
         REGISTER_EXCEPTION_FACTORY(IOException,xmltooling);
         
 #ifndef XMLTOOLING_NO_XMLSEC
-        XMLObjectBuilder::registerBuilder(QName(XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME),new SignatureBuilder());
+        XMLObjectBuilder::registerBuilder(QName(xmlconstants::XMLSIG_NS,Signature::LOCAL_NAME),new SignatureBuilder());
         REGISTER_EXCEPTION_FACTORY(SignatureException,xmlsignature);
         registerKeyResolvers();
         registerCredentialResolvers();
@@ -223,7 +223,7 @@ bool XMLToolingInternalConfig::init()
 
         // Register xml:id as an ID attribute.        
         static const XMLCh xmlid[] = UNICODE_LITERAL_2(i,d);
-        AttributeExtensibleXMLObject::registerIDAttribute(QName(XMLConstants::XML_NS, xmlid)); 
+        AttributeExtensibleXMLObject::registerIDAttribute(QName(xmlconstants::XML_NS, xmlid)); 
     }
     catch (const xercesc::XMLException&) {
         log.fatal("caught exception while initializing Xerces");

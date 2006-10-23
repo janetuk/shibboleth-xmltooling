@@ -28,6 +28,7 @@
 using namespace xmlencryption;
 using namespace xmltooling;
 using namespace std;
+using xmlconstants::XMLENC_NS;
 
 namespace xmlencryption {
 
@@ -56,7 +57,7 @@ namespace xmlencryption {
     public:
         void operator()(const XMLObject* xmlObject) const {
             const XMLCh* ns=xmlObject->getElementQName().getNamespaceURI();
-            if (XMLString::equals(ns,XMLConstants::XMLENC_NS) || !ns || !*ns) {
+            if (XMLString::equals(ns,XMLENC_NS) || !ns || !*ns) {
                 throw ValidationException(
                     "Object contains an illegal extension child element ($1).",
                     params(1,xmlObject->getElementQName().toString().c_str())
@@ -122,25 +123,25 @@ namespace xmlencryption {
 void xmlencryption::registerEncryptionClasses()
 {
     QName q;
-    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,CarriedKeyName);
-    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,CipherData);
-    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,CipherReference);
-    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,CipherValue);
-    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,DataReference);
-    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,EncryptedData);
-    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,EncryptedKey);
-    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,EncryptionMethod);
-    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,EncryptionProperties);
-    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,EncryptionProperty);
-    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,KeyReference);
-    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,KeySize);
-    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,OAEPparams);
-    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,ReferenceList);
-    REGISTER_ELEMENT(XMLConstants::XMLENC_NS,Transforms);
-    REGISTER_TYPE(XMLConstants::XMLENC_NS,CipherData);
-    REGISTER_TYPE(XMLConstants::XMLENC_NS,CipherReference);
-    REGISTER_TYPE(XMLConstants::XMLENC_NS,EncryptionMethod);
-    REGISTER_TYPE(XMLConstants::XMLENC_NS,EncryptionProperties);
-    REGISTER_TYPE(XMLConstants::XMLENC_NS,EncryptionProperty);
-    REGISTER_TYPE(XMLConstants::XMLENC_NS,Transforms);
+    REGISTER_ELEMENT(XMLENC_NS,CarriedKeyName);
+    REGISTER_ELEMENT(XMLENC_NS,CipherData);
+    REGISTER_ELEMENT(XMLENC_NS,CipherReference);
+    REGISTER_ELEMENT(XMLENC_NS,CipherValue);
+    REGISTER_ELEMENT(XMLENC_NS,DataReference);
+    REGISTER_ELEMENT(XMLENC_NS,EncryptedData);
+    REGISTER_ELEMENT(XMLENC_NS,EncryptedKey);
+    REGISTER_ELEMENT(XMLENC_NS,EncryptionMethod);
+    REGISTER_ELEMENT(XMLENC_NS,EncryptionProperties);
+    REGISTER_ELEMENT(XMLENC_NS,EncryptionProperty);
+    REGISTER_ELEMENT(XMLENC_NS,KeyReference);
+    REGISTER_ELEMENT(XMLENC_NS,KeySize);
+    REGISTER_ELEMENT(XMLENC_NS,OAEPparams);
+    REGISTER_ELEMENT(XMLENC_NS,ReferenceList);
+    REGISTER_ELEMENT(XMLENC_NS,Transforms);
+    REGISTER_TYPE(XMLENC_NS,CipherData);
+    REGISTER_TYPE(XMLENC_NS,CipherReference);
+    REGISTER_TYPE(XMLENC_NS,EncryptionMethod);
+    REGISTER_TYPE(XMLENC_NS,EncryptionProperties);
+    REGISTER_TYPE(XMLENC_NS,EncryptionProperty);
+    REGISTER_TYPE(XMLENC_NS,Transforms);
 }

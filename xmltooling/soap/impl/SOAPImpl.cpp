@@ -35,6 +35,7 @@
 using namespace soap11;
 using namespace xmltooling;
 using namespace std;
+using xmlconstants::SOAP11ENV_NS;
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -183,10 +184,10 @@ namespace {
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILD(Faultcode,XMLConstants::SOAP11ENV_NS,false);
-            PROC_TYPED_CHILD(Faultstring,XMLConstants::SOAP11ENV_NS,false);
-            PROC_TYPED_CHILD(Faultactor,XMLConstants::SOAP11ENV_NS,false);
-            PROC_TYPED_CHILD(Detail,XMLConstants::SOAP11ENV_NS,false);
+            PROC_TYPED_CHILD(Faultcode,SOAP11ENV_NS,false);
+            PROC_TYPED_CHILD(Faultstring,SOAP11ENV_NS,false);
+            PROC_TYPED_CHILD(Faultactor,SOAP11ENV_NS,false);
+            PROC_TYPED_CHILD(Detail,SOAP11ENV_NS,false);
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
     };
@@ -229,7 +230,7 @@ namespace {
         IMPL_STRING_ATTRIB(EncodingStyle);
 
         void setAttribute(QName& qualifiedName, const XMLCh* value) {
-            if (qualifiedName.hasNamespaceURI() && XMLString::equals(qualifiedName.getNamespaceURI(),XMLConstants::SOAP11ENV_NS)) {
+            if (qualifiedName.hasNamespaceURI() && XMLString::equals(qualifiedName.getNamespaceURI(),SOAP11ENV_NS)) {
                 if (XMLString::equals(qualifiedName.getLocalPart(),ENCODINGSTYLE_ATTRIB_NAME)) {
                     setEncodingStyle(value);
                     return;
@@ -240,7 +241,7 @@ namespace {
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_STRING_ATTRIB(EncodingStyle,ENCODINGSTYLE,XMLConstants::SOAP11ENV_NS);
+            MARSHALL_STRING_ATTRIB(EncodingStyle,ENCODINGSTYLE,SOAP11ENV_NS);
             marshallExtensionAttributes(domElement);
         }
 
@@ -262,7 +263,7 @@ namespace {
     {
         void init() {
             m_Actor=NULL;
-            m_MustUnderstand=XMLConstants::XML_BOOL_NULL;
+            m_MustUnderstand=xmlconstants::XML_BOOL_NULL;
         }
     public:
         virtual ~HeaderImpl() {
@@ -294,7 +295,7 @@ namespace {
         IMPL_BOOLEAN_ATTRIB(MustUnderstand);
 
         void setAttribute(QName& qualifiedName, const XMLCh* value) {
-            if (qualifiedName.hasNamespaceURI() && XMLString::equals(qualifiedName.getNamespaceURI(),XMLConstants::SOAP11ENV_NS)) {
+            if (qualifiedName.hasNamespaceURI() && XMLString::equals(qualifiedName.getNamespaceURI(),SOAP11ENV_NS)) {
                 if (XMLString::equals(qualifiedName.getLocalPart(),MUSTUNDERSTAND_ATTRIB_NAME)) {
                     setMustUnderstand(value);
                     return;
@@ -309,8 +310,8 @@ namespace {
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_STRING_ATTRIB(Actor,ACTOR,XMLConstants::SOAP11ENV_NS);
-            MARSHALL_BOOLEAN_ATTRIB(MustUnderstand,MUSTUNDERSTAND,XMLConstants::SOAP11ENV_NS);
+            MARSHALL_STRING_ATTRIB(Actor,ACTOR,SOAP11ENV_NS);
+            MARSHALL_BOOLEAN_ATTRIB(MustUnderstand,MUSTUNDERSTAND,SOAP11ENV_NS);
             marshallExtensionAttributes(domElement);
         }
 
@@ -367,8 +368,8 @@ namespace {
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILD(Header,XMLConstants::SOAP11ENV_NS,false);
-            PROC_TYPED_CHILD(Body,XMLConstants::SOAP11ENV_NS,false);
+            PROC_TYPED_CHILD(Header,SOAP11ENV_NS,false);
+            PROC_TYPED_CHILD(Body,SOAP11ENV_NS,false);
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
 

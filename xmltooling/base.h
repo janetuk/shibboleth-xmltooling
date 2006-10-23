@@ -387,46 +387,46 @@
         XMLTOOLING_DOXYGEN(Returns the proper attribute or def if not set.) \
         bool proper() const { \
             switch (get##proper()) { \
-                case xmltooling::XMLConstants::XML_BOOL_TRUE: \
-                case xmltooling::XMLConstants::XML_BOOL_ONE: \
+                case xmlconstants::XML_BOOL_TRUE: \
+                case xmlconstants::XML_BOOL_ONE: \
                     return true; \
-                case xmltooling::XMLConstants::XML_BOOL_FALSE: \
-                case xmltooling::XMLConstants::XML_BOOL_ZERO: \
+                case xmlconstants::XML_BOOL_FALSE: \
+                case xmlconstants::XML_BOOL_ZERO: \
                     return false; \
                 default: \
                     return def; \
             } \
         } \
         XMLTOOLING_DOXYGEN(Returns the proper attribute as an explicit enumerated value.) \
-        virtual xmltooling::XMLConstants::xmltooling_bool_t get##proper() const=0; \
+        virtual xmlconstants::xmltooling_bool_t get##proper() const=0; \
         XMLTOOLING_DOXYGEN(Sets the proper attribute using an enumerated value.) \
-        virtual void proper(xmltooling::XMLConstants::xmltooling_bool_t value)=0; \
+        virtual void proper(xmlconstants::xmltooling_bool_t value)=0; \
         XMLTOOLING_DOXYGEN(Sets the proper attribute.) \
         void proper(bool value) { \
-            proper(value ? xmltooling::XMLConstants::XML_BOOL_ONE : xmltooling::XMLConstants::XML_BOOL_ZERO); \
+            proper(value ? xmlconstants::XML_BOOL_ONE : xmlconstants::XML_BOOL_ZERO); \
         } \
         XMLTOOLING_DOXYGEN(Sets the proper attribute using a string constant.) \
         void set##proper(const XMLCh* value) { \
             if (value) { \
                 switch (*value) { \
                     case chLatin_t: \
-                        proper(xmltooling::XMLConstants::XML_BOOL_TRUE); \
+                        proper(xmlconstants::XML_BOOL_TRUE); \
                         break; \
                     case chLatin_f: \
-                        proper(xmltooling::XMLConstants::XML_BOOL_FALSE); \
+                        proper(xmlconstants::XML_BOOL_FALSE); \
                         break; \
                     case chDigit_1: \
-                        proper(xmltooling::XMLConstants::XML_BOOL_ONE); \
+                        proper(xmlconstants::XML_BOOL_ONE); \
                         break; \
                     case chDigit_0: \
-                        proper(xmltooling::XMLConstants::XML_BOOL_ZERO); \
+                        proper(xmlconstants::XML_BOOL_ZERO); \
                         break; \
                     default: \
-                        proper(xmltooling::XMLConstants::XML_BOOL_NULL); \
+                        proper(xmlconstants::XML_BOOL_NULL); \
                 } \
             } \
             else \
-                proper(xmltooling::XMLConstants::XML_BOOL_NULL); \
+                proper(xmlconstants::XML_BOOL_NULL); \
         }
 
 /**
@@ -527,12 +527,12 @@
  */
 #define IMPL_BOOLEAN_ATTRIB(proper) \
     protected: \
-        XMLConstants::xmltooling_bool_t m_##proper; \
+        xmlconstants::xmltooling_bool_t m_##proper; \
     public: \
-        XMLConstants::xmltooling_bool_t get##proper() const { \
+        xmlconstants::xmltooling_bool_t get##proper() const { \
             return m_##proper; \
         } \
-        void proper(XMLConstants::xmltooling_bool_t value) { \
+        void proper(xmlconstants::xmltooling_bool_t value) { \
             if (m_##proper != value) { \
                 releaseThisandParentDOM(); \
                 m_##proper = value; \
@@ -768,19 +768,19 @@
  */
 #define MARSHALL_BOOLEAN_ATTRIB(proper,ucase,namespaceURI) \
     switch (m_##proper) { \
-        case XMLConstants::XML_BOOL_TRUE: \
-            domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, XMLConstants::XML_TRUE); \
+        case xmlconstants::XML_BOOL_TRUE: \
+            domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, xmlconstants::XML_TRUE); \
             break; \
-        case XMLConstants::XML_BOOL_ONE: \
-            domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, XMLConstants::XML_ONE); \
+        case xmlconstants::XML_BOOL_ONE: \
+            domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, xmlconstants::XML_ONE); \
             break; \
-        case XMLConstants::XML_BOOL_FALSE: \
-            domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, XMLConstants::XML_FALSE); \
+        case xmlconstants::XML_BOOL_FALSE: \
+            domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, xmlconstants::XML_FALSE); \
             break; \
-        case XMLConstants::XML_BOOL_ZERO: \
-            domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, XMLConstants::XML_ZERO); \
+        case xmlconstants::XML_BOOL_ZERO: \
+            domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, xmlconstants::XML_ZERO); \
             break; \
-        case XMLConstants::XML_BOOL_NULL: \
+        case xmlconstants::XML_BOOL_NULL: \
             break; \
     }
 

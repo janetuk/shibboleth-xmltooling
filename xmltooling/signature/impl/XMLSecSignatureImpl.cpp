@@ -42,6 +42,8 @@ using namespace xmlsignature;
 using namespace xmltooling;
 using namespace log4cpp;
 using namespace std;
+using xmlconstants::XMLSIG_NS;
+using xmlconstants::XMLSIG_PREFIX;
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -53,7 +55,7 @@ namespace xmlsignature {
     class XMLTOOL_DLLLOCAL XMLSecSignatureImpl : public UnknownElementImpl, public virtual Signature
     {
     public:
-        XMLSecSignatureImpl() : UnknownElementImpl(XMLConstants::XMLSIG_NS, Signature::LOCAL_NAME, XMLConstants::XMLSIG_PREFIX),
+        XMLSecSignatureImpl() : UnknownElementImpl(XMLSIG_NS, Signature::LOCAL_NAME, XMLSIG_PREFIX),
             m_signature(NULL), m_c14n(NULL), m_sm(NULL), m_key(NULL), m_keyInfo(NULL), m_reference(NULL) {}
         virtual ~XMLSecSignatureImpl();
         
@@ -234,7 +236,7 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, const vector<Si
             bindDocument=true;
         }
         m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignature();
-        m_signature->setDSIGNSPrefix(XMLConstants::XMLSIG_PREFIX);
+        m_signature->setDSIGNSPrefix(XMLSIG_PREFIX);
         cachedDOM=m_signature->createBlankSignature(document, getCanonicalizationMethod(), getSignatureAlgorithm());
     }
     else {
@@ -325,7 +327,7 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, const vecto
         // Fresh signature, so we just create an empty one.
         log.debug("creating empty Signature element");
         m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignature();
-        m_signature->setDSIGNSPrefix(XMLConstants::XMLSIG_PREFIX);
+        m_signature->setDSIGNSPrefix(XMLSIG_PREFIX);
         cachedDOM=m_signature->createBlankSignature(
             parentElement->getOwnerDocument(), getCanonicalizationMethod(), getSignatureAlgorithm()
             );
@@ -396,7 +398,7 @@ Signature* SignatureBuilder::buildObject(
     const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType
     ) const
 {
-    if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) || !XMLString::equals(localName,Signature::LOCAL_NAME))
+    if (!XMLString::equals(nsURI,XMLSIG_NS) || !XMLString::equals(localName,Signature::LOCAL_NAME))
         throw XMLObjectException("XMLSecSignatureBuilder requires standard Signature element name.");
     return buildObject();
 }

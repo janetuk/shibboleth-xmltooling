@@ -32,6 +32,7 @@
 
 using namespace xmltooling;
 using namespace std;
+using xmlconstants::XMLTOOLING_NS;
 
 params::params(int count,...)
 {
@@ -240,7 +241,7 @@ XMLToolingException* XMLToolingException::fromStream(std::istream& in)
     
     // Check root element.
     const DOMElement* root=doc->getDocumentElement();
-    if (!XMLHelper::isNodeNamed(root,XMLConstants::XMLTOOLING_NS,exception)) {
+    if (!XMLHelper::isNodeNamed(root,XMLTOOLING_NS,exception)) {
         doc->release();
         throw XMLToolingException("Invalid root element on serialized exception.");
     }
@@ -248,20 +249,20 @@ XMLToolingException* XMLToolingException::fromStream(std::istream& in)
     auto_ptr_char classname(root->getAttributeNS(NULL,type));
     auto_ptr<XMLToolingException> excep(XMLToolingException::getInstance(classname.get()));
     
-    DOMElement* child=XMLHelper::getFirstChildElement(root,XMLConstants::XMLTOOLING_NS,message);
+    DOMElement* child=XMLHelper::getFirstChildElement(root,XMLTOOLING_NS,message);
     if (child && child->hasChildNodes()) {
         auto_ptr_char m(child->getFirstChild()->getNodeValue());
         excep->setMessage(m.get());
     }
     
-    child=XMLHelper::getFirstChildElement(root,XMLConstants::XMLTOOLING_NS,param);
+    child=XMLHelper::getFirstChildElement(root,XMLTOOLING_NS,param);
     while (child && child->hasChildNodes()) {
         auto_ptr_char n(child->getAttributeNS(NULL,name));
         char* v=toUTF8(child->getFirstChild()->getNodeValue());
         if (n.get() && v)
             excep->addProperty(n.get(), v);
         XMLString::release(&v);
-        child=XMLHelper::getNextSiblingElement(root,XMLConstants::XMLTOOLING_NS,param);
+        child=XMLHelper::getNextSiblingElement(root,XMLTOOLING_NS,param);
     }
 
     doc->release();

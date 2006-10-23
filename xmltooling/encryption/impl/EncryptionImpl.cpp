@@ -35,6 +35,8 @@
 using namespace xmlencryption;
 using namespace xmltooling;
 using namespace std;
+using xmlconstants::XMLENC_NS;
+using xmlconstants::XMLSIG_NS;
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -102,12 +104,12 @@ namespace xmlencryption {
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILD(KeySize,XMLConstants::XMLENC_NS,false);
-            PROC_TYPED_CHILD(OAEPparams,XMLConstants::XMLENC_NS,false);
+            PROC_TYPED_CHILD(KeySize,XMLENC_NS,false);
+            PROC_TYPED_CHILD(OAEPparams,XMLENC_NS,false);
             
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
-            if (!XMLString::equals(nsURI,XMLConstants::XMLENC_NS) && nsURI && *nsURI) {
+            if (!XMLString::equals(nsURI,XMLENC_NS) && nsURI && *nsURI) {
                 getOtherParameters().push_back(childXMLObject);
                 return;
             }
@@ -149,7 +151,7 @@ namespace xmlencryption {
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_FOREIGN_CHILDREN(Transform,xmlsignature,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_FOREIGN_CHILDREN(Transform,xmlsignature,XMLSIG_NS,false);
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
     };
@@ -194,7 +196,7 @@ namespace xmlencryption {
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILD(Transforms,XMLConstants::XMLENC_NS,false);
+            PROC_TYPED_CHILD(Transforms,XMLENC_NS,false);
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
 
@@ -242,8 +244,8 @@ namespace xmlencryption {
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILD(CipherValue,XMLConstants::XMLENC_NS,false);
-            PROC_TYPED_CHILD(CipherReference,XMLConstants::XMLENC_NS,false);
+            PROC_TYPED_CHILD(CipherValue,XMLENC_NS,false);
+            PROC_TYPED_CHILD(CipherReference,XMLENC_NS,false);
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
     };
@@ -360,7 +362,7 @@ namespace xmlencryption {
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILDREN(EncryptionProperty,XMLConstants::XMLENC_NS,false);
+            PROC_TYPED_CHILDREN(EncryptionProperty,XMLENC_NS,false);
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
 
@@ -494,8 +496,8 @@ namespace xmlencryption {
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILDREN(DataReference,XMLConstants::XMLENC_NS,false);
-            PROC_TYPED_CHILDREN(KeyReference,XMLConstants::XMLENC_NS,false);
+            PROC_TYPED_CHILDREN(DataReference,XMLENC_NS,false);
+            PROC_TYPED_CHILDREN(KeyReference,XMLENC_NS,false);
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
     };
@@ -578,10 +580,10 @@ namespace xmlencryption {
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILD(EncryptionMethod,XMLConstants::XMLENC_NS,false);
-            PROC_TYPED_FOREIGN_CHILD(KeyInfo,xmlsignature,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILD(CipherData,XMLConstants::XMLENC_NS,false);
-            PROC_TYPED_CHILD(EncryptionProperties,XMLConstants::XMLENC_NS,false);
+            PROC_TYPED_CHILD(EncryptionMethod,XMLENC_NS,false);
+            PROC_TYPED_FOREIGN_CHILD(KeyInfo,xmlsignature,XMLSIG_NS,false);
+            PROC_TYPED_CHILD(CipherData,XMLENC_NS,false);
+            PROC_TYPED_CHILD(EncryptionProperties,XMLENC_NS,false);
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
 
@@ -653,8 +655,8 @@ namespace xmlencryption {
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILD(ReferenceList,XMLConstants::XMLENC_NS,false);
-            PROC_TYPED_CHILD(CarriedKeyName,XMLConstants::XMLENC_NS,false);
+            PROC_TYPED_CHILD(ReferenceList,XMLENC_NS,false);
+            PROC_TYPED_CHILD(CarriedKeyName,XMLENC_NS,false);
             EncryptedTypeImpl::processChildElement(childXMLObject,root);
         }
 

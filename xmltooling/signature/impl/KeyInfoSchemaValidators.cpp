@@ -28,6 +28,7 @@
 using namespace xmlsignature;
 using namespace xmltooling;
 using namespace std;
+using xmlconstants::XMLSIG_NS;
 
 namespace xmlsignature {
 
@@ -89,7 +90,7 @@ namespace xmlsignature {
     public:
         void operator()(const XMLObject* xmlObject) const {
             const XMLCh* ns=xmlObject->getElementQName().getNamespaceURI();
-            if (XMLString::equals(ns,XMLConstants::XMLSIG_NS) || !ns || !*ns) {
+            if (XMLString::equals(ns,XMLSIG_NS) || !ns || !*ns) {
                 throw ValidationException(
                     "Object contains an illegal extension child element ($1).",
                     params(1,xmlObject->getElementQName().toString().c_str())
@@ -135,47 +136,47 @@ namespace xmlsignature {
 void xmlsignature::registerKeyInfoClasses()
 {
     QName q;
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,KeyInfo);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,KeyName);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,KeyValue);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,MgmtData);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,DSAKeyValue);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,RSAKeyValue);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Exponent);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Modulus);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,P);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Q);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,G);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Y);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,J);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Seed);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,PgenCounter);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,XPath);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Transform);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,Transforms);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,RetrievalMethod);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509IssuerSerial);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509IssuerName);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509SerialNumber);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509SKI);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509SubjectName);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509Certificate);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509CRL);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,X509Data);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,SPKISexp);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,SPKIData);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,PGPKeyID);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,PGPKeyPacket);
-    REGISTER_ELEMENT(XMLConstants::XMLSIG_NS,PGPData);
-    REGISTER_TYPE(XMLConstants::XMLSIG_NS,KeyInfo);
-    REGISTER_TYPE(XMLConstants::XMLSIG_NS,KeyValue);
-    REGISTER_TYPE(XMLConstants::XMLSIG_NS,DSAKeyValue);
-    REGISTER_TYPE(XMLConstants::XMLSIG_NS,RSAKeyValue);
-    REGISTER_TYPE(XMLConstants::XMLSIG_NS,Transform);
-    REGISTER_TYPE(XMLConstants::XMLSIG_NS,Transforms);
-    REGISTER_TYPE(XMLConstants::XMLSIG_NS,RetrievalMethod);
-    REGISTER_TYPE(XMLConstants::XMLSIG_NS,X509IssuerSerial);
-    REGISTER_TYPE(XMLConstants::XMLSIG_NS,X509Data);
-    REGISTER_TYPE(XMLConstants::XMLSIG_NS,SPKIData);
-    REGISTER_TYPE(XMLConstants::XMLSIG_NS,PGPData);
+    REGISTER_ELEMENT(XMLSIG_NS,KeyInfo);
+    REGISTER_ELEMENT(XMLSIG_NS,KeyName);
+    REGISTER_ELEMENT(XMLSIG_NS,KeyValue);
+    REGISTER_ELEMENT(XMLSIG_NS,MgmtData);
+    REGISTER_ELEMENT(XMLSIG_NS,DSAKeyValue);
+    REGISTER_ELEMENT(XMLSIG_NS,RSAKeyValue);
+    REGISTER_ELEMENT(XMLSIG_NS,Exponent);
+    REGISTER_ELEMENT(XMLSIG_NS,Modulus);
+    REGISTER_ELEMENT(XMLSIG_NS,P);
+    REGISTER_ELEMENT(XMLSIG_NS,Q);
+    REGISTER_ELEMENT(XMLSIG_NS,G);
+    REGISTER_ELEMENT(XMLSIG_NS,Y);
+    REGISTER_ELEMENT(XMLSIG_NS,J);
+    REGISTER_ELEMENT(XMLSIG_NS,Seed);
+    REGISTER_ELEMENT(XMLSIG_NS,PgenCounter);
+    REGISTER_ELEMENT(XMLSIG_NS,XPath);
+    REGISTER_ELEMENT(XMLSIG_NS,Transform);
+    REGISTER_ELEMENT(XMLSIG_NS,Transforms);
+    REGISTER_ELEMENT(XMLSIG_NS,RetrievalMethod);
+    REGISTER_ELEMENT(XMLSIG_NS,X509IssuerSerial);
+    REGISTER_ELEMENT(XMLSIG_NS,X509IssuerName);
+    REGISTER_ELEMENT(XMLSIG_NS,X509SerialNumber);
+    REGISTER_ELEMENT(XMLSIG_NS,X509SKI);
+    REGISTER_ELEMENT(XMLSIG_NS,X509SubjectName);
+    REGISTER_ELEMENT(XMLSIG_NS,X509Certificate);
+    REGISTER_ELEMENT(XMLSIG_NS,X509CRL);
+    REGISTER_ELEMENT(XMLSIG_NS,X509Data);
+    REGISTER_ELEMENT(XMLSIG_NS,SPKISexp);
+    REGISTER_ELEMENT(XMLSIG_NS,SPKIData);
+    REGISTER_ELEMENT(XMLSIG_NS,PGPKeyID);
+    REGISTER_ELEMENT(XMLSIG_NS,PGPKeyPacket);
+    REGISTER_ELEMENT(XMLSIG_NS,PGPData);
+    REGISTER_TYPE(XMLSIG_NS,KeyInfo);
+    REGISTER_TYPE(XMLSIG_NS,KeyValue);
+    REGISTER_TYPE(XMLSIG_NS,DSAKeyValue);
+    REGISTER_TYPE(XMLSIG_NS,RSAKeyValue);
+    REGISTER_TYPE(XMLSIG_NS,Transform);
+    REGISTER_TYPE(XMLSIG_NS,Transforms);
+    REGISTER_TYPE(XMLSIG_NS,RetrievalMethod);
+    REGISTER_TYPE(XMLSIG_NS,X509IssuerSerial);
+    REGISTER_TYPE(XMLSIG_NS,X509Data);
+    REGISTER_TYPE(XMLSIG_NS,SPKIData);
+    REGISTER_TYPE(XMLSIG_NS,PGPData);
 }

@@ -38,6 +38,7 @@
 #ifndef XMLTOOLING_NO_XMLSEC
     using namespace xmlsignature;
 #endif
+using namespace xmlconstants;
 using namespace xmltooling;
 using namespace log4cpp;
 using namespace std;
@@ -175,7 +176,7 @@ void AbstractXMLObjectMarshaller::marshallInto(
     if (m_schemaLocation) {
         static const XMLCh schemaLocation[]= UNICODE_LITERAL_14(s,c,h,e,m,a,L,o,c,a,t,i,o,n);
         if (targetElement->getParentNode()==NULL || targetElement->getParentNode()->getNodeType()==DOMNode::DOCUMENT_NODE)
-            targetElement->setAttributeNS(XMLConstants::XSI_NS,schemaLocation,m_schemaLocation); 
+            targetElement->setAttributeNS(XSI_NS,schemaLocation,m_schemaLocation); 
     }
 
     marshallElementType(targetElement);
@@ -215,12 +216,12 @@ void AbstractXMLObjectMarshaller::marshallElementType(DOMElement* domElement) co
             XMLString::catString(xsivalue,colon);
             XMLString::catString(xsivalue,typeLocalName);
         }   
-        domElement->setAttributeNS(XMLConstants::XSI_NS, xsitype, xsivalue);
+        domElement->setAttributeNS(XSI_NS, xsitype, xsivalue);
         if (xsivalue != typeLocalName)
             XMLString::release(&xsivalue);
 
         XT_log.debug("Adding XSI namespace to list of namespaces used by XMLObject");
-        addNamespace(Namespace(XMLConstants::XSI_NS, XMLConstants::XSI_PREFIX));
+        addNamespace(Namespace(XSI_NS, XSI_PREFIX));
     }
 }
 
@@ -238,16 +239,16 @@ public:
         }
             
         if (prefix && *prefix) {
-            XMLCh* xmlns=new XMLCh[XMLString::stringLen(XMLConstants::XMLNS_PREFIX) + XMLString::stringLen(prefix) + 2*sizeof(XMLCh)];
+            XMLCh* xmlns=new XMLCh[XMLString::stringLen(XMLNS_PREFIX) + XMLString::stringLen(prefix) + 2*sizeof(XMLCh)];
             *xmlns=chNull;
-            XMLString::catString(xmlns,XMLConstants::XMLNS_PREFIX);
+            XMLString::catString(xmlns,XMLNS_PREFIX);
             static const XMLCh colon[] = {chColon, chNull};
             XMLString::catString(xmlns,colon);
             XMLString::catString(xmlns,prefix);
-            domElement->setAttributeNS(XMLConstants::XMLNS_NS, xmlns, uri);
+            domElement->setAttributeNS(XMLNS_NS, xmlns, uri);
         }
         else {
-            domElement->setAttributeNS(XMLConstants::XMLNS_NS, XMLConstants::XMLNS_PREFIX, uri);
+            domElement->setAttributeNS(XMLNS_NS, XMLNS_PREFIX, uri);
         }
     }
 
@@ -269,10 +270,10 @@ public:
             if (childNode->getNodeType() != DOMNode::ATTRIBUTE_NODE)    // not an attribute?
                 continue;
             attribute = static_cast<DOMAttr*>(childNode);
-            if (!XMLString::equals(attribute->getNamespaceURI(),XMLConstants::XMLNS_NS))
+            if (!XMLString::equals(attribute->getNamespaceURI(),XMLNS_NS))
                 continue;   // not a namespace declaration
             // Local name should be the prefix and the value would be the URI, except for the default namespace.
-            if ((!prefix || !*prefix) && XMLString::equals(attribute->getLocalName(),XMLConstants::XMLNS_PREFIX))
+            if ((!prefix || !*prefix) && XMLString::equals(attribute->getLocalName(),XMLNS_PREFIX))
                 return attribute->getNodeValue();
             else if (XMLString::equals(prefix,attribute->getLocalName()))
                 return attribute->getNodeValue();

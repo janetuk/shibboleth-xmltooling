@@ -156,7 +156,7 @@ namespace xmlsignature {
         static Signature* buildSignature() {
             const SignatureBuilder* b = dynamic_cast<const SignatureBuilder*>(
                 xmltooling::XMLObjectBuilder::getBuilder(
-                    xmltooling::QName(xmltooling::XMLConstants::XMLSIG_NS,Signature::LOCAL_NAME)
+                    xmltooling::QName(xmlconstants::XMLSIG_NS,Signature::LOCAL_NAME)
                     )
                 );
             if (b)

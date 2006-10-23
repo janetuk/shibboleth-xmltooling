@@ -25,78 +25,75 @@
 
 #include <xmltooling/unicode.h>
 
-namespace xmltooling {
+/**
+ * XML related constants.
+ */
+namespace xmlconstants {
     
-    /**
-     * XML related constants.
-     */
-    struct XMLTOOL_API XMLConstants
-    {
-        /**  XML core namespace ("http://www.w3.org/XML/1998/namespace") */
-        static const XMLCh XML_NS[]; 
+    /**  XML core namespace ("http://www.w3.org/XML/1998/namespace") */
+    extern XMLTOOL_API const XMLCh XML_NS[];
 
-        /** XML namespace prefix for special xml attributes ("xml") */
-        static const XMLCh XML_PREFIX[];
+    /** XML namespace prefix for special xml attributes ("xml") */
+    extern XMLTOOL_API const XMLCh XML_PREFIX[];
+
+    /**  XML namespace for xmlns attributes ("http://www.w3.org/2000/xmlns/") */
+    extern XMLTOOL_API const XMLCh XMLNS_NS[];
     
-        /**  XML namespace for xmlns attributes ("http://www.w3.org/2000/xmlns/") */
-        static const XMLCh XMLNS_NS[];
-        
-        /** XML namespace prefix for xmlns attributes ("xmlns") */
-        static const XMLCh XMLNS_PREFIX[];
+    /** XML namespace prefix for xmlns attributes ("xmlns") */
+    extern XMLTOOL_API const XMLCh XMLNS_PREFIX[];
+
+    /**  XML Schema namespace ("http://www.w3.org/2001/XMLSchema") */
+    extern XMLTOOL_API const XMLCh XSD_NS[];
     
-        /**  XML Schema namespace ("http://www.w3.org/2001/XMLSchema") */
-        static const XMLCh XSD_NS[];
-        
-        /**  XML Schema QName prefix ("xs") */
-        static const XMLCh XSD_PREFIX[];
+    /**  XML Schema QName prefix ("xs") */
+    extern XMLTOOL_API const XMLCh XSD_PREFIX[];
+
+    /**  XML Schema Instance namespace ("http://www.w3.org/2001/XMLSchema-instance") */
+    extern XMLTOOL_API const XMLCh XSI_NS[];
     
-        /**  XML Schema Instance namespace ("http://www.w3.org/2001/XMLSchema-instance") */
-        static const XMLCh XSI_NS[];
-        
-        /**  XML Schema Instance QName prefix ("xsi") */
-        static const XMLCh XSI_PREFIX[];
-        
-        /**  XML Signature namespace ("http://www.w3.org/2000/09/xmldsig#") */
-        static const XMLCh XMLSIG_NS[];
-        
-        /**  XML Signature QName prefix ("ds") */
-        static const XMLCh XMLSIG_PREFIX[];
-        
-        /**  XML Encryption namespace ("http://www.w3.org/2001/04/xmlenc#") */
-        static const XMLCh XMLENC_NS[];
-        
-        /**  XML Encryption QName prefix ("xenc") */
-        static const XMLCh XMLENC_PREFIX[];
-        
-        /**  SOAP 1.1 Envelope XML namespace ("http://schemas.xmlsoap.org/soap/envelope/") */
-        static const XMLCh SOAP11ENV_NS[]; 
-
-        /**  SOAP 1.1 Envelope QName prefix ("S") */
-        static const XMLCh SOAP11ENV_PREFIX[];
+    /**  XML Schema Instance QName prefix ("xsi") */
+    extern XMLTOOL_API const XMLCh XSI_PREFIX[];
     
-        /**  XML Tooling namespace ("http://www.opensaml.org/xmltooling") */
-        static const XMLCh XMLTOOLING_NS[];
+    /**  XML Signature namespace ("http://www.w3.org/2000/09/xmldsig#") */
+    extern XMLTOOL_API const XMLCh XMLSIG_NS[];
+    
+    /**  XML Signature QName prefix ("ds") */
+    extern XMLTOOL_API const XMLCh XMLSIG_PREFIX[];
+    
+    /**  XML Encryption namespace ("http://www.w3.org/2001/04/xmlenc#") */
+    extern XMLTOOL_API const XMLCh XMLENC_NS[];
+    
+    /**  XML Encryption QName prefix ("xenc") */
+    extern XMLTOOL_API const XMLCh XMLENC_PREFIX[];
+    
+    /**  SOAP 1.1 Envelope XML namespace ("http://schemas.xmlsoap.org/soap/envelope/") */
+    extern XMLTOOL_API const XMLCh SOAP11ENV_NS[]; 
 
-        /**  XML "true" boolean constant */
-        static const XMLCh XML_TRUE[];
+    /**  SOAP 1.1 Envelope QName prefix ("S") */
+    extern XMLTOOL_API const XMLCh SOAP11ENV_PREFIX[];
 
-        /**  XML "false" boolean constant */
-        static const XMLCh XML_FALSE[];
+    /**  XML Tooling namespace ("http://www.opensaml.org/xmltooling") */
+    extern XMLTOOL_API const XMLCh XMLTOOLING_NS[];
 
-        /**  XML "1" boolean constant */
-        static const XMLCh XML_ONE[];
+    /**  XML "true" boolean constant */
+    extern XMLTOOL_API const XMLCh XML_TRUE[];
 
-        /**  XML "0" boolean constant */
-        static const XMLCh XML_ZERO[];
-        
-        /** Enumerations of the different values of a boolean attribute or element */
-        enum xmltooling_bool_t {
-            XML_BOOL_NULL,
-            XML_BOOL_TRUE,
-            XML_BOOL_FALSE,
-            XML_BOOL_ONE,
-            XML_BOOL_ZERO
-        };
+    /**  XML "false" boolean constant */
+    extern XMLTOOL_API const XMLCh XML_FALSE[];
+
+    /**  XML "1" boolean constant */
+    extern XMLTOOL_API const XMLCh XML_ONE[];
+
+    /**  XML "0" boolean constant */
+    extern XMLTOOL_API const XMLCh XML_ZERO[];
+    
+    /** Enumerations of the different values of a boolean attribute or element */
+    enum xmltooling_bool_t {
+        XML_BOOL_NULL,
+        XML_BOOL_TRUE,
+        XML_BOOL_FALSE,
+        XML_BOOL_ONE,
+        XML_BOOL_ZERO
     };
 
 };

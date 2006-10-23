@@ -35,7 +35,7 @@ static const XMLCh type[]={chLatin_t, chLatin_y, chLatin_p, chLatin_e, chNull };
 bool XMLHelper::hasXSIType(const DOMElement* e)
 {
     if (e) {
-        if (e->hasAttributeNS(XMLConstants::XSI_NS, type)) {
+        if (e->hasAttributeNS(xmlconstants::XSI_NS, type)) {
             return true;
         }
     }
@@ -45,7 +45,7 @@ bool XMLHelper::hasXSIType(const DOMElement* e)
 
 QName* XMLHelper::getXSIType(const DOMElement* e)
 {
-    DOMAttr* attribute = e->getAttributeNodeNS(XMLConstants::XSI_NS, type);
+    DOMAttr* attribute = e->getAttributeNodeNS(xmlconstants::XSI_NS, type);
     if (attribute) {
         const XMLCh* attributeValue = attribute->getTextContent();
         if (attributeValue && *attributeValue) {

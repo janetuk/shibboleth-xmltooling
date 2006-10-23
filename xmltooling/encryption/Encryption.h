@@ -27,7 +27,7 @@
 #include <xmltooling/signature/KeyInfo.h>
 
 #define DECL_XMLENCOBJECTBUILDER(cname) \
-    DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,xmltooling::XMLConstants::XMLENC_NS,xmltooling::XMLConstants::XMLENC_PREFIX)
+    DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,xmlconstants::XMLENC_NS,xmlconstants::XMLENC_PREFIX)
 
 /**
  * @namespace xmlencryption

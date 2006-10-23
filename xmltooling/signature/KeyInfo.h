@@ -29,7 +29,7 @@
 #include <xmltooling/util/XMLConstants.h>
 
 #define DECL_XMLSIGOBJECTBUILDER(cname) \
-    DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,xmltooling::XMLConstants::XMLSIG_NS,xmltooling::XMLConstants::XMLSIG_PREFIX)
+    DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,xmlconstants::XMLSIG_NS,xmlconstants::XMLSIG_PREFIX)
 
 namespace xmlsignature {
 

@@ -98,7 +98,7 @@ static const XMLCh cache[] = UNICODE_LITERAL_5(c,a,c,h,e);
 InlineKeyResolver::InlineKeyResolver(const DOMElement* e) : m_lock(NULL)
 {
     const XMLCh* flag = e ? e->getAttributeNS(NULL,cache) : NULL;
-    if (flag && XMLString::equals(flag,XMLConstants::XML_TRUE) || XMLString::equals(flag,XMLConstants::XML_ONE))
+    if (flag && XMLString::equals(flag,xmlconstants::XML_TRUE) || XMLString::equals(flag,xmlconstants::XML_ONE))
         m_lock=RWLock::create();
 }
 

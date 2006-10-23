@@ -30,7 +30,7 @@
 #include <xercesc/util/XMLUniDefs.hpp>
 
 #define DECL_SOAP11OBJECTBUILDER(cname) \
-    DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,xmltooling::XMLConstants::SOAP11ENV_NS,xmltooling::XMLConstants::SOAP11ENV_PREFIX)
+    DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,xmlconstants::SOAP11ENV_NS,xmlconstants::SOAP11ENV_PREFIX)
 
 /**
  * @namespace soap11

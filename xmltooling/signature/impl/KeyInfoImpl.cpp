@@ -36,6 +36,7 @@
 using namespace xmlsignature;
 using namespace xmltooling;
 using namespace std;
+using xmlconstants::XMLSIG_NS;
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -118,13 +119,13 @@ namespace xmlsignature {
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILD(P,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILD(Q,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILD(G,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILD(Y,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILD(J,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILD(Seed,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILD(PgenCounter,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILD(P,XMLSIG_NS,false);
+            PROC_TYPED_CHILD(Q,XMLSIG_NS,false);
+            PROC_TYPED_CHILD(G,XMLSIG_NS,false);
+            PROC_TYPED_CHILD(Y,XMLSIG_NS,false);
+            PROC_TYPED_CHILD(J,XMLSIG_NS,false);
+            PROC_TYPED_CHILD(Seed,XMLSIG_NS,false);
+            PROC_TYPED_CHILD(PgenCounter,XMLSIG_NS,false);
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
     };
@@ -168,8 +169,8 @@ namespace xmlsignature {
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILD(Modulus,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILD(Exponent,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILD(Modulus,XMLSIG_NS,false);
+            PROC_TYPED_CHILD(Exponent,XMLSIG_NS,false);
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
     };
@@ -220,12 +221,12 @@ namespace xmlsignature {
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILD(DSAKeyValue,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILD(RSAKeyValue,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILD(DSAKeyValue,XMLSIG_NS,false);
+            PROC_TYPED_CHILD(RSAKeyValue,XMLSIG_NS,false);
             
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
-            if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI) {
+            if (!XMLString::equals(nsURI,XMLSIG_NS) && nsURI && *nsURI) {
                 setOtherKeyValue(childXMLObject);
                 return;
             }
@@ -274,11 +275,11 @@ namespace xmlsignature {
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILDREN(XPath,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(XPath,XMLSIG_NS,false);
             
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
-            if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI) {
+            if (!XMLString::equals(nsURI,XMLSIG_NS) && nsURI && *nsURI) {
                 getXMLObjects().push_back(childXMLObject);
                 return;
             }
@@ -320,7 +321,7 @@ namespace xmlsignature {
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILDREN(Transform,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(Transform,XMLSIG_NS,false);
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
     };
@@ -370,7 +371,7 @@ namespace xmlsignature {
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILD(Transforms,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILD(Transforms,XMLSIG_NS,false);
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
 
@@ -420,8 +421,8 @@ namespace xmlsignature {
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILD(X509IssuerName,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILD(X509SerialNumber,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILD(X509IssuerName,XMLSIG_NS,false);
+            PROC_TYPED_CHILD(X509SerialNumber,XMLSIG_NS,false);
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
     };
@@ -488,15 +489,15 @@ namespace xmlsignature {
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILDREN(X509IssuerSerial,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILDREN(X509SKI,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILDREN(X509SubjectName,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILDREN(X509Certificate,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILDREN(X509CRL,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(X509IssuerSerial,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(X509SKI,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(X509SubjectName,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(X509Certificate,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(X509CRL,XMLSIG_NS,false);
             
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
-            if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI) {
+            if (!XMLString::equals(nsURI,XMLSIG_NS) && nsURI && *nsURI) {
                 getOtherX509Datas().push_back(childXMLObject);
                 return;
             }
@@ -544,7 +545,7 @@ namespace xmlsignature {
         
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            if (XMLHelper::isNodeNamed(root,XMLConstants::XMLSIG_NS,SPKISexp::LOCAL_NAME)) {
+            if (XMLHelper::isNodeNamed(root,XMLSIG_NS,SPKISexp::LOCAL_NAME)) {
                 SPKISexp* typesafe=dynamic_cast<SPKISexp*>(childXMLObject);
                 if (typesafe) {
                     getSPKISexps().push_back(make_pair(typesafe,(XMLObject*)NULL));
@@ -554,7 +555,7 @@ namespace xmlsignature {
 
             // Unknown child (has to be paired with the last SPKISexp processed.
             const XMLCh* nsURI=root->getNamespaceURI();
-            if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI) {
+            if (!XMLString::equals(nsURI,XMLSIG_NS) && nsURI && *nsURI) {
                 // Update second half of pair in vector, and in master list.
                 if (!m_SPKISexps.empty() && m_SPKISexps.back().second==NULL) {
                     m_SPKISexps.back().second=childXMLObject;
@@ -615,12 +616,12 @@ namespace xmlsignature {
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILD(PGPKeyID,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILD(PGPKeyPacket,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILD(PGPKeyID,XMLSIG_NS,false);
+            PROC_TYPED_CHILD(PGPKeyPacket,XMLSIG_NS,false);
 
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
-            if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI) {
+            if (!XMLString::equals(nsURI,XMLSIG_NS) && nsURI && *nsURI) {
                 getPGPDataExtensions().push_back(childXMLObject);
                 return;
             }
@@ -714,17 +715,17 @@ namespace xmlsignature {
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILDREN(X509Data,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILDREN(KeyName,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILDREN(KeyValue,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILDREN(RetrievalMethod,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILDREN(MgmtData,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILDREN(SPKIData,XMLConstants::XMLSIG_NS,false);
-            PROC_TYPED_CHILDREN(PGPData,XMLConstants::XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(X509Data,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(KeyName,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(KeyValue,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(RetrievalMethod,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(MgmtData,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(SPKIData,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(PGPData,XMLSIG_NS,false);
             
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
-            if (!XMLString::equals(nsURI,XMLConstants::XMLSIG_NS) && nsURI && *nsURI) {
+            if (!XMLString::equals(nsURI,XMLSIG_NS) && nsURI && *nsURI) {
                 getOthers().push_back(childXMLObject);
                 return;
             }

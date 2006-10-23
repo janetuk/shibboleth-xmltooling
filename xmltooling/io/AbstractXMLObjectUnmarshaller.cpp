@@ -31,6 +31,7 @@
 #include <xercesc/util/XMLUniDefs.hpp>
 #include <log4cpp/Category.hh>
 
+using namespace xmlconstants;
 using namespace xmltooling;
 using namespace log4cpp;
 using namespace std;
@@ -97,8 +98,8 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
         attribute = static_cast<DOMAttr*>(childNode);
         
         const XMLCh* nsuri=attribute->getNamespaceURI();
-        if (XMLString::equals(nsuri,XMLConstants::XMLNS_NS)) {
-            if (XMLString::equals(attribute->getLocalName(),XMLConstants::XMLNS_PREFIX)) {
+        if (XMLString::equals(nsuri,XMLNS_NS)) {
+            if (XMLString::equals(attribute->getLocalName(),XMLNS_PREFIX)) {
                 XT_log.debug("found default namespace declaration, adding it to the list of namespaces on the XMLObject");
                 addNamespace(Namespace(attribute->getValue(), NULL, true));
                 continue;
@@ -109,7 +110,7 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
                 continue;
             }
         }
-        else if (XMLString::equals(nsuri,XMLConstants::XSI_NS)) {
+        else if (XMLString::equals(nsuri,XSI_NS)) {
             static const XMLCh type[]= UNICODE_LITERAL_4(t,y,p,e);
             static const XMLCh schemaLocation[]= UNICODE_LITERAL_14(s,c,h,e,m,a,L,o,c,a,t,i,o,n);
             if (XMLString::equals(attribute->getLocalName(),type)) {
@@ -124,7 +125,7 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
                 continue;
             }
         }
-        else if (nsuri && !XMLString::equals(nsuri,XMLConstants::XML_NS)) {
+        else if (nsuri && !XMLString::equals(nsuri,XML_NS)) {
             XT_log.debug("found namespace-qualified attribute, adding prefix to the list of namespaces on the XMLObject");
             addNamespace(Namespace(nsuri, attribute->getPrefix()));
         }
