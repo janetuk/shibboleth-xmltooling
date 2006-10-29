@@ -312,10 +312,10 @@ namespace xmltooling {
         XMLObject& operator=(const XMLObject& src);
     };
 
+};
+
 #if defined (_MSC_VER)
     #pragma warning( pop )
 #endif
-
-};
 
 #endif /* __xmltooling_xmlobj_h__ */
