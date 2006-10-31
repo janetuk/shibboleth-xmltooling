@@ -317,6 +317,21 @@
 #define END_XMLOBJECT }
 
 /**
+ * Declares abstract set method for a typed XML attribute.
+ * The get method is omitted.
+ * 
+ * @param proper    the proper name of the attribute
+ * @param upcased   the upcased name of the attribute
+ * @param type      the attribute's data type
+ */
+#define DECL_INHERITED_XMLOBJECT_ATTRIB(proper,upcased,type) \
+    public: \
+        XMLTOOLING_DOXYGEN(proper attribute name) \
+        static const XMLCh upcased##_ATTRIB_NAME[]; \
+        XMLTOOLING_DOXYGEN(Sets the proper attribute.) \
+        virtual void set##proper(const type* proper)=0
+
+/**
  * Declares abstract get/set methods for a typed XML attribute.
  * 
  * @param proper    the proper name of the attribute
@@ -333,6 +348,16 @@
         virtual void set##proper(const type* proper)=0
 
 /**
+ * Declares abstract set method for a string XML attribute.
+ * The get method is omitted.
+ * 
+ * @param proper    the proper name of the attribute
+ * @param upcased   the upcased name of the attribute
+ */
+#define DECL_INHERITED_STRING_ATTRIB(proper,upcased) \
+    DECL_INHERITED_XMLOBJECT_ATTRIB(proper,upcased,XMLCh)
+
+/**
  * Declares abstract get/set methods for a string XML attribute.
  * 
  * @param proper    the proper name of the attribute
@@ -342,7 +367,21 @@
     DECL_XMLOBJECT_ATTRIB(proper,upcased,XMLCh)
 
 /**
- * Declares abstract get/set methods for a string XML attribute.
+ * Declares abstract set method for a DateTime XML attribute.
+ * The get method is omitted.
+ * 
+ * @param proper    the proper name of the attribute
+ * @param upcased   the upcased name of the attribute
+ */
+#define DECL_INHERITED_DATETIME_ATTRIB(proper,upcased) \
+    DECL_INHERITED_XMLOBJECT_ATTRIB(proper,upcased,xmltooling::DateTime); \
+    XMLTOOLING_DOXYGEN(Sets the proper attribute.) \
+    virtual void set##proper(time_t proper)=0; \
+    XMLTOOLING_DOXYGEN(Sets the proper attribute.) \
+    virtual void set##proper(const XMLCh* proper)=0
+
+/**
+ * Declares abstract get/set methods for a DateTime XML attribute.
  * 
  * @param proper    the proper name of the attribute
  * @param upcased   the upcased name of the attribute
@@ -355,6 +394,22 @@
     virtual void set##proper(time_t proper)=0; \
     XMLTOOLING_DOXYGEN(Sets the proper attribute.) \
     virtual void set##proper(const XMLCh* proper)=0
+
+/**
+ * Declares abstract set method for an integer XML attribute.
+ * The get method is omitted.
+ * 
+ * @param proper    the proper name of the attribute
+ * @param upcased   the upcased name of the attribute
+ */
+#define DECL_INHERITED_INTEGER_ATTRIB(proper,upcased) \
+    public: \
+        XMLTOOLING_DOXYGEN(proper attribute name) \
+        static const XMLCh upcased##_ATTRIB_NAME[]; \
+        XMLTOOLING_DOXYGEN(Sets the proper attribute using a string value.) \
+        virtual void set##proper(const XMLCh* proper)=0; \
+        XMLTOOLING_DOXYGEN(Sets the proper attribute.) \
+        virtual void set##proper(int proper)=0
 
 /**
  * Declares abstract get/set methods for an integer XML attribute.
@@ -540,6 +595,18 @@
         }
 
 /**
+ * Declares abstract set method for a typed XML child object in a foreign namespace.
+ * The get method is omitted.
+ * 
+ * @param proper    the proper name of the child type
+ * @param ns        the C++ namespace for the type
+ */
+#define DECL_INHERITED_TYPED_FOREIGN_CHILD(proper,ns) \
+    public: \
+        XMLTOOLING_DOXYGEN(Sets the proper child.) \
+        virtual void set##proper(ns::proper* child)=0
+
+/**
  * Declares abstract get/set methods for a typed XML child object in a foreign namespace.
  * 
  * @param proper    the proper name of the child type
@@ -551,6 +618,17 @@
         virtual ns::proper* get##proper() const=0; \
         XMLTOOLING_DOXYGEN(Sets the proper child.) \
         virtual void set##proper(ns::proper* child)=0
+
+/**
+ * Declares abstract set method for a typed XML child object.
+ * The get method is omitted.
+ * 
+ * @param proper    the proper name of the child type
+ */
+#define DECL_INHERITED_TYPED_CHILD(proper) \
+    public: \
+        XMLTOOLING_DOXYGEN(Sets the proper child.) \
+        virtual void set##proper(proper* child)=0
 
 /**
  * Declares abstract get/set methods for a typed XML child object.
