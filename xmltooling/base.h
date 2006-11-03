@@ -1082,9 +1082,9 @@
  */
 #define IMPL_XMLOBJECT_CLONE(cname) \
     cname* clone##cname() const { \
-        return clone(); \
+        return dynamic_cast<cname*>(clone()); \
     } \
-    cname* clone() const { \
+    xmltooling::XMLObject* clone() const { \
         std::auto_ptr<xmltooling::XMLObject> domClone(xmltooling::AbstractDOMCachingXMLObject::clone()); \
         cname##Impl* ret=dynamic_cast<cname##Impl*>(domClone.get()); \
         if (ret) { \
