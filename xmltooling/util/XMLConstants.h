@@ -96,6 +96,35 @@ namespace xmlconstants {
         XML_BOOL_ZERO
     };
 
+    /** PKCS#1 DigestInfo Encoding OID for RSAwithSHA1 */
+    extern XMLTOOL_API const unsigned char OID_RSASHA1[];
+    
+    /** Size of PKCS#1 DigestInfo Encoding OID for RSAwithSHA1 */
+    extern XMLTOOL_API const int OID_RSASHA1_LEN;
+
+    /** PKCS#1 DigestInfo Encoding OID for RSAwithSHA224 */
+    extern XMLTOOL_API const unsigned char OID_RSASHA224[];
+    
+    /** Size of PKCS#1 DigestInfo Encoding OID for RSAwithSHA224 */
+    extern XMLTOOL_API const int OID_RSASHA224_LEN;
+
+    /** PKCS#1 DigestInfo Encoding OID for RSAwithSHA256 */
+    extern XMLTOOL_API const unsigned char OID_RSASHA256[];
+    
+    /** Size of PKCS#1 DigestInfo Encoding OID for RSAwithSHA256 */
+    extern XMLTOOL_API const int OID_RSASHA256_LEN;
+
+    /** PKCS#1 DigestInfo Encoding OID for RSAwithSHA384 */
+    extern XMLTOOL_API const unsigned char OID_RSASHA384[];
+    
+    /** Size of PKCS#1 DigestInfo Encoding OID for RSAwithSHA384 */
+    extern XMLTOOL_API const int OID_RSASHA384_LEN;
+
+    /** PKCS#1 DigestInfo Encoding OID for RSAwithSHA512 */
+    extern XMLTOOL_API const unsigned char OID_RSASHA512[];
+    
+    /** Size of PKCS#1 DigestInfo Encoding OID for RSAwithSHA512 */
+    extern XMLTOOL_API const int OID_RSASHA512_LEN;
 };
 
 #endif /* __xmltooling_xmlconstants_h__ */
