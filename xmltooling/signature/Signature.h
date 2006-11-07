@@ -132,6 +132,51 @@ namespace xmlsignature {
          */
         virtual Signature* cloneSignature() const=0;
 
+        /**
+         * Sign the input data and return a base64-encoded signature. The signature value
+         * <strong>MUST NOT</strong> contain any embedded linefeeds.
+         * 
+         * <p>Allows specialized applications to create raw signatures over any input using
+         * the same cryptography layer as XML Signatures use. 
+         * 
+         * @param key               key to sign with, will <strong>NOT</strong> be freed
+         * @param sigAlgorithm      XML signature algorithm identifier
+         * @param in                input data
+         * @param in_len            size of input data in bytes
+         * @param out               output buffer
+         * @param out_len           size of output buffer in bytes
+         * @return  size in bytes of base64-encoded signature
+         */
+        static unsigned int createRawSignature(
+            XSECCryptoKey* key,
+            const XMLCh* sigAlgorithm,
+            const char* in,
+            unsigned int in_len,
+            char* out,
+            unsigned int out_len
+            );
+         
+        /**
+         * Verifies a base-64 encoded signature over the input data.
+         * 
+         * <p>Allows specialized applications to verify raw signatures over any input using
+         * the same cryptography layer as XML Signatures use. 
+         * 
+         * @param key               key to verify with, will <strong>NOT</strong> be freed
+         * @param sigAlgorithm      XML signature algorithm identifier
+         * @param signature         base64-encoded signature value
+         * @param in                input data
+         * @param in_len            size of input data in bytes
+         * @return  true iff signature verifies
+         */
+        static bool verifyRawSignature(
+            XSECCryptoKey* key,
+            const XMLCh* sigAlgorithm,
+            const char* signature,
+            const char* in,
+            unsigned int in_len
+            );
+
     protected:
         Signature() {}
     };

@@ -30,7 +30,7 @@
 namespace xmltooling {
 
     /**
-     * Evaluates the trustworthiness and validity of XML Signatures against
+     * Evaluates the trustworthiness and validity of XML or raw Signatures against
      * implementation-specific requirements.
      */
     class XMLTOOL_API TrustEngine {
@@ -86,21 +86,55 @@ namespace xmltooling {
         };
         
         /**
-         * Determines whether a signature is correct and valid with respect to the
-         * KeyInfo data supplied. It is the responsibility of the application to
+         * Determines whether an XML signature is correct and valid with respect to
+         * the KeyInfo data supplied. It is the responsibility of the application to
          * ensure that the KeyInfo information supplied is in fact associated with
          * the peer who created the signature. 
          * 
-         * A custom KeyResolver can be supplied from outside the TrustEngine.
+         * <p>A custom KeyResolver can be supplied from outside the TrustEngine.
          * Alternatively, one may be specified to the plugin constructor.
          * A non-caching, inline resolver will be used as a fallback.
          * 
          * @param sig           reference to a signature object to validate
          * @param keyInfoSource supplies KeyInfo objects to the TrustEngine
          * @param keyResolver   optional externally supplied KeyResolver, or NULL
+         * @return  true iff the signature validates
          */
         virtual bool validate(
             xmlsignature::Signature& sig,
+            KeyInfoIterator& keyInfoSource,
+            const xmlsignature::KeyResolver* keyResolver=NULL
+            ) const=0;
+
+        /**
+         * Determines whether a raw signature is correct and valid with respect to
+         * the KeyInfo data supplied. It is the responsibility of the application to
+         * ensure that the KeyInfo information supplied is in fact associated with
+         * the peer who created the signature.
+         * 
+         * <p>A custom KeyResolver can be supplied from outside the TrustEngine.
+         * Alternatively, one may be specified to the plugin constructor.
+         * A non-caching, inline resolver will be used as a fallback.
+         * 
+         * <p>Note that the keyInfo parameter is not part of the implicitly trusted
+         * set of key information supplied via the iterator, but rather advisory data
+         * that may have accompanied the signature itself.
+         * 
+         * @param sigAlgorithm  XML Signature identifier for the algorithm used
+         * @param sig           null-terminated base64-encoded signature value
+         * @param keyInfo       KeyInfo object accompanying the signature, if any
+         * @param in            the input data over which the signature was created
+         * @param in_len        size of input data in bytes
+         * @param keyInfoSource supplies KeyInfo objects to the TrustEngine
+         * @param keyResolver   optional externally supplied KeyResolver, or NULL
+         * @return  true iff the signature validates
+         */
+        virtual bool validate(
+            const XMLCh* sigAlgorithm,
+            const char* sig,
+            xmlsignature::KeyInfo* keyInfo,
+            const char* in,
+            unsigned int in_len,
             KeyInfoIterator& keyInfoSource,
             const xmlsignature::KeyResolver* keyResolver=NULL
             ) const=0;

@@ -36,7 +36,12 @@
 #include <xsec/dsig/DSIGKeyInfoX509.hpp>
 #include <xsec/dsig/DSIGReference.hpp>
 #include <xsec/enc/XSECCryptoException.hpp>
+#include <xsec/framework/XSECAlgorithmHandler.hpp>
+#include <xsec/framework/XSECAlgorithmMapper.hpp>
 #include <xsec/framework/XSECException.hpp>
+#include <xsec/transformers/TXFMSB.hpp>
+#include <xsec/transformers/TXFMChain.hpp>
+#include <xsec/transformers/TXFMOutputFile.hpp>
 
 using namespace xmlsignature;
 using namespace xmltooling;
@@ -409,3 +414,81 @@ Signature* SignatureBuilder::buildObject() const
 }
 
 const XMLCh Signature::LOCAL_NAME[] = UNICODE_LITERAL_9(S,i,g,n,a,t,u,r,e);
+
+// Raw signature methods.
+
+unsigned int Signature::createRawSignature(
+    XSECCryptoKey* key, const XMLCh* sigAlgorithm, const char* in, unsigned int in_len, char* out, unsigned int out_len
+    )
+{
+    try {
+        XSECAlgorithmHandler* handler = XSECPlatformUtils::g_algorithmMapper->mapURIToHandler(sigAlgorithm);
+        if (!handler) {
+            auto_ptr_char alg(sigAlgorithm);
+            throw SignatureException("Unsupported signature algorithm ($1).", params(1,alg.get()));
+        }
+        
+        // Move input into a safeBuffer to source the transform chain.
+        safeBuffer sb,sbout;
+        sb.sbStrncpyIn(in,in_len);
+        TXFMSB* sbt = new TXFMSB(NULL);
+        sbt->setInput(sb, in_len);
+        TXFMChain tx(sbt);
+        
+        // Sign the chain.
+        unsigned int siglen = handler->signToSafeBuffer(&tx, sigAlgorithm, key, out_len-1, sbout);
+        if (siglen >= out_len)
+            throw SignatureException("Signature size exceeded output buffer size.");
+        
+        // Push all non-whitespace into buffer.
+        unsigned int ret_len = 0;
+        const char* source = sbout.rawCharBuffer();
+        while (siglen--) {
+            if (isspace(*source))
+                ++source;
+            else {
+                *out++ = *source++;
+                ++ret_len;
+            }
+        }
+        *out = 0;
+        return ret_len;
+    }
+    catch(XSECException& e) {
+        auto_ptr_char temp(e.getMsg());
+        throw SignatureException(string("Caught an XMLSecurity exception while creating raw signature: ") + temp.get());
+    }
+    catch(XSECCryptoException& e) {
+        throw SignatureException(string("Caught an XMLSecurity exception while creating raw signature: ") + e.getMsg());
+    }
+}
+
+bool Signature::verifyRawSignature(
+    XSECCryptoKey* key, const XMLCh* sigAlgorithm, const char* signature, const char* in, unsigned int in_len
+    )
+{
+    try {
+        XSECAlgorithmHandler* handler = XSECPlatformUtils::g_algorithmMapper->mapURIToHandler(sigAlgorithm);
+        if (!handler) {
+            auto_ptr_char alg(sigAlgorithm);
+            throw SignatureException("Unsupported signature algorithm ($1).", params(1,alg.get()));
+        }
+        
+        // Move input into a safeBuffer to source the transform chain.
+        safeBuffer sb;
+        sb.sbStrncpyIn(in,in_len);
+        TXFMSB* sbt = new TXFMSB(NULL);
+        sbt->setInput(sb, in_len);
+        TXFMChain tx(sbt);
+        
+        // Verify the chain.
+        return handler->verifyBase64Signature(&tx, sigAlgorithm, signature, 0, key);
+    }
+    catch(XSECException& e) {
+        auto_ptr_char temp(e.getMsg());
+        throw SignatureException(string("Caught an XMLSecurity exception while verifying raw signature: ") + temp.get());
+    }
+    catch(XSECCryptoException& e) {
+        throw SignatureException(string("Caught an XMLSecurity exception while verifying raw signature: ") + e.getMsg());
+    }
+}

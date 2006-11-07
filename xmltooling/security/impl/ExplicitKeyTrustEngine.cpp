@@ -53,6 +53,15 @@ namespace xmltooling {
             bool checkName=true,
             const KeyResolver* keyResolver=NULL
             ) const;
+        virtual bool validate(
+            const XMLCh* sigAlgorithm,
+            const char* sig,
+            KeyInfo* keyInfo,
+            const char* in,
+            unsigned int in_len,
+            KeyInfoIterator& keyInfoSource,
+            const KeyResolver* keyResolver=NULL
+            ) const;
     };
 
     TrustEngine* XMLTOOL_DLLLOCAL ExplicitKeyTrustEngineFactory(const DOMElement* const & e)
@@ -90,6 +99,52 @@ bool ExplicitKeyTrustEngine::validate(
                 return true;
             }
             catch (ValidationException& e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("public key did not validate signature: %s", e.what());
+                }
+            }
+        }
+        else {
+            log.debug("key information does not resolve to a public key, skipping it");
+        }
+    }
+
+    log.error("no peer key information validated the signature");
+    return false;
+}
+
+bool ExplicitKeyTrustEngine::validate(
+    const XMLCh* sigAlgorithm,
+    const char* sig,
+    KeyInfo* keyInfo,
+    const char* in,
+    unsigned int in_len,
+    KeyInfoIterator& keyInfoSource,
+    const KeyResolver* keyResolver
+    ) const
+{
+#ifdef _DEBUG
+    NDC ndc("validate");
+#endif
+    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine");
+    
+    if (!keyInfoSource.hasNext()) {
+        log.warn("unable to validate signature, no key information available for peer");
+        return false;
+    }
+    
+    log.debug("attempting to validate signature with the key information for peer");
+    while (keyInfoSource.hasNext()) {
+        auto_ptr<XSECCryptoKey> key((keyResolver ? keyResolver : m_keyResolver)->resolveKey(keyInfoSource.next()));
+        if (key.get()) {
+            log.debug("attempting to validate signature with public key...");
+            try {
+                if (Signature::verifyRawSignature(key.get(), sigAlgorithm, sig, in, in_len)) {
+                    log.info("signature validated with public key");
+                    return true;
+                }
+            }
+            catch (SignatureException& e) {
                 if (log.isDebugEnabled()) {
                     log.debug("public key did not validate signature: %s", e.what());
                 }
