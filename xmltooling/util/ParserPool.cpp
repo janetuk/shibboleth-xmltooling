@@ -229,9 +229,10 @@ DOMInputSource* ParserPool::resolveEntity(const XMLCh* const publicId, const XML
 #else
     auto_ptr_char temp(systemId);
     map<string,string>::const_iterator i=m_schemaLocMap.find(temp.get());
-    auto_ptr_XMLCh temp2(i->second.c_str());
-    if (i!=m_schemaLocMap.end())
+    if (i!=m_schemaLocMap.end()) {
+        auto_ptr_XMLCh temp2(i->second.c_str());
         return new Wrapper4InputSource(new LocalFileInputSource(NULL,temp2.get()));
+    }
 #endif    
 
     // Shortcircuit the request.
