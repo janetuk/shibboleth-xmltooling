@@ -241,6 +241,7 @@ void XMLToolingInternalConfig::term()
     XMLToolingException::deregisterFactories();
     AttributeExtensibleXMLObject::deregisterIDAttributes();
 
+    StorageServiceManager.deregisterFactories();
 #ifndef XMLTOOLING_NO_XMLSEC
     TrustEngineManager.deregisterFactories();
     CredentialResolverManager.deregisterFactories();
