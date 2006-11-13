@@ -75,14 +75,14 @@ Namespace::Namespace(const Namespace& src)
 {
     m_uri=XMLString::replicate(src.getNamespaceURI());
     m_prefix=XMLString::replicate(src.getNamespacePrefix());
-    m_pinned=src.getAlwaysDeclare();
+    m_pinned=src.alwaysDeclare();
 }
 
 Namespace& Namespace::operator=(const Namespace& src)
 {
     m_uri=XMLString::replicate(src.getNamespaceURI());
     m_prefix=XMLString::replicate(src.getNamespacePrefix());
-    m_pinned=src.getAlwaysDeclare();
+    m_pinned=src.alwaysDeclare();
     return *this;
 }
 
