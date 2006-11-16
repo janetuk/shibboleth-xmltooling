@@ -227,3 +227,36 @@ void XMLHelper::serialize(const DOMElement* e, std::string& buf)
     buf.erase();
     buf.append(reinterpret_cast<const char*>(target.getRawBuffer()),target.getLen());
 }
+
+namespace {
+    class StreamFormatTarget : public XMLFormatTarget
+    {
+    public:
+        StreamFormatTarget(std::ostream& out) : m_out(out) {}
+        ~StreamFormatTarget() {}
+
+        void writeChars(const XMLByte *const toWrite, const unsigned int count, XMLFormatter *const formatter) {
+            m_out.write(reinterpret_cast<const char*>(toWrite),count);
+        }
+
+        void flush() {
+            m_out.flush();
+        }
+
+    private:
+        std::ostream& m_out;
+    };
+};
+
+void XMLHelper::serialize(const DOMElement* e, std::ostream& out)
+{
+    static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
+    static const XMLCh UTF8[]={ chLatin_U, chLatin_T, chLatin_F, chDigit_8, chNull };
+    DOMImplementation* impl=DOMImplementationRegistry::getDOMImplementation(impltype);
+    DOMWriter* serializer=(static_cast<DOMImplementationLS*>(impl))->createDOMWriter();
+    XercesJanitor<DOMWriter> janitor(serializer);
+    serializer->setEncoding(UTF8);
+    StreamFormatTarget target(out);
+    if (!serializer->writeNode(&target,*e))
+        throw XMLParserException("unable to serialize XML");
+}

@@ -26,6 +26,8 @@
 #include <xmltooling/QName.h>
 #include <xercesc/dom/DOM.hpp>
 
+#include <iostream>
+
 using namespace xercesc;
 
 namespace xmltooling {
@@ -219,6 +221,15 @@ namespace xmltooling {
          * @param buf   buffer to serialize element into
          */
         static void serialize(const DOMElement* e, std::string& buf);
+
+        /**
+         * Serializes the DOM Element provided to a stream using UTF-8 encoding and
+         * the default XML serializer available. No manipulation or formatting is applied.
+         * 
+         * @param e     element to serialize
+         * @param out   stream to serialize element into
+         */
+        static void serialize(const DOMElement* e, std::ostream& out);
     };
 
 };
