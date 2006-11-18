@@ -312,6 +312,32 @@
         static const XMLCh LOCAL_NAME[]
 
 /**
+ * Begins the declaration of an XMLObject specialization with five base classes.
+ * Basic boilerplate includes a protected constructor, empty virtual destructor,
+ * and Unicode constants for the default associated element's name and prefix.
+ * 
+ * @param linkage   linkage specifier for the class
+ * @param cname     the name of the class to declare
+ * @param base      the first base class to derive from using public virtual inheritance
+ * @param base2     the second base class to derive from using public virtual inheritance
+ * @param base3     the third base class to derive from using public virtual inheritance
+ * @param base4     the fourth base class to derive from using public virtual inheritance
+ * @param base5     the fifth base class to derive from using public virtual inheritance
+ * @param desc      documentation comment for class
+ */
+#define BEGIN_XMLOBJECT5(linkage,cname,base,base2,base3,base4,base5,desc) \
+    XMLTOOLING_DOXYGEN(desc) \
+    class linkage cname : public virtual base, public virtual base2, public virtual base3, public virtual base4, public virtual base5 { \
+    protected: \
+        cname() {} \
+    public: \
+        virtual ~cname() {} \
+        XMLTOOLING_DOXYGEN(Type-specific clone method.) \
+        virtual cname* clone##cname() const=0; \
+        XMLTOOLING_DOXYGEN(Element local name) \
+        static const XMLCh LOCAL_NAME[]
+
+/**
  * Ends the declaration of an XMLObject specialization.
  */
 #define END_XMLOBJECT }

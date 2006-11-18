@@ -24,6 +24,7 @@
 #if !defined(__xmltooling_trust_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_trust_h__
 
+#include <xmltooling/security/KeyInfoSource.h>
 #include <xmltooling/signature/KeyResolver.h>
 #include <xmltooling/signature/Signature.h>
 
@@ -58,38 +59,10 @@ namespace xmltooling {
         virtual ~TrustEngine();
         
         /**
-         * Callback interface to supply KeyInfo objects to a TrustEngine.
-         * Applications can adapt TrustEngines to their environment by supplying
-         * implementations of this interface, or create specialized TrustEngine APIs
-         * by combining a KeyInfoIterator with a delegated TrustEngine. 
-         */
-        class XMLTOOL_API KeyInfoIterator {
-            MAKE_NONCOPYABLE(KeyInfoIterator);
-        protected:
-            KeyInfoIterator() {}
-        public:
-            virtual ~KeyInfoIterator() {}
-            
-            /**
-             * Indicates whether additional KeyInfo objects are available.
-             * 
-             * @return true iff another KeyInfo object can be fetched
-             */
-            virtual bool hasNext() const=0;
-            
-            /**
-             * Returns the next KeyInfo object available.
-             * 
-             * @return the next KeyInfo object, or NULL if none are left
-             */
-            virtual const xmlsignature::KeyInfo* next()=0;
-        };
-        
-        /**
          * Determines whether an XML signature is correct and valid with respect to
-         * the KeyInfo data supplied. It is the responsibility of the application to
-         * ensure that the KeyInfo information supplied is in fact associated with
-         * the peer who created the signature. 
+         * the source of KeyInfo data supplied. It is the responsibility of the
+         * application to ensure that the KeyInfo information supplied is in fact
+         * associated with the peer who created the signature. 
          * 
          * <p>A custom KeyResolver can be supplied from outside the TrustEngine.
          * Alternatively, one may be specified to the plugin constructor.
@@ -102,23 +75,23 @@ namespace xmltooling {
          */
         virtual bool validate(
             xmlsignature::Signature& sig,
-            KeyInfoIterator& keyInfoSource,
+            const KeyInfoSource& keyInfoSource,
             const xmlsignature::KeyResolver* keyResolver=NULL
             ) const=0;
 
         /**
          * Determines whether a raw signature is correct and valid with respect to
-         * the KeyInfo data supplied. It is the responsibility of the application to
-         * ensure that the KeyInfo information supplied is in fact associated with
-         * the peer who created the signature.
+         * the source of KeyInfo data supplied. It is the responsibility of the
+         * application to ensure that the KeyInfo information supplied is in fact
+         * associated with the peer who created the signature.
          * 
          * <p>A custom KeyResolver can be supplied from outside the TrustEngine.
          * Alternatively, one may be specified to the plugin constructor.
          * A non-caching, inline resolver will be used as a fallback.
          * 
          * <p>Note that the keyInfo parameter is not part of the implicitly trusted
-         * set of key information supplied via the iterator, but rather advisory data
-         * that may have accompanied the signature itself.
+         * set of key information supplied via the KeyInfoSource, but rather advisory
+         * data that may have accompanied the signature itself.
          * 
          * @param sigAlgorithm  XML Signature identifier for the algorithm used
          * @param sig           null-terminated base64-encoded signature value
@@ -135,7 +108,7 @@ namespace xmltooling {
             xmlsignature::KeyInfo* keyInfo,
             const char* in,
             unsigned int in_len,
-            KeyInfoIterator& keyInfoSource,
+            const KeyInfoSource& keyInfoSource,
             const xmlsignature::KeyResolver* keyResolver=NULL
             ) const=0;
     };
@@ -146,7 +119,11 @@ namespace xmltooling {
     void XMLTOOL_API registerTrustEngines();
 
     /** TrustEngine based on explicit knowledge of peer key information. */
-    #define EXPLICIT_KEY_TRUSTENGINE  "org.opensaml.xmlooling.security.ExplicitKeyTrustEngine"
+    #define EXPLICIT_KEY_TRUSTENGINE  "org.opensaml.xmltooling.security.ExplicitKeyTrustEngine"
+    
+    /** TrustEngine that tries multiple engines in sequence. */
+    #define CHAINING_TRUSTENGINE  "org.opensaml.xmltooling.security.ChainingTrustEngine"
+    
 };
 
 #endif /* __xmltooling_trust_h__ */

@@ -29,6 +29,7 @@
 #include "security/OpenSSLCryptoX509CRL.h"
 #include "signature/CredentialResolver.h"
 #include "soap/SOAP.h"
+#include "soap/SOAPTransport.h"
 #include "util/NDC.h"
 #include "util/ReplayCache.h"
 #include "util/StorageService.h"
@@ -219,6 +220,8 @@ bool XMLToolingInternalConfig::init()
         registerCredentialResolvers();
         registerTrustEngines();
 #endif
+        registerSOAPTransports();
+        initSOAPTransports();
         registerStorageServices();
 
         // Register xml:id as an ID attribute.        
@@ -242,6 +245,8 @@ void XMLToolingInternalConfig::term()
     AttributeExtensibleXMLObject::deregisterIDAttributes();
 
     StorageServiceManager.deregisterFactories();
+    termSOAPTransports();
+    SOAPTransportManager.deregisterFactories();
 #ifndef XMLTOOLING_NO_XMLSEC
     TrustEngineManager.deregisterFactories();
     CredentialResolverManager.deregisterFactories();

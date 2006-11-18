@@ -23,12 +23,13 @@
 #ifndef __xmltooling_xmlobj_h__
 #define __xmltooling_xmlobj_h__
 
+#include <xmltooling/QName.h>
+#include <xmltooling/Namespace.h>
+
 #include <set>
 #include <list>
 #include <vector>
 #include <xercesc/dom/DOM.hpp>
-#include <xmltooling/QName.h>
-#include <xmltooling/Namespace.h>
 
 using namespace xercesc;
 

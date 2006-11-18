@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="log4cppD.lib xerces-c_2D.lib xsec_1D.lib libeay32_0_9_8D.lib ssleay32_0_9_8D.lib"
+				AdditionalDependencies="log4cppD.lib xerces-c_2D.lib xsec_1D.lib libeay32_0_9_8D.lib ssleay32_0_9_8D.lib libcurld_imp.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_1D.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -138,7 +138,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="log4cpp.lib xerces-c_2.lib xsec_1.lib libeay32_0_9_8.lib ssleay32_0_9_8.lib"
+				AdditionalDependencies="log4cpp.lib xerces-c_2.lib xsec_1.lib libeay32_0_9_8.lib ssleay32_0_9_8.lib libcurl_imp.lib"
 				OutputFile="$(OutDir)\$(ProjectName)_1.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -372,6 +372,14 @@
 					Name="impl"
 					>
 					<File
+						RelativePath=".\security\impl\AbstractPKIXTrustEngine.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\security\impl\ChainingTrustEngine.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\security\impl\ExplicitKeyTrustEngine.cpp"
 						>
 					</File>
@@ -395,6 +403,10 @@
 				<Filter
 					Name="impl"
 					>
+					<File
+						RelativePath=".\soap\impl\CURLSOAPTransport.cpp"
+						>
+					</File>
 					<File
 						RelativePath=".\soap\impl\SOAPImpl.cpp"
 						>
@@ -643,7 +655,23 @@
 				Name="security"
 				>
 				<File
+					RelativePath=".\security\AbstractPKIXTrustEngine.h"
+					>
+				</File>
+				<File
+					RelativePath=".\security\ChainingTrustEngine.h"
+					>
+				</File>
+				<File
+					RelativePath=".\security\KeyInfoSource.h"
+					>
+				</File>
+				<File
 					RelativePath=".\security\OpenSSLCryptoX509CRL.h"
+					>
+				</File>
+				<File
+					RelativePath=".\security\OpenSSLTrustEngine.h"
 					>
 				</File>
 				<File
@@ -663,7 +691,23 @@
 				Name="soap"
 				>
 				<File
+					RelativePath=".\soap\HTTPSOAPTransport.h"
+					>
+				</File>
+				<File
+					RelativePath=".\soap\OpenSSLSOAPTransport.h"
+					>
+				</File>
+				<File
 					RelativePath=".\soap\SOAP.h"
+					>
+				</File>
+				<File
+					RelativePath=".\soap\SOAPClient.h"
+					>
+				</File>
+				<File
+					RelativePath=".\soap\SOAPTransport.h"
 					>
 				</File>
 			</Filter>

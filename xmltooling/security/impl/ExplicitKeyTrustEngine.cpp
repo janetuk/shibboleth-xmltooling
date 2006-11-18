@@ -21,7 +21,7 @@
  */
 
 #include "internal.h"
-#include "security/X509TrustEngine.h"
+#include "security/OpenSSLTrustEngine.h"
 #include "signature/SignatureValidator.h"
 #include "util/NDC.h"
 
@@ -35,22 +35,15 @@ using namespace log4cpp;
 using namespace std;
 
 namespace xmltooling {
-    class XMLTOOL_DLLLOCAL ExplicitKeyTrustEngine : public X509TrustEngine
+    class XMLTOOL_DLLLOCAL ExplicitKeyTrustEngine : public OpenSSLTrustEngine
     {
     public:
-        ExplicitKeyTrustEngine(const DOMElement* e) : X509TrustEngine(e) {}
+        ExplicitKeyTrustEngine(const DOMElement* e) : OpenSSLTrustEngine(e) {}
         virtual ~ExplicitKeyTrustEngine() {}
 
         virtual bool validate(
             Signature& sig,
-            TrustEngine::KeyInfoIterator& keyInfoSource,
-            const KeyResolver* keyResolver=NULL
-            ) const;
-        virtual bool validate(
-            XSECCryptoX509* certEE,
-            const vector<XSECCryptoX509*>& certChain,
-            TrustEngine::KeyInfoIterator& keyInfoSource,
-            bool checkName=true,
+            const KeyInfoSource& keyInfoSource,
             const KeyResolver* keyResolver=NULL
             ) const;
         virtual bool validate(
@@ -59,7 +52,21 @@ namespace xmltooling {
             KeyInfo* keyInfo,
             const char* in,
             unsigned int in_len,
-            KeyInfoIterator& keyInfoSource,
+            const KeyInfoSource& keyInfoSource,
+            const KeyResolver* keyResolver=NULL
+            ) const;
+        virtual bool validate(
+            XSECCryptoX509* certEE,
+            const vector<XSECCryptoX509*>& certChain,
+            const KeyInfoSource& keyInfoSource,
+            bool checkName=true,
+            const KeyResolver* keyResolver=NULL
+            ) const;
+        virtual bool validate(
+            X509* certEE,
+            STACK_OF(X509)* certChain,
+            const KeyInfoSource& keyInfoSource,
+            bool checkName=true,
             const KeyResolver* keyResolver=NULL
             ) const;
     };
@@ -72,7 +79,7 @@ namespace xmltooling {
 
 bool ExplicitKeyTrustEngine::validate(
     Signature& sig,
-    TrustEngine::KeyInfoIterator& keyInfoSource,
+    const KeyInfoSource& keyInfoSource,
     const KeyResolver* keyResolver
     ) const
 {
@@ -81,15 +88,16 @@ bool ExplicitKeyTrustEngine::validate(
 #endif
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine");
     
-    if (!keyInfoSource.hasNext()) {
+    auto_ptr<KeyInfoIterator> keyInfoIter(keyInfoSource.getKeyInfoIterator());
+    if (!keyInfoIter->hasNext()) {
         log.warn("unable to validate signature, no key information available for peer");
         return false;
     }
     
     log.debug("attempting to validate signature with the key information for peer");
     SignatureValidator sigValidator;
-    while (keyInfoSource.hasNext()) {
-        XSECCryptoKey* key = (keyResolver ? keyResolver : m_keyResolver)->resolveKey(keyInfoSource.next());
+    while (keyInfoIter->hasNext()) {
+        XSECCryptoKey* key = (keyResolver ? keyResolver : m_keyResolver)->resolveKey(keyInfoIter->next());
         if (key) {
             log.debug("attempting to validate signature with public key...");
             try {
@@ -119,7 +127,7 @@ bool ExplicitKeyTrustEngine::validate(
     KeyInfo* keyInfo,
     const char* in,
     unsigned int in_len,
-    KeyInfoIterator& keyInfoSource,
+    const KeyInfoSource& keyInfoSource,
     const KeyResolver* keyResolver
     ) const
 {
@@ -128,14 +136,15 @@ bool ExplicitKeyTrustEngine::validate(
 #endif
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine");
     
-    if (!keyInfoSource.hasNext()) {
+    auto_ptr<KeyInfoIterator> keyInfoIter(keyInfoSource.getKeyInfoIterator());
+    if (!keyInfoIter->hasNext()) {
         log.warn("unable to validate signature, no key information available for peer");
         return false;
     }
     
     log.debug("attempting to validate signature with the key information for peer");
-    while (keyInfoSource.hasNext()) {
-        auto_ptr<XSECCryptoKey> key((keyResolver ? keyResolver : m_keyResolver)->resolveKey(keyInfoSource.next()));
+    while (keyInfoIter->hasNext()) {
+        auto_ptr<XSECCryptoKey> key((keyResolver ? keyResolver : m_keyResolver)->resolveKey(keyInfoIter->next()));
         if (key.get()) {
             log.debug("attempting to validate signature with public key...");
             try {
@@ -162,7 +171,33 @@ bool ExplicitKeyTrustEngine::validate(
 bool ExplicitKeyTrustEngine::validate(
     XSECCryptoX509* certEE,
     const vector<XSECCryptoX509*>& certChain,
-    TrustEngine::KeyInfoIterator& keyInfoSource,
+    const KeyInfoSource& keyInfoSource,
+    bool checkName,
+    const KeyResolver* keyResolver
+    ) const
+{
+    if (!certEE) {
+#ifdef _DEBUG
+        NDC ndc("validate");
+#endif
+        Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine").error("unable to validate, end-entity certificate was null");
+        return false;
+    }
+    else if (certEE->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
+#ifdef _DEBUG
+        NDC ndc("validate");
+#endif
+        Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine").error("only the OpenSSL XSEC provider is supported");
+        return false;
+    }
+
+    return validate(static_cast<OpenSSLCryptoX509*>(certEE)->getOpenSSLX509(), NULL, keyInfoSource, checkName, keyResolver);
+}
+
+bool ExplicitKeyTrustEngine::validate(
+    X509* certEE,
+    STACK_OF(X509)* certChain,
+    const KeyInfoSource& keyInfoSource,
     bool checkName,
     const KeyResolver* keyResolver
     ) const
@@ -176,22 +211,20 @@ bool ExplicitKeyTrustEngine::validate(
         log.error("unable to validate, end-entity certificate was null");
         return false;
     }
-    else if (certEE->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
-        log.error("only the OpenSSL XSEC provider is supported");
-        return false;
-    }
-    else if (!keyInfoSource.hasNext()) {
+
+    auto_ptr<KeyInfoIterator> keyInfoIter(keyInfoSource.getKeyInfoIterator());
+    if (!keyInfoIter->hasNext()) {
         log.warn("unable to validate, no key information available for peer");
         return false;
     }
 
-    // The new "basic" trust implementation relies solely on certificates living within the
-    // role interface to verify the EE certificate.
+    // The "basic" trust implementation relies solely on certificates living within the
+    // peer interface to verify the EE certificate.
 
     log.debug("attempting to match key information from peer with end-entity certificate");
-    while (keyInfoSource.hasNext()) {
+    while (keyInfoIter->hasNext()) {
         KeyResolver::ResolvedCertificates resolvedCerts;
-        if (0 == (keyResolver ? keyResolver : m_keyResolver)->resolveCertificates(keyInfoSource.next(),resolvedCerts)) {
+        if (0 == (keyResolver ? keyResolver : m_keyResolver)->resolveCertificates(keyInfoIter->next(),resolvedCerts)) {
             log.debug("key information does not resolve to a certificate, skipping it");
             continue;
         }
@@ -201,7 +234,7 @@ bool ExplicitKeyTrustEngine::validate(
             log.error("only the OpenSSL XSEC provider is supported");
             continue;
         }
-        else if (!X509_cmp(static_cast<OpenSSLCryptoX509*>(certEE)->getOpenSSLX509(),static_cast<OpenSSLCryptoX509*>(resolvedCerts.v().front())->getOpenSSLX509())) {
+        else if (!X509_cmp(certEE,static_cast<OpenSSLCryptoX509*>(resolvedCerts.v().front())->getOpenSSLX509())) {
             log.info("end-entity certificate matches certificate from peer key information");
             return true;
         }

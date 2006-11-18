@@ -29,13 +29,15 @@ using namespace xmltooling;
 using namespace std;
 
 namespace xmltooling {
-    XMLTOOL_DLLLOCAL PluginManager<TrustEngine,const DOMElement*>::Factory ExplicitKeyTrustEngineFactory; 
+    XMLTOOL_DLLLOCAL PluginManager<TrustEngine,const DOMElement*>::Factory ExplicitKeyTrustEngineFactory;
+    XMLTOOL_DLLLOCAL PluginManager<TrustEngine,const DOMElement*>::Factory ChainingTrustEngineFactory;
 };
 
 void XMLTOOL_API xmltooling::registerTrustEngines()
 {
     XMLToolingConfig& conf=XMLToolingConfig::getConfig();
     conf.TrustEngineManager.registerFactory(EXPLICIT_KEY_TRUSTENGINE, ExplicitKeyTrustEngineFactory);
+    conf.TrustEngineManager.registerFactory(CHAINING_TRUSTENGINE, ChainingTrustEngineFactory);
 }
 
 static const XMLCh GenericKeyResolver[] =           UNICODE_LITERAL_11(K,e,y,R,e,s,o,l,v,e,r);

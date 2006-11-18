@@ -20,12 +20,13 @@
  * Helper classes and types for manipulating Unicode
  */
  
-#if !defined(__xmltooling_unicode_h__)
+#ifndef __xmltooling_unicode_h__
 #define __xmltooling_unicode_h__
+
+#include <xmltooling/base.h>
 
 #include <string>
 #include <xercesc/util/XMLString.hpp>
-#include <xmltooling/base.h>
 
 using namespace xercesc;
 

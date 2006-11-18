@@ -57,8 +57,12 @@ ioinclude_HEADERS = \
 	io/AbstractXMLObjectUnmarshaller.h
 
 secinclude_HEADERS = \
+	security/AbstractPKIXTrustEngine.h \
+	security/ChainingTrustEngine.h \
+	security/KeyInfoSource.h \
 	security/TrustEngine.h \
 	security/X509TrustEngine.h \
+	security/OpenSSLTrustEngine.h \
 	security/XSECCryptoX509CRL.h \
 	security/OpenSSLCryptoX509CRL.h
 
@@ -73,7 +77,11 @@ siginclude_HEADERS = \
 	signature/SignatureValidator.h
 
 soapinclude_HEADERS = \
-	soap/SOAP.h
+	soap/SOAP.h \
+	soap/SOAPClient.h \
+	soap/SOAPTransport.h \
+	soap/HTTPSOAPTransport.h \
+	soap/OpenSSLSOAPTransport.h
 
 utilinclude_HEADERS = \
 	util/DateTime.h \
@@ -99,6 +107,8 @@ xmlsec_sources = \
 	encryption/impl/Decrypter.cpp \
 	encryption/impl/Encrypter.cpp \
 	security/impl/TrustEngine.cpp \
+	security/impl/AbstractPKIXTrustEngine.cpp \
+	security/impl/ChainingTrustEngine.cpp \
 	security/impl/ExplicitKeyTrustEngine.cpp \
 	security/impl/XSECCryptoX509CRL.cpp \
 	security/impl/OpenSSLCryptoX509CRL.cpp \
@@ -141,6 +151,7 @@ libxmltooling_la_SOURCES = \
 	signature/impl/KeyInfoSchemaValidators.cpp \
 	soap/impl/SOAPImpl.cpp \
 	soap/impl/SOAPSchemaValidators.cpp \
+	soap/impl/CURLSOAPTransport.cpp \
 	util/DateTime.cpp \
 	util/NDC.cpp \
 	util/ParserPool.cpp \

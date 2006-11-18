@@ -15,22 +15,26 @@
  */
 
 /**
- * @file xmltooling/security/X509TrustEngine.h
+ * @file xmltooling/security/OpenSSLTrustEngine.h
  * 
- * Extended TrustEngine interface that adds validation of X.509 credentials.
+ * Extended TrustEngine interface that adds validation of X.509 credentials
+ * using OpenSSL data types directly for efficiency.
  */
 
-#if !defined(__xmltooling_x509trust_h__) && !defined(XMLTOOLING_NO_XMLSEC)
-#define __xmltooling_x509trust_h__
+#if !defined(__xmltooling_openssltrust_h__) && !defined(XMLTOOLING_NO_XMLSEC)
+#define __xmltooling_openssltrust_h__
 
-#include <xmltooling/security/TrustEngine.h>
+#include <xmltooling/security/X509TrustEngine.h>
+
+#include <openssl/x509.h>
 
 namespace xmltooling {
 
     /**
-     * Extended TrustEngine interface that adds validation of X.509 credentials.
+     * Extended TrustEngine interface that adds validation of X.509 credentials
+     * using OpenSSL data types directly for efficiency.
      */
-    class XMLTOOL_API X509TrustEngine : public TrustEngine {
+    class XMLTOOL_API OpenSSLTrustEngine : public X509TrustEngine {
     protected:
         /**
          * Constructor.
@@ -45,10 +49,10 @@ namespace xmltooling {
          * 
          * @param e DOM to supply configuration for provider
          */
-        X509TrustEngine(const DOMElement* e=NULL) : TrustEngine(e) {}
+        OpenSSLTrustEngine(const DOMElement* e=NULL) : X509TrustEngine(e) {}
         
     public:
-        virtual ~X509TrustEngine() {}
+        virtual ~OpenSSLTrustEngine() {}
         
         /**
          * Determines whether an X.509 credential is valid with respect to the
@@ -61,14 +65,14 @@ namespace xmltooling {
          * A non-caching, inline resolver will be used as a fallback.
          * 
          * @param certEE        end-entity certificate to validate
-         * @param certChain     the complete set of certificates presented for validation (includes certEE)
+         * @param certChain     stack of certificates presented for validation (includes certEE)
          * @param keyInfoSource supplies KeyInfo objects to the TrustEngine
          * @param checkName     true iff certificate subject/name checking has <b>NOT</b> already occurred
          * @param keyResolver   optional externally supplied KeyResolver, or NULL
          */
         virtual bool validate(
-            XSECCryptoX509* certEE,
-            const std::vector<XSECCryptoX509*>& certChain,
+            X509* certEE,
+            STACK_OF(X509)* certChain,
             const KeyInfoSource& keyInfoSource,
             bool checkName=true,
             const xmlsignature::KeyResolver* keyResolver=NULL
@@ -77,4 +81,4 @@ namespace xmltooling {
     
 };
 
-#endif /* __xmltooling_x509trust_h__ */
+#endif /* __xmltooling_openssltrust_h__ */

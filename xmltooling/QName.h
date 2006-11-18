@@ -20,11 +20,11 @@
  * Representing XML QNames 
  */
 
-#if !defined(__xmltooling_qname_h__)
+#ifndef __xmltooling_qname_h__
 #define __xmltooling_qname_h__
 
-#include <algorithm>
 #include <xmltooling/unicode.h>
+#include <algorithm>
 
 namespace xmltooling {
     
