@@ -1,5 +1,8 @@
 /* config_win32.h.  Copied from a ./configure on Unix */
 
+/* Define if C++ compiler supports covariant virtual methods. */
+#define HAVE_COVARIANT_RETURNS 1
+
 /* Define to 1 if you have the <dlfcn.h> header file.
 #define HAVE_DLFCN_H 1
 */
