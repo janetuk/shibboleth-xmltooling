@@ -107,11 +107,41 @@ AC_TRY_LINK_FUNC([ERR_load_CRYPTO_strings],,
              AC_MSG_ERROR([unable to link with openssl libraries]))
 AC_MSG_RESULT(yes)
 
+# libcurl settings
+AC_PATH_PROG(CURL_CONFIG,curl-config)
+AC_ARG_WITH(curl,
+    AC_HELP_STRING([--with-curl=PATH], [where curl-config is installed]),
+    [
+    CURL_CONFIG="${with_curl}"
+    if ! test -f "${CURL_CONFIG}" ; then
+    	CURL_CONFIG="${with_curl}/bin/curl-config"
+    fi
+    ])
+if test -f "${CURL_CONFIG}" ; then
+    LDFLAGS="`${CURL_CONFIG} --libs` $LDFLAGS"
+    CPPFLAGS="`${CURL_CONFIG} --cflags` $CPPFLAGS"
+else
+    AC_MSG_ERROR([curl-config not found, may need to use --with-curl option])
+fi
+AC_CHECK_HEADER([curl/curl.h],,AC_MSG_ERROR([unable to find libcurl header files]))
+AC_CHECK_LIB([curl],[curl_global_init],,AC_MSG_ERROR([unable to link with libcurl]))
+AC_MSG_CHECKING([for CURLOPT_SSL_CTX_FUNCTION in curl.h])
+AC_EGREP_HEADER([CURLOPT_SSL_CTX_FUNCTION], [curl/curl.h],
+		[AC_MSG_RESULT(yes)],
+		[AC_MSG_ERROR([need libcurl that supports CURLOPT_SSL_CTX_FUNCTION])])
+
+
 AC_LANG(C++)
 
 # C++ requirements
 AC_CXX_REQUIRE_STL
 AC_CXX_NAMESPACES
+
+# are covariant methods allowed?
+AC_TRY_LINK(
+     [ class base { public: virtual base *GetPtr( void ) { return this; } }; ],
+     [ class derived: virtual public base { public: virtual derived *GetPtr( void ) { return this; } }; ],
+     [AC_DEFINE(HAVE_COVARIANT_RETURNS,1,[Define if C++ compiler supports covariant virtual methods.])])
 
 # log4cpp settings
 AC_PATH_PROG(LOG4CPP_CONFIG,log4cpp-config)
