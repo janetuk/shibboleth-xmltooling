@@ -60,7 +60,7 @@ protected:
 #endif
         VectorOf(SimpleXMLObject) mine=getSimpleXMLObjects();
         for (vector<SimpleXMLObject*>::const_iterator i=src.m_simples.begin(); i!=src.m_simples.end(); i++) {
-            mine.push_back((*i) ? (*i)->clone() : NULL);
+            mine.push_back(dynamic_cast<SimpleXMLObject*>((*i)->clone()));
         }
     }
 
@@ -85,7 +85,7 @@ public:
         XMLString::release(&m_id);
     }
 
-    SimpleXMLObject* clone() const {
+    XMLObject* clone() const {
         auto_ptr<XMLObject> domClone(AbstractDOMCachingXMLObject::clone());
         SimpleXMLObject* ret=dynamic_cast<SimpleXMLObject*>(domClone.get());
         if (ret) {
@@ -165,22 +165,22 @@ private:
 class SimpleXMLObjectBuilder : public XMLObjectBuilder
 {
 public:
-    SimpleXMLObject* buildObject() const {
+    XMLObject* buildObject() const {
         return buildObject(SimpleXMLObject::NAMESPACE, SimpleXMLObject::LOCAL_NAME, SimpleXMLObject::NAMESPACE_PREFIX);
     }
 
-    SimpleXMLObject* buildObject(
+    XMLObject* buildObject(
         const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL
         ) const {
         return new SimpleXMLObject(nsURI, localName, prefix, schemaType);
     }
 
-    static SimpleXMLObject* newSimpleXMLObject() {
+    static SimpleXMLObject* buildSimpleXMLObject() {
         const SimpleXMLObjectBuilder* b = dynamic_cast<const SimpleXMLObjectBuilder*>(
             XMLObjectBuilder::getBuilder(QName(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME))
             );
         if (b)
-            return b->buildObject();
+            return dynamic_cast<SimpleXMLObject*>(b->buildObject());
         throw XMLObjectException("Unable to obtain typed builder for SimpleXMLObject.");
     }
 };

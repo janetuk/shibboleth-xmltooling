@@ -1,3 +1,6 @@
+/* Define if C++ compiler supports covariant virtual methods. */
+#undef HAVE_COVARIANT_RETURNS
+
 /* Define to 1 if you have an STL implementation that supports useful string
    specialization. */
 #undef HAVE_GOOD_STL

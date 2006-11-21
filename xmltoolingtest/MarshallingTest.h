@@ -36,7 +36,7 @@ public:
 
     void testMarshallingWithAttributes() {
         QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
-        auto_ptr<SimpleXMLObject> sxObject(SimpleXMLObjectBuilder::newSimpleXMLObject());
+        auto_ptr<SimpleXMLObject> sxObject(SimpleXMLObjectBuilder::buildSimpleXMLObject());
         TS_ASSERT(sxObject.get()!=NULL);
         auto_ptr_XMLCh expected("Firefly");
         sxObject->setId(expected.get());
@@ -54,7 +54,7 @@ public:
 
     void testMarshallingWithElementContent() {
         QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
-        auto_ptr<SimpleXMLObject> sxObject(SimpleXMLObjectBuilder::newSimpleXMLObject());
+        auto_ptr<SimpleXMLObject> sxObject(SimpleXMLObjectBuilder::buildSimpleXMLObject());
         TS_ASSERT(sxObject.get()!=NULL);
         auto_ptr_XMLCh expected("Sample Content");
         sxObject->setValue(expected.get());
@@ -75,12 +75,12 @@ public:
         const SimpleXMLObjectBuilder* b=dynamic_cast<const SimpleXMLObjectBuilder*>(XMLObjectBuilder::getBuilder(qname));
         TS_ASSERT(b!=NULL);
         
-        auto_ptr<SimpleXMLObject> sxObject(b->buildObject());
+        auto_ptr<SimpleXMLObject> sxObject(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
         TS_ASSERT(sxObject.get()!=NULL);
         VectorOf(SimpleXMLObject) kids=sxObject->getSimpleXMLObjects();
-        kids.push_back(b->buildObject());
-        kids.push_back(b->buildObject());
-        kids.push_back(b->buildObject());
+        kids.push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
+        kids.push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
+        kids.push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
         
         // Test some collection stuff
         auto_ptr_XMLCh foo("Foo");
@@ -93,7 +93,9 @@ public:
         
         QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME,SimpleXMLObject::NAMESPACE_PREFIX);
         kids.push_back(
-            b->buildObject(SimpleXMLObject::NAMESPACE,SimpleXMLObject::DERIVED_NAME,SimpleXMLObject::NAMESPACE_PREFIX,&qtype)
+            dynamic_cast<SimpleXMLObject*>(
+                b->buildObject(SimpleXMLObject::NAMESPACE,SimpleXMLObject::DERIVED_NAME,SimpleXMLObject::NAMESPACE_PREFIX,&qtype)
+                )
             );
         kids.back()->setValue(baz.get());
         

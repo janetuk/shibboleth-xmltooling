@@ -1160,7 +1160,9 @@
                 xmltooling::AbstractDOMCachingXMLObject(src) {} \
         IMPL_XMLOBJECT_CLONE(cname) \
     }
-    
+
+#ifdef HAVE_COVARIANT_RETURNS
+
 /**
  * Begins the declaration of an XMLObjectBuilder specialization.
  * Basic boilerplate includes an empty virtual destructor, and
@@ -1223,6 +1225,73 @@
     { \
         return new cname##Impl(nsURI,localName,prefix,schemaType); \
     }
+
+#else   /* !HAVE_COVARIANT_RETURNS */
+
+/**
+ * Begins the declaration of an XMLObjectBuilder specialization.
+ * Basic boilerplate includes an empty virtual destructor, and
+ * a default builder that defaults the element name.
+ * 
+ * @param linkage           linkage specifier for the class
+ * @param cname             the name of the XMLObject specialization
+ * @param namespaceURI      the XML namespace of the default associated element
+ * @param namespacePrefix   the XML namespace prefix of the default associated element
+ */
+#define BEGIN_XMLOBJECTBUILDER(linkage,cname,namespaceURI,namespacePrefix) \
+    XMLTOOLING_DOXYGEN(Builder for cname objects.) \
+    class linkage cname##Builder : public xmltooling::XMLObjectBuilder { \
+    public: \
+        virtual ~cname##Builder() {} \
+        XMLTOOLING_DOXYGEN(Default builder.) \
+        virtual xmltooling::XMLObject* buildObject() const { \
+            return buildObject(namespaceURI,cname::LOCAL_NAME,namespacePrefix); \
+        } \
+        XMLTOOLING_DOXYGEN(Builder that allows element/type override.) \
+        virtual xmltooling::XMLObject* buildObject( \
+            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const xmltooling::QName* schemaType=NULL \
+            ) const
+
+/**
+ * Ends the declaration of an XMLObjectBuilder specialization.
+ */
+#define END_XMLOBJECTBUILDER }
+
+/**
+ * Declares a generic XMLObjectBuilder specialization.
+ * 
+ * @param linkage           linkage specifier for the class
+ * @param cname             the name of the XMLObject specialization
+ * @param namespaceURI      the XML namespace of the default associated element
+ * @param namespacePrefix   the XML namespace prefix of the default associated element
+ */
+ #define DECL_XMLOBJECTBUILDER(linkage,cname,namespaceURI,namespacePrefix) \
+    BEGIN_XMLOBJECTBUILDER(linkage,cname,namespaceURI,namespacePrefix); \
+    XMLTOOLING_DOXYGEN(Singleton builder.) \
+    static cname* build##cname() { \
+        const cname##Builder* b = dynamic_cast<const cname##Builder*>( \
+            XMLObjectBuilder::getBuilder(xmltooling::QName(namespaceURI,cname::LOCAL_NAME)) \
+            ); \
+        if (b) \
+            return dynamic_cast<cname*>(b->buildObject()); \
+        throw xmltooling::XMLObjectException("Unable to obtain typed builder for "#cname"."); \
+    } \
+    END_XMLOBJECTBUILDER
+
+/**
+ * Implements the standard XMLObjectBuilder specialization function. 
+ * 
+ * @param cname the name of the XMLObject specialization
+ */
+#define IMPL_XMLOBJECTBUILDER(cname) \
+    xmltooling::XMLObject* cname##Builder::buildObject( \
+        const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType \
+        ) const \
+    { \
+        return new cname##Impl(nsURI,localName,prefix,schemaType); \
+    }
+
+#endif  /* HAVE_COVARIANT_RETURNS */
 
 /**
  * Begins the declaration of a Schema Validator specialization.

@@ -408,7 +408,12 @@ Signature* SignatureBuilder::buildObject(
     return buildObject();
 }
 
-Signature* SignatureBuilder::buildObject() const
+#ifdef HAVE_COVARIANT_RETURNS
+Signature*
+#else
+XMLObject*
+#endif
+SignatureBuilder::buildObject() const
 {
     return new XMLSecSignatureImpl();
 }

@@ -196,16 +196,24 @@ namespace xmlsignature {
          * 
          * @return empty Signature object
          */
+#ifdef HAVE_COVARIANT_RETURNS
         virtual Signature* buildObject() const;
-
+#else
+        virtual xmltooling::XMLObject* buildObject() const;
+#endif
         static Signature* buildSignature() {
             const SignatureBuilder* b = dynamic_cast<const SignatureBuilder*>(
                 xmltooling::XMLObjectBuilder::getBuilder(
                     xmltooling::QName(xmlconstants::XMLSIG_NS,Signature::LOCAL_NAME)
                     )
                 );
-            if (b)
+            if (b) {
+#ifdef HAVE_COVARIANT_RETURNS
                 return b->buildObject();
+#else
+                return dynamic_cast<Signature*>(b->buildObject());
+#endif
+            }
             throw xmltooling::XMLObjectException("Unable to obtain typed builder for Signature.");
         }
     };

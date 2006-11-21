@@ -139,7 +139,7 @@ public:
         TS_ASSERT(sxObject.get()!=NULL);
 
         sxObject->releaseThisAndChildrenDOM();
-        auto_ptr<SimpleXMLObject> clonedObject(sxObject->clone());
+        auto_ptr<SimpleXMLObject> clonedObject(dynamic_cast<SimpleXMLObject*>(sxObject->clone()));
 
         VectorOf(SimpleXMLObject) kids=clonedObject->getSimpleXMLObjects();
         TSM_ASSERT_EQUALS("Number of child elements was not expected value", 3, kids.size());
