@@ -42,9 +42,11 @@ namespace xmlsignature {
 namespace xmltooling {
     
     class XMLTOOL_API ReplayCache;
+    class XMLTOOL_API SOAPTransport;
     class XMLTOOL_API StorageService;
     class XMLTOOL_API TemplateEngine;
     class XMLTOOL_API TrustEngine;
+    class XMLTOOL_API KeyInfoSource;
     class XMLTOOL_API XSECCryptoX509CRL;
 
     /**
@@ -207,6 +209,11 @@ namespace xmltooling {
          */
         PluginManager<TrustEngine,const DOMElement*> TrustEngineManager;
 #endif
+
+        /**
+         * Manages factories for SOAPTransport plugins.
+         */
+        PluginManager<SOAPTransport,std::pair<const KeyInfoSource*,const char*> > SOAPTransportManager;
 
         /**
          * Manages factories for StorageService plugins.
