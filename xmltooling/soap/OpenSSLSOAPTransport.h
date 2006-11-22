@@ -20,10 +20,9 @@
  * Encapsulates OpenSSL-capable SOAP transport layer.
  */
 
-#if !defined(__xmltooling_opensslsoaptrans_h__) && !defined(XMLTOOLING_NO_XMLSEC)
+#ifndef __xmltooling_opensslsoaptrans_h__
 #define __xmltooling_opensslsoaptrans_h__
 
-#include <xmltooling/signature/CredentialResolver.h>
 #include <xmltooling/soap/SOAPTransport.h>
 
 #include <openssl/ssl.h>
@@ -41,7 +40,7 @@ namespace xmltooling {
         virtual ~OpenSSLSOAPTransport() {}
         
         /** OpenSSL context callback for manipulating credentials and validation behavior. */
-        typedef bool (*ssl_ctx_callback_fn)(SSL_CTX* ssl_ctx, void* userptr);
+        typedef bool (*ssl_ctx_callback_fn)(OpenSSLSOAPTransport* transport, SSL_CTX* ssl_ctx, void* userptr);
 
         /**
          * Sets a callback function to invoke against the SSL_CTX before the handshake.
@@ -51,6 +50,13 @@ namespace xmltooling {
          * @return true iff the callback was set
          */
         virtual bool setSSLCallback(ssl_ctx_callback_fn fn, void* userptr=NULL) const=0;
+        
+        /**
+         * Sets indicator that the transport peer has been authenticated.
+         * 
+         * @param secure    flag to set
+         */
+        virtual void setSecure(bool secure)=0;
     };
 
 };

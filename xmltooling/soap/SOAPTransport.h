@@ -86,7 +86,7 @@ namespace xmltooling {
          */
         virtual bool setAuth(transport_auth_t authType, const char* username=NULL, const char* password=NULL) const=0;
 
-#ifndef XMLTOOLING_NO_XMLSEC 
+#ifndef XMLTOOLING_NO_XMLSEC
         /**
          * Provides a CredentialResolver to the transport to supply transport credentials.
          * The lifetime of the resolver must be longer than the lifetime of this object.
@@ -103,10 +103,16 @@ namespace xmltooling {
          * The lifetime of the engine must be longer than the lifetime of this object.
          * 
          * @param trustEngine   a TrustEngine instance, or NULL
+         * @param mandatory     flag controls whether message is sent at all if the
+         *                      transport isn't authenticated using the TrustEngine
          * @param keyResolver   optional externally supplied KeyResolver, or NULL
          * @return true iff the transport supports the use of a TrustEngine
          */
-        virtual bool setTrustEngine(const X509TrustEngine* trustEngine, const xmlsignature::KeyResolver* keyResolver=NULL) const=0;
+        virtual bool setTrustEngine(
+            const X509TrustEngine* trustEngine,
+            bool mandatory=true,
+            const xmlsignature::KeyResolver* keyResolver=NULL
+            ) const=0;
 #endif
 
         /**
@@ -125,6 +131,13 @@ namespace xmltooling {
          */
         virtual std::istream& receive()=0;
         
+        /**
+         * Returns result of authenticating transport peer.
+         * 
+         * @return true iff TrustEngine or other mechanism successfully authenticated the peer
+         */
+        virtual bool isSecure() const=0;
+
         /**
          * Returns the MIME type of the response, if any.
          * 

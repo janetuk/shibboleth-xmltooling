@@ -68,8 +68,10 @@ namespace xmltooling {
     public:
         CURLSOAPTransport(const KeyInfoSource& peer, const char* endpoint)
                 : m_peer(peer), m_endpoint(endpoint), m_handle(NULL), m_headers(NULL),
-                    m_credResolver(NULL), m_trustEngine(NULL), m_keyResolver(NULL),
-                    m_ssl_callback(NULL), m_ssl_userptr(NULL) {
+#ifndef XMLTOOLING_NO_XMLSEC
+                    m_credResolver(NULL), m_trustEngine(NULL), m_mandatory(false), m_keyResolver(NULL),
+#endif
+                    m_ssl_callback(NULL), m_ssl_userptr(NULL), m_secure(false) {
             m_handle = g_CURLPool->get(peer.getName(), endpoint);
             curl_easy_setopt(m_handle,CURLOPT_URL,endpoint);
             curl_easy_setopt(m_handle,CURLOPT_CONNECTTIMEOUT,15);
@@ -83,6 +85,7 @@ namespace xmltooling {
         virtual ~CURLSOAPTransport() {
             curl_slist_free_all(m_headers);
             curl_easy_setopt(m_handle,CURLOPT_ERRORBUFFER,NULL);
+            curl_easy_setopt(m_handle,CURLOPT_PRIVATE,m_secure ? "secure" : NULL); // Save off security "state".
             g_CURLPool->put(m_peer.getName(), m_endpoint.c_str(), m_handle);
         }
 
@@ -96,6 +99,7 @@ namespace xmltooling {
         
         bool setAuth(transport_auth_t authType, const char* username=NULL, const char* password=NULL) const;
         
+#ifndef XMLTOOLING_NO_XMLSEC
         bool setCredentialResolver(const CredentialResolver* credResolver) const {
             const OpenSSLCredentialResolver* down = dynamic_cast<const OpenSSLCredentialResolver*>(credResolver);
             if (!down) {
@@ -106,7 +110,7 @@ namespace xmltooling {
             return true;
         }
         
-        bool setTrustEngine(const X509TrustEngine* trustEngine, const KeyResolver* keyResolver=NULL) const {
+        bool setTrustEngine(const X509TrustEngine* trustEngine, bool mandatory=true, const KeyResolver* keyResolver=NULL) const {
             const OpenSSLTrustEngine* down = dynamic_cast<const OpenSSLTrustEngine*>(trustEngine);
             if (!down) {
                 m_trustEngine = NULL;
@@ -115,8 +119,11 @@ namespace xmltooling {
             }
             m_trustEngine = down;
             m_keyResolver = keyResolver;
+            m_mandatory = mandatory;
             return true;
         }
+        
+#endif
         
         void send(istream& in);
         
@@ -124,6 +131,14 @@ namespace xmltooling {
             return m_stream;
         }
         
+        bool isSecure() const {
+            return m_secure;
+        }
+
+        void setSecure(bool secure) {
+            m_secure = secure;
+        }
+
         string getContentType() const;
         
         bool setRequestHeader(const char* name, const char* val) const {
@@ -149,11 +164,15 @@ namespace xmltooling {
         stringstream m_stream;
         mutable struct curl_slist* m_headers;
         map<string,vector<string> > m_response_headers;
+#ifndef XMLTOOLING_NO_XMLSEC
         mutable const OpenSSLCredentialResolver* m_credResolver;
         mutable const OpenSSLTrustEngine* m_trustEngine;
+        mutable bool m_mandatory;
         mutable const KeyResolver* m_keyResolver;
+#endif
         mutable ssl_ctx_callback_fn m_ssl_callback;
         mutable void* m_ssl_userptr;
+        bool m_secure;
         
         friend size_t XMLTOOL_DLLLOCAL curl_header_hook(void* ptr, size_t size, size_t nmemb, void* stream);
         friend CURLcode XMLTOOL_DLLLOCAL xml_ssl_ctx_callback(CURL* curl, SSL_CTX* ssl_ctx, void* userptr);
@@ -166,7 +185,9 @@ namespace xmltooling {
     size_t XMLTOOL_DLLLOCAL curl_read_hook( void *ptr, size_t size, size_t nmemb, void *stream);
     int XMLTOOL_DLLLOCAL curl_debug_hook(CURL* handle, curl_infotype type, char* data, size_t len, void* ptr);
     CURLcode XMLTOOL_DLLLOCAL xml_ssl_ctx_callback(CURL* curl, SSL_CTX* ssl_ctx, void* userptr);
+#ifndef XMLTOOLING_NO_XMLSEC
     int XMLTOOL_DLLLOCAL verify_callback(X509_STORE_CTX* x509_ctx, void* arg);
+#endif
 
     SOAPTransport* CURLSOAPTransportFactory(const pair<const KeyInfoSource*,const char*>& dest)
     {
@@ -360,6 +381,13 @@ void CURLSOAPTransport::send(istream& in)
     if (m_ssl_callback || m_credResolver || m_trustEngine) {
         curl_easy_setopt(m_handle,CURLOPT_SSL_CTX_FUNCTION,xml_ssl_ctx_callback);
         curl_easy_setopt(m_handle,CURLOPT_SSL_CTX_DATA,this);
+
+        // Restore security "state". Necessary because the callback only runs
+        // when handshakes occur. Even new TCP connections won't execute it.
+        char* priv=NULL;
+        curl_easy_getinfo(m_handle,CURLINFO_PRIVATE,&priv);
+        if (priv)
+            m_secure=true;
     }
     else {
         curl_easy_setopt(m_handle,CURLOPT_SSL_CTX_FUNCTION,NULL);
@@ -436,6 +464,7 @@ int xmltooling::curl_debug_hook(CURL* handle, curl_infotype type, char* data, si
     return 0;
 }
 
+#ifndef XMLTOOLING_NO_XMLSEC
 int xmltooling::verify_callback(X509_STORE_CTX* x509_ctx, void* arg)
 {
     Category::getInstance("OpenSSL").debug("invoking X509 verify callback");
@@ -456,17 +485,22 @@ int xmltooling::verify_callback(X509_STORE_CTX* x509_ctx, void* arg)
      // Bypass name check (handled for us by curl).
     if (!ctx->m_trustEngine->validate(x509_ctx->cert,x509_ctx->untrusted,ctx->m_peer,false,ctx->m_keyResolver)) {
         x509_ctx->error=X509_V_ERR_APPLICATION_VERIFICATION;     // generic error, check log for plugin specifics
-        return 0;
+        ctx->setSecure(false);
+        return ctx->m_mandatory ? 0 : 1;
     }
     
     // Signal success. Hopefully it doesn't matter what's actually in the structure now.
+    ctx->setSecure(true);
     return 1;
 }
+#endif
 
 // callback to invoke a caller-defined SSL callback
 CURLcode xmltooling::xml_ssl_ctx_callback(CURL* curl, SSL_CTX* ssl_ctx, void* userptr)
 {
     CURLSOAPTransport* conf = reinterpret_cast<CURLSOAPTransport*>(userptr);
+
+#ifndef XMLTOOLING_NO_XMLSEC
     if (conf->m_credResolver)
         conf->m_credResolver->attach(ssl_ctx);
 
@@ -483,8 +517,9 @@ CURLcode xmltooling::xml_ssl_ctx_callback(CURL* curl, SSL_CTX* ssl_ctx, void* us
         SSL_CTX_set_verify_depth(ssl_ctx,reinterpret_cast<int>(userptr));
 #endif
     }
+#endif
         
-    if (!conf->m_ssl_callback(ssl_ctx,conf->m_ssl_userptr))
+    if (!conf->m_ssl_callback(conf, ssl_ctx, conf->m_ssl_userptr))
         return CURLE_SSL_CERTPROBLEM;
         
     return CURLE_OK;
