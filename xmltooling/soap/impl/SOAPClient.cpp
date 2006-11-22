@@ -25,6 +25,7 @@
 #include "soap/SOAP.h"
 #include "soap/SOAPClient.h"
 #include "util/XMLHelper.h"
+#include "validation/ValidatorSuite.h"
 
 #include <sstream>
 
@@ -77,10 +78,13 @@ Envelope* SOAPClient::receive()
     XercesJanitor<DOMDocument> janitor(doc);
     auto_ptr<XMLObject> xmlObject(XMLObjectBuilder::buildOneFromElement(doc->getDocumentElement(), true));
     janitor.release();
+    if (!m_validate)
+        SchemaValidators.validate(xmlObject.get());
 
     Envelope* env = dynamic_cast<Envelope*>(xmlObject.get());
     if (!env)
         throw IOException("Response was not a SOAP 1.1 Envelope.");
+
     reset();
     xmlObject.release();
     return env;
