@@ -77,6 +77,7 @@ namespace xmltooling {
             curl_easy_setopt(m_handle,CURLOPT_HTTPAUTH,0);
             curl_easy_setopt(m_handle,CURLOPT_USERPWD,NULL);
             curl_easy_setopt(m_handle,CURLOPT_HEADERDATA,this);
+            m_headers=curl_slist_append(m_headers,"Content-Type: text/xml");
         }
         
         virtual ~CURLSOAPTransport() {
@@ -117,7 +118,11 @@ namespace xmltooling {
             return true;
         }
         
-        size_t send(istream& in, ostream& out);
+        void send(istream& in);
+        
+        istream& receive() {
+            return m_stream;
+        }
         
         string getContentType() const;
         
@@ -141,6 +146,7 @@ namespace xmltooling {
         const KeyInfoSource& m_peer;
         string m_endpoint;
         CURL* m_handle;
+        stringstream m_stream;
         mutable struct curl_slist* m_headers;
         map<string,vector<string> > m_response_headers;
         mutable const OpenSSLCredentialResolver* m_credResolver;
@@ -325,7 +331,7 @@ string CURLSOAPTransport::getContentType() const
     return content_type ? content_type : "";
 }
 
-size_t CURLSOAPTransport::send(istream& in, ostream& out)
+void CURLSOAPTransport::send(istream& in)
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("send");
@@ -337,11 +343,9 @@ size_t CURLSOAPTransport::send(istream& in, ostream& out)
     // caller should have executed any set functions to manipulate it.
 
     // Setup standard per-call curl properties.
-    size_t content_length=0;
-    pair<ostream*,size_t*> output = make_pair(&out,&content_length); 
     curl_easy_setopt(m_handle,CURLOPT_POST,1);
     curl_easy_setopt(m_handle,CURLOPT_READDATA,&in);
-    curl_easy_setopt(m_handle,CURLOPT_FILE,&output);
+    curl_easy_setopt(m_handle,CURLOPT_FILE,&m_stream);
     curl_easy_setopt(m_handle,CURLOPT_DEBUGDATA,&log_curl);
 
     char curl_errorbuf[CURL_ERROR_SIZE];
@@ -374,8 +378,6 @@ size_t CURLSOAPTransport::send(istream& in, ostream& out)
             string("CURLSOAPTransport::send() failed while contacting SOAP responder: ") +
                 (curl_errorbuf[0] ? curl_errorbuf : "no further information available"));
     }
-    
-    return content_length;
 }
 
 // callback to buffer headers from server
@@ -417,10 +419,8 @@ size_t xmltooling::curl_read_hook(void* ptr, size_t size, size_t nmemb, void* st
 // callback to buffer data from server
 size_t xmltooling::curl_write_hook(void* ptr, size_t size, size_t nmemb, void* stream)
 {
-    pair<ostream*,size_t*>* output = reinterpret_cast<pair<ostream*,size_t*>*>(stream); 
     size_t len = size*nmemb;
-    output->first->write(reinterpret_cast<const char*>(ptr),len);
-    *(output->second) += len;
+    reinterpret_cast<stringstream*>(stream)->write(reinterpret_cast<const char*>(ptr),len);
     return len;
 }
 

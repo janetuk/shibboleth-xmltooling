@@ -149,6 +149,7 @@ libxmltooling_la_SOURCES = \
 	io/AbstractXMLObjectUnmarshaller.cpp \
 	signature/impl/KeyInfoImpl.cpp \
 	signature/impl/KeyInfoSchemaValidators.cpp \
+	soap/impl/SOAPClient.cpp \
 	soap/impl/SOAPImpl.cpp \
 	soap/impl/SOAPSchemaValidators.cpp \
 	soap/impl/CURLSOAPTransport.cpp \

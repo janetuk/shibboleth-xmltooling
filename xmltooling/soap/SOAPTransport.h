@@ -110,12 +110,20 @@ namespace xmltooling {
 #endif
 
         /**
-         * Sends a stream of data over the transport, and writes the results into another.
+         * Sends a stream of data over the transport. The function may return without
+         * having received any data, depending on the nature of the transport.
          * 
          * @param in    input stream to send
-         * @param out   output stream to write result into 
          */        
-        virtual size_t send(std::istream& in, std::ostream& out)=0;
+        virtual void send(std::istream& in)=0;
+        
+        /**
+         * Returns reference to response stream.  The resulting stream must be
+         * checked directly to determine whether data is available.
+         * 
+         * @return  reference to a stream containing the response, if any
+         */
+        virtual std::istream& receive()=0;
         
         /**
          * Returns the MIME type of the response, if any.

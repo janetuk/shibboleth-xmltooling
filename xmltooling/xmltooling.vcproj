@@ -408,6 +408,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\soap\impl\SOAPClient.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\soap\impl\SOAPImpl.cpp"
 						>
 					</File>
