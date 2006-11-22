@@ -40,7 +40,7 @@ namespace soap11 {
     {
         MAKE_NONCOPYABLE(SOAPClient);
     public:
-        SOAPClient() : m_validate(false), m_transport(NULL) {}
+        SOAPClient(bool validate=false) : m_validate(validate), m_transport(NULL) {}
         virtual ~SOAPClient();
         
         /**
