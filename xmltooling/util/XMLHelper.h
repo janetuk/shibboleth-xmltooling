@@ -23,7 +23,7 @@
 #ifndef __xmltooling_xmlhelper_h__
 #define __xmltooling_xmlhelper_h__
 
-#include <xmltooling/QName.h>
+#include <xmltooling/XMLObject.h>
 #include <xercesc/dom/DOM.hpp>
 
 #include <iostream>
@@ -214,24 +214,45 @@ namespace xmltooling {
         static const XMLCh* getTextContent(const DOMElement* e);
 
         /**
-         * Serializes the DOM Element provided into a buffer using UTF-8 encoding and
+         * Serializes the DOM node provided into a buffer using UTF-8 encoding and
          * the default XML serializer available. No manipulation or formatting is applied.
          * 
-         * @param e     element to serialize
+         * @param n     node to serialize
          * @param buf   buffer to serialize element into
          */
-        static void serialize(const DOMElement* e, std::string& buf);
+        static void serialize(const DOMNode* n, std::string& buf);
 
         /**
-         * Serializes the DOM Element provided to a stream using UTF-8 encoding and
+         * Serializes the DOM node provided to a stream using UTF-8 encoding and
          * the default XML serializer available. No manipulation or formatting is applied.
          * 
-         * @param e     element to serialize
+         * @param n     node to serialize
          * @param out   stream to serialize element into
          */
-        static void serialize(const DOMElement* e, std::ostream& out);
+        static void serialize(const DOMNode* n, std::ostream& out);
     };
 
+    /**
+     * Serializes the DOM node provided to a stream using UTF-8 encoding and
+     * the default XML serializer available. No manipulation or formatting is applied.
+     * 
+     * @param n      node to serialize
+     * @param ostr   stream to serialize element into
+     * @return reference to output stream
+     */
+    extern XMLTOOL_API std::ostream& operator<<(std::ostream& ostr, const DOMNode& n);
+
+    /**
+     * Marshalls and serializes the XMLObject provided to a stream using UTF-8 encoding and
+     * the default XML serializer available. No manipulation or formatting is applied.
+     * 
+     * <p>The marshaller operation takes no parameters.
+     * 
+     * @param obj    object to serialize
+     * @param ostr   stream to serialize object into
+     * @return reference to output stream
+     */
+    extern XMLTOOL_API std::ostream& operator<<(std::ostream& ostr, const XMLObject& obj);
 };
 
 #endif /* __xmltooling_xmlhelper_h__ */

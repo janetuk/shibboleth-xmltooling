@@ -29,6 +29,7 @@
 #include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmltooling;
+using std::ostream;
 
 static const XMLCh type[]={chLatin_t, chLatin_y, chLatin_p, chLatin_e, chNull };
     
@@ -213,7 +214,7 @@ DOMElement* XMLHelper::getPreviousSiblingElement(const DOMNode* n, const XMLCh* 
     return e;
 }
 
-void XMLHelper::serialize(const DOMElement* e, std::string& buf)
+void XMLHelper::serialize(const DOMNode* n, std::string& buf)
 {
     static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
     static const XMLCh UTF8[]={ chLatin_U, chLatin_T, chLatin_F, chDigit_8, chNull };
@@ -222,7 +223,7 @@ void XMLHelper::serialize(const DOMElement* e, std::string& buf)
     XercesJanitor<DOMWriter> janitor(serializer);
     serializer->setEncoding(UTF8);
     MemBufFormatTarget target;
-    if (!serializer->writeNode(&target,*e))
+    if (!serializer->writeNode(&target,*n))
         throw XMLParserException("unable to serialize XML");
     buf.erase();
     buf.append(reinterpret_cast<const char*>(target.getRawBuffer()),target.getLen());
@@ -248,7 +249,7 @@ namespace {
     };
 };
 
-void XMLHelper::serialize(const DOMElement* e, std::ostream& out)
+void XMLHelper::serialize(const DOMNode* n, std::ostream& out)
 {
     static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
     static const XMLCh UTF8[]={ chLatin_U, chLatin_T, chLatin_F, chDigit_8, chNull };
@@ -257,6 +258,17 @@ void XMLHelper::serialize(const DOMElement* e, std::ostream& out)
     XercesJanitor<DOMWriter> janitor(serializer);
     serializer->setEncoding(UTF8);
     StreamFormatTarget target(out);
-    if (!serializer->writeNode(&target,*e))
+    if (!serializer->writeNode(&target,*n))
         throw XMLParserException("unable to serialize XML");
+}
+
+ostream& xmltooling::operator<<(ostream& ostr, const DOMNode& node)
+{
+    XMLHelper::serialize(&node, ostr);
+    return ostr;
+}
+
+ostream& xmltooling::operator<<(ostream& ostr, const XMLObject& obj)
+{
+    return ostr << obj.marshall();
 }

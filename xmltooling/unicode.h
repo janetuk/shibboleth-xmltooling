@@ -26,6 +26,7 @@
 #include <xmltooling/base.h>
 
 #include <string>
+#include <iostream>
 #include <xercesc/util/XMLString.hpp>
 
 using namespace xercesc;
@@ -53,6 +54,15 @@ namespace xmltooling {
      * @return      a 16-bit Unicode string allocated by the Xerces memory manager 
      */
     extern XMLTOOL_API XMLCh* fromUTF8(const char* src);
+
+    /**
+     * Writes a Unicode string to an ASCII stream by transcoding to UTF8.
+     * 
+     * @param ostr  stream to write to
+     * @param s     string to write
+     * @return      reference to output stream
+     */
+    extern XMLTOOL_API std::ostream& operator<<(std::ostream& ostr, const XMLCh* s);
 
     /**
      * A minimal auto_ptr-like class that can copy or transcode a buffer into

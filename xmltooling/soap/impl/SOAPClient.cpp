@@ -56,7 +56,7 @@ void SOAPClient::send(const Envelope* env, const KeyInfoSource& peer, const char
     
     // Serialize envelope.
     stringstream s;
-    XMLHelper::serialize(env->marshall(), s);
+    s << *env;
     
     // Send to peer.
     m_transport->send(s);

@@ -57,3 +57,13 @@ XMLCh* xmltooling::fromUTF8(const char* src)
     delete[] sizes;
     return buf;
 }
+
+std::ostream& xmltooling::operator<<(std::ostream& ostr, const XMLCh* s)
+{
+    if (s) {
+        char* p=xmltooling::toUTF8(s);
+        ostr << p;
+        delete[] p;
+    }
+    return ostr;
+}
