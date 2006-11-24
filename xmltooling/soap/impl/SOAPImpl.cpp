@@ -68,7 +68,7 @@ namespace {
             setCode(src.getCode());
         }
         
-        QName* getCode() const {
+        const QName* getCode() const {
             return m_qname;
         }
         

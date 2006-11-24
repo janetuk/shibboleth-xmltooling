@@ -101,7 +101,7 @@ Envelope* SOAPClient::receive()
 
 bool SOAPClient::handleFault(const Fault& fault)
 {
-    QName* code = (fault.getFaultcode() ? fault.getFaultcode()->getCode() : NULL);
+    const QName* code = (fault.getFaultcode() ? fault.getFaultcode()->getCode() : NULL);
     auto_ptr_char str((fault.getFaultstring() ? fault.getFaultstring()->getString() : NULL));
     Category::getInstance(XMLTOOLING_LOGCAT".SOAPClient").error(
         "SOAP client detected a Fault: (%s) (%s)",

@@ -43,7 +43,7 @@ namespace soap11 {
 
     BEGIN_XMLOBJECT(XMLTOOL_API,Faultcode,xmltooling::XMLObject,SOAP 1.1 faultcode element);
         /** Gets the QName content of the element. */
-        virtual xmltooling::QName* getCode() const=0;
+        virtual const xmltooling::QName* getCode() const=0;
         /** Sets the QName content of the element. */
         virtual void setCode(const xmltooling::QName* qname)=0;
     END_XMLOBJECT;
