@@ -60,7 +60,7 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(XMLToolingConfig);
     protected:
-        XMLToolingConfig() : m_replayCache(NULL), clock_skew_secs(180) {}
+        XMLToolingConfig() : m_replayCache(NULL), m_templateEngine(NULL), clock_skew_secs(180) {}
         
         /** Global ReplayCache instance. */
         ReplayCache* m_replayCache;
