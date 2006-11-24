@@ -24,13 +24,16 @@
 #include "exceptions.h"
 #include "soap/SOAP.h"
 #include "soap/SOAPClient.h"
+#include "util/NDC.h"
 #include "util/XMLHelper.h"
 #include "validation/ValidatorSuite.h"
 
 #include <sstream>
+#include <log4cpp/Category.hh>
 
 using namespace soap11;
 using namespace xmltooling;
+using namespace log4cpp;
 using namespace std;
 
 SOAPClient::~SOAPClient()
@@ -85,7 +88,29 @@ Envelope* SOAPClient::receive()
     if (!env)
         throw IOException("Response was not a SOAP 1.1 Envelope.");
 
-    reset();
+    Body* body = env->getBody();
+    if (body && body->hasChildren()) {
+        //Check for a Fault.
+        const Fault* fault = dynamic_cast<Fault*>(body->getXMLObjects().front());
+        if (fault && handleFault(*fault))
+            throw IOException("SOAP client detected a Fault.");
+    }
+
     xmlObject.release();
     return env;
+}
+
+bool SOAPClient::handleFault(const Fault& fault)
+{
+#ifdef _DEBUG
+    xmltooling::NDC ndc("receiveSAML");
+#endif
+    QName* code = (fault.getFaultcode() ? fault.getFaultcode()->getCode() : NULL);
+    auto_ptr_char str((fault.getFaultstring() ? fault.getFaultstring()->getString() : NULL));
+    Category::getInstance(XMLTOOLING_LOGCAT".SOAPClient").error(
+        "SOAP client detected a Fault: (%s) (%s)",
+        (code ? code->toString().c_str() : "no code"),
+        (str.get() ? str.get() : "no message")
+        );
+    return true;
 }

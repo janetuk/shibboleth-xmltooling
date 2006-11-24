@@ -29,6 +29,7 @@
 namespace soap11 {
 
     class XMLTOOL_API Envelope;
+    class XMLTOOL_API Fault;
 
     /**
      * Implements SOAP 1.1 messaging over a transport.
@@ -73,8 +74,6 @@ namespace soap11 {
          * will be forthcoming, an exception is raised.
          * 
          * <p>The caller is responsible for freeing the returned envelope.
-         * 
-         * <p>Once a response is returned, the object will be reset for a subsequent call.
          */
         virtual Envelope* receive();
         
@@ -90,7 +89,15 @@ namespace soap11 {
          * @param transport reference to transport layer
          */
         virtual void prepareTransport(const xmltooling::SOAPTransport& transport) {}
-        
+
+        /**
+         * Handling of SOAP faults.
+         * 
+         * @param fault SOAP Fault received by client
+         * @return true iff the Fault should be treated as a fatal error
+         */
+        virtual bool handleFault(const soap11::Fault& fault);
+            
         /** Flag controlling schema validation. */
         bool m_validate;
 
