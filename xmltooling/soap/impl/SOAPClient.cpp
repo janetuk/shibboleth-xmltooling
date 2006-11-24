@@ -24,7 +24,6 @@
 #include "exceptions.h"
 #include "soap/SOAP.h"
 #include "soap/SOAPClient.h"
-#include "util/NDC.h"
 #include "util/XMLHelper.h"
 #include "validation/ValidatorSuite.h"
 
@@ -102,9 +101,6 @@ Envelope* SOAPClient::receive()
 
 bool SOAPClient::handleFault(const Fault& fault)
 {
-#ifdef _DEBUG
-    xmltooling::NDC ndc("receiveSAML");
-#endif
     QName* code = (fault.getFaultcode() ? fault.getFaultcode()->getCode() : NULL);
     auto_ptr_char str((fault.getFaultstring() ? fault.getFaultstring()->getString() : NULL));
     Category::getInstance(XMLTOOLING_LOGCAT".SOAPClient").error(
