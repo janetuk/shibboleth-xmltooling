@@ -90,6 +90,17 @@ namespace xmltooling {
         static DOMAttr* getIdAttribute(const DOMElement* domElement);
 
         /**
+         * Attempts to locate an XMLObject from this point downward in the tree whose
+         * XML ID matches the supplied value.
+         * 
+         * @param tree  root of tree to search
+         * @param id    ID value to locate
+         * @return XMLObject in the tree with a matching ID value, or NULL
+         */
+        static const XMLObject* getXMLObjectById(const XMLObject& tree, const XMLCh* id);
+        
+
+        /**
          * Gets the QName for the given DOM node.
          * 
          * @param domNode the DOM node

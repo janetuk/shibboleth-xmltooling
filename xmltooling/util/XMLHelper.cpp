@@ -30,6 +30,7 @@
 
 using namespace xmltooling;
 using std::ostream;
+using std::list;
 
 static const XMLCh type[]={chLatin_t, chLatin_y, chLatin_p, chLatin_e, chNull };
     
@@ -80,6 +81,24 @@ DOMAttr* XMLHelper::getIdAttribute(const DOMElement* domElement)
         attribute = static_cast<DOMAttr*>(attributes->item(i));
         if(attribute->isId()) {
             return attribute;
+        }
+    }
+    
+    return NULL;
+}
+
+const XMLObject* XMLHelper::getXMLObjectById(const XMLObject& tree, const XMLCh* id)
+{
+    if (XMLString::equals(id, tree.getXMLID()))
+        return &tree;
+    
+    const XMLObject* ret;
+    const list<XMLObject*>& children = tree.getOrderedChildren();
+    for (list<XMLObject*>::const_iterator i=children.begin(); i!=children.end(); ++i) {
+        if (*i) {
+            ret = getXMLObjectById(*(*i), id);
+            if (ret)
+                return ret;
         }
     }
     
