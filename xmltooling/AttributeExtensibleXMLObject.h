@@ -15,17 +15,15 @@
  */
 
 /**
- * @file AttributeExtensibleXMLObject.h
+ * @file xmltooling/AttributeExtensibleXMLObject.h
  * 
  * An XMLObject that supports arbitrary attributes 
  */
 
-#if !defined(__xmltooling_attrextxmlobj_h__)
+#ifndef __xmltooling_attrextxmlobj_h__
 #define __xmltooling_attrextxmlobj_h__
 
 #include <xmltooling/XMLObject.h>
-
-using namespace xercesc;
 
 #if defined (_MSC_VER)
     #pragma warning( push )

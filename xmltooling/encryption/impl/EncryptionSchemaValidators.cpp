@@ -69,7 +69,7 @@ namespace xmlencryption {
     BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,EncryptionProperty);
         if (!ptr->hasChildren())
             throw ValidationException("EncryptionProperty must have at least one child element.");
-        const list<XMLObject*>& anys=ptr->getXMLObjects();
+        const vector<XMLObject*>& anys=ptr->getUnknownXMLObjects();
         for_each(anys.begin(),anys.end(),checkWildcardNS());
     END_XMLOBJECTVALIDATOR;
 
@@ -79,7 +79,7 @@ namespace xmlencryption {
 
     BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,ReferenceType);
         XMLOBJECTVALIDATOR_REQUIRE(DataReference,URI);
-        const list<XMLObject*>& anys=ptr->getXMLObjects();
+        const vector<XMLObject*>& anys=ptr->getUnknownXMLObjects();
         for_each(anys.begin(),anys.end(),checkWildcardNS());
     END_XMLOBJECTVALIDATOR;
 

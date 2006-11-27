@@ -45,10 +45,10 @@ XMLObject* AnyElementImpl::clone() const {
 }
 
 AnyElementImpl::AnyElementImpl(const AnyElementImpl& src) : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src),
-    AbstractElementProxy(src), AbstractAttributeExtensibleXMLObject(src) {
-    for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
-        getXMLObjects().push_back((*i) ? (*i)->clone() : NULL);
-    }
+        AbstractComplexElement(src), AbstractAttributeExtensibleXMLObject(src) {
+    const vector<XMLObject*>& children = src.getUnknownXMLObjects();
+    for (vector<XMLObject*>::const_iterator i=children.begin(); i!=children.end(); ++i)
+        getUnknownXMLObjects().push_back((*i)->clone());
 }       
 
 void AnyElementImpl::marshallAttributes(DOMElement* domElement) const {
@@ -56,7 +56,7 @@ void AnyElementImpl::marshallAttributes(DOMElement* domElement) const {
 }
 
 void AnyElementImpl::processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-    getXMLObjects().push_back(childXMLObject);
+    getUnknownXMLObjects().push_back(childXMLObject);
 }
 
 void AnyElementImpl::processAttribute(const DOMAttr* attribute) {

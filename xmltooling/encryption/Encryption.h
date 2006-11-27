@@ -23,7 +23,6 @@
 #ifndef __xmltooling_encryption_h__
 #define __xmltooling_encryption_h__
 
-#include <xmltooling/AttributeExtensibleXMLObject.h>
 #include <xmltooling/signature/KeyInfo.h>
 
 #define DECL_XMLENCOBJECTBUILDER(cname) \
@@ -43,11 +42,10 @@ namespace xmlencryption {
         DECL_INTEGER_CONTENT(Size);
     END_XMLOBJECT;
 
-    BEGIN_XMLOBJECT(XMLTOOL_API,EncryptionMethod,xmltooling::XMLObject,XML Encryption EncryptionMethod element);
+    BEGIN_XMLOBJECT(XMLTOOL_API,EncryptionMethod,xmltooling::ElementExtensibleXMLObject,XML Encryption EncryptionMethod element);
         DECL_STRING_ATTRIB(Algorithm,ALGORITHM);
         DECL_TYPED_CHILD(KeySize);
         DECL_TYPED_CHILD(OAEPparams);
-        DECL_XMLOBJECT_CHILDREN(OtherParameter);
         /** EncryptionMethodType local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
@@ -72,7 +70,7 @@ namespace xmlencryption {
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
-    BEGIN_XMLOBJECT2(XMLTOOL_API,EncryptionProperty,xmltooling::ElementProxy,xmltooling::AttributeExtensibleXMLObject,XML Encryption EncryptionProperty element);
+    BEGIN_XMLOBJECT(XMLTOOL_API,EncryptionProperty,xmltooling::ElementProxy,XML Encryption EncryptionProperty element);
         DECL_STRING_ATTRIB(Target,TARGET);
         DECL_STRING_ATTRIB(Id,ID);
         /** EncryptionPropertyType local name */
@@ -86,7 +84,7 @@ namespace xmlencryption {
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
-    BEGIN_XMLOBJECT(XMLTOOL_API,ReferenceType,xmltooling::ElementProxy,XML Encryption ReferenceType type);
+    BEGIN_XMLOBJECT(XMLTOOL_API,ReferenceType,xmltooling::ElementExtensibleXMLObject,XML Encryption ReferenceType type);
         DECL_STRING_ATTRIB(URI,URI);
         /** ReferenceType local name */
         static const XMLCh TYPE_NAME[];

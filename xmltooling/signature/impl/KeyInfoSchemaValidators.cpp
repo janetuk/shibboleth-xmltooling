@@ -66,7 +66,7 @@ namespace xmlsignature {
     END_XMLOBJECTVALIDATOR;
 
     BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,KeyValue);
-        XMLOBJECTVALIDATOR_ONLYONEOF3(KeyValue,DSAKeyValue,RSAKeyValue,OtherKeyValue);
+        XMLOBJECTVALIDATOR_ONLYONEOF3(KeyValue,DSAKeyValue,RSAKeyValue,UnknownXMLObject);
     END_XMLOBJECTVALIDATOR;
 
     BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,Transform);
@@ -102,7 +102,7 @@ namespace xmlsignature {
     BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,X509Data);
         if (!ptr->hasChildren())
             throw ValidationException("X509Data must have at least one child element.");
-        const vector<XMLObject*>& anys=ptr->getOtherX509Datas();
+        const vector<XMLObject*>& anys=ptr->getUnknownXMLObjects();
         for_each(anys.begin(),anys.end(),checkWildcardNS());
     END_XMLOBJECTVALIDATOR;
 
@@ -117,7 +117,7 @@ namespace xmlsignature {
     BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,KeyInfo);
         if (!ptr->hasChildren())
             throw ValidationException("KeyInfo must have at least one child element.");
-        const vector<XMLObject*>& anys=ptr->getOthers();
+        const vector<XMLObject*>& anys=ptr->getUnknownXMLObjects();
         for_each(anys.begin(),anys.end(),checkWildcardNS());
     END_XMLOBJECTVALIDATOR;
 

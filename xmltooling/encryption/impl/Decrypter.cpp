@@ -74,7 +74,7 @@ DOMDocumentFragment* Decrypter::decryptData(EncryptedData* encryptedData)
                 throw DecryptionException("No EncryptionMethod/@Algorithm set, key decryption cannot proceed.");
             
             if (encryptedData->getKeyInfo()) {
-                const vector<XMLObject*>& others=const_cast<const KeyInfo*>(encryptedData->getKeyInfo())->getOthers();
+                const vector<XMLObject*>& others=const_cast<const KeyInfo*>(encryptedData->getKeyInfo())->getUnknownXMLObjects();
                 for (vector<XMLObject*>::const_iterator i=others.begin(); i!=others.end(); i++) {
                     EncryptedKey* encKey=dynamic_cast<EncryptedKey*>(*i);
                     if (encKey) {

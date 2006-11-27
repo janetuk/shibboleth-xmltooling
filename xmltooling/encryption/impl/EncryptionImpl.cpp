@@ -22,8 +22,8 @@
 
 #include "internal.h"
 #include "AbstractAttributeExtensibleXMLObject.h"
+#include "AbstractComplexElement.h"
 #include "AbstractSimpleElement.h"
-#include "AbstractElementProxy.h"
 #include "exceptions.h"
 #include "encryption/Encryption.h"
 #include "io/AbstractXMLObjectMarshaller.h"
@@ -84,19 +84,16 @@ namespace xmlencryption {
                 setKeySize(src.getKeySize()->cloneKeySize());
             if (src.getOAEPparams())
                 setOAEPparams(src.getOAEPparams()->cloneOAEPparams());
-            VectorOf(XMLObject) v=getOtherParameters();
-            for (vector<XMLObject*>::const_iterator i=src.m_OtherParameters.begin(); i!=src.m_OtherParameters.end(); i++) {
-                if (*i) {
-                    v.push_back((*i)->clone());
-                }
-            }
+            VectorOf(XMLObject) v=getUnknownXMLObjects();
+            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i)
+                v.push_back((*i)->clone());
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptionMethod);
         IMPL_STRING_ATTRIB(Algorithm);
         IMPL_TYPED_CHILD(KeySize);
         IMPL_TYPED_CHILD(OAEPparams);
-        IMPL_XMLOBJECT_CHILDREN(OtherParameter,m_children.end());
+        IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject,m_children.end());
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
@@ -110,7 +107,7 @@ namespace xmlencryption {
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
             if (!XMLString::equals(nsURI,XMLENC_NS) && nsURI && *nsURI) {
-                getOtherParameters().push_back(childXMLObject);
+                getUnknownXMLObjects().push_back(childXMLObject);
                 return;
             }
             
@@ -251,8 +248,8 @@ namespace xmlencryption {
     };
 
     class XMLTOOL_DLLLOCAL EncryptionPropertyImpl : public virtual EncryptionProperty,
-        public AbstractElementProxy,
         public AbstractAttributeExtensibleXMLObject,
+        public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
@@ -273,22 +270,21 @@ namespace xmlencryption {
             
         EncryptionPropertyImpl(const EncryptionPropertyImpl& src)
                 : AbstractXMLObject(src),
-                    AbstractElementProxy(src),
                     AbstractAttributeExtensibleXMLObject(src),
+                    AbstractComplexElement(src),
                     AbstractDOMCachingXMLObject(src) {
             init();
             setId(src.getId());
             setTarget(src.getTarget());
-            for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
-                if (*i) {
-                    getXMLObjects().push_back((*i)->clone());
-                }
-            }
+            VectorOf(XMLObject) v=getUnknownXMLObjects();
+            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i)
+                v.push_back((*i)->clone());
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptionProperty);
         IMPL_ID_ATTRIB(Id);
         IMPL_STRING_ATTRIB(Target);
+        IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject, m_children.end());
 
         void setAttribute(QName& qualifiedName, const XMLCh* value) {
             if (!qualifiedName.hasNamespaceURI()) {
@@ -312,7 +308,7 @@ namespace xmlencryption {
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            getXMLObjects().push_back(childXMLObject);
+            getUnknownXMLObjects().push_back(childXMLObject);
         }
 
         void processAttribute(const DOMAttr* attribute) {
@@ -373,7 +369,7 @@ namespace xmlencryption {
     };
 
     class XMLTOOL_DLLLOCAL ReferenceTypeImpl : public virtual ReferenceType,
-        public AbstractElementProxy,
+        public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
@@ -398,18 +394,17 @@ namespace xmlencryption {
         }
             
         ReferenceTypeImpl(const ReferenceTypeImpl& src)
-                : AbstractXMLObject(src), AbstractElementProxy(src), AbstractDOMCachingXMLObject(src) {
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
             setURI(src.getURI());
-            for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
-                if (*i) {
-                    getXMLObjects().push_back((*i)->clone());
-                }
-            }
+            VectorOf(XMLObject) v=getUnknownXMLObjects();
+            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i)
+                v.push_back((*i)->clone());
         }
         
         IMPL_XMLOBJECT_CLONE(ReferenceType);
         IMPL_STRING_ATTRIB(URI);
+        IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject,m_children.end());
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
@@ -417,7 +412,7 @@ namespace xmlencryption {
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            getXMLObjects().push_back(childXMLObject);
+            getUnknownXMLObjects().push_back(childXMLObject);
         }
 
         void processAttribute(const DOMAttr* attribute) {

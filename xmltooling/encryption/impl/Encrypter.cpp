@@ -211,7 +211,7 @@ EncryptedData* Encrypter::decorateAndUnmarshall(EncryptionParams& encParams, Key
         // Add the EncryptedKey.
         if (!xmlEncData->getKeyInfo())
             xmlEncData->setKeyInfo(KeyInfoBuilder::buildKeyInfo());
-        xmlEncData->getKeyInfo()->getOthers().push_back(xmlEncKey);
+        xmlEncData->getKeyInfo()->getUnknownXMLObjects().push_back(xmlEncKey);
         xmlObjectKey.release();
     }
     

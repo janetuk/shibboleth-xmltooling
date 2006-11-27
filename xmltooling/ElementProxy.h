@@ -23,7 +23,8 @@
 #ifndef __xmltooling_eleproxy_h__
 #define __xmltooling_eleproxy_h__
 
-#include <xmltooling/XMLObject.h>
+#include <xmltooling/AttributeExtensibleXMLObject.h>
+#include <xmltooling/ElementExtensibleXMLObject.h>
 #include <xmltooling/util/XMLObjectChildrenList.h>
 
 using namespace xercesc;
@@ -31,27 +32,15 @@ using namespace xercesc;
 namespace xmltooling {
 
     /**
-     * An XMLObject that exposes its children via mutable list.
+     * An XMLObject with an open content model.
      */
-    class XMLTOOL_API ElementProxy : public virtual XMLObject
+    class XMLTOOL_API ElementProxy : public virtual AttributeExtensibleXMLObject, public virtual ElementExtensibleXMLObject
     {
-    public:
+    protected:
         ElementProxy() {}
-        virtual ~ElementProxy() {}
-        
-        /**
-         * Gets a mutable list of child objects
-         * 
-         * @return  mutable list of child objects
-         */
-        virtual ListOf(XMLObject) getXMLObjects()=0;
 
-        /**
-         * Gets an immutable list of child objects
-         * 
-         * @return  immutable list of child objects
-         */
-        virtual const std::list<XMLObject*>& getXMLObjects() const=0;
+    public:
+        virtual ~ElementProxy() {}
     };
     
 };

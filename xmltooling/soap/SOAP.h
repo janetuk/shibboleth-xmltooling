@@ -23,7 +23,6 @@
 #ifndef __xmltooling_soap_h__
 #define __xmltooling_soap_h__
 
-#include <xmltooling/AttributeExtensibleXMLObject.h>
 #include <xmltooling/ElementProxy.h>
 #include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/util/XMLConstants.h>
@@ -48,7 +47,7 @@ namespace soap11 {
         virtual void setCode(const xmltooling::QName* qname)=0;
     END_XMLOBJECT;
 
-    BEGIN_XMLOBJECT2(XMLTOOL_API,Detail,xmltooling::ElementProxy,xmltooling::AttributeExtensibleXMLObject,SOAP 1.1 detail element);
+    BEGIN_XMLOBJECT(XMLTOOL_API,Detail,xmltooling::ElementProxy,SOAP 1.1 detail element);
         /** detail (type) local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
@@ -62,13 +61,13 @@ namespace soap11 {
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
-    BEGIN_XMLOBJECT2(XMLTOOL_API,Body,xmltooling::ElementProxy,xmltooling::AttributeExtensibleXMLObject,SOAP 1.1 Body element);
+    BEGIN_XMLOBJECT(XMLTOOL_API,Body,xmltooling::ElementProxy,SOAP 1.1 Body element);
         DECL_STRING_ATTRIB(EncodingStyle,ENCODINGSTYLE);
         /** Body (type) local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
-    BEGIN_XMLOBJECT2(XMLTOOL_API,Header,xmltooling::ElementProxy,xmltooling::AttributeExtensibleXMLObject,SOAP 1.1 Header element);
+    BEGIN_XMLOBJECT(XMLTOOL_API,Header,xmltooling::ElementProxy,SOAP 1.1 Header element);
         DECL_BOOLEAN_ATTRIB(MustUnderstand,MUSTUNDERSTAND,false);
         DECL_STRING_ATTRIB(Actor,ACTOR);
         /** Header (type) local name */

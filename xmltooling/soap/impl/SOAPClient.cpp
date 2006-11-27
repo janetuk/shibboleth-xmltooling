@@ -90,7 +90,7 @@ Envelope* SOAPClient::receive()
     Body* body = env->getBody();
     if (body && body->hasChildren()) {
         //Check for a Fault.
-        const Fault* fault = dynamic_cast<Fault*>(body->getXMLObjects().front());
+        const Fault* fault = dynamic_cast<Fault*>(body->getUnknownXMLObjects().front());
         if (fault && handleFault(*fault))
             throw IOException("SOAP client detected a Fault.");
     }

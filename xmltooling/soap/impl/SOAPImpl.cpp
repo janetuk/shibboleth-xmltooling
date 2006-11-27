@@ -22,8 +22,8 @@
 
 #include "internal.h"
 #include "AbstractAttributeExtensibleXMLObject.h"
+#include "AbstractComplexElement.h"
 #include "AbstractSimpleElement.h"
-#include "AbstractElementProxy.h"
 #include "exceptions.h"
 #include "io/AbstractXMLObjectMarshaller.h"
 #include "io/AbstractXMLObjectUnmarshaller.h"
@@ -86,8 +86,8 @@ namespace {
     };
 
     class XMLTOOL_DLLLOCAL DetailImpl : public virtual Detail,
-        public AbstractElementProxy,
         public AbstractAttributeExtensibleXMLObject,
+        public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
@@ -101,17 +101,16 @@ namespace {
             
         DetailImpl(const DetailImpl& src)
                 : AbstractXMLObject(src),
-                    AbstractElementProxy(src),
                     AbstractAttributeExtensibleXMLObject(src),
+                    AbstractComplexElement(src),
                     AbstractDOMCachingXMLObject(src) {
-            for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
-                if (*i) {
-                    getXMLObjects().push_back((*i)->clone());
-                }
-            }
+            VectorOf(XMLObject) v=getUnknownXMLObjects();
+            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i)
+                v.push_back((*i)->clone());
         }
         
         IMPL_XMLOBJECT_CLONE(Detail);
+        IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject, m_children.end());
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
@@ -119,7 +118,7 @@ namespace {
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            getXMLObjects().push_back(childXMLObject);
+            getUnknownXMLObjects().push_back(childXMLObject);
         }
 
         void processAttribute(const DOMAttr* attribute) {
@@ -193,8 +192,8 @@ namespace {
     };
 
     class XMLTOOL_DLLLOCAL BodyImpl : public virtual Body,
-        public AbstractElementProxy,
         public AbstractAttributeExtensibleXMLObject,
+        public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
@@ -214,20 +213,19 @@ namespace {
             
         BodyImpl(const BodyImpl& src)
                 : AbstractXMLObject(src),
-                    AbstractElementProxy(src),
                     AbstractAttributeExtensibleXMLObject(src),
+                    AbstractComplexElement(src),
                     AbstractDOMCachingXMLObject(src) {
             init();
             setEncodingStyle(src.getEncodingStyle());
-            for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
-                if (*i) {
-                    getXMLObjects().push_back((*i)->clone());
-                }
-            }
+            VectorOf(XMLObject) v=getUnknownXMLObjects();
+            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i)
+                v.push_back((*i)->clone());
         }
         
         IMPL_XMLOBJECT_CLONE(Body);
         IMPL_STRING_ATTRIB(EncodingStyle);
+        IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject, m_children.end());
 
         void setAttribute(QName& qualifiedName, const XMLCh* value) {
             if (qualifiedName.hasNamespaceURI() && XMLString::equals(qualifiedName.getNamespaceURI(),SOAP11ENV_NS)) {
@@ -246,7 +244,7 @@ namespace {
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            getXMLObjects().push_back(childXMLObject);
+            getUnknownXMLObjects().push_back(childXMLObject);
         }
 
         void processAttribute(const DOMAttr* attribute) {
@@ -255,8 +253,8 @@ namespace {
     };
 
     class XMLTOOL_DLLLOCAL HeaderImpl : public virtual Header,
-        public AbstractElementProxy,
         public AbstractAttributeExtensibleXMLObject,
+        public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
@@ -277,22 +275,21 @@ namespace {
             
         HeaderImpl(const HeaderImpl& src)
                 : AbstractXMLObject(src),
-                    AbstractElementProxy(src),
                     AbstractAttributeExtensibleXMLObject(src),
+                    AbstractComplexElement(src),
                     AbstractDOMCachingXMLObject(src) {
             init();
             setActor(src.getActor());
             MustUnderstand(m_MustUnderstand);
-            for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
-                if (*i) {
-                    getXMLObjects().push_back((*i)->clone());
-                }
-            }
+            VectorOf(XMLObject) v=getUnknownXMLObjects();
+            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i)
+                v.push_back((*i)->clone());
         }
         
         IMPL_XMLOBJECT_CLONE(Header);
         IMPL_STRING_ATTRIB(Actor);
         IMPL_BOOLEAN_ATTRIB(MustUnderstand);
+        IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject, m_children.end());
 
         void setAttribute(QName& qualifiedName, const XMLCh* value) {
             if (qualifiedName.hasNamespaceURI() && XMLString::equals(qualifiedName.getNamespaceURI(),SOAP11ENV_NS)) {
@@ -316,7 +313,7 @@ namespace {
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            getXMLObjects().push_back(childXMLObject);
+            getUnknownXMLObjects().push_back(childXMLObject);
         }
 
         void processAttribute(const DOMAttr* attribute) {

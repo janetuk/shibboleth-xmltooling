@@ -24,12 +24,12 @@ libxmltoolinginclude_HEADERS = \
 	AbstractAttributeExtensibleXMLObject.h \
 	AbstractComplexElement.h \
 	AbstractDOMCachingXMLObject.h \
-	AbstractElementProxy.h \
 	AbstractSimpleElement.h \
 	AbstractXMLObject.h \
 	AttributeExtensibleXMLObject.h \
 	base.h \
 	config_pub.h \
+	ElementExtensibleXMLObject.h \
 	ElementProxy.h \
 	exceptions.h \
 	Lockable.h \

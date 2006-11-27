@@ -21,9 +21,7 @@
  */
 
 #include "internal.h"
-#include "AbstractSimpleElement.h"
 #include "AbstractComplexElement.h"
-#include "AbstractElementProxy.h"
 #include "AbstractSimpleElement.h"
 #include "exceptions.h"
 #include "io/AbstractXMLObjectMarshaller.h"
@@ -196,28 +194,28 @@ namespace xmlsignature {
                 setDSAKeyValue(src.getDSAKeyValue()->cloneDSAKeyValue());
             if (src.getRSAKeyValue())
                 setRSAKeyValue(src.getRSAKeyValue()->cloneRSAKeyValue());
-            if (src.getOtherKeyValue())
-                setOtherKeyValue(src.getOtherKeyValue()->clone());
+            if (src.getUnknownXMLObject())
+                setUnknownXMLObject(src.getUnknownXMLObject()->clone());
         }
         
         void init() {
             m_DSAKeyValue=NULL;
             m_RSAKeyValue=NULL;
-            m_OtherKeyValue=NULL;
+            m_UnknownXMLObject=NULL;
             m_children.push_back(NULL);
             m_children.push_back(NULL);
             m_children.push_back(NULL);
             m_pos_DSAKeyValue=m_children.begin();
             m_pos_RSAKeyValue=m_pos_DSAKeyValue;
             ++m_pos_RSAKeyValue;
-            m_pos_OtherKeyValue=m_pos_RSAKeyValue;
-            ++m_pos_OtherKeyValue;
+            m_pos_UnknownXMLObject=m_pos_RSAKeyValue;
+            ++m_pos_UnknownXMLObject;
         }
         
         IMPL_XMLOBJECT_CLONE(KeyValue);
         IMPL_TYPED_CHILD(DSAKeyValue);
         IMPL_TYPED_CHILD(RSAKeyValue);
-        IMPL_XMLOBJECT_CHILD(OtherKeyValue);
+        IMPL_XMLOBJECT_CHILD(UnknownXMLObject);
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -227,7 +225,7 @@ namespace xmlsignature {
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
             if (!XMLString::equals(nsURI,XMLSIG_NS) && nsURI && *nsURI) {
-                setOtherKeyValue(childXMLObject);
+                setUnknownXMLObject(childXMLObject);
                 return;
             }
             
@@ -236,8 +234,8 @@ namespace xmlsignature {
     };
 
     class XMLTOOL_DLLLOCAL TransformImpl : public virtual Transform,
+        public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
-        public AbstractElementProxy,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
@@ -251,7 +249,7 @@ namespace xmlsignature {
         }
             
         TransformImpl(const TransformImpl& src)
-                : AbstractXMLObject(src), AbstractDOMCachingXMLObject(src), AbstractElementProxy(src),
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src),
                     m_Algorithm(XMLString::replicate(src.m_Algorithm)) {
             for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
                 if (*i) {
@@ -260,7 +258,7 @@ namespace xmlsignature {
                         getXPaths().push_back(x->cloneXPath());
                         continue;
                     }
-                    getXMLObjects().push_back((*i)->clone());
+                    getUnknownXMLObjects().push_back((*i)->clone());
                 }
             }
         }
@@ -268,6 +266,7 @@ namespace xmlsignature {
         IMPL_XMLOBJECT_CLONE(Transform);
         IMPL_STRING_ATTRIB(Algorithm);
         IMPL_TYPED_CHILDREN(XPath,m_children.end());
+        IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject,m_children.end());
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
@@ -280,7 +279,7 @@ namespace xmlsignature {
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
             if (!XMLString::equals(nsURI,XMLSIG_NS) && nsURI && *nsURI) {
-                getXMLObjects().push_back(childXMLObject);
+                getUnknownXMLObjects().push_back(childXMLObject);
                 return;
             }
             
@@ -474,7 +473,7 @@ namespace xmlsignature {
                         continue;
                     }
 
-                    getOtherX509Datas().push_back((*i)->clone());
+                    getUnknownXMLObjects().push_back((*i)->clone());
                 }
             }
         }
@@ -485,7 +484,7 @@ namespace xmlsignature {
         IMPL_TYPED_CHILDREN(X509SubjectName,m_children.end());
         IMPL_TYPED_CHILDREN(X509Certificate,m_children.end());
         IMPL_TYPED_CHILDREN(X509CRL,m_children.end());
-        IMPL_XMLOBJECT_CHILDREN(OtherX509Data,m_children.end());
+        IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject,m_children.end());
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -498,7 +497,7 @@ namespace xmlsignature {
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
             if (!XMLString::equals(nsURI,XMLSIG_NS) && nsURI && *nsURI) {
-                getOtherX509Datas().push_back(childXMLObject);
+                getUnknownXMLObjects().push_back(childXMLObject);
                 return;
             }
             
@@ -591,12 +590,9 @@ namespace xmlsignature {
                 setPGPKeyID(src.getPGPKeyID()->clonePGPKeyID());
             if (src.getPGPKeyPacket())
                 setPGPKeyPacket(src.getPGPKeyPacket()->clonePGPKeyPacket());
-            VectorOf(XMLObject) v=getPGPDataExtensions();
-            for (vector<XMLObject*>::const_iterator i=src.m_PGPDataExtensions.begin(); i!=src.m_PGPDataExtensions.end(); i++) {
-                if (*i) {
-                    v.push_back((*i)->clone());
-                }
-            }
+            VectorOf(XMLObject) v=getUnknownXMLObjects();
+            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i)
+                v.push_back((*i)->clone());
         }
         
         void init() {
@@ -612,7 +608,7 @@ namespace xmlsignature {
         IMPL_XMLOBJECT_CLONE(PGPData);
         IMPL_TYPED_CHILD(PGPKeyID);
         IMPL_TYPED_CHILD(PGPKeyPacket);
-        IMPL_XMLOBJECT_CHILDREN(PGPDataExtension,m_children.end());
+        IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject,m_children.end());
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -622,7 +618,7 @@ namespace xmlsignature {
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
             if (!XMLString::equals(nsURI,XMLSIG_NS) && nsURI && *nsURI) {
-                getPGPDataExtensions().push_back(childXMLObject);
+                getUnknownXMLObjects().push_back(childXMLObject);
                 return;
             }
 
@@ -693,7 +689,7 @@ namespace xmlsignature {
                         continue;
                     }
 
-                    getOthers().push_back((*i)->clone());
+                    getUnknownXMLObjects().push_back((*i)->clone());
                 }
             }
         }
@@ -707,7 +703,7 @@ namespace xmlsignature {
         IMPL_TYPED_CHILDREN(MgmtData,m_children.end());
         IMPL_TYPED_CHILDREN(SPKIData,m_children.end());
         IMPL_TYPED_CHILDREN(PGPData,m_children.end());
-        IMPL_XMLOBJECT_CHILDREN(Other,m_children.end());
+        IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject,m_children.end());
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
@@ -726,7 +722,7 @@ namespace xmlsignature {
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
             if (!XMLString::equals(nsURI,XMLSIG_NS) && nsURI && *nsURI) {
-                getOthers().push_back(childXMLObject);
+                getUnknownXMLObjects().push_back(childXMLObject);
                 return;
             }
             

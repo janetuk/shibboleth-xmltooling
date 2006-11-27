@@ -20,11 +20,12 @@
  * Advanced anyType implementation suitable for deep processing of unknown content.
  */
 
-#if !defined(__xmltooling_anyelement_h__)
+#ifndef __xmltooling_anyelement_h__
 #define __xmltooling_anyelement_h__
 
+#include <xmltooling/ElementProxy.h>
 #include <xmltooling/AbstractAttributeExtensibleXMLObject.h>
-#include <xmltooling/AbstractElementProxy.h>
+#include <xmltooling/AbstractComplexElement.h>
 #include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/io/AbstractXMLObjectMarshaller.h>
 #include <xmltooling/io/AbstractXMLObjectUnmarshaller.h>
@@ -39,8 +40,9 @@ namespace xmltooling {
     /**
      * Implements a smart wrapper around unknown or arbitrary DOM content.
      */
-    class XMLTOOL_API AnyElementImpl : public AbstractDOMCachingXMLObject,
-        public AbstractElementProxy,
+    class XMLTOOL_API AnyElementImpl : public virtual ElementProxy,
+        public AbstractDOMCachingXMLObject,
+        public AbstractComplexElement,
         public AbstractAttributeExtensibleXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
@@ -55,7 +57,9 @@ namespace xmltooling {
         
     protected:
         AnyElementImpl() {}
-        AnyElementImpl(const AnyElementImpl& src);   
+        AnyElementImpl(const AnyElementImpl& src);
+        
+        IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject,m_children.end());
         
         void marshallAttributes(DOMElement* domElement) const;
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root);
