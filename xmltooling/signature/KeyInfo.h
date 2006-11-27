@@ -101,6 +101,12 @@ namespace xmlsignature {
         DECL_TYPED_CHILD(Transforms);
         /** RetrievalMethodType local name */
         static const XMLCh TYPE_NAME[];
+        /** DSAKeyValue RetrievalMethod Type */
+        static const XMLCh TYPE_DSAKEYVALUE[];
+        /** RSAKeyValue RetrievalMethod Type */
+        static const XMLCh TYPE_RSAKEYVALUE[];
+        /** X509Data RetrievalMethod Type */
+        static const XMLCh TYPE_X509DATA[];
     END_XMLOBJECT;
 
     BEGIN_XMLOBJECT(XMLTOOL_API,X509IssuerSerial,xmltooling::XMLObject,XML Digital Signature version 20020212 X509IssuerSerial element);

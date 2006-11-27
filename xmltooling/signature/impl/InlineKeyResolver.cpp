@@ -202,6 +202,36 @@ XSECCryptoKey* InlineKeyResolver::_resolveKey(const KeyInfo* keyInfo) const
         }
     }
 
+    // Check for RetrievalMethod.
+    const XMLCh* fragID=NULL;
+    const XMLObject* treeRoot=NULL;
+    XSECCryptoKey* remote=NULL;
+    const vector<RetrievalMethod*> methods=keyInfo->getRetrievalMethods();
+    for (vector<RetrievalMethod*>::const_iterator m=methods.begin(); m!=methods.end(); ++m) {
+        if (!XMLString::equals((*m)->getType(),RetrievalMethod::TYPE_X509DATA) &&
+            !XMLString::equals((*m)->getType(),RetrievalMethod::TYPE_RSAKEYVALUE) &&
+            !XMLString::equals((*m)->getType(),RetrievalMethod::TYPE_DSAKEYVALUE))
+            continue;
+        fragID = (*m)->getURI();
+        if (!fragID || *fragID != chPound || !*(fragID+1)) {
+            log.warn("skipping ds:RetrievalMethod with an empty or non-local reference");
+            continue;
+        }
+        if (!treeRoot) {
+            treeRoot = keyInfo;
+            while (treeRoot->getParent())
+                treeRoot = treeRoot->getParent();
+        }
+        keyInfo = dynamic_cast<const KeyInfo*>(XMLHelper::getXMLObjectById(*treeRoot, fragID+1));
+        if (!keyInfo) {
+            log.warn("skipping ds:RetrievalMethod, local reference did not resolve to a ds:KeyInfo");
+            continue;
+        }
+        remote = _resolveKey(keyInfo);
+        if (remote)
+            return remote;
+    }
+
     log.warn("unable to resolve key");
     return NULL;
 }
@@ -244,6 +274,34 @@ vector<XSECCryptoX509*>::size_type InlineKeyResolver::_resolveCertificates(
             }
         }
     }
+    
+    if (certs.empty()) {
+        // Check for RetrievalMethod.
+        const XMLCh* fragID=NULL;
+        const XMLObject* treeRoot=NULL;
+        const vector<RetrievalMethod*> methods=keyInfo->getRetrievalMethods();
+        for (vector<RetrievalMethod*>::const_iterator m=methods.begin(); certs.empty() && m!=methods.end(); ++m) {
+            if (!XMLString::equals((*m)->getType(),RetrievalMethod::TYPE_X509DATA))
+                continue;
+            fragID = (*m)->getURI();
+            if (!fragID || *fragID != chPound || !*(fragID+1)) {
+                log.warn("skipping ds:RetrievalMethod with an empty or non-local reference");
+                continue;
+            }
+            if (!treeRoot) {
+                treeRoot = keyInfo;
+                while (treeRoot->getParent())
+                    treeRoot = treeRoot->getParent();
+            }
+            keyInfo = dynamic_cast<const KeyInfo*>(XMLHelper::getXMLObjectById(*treeRoot, fragID+1));
+            if (!keyInfo) {
+                log.warn("skipping ds:RetrievalMethod, local reference did not resolve to a ds:KeyInfo");
+                continue;
+            }
+            _resolveCertificates(keyInfo, certs);
+        }
+    }
+    
     if (log.isDebugEnabled()) {
         log.debug("resolved %d certificate%s", certs.size(), certs.size()==1 ? "" : "s");
     }
@@ -286,6 +344,35 @@ XSECCryptoX509CRL* InlineKeyResolver::_resolveCRL(const KeyInfo* keyInfo) const
             }
         }
     }
+
+    // Check for RetrievalMethod.
+    const XMLCh* fragID=NULL;
+    const XMLObject* treeRoot=NULL;
+    XSECCryptoX509CRL* remote=NULL;
+    const vector<RetrievalMethod*> methods=keyInfo->getRetrievalMethods();
+    for (vector<RetrievalMethod*>::const_iterator m=methods.begin(); m!=methods.end(); ++m) {
+        if (!XMLString::equals((*m)->getType(),RetrievalMethod::TYPE_X509DATA))
+            continue;
+        fragID = (*m)->getURI();
+        if (!fragID || *fragID != chPound || !*(fragID+1)) {
+            log.warn("skipping ds:RetrievalMethod with an empty or non-local reference");
+            continue;
+        }
+        if (!treeRoot) {
+            treeRoot = keyInfo;
+            while (treeRoot->getParent())
+                treeRoot = treeRoot->getParent();
+        }
+        keyInfo = dynamic_cast<const KeyInfo*>(XMLHelper::getXMLObjectById(*treeRoot, fragID+1));
+        if (!keyInfo) {
+            log.warn("skipping ds:RetrievalMethod, local reference did not resolve to a ds:KeyInfo");
+            continue;
+        }
+        remote = _resolveCRL(keyInfo);
+        if (remote)
+            return remote;
+    }
+
     return NULL;
 }
 

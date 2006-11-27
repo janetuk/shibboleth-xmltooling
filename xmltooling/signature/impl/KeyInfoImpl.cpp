@@ -877,3 +877,27 @@ const XMLCh X509Certificate::LOCAL_NAME[] = {
     };
 const XMLCh X509CRL::LOCAL_NAME[] = { XCH(X), XNUM(5), XNUM(0), XNUM(9), XCH(C), XCH(R), XCH(L), chNull };
 
+const XMLCh RetrievalMethod::TYPE_DSAKEYVALUE[] = {
+    chLatin_h, chLatin_t, chLatin_t, chLatin_p, chColon, chForwardSlash, chForwardSlash,
+    chLatin_w, chLatin_w, chLatin_w, chPeriod, chLatin_w, chDigit_3, chPeriod, chLatin_o, chLatin_r, chLatin_g, chForwardSlash,
+    chDigit_2, chDigit_0, chDigit_0, chDigit_0, chForwardSlash, chDigit_0, chDigit_9, chForwardSlash,
+    chLatin_x, chLatin_m, chLatin_l, chLatin_d, chLatin_s, chLatin_i, chLatin_g, chPound,
+    chLatin_D, chLatin_S, chLatin_A, chLatin_K, chLatin_e, chLatin_y, chLatin_V, chLatin_a, chLatin_l, chLatin_u, chLatin_e, chNull
+    };
+
+const XMLCh RetrievalMethod::TYPE_RSAKEYVALUE[] = {
+    chLatin_h, chLatin_t, chLatin_t, chLatin_p, chColon, chForwardSlash, chForwardSlash,
+    chLatin_w, chLatin_w, chLatin_w, chPeriod, chLatin_w, chDigit_3, chPeriod, chLatin_o, chLatin_r, chLatin_g, chForwardSlash,
+    chDigit_2, chDigit_0, chDigit_0, chDigit_0, chForwardSlash, chDigit_0, chDigit_9, chForwardSlash,
+    chLatin_x, chLatin_m, chLatin_l, chLatin_d, chLatin_s, chLatin_i, chLatin_g, chPound,
+    chLatin_R, chLatin_S, chLatin_A, chLatin_K, chLatin_e, chLatin_y, chLatin_V, chLatin_a, chLatin_l, chLatin_u, chLatin_e, chNull
+    };
+
+const XMLCh RetrievalMethod::TYPE_X509DATA[] = {
+    chLatin_h, chLatin_t, chLatin_t, chLatin_p, chColon, chForwardSlash, chForwardSlash,
+    chLatin_w, chLatin_w, chLatin_w, chPeriod, chLatin_w, chDigit_3, chPeriod, chLatin_o, chLatin_r, chLatin_g, chForwardSlash,
+    chDigit_2, chDigit_0, chDigit_0, chDigit_0, chForwardSlash, chDigit_0, chDigit_9, chForwardSlash,
+    chLatin_x, chLatin_m, chLatin_l, chLatin_d, chLatin_s, chLatin_i, chLatin_g, chPound,
+    chLatin_X, chDigit_5, chDigit_0, chDigit_9, chLatin_D, chLatin_a, chLatin_t, chLatin_a, chNull
+    };
+    
