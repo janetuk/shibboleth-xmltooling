@@ -27,6 +27,8 @@
 
 #include <log4cpp/Category.hh>
 #include <xercesc/util/XMLUniDefs.hpp>
+#include <xsec/enc/OpenSSL/OpenSSLCryptoKeyDSA.hpp>
+#include <xsec/enc/OpenSSL/OpenSSLCryptoKeyRSA.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
 
 using namespace xmlsignature;
@@ -218,28 +220,51 @@ bool ExplicitKeyTrustEngine::validate(
         return false;
     }
 
-    // The "basic" trust implementation relies solely on certificates living within the
+    // The "explicit" trust implementation relies solely on keys living within the
     // peer interface to verify the EE certificate.
 
     log.debug("attempting to match key information from peer with end-entity certificate");
     while (keyInfoIter->hasNext()) {
-        KeyResolver::ResolvedCertificates resolvedCerts;
-        if (0 == (keyResolver ? keyResolver : m_keyResolver)->resolveCertificates(keyInfoIter->next(),resolvedCerts)) {
-            log.debug("key information does not resolve to a certificate, skipping it");
-            continue;
-        }
+        auto_ptr<XSECCryptoKey> key((keyResolver ? keyResolver : m_keyResolver)->resolveKey(keyInfoIter->next()));
+        if (key.get()) {
+            log.debug("checking if peer key matches end-entity certificate");
+            if (key->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
+                log.error("only the OpenSSL XSEC provider is supported");
+                continue;
+            }
+            switch (key->getKeyType()) {
+                case XSECCryptoKey::KEY_RSA_PUBLIC:
+                {
+                    RSA* rsa = static_cast<OpenSSLCryptoKeyRSA*>(key.get())->getOpenSSLRSA();
+                    EVP_PKEY* evp = certEE->cert_info->key->pkey;
+                    if (rsa && evp && evp->type == EVP_PKEY_RSA &&
+                            BN_cmp(rsa->n,evp->pkey.rsa->n) == 0 && BN_cmp(rsa->e,evp->pkey.rsa->e) != 0) {
+                        log.info("end-entity certificate matches peer RSA key information");
+                        return true;
+                    }
+                    break;
+                }
+                
+                case XSECCryptoKey::KEY_DSA_PUBLIC:
+                {
+                    DSA* dsa = static_cast<OpenSSLCryptoKeyDSA*>(key.get())->getOpenSSLDSA();
+                    EVP_PKEY* evp = certEE->cert_info->key->pkey;
+                    if (dsa && evp && evp->type == EVP_PKEY_DSA && BN_cmp(dsa->pub_key,evp->pkey.dsa->pub_key) == 0) {
+                        log.info("end-entity certificate matches peer DSA key information");
+                        return true;
+                    }
+                    break;
+                }
 
-        log.debug("checking if certificates contained within key information match end-entity certificate");
-        if (resolvedCerts.v().front()->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
-            log.error("only the OpenSSL XSEC provider is supported");
-            continue;
+                default:
+                    log.warn("unknown peer key type, skipping...");
+            }
         }
-        else if (!X509_cmp(certEE,static_cast<OpenSSLCryptoX509*>(resolvedCerts.v().front())->getOpenSSLX509())) {
-            log.info("end-entity certificate matches certificate from peer key information");
-            return true;
+        else {
+            log.debug("key information does not resolve to a public key, skipping it");
         }
     }
 
-    log.debug("no certificates within this peer's key information matched the given end-entity certificate");
+    log.debug("no keys within this peer's key information matched the given end-entity certificate");
     return false;
 }
