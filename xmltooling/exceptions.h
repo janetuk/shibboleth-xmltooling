@@ -61,7 +61,7 @@
  * @param name  the exception class name
  * @param ns    the exception class C++ namespace
  */
-#define DECL_EXCEPTION_FACTORY(name,ns) \
+#define DECL_XMLTOOLING_EXCEPTION_FACTORY(name,ns) \
     xmltooling::XMLToolingException* name##Factory() \
     { \
         return new ns::name(); \
@@ -73,7 +73,7 @@
  * @param name      the exception class name
  * @param ns        the exception class C++ namespace
  */
-#define REGISTER_EXCEPTION_FACTORY(name,ns) XMLToolingException::registerFactory(#ns"::"#name,name##Factory)
+#define REGISTER_XMLTOOLING_EXCEPTION_FACTORY(name,ns) XMLToolingException::registerFactory(#ns"::"#name,name##Factory)
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -350,9 +350,11 @@ namespace xmltooling {
     DECL_XMLTOOLING_EXCEPTION(UnknownAttributeException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions due to processing of unknown attributes);
     DECL_XMLTOOLING_EXCEPTION(UnknownExtensionException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions from use of an unrecognized extension/plugin);
     DECL_XMLTOOLING_EXCEPTION(ValidationException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions during object validation);
-    DECL_XMLTOOLING_EXCEPTION(XMLSecurityException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions related to the XML security layer);
     DECL_XMLTOOLING_EXCEPTION(IOException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions related to physical input/output errors);
 
+#ifndef XMLTOOLING_NO_XMLSEC
+    DECL_XMLTOOLING_EXCEPTION(XMLSecurityException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions related to the XML security layer);
+#endif
 };
 
 #if defined (_MSC_VER)

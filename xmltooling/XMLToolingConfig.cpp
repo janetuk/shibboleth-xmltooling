@@ -23,7 +23,7 @@
 #include "internal.h"
 #include "exceptions.h"
 #include "XMLToolingConfig.h"
-#include "encryption/Encryption.h"
+#include "encryption/Encrypter.h"
 #include "impl/UnknownElement.h"
 #include "security/TrustEngine.h"
 #include "security/OpenSSLCryptoX509CRL.h"
@@ -58,19 +58,20 @@ using namespace xmltooling;
 using namespace log4cpp;
 using namespace std;
 
-DECL_EXCEPTION_FACTORY(XMLParserException,xmltooling);
-DECL_EXCEPTION_FACTORY(XMLObjectException,xmltooling);
-DECL_EXCEPTION_FACTORY(MarshallingException,xmltooling);
-DECL_EXCEPTION_FACTORY(UnmarshallingException,xmltooling);
-DECL_EXCEPTION_FACTORY(UnknownElementException,xmltooling);
-DECL_EXCEPTION_FACTORY(UnknownAttributeException,xmltooling);
-DECL_EXCEPTION_FACTORY(UnknownExtensionException,xmltooling);
-DECL_EXCEPTION_FACTORY(ValidationException,xmltooling);
-DECL_EXCEPTION_FACTORY(XMLSecurityException,xmltooling);
-DECL_EXCEPTION_FACTORY(IOException,xmltooling);
+DECL_XMLTOOLING_EXCEPTION_FACTORY(XMLParserException,xmltooling);
+DECL_XMLTOOLING_EXCEPTION_FACTORY(XMLObjectException,xmltooling);
+DECL_XMLTOOLING_EXCEPTION_FACTORY(MarshallingException,xmltooling);
+DECL_XMLTOOLING_EXCEPTION_FACTORY(UnmarshallingException,xmltooling);
+DECL_XMLTOOLING_EXCEPTION_FACTORY(UnknownElementException,xmltooling);
+DECL_XMLTOOLING_EXCEPTION_FACTORY(UnknownAttributeException,xmltooling);
+DECL_XMLTOOLING_EXCEPTION_FACTORY(UnknownExtensionException,xmltooling);
+DECL_XMLTOOLING_EXCEPTION_FACTORY(ValidationException,xmltooling);
+DECL_XMLTOOLING_EXCEPTION_FACTORY(IOException,xmltooling);
 
 #ifndef XMLTOOLING_NO_XMLSEC
-    DECL_EXCEPTION_FACTORY(SignatureException,xmlsignature);
+    DECL_XMLTOOLING_EXCEPTION_FACTORY(XMLSecurityException,xmltooling);
+    DECL_XMLTOOLING_EXCEPTION_FACTORY(SignatureException,xmlsignature);
+    DECL_XMLTOOLING_EXCEPTION_FACTORY(EncryptionException,xmlencryption);
 #endif
 
 namespace xmltooling {
@@ -203,19 +204,20 @@ bool XMLToolingInternalConfig::init()
         registerEncryptionClasses();
         registerSOAPClasses();
         
-        REGISTER_EXCEPTION_FACTORY(XMLParserException,xmltooling);
-        REGISTER_EXCEPTION_FACTORY(XMLObjectException,xmltooling);
-        REGISTER_EXCEPTION_FACTORY(MarshallingException,xmltooling);
-        REGISTER_EXCEPTION_FACTORY(UnmarshallingException,xmltooling);
-        REGISTER_EXCEPTION_FACTORY(UnknownElementException,xmltooling);
-        REGISTER_EXCEPTION_FACTORY(UnknownAttributeException,xmltooling);
-        REGISTER_EXCEPTION_FACTORY(ValidationException,xmltooling);
-        REGISTER_EXCEPTION_FACTORY(XMLSecurityException,xmltooling);
-        REGISTER_EXCEPTION_FACTORY(IOException,xmltooling);
+        REGISTER_XMLTOOLING_EXCEPTION_FACTORY(XMLParserException,xmltooling);
+        REGISTER_XMLTOOLING_EXCEPTION_FACTORY(XMLObjectException,xmltooling);
+        REGISTER_XMLTOOLING_EXCEPTION_FACTORY(MarshallingException,xmltooling);
+        REGISTER_XMLTOOLING_EXCEPTION_FACTORY(UnmarshallingException,xmltooling);
+        REGISTER_XMLTOOLING_EXCEPTION_FACTORY(UnknownElementException,xmltooling);
+        REGISTER_XMLTOOLING_EXCEPTION_FACTORY(UnknownAttributeException,xmltooling);
+        REGISTER_XMLTOOLING_EXCEPTION_FACTORY(ValidationException,xmltooling);
+        REGISTER_XMLTOOLING_EXCEPTION_FACTORY(IOException,xmltooling);
         
 #ifndef XMLTOOLING_NO_XMLSEC
         XMLObjectBuilder::registerBuilder(QName(xmlconstants::XMLSIG_NS,Signature::LOCAL_NAME),new SignatureBuilder());
-        REGISTER_EXCEPTION_FACTORY(SignatureException,xmlsignature);
+        REGISTER_XMLTOOLING_EXCEPTION_FACTORY(XMLSecurityException,xmltooling);
+        REGISTER_XMLTOOLING_EXCEPTION_FACTORY(SignatureException,xmlsignature);
+        REGISTER_XMLTOOLING_EXCEPTION_FACTORY(EncryptionException,xmlencryption);
         registerKeyResolvers();
         registerCredentialResolvers();
         registerTrustEngines();
