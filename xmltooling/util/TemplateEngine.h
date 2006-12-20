@@ -29,6 +29,11 @@
 #include <string>
 #include <iostream>
 
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4251 )
+#endif
+
 namespace xmltooling {
 
     /**
@@ -116,5 +121,9 @@ namespace xmltooling {
         std::string keytag,iftag,ifendtag,ifnottag,ifnotendtag;
     };
 };
+
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
 
 #endif /* __xmltooling_template_h__ */
