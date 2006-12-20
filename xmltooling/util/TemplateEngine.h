@@ -61,18 +61,43 @@ namespace xmltooling {
         void setTagPrefix(const char* tagPrefix);
         
         /**
+         * Interface to parameters to plug into templates.
+         * Allows callers to supply a more dynamic lookup mechanism to supplement a basic map.
+         */
+        class XMLTOOL_API TemplateParameters {
+            MAKE_NONCOPYABLE(TemplateParameters);
+        public:
+            TemplateParameters() {}
+            virtual ~TemplateParameters() {}
+            
+            /** Map of known parameters to supply to template. */
+            std::map<std::string,std::string> m_map;
+            
+            /**
+             * Returns the value of a parameter to plug into the template.
+             * 
+             * @param name  name of parameter
+             * @return value of parameter, or NULL
+             */
+            virtual const char* getParameter(const char* name) const {
+                std::map<std::string,std::string>::const_iterator i=m_map.find(name);
+                return (i!=m_map.end() ? i->second.c_str() : NULL); 
+            }
+        };
+        
+        /**
          * Processes template from an input stream and executes replacements and
          * conditional logic based on parameters. 
          * 
          * @param is            input stream providing template
          * @param os            output stream to send results of executing template
-         * @param parameters    name/value parameters to plug into template
+         * @param parameters    parameters to plug into template
          * @param e             optional exception to extract parameters from
          */
         virtual void run(
             std::istream& is,
             std::ostream& os,
-            const std::map<std::string,std::string>& parameters,
+            const TemplateParameters& parameters,
             const XMLToolingException* e=NULL
             ) const;
 
@@ -84,7 +109,7 @@ namespace xmltooling {
             const std::string& buf,
             const char*& lastpos,
             std::ostream& os,
-            const std::map<std::string,std::string>& parameters,
+            const TemplateParameters& parameters,
             const XMLToolingException* e
             ) const;
             

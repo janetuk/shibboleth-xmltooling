@@ -82,7 +82,7 @@ void TemplateEngine::process(
     const string& buf,
     const char*& lastpos,
     ostream& os,
-    const map<string,string>& parameters,
+    const TemplateParameters& parameters,
     const XMLToolingException* e
     ) const
 {
@@ -118,15 +118,11 @@ void TemplateEngine::process(
                 string key = buf.substr(lastpos-line, thispos-lastpos);
                 trimspace(key);
         
-                map<string,string>::const_iterator i=parameters.find(key);
-                if (i != parameters.end()) {
-                    html_encode(os,i->second.c_str());
-                }
-                else if (e) {
-                    const char* ep = e->getProperty(key.c_str());
-                    if (ep)
-                        html_encode(os,ep);
-                }
+                const char* p = parameters.getParameter(key.c_str());
+                if (!p && e)
+                    p = e->getProperty(key.c_str());
+                if (p)
+                    html_encode(os,p);
                 lastpos = thispos + 2; // strlen("/>")
             }
         }
@@ -143,14 +139,9 @@ void TemplateEngine::process(
             if ((thispos = strchr(lastpos, '>')) != NULL) {
                 string key = buf.substr(lastpos-line, thispos-lastpos);
                 trimspace(key);
-                map<string,string>::const_iterator i=parameters.find(key);
                 bool cond=false;
-                if (visible) {
-                    if (i != parameters.end())
-                        cond=true;
-                    else if (e && e->getProperty(key.c_str()))
-                        cond=true;
-                }
+                if (visible)
+                    cond = parameters.getParameter(key.c_str()) || (e && e->getProperty(key.c_str()));
                 lastpos = thispos + 1; // strlen(">")
                 process(cond, buf, lastpos, os, parameters, e);
             }
@@ -178,14 +169,9 @@ void TemplateEngine::process(
             if ((thispos = strchr(lastpos, '>')) != NULL) {
                 string key = buf.substr(lastpos-line, thispos-lastpos);
                 trimspace(key);
-                map<string,string>::const_iterator i=parameters.find(key);
                 bool cond=visible;
-                if (visible) {
-                    if (i != parameters.end())
-                        cond=false;
-                    else if (e && e->getProperty(key.c_str()))
-                        cond=false;
-                }
+                if (visible)
+                    cond = !(parameters.getParameter(key.c_str()) || (e && e->getProperty(key.c_str())));
                 lastpos = thispos + 1; // strlen(">")
                 process(cond, buf, lastpos, os, parameters, e);
             }
@@ -211,7 +197,7 @@ void TemplateEngine::process(
         os << buf.substr(lastpos-line);
 }
 
-void TemplateEngine::run(istream& is, ostream& os, const map<string,string>& parameters, const XMLToolingException* e) const
+void TemplateEngine::run(istream& is, ostream& os, const TemplateParameters& parameters, const XMLToolingException* e) const
 {
     string buf,line;
     while (getline(is, line))
