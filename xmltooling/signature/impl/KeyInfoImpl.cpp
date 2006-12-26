@@ -896,4 +896,4 @@ const XMLCh RetrievalMethod::TYPE_X509DATA[] = {
     chLatin_x, chLatin_m, chLatin_l, chLatin_d, chLatin_s, chLatin_i, chLatin_g, chPound,
     chLatin_X, chDigit_5, chDigit_0, chDigit_9, chLatin_D, chLatin_a, chLatin_t, chLatin_a, chNull
     };
-    
+

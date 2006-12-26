@@ -50,7 +50,7 @@
         name(const std::string& msg, const xmltooling::params& p=xmltooling::params()) : base(msg,p) {} \
         XMLTOOLING_DOXYGEN(Constructor) \
         name(const std::string& msg, const xmltooling::namedparams& p) : base(msg,p) {} \
-        virtual ~name() {} \
+        virtual ~name() throw () {} \
         virtual const char* getClassName() const { return #ns"::"#name; } \
         void raise() const {throw *this;} \
     }
@@ -139,7 +139,7 @@ namespace xmltooling {
     class XMLTOOL_EXCEPTIONAPI(XMLTOOL_API) XMLToolingException : public std::exception
     {
     public:
-        virtual ~XMLToolingException() {}
+        virtual ~XMLToolingException() throw () {}
 
         /**
          * Constructs an exception using a message and positional parameters.
@@ -185,7 +185,7 @@ namespace xmltooling {
          * 
          * @return  the processed message
          */
-        const char* what() const {return getMessage();}
+        const char* what() const throw () {return getMessage();}
 
         /**
          * Sets the error message.
