@@ -131,17 +131,12 @@ namespace xmltooling {
         namedparams(int count,...);
     };
 
-    class XMLTOOL_EXCEPTIONAPI(XMLTOOL_API) XMLToolingException;
-    
-    /** A factory function that returns an empty exception object of a given type. */
-    typedef XMLToolingException* ExceptionFactory();
-    
     /**
      * Base exception class, supports parametrized messages and XML serialization.
      * Parameters are prefixed with a dollar sign ($) and can be positional ($1)
      * or named ($info).
      */
-    class XMLTOOL_EXCEPTIONAPI(XMLTOOL_API) XMLToolingException
+    class XMLTOOL_EXCEPTIONAPI(XMLTOOL_API) XMLToolingException : public std::exception
     {
     public:
         virtual ~XMLToolingException() {}
@@ -311,6 +306,9 @@ namespace xmltooling {
          */
         static XMLToolingException* fromString(const char* s);
                 
+        /** A factory function that returns an empty exception object of a given type. */
+        typedef XMLToolingException* ExceptionFactory();
+        
         /**
          * Registers a factory to create exceptions of a given class name.
          * 
