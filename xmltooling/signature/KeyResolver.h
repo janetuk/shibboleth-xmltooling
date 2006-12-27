@@ -98,14 +98,47 @@ namespace xmlsignature {
             std::vector<XSECCryptoX509*> m_certs;
         public:
             ResolvedCertificates() : m_owned(false) {}
+            
             ~ResolvedCertificates() {
+                clear();
+            }
+            
+            /**
+             * Empties the container and frees any held resources.
+             */
+            void clear() {
                 if (m_owned) {
                     std::for_each(m_certs.begin(), m_certs.end(), xmltooling::cleanup<XSECCryptoX509>());
+                    m_owned = false;
                 }
+                m_certs.clear();
             }
+            
+            /**
+             * Transfers ownership of certificates outside wrapper.
+             * 
+             * @param writeTo   a container into which to move the certificates
+             * @return  true iff the certificates must be freed by caller
+             */
+            bool release(std::vector<XSECCryptoX509*>& writeTo) {
+                writeTo.assign(m_certs.begin(),m_certs.end());
+                m_certs.clear();
+                if (m_owned) {
+                    m_owned=false;
+                    return true;
+                }
+                return false;
+            }
+            
+            /**
+             * Accesses the underlying array of certificates.
+             * 
+             * @return reference to certificate container
+             */
             const std::vector<XSECCryptoX509*>& v() const {
                 return m_certs;
             }
+            
             friend class XMLTOOL_API KeyResolver;
         };
 
