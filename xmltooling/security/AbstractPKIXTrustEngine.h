@@ -110,7 +110,10 @@ namespace xmltooling {
         class XMLTOOL_API PKIXValidationInfoIterator {
             MAKE_NONCOPYABLE(PKIXValidationInfoIterator);
         protected:
-            PKIXValidationInfoIterator() {}
+            const xmlsignature::KeyResolver& m_keyResolver;
+            
+            PKIXValidationInfoIterator(const xmlsignature::KeyResolver& keyResolver) : m_keyResolver(keyResolver) {}
+            
         public:
             virtual ~PKIXValidationInfoIterator() {}
             
@@ -156,9 +159,14 @@ namespace xmltooling {
          * will be tried, in turn, until one succeeds or no more remain.
          * The caller must free the returned interface when finished with it.
          * 
-         * @return interface for obtaining validation data  
+         * @param pkixSource    the peer for which validation rules are required
+         * @param keyResolver   reference to KeyResolver to use for any KeyInfo operations
+         * @return interface for obtaining validation data
          */
-        virtual PKIXValidationInfoIterator* getPKIXValidationInfoIterator(const KeyInfoSource& pkixSource) const=0;
+        virtual PKIXValidationInfoIterator* getPKIXValidationInfoIterator(
+            const KeyInfoSource& pkixSource,
+            const xmlsignature::KeyResolver& keyResolver
+            ) const=0;
     };
 };
 
