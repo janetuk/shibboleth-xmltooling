@@ -15,13 +15,13 @@
  */
 
 /**
- * @file DateTime.h
+ * @file xmltooling/util/DateTime.h
  * 
  * Manipulation of XML date/time data. 
  */
 
-#ifndef _XML_DATETIME_H
-#define _XML_DATETIME_H
+#ifndef __xmltool_datetime_h__
+#define __xmltool_datetime_h__
 
 #include <xmltooling/base.h>
 
@@ -230,4 +230,4 @@ namespace xmltooling
 
 }
 
-#endif
+#endif /* __xmltool_datetime_h__ */
