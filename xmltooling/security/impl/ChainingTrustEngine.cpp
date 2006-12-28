@@ -40,35 +40,24 @@ namespace xmltooling {
 static const XMLCh GenericTrustEngine[] =           UNICODE_LITERAL_11(T,r,u,s,t,E,n,g,i,n,e);
 static const XMLCh type[] =                         UNICODE_LITERAL_4(t,y,p,e);
 
-ChainingTrustEngine::ChainingTrustEngine(const DOMElement* e) : X509TrustEngine(e) {
+ChainingTrustEngine::ChainingTrustEngine(const DOMElement* e) : OpenSSLTrustEngine(e) {
     try {
         e = e ? xmltooling::XMLHelper::getFirstChildElement(e, GenericTrustEngine) : NULL;
         while (e) {
-            xmltooling::auto_ptr_char temp(e->getAttributeNS(NULL,type));
-            if (temp.get()) {
-                auto_ptr<TrustEngine> engine(
-                    XMLToolingConfig::getConfig().TrustEngineManager.newPlugin(temp.get(), e)
-                    );
-                X509TrustEngine* x509 = dynamic_cast<X509TrustEngine*>(engine.get());
-                if (x509) {
-                    m_engines.push_back(x509);
-                    engine.release();
-                }
-                else {
-                    throw xmltooling::UnknownExtensionException("Embedded trust engine does not support required interface.");
-                }
-            }
+            auto_ptr_char temp(e->getAttributeNS(NULL,type));
+            if (temp.get())
+                m_engines.push_back(XMLToolingConfig::getConfig().TrustEngineManager.newPlugin(temp.get(), e));
             e = xmltooling::XMLHelper::getNextSiblingElement(e, GenericTrustEngine);
         }
     }
     catch (xmltooling::XMLToolingException&) {
-        for_each(m_engines.begin(), m_engines.end(), xmltooling::cleanup<X509TrustEngine>());
+        for_each(m_engines.begin(), m_engines.end(), xmltooling::cleanup<TrustEngine>());
         throw;
     }
 }
 
 ChainingTrustEngine::~ChainingTrustEngine() {
-    for_each(m_engines.begin(), m_engines.end(), xmltooling::cleanup<X509TrustEngine>());
+    for_each(m_engines.begin(), m_engines.end(), xmltooling::cleanup<TrustEngine>());
 }
 
 bool ChainingTrustEngine::validate(
@@ -77,8 +66,8 @@ bool ChainingTrustEngine::validate(
     const KeyResolver* keyResolver
     ) const
 {
-    for (vector<X509TrustEngine*>::const_iterator i=m_engines.begin(); i!=m_engines.end(); ++i) {
-        if (static_cast<TrustEngine*>(*i)->validate(sig,keyInfoSource,keyResolver))
+    for (vector<TrustEngine*>::const_iterator i=m_engines.begin(); i!=m_engines.end(); ++i) {
+        if ((*i)->validate(sig,keyInfoSource,keyResolver))
             return true;
     }
     return false;
@@ -94,8 +83,8 @@ bool ChainingTrustEngine::validate(
     const KeyResolver* keyResolver
     ) const
 {
-    for (vector<X509TrustEngine*>::const_iterator i=m_engines.begin(); i!=m_engines.end(); ++i) {
-        if (static_cast<TrustEngine*>(*i)->validate(sigAlgorithm, sig, keyInfo, in, in_len, keyInfoSource, keyResolver))
+    for (vector<TrustEngine*>::const_iterator i=m_engines.begin(); i!=m_engines.end(); ++i) {
+        if ((*i)->validate(sigAlgorithm, sig, keyInfo, in, in_len, keyInfoSource, keyResolver))
             return true;
     }
     return false;
@@ -109,8 +98,27 @@ bool ChainingTrustEngine::validate(
     const KeyResolver* keyResolver
     ) const
 {
-    for (vector<X509TrustEngine*>::const_iterator i=m_engines.begin(); i!=m_engines.end(); ++i) {
-        if ((*i)->validate(certEE,certChain,keyInfoSource,checkName,keyResolver))
+    X509TrustEngine* down;
+    for (vector<TrustEngine*>::const_iterator i=m_engines.begin(); i!=m_engines.end(); ++i) {
+        if ((down = dynamic_cast<X509TrustEngine*>(*i)) &&
+                down->validate(certEE,certChain,keyInfoSource,checkName,keyResolver))
+            return true;
+    }
+    return false;
+}
+
+bool ChainingTrustEngine::validate(
+    X509* certEE,
+    STACK_OF(X509)* certChain,
+    const KeyInfoSource& keyInfoSource,
+    bool checkName,
+    const xmlsignature::KeyResolver* keyResolver
+    ) const
+{
+    OpenSSLTrustEngine* down;
+    for (vector<TrustEngine*>::const_iterator i=m_engines.begin(); i!=m_engines.end(); ++i) {
+        if ((down = dynamic_cast<OpenSSLTrustEngine*>(*i)) &&
+                down->validate(certEE,certChain,keyInfoSource,checkName,keyResolver))
             return true;
     }
     return false;

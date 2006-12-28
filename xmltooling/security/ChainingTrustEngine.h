@@ -17,20 +17,20 @@
 /**
  * @file xmltooling/security/ChainingTrustEngine.h
  * 
- * X509TrustEngine that uses multiple engines in sequence.
+ * OpenSSLTrustEngine that uses multiple engines in sequence.
  */
 
 #if !defined(__xmltooling_chaintrust_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_chaintrust_h__
 
-#include <xmltooling/security/X509TrustEngine.h>
+#include <xmltooling/security/OpenSSLTrustEngine.h>
 
 namespace xmltooling {
 
     /**
-     * X509TrustEngine that uses multiple engines in sequence.
+     * OpenSSLTrustEngine that uses multiple engines in sequence.
      */
-    class XMLTOOL_API ChainingTrustEngine : public X509TrustEngine {
+    class XMLTOOL_API ChainingTrustEngine : public OpenSSLTrustEngine {
     public:
         /**
          * Constructor.
@@ -57,7 +57,7 @@ namespace xmltooling {
          * 
          * @param newEngine trust engine to add
          */
-        void addTrustEngine(X509TrustEngine* newEngine) {
+        void addTrustEngine(TrustEngine* newEngine) {
             m_engines.push_back(newEngine);
         }
 
@@ -67,8 +67,8 @@ namespace xmltooling {
          * @param oldEngine trust engine to remove
          * @return  the old engine
          */
-        X509TrustEngine* removeTrustEngine(X509TrustEngine* oldEngine) {
-            for (std::vector<X509TrustEngine*>::iterator i=m_engines.begin(); i!=m_engines.end(); i++) {
+        TrustEngine* removeTrustEngine(TrustEngine* oldEngine) {
+            for (std::vector<TrustEngine*>::iterator i=m_engines.begin(); i!=m_engines.end(); i++) {
                 if (oldEngine==(*i)) {
                     m_engines.erase(i);
                     return oldEngine;
@@ -77,12 +77,12 @@ namespace xmltooling {
             return NULL;
         }
 
-        virtual bool validate(
+        bool validate(
             xmlsignature::Signature& sig,
             const KeyInfoSource& keyInfoSource,
             const xmlsignature::KeyResolver* keyResolver=NULL
             ) const;
-        virtual bool validate(
+        bool validate(
             const XMLCh* sigAlgorithm,
             const char* sig,
             xmlsignature::KeyInfo* keyInfo,
@@ -91,16 +91,22 @@ namespace xmltooling {
             const KeyInfoSource& keyInfoSource,
             const xmlsignature::KeyResolver* keyResolver=NULL
             ) const;
-        virtual bool validate(
+        bool validate(
             XSECCryptoX509* certEE,
             const std::vector<XSECCryptoX509*>& certChain,
             const KeyInfoSource& keyInfoSource,
             bool checkName=true,
             const xmlsignature::KeyResolver* keyResolver=NULL
             ) const;
-
+        bool validate(
+            X509* certEE,
+            STACK_OF(X509)* certChain,
+            const KeyInfoSource& keyInfoSource,
+            bool checkName=true,
+            const xmlsignature::KeyResolver* keyResolver=NULL
+            ) const;
     private:
-        std::vector<X509TrustEngine*> m_engines;
+        std::vector<TrustEngine*> m_engines;
     };
     
 };
