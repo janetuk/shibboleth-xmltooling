@@ -33,17 +33,13 @@
 #include <algorithm>
 #include <functional>
 #include <xercesc/util/XMLUniDefs.hpp>
-#include <log4cpp/Category.hh>
 
 #ifndef XMLTOOLING_NO_XMLSEC
     using namespace xmlsignature;
 #endif
 using namespace xmlconstants;
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
-
-#define XT_log (*static_cast<Category*>(m_log))
 
 DOMElement* AbstractXMLObjectMarshaller::marshall(
     DOMDocument* document
@@ -56,14 +52,14 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(
     xmltooling::NDC ndc("marshall");
 #endif
 
-    if (XT_log.isDebugEnabled()) {
-        XT_log.debug("starting to marshal %s", getElementQName().toString().c_str());
+    if (m_log.isDebugEnabled()) {
+        m_log.debug("starting to marshal %s", getElementQName().toString().c_str());
     }
 
     DOMElement* cachedDOM=getDOM();
     if (cachedDOM) {
         if (!document || document==cachedDOM->getOwnerDocument()) {
-            XT_log.debug("XMLObject has a usable cached DOM, reusing it");
+            m_log.debug("XMLObject has a usable cached DOM, reusing it");
             if (document)
                 setDocumentElement(cachedDOM->getOwnerDocument(),cachedDOM);
             releaseParentDOM(true);
@@ -89,7 +85,7 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(
     
     XercesJanitor<DOMDocument> janitor(bindDocument ? document : NULL);
 
-    XT_log.debug("creating root element to marshall");
+    m_log.debug("creating root element to marshall");
     DOMElement* domElement = document->createElementNS(
         getElementQName().getNamespaceURI(), getElementQName().getLocalPart()
         );
@@ -100,7 +96,7 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(
     marshallInto(domElement);
 #endif
     //Recache the DOM.
-    XT_log.debug("caching DOM for XMLObject (document is %sbound)", bindDocument ? "" : "not ");
+    m_log.debug("caching DOM for XMLObject (document is %sbound)", bindDocument ? "" : "not ");
     setDOM(domElement, bindDocument);
     janitor.release();  // safely transferred
     releaseParentDOM(true);
@@ -119,14 +115,14 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(
     xmltooling::NDC ndc("marshall");
 #endif
 
-    if (XT_log.isDebugEnabled()) {
-        XT_log.debug("starting to marshalling %s", getElementQName().toString().c_str());
+    if (m_log.isDebugEnabled()) {
+        m_log.debug("starting to marshalling %s", getElementQName().toString().c_str());
     }
 
     DOMElement* cachedDOM=getDOM();
     if (cachedDOM) {
         if (parentElement->getOwnerDocument()==cachedDOM->getOwnerDocument()) {
-            XT_log.debug("XMLObject has a usable cached DOM, reusing it");
+            m_log.debug("XMLObject has a usable cached DOM, reusing it");
             if (parentElement!=cachedDOM->getParentNode()) {
                 parentElement->appendChild(cachedDOM);
                 releaseParentDOM(true);
@@ -144,7 +140,7 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(
     }
     
     // If we get here, we didn't have a usable DOM (and/or we released the one we had).
-    XT_log.debug("creating root element to marshall");
+    m_log.debug("creating root element to marshall");
     DOMElement* domElement = parentElement->getOwnerDocument()->createElementNS(
         getElementQName().getNamespaceURI(), getElementQName().getLocalPart()
         );
@@ -156,7 +152,7 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(
 #endif
 
     //Recache the DOM.
-    XT_log.debug("caching DOM for XMLObject");
+    m_log.debug("caching DOM for XMLObject");
     setDOM(domElement, false);
     releaseParentDOM(true);
 
@@ -195,7 +191,7 @@ void AbstractXMLObjectMarshaller::marshallElementType(DOMElement* domElement) co
 {
     const QName* type = getSchemaType();
     if (type) {
-        XT_log.debug("setting xsi:type attribute for XMLObject");
+        m_log.debug("setting xsi:type attribute for XMLObject");
         
         const XMLCh* typeLocalName = type->getLocalPart();
         if (!typeLocalName || !*typeLocalName) {
@@ -220,7 +216,7 @@ void AbstractXMLObjectMarshaller::marshallElementType(DOMElement* domElement) co
         if (xsivalue != typeLocalName)
             XMLString::release(&xsivalue);
 
-        XT_log.debug("Adding XSI namespace to list of namespaces used by XMLObject");
+        m_log.debug("Adding XSI namespace to list of namespaces used by XMLObject");
         addNamespace(Namespace(XSI_NS, XSI_PREFIX));
     }
 }
@@ -285,14 +281,14 @@ public:
 
 void AbstractXMLObjectMarshaller::marshallNamespaces(DOMElement* domElement) const
 {
-    XT_log.debug("marshalling namespace attributes for XMLObject");
+    m_log.debug("marshalling namespace attributes for XMLObject");
     const set<Namespace>& namespaces = getNamespaces();
     for_each(namespaces.begin(),namespaces.end(),bind1st(_addns(),domElement));
 }
 
 void AbstractXMLObjectMarshaller::marshallContent(DOMElement* domElement) const
 {
-    XT_log.debug("marshalling text and child elements for XMLObject");
+    m_log.debug("marshalling text and child elements for XMLObject");
     
     const XMLCh* val;
     unsigned int pos=0;

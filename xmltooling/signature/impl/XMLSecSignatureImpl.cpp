@@ -209,7 +209,7 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, const vector<Si
     xmltooling::NDC ndc("marshall");
 #endif
     
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Signature");
+    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".XMLObject.Signature");
     log.debug("marshalling ds:Signature");
 
     DOMElement* cachedDOM=getDOM();
@@ -304,7 +304,7 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, const vecto
     xmltooling::NDC ndc("marshall");
 #endif
     
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Signature");
+    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".XMLObject.Signature");
     log.debug("marshalling ds:Signature");
 
     DOMElement* cachedDOM=getDOM();
@@ -379,7 +379,7 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, const vecto
 
 XMLObject* XMLSecSignatureImpl::unmarshall(DOMElement* element, bool bindDocument)
 {
-    Category::getInstance(XMLTOOLING_LOGCAT".Signature").debug("unmarshalling ds:Signature");
+    Category::getInstance(XMLTOOLING_LOGCAT".XMLObject.Signature").debug("unmarshalling ds:Signature");
 
     try {
         m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignatureFromDOM(

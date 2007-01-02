@@ -29,14 +29,11 @@
 #include "util/XMLHelper.h"
 
 #include <xercesc/util/XMLUniDefs.hpp>
-#include <log4cpp/Category.hh>
 
 using namespace xmlconstants;
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
 
-#define XT_log (*static_cast<Category*>(m_log))
 
 XMLObject* AbstractXMLObjectUnmarshaller::unmarshall(DOMElement* element, bool bindDocument)
 {
@@ -52,9 +49,9 @@ XMLObject* AbstractXMLObjectUnmarshaller::unmarshall(DOMElement* element, bool b
         throw UnmarshallingException("Unrecognized element supplied to implementation for unmarshalling.");
     }
 
-    if (XT_log.isDebugEnabled()) {
+    if (m_log.isDebugEnabled()) {
         auto_ptr_char dname(element->getNodeName());
-        XT_log.debug("unmarshalling DOM element (%s)", dname.get());
+        m_log.debug("unmarshalling DOM element (%s)", dname.get());
     }
 
     if (element->hasAttributes()) {
@@ -73,14 +70,14 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
     xmltooling::NDC ndc("unmarshallAttributes");
 #endif
 
-    if (XT_log.isDebugEnabled()) {
+    if (m_log.isDebugEnabled()) {
         auto_ptr_char dname(domElement->getNodeName());
-        XT_log.debug("unmarshalling attributes for DOM element (%s)", dname.get());
+        m_log.debug("unmarshalling attributes for DOM element (%s)", dname.get());
     }
 
     DOMNamedNodeMap* attributes = domElement->getAttributes();
     if (!attributes) {
-        XT_log.debug("no attributes to unmarshall");
+        m_log.debug("no attributes to unmarshall");
         return;
     }
 
@@ -91,7 +88,7 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
 
         // The child node should always be an attribute, but just in case
         if (childNode->getNodeType() != DOMNode::ATTRIBUTE_NODE) {
-            XT_log.debug("encountered child node of type %d in attribute list, ignoring it", childNode->getNodeType());
+            m_log.debug("encountered child node of type %d in attribute list, ignoring it", childNode->getNodeType());
             continue;
         }
 
@@ -100,12 +97,12 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
         const XMLCh* nsuri=attribute->getNamespaceURI();
         if (XMLString::equals(nsuri,XMLNS_NS)) {
             if (XMLString::equals(attribute->getLocalName(),XMLNS_PREFIX)) {
-                XT_log.debug("found default namespace declaration, adding it to the list of namespaces on the XMLObject");
+                m_log.debug("found default namespace declaration, adding it to the list of namespaces on the XMLObject");
                 addNamespace(Namespace(attribute->getValue(), NULL, true));
                 continue;
             }
             else {
-                XT_log.debug("found namespace declaration, adding it to the list of namespaces on the XMLObject");
+                m_log.debug("found namespace declaration, adding it to the list of namespaces on the XMLObject");
                 addNamespace(Namespace(attribute->getValue(), attribute->getLocalName(), true));
                 continue;
             }
@@ -114,11 +111,11 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
             static const XMLCh type[]= UNICODE_LITERAL_4(t,y,p,e);
             static const XMLCh schemaLocation[]= UNICODE_LITERAL_14(s,c,h,e,m,a,L,o,c,a,t,i,o,n);
             if (XMLString::equals(attribute->getLocalName(),type)) {
-                XT_log.debug("skipping xsi:type declaration");
+                m_log.debug("skipping xsi:type declaration");
                 continue;
             }
             else if (XMLString::equals(attribute->getLocalName(),schemaLocation)) {
-                XT_log.debug("storing off xsi:schemaLocation attribute");
+                m_log.debug("storing off xsi:schemaLocation attribute");
                 if (m_schemaLocation)
                     XMLString::release(&m_schemaLocation);
                 m_schemaLocation=XMLString::replicate(attribute->getValue());
@@ -126,11 +123,11 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
             }
         }
         else if (nsuri && !XMLString::equals(nsuri,XML_NS)) {
-            XT_log.debug("found namespace-qualified attribute, adding prefix to the list of namespaces on the XMLObject");
+            m_log.debug("found namespace-qualified attribute, adding prefix to the list of namespaces on the XMLObject");
             addNamespace(Namespace(nsuri, attribute->getPrefix()));
         }
 
-        XT_log.debug("processing generic attribute");
+        m_log.debug("processing generic attribute");
         processAttribute(attribute);
     }
 }
@@ -141,14 +138,14 @@ void AbstractXMLObjectUnmarshaller::unmarshallContent(const DOMElement* domEleme
     xmltooling::NDC ndc("unmarshallContent");
 #endif
 
-    if (XT_log.isDebugEnabled()) {
+    if (m_log.isDebugEnabled()) {
         auto_ptr_char dname(domElement->getNodeName());
-        XT_log.debug("unmarshalling child nodes of DOM element (%s)", dname.get());
+        m_log.debug("unmarshalling child nodes of DOM element (%s)", dname.get());
     }
 
     DOMNode* childNode = domElement->getFirstChild();
     if (!childNode) {
-        XT_log.debug("element had no children");
+        m_log.debug("element had no children");
         return;
     }
 
@@ -158,13 +155,13 @@ void AbstractXMLObjectUnmarshaller::unmarshallContent(const DOMElement* domEleme
             const XMLObjectBuilder* builder = XMLObjectBuilder::getBuilder(static_cast<DOMElement*>(childNode));
             if (!builder) {
                 auto_ptr<QName> cname(XMLHelper::getNodeQName(childNode));
-                XT_log.error("no default builder installed, found unknown child element (%s)", cname->toString().c_str());
+                m_log.error("no default builder installed, found unknown child element (%s)", cname->toString().c_str());
                 throw UnmarshallingException("Unmarshaller found unknown child element, but no default builder was found.");
             }
 
-            if (XT_log.isDebugEnabled()) {
+            if (m_log.isDebugEnabled()) {
                 auto_ptr<QName> cname(XMLHelper::getNodeQName(childNode));
-                XT_log.debug("unmarshalling child element (%s)", cname->toString().c_str());
+                m_log.debug("unmarshalling child element (%s)", cname->toString().c_str());
             }
 
             // Retain ownership of the unmarshalled child until it's processed by the parent.
@@ -176,7 +173,7 @@ void AbstractXMLObjectUnmarshaller::unmarshallContent(const DOMElement* domEleme
             ++position;
         }
         else if (childNode->getNodeType() == DOMNode::TEXT_NODE) {
-            XT_log.debug("processing text content at position (%d)", position);
+            m_log.debug("processing text content at position (%d)", position);
             setTextContent(childNode->getNodeValue(), position);
         }
         

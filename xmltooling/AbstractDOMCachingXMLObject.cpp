@@ -28,10 +28,8 @@
 
 #include <algorithm>
 #include <functional>
-#include <log4cpp/Category.hh>
 
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
 
 AbstractDOMCachingXMLObject::~AbstractDOMCachingXMLObject()
@@ -53,10 +51,9 @@ void AbstractDOMCachingXMLObject::setDOM(DOMElement* dom, bool bindDocument) con
 void AbstractDOMCachingXMLObject::releaseDOM() const
 {
     if (m_dom) {
-        Category& log=Category::getInstance(XMLTOOLING_LOGCAT".DOM");
-        if (log.isDebugEnabled()) {
+        if (m_log.isDebugEnabled()) {
             string qname=getElementQName().toString();
-            log.debug("releasing cached DOM representation for (%s)", qname.empty() ? "unknown" : qname.c_str());
+            m_log.debug("releasing cached DOM representation for (%s)", qname.empty() ? "unknown" : qname.c_str());
         }
         setDOM(NULL);
     }
@@ -65,7 +62,7 @@ void AbstractDOMCachingXMLObject::releaseDOM() const
 void AbstractDOMCachingXMLObject::releaseParentDOM(bool propagateRelease) const
 {
     if (getParent() && getParent()->getDOM()) {
-        Category::getInstance(XMLTOOLING_LOGCAT".DOM").debug(
+        m_log.debug(
             "releasing cached DOM representation for parent object with propagation set to %s",
             propagateRelease ? "true" : "false"
             );
@@ -89,7 +86,7 @@ public:
 void AbstractDOMCachingXMLObject::releaseChildrenDOM(bool propagateRelease) const
 {
     if (hasChildren()) {
-        Category::getInstance(XMLTOOLING_LOGCAT".DOM").debug(
+        m_log.debug(
             "releasing cached DOM representation for children with propagation set to %s",
             propagateRelease ? "true" : "false"
             );
@@ -117,7 +114,7 @@ XMLObject* AbstractDOMCachingXMLObject::clone() const
         const XMLObjectBuilder* b=XMLObjectBuilder::getBuilder(domCopy);
         if (!b) {
             auto_ptr<QName> q(XMLHelper::getNodeQName(domCopy));
-            Category::getInstance(XMLTOOLING_LOGCAT".DOM").error(
+            m_log.error(
                 "DOM clone failed, unable to locate builder for element (%s)", q->toString().c_str()
                 );
             domCopy->getOwnerDocument()->release();

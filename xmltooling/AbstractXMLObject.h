@@ -20,11 +20,13 @@
  * An abstract implementation of XMLObject.
  */
 
-#if !defined(__xmltooling_abstractxmlobj_h__)
+#ifndef __xmltooling_abstractxmlobj_h__
 #define __xmltooling_abstractxmlobj_h__
 
 #include <xmltooling/XMLObject.h>
 #include <xmltooling/util/DateTime.h>
+
+#include <log4cpp/Category.hh>
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -192,7 +194,7 @@ namespace xmltooling {
         /**
          * Logging object.
          */
-        void* m_log;
+        log4cpp::Category& m_log;
 
         /**
          * Stores off xsi:schemaLocation attribute.

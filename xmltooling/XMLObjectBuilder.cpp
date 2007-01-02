@@ -39,7 +39,7 @@ const XMLObjectBuilder* XMLObjectBuilder::getBuilder(const DOMElement* domElemen
 #ifdef _DEBUG
     xmltooling::NDC ndc("getBuilder");
 #endif
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".XMLObjectBuilder");
+    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".XMLObject.Builder");
  
     auto_ptr<QName> schemaType(XMLHelper::getXSIType(domElement));
     const XMLObjectBuilder* xmlObjectBuilder = schemaType.get() ? getBuilder(*(schemaType.get())) : NULL;

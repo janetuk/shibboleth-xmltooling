@@ -221,23 +221,48 @@ DOMInputSource* ParserPool::resolveEntity(const XMLCh* const publicId, const XML
         log.debug("asked to resolve %s with baseURI %s",sysId.get(),base.get() ? base.get() : "(null)");
     }
 
-    // Find well-known schemas in the specified location.
 #ifdef HAVE_GOOD_STL
+    // Find well-known schemas in the specified location.
     map<xstring,xstring>::const_iterator i=m_schemaLocMap.find(systemId);
     if (i!=m_schemaLocMap.end())
-        return new Wrapper4InputSource(new LocalFileInputSource(NULL,i->second.c_str()));
+        return new Wrapper4InputSource(new LocalFileInputSource(baseURI,i->second.c_str()));
+
+    // We'll allow anything without embedded slashes.
+    if (XMLString::indexOf(systemId, chForwardSlash)==-1)
+        return new Wrapper4InputSource(new LocalFileInputSource(baseURI,systemId));
+
+    // Check for entity as a value in the map.
+    for (i=m_schemaLocMap.begin(); i!=m_schemaLocMap.end(); ++i) {
+        if (XMLString::endsWith(i->second.c_str(), systemId))
+            return new Wrapper4InputSource(new LocalFileInputSource(baseURI,i->second.c_str()));
+    }
 #else
+    // Find well-known schemas in the specified location.
     auto_ptr_char temp(systemId);
     map<string,string>::const_iterator i=m_schemaLocMap.find(temp.get());
     if (i!=m_schemaLocMap.end()) {
         auto_ptr_XMLCh temp2(i->second.c_str());
-        return new Wrapper4InputSource(new LocalFileInputSource(NULL,temp2.get()));
+        return new Wrapper4InputSource(new LocalFileInputSource(baseURI,temp2.get()));
+    }
+
+    // We'll allow anything without embedded slashes.
+    if (XMLString::indexOf(systemId, chForwardSlash)==-1)
+        return new Wrapper4InputSource(new LocalFileInputSource(baseURI,systemId));
+
+    // Check for entity as a value in the map.
+    for (i=m_schemaLocMap.begin(); i!=m_schemaLocMap.end(); ++i) {
+        if (XMLString::endsWith(i->second.c_str(), temp.get())) {
+            auto_ptr_XMLCh temp2(i->second.c_str());
+            return new Wrapper4InputSource(new LocalFileInputSource(baseURI,temp2.get()));
+        }
     }
 #endif    
 
     // Shortcircuit the request.
-    auto_ptr_char sysId(systemId);
-    log.warn("unauthorized entity request (%s), blocking it", sysId.get() ? sysId.get() : "no systemId");
+#ifdef HAVE_GOOD_STL
+    auto_ptr_char temp(systemId);
+#endif
+    log.warn("unauthorized entity request (%s), blocking it", temp.get());
     static const XMLByte nullbuf[] = {0};
     return new Wrapper4InputSource(new MemBufInputSource(nullbuf,0,systemId));
 }
