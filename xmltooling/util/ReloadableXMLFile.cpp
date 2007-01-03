@@ -91,7 +91,7 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e)
         }
 
         flag=e->getAttributeNS(NULL,reloadChanges);
-        if (!flag || XMLString::equals(flag,xmlconstants::XML_TRUE) || XMLString::equals(flag,xmlconstants::XML_ONE)) {
+        if (!XMLString::equals(flag,xmlconstants::XML_FALSE) && !XMLString::equals(flag,xmlconstants::XML_ZERO)) {
             if (m_local) {
 #ifdef WIN32
                 struct _stat stat_buf;
