@@ -158,12 +158,12 @@ pair<bool,DOMElement*> ReloadableXMLFile::load()
     }
     catch (XMLException& e) {
         auto_ptr_char msg(e.getMessage());
-        log.errorStream() << "Xerces error while loading resource (" << m_source << "): "
+        log.critStream() << "Xerces error while loading resource (" << m_source << "): "
             << msg.get() << CategoryStream::ENDLINE;
         throw XMLParserException(msg.get());
     }
-    catch (XMLToolingException& e) {
-        log.errorStream() << "error while loading configuration from ("
+    catch (exception& e) {
+        log.critStream() << "error while loading configuration from ("
             << (m_source.empty() ? "inline" : m_source) << "): " << e.what() << CategoryStream::ENDLINE;
         throw;
     }
@@ -202,6 +202,7 @@ Lockable* ReloadableXMLFile::lock()
 
         // Update the timestamp regardless. No point in repeatedly trying.
         m_filestamp=stat_buf.st_mtime;
+        Category::getInstance(XMLTOOLING_LOGCAT".ReloadableXMLFile").info("change detected, reloading local resource...");
     }
     else {
         if (isValid())
@@ -216,16 +217,21 @@ Lockable* ReloadableXMLFile::lock()
             m_lock->rdlock();
             return this;
         }
+        Category::getInstance(XMLTOOLING_LOGCAT".ReloadableXMLFile").info("local copy invalid, reloading remote resource...");
     }
     
     // Do this once...
-    do {
+    try {
         // At this point we're holding the write lock, so make sure we pop it.
         SharedLock lockwrap(m_lock,false);
         pair<bool,DOMElement*> ret=load();
         if (ret.first)
             ret.second->getOwnerDocument()->release();
-    } while(0);
+    } catch (exception& ex) {
+        Category::getInstance(XMLTOOLING_LOGCAT".ReloadableXMLFile").crit(
+            "maintaining existing configuration, error reloading resource (%s): %s", m_source.c_str(), ex.what()
+            );
+    }
     
     // If we made it here, the swap may or may not have worked, but we need to relock.
     m_lock->rdlock();

@@ -61,14 +61,6 @@ namespace xmltooling {
             delete m_lock;
         }
 
-    public:
-        Lockable* lock();
-
-        void unlock() {
-            if (m_lock)
-                m_lock->unlock();
-        }
-
         /**
          * Loads configuration material.
          * 
@@ -90,12 +82,31 @@ namespace xmltooling {
             return true;
         }
 
-    private:
+        /** Root of the original DOM element passed into constructor. */
         const DOMElement* m_root;
-        bool m_local, m_validate;
+        
+        /** Indicates whether resources is local or remote. */
+        bool m_local;
+        
+        /** Use a validating parser when parsing XML. */
+        bool m_validate;
+        
+        /** Resource location, may be a local path or a URI. */
         std::string m_source;
+        
+        /** Last modification of local resource. */
         time_t m_filestamp;
+        
+        /** Shared lock for guarding reloads. */
         RWLock* m_lock;
+
+    public:
+        Lockable* lock();
+
+        void unlock() {
+            if (m_lock)
+                m_lock->unlock();
+        }
     };
 
 };
