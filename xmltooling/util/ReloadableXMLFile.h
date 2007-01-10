@@ -28,6 +28,7 @@
 
 #include <ctime>
 #include <string>
+#include <xercesc/dom/DOM.hpp>
 
 namespace xmltooling {
 
@@ -55,7 +56,7 @@ namespace xmltooling {
          * 
          * @param e DOM to supply configuration
          */
-        ReloadableXMLFile(const DOMElement* e);
+        ReloadableXMLFile(const xercesc::DOMElement* e);
     
         virtual ~ReloadableXMLFile() {
             delete m_lock;
@@ -71,7 +72,7 @@ namespace xmltooling {
          * @return a pair consisting of a flag indicating whether to take ownership of
          *      the document, and the root element of the tree to load
          */
-        virtual std::pair<bool,DOMElement*> load();
+        virtual std::pair<bool,xercesc::DOMElement*> load();
         
         /**
          * Overrideable method to determine whether a remote resource remains valid.
@@ -83,7 +84,7 @@ namespace xmltooling {
         }
 
         /** Root of the original DOM element passed into constructor. */
-        const DOMElement* m_root;
+        const xercesc::DOMElement* m_root;
         
         /** Indicates whether resources is local or remote. */
         bool m_local;
