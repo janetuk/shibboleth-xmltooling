@@ -74,6 +74,11 @@ Envelope* SOAPClient::receive()
     if (!out)
         return NULL;    // nothing yet
     
+    // Check content type.
+    string s = m_transport->getContentType();
+    if (s.find("text/xml") == string::npos)
+        throw IOException("Incorrect content type ($1) for SOAP response.", params(1,s.c_str() ? s.c_str() : "none"));
+    
     // Parse and bind the document into an XMLObject.
     DOMDocument* doc = (m_validate ? XMLToolingConfig::getConfig().getValidatingParser()
         : XMLToolingConfig::getConfig().getParser()).parse(out); 
