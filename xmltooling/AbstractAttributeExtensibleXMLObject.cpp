@@ -80,7 +80,7 @@ void AbstractAttributeExtensibleXMLObject::setAttribute(const QName& qualifiedNa
 void AbstractAttributeExtensibleXMLObject::unmarshallExtensionAttribute(const DOMAttr* attribute)
 {
     QName q(attribute->getNamespaceURI(),attribute->getLocalName(),attribute->getPrefix());
-    bool ID = isRegisteredIDAttribute(q); 
+    bool ID = attribute->isId() || isRegisteredIDAttribute(q);
     setAttribute(q,attribute->getNodeValue(),ID);
     if (ID) {
         attribute->getOwnerElement()->setIdAttributeNode(attribute);
