@@ -41,18 +41,18 @@ namespace xmltooling {
         virtual ~MemoryStorageService();
         
         void createString(const char* context, const char* key, const char* value, time_t expiration);
-        bool readString(const char* context, const char* key, string* pvalue=NULL, time_t* pexpiration=NULL);
-        bool updateString(const char* context, const char* key, const char* value=NULL, time_t expiration=0);
+        int readString(const char* context, const char* key, string* pvalue=NULL, time_t* pexpiration=NULL, int version=0);
+        int updateString(const char* context, const char* key, const char* value=NULL, time_t expiration=0, int version=0);
         bool deleteString(const char* context, const char* key);
         
         void createText(const char* context, const char* key, const char* value, time_t expiration) {
             return createString(context, key, value, expiration);
         }
-        bool readText(const char* context, const char* key, string* pvalue=NULL, time_t* pexpiration=NULL) {
-            return readString(context, key, pvalue, pexpiration);
+        int readText(const char* context, const char* key, string* pvalue=NULL, time_t* pexpiration=NULL, int version=0) {
+            return readString(context, key, pvalue, pexpiration, version);
         }
-        bool updateText(const char* context, const char* key, const char* value=NULL, time_t expiration=0) {
-            return updateString(context, key, value, expiration);
+        int updateText(const char* context, const char* key, const char* value=NULL, time_t expiration=0, int version=0) {
+            return updateString(context, key, value, expiration, version);
         }
         bool deleteText(const char* context, const char* key) {
             return deleteString(context, key);
@@ -68,10 +68,11 @@ namespace xmltooling {
         void cleanup();
     
         struct XMLTOOL_DLLLOCAL Record {
-            Record() : expiration(0) {}
-            Record(string s, time_t t) : data(s), expiration(t) {}
+            Record() : expiration(0), version(1) {}
+            Record(const string& s, time_t t) : data(s), expiration(t), version(1) {}
             string data;
             time_t expiration;
+            int version;
         };
         
         struct XMLTOOL_DLLLOCAL Context {
@@ -158,15 +159,14 @@ void MemoryStorageService::cleanup()
 #ifdef _DEBUG
     NDC ndc("cleanup");
 #endif
-    
 
-    Mutex* mutex = Mutex::create();
+    auto_ptr<Mutex> mutex(Mutex::create());
     mutex->lock();
 
     m_log.info("cleanup thread started...running every %d seconds", m_cleanupInterval);
 
     while (!shutdown) {
-        shutdown_wait->timedwait(mutex, m_cleanupInterval);
+        shutdown_wait->timedwait(mutex.get(), m_cleanupInterval);
         if (shutdown)
             break;
         
@@ -182,7 +182,6 @@ void MemoryStorageService::cleanup()
     m_log.info("cleanup thread finished");
 
     mutex->unlock();
-    delete mutex;
     Thread::exit(NULL);
 }
 
@@ -242,24 +241,26 @@ void MemoryStorageService::createString(const char* context, const char* key, co
     m_log.debug("inserted record (%s) in context (%s)", key, context);
 }
 
-bool MemoryStorageService::readString(const char* context, const char* key, string* pvalue, time_t* pexpiration)
+int MemoryStorageService::readString(const char* context, const char* key, string* pvalue, time_t* pexpiration, int version)
 {
     Context& ctx = getContext(context);
 
     SharedLock wrapper(ctx.m_lock);
     map<string,Record>::iterator i=ctx.m_dataMap.find(key);
     if (i==ctx.m_dataMap.end())
-        return false;
+        return 0;
     else if (time(NULL) >= i->second.expiration)
-        return false;
+        return 0;
+    if (i->second.version == version)
+        return version; // nothing's changed, so just echo back the version
     if (pvalue)
         *pvalue = i->second.data;
     if (pexpiration)
         *pexpiration = i->second.expiration;
-    return true;
+    return i->second.version;
 }
 
-bool MemoryStorageService::updateString(const char* context, const char* key, const char* value, time_t expiration)
+int MemoryStorageService::updateString(const char* context, const char* key, const char* value, time_t expiration, int version)
 {
     Context& ctx = getContext(context);
 
@@ -269,12 +270,17 @@ bool MemoryStorageService::updateString(const char* context, const char* key, co
 
     map<string,Record>::iterator i=ctx.m_dataMap.find(key);
     if (i==ctx.m_dataMap.end())
-        return false;
+        return 0;
     else if (time(NULL) >= i->second.expiration)
-        return false;
-        
-    if (value)
+        return 0;
+    
+    if (version > 0 && version != i->second.version)
+        return -1;  // caller's out of sync
+
+    if (value) {
         i->second.data = value;
+        ++(i->second.version);
+    }
         
     if (expiration && expiration != i->second.expiration) {
         // Update secondary map.
@@ -291,7 +297,7 @@ bool MemoryStorageService::updateString(const char* context, const char* key, co
     }
 
     m_log.debug("updated record (%s) in context (%s)", key, context);
-    return true;
+    return i->second.version;
 }
 
 bool MemoryStorageService::deleteString(const char* context, const char* key)

@@ -59,16 +59,21 @@ namespace xmltooling {
         
         /**
          * Returns an existing "short" record from the storage service.
+         *
+         * <p>The version parameter can be set for "If-Modified-Since" semantics.
          * 
          * @param context       a storage context label
          * @param key           null-terminated unique key of up to 255 bytes
          * @param pvalue        location in which to return the record value
          * @param pexpiration   location in which to return the expiration timestamp
-         * @return  true iff a valid record exists and was returned   
+         * @param version       if > 0, only copy back data if newer than supplied version
+         * @return  the version of the record read back, or 0 if no record exists
          * 
          * @throws IOException  raised if errors occur in the read process 
          */
-        virtual bool readString(const char* context, const char* key, std::string* pvalue=NULL, time_t* pexpiration=NULL)=0;
+        virtual int readString(
+            const char* context, const char* key, std::string* pvalue=NULL, time_t* pexpiration=NULL, int version=0
+            )=0;
 
         /**
          * Updates an existing "short" record in the storage service.
@@ -77,11 +82,15 @@ namespace xmltooling {
          * @param key           null-terminated unique key of up to 255 bytes
          * @param value         null-terminated value of up to 255 bytes to store, or NULL to leave alone
          * @param expiration    a new expiration timestamp, or 0 to leave alone
-         * @return true iff the record exists and was updated
+         * @param version       if > 0, only update if the current version matches this value
+         * @return the version of the record after update, 0 if no record exists, or -1 if the version
+         *  parameter is non-zero and does not match the current version before update (so the caller is out of sync)
          *    
          * @throws IOException  raised if errors occur in the update process 
          */
-        virtual bool updateString(const char* context, const char* key, const char* value=NULL, time_t expiration=0)=0;
+        virtual int updateString(
+            const char* context, const char* key, const char* value=NULL, time_t expiration=0, int version=0
+            )=0;
         
         /**
          * Deletes an existing "short" record from the storage service.
@@ -108,16 +117,21 @@ namespace xmltooling {
         
         /**
          * Returns an existing "long" record from the storage service.
+         *
+         * <p>The version parameter can be set for "If-Modified-Since" semantics.
          * 
          * @param context       a storage context label
          * @param key           null-terminated unique key of up to 255 bytes
          * @param pvalue        location in which to return the record value
          * @param pexpiration   location in which to return the expiration timestamp
-         * @return  true iff a valid record exists and was returned   
+         * @param version       if > 0, only copy back data if newer than supplied version
+         * @return  the version of the record read back, or 0 if no record exists
          * 
          * @throws IOException  raised if errors occur in the read process 
          */
-        virtual bool readText(const char* context, const char* key, std::string* pvalue=NULL, time_t* pexpiration=NULL)=0;
+        virtual int readText(
+            const char* context, const char* key, std::string* pvalue=NULL, time_t* pexpiration=NULL, int version=0
+            )=0;
 
         /**
          * Updates an existing "long" record in the storage service.
@@ -126,11 +140,15 @@ namespace xmltooling {
          * @param key           null-terminated unique key of up to 255 bytes
          * @param value         null-terminated value of arbitrary length to store, or NULL to leave alone
          * @param expiration    a new expiration timestamp, or 0 to leave alone
-         * @return true iff the record exists and was updated
+         * @param version       if > 0, only update if the current version matches this value
+         * @return the version of the record after update, 0 if no record exists, or -1 if the version
+         *  parameter is non-zero and does not match the current version before update (so the caller is out of sync)
          *    
          * @throws IOException  raised if errors occur in the update process 
          */
-        virtual bool updateText(const char* context, const char* key, const char* value=NULL, time_t expiration=0)=0;
+        virtual int updateText(
+            const char* context, const char* key, const char* value=NULL, time_t expiration=0, int version=0
+            )=0;
         
         /**
          * Deletes an existing "long" record from the storage service.

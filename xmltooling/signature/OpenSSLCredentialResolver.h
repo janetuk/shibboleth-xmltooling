@@ -42,7 +42,7 @@ namespace xmlsignature {
         
         /**
          * Attaches credentials to an OpenSSL SSL context object.
-         * The resolver is unlockable after attachment.
+         * The resolver <strong>MUST</strong> be unlockable after attachment.
          * 
          * @param ctx   an SSL context
          */
