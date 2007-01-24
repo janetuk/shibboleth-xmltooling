@@ -268,7 +268,7 @@ namespace {
     };
 };
 
-void XMLHelper::serialize(const DOMNode* n, std::ostream& out)
+ostream& XMLHelper::serialize(const DOMNode* n, ostream& out)
 {
     static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
     static const XMLCh UTF8[]={ chLatin_U, chLatin_T, chLatin_F, chDigit_8, chNull };
@@ -279,15 +279,15 @@ void XMLHelper::serialize(const DOMNode* n, std::ostream& out)
     StreamFormatTarget target(out);
     if (!serializer->writeNode(&target,*n))
         throw XMLParserException("unable to serialize XML");
+    return out;
 }
 
 ostream& xmltooling::operator<<(ostream& ostr, const DOMNode& node)
 {
-    XMLHelper::serialize(&node, ostr);
-    return ostr;
+    return XMLHelper::serialize(&node, ostr);
 }
 
 ostream& xmltooling::operator<<(ostream& ostr, const XMLObject& obj)
 {
-    return ostr << obj.marshall();
+    return ostr << *(obj.marshall());
 }

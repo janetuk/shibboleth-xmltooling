@@ -239,8 +239,9 @@ namespace xmltooling {
          * 
          * @param n     node to serialize
          * @param out   stream to serialize element into
+         * @return reference to output stream
          */
-        static void serialize(const DOMNode* n, std::ostream& out);
+        static std::ostream& serialize(const DOMNode* n, std::ostream& out);
     };
 
     /**
