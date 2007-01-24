@@ -32,13 +32,13 @@ public:
             );
 
         string data;
-        TSM_ASSERT("Record found in storage.", !storage->readString("context", "foo1", &data));
+        TSM_ASSERT_EQUALS("Record found in storage.", 0, storage->readString("context", "foo1", &data));
         storage->createString("context", "foo1", "bar1", time(NULL) + 60);
         storage->createString("context", "foo2", "bar2", time(NULL) + 60);
-        TSM_ASSERT("Record not found in storage.", storage->readString("context", "foo1", &data));
+        TSM_ASSERT_EQUALS("Record not found in storage.", 1, storage->readString("context", "foo1", &data));
         TSM_ASSERT_EQUALS("Record value doesn't match.", data, "bar1");
-        TSM_ASSERT("Update failed.", storage->updateString("context", "foo2", "bar1"));
-        TSM_ASSERT("Record not found in storage.", storage->readString("context", "foo2", &data));
+        TSM_ASSERT_EQUALS("Update failed.", 2, storage->updateString("context", "foo2", "bar1", 0, 1));
+        TSM_ASSERT_EQUALS("Record not found in storage.", 2, storage->readString("context", "foo2", &data, NULL, 1));
         TSM_ASSERT_EQUALS("Record value doesn't match.", data, "bar1");
         TSM_ASSERT("Delete failed.", storage->deleteString("context", "foo2"));
         storage->reap("context");
