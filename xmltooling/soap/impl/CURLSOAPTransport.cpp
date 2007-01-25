@@ -80,6 +80,7 @@ namespace xmltooling {
             curl_easy_setopt(m_handle,CURLOPT_USERPWD,NULL);
             curl_easy_setopt(m_handle,CURLOPT_HEADERDATA,this);
             m_headers=curl_slist_append(m_headers,"Content-Type: text/xml");
+            m_headers=curl_slist_append(m_headers,"Transport-Encoding: chunked");
         }
         
         virtual ~CURLSOAPTransport() {
