@@ -26,7 +26,7 @@
 using namespace xmltooling;
 using namespace std;
 
-ReplayCache::ReplayCache(StorageService* storage) : m_storage(storage)
+ReplayCache::ReplayCache(StorageService* storage) : m_owned(storage==NULL), m_storage(storage)
 {
     if (!m_storage)
         m_storage = XMLToolingConfig::getConfig().StorageServiceManager.newPlugin(MEMORY_STORAGE_SERVICE, NULL);
@@ -34,7 +34,8 @@ ReplayCache::ReplayCache(StorageService* storage) : m_storage(storage)
 
 ReplayCache::~ReplayCache()
 {
-    delete m_storage;
+    if (m_owned)
+        delete m_storage;
 }
 
 bool ReplayCache::check(const char* context, const char* s, time_t expires)

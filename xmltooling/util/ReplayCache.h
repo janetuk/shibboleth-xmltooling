@@ -37,6 +37,9 @@ namespace xmltooling {
         
         /**
          * Creates a replay cache on top of a particular StorageService.
+         *
+         * The lifetime of the StorageService <strong>MUST</strong> be longer than
+         * the lifetime of the ReplayCache.
          * 
          * @param storage       pointer to a StorageService, or NULL to keep cache in memory
          */
@@ -59,6 +62,7 @@ namespace xmltooling {
         }
         
     private:
+        bool m_owned;
         StorageService* m_storage;
     };
 };
