@@ -17,7 +17,7 @@
 /**
  * @file AbstractXMLObjectUnmarshaller.h
  * 
- * A thread-safe abstract unmarshaller.
+ * A mix-in to implement object unmarshalling.
  */
 
 #ifndef __xmltooling_xmlunmarshaller_h__
@@ -33,7 +33,7 @@
 namespace xmltooling {
 
     /**
-     * A thread-safe abstract unmarshaller.
+     * A mix-in to implement object unmarshalling.
      */
     class XMLTOOL_API AbstractXMLObjectUnmarshaller : public virtual AbstractXMLObject
     {

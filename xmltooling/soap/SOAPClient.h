@@ -41,7 +41,13 @@ namespace soap11 {
     {
         MAKE_NONCOPYABLE(SOAPClient);
     public:
+        /**
+         * Constructor
+         * 
+         * @param validate  true iff schema validation should be used 
+         */
         SOAPClient(bool validate=false) : m_validate(validate), m_transport(NULL) {}
+        
         virtual ~SOAPClient();
         
         /**

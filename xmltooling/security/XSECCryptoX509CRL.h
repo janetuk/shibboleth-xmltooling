@@ -62,12 +62,16 @@ namespace xmltooling {
          */
         virtual XSECCryptoX509CRL* clone() const=0;
 
+        /**
+         * Load a Base64-encoded CRL into the object.
+         *
+         * @param buf buffer containing the base64-encoded CRL
+         * @param len number of bytes of data in the CRL buffer (0 if the string is null terminated)
+         */
     	virtual void loadX509CRLBase64Bin(const char* buf, unsigned int len)=0;
     
     	/**
     	 * Load a PEM encoded CRL into the object.
-    	 *
-    	 * Takes a PEM encoded CRL and loads it.
     	 *
     	 * @param buf buffer containing the PEM encoded CRL
     	 * @param len number of bytes of data in the CRL buffer (0 if the string is null terminated)

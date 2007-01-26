@@ -58,6 +58,11 @@ namespace xmlsignature {
 
         virtual void validate(const xmltooling::XMLObject* xmlObject) const;
 
+        /**
+         * Type-safe validator.
+         * 
+         * @param signature object to validate
+         */
         virtual void validate(const Signature* signature) const;
         
         /**
@@ -85,7 +90,10 @@ namespace xmlsignature {
         }
     
     protected:
+        /** Verification key. */
         XSECCryptoKey* m_key;
+        
+        /** KeyResolver to use against signature. */
         KeyResolver* m_resolver;
     };
 

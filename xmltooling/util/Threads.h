@@ -84,7 +84,7 @@ namespace xmltooling
          * 
          * @param seconds   time to sleep
          */
-        static void sleep(int secounds);        
+        static void sleep(int seconds);        
 #ifndef WIN32
         /**
          * Masks all signals from a thread. 

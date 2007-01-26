@@ -47,6 +47,7 @@ namespace xmltooling {
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
+    /// @cond OFF
     public:
         virtual ~AnyElementImpl() {}
 
@@ -62,9 +63,10 @@ namespace xmltooling {
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject,m_children.end());
         
         void marshallAttributes(DOMElement* domElement) const;
-        void processChildElement(XMLObject* childXMLObject, const DOMElement* root);
+        void processChildElement(XMLObject* childXMLObject, const DOMElement* childRoot);
         void processAttribute(const DOMAttr* attribute);
     };
+    /// @endcond
 
     /**
      * Builder for AnyElementImpl objects.

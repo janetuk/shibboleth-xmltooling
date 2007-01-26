@@ -206,6 +206,7 @@ namespace xmlsignature {
         xmltooling::XSECCryptoX509CRL* resolveCRL(const Signature* sig) const;
 
     protected:
+        /** Stores an explicit key. */
         XSECCryptoKey* m_key;
 
         /**

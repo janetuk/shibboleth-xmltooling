@@ -46,7 +46,7 @@ namespace xmltooling {
          * @param value  header value to send
          * @return  true iff the header is successfully set
          */
-        virtual bool setRequestHeader(const char* name, const char* val) const=0;
+        virtual bool setRequestHeader(const char* name, const char* value) const=0;
         
         /**
          * Returns the values of an HTTP response header.

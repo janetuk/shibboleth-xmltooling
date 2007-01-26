@@ -40,6 +40,11 @@ namespace xmltooling {
         MAKE_NONCOPYABLE(XercesJanitor);
         T* m_held;
     public:
+        /**
+         * Constructor
+         * 
+         * @param resource  object to release when leaving scope
+         */
         XercesJanitor(T* resource) : m_held(resource) {}
         
         ~XercesJanitor() {

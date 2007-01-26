@@ -30,6 +30,9 @@
 #include <xsec/utils/XSECSafeBuffer.hpp>
 
 namespace xmltooling {
+    /**
+     * OpenSSL-based class for handling X.509 CRLs
+     */
     class XMLTOOL_API OpenSSLCryptoX509CRL : public XSECCryptoX509CRL {
     public:
     	OpenSSLCryptoX509CRL() : mp_X509CRL(NULL), m_DERX509CRL("") {}
@@ -44,8 +47,19 @@ namespace xmltooling {
             return m_DERX509CRL;
         }
     
+        /**
+         * Constructor
+         * 
+         * @param x a native CRL object
+         */
     	OpenSSLCryptoX509CRL(X509_CRL* x);
-    	X509_CRL* getOpenSSLX509CRL(void) {
+        
+        /**
+         * Returns native CRL object.
+         * 
+         * @return  native CRL object, or NULL
+         */
+    	X509_CRL* getOpenSSLX509CRL() {
             return mp_X509CRL;
         }
 

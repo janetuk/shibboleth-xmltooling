@@ -201,6 +201,7 @@ namespace xmlsignature {
 #else
         virtual xmltooling::XMLObject* buildObject() const;
 #endif
+        /** Singleton builder. */
         static Signature* buildSignature() {
             const SignatureBuilder* b = dynamic_cast<const SignatureBuilder*>(
                 xmltooling::XMLObjectBuilder::getBuilder(

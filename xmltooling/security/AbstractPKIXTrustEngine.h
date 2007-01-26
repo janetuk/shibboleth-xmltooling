@@ -110,8 +110,14 @@ namespace xmltooling {
         class XMLTOOL_API PKIXValidationInfoIterator {
             MAKE_NONCOPYABLE(PKIXValidationInfoIterator);
         protected:
+            /** Reference to KeyResolver to use. */
             const xmlsignature::KeyResolver& m_keyResolver;
             
+            /**
+             * Constructor
+             * 
+             * @param keyResolver   reference to KeyResolver to use
+             */
             PKIXValidationInfoIterator(const xmlsignature::KeyResolver& keyResolver) : m_keyResolver(keyResolver) {}
             
         public:

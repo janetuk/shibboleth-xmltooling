@@ -15,7 +15,7 @@
  */
 
 /**
- * @file Encrypter.h
+ * @file xmltooling/encryption/Encrypter.h
  * 
  * Methods for encrypting XMLObjects and other data.
  */

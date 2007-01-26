@@ -28,6 +28,11 @@
 #include <xmltooling/util/XMLConstants.h>
 #include <xercesc/util/XMLUniDefs.hpp>
 
+/**
+ * Macro for declaring SOAP builders.
+ * 
+ * @param cname name of class being built
+ */
 #define DECL_SOAP11OBJECTBUILDER(cname) \
     DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,xmlconstants::SOAP11ENV_NS,xmlconstants::SOAP11ENV_PREFIX)
 

@@ -28,6 +28,11 @@
 #include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/util/XMLConstants.h>
 
+/**
+ * Macro for declaring signature builders.
+ * 
+ * @param cname name of class being built
+ */
 #define DECL_XMLSIGOBJECTBUILDER(cname) \
     DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,xmlconstants::XMLSIG_NS,xmlconstants::XMLSIG_PREFIX)
 

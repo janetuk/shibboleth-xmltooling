@@ -25,6 +25,11 @@
 
 #include <xmltooling/signature/KeyInfo.h>
 
+/**
+ * Macro for declaring encryption builders.
+ * 
+ * @param cname name of class being built
+ */
 #define DECL_XMLENCOBJECTBUILDER(cname) \
     DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,xmlconstants::XMLENC_NS,xmlconstants::XMLENC_PREFIX)
 

@@ -17,7 +17,7 @@
 /**
  * @file AbstractXMLObjectMarshaller.h
  * 
- * A thread-safe abstract marshaller.
+ * A mix-in to implement object marshalling with DOM reuse.
  */
 
 #if !defined(__xmltooling_xmlmarshaller_h__)
@@ -33,7 +33,7 @@
 namespace xmltooling {
 
     /**
-     * A thread-safe abstract marshaller.
+     * A mix-in to implement object marshalling with DOM reuse.
      */
     class XMLTOOL_API AbstractXMLObjectMarshaller : public virtual AbstractXMLObject
     {
@@ -72,22 +72,29 @@ namespace xmltooling {
                 document->appendChild(element);
         }
     
+#ifndef XMLTOOLING_NO_XMLSEC
         /**
          * Marshalls the XMLObject into the given DOM Element.
          * The DOM Element must be within a DOM tree rooted in the owning Document.
          * 
          * @param targetElement the Element into which the XMLObject is marshalled into
-         * @param ctx           optional marshalling context
+         * @param sigs          optional array of signatures to create after marshalling          
          * 
          * @throws MarshallingException thrown if there is a problem marshalling the object
          * @throws SignatureException thrown if a problem occurs during signature creation 
          */
-        void marshallInto(
-            DOMElement* targetElement
-#ifndef XMLTOOLING_NO_XMLSEC
-            ,const std::vector<xmlsignature::Signature*>* sigs
+        void marshallInto(DOMElement* targetElement, const std::vector<xmlsignature::Signature*>* sigs) const;
+#else
+        /**
+         * Marshalls the XMLObject into the given DOM Element.
+         * The DOM Element must be within a DOM tree rooted in the owning Document.
+         * 
+         * @param targetElement the Element into which the XMLObject is marshalled into
+         * 
+         * @throws MarshallingException thrown if there is a problem marshalling the object
+         */
+        void marshallInto(DOMElement* targetElement) const;
 #endif
-            ) const;
     
         /**
          * Creates an xsi:type attribute, corresponding to the given type of the XMLObject, on the DOM element.

@@ -15,9 +15,9 @@
  */
 
 /**
- * @file Encrypter.h
+ * @file xmltooling/encryption/Decrypter.h
  * 
- * Methods for encrypting XMLObjects and other data.
+ * Wrapper API for XML Decryption functionality.
  */
 
 #if !defined(__xmltooling_decrypter_h__) && !defined(XMLTOOLING_NO_XMLSEC)

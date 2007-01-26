@@ -56,8 +56,15 @@ namespace xmltooling {
          */
         virtual bool check(const char* context, const char* s, time_t expires);
     
-        bool check(const char* context, const XMLCh* str, time_t expires) {
-            auto_ptr_char temp(str);
+        /**
+         * Returns true iff the check value is not found in the cache, and stores it.
+         * 
+         * @param context   a context label to subdivide the cache
+         * @param s         value to check
+         * @param expires   time for disposal of value from cache
+         */
+        bool check(const char* context, const XMLCh* s, time_t expires) {
+            auto_ptr_char temp(s);
             return check(context, temp.get(), expires);
         }
         
