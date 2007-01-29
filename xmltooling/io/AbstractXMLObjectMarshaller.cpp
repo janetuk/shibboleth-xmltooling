@@ -242,6 +242,7 @@ public:
             XMLString::catString(xmlns,colon);
             XMLString::catString(xmlns,prefix);
             domElement->setAttributeNS(XMLNS_NS, xmlns, uri);
+            XMLString::release(&xmlns);
         }
         else {
             domElement->setAttributeNS(XMLNS_NS, XMLNS_PREFIX, uri);
