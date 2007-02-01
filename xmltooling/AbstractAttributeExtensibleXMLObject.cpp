@@ -94,7 +94,7 @@ void AbstractAttributeExtensibleXMLObject::marshallExtensionAttributes(DOMElemen
         if (i->first.hasPrefix())
             attr->setPrefix(i->first.getPrefix());
         attr->setNodeValue(i->second);
-        domElement->setAttributeNode(attr);
+        domElement->setAttributeNodeNS(attr);
         if (m_idAttribute==i)
             domElement->setIdAttributeNode(attr);
     }
