@@ -171,6 +171,14 @@ namespace xmltooling {
         virtual void reap(const char* context)=0;
         
         /**
+         * Updates the expiration time of all records in the context.
+         * 
+         * @param context       a storage context label
+         * @param expiration    a new expiration timestamp
+         */
+        virtual void updateContext(const char* context, time_t expiration)=0;
+
+        /**
          * Forcibly removes all records in a given context along with any
          * associated resources devoted to maintaining the context.
          * 

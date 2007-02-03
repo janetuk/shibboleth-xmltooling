@@ -59,6 +59,7 @@ namespace xmltooling {
         }
         
         void reap(const char* context);
+        void updateContext(const char* context, time_t expiration);
         void deleteContext(const char* context) {
             Lock wrapper(contextLock);
             m_contextMap.erase(context);
@@ -79,14 +80,12 @@ namespace xmltooling {
             Context() : m_lock(RWLock::create()) {}
             Context(const Context& src) {
                 m_dataMap = src.m_dataMap;
-                m_expMap = src.m_expMap;
                 m_lock = RWLock::create();
             }
             ~Context() { delete m_lock; }
             map<string,Record> m_dataMap;
-            multimap<time_t,string> m_expMap;
             RWLock* m_lock;
-            unsigned long reap();
+            unsigned long reap(time_t exp);
         };
 
         Context& getContext(const char* context) {
@@ -102,13 +101,14 @@ namespace xmltooling {
         bool shutdown;
         int m_cleanupInterval;
         Category& m_log;
+
+        friend class _expcheck;
     };
 
     StorageService* XMLTOOL_DLLLOCAL MemoryStorageServiceFactory(const DOMElement* const & e)
     {
         return new MemoryStorageService(e);
     }
-
 };
 
 static const XMLCh cleanupInterval[] = UNICODE_LITERAL_15(c,l,e,a,n,u,p,I,n,t,e,r,v,a,l);
@@ -122,7 +122,7 @@ MemoryStorageService::MemoryStorageService(const DOMElement* e)
         m_cleanupInterval = XMLString::parseInt(tag);
     }
     if (!m_cleanupInterval)
-        m_cleanupInterval=300;
+        m_cleanupInterval=900;
 
     contextLock = Mutex::create();
     shutdown_wait = CondWait::create();
@@ -171,12 +171,13 @@ void MemoryStorageService::cleanup()
             break;
         
         unsigned long count=0;
+        time_t now = time(NULL);
         Lock wrapper(contextLock);
         for (map<string,Context>::iterator i=m_contextMap.begin(); i!=m_contextMap.end(); ++i)
-            count += i->second.reap();
+            count += i->second.reap(now);
         
         if (count)
-            m_log.info("purged %d record(s) from storage", count);
+            m_log.info("purged %d expired record(s) from storage", count);
     }
 
     m_log.info("cleanup thread finished");
@@ -187,10 +188,10 @@ void MemoryStorageService::cleanup()
 
 void MemoryStorageService::reap(const char* context)
 {
-    getContext(context).reap();
+    getContext(context).reap(time(NULL));
 }
 
-unsigned long MemoryStorageService::Context::reap()
+unsigned long MemoryStorageService::Context::reap(time_t exp)
 {
     // Lock the "database".
     m_lock->wrlock();
@@ -198,12 +199,18 @@ unsigned long MemoryStorageService::Context::reap()
     
     // Garbage collect any expired entries.
     unsigned long count=0;
-    multimap<time_t,string>::iterator stop=m_expMap.upper_bound(time(NULL));
-    for (multimap<time_t,string>::iterator i=m_expMap.begin(); i!=stop; m_expMap.erase(i++)) {
-        m_dataMap.erase(i->second);
-        ++count;
+    map<string,Record>::iterator cur = m_dataMap.begin();
+    map<string,Record>::const_iterator stop = m_dataMap.end();
+    while (cur != stop) {
+        if (cur->second.expiration <= exp) {
+            map<string,Record>::iterator tmp = cur++;
+            m_dataMap.erase(tmp);
+            ++count;
+        }
+        else {
+            cur++;
+        }
     }
-
     return count;
 }
 
@@ -222,21 +229,10 @@ void MemoryStorageService::createString(const char* context, const char* key, co
         if (time(NULL) < i->second.expiration)
             throw IOException("attempted to insert a record with duplicate key ($1)", params(1,key));
         // It's dead, so we can just remove it now and create the new record.
-        // Now find the reversed index of expiration to key, so we can clear it.
-        pair<multimap<time_t,string>::iterator,multimap<time_t,string>::iterator> range =
-            ctx.m_expMap.equal_range(i->second.expiration);
-        for (; range.first != range.second; ++range.first) {
-            if (range.first->second == i->first) {
-                ctx.m_expMap.erase(range.first);
-                break;
-            }
-        }
-        // And finally delete the record itself.
         ctx.m_dataMap.erase(i);
     }
     
     ctx.m_dataMap[key]=Record(value,expiration);
-    ctx.m_expMap.insert(multimap<time_t,string>::value_type(expiration,key));
     
     m_log.debug("inserted record (%s) in context (%s)", key, context);
 }
@@ -264,7 +260,7 @@ int MemoryStorageService::updateString(const char* context, const char* key, con
 {
     Context& ctx = getContext(context);
 
-    // Lock the maps.
+    // Lock the map.
     ctx.m_lock->wrlock();
     SharedLock wrapper(ctx.m_lock, false);
 
@@ -282,19 +278,8 @@ int MemoryStorageService::updateString(const char* context, const char* key, con
         ++(i->second.version);
     }
         
-    if (expiration && expiration != i->second.expiration) {
-        // Update secondary map.
-        pair<multimap<time_t,string>::iterator,multimap<time_t,string>::iterator> range =
-            ctx.m_expMap.equal_range(i->second.expiration);
-        for (; range.first != range.second; ++range.first) {
-            if (range.first->second == i->first) {
-                ctx.m_expMap.erase(range.first);
-                break;
-            }
-        }
+    if (expiration && expiration != i->second.expiration)
         i->second.expiration = expiration;
-        ctx.m_expMap.insert(multimap<time_t,string>::value_type(expiration,key));
-    }
 
     m_log.debug("updated record (%s) in context (%s)", key, context);
     return i->second.version;
@@ -304,23 +289,13 @@ bool MemoryStorageService::deleteString(const char* context, const char* key)
 {
     Context& ctx = getContext(context);
 
-    // Lock the maps.
+    // Lock the map.
     ctx.m_lock->wrlock();
     SharedLock wrapper(ctx.m_lock, false);
     
     // Find the record.
     map<string,Record>::iterator i=ctx.m_dataMap.find(key);
     if (i!=ctx.m_dataMap.end()) {
-        // Now find the reversed index of expiration to key, so we can clear it.
-        pair<multimap<time_t,string>::iterator,multimap<time_t,string>::iterator> range =
-            ctx.m_expMap.equal_range(i->second.expiration);
-        for (; range.first != range.second; ++range.first) {
-            if (range.first->second == i->first) {
-                ctx.m_expMap.erase(range.first);
-                break;
-            }
-        }
-        // And finally delete the record itself.
         ctx.m_dataMap.erase(i);
         m_log.debug("deleted record (%s) in context (%s)", key, context);
         return true;
@@ -328,4 +303,22 @@ bool MemoryStorageService::deleteString(const char* context, const char* key)
 
     m_log.debug("deleting record (%s) in context (%s)....not found", key, context);
     return false;
+}
+
+void MemoryStorageService::updateContext(const char* context, time_t expiration)
+{
+    Context& ctx = getContext(context);
+
+    // Lock the map.
+    ctx.m_lock->wrlock();
+    SharedLock wrapper(ctx.m_lock, false);
+
+    time_t now = time(NULL);
+    map<string,Record>::const_iterator stop=ctx.m_dataMap.end();
+    for (map<string,Record>::iterator i = ctx.m_dataMap.begin(); i!=stop; ++i) {
+        if (now >= i->second.expiration)
+            i->second.expiration = expiration;
+    }
+
+    m_log.debug("updated expiration of valid records in context (%s)", context);
 }
