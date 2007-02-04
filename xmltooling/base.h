@@ -1509,6 +1509,19 @@ namespace xmltooling {
          */
         void operator()(const std::pair<A,B*>& p) {delete p.second;}
     };
+
+    /**
+     * Functor for cleaning up const heap objects in key/value containers.
+     */
+    template<class A,class B> struct cleanup_const_pair
+    {
+        /**
+         * Function operator to delete an object stored as const
+         * 
+         * @param p   a pair in which the second component is the const object to delete
+         */
+        void operator()(const std::pair<A,const B*>& p) {delete const_cast<B*>(p.second);}
+    };
 };
 
 #endif /* __xmltooling_base_h__ */
