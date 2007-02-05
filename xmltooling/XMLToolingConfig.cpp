@@ -42,6 +42,7 @@
 #endif
 
 #include <stdexcept>
+#include <curl/curl.h>
 #include <log4cpp/Category.hh>
 #include <log4cpp/PropertyConfigurator.hh>
 #include <log4cpp/OstreamAppender.hh>
@@ -75,7 +76,23 @@ DECL_XMLTOOLING_EXCEPTION_FACTORY(IOException,xmltooling);
 #endif
 
 namespace xmltooling {
-   XMLToolingInternalConfig g_config;
+    static XMLToolingInternalConfig g_config;
+    static vector<Mutex*> g_openssl_locks;
+
+    extern "C" void openssl_locking_callback(int mode,int n,const char *file,int line)
+    {
+        if (mode & CRYPTO_LOCK)
+            g_openssl_locks[n]->lock();
+        else
+            g_openssl_locks[n]->unlock();
+    }
+    
+    #ifndef WIN32
+    extern "C" unsigned long openssl_thread_id(void)
+    {
+        return (unsigned long)(pthread_self());
+    }
+    #endif
 }
 
 XMLToolingConfig& XMLToolingConfig::getConfig()
@@ -168,6 +185,12 @@ bool XMLToolingInternalConfig::init()
     try {
         log.debug("library initialization started");
 
+        if (curl_global_init(CURL_GLOBAL_ALL)) {
+            log.fatal("failed to initialize libcurl, OpenSSL, or Winsock");
+            return false;
+        }
+        log.debug("libcurl %s initialization complete", LIBCURL_VERSION);
+
         xercesc::XMLPlatformUtils::Initialize();
         log.debug("Xerces initialization complete");
 
@@ -232,8 +255,17 @@ bool XMLToolingInternalConfig::init()
     }
     catch (const xercesc::XMLException&) {
         log.fatal("caught exception while initializing Xerces");
+        curl_global_cleanup();
         return false;
     }
+
+    // Set up OpenSSL locking.
+    for (int i=0; i<CRYPTO_num_locks(); i++)
+        g_openssl_locks.push_back(Mutex::create());
+    CRYPTO_set_locking_callback(openssl_locking_callback);
+#ifndef WIN32
+    CRYPTO_set_id_callback(openssl_thread_id);
+#endif
 
     log.info("library initialization complete");
     return true;
@@ -241,6 +273,10 @@ bool XMLToolingInternalConfig::init()
 
 void XMLToolingInternalConfig::term()
 {
+    CRYPTO_set_locking_callback(NULL);
+    for_each(g_openssl_locks.begin(), g_openssl_locks.end(), xmltooling::cleanup<Mutex>());
+    g_openssl_locks.clear();
+
     SchemaValidators.destroyValidators();
     XMLObjectBuilder::destroyBuilders();
     XMLToolingException::deregisterFactories();
@@ -293,6 +329,8 @@ void XMLToolingInternalConfig::term()
     m_lock=NULL;
     xercesc::XMLPlatformUtils::Terminate();
 
+    curl_global_cleanup();
+    
  #ifdef _DEBUG
     xmltooling::NDC ndc("term");
 #endif
