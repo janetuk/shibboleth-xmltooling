@@ -119,10 +119,10 @@ namespace xmltooling {
     void XMLTOOL_API registerTrustEngines();
 
     /** TrustEngine based on explicit knowledge of peer key information. */
-    #define EXPLICIT_KEY_TRUSTENGINE  "org.opensaml.xmltooling.security.ExplicitKeyTrustEngine"
+    #define EXPLICIT_KEY_TRUSTENGINE  "ExplicitKey"
     
     /** TrustEngine that tries multiple engines in sequence. */
-    #define CHAINING_TRUSTENGINE  "org.opensaml.xmltooling.security.ChainingTrustEngine"
+    #define CHAINING_TRUSTENGINE  "Chaining"
     
 };
 

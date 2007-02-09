@@ -236,10 +236,10 @@ namespace xmlsignature {
     void XMLTOOL_API registerKeyResolvers();
 
     /** KeyResolver based on hard-wired key */
-    #define FILESYSTEM_KEY_RESOLVER  "org.opensaml.xmlooling.FilesystemKeyResolver"
+    #define FILESYSTEM_KEY_RESOLVER  "File"
 
     /** KeyResolver based on extracting information directly out of a KeyInfo */
-    #define INLINE_KEY_RESOLVER  "org.opensaml.xmlooling.InlineKeyResolver"
+    #define INLINE_KEY_RESOLVER  "Inline"
 };
 
 #endif /* __xmltooling_keyres_h__ */

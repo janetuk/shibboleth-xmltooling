@@ -196,7 +196,7 @@ namespace xmltooling {
     void XMLTOOL_API registerStorageServices();
 
     /** StorageService based on in-memory caching. */
-    #define MEMORY_STORAGE_SERVICE  "org.opensaml.xmlooling.MemoryStorageService"
+    #define MEMORY_STORAGE_SERVICE  "Memory"
 };
 
 #endif /* __xmltooling_storage_h__ */

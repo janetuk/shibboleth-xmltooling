@@ -66,7 +66,7 @@ namespace xmlsignature {
     void XMLTOOL_API registerCredentialResolvers();
 
     /** CredentialResolver based on local files */
-    #define FILESYSTEM_CREDENTIAL_RESOLVER  "org.opensaml.xmlooling.FilesystemCredentialResolver"
+    #define FILESYSTEM_CREDENTIAL_RESOLVER  "File"
 };
 
 #endif /* __xmltooling_credres_h__ */
