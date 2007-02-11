@@ -227,15 +227,15 @@ DOMInputSource* ParserPool::resolveEntity(const XMLCh* const publicId, const XML
     if (i!=m_schemaLocMap.end())
         return new Wrapper4InputSource(new LocalFileInputSource(baseURI,i->second.c_str()));
 
-    // We'll allow anything without embedded slashes.
-    if (XMLString::indexOf(systemId, chForwardSlash)==-1)
-        return new Wrapper4InputSource(new LocalFileInputSource(baseURI,systemId));
-
     // Check for entity as a value in the map.
     for (i=m_schemaLocMap.begin(); i!=m_schemaLocMap.end(); ++i) {
         if (XMLString::endsWith(i->second.c_str(), systemId))
             return new Wrapper4InputSource(new LocalFileInputSource(baseURI,i->second.c_str()));
     }
+
+    // We'll allow anything without embedded slashes.
+    if (XMLString::indexOf(systemId, chForwardSlash)==-1)
+        return new Wrapper4InputSource(new LocalFileInputSource(baseURI,systemId));
 #else
     // Find well-known schemas in the specified location.
     auto_ptr_char temp(systemId);
@@ -245,10 +245,6 @@ DOMInputSource* ParserPool::resolveEntity(const XMLCh* const publicId, const XML
         return new Wrapper4InputSource(new LocalFileInputSource(baseURI,temp2.get()));
     }
 
-    // We'll allow anything without embedded slashes.
-    if (XMLString::indexOf(systemId, chForwardSlash)==-1)
-        return new Wrapper4InputSource(new LocalFileInputSource(baseURI,systemId));
-
     // Check for entity as a value in the map.
     for (i=m_schemaLocMap.begin(); i!=m_schemaLocMap.end(); ++i) {
         if (XMLString::endsWith(i->second.c_str(), temp.get())) {
@@ -256,6 +252,10 @@ DOMInputSource* ParserPool::resolveEntity(const XMLCh* const publicId, const XML
             return new Wrapper4InputSource(new LocalFileInputSource(baseURI,temp2.get()));
         }
     }
+
+    // We'll allow anything without embedded slashes.
+    if (XMLString::indexOf(systemId, chForwardSlash)==-1)
+        return new Wrapper4InputSource(new LocalFileInputSource(baseURI,systemId));
 #endif    
 
     // Shortcircuit the request.
