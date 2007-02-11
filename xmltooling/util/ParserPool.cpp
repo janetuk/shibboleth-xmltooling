@@ -262,7 +262,7 @@ DOMInputSource* ParserPool::resolveEntity(const XMLCh* const publicId, const XML
 #ifdef HAVE_GOOD_STL
     auto_ptr_char temp(systemId);
 #endif
-    log.warn("unauthorized entity request (%s), blocking it", temp.get());
+    log.debug("unauthorized entity request (%s), blocking it", temp.get());
     static const XMLByte nullbuf[] = {0};
     return new Wrapper4InputSource(new MemBufInputSource(nullbuf,0,systemId));
 }
