@@ -91,7 +91,7 @@ namespace xmltooling {
         T* newPlugin(const std::string& type, const Params& p) {
             typename std::map<std::string, typename PluginManager::Factory*>::const_iterator i=m_map.find(type);
             if (i==m_map.end())
-                throw UnknownExtensionException("Unable to build plugin of type '$1'",params(1,type.c_str()));
+                throw UnknownExtensionException("Unknown plugin type ('$1')",params(1,type.c_str()));
             return i->second(p);
         }
         
