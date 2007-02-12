@@ -37,7 +37,7 @@ using namespace std;
 
 SOAPClient::~SOAPClient()
 {
-    reset();
+    delete m_transport;
 }
 
 void SOAPClient::reset()
