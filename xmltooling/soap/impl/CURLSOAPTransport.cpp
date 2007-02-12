@@ -520,7 +520,7 @@ CURLcode xmltooling::xml_ssl_ctx_callback(CURL* curl, SSL_CTX* ssl_ctx, void* us
     }
 #endif
         
-    if (!conf->m_ssl_callback(conf, ssl_ctx, conf->m_ssl_userptr))
+    if (conf->m_ssl_callback && !conf->m_ssl_callback(conf, ssl_ctx, conf->m_ssl_userptr))
         return CURLE_SSL_CERTPROBLEM;
         
     return CURLE_OK;
