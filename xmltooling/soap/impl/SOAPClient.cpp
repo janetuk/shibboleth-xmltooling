@@ -46,7 +46,7 @@ void SOAPClient::reset()
     m_transport=NULL;
 }
 
-void SOAPClient::send(const Envelope* env, const KeyInfoSource& peer, const char* endpoint)
+void SOAPClient::send(const Envelope& env, const KeyInfoSource& peer, const char* endpoint)
 {
     // Prepare a transport object.
     const char* pch = strchr(endpoint,':');
@@ -58,7 +58,7 @@ void SOAPClient::send(const Envelope* env, const KeyInfoSource& peer, const char
     
     // Serialize envelope.
     stringstream s;
-    s << *env;
+    s << env;
     
     // Send to peer.
     m_transport->send(s);

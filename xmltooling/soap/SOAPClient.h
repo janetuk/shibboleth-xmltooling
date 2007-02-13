@@ -72,7 +72,7 @@ namespace soap11 {
          * @param peer      peer to send message to, expressed in TrustEngine terms
          * @param endpoint  URL of endpoint to recieve message
          */
-        virtual void send(const Envelope* env, const xmltooling::KeyInfoSource& peer, const char* endpoint);
+        virtual void send(const Envelope& env, const xmltooling::KeyInfoSource& peer, const char* endpoint);
         
         /**
          * Returns the response message, if any. As long as a response is
