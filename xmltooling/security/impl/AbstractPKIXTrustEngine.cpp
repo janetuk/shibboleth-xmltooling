@@ -136,7 +136,7 @@ namespace {
         sk_X509_free(CAstack);
     
         if (ret==1) {
-            log.info("successfully validated certificate chain");
+            log.debug("successfully validated certificate chain");
             return true;
         }
         
@@ -186,7 +186,7 @@ bool AbstractPKIXTrustEngine::checkEntityNames(X509* certEE, const KeyInfoSource
             buf[len] = '\0';
             subjectstr+=buf;
         }
-        log.infoStream() << "certificate subject: " << subjectstr << CategoryStream::ENDLINE;
+        log.debugStream() << "certificate subject: " << subjectstr << CategoryStream::ENDLINE;
         // The flags give us LDAP order instead of X.500, with a comma plus space separator.
         len=X509_NAME_print_ex(b2,subject,0,XN_FLAG_RFC2253 + XN_FLAG_SEP_CPLUS_SPC - XN_FLAG_SEP_COMMA_PLUS);
         BIO_flush(b2);
@@ -202,7 +202,7 @@ bool AbstractPKIXTrustEngine::checkEntityNames(X509* certEE, const KeyInfoSource
 #else
             if (!stricmp(n->c_str(),subjectstr.c_str()) || !stricmp(n->c_str(),subjectstr2.c_str())) {
 #endif
-                log.info("matched full subject DN to a key name (%s)", n->c_str());
+                log.debug("matched full subject DN to a key name (%s)", n->c_str());
                 BIO_free(b);
                 BIO_free(b2);
                 return true;
@@ -228,7 +228,7 @@ bool AbstractPKIXTrustEngine::checkEntityNames(X509* certEE, const KeyInfoSource
                         if ((check->type==GEN_DNS && !strnicmp(altptr,n->c_str(),altlen))
 #endif
                                 || (check->type==GEN_URI && !strncmp(altptr,n->c_str(),altlen))) {
-                            log.info("matched DNS/URI subjectAltName to a key name (%s)", n->c_str());
+                            log.debug("matched DNS/URI subjectAltName to a key name (%s)", n->c_str());
                             GENERAL_NAMES_free(altnames);
                             return true;
                         }
@@ -247,7 +247,7 @@ bool AbstractPKIXTrustEngine::checkEntityNames(X509* certEE, const KeyInfoSource
 #else
                 if (!stricmp(buf,n->c_str())) {
 #endif
-                    log.info("matched subject CN to a key name (%s)", n->c_str());
+                    log.debug("matched subject CN to a key name (%s)", n->c_str());
                     return true;
                 }
             }
@@ -282,7 +282,7 @@ bool AbstractPKIXTrustEngine::validate(
     if (checkName) {
         log.debug("checking that the certificate name is acceptable");
         if (!checkEntityNames(certEE,keyInfoSource)) {
-            log.error("certificate name was not acceptable");
+            log.debug("certificate name was not acceptable");
             return false;
         }
     }
@@ -298,7 +298,7 @@ bool AbstractPKIXTrustEngine::validate(
         }
     }
 
-    log.error("failed to validate certificate chain using supplied PKIX information");
+    log.debug("failed to validate certificate chain using supplied PKIX information");
     return false;
 }
 
@@ -310,25 +310,21 @@ bool AbstractPKIXTrustEngine::validate(
     const KeyResolver* keyResolver
     ) const
 {
-    if (!certEE) {
 #ifdef _DEBUG
         NDC ndc("validate");
 #endif
+    if (!certEE) {
         Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine").error("X.509 credential was NULL, unable to perform validation");
         return false;
     }
     else if (certEE->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
-#ifdef _DEBUG
-        NDC ndc("validate");
-#endif
         Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine").error("only the OpenSSL XSEC provider is supported");
         return false;
     }
 
     STACK_OF(X509)* untrusted=sk_X509_new_null();
-    for (vector<XSECCryptoX509*>::const_iterator i=certChain.begin(); i!=certChain.end(); ++i) {
+    for (vector<XSECCryptoX509*>::const_iterator i=certChain.begin(); i!=certChain.end(); ++i)
         sk_X509_push(untrusted,static_cast<OpenSSLCryptoX509*>(*i)->getOpenSSLX509());
-    }
 
     bool ret = validate(static_cast<OpenSSLCryptoX509*>(certEE)->getOpenSSLX509(),untrusted,keyInfoSource,checkName,keyResolver);
     sk_X509_free(untrusted);
@@ -363,7 +359,7 @@ bool AbstractPKIXTrustEngine::validate(
         try {
             keyValidator.setKey((*i)->clonePublicKey());
             keyValidator.validate(&sig);
-            log.info("signature verified with key inside signature, attempting certificate validation...");
+            log.debug("signature verified with key inside signature, attempting certificate validation...");
             certEE=(*i);
         }
         catch (ValidationException&) {
@@ -374,7 +370,7 @@ bool AbstractPKIXTrustEngine::validate(
     if (certEE)
         return validate(certEE,certs.v(),keyInfoSource,true,keyResolver);
         
-    log.error("failed to verify signature with embedded certificates");
+    log.debug("failed to verify signature with embedded certificates");
     return false;
 }
 
@@ -410,7 +406,7 @@ bool AbstractPKIXTrustEngine::validate(
         try {
             auto_ptr<XSECCryptoKey> key((*i)->clonePublicKey());
             if (Signature::verifyRawSignature(key.get(), sigAlgorithm, sig, in, in_len)) {
-                log.info("signature verified with key inside signature, attempting certificate validation...");
+                log.debug("signature verified with key inside signature, attempting certificate validation...");
                 certEE=(*i);
             }
         }
@@ -422,6 +418,6 @@ bool AbstractPKIXTrustEngine::validate(
     if (certEE)
         return validate(certEE,certs.v(),keyInfoSource,true,keyResolver);
         
-    log.error("failed to verify signature with embedded certificates");
+    log.debug("failed to verify signature with embedded certificates");
     return false;
 }

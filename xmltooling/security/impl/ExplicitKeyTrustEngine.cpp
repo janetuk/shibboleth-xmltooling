@@ -105,13 +105,11 @@ bool ExplicitKeyTrustEngine::validate(
             try {
                 sigValidator.setKey(key);   // key now owned by validator
                 sigValidator.validate(&sig);
-                log.info("signature validated with public key");
+                log.debug("signature validated with public key");
                 return true;
             }
             catch (ValidationException& e) {
-                if (log.isDebugEnabled()) {
-                    log.debug("public key did not validate signature: %s", e.what());
-                }
+                log.debug("public key did not validate signature: %s", e.what());
             }
         }
         else {
@@ -151,7 +149,7 @@ bool ExplicitKeyTrustEngine::validate(
             log.debug("attempting to validate signature with public key...");
             try {
                 if (Signature::verifyRawSignature(key.get(), sigAlgorithm, sig, in, in_len)) {
-                    log.info("signature validated with public key");
+                    log.debug("signature validated with public key");
                     return true;
                 }
             }
@@ -178,17 +176,14 @@ bool ExplicitKeyTrustEngine::validate(
     const KeyResolver* keyResolver
     ) const
 {
-    if (!certEE) {
 #ifdef _DEBUG
         NDC ndc("validate");
 #endif
+    if (!certEE) {
         Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine").error("unable to validate, end-entity certificate was null");
         return false;
     }
     else if (certEE->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
-#ifdef _DEBUG
-        NDC ndc("validate");
-#endif
         Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine").error("only the OpenSSL XSEC provider is supported");
         return false;
     }
@@ -239,7 +234,7 @@ bool ExplicitKeyTrustEngine::validate(
                     EVP_PKEY* evp = certEE->cert_info->key->pkey;
                     if (rsa && evp && evp->type == EVP_PKEY_RSA &&
                             BN_cmp(rsa->n,evp->pkey.rsa->n) == 0 && BN_cmp(rsa->e,evp->pkey.rsa->e) != 0) {
-                        log.info("end-entity certificate matches peer RSA key information");
+                        log.debug("end-entity certificate matches peer RSA key information");
                         return true;
                     }
                     break;
@@ -250,7 +245,7 @@ bool ExplicitKeyTrustEngine::validate(
                     DSA* dsa = static_cast<OpenSSLCryptoKeyDSA*>(key.get())->getOpenSSLDSA();
                     EVP_PKEY* evp = certEE->cert_info->key->pkey;
                     if (dsa && evp && evp->type == EVP_PKEY_DSA && BN_cmp(dsa->pub_key,evp->pkey.dsa->pub_key) == 0) {
-                        log.info("end-entity certificate matches peer DSA key information");
+                        log.debug("end-entity certificate matches peer DSA key information");
                         return true;
                     }
                     break;

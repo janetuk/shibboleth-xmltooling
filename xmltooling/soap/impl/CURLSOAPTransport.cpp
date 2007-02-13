@@ -399,12 +399,10 @@ void CURLSOAPTransport::send(istream& in)
     curl_easy_setopt(m_handle,CURLOPT_SSL_VERIFYPEER,0);
 
     // Make the call.
-    log.info("sending SOAP message to %s", m_endpoint.c_str());
+    log.debug("sending SOAP message to %s", m_endpoint.c_str());
     if (curl_easy_perform(m_handle) != CURLE_OK) {
-        log.error("failed communicating with SOAP endpoint: %s",
-            (curl_errorbuf[0] ? curl_errorbuf : "no further information available"));
         throw IOException(
-            string("CURLSOAPTransport::send() failed while contacting SOAP responder: ") +
+            string("CURLSOAPTransport failed while contacting SOAP responder: ") +
                 (curl_errorbuf[0] ? curl_errorbuf : "no further information available"));
     }
 }
@@ -468,7 +466,8 @@ int xmltooling::curl_debug_hook(CURL* handle, curl_infotype type, char* data, si
 #ifndef XMLTOOLING_NO_XMLSEC
 int xmltooling::verify_callback(X509_STORE_CTX* x509_ctx, void* arg)
 {
-    Category::getInstance("OpenSSL").debug("invoking X509 verify callback");
+    Category& log = Category::getInstance("OpenSSL");
+    log.debug("invoking X509 verify callback");
 #if (OPENSSL_VERSION_NUMBER >= 0x00907000L)
     CURLSOAPTransport* ctx = reinterpret_cast<CURLSOAPTransport*>(arg);
 #else
@@ -485,6 +484,7 @@ int xmltooling::verify_callback(X509_STORE_CTX* x509_ctx, void* arg)
 
      // Bypass name check (handled for us by curl).
     if (!ctx->m_trustEngine->validate(x509_ctx->cert,x509_ctx->untrusted,ctx->m_peer,false,ctx->m_keyResolver)) {
+        log.error("supplied TrustEngine failed to validate SSL/TLS server certificate");
         x509_ctx->error=X509_V_ERR_APPLICATION_VERIFICATION;     // generic error, check log for plugin specifics
         ctx->setSecure(false);
         return ctx->m_mandatory ? 0 : 1;
