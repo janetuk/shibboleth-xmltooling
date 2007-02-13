@@ -187,7 +187,11 @@ namespace xmlsignature {
     class XMLTOOL_API SignatureBuilder : public xmltooling::XMLObjectBuilder
     {
     public:
+#ifdef HAVE_COVARIANT_RETURNS
         virtual Signature* buildObject(
+#else
+        virtual xmltooling::XMLObject* buildObject(
+#endif
             const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const xmltooling::QName* schemaType=NULL
             ) const;
             

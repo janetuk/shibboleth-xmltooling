@@ -399,7 +399,12 @@ XMLObject* XMLSecSignatureImpl::unmarshall(DOMElement* element, bool bindDocumen
     return this;
 }
 
-Signature* SignatureBuilder::buildObject(
+#ifdef HAVE_COVARIANT_RETURNS
+Signature*
+#else
+XMLObject*
+#endif
+SignatureBuilder::buildObject(
     const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType
     ) const
 {
