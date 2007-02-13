@@ -247,10 +247,9 @@ DOMInputSource* ParserPool::resolveEntity(const XMLCh* const publicId, const XML
 
     // Check for entity as a value in the map.
     for (i=m_schemaLocMap.begin(); i!=m_schemaLocMap.end(); ++i) {
-        if (XMLString::endsWith(i->second.c_str(), temp.get())) {
-            auto_ptr_XMLCh temp2(i->second.c_str());
+        auto_ptr_XMLCh temp2(i->second.c_str());
+        if (XMLString::endsWith(temp2.get(), systemId))
             return new Wrapper4InputSource(new LocalFileInputSource(baseURI,temp2.get()));
-        }
     }
 
     // We'll allow anything without embedded slashes.
