@@ -50,6 +50,13 @@ namespace xmltooling {
         virtual ~SOAPTransport() {}
         
         /**
+         * Indicates whether transport provides confidentiality.
+         * 
+         * @return  true iff transport layer provides confidentiality
+         */
+        virtual bool isConfidential() const=0;
+        
+        /**
          * Sets the connection timeout.
          * 
          * @param timeout  time to wait for connection to server in seconds, or -1 for no timeout

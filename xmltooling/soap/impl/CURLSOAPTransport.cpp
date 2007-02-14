@@ -90,6 +90,10 @@ namespace xmltooling {
             g_CURLPool->put(m_peer.getName(), m_endpoint.c_str(), m_handle);
         }
 
+        bool isConfidential() const {
+            return m_endpoint.find("https")==0;
+        }
+
         bool setConnectTimeout(long timeout) const {
             return (curl_easy_setopt(m_handle,CURLOPT_CONNECTTIMEOUT,timeout)==CURLE_OK);
         }
