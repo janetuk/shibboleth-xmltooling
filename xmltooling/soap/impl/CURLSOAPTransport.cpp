@@ -45,7 +45,7 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL CURLPool
     {
     public:
-        CURLPool() : m_size(256), m_lock(Mutex::create()),
+        CURLPool() : m_size(0), m_lock(Mutex::create()),
             m_log(Category::getInstance(XMLTOOLING_LOGCAT".SOAPTransport.CURLPool")) {}
         ~CURLPool();
         
