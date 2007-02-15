@@ -71,7 +71,7 @@ namespace xmltooling {
 #ifndef XMLTOOLING_NO_XMLSEC
                     m_credResolver(NULL), m_trustEngine(NULL), m_mandatory(false), m_keyResolver(NULL),
 #endif
-                    m_ssl_callback(NULL), m_ssl_userptr(NULL), m_secure(false) {
+                    m_ssl_callback(NULL), m_ssl_userptr(NULL), m_chunked(true), m_secure(false) {
             m_handle = g_CURLPool->get(peer.getName(), endpoint);
             curl_easy_setopt(m_handle,CURLOPT_URL,endpoint);
             curl_easy_setopt(m_handle,CURLOPT_CONNECTTIMEOUT,15);
@@ -80,7 +80,6 @@ namespace xmltooling {
             curl_easy_setopt(m_handle,CURLOPT_USERPWD,NULL);
             curl_easy_setopt(m_handle,CURLOPT_HEADERDATA,this);
             m_headers=curl_slist_append(m_headers,"Content-Type: text/xml");
-            m_headers=curl_slist_append(m_headers,"Transport-Encoding: chunked");
         }
         
         virtual ~CURLSOAPTransport() {
@@ -94,18 +93,18 @@ namespace xmltooling {
             return m_endpoint.find("https")==0;
         }
 
-        bool setConnectTimeout(long timeout) const {
+        bool setConnectTimeout(long timeout) {
             return (curl_easy_setopt(m_handle,CURLOPT_CONNECTTIMEOUT,timeout)==CURLE_OK);
         }
         
-        bool setTimeout(long timeout) const {
+        bool setTimeout(long timeout) {
             return (curl_easy_setopt(m_handle,CURLOPT_TIMEOUT,timeout)==CURLE_OK);
         }
         
-        bool setAuth(transport_auth_t authType, const char* username=NULL, const char* password=NULL) const;
+        bool setAuth(transport_auth_t authType, const char* username=NULL, const char* password=NULL);
         
 #ifndef XMLTOOLING_NO_XMLSEC
-        bool setCredentialResolver(const CredentialResolver* credResolver) const {
+        bool setCredentialResolver(const CredentialResolver* credResolver) {
             const OpenSSLCredentialResolver* down = dynamic_cast<const OpenSSLCredentialResolver*>(credResolver);
             if (!down) {
                 m_credResolver = NULL;
@@ -115,7 +114,7 @@ namespace xmltooling {
             return true;
         }
         
-        bool setTrustEngine(const X509TrustEngine* trustEngine, bool mandatory=true, const KeyResolver* keyResolver=NULL) const {
+        bool setTrustEngine(const X509TrustEngine* trustEngine, bool mandatory=true, const KeyResolver* keyResolver=NULL) {
             const OpenSSLTrustEngine* down = dynamic_cast<const OpenSSLTrustEngine*>(trustEngine);
             if (!down) {
                 m_trustEngine = NULL;
@@ -130,6 +129,11 @@ namespace xmltooling {
         
 #endif
         
+        bool useChunkedEncoding(bool chunked=true) {
+            m_chunked = chunked;
+            return true;
+        }
+
         void send(istream& in);
         
         istream& receive() {
@@ -146,7 +150,7 @@ namespace xmltooling {
 
         string getContentType() const;
         
-        bool setRequestHeader(const char* name, const char* val) const {
+        bool setRequestHeader(const char* name, const char* val) {
             string temp(name);
             temp=temp + ": " + val;
             m_headers=curl_slist_append(m_headers,temp.c_str());
@@ -155,7 +159,7 @@ namespace xmltooling {
         
         const vector<string>& getResponseHeader(const char* val) const;
         
-        bool setSSLCallback(ssl_ctx_callback_fn fn, void* userptr=NULL) const {
+        bool setSSLCallback(ssl_ctx_callback_fn fn, void* userptr=NULL) {
             m_ssl_callback=fn;
             m_ssl_userptr=userptr;
             return true;
@@ -167,16 +171,17 @@ namespace xmltooling {
         string m_endpoint;
         CURL* m_handle;
         stringstream m_stream;
-        mutable struct curl_slist* m_headers;
+        struct curl_slist* m_headers;
         map<string,vector<string> > m_response_headers;
 #ifndef XMLTOOLING_NO_XMLSEC
-        mutable const OpenSSLCredentialResolver* m_credResolver;
-        mutable const OpenSSLTrustEngine* m_trustEngine;
-        mutable bool m_mandatory;
-        mutable const KeyResolver* m_keyResolver;
+        const OpenSSLCredentialResolver* m_credResolver;
+        const OpenSSLTrustEngine* m_trustEngine;
+        bool m_mandatory;
+        const KeyResolver* m_keyResolver;
 #endif
-        mutable ssl_ctx_callback_fn m_ssl_callback;
-        mutable void* m_ssl_userptr;
+        ssl_ctx_callback_fn m_ssl_callback;
+        void* m_ssl_userptr;
+        bool m_chunked;
         bool m_secure;
         
         friend size_t XMLTOOL_DLLLOCAL curl_header_hook(void* ptr, size_t size, size_t nmemb, void* stream);
@@ -267,7 +272,6 @@ CURL* CURLPool::get(const string& to, const char* endpoint)
     curl_easy_setopt(handle,CURLOPT_SSL_VERIFYPEER,0);
     curl_easy_setopt(handle,CURLOPT_SSL_VERIFYHOST,2);
     curl_easy_setopt(handle,CURLOPT_HEADERFUNCTION,&curl_header_hook);
-    curl_easy_setopt(handle,CURLOPT_READFUNCTION,&curl_read_hook);
     curl_easy_setopt(handle,CURLOPT_WRITEFUNCTION,&curl_write_hook);
     curl_easy_setopt(handle,CURLOPT_DEBUGFUNCTION,&curl_debug_hook);
 
@@ -311,7 +315,7 @@ void CURLPool::put(const string& to, const char* endpoint, CURL* handle)
     }
 }
 
-bool CURLSOAPTransport::setAuth(transport_auth_t authType, const char* username, const char* password) const
+bool CURLSOAPTransport::setAuth(transport_auth_t authType, const char* username, const char* password)
 {
     if (authType==transport_auth_none) {
         if (curl_easy_setopt(m_handle,CURLOPT_HTTPAUTH,0)!=CURLE_OK)
@@ -367,14 +371,30 @@ void CURLSOAPTransport::send(istream& in)
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".SOAPTransport");
     Category& log_curl=Category::getInstance(XMLTOOLING_LOGCAT".libcurl");
 
+    string msg;
+
     // By this time, the handle has been prepared with the URL to use and the
     // caller should have executed any set functions to manipulate it.
 
     // Setup standard per-call curl properties.
-    curl_easy_setopt(m_handle,CURLOPT_POST,1);
-    curl_easy_setopt(m_handle,CURLOPT_READDATA,&in);
-    curl_easy_setopt(m_handle,CURLOPT_FILE,&m_stream);
     curl_easy_setopt(m_handle,CURLOPT_DEBUGDATA,&log_curl);
+    curl_easy_setopt(m_handle,CURLOPT_FILE,&m_stream);
+    curl_easy_setopt(m_handle,CURLOPT_POST,1);
+    if (m_chunked) {
+        m_headers=curl_slist_append(m_headers,"Transfer-Encoding: chunked");
+        curl_easy_setopt(m_handle,CURLOPT_READFUNCTION,&curl_read_hook);
+        curl_easy_setopt(m_handle,CURLOPT_READDATA,&in);
+    }
+    else {
+        char buf[1024];
+        while (in) {
+            in.read(buf,1024);
+            msg.append(buf,in.gcount());
+        }
+        curl_easy_setopt(m_handle,CURLOPT_READFUNCTION,NULL);
+        curl_easy_setopt(m_handle,CURLOPT_POSTFIELDS,msg.c_str());
+        curl_easy_setopt(m_handle,CURLOPT_POSTFIELDSIZE,msg.length());
+    }
 
     char curl_errorbuf[CURL_ERROR_SIZE];
     curl_errorbuf[0]=0;
@@ -382,7 +402,7 @@ void CURLSOAPTransport::send(istream& in)
     if (log_curl.isDebugEnabled())
         curl_easy_setopt(m_handle,CURLOPT_VERBOSE,1);
 
-    // Set request headers (possibly appended by hooks).
+    // Set request headers.
     curl_easy_setopt(m_handle,CURLOPT_HTTPHEADER,m_headers);
 
     if (m_ssl_callback || m_credResolver || m_trustEngine) {

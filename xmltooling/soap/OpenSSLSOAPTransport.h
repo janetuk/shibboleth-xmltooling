@@ -49,7 +49,7 @@ namespace xmltooling {
          * @param userptr   a caller-supplied value to pass to the callback function
          * @return true iff the callback was set
          */
-        virtual bool setSSLCallback(ssl_ctx_callback_fn fn, void* userptr=NULL) const=0;
+        virtual bool setSSLCallback(ssl_ctx_callback_fn fn, void* userptr=NULL)=0;
         
         /**
          * Sets indicator that the transport peer has been authenticated.

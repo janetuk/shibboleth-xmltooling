@@ -62,7 +62,7 @@ namespace xmltooling {
          * @param timeout  time to wait for connection to server in seconds, or -1 for no timeout
          * @return  true iff the transport supports connection timeouts
          */
-        virtual bool setConnectTimeout(long timeout) const=0;
+        virtual bool setConnectTimeout(long timeout)=0;
         
         /**
          * Sets the request timeout.
@@ -70,7 +70,7 @@ namespace xmltooling {
          * @param timeout  time to wait for a response in seconds, or -1 for no timeout
          * @return  true iff the transport supports request/response timeouts
          */
-        virtual bool setTimeout(long timeout) const=0;
+        virtual bool setTimeout(long timeout)=0;
         
         /**
          * Common types of transport authentication that may be supported.
@@ -91,7 +91,7 @@ namespace xmltooling {
          * @param password  simple password/credential for transport authentication
          * @return  true iff the transport supports the indicated form of authentication
          */
-        virtual bool setAuth(transport_auth_t authType, const char* username=NULL, const char* password=NULL) const=0;
+        virtual bool setAuth(transport_auth_t authType, const char* username=NULL, const char* password=NULL)=0;
 
 #ifndef XMLTOOLING_NO_XMLSEC
         /**
@@ -103,7 +103,7 @@ namespace xmltooling {
          * @param credResolver  a locked CredentialResolver instance, or NULL
          * @return true iff the transport supports the use of a CredentialResolver
          */
-        virtual bool setCredentialResolver(const xmlsignature::CredentialResolver* credResolver) const=0;
+        virtual bool setCredentialResolver(const xmlsignature::CredentialResolver* credResolver)=0;
 
         /**
          * Provides a TrustEngine to the transport to authenticate the transport peer.
@@ -119,7 +119,7 @@ namespace xmltooling {
             const X509TrustEngine* trustEngine,
             bool mandatory=true,
             const xmlsignature::KeyResolver* keyResolver=NULL
-            ) const=0;
+            )=0;
 #endif
 
         /**

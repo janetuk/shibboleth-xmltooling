@@ -94,7 +94,7 @@ namespace soap11 {
          * 
          * @param transport reference to transport layer
          */
-        virtual void prepareTransport(const xmltooling::SOAPTransport& transport) {}
+        virtual void prepareTransport(xmltooling::SOAPTransport& transport) {}
 
         /**
          * Handling of SOAP faults.

@@ -40,13 +40,22 @@ namespace xmltooling {
         virtual ~HTTPSOAPTransport() {}
         
         /**
+         * Indicate whether content should be sent using HTTP 1.1 and
+         * Chunked Transport-Encoding, or buffered and sent with a Content-Length.
+         *
+         * @param chunked true iff chunked encoding should be used
+         * @return  true iff the property is successfully set
+         */
+        virtual bool useChunkedEncoding(bool chunked=true)=0;
+
+        /**
          * Sets an outgoing HTTP request header.
          * 
          * @param name   name of header, without the colon separator
          * @param value  header value to send
          * @return  true iff the header is successfully set
          */
-        virtual bool setRequestHeader(const char* name, const char* value) const=0;
+        virtual bool setRequestHeader(const char* name, const char* value)=0;
         
         /**
          * Returns the values of an HTTP response header.
