@@ -231,23 +231,31 @@ bool ExplicitKeyTrustEngine::validate(
                 case XSECCryptoKey::KEY_RSA_PUBLIC:
                 {
                     RSA* rsa = static_cast<OpenSSLCryptoKeyRSA*>(key.get())->getOpenSSLRSA();
-                    EVP_PKEY* evp = certEE->cert_info->key->pkey;
+                    EVP_PKEY* evp = X509_PUBKEY_get(X509_get_X509_PUBKEY(certEE));
                     if (rsa && evp && evp->type == EVP_PKEY_RSA &&
-                            BN_cmp(rsa->n,evp->pkey.rsa->n) == 0 && BN_cmp(rsa->e,evp->pkey.rsa->e) != 0) {
+                            BN_cmp(rsa->n,evp->pkey.rsa->n) == 0 && BN_cmp(rsa->e,evp->pkey.rsa->e) == 0) {
                         log.debug("end-entity certificate matches peer RSA key information");
+                        if (evp)
+                            EVP_PKEY_free(evp);
                         return true;
                     }
+                    if (evp)
+                        EVP_PKEY_free(evp);
                     break;
                 }
                 
                 case XSECCryptoKey::KEY_DSA_PUBLIC:
                 {
                     DSA* dsa = static_cast<OpenSSLCryptoKeyDSA*>(key.get())->getOpenSSLDSA();
-                    EVP_PKEY* evp = certEE->cert_info->key->pkey;
+                    EVP_PKEY* evp = X509_PUBKEY_get(X509_get_X509_PUBKEY(certEE));
                     if (dsa && evp && evp->type == EVP_PKEY_DSA && BN_cmp(dsa->pub_key,evp->pkey.dsa->pub_key) == 0) {
                         log.debug("end-entity certificate matches peer DSA key information");
+                        if (evp)
+                            EVP_PKEY_free(evp);
                         return true;
                     }
+                    if (evp)
+                        EVP_PKEY_free(evp);
                     break;
                 }
 

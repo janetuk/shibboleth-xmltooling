@@ -263,6 +263,8 @@ CURL* CURLPool::get(const string& to, const char* endpoint)
     curl_easy_setopt(handle,CURLOPT_NOSIGNAL,1);
     curl_easy_setopt(handle,CURLOPT_FAILONERROR,1);
     curl_easy_setopt(handle,CURLOPT_SSLVERSION,3);
+    // Verification of the peer is via TrustEngine only.
+    curl_easy_setopt(handle,CURLOPT_SSL_VERIFYPEER,0);
     curl_easy_setopt(handle,CURLOPT_SSL_VERIFYHOST,2);
     curl_easy_setopt(handle,CURLOPT_HEADERFUNCTION,&curl_header_hook);
     curl_easy_setopt(handle,CURLOPT_READFUNCTION,&curl_read_hook);
@@ -399,9 +401,6 @@ void CURLSOAPTransport::send(istream& in)
         curl_easy_setopt(m_handle,CURLOPT_SSL_CTX_DATA,NULL);
     }
     
-    // Verification of the peer is via TrustEngine only.
-    curl_easy_setopt(m_handle,CURLOPT_SSL_VERIFYPEER,0);
-
     // Make the call.
     log.debug("sending SOAP message to %s", m_endpoint.c_str());
     if (curl_easy_perform(m_handle) != CURLE_OK) {
