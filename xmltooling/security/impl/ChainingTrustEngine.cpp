@@ -24,10 +24,12 @@
 #include "exceptions.h"
 #include "security/ChainingTrustEngine.h"
 
+#include <log4cpp/Category.hh>
 #include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmlsignature;
 using namespace xmltooling;
+using namespace log4cpp;
 using namespace std;
 
 namespace xmltooling {
@@ -37,20 +39,23 @@ namespace xmltooling {
     }
 };
 
-static const XMLCh GenericTrustEngine[] =           UNICODE_LITERAL_11(T,r,u,s,t,E,n,g,i,n,e);
+static const XMLCh _TrustEngine[] =                 UNICODE_LITERAL_11(T,r,u,s,t,E,n,g,i,n,e);
 static const XMLCh type[] =                         UNICODE_LITERAL_4(t,y,p,e);
 
 ChainingTrustEngine::ChainingTrustEngine(const DOMElement* e) : OpenSSLTrustEngine(e) {
+    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine");
     try {
-        e = e ? xmltooling::XMLHelper::getFirstChildElement(e, GenericTrustEngine) : NULL;
+        e = e ? XMLHelper::getFirstChildElement(e, _TrustEngine) : NULL;
         while (e) {
             auto_ptr_char temp(e->getAttributeNS(NULL,type));
-            if (temp.get())
+            if (temp.get() && *temp.get()) {
+                log.info("building TrustEngine of type %s", temp.get());
                 m_engines.push_back(XMLToolingConfig::getConfig().TrustEngineManager.newPlugin(temp.get(), e));
-            e = xmltooling::XMLHelper::getNextSiblingElement(e, GenericTrustEngine);
+            }
+            e = XMLHelper::getNextSiblingElement(e, _TrustEngine);
         }
     }
-    catch (xmltooling::XMLToolingException&) {
+    catch (exception&) {
         for_each(m_engines.begin(), m_engines.end(), xmltooling::cleanup<TrustEngine>());
         throw;
     }
