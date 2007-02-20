@@ -141,9 +141,10 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".ParserPool");
 
     // XML constants
-    static const XMLCh catalog[] = { chLatin_c, chLatin_a, chLatin_t, chLatin_a, chLatin_l, chLatin_o, chLatin_g, chNull };
-    static const XMLCh uri[] = { chLatin_u, chLatin_r, chLatin_i, chNull };
-    static const XMLCh name[] = { chLatin_n, chLatin_a, chLatin_m, chLatin_e, chNull };
+    static const XMLCh catalog[] =  UNICODE_LITERAL_7(c,a,t,a,l,o,g);
+    static const XMLCh system[] =   UNICODE_LITERAL_6(s,y,s,t,e,m);
+    static const XMLCh systemId[] = UNICODE_LITERAL_8(s,y,s,t,e,m,I,d);
+    static const XMLCh uri[] =      UNICODE_LITERAL_3(u,r,i);
     static const XMLCh CATALOG_NS[] = {
         chLatin_u, chLatin_r, chLatin_n, chColon,
         chLatin_o, chLatin_a, chLatin_s, chLatin_i, chLatin_s, chColon,
@@ -176,12 +177,12 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
             return false;
         }
         
-        // Fetch all the <uri> elements.
-        DOMNodeList* mappings=root->getElementsByTagNameNS(CATALOG_NS,uri);
+        // Fetch all the <system> elements.
+        DOMNodeList* mappings=root->getElementsByTagNameNS(CATALOG_NS,system);
         Lock lock(m_lock);
         for (XMLSize_t i=0; i<mappings->getLength(); i++) {
             root=static_cast<DOMElement*>(mappings->item(i));
-            const XMLCh* from=root->getAttributeNS(NULL,name);
+            const XMLCh* from=root->getAttributeNS(NULL,systemId);
             const XMLCh* to=root->getAttributeNS(NULL,uri);
 #ifdef HAVE_GOOD_STL
             m_schemaLocMap[from]=to;
@@ -198,8 +199,8 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
         for_each(m_schemaLocMap.begin(),m_schemaLocMap.end(),doubleit<string>(m_schemaLocations,' '));
 #endif
     }
-    catch (XMLParserException& e) {
-        log.error("catalog loader caught XMLParserException: %s", e.what());
+    catch (exception& e) {
+        log.error("catalog loader caught exception: %s", e.what());
         return false;
     }
 
