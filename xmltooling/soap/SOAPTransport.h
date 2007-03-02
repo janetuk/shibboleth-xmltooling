@@ -26,13 +26,10 @@
 #include <xmltooling/base.h>
 #include <iostream>
 
-namespace xmlsignature {
-    class XMLTOOL_API CredentialResolver;
-    class XMLTOOL_API KeyResolver;
-};
-
 namespace xmltooling {
     
+    class XMLTOOL_API CredentialResolver;
+    class XMLTOOL_API KeyResolver;
     class XMLTOOL_API X509TrustEngine;
     
     /**
