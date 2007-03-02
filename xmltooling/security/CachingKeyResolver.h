@@ -15,7 +15,7 @@
  */
 
 /**
- * @file xmltooling/signature/CachingKeyResolver.h
+ * @file xmltooling/security/CachingKeyResolver.h
  * 
  * A KeyResolver that caches content across method calls.
  */
@@ -23,14 +23,14 @@
 #if !defined(__xmltooling_cachekeyres_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_cachekeyres_h__
 
-#include <xmltooling/signature/KeyResolver.h>
+#include <xmltooling/security/KeyResolver.h>
 
-namespace xmlsignature {
+namespace xmltooling {
 
     /**
      * An API for resolving encrypted decryption keys.
      */
-    class XMLTOOL_API CachingKeyResolver : public xmlsignature::KeyResolver {
+    class XMLTOOL_API CachingKeyResolver : public KeyResolver {
     public:
         virtual ~CachingKeyResolver() {}
         

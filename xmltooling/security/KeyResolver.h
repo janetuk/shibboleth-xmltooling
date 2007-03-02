@@ -15,7 +15,7 @@
  */
 
 /**
- * @file KeyResolver.h
+ * @file xmltooling/security/KeyResolver.h
  * 
  * Resolves public keys and certificates based on KeyInfo information or
  * external factors. 
@@ -36,6 +36,9 @@
 namespace xmlsignature {
     class XMLTOOL_API KeyInfo;
     class XMLTOOL_API Signature;
+};
+
+namespace xmltooling {
 
     /**
      * An API for resolving keys. The default/simple implementation
@@ -65,7 +68,7 @@ namespace xmlsignature {
          * @param keyInfo   the key information
          * @return  the resolved key
          */
-        virtual XSECCryptoKey* resolveKey(const KeyInfo* keyInfo) const {
+        virtual XSECCryptoKey* resolveKey(const xmlsignature::KeyInfo* keyInfo) const {
             return m_key ? m_key->clone() : NULL;
         }
 
@@ -87,7 +90,7 @@ namespace xmlsignature {
          * @param sig   signature containing the key information
          * @return  the resolved key
          */
-        XSECCryptoKey* resolveKey(const Signature* sig) const;
+        XSECCryptoKey* resolveKey(const xmlsignature::Signature* sig) const;
 
         /**
          * A wrapper that handles disposal of certificates when required.
@@ -151,7 +154,7 @@ namespace xmlsignature {
          * @return  number of certificates returned
          */
         virtual std::vector<XSECCryptoX509*>::size_type resolveCertificates(
-            const KeyInfo* keyInfo, ResolvedCertificates& certs
+            const xmlsignature::KeyInfo* keyInfo, ResolvedCertificates& certs
             ) const;
         
         /**
@@ -175,7 +178,7 @@ namespace xmlsignature {
          * @return  number of certificates returned
          */
         std::vector<XSECCryptoX509*>::size_type resolveCertificates(
-            const Signature* sig, ResolvedCertificates& certs
+            const xmlsignature::Signature* sig, ResolvedCertificates& certs
             ) const;
 
         /**
@@ -185,7 +188,7 @@ namespace xmlsignature {
          * @param keyInfo   the key information
          * @return  the resolved CRL
          */
-        virtual xmltooling::XSECCryptoX509CRL* resolveCRL(const KeyInfo* keyInfo) const;
+        virtual XSECCryptoX509CRL* resolveCRL(const xmlsignature::KeyInfo* keyInfo) const;
         
         /**
          * Returns a CRL based on the supplied KeyInfo information.
@@ -194,7 +197,7 @@ namespace xmlsignature {
          * @param keyInfo   the key information
          * @return  the resolved CRL
          */
-        virtual xmltooling::XSECCryptoX509CRL* resolveCRL(DSIGKeyInfoList* keyInfo) const;
+        virtual XSECCryptoX509CRL* resolveCRL(DSIGKeyInfoList* keyInfo) const;
 
         /**
          * Returns a CRL based on the supplied KeyInfo information.
@@ -203,7 +206,7 @@ namespace xmlsignature {
          * @param sig   signature containing the key information
          * @return  the resolved CRL
          */
-        xmltooling::XSECCryptoX509CRL* resolveCRL(const Signature* sig) const;
+        XSECCryptoX509CRL* resolveCRL(const xmlsignature::Signature* sig) const;
 
     protected:
         /** Stores an explicit key. */

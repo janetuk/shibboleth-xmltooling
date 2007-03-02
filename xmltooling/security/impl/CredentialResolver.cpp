@@ -21,18 +21,16 @@
  */
 
 #include "internal.h"
-#include "signature/CredentialResolver.h"
+#include "security/CredentialResolver.h"
 
-using namespace xmlsignature;
 using namespace xmltooling;
 
-namespace xmlsignature {
+namespace xmltooling {
     XMLTOOL_DLLLOCAL PluginManager<CredentialResolver,const DOMElement*>::Factory FilesystemCredentialResolverFactory; 
 };
 
-void XMLTOOL_API xmlsignature::registerCredentialResolvers()
+void XMLTOOL_API xmltooling::registerCredentialResolvers()
 {
     XMLToolingConfig& conf=XMLToolingConfig::getConfig();
     conf.CredentialResolverManager.registerFactory(FILESYSTEM_CREDENTIAL_RESOLVER, FilesystemCredentialResolverFactory);
-    conf.CredentialResolverManager.registerFactory("edu.internet2.middleware.shibboleth.common.Credentials.FileCredentialResolver", FilesystemCredentialResolverFactory);
 }

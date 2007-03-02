@@ -15,7 +15,7 @@
  */
 
 /**
- * @file xmltooling/signature/OpenSSLCredentialResolver.h
+ * @file xmltooling/security/OpenSSLCredentialResolver.h
  * 
  * OpenSSL-specific credential resolver
  */
@@ -23,11 +23,11 @@
 #if !defined(__xmltooling_opensslcredres_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_opensslcredres_h__
 
-#include <xmltooling/signature/CredentialResolver.h>
+#include <xmltooling/security/CredentialResolver.h>
 
 #include <openssl/ssl.h>
 
-namespace xmlsignature {
+namespace xmltooling {
 
     /**
      * An OpenSSL-specific API for resolving local/owned keys and certificates

@@ -28,9 +28,12 @@
 #include <xmltooling/util/ParserPool.h>
 
 #ifndef XMLTOOLING_NO_XMLSEC
-namespace xmlsignature {
+namespace xmltooling {
     class XMLTOOL_API CredentialResolver;
+    class XMLTOOL_API KeyInfoSource;
     class XMLTOOL_API KeyResolver;
+    class XMLTOOL_API TrustEngine;
+    class XMLTOOL_API XSECCryptoX509CRL;
 };
 #endif
 
@@ -45,9 +48,6 @@ namespace xmltooling {
     class XMLTOOL_API SOAPTransport;
     class XMLTOOL_API StorageService;
     class XMLTOOL_API TemplateEngine;
-    class XMLTOOL_API TrustEngine;
-    class XMLTOOL_API KeyInfoSource;
-    class XMLTOOL_API XSECCryptoX509CRL;
 
     /**
      * Singleton object that manages library startup/shutdown.configuration.
@@ -197,12 +197,12 @@ namespace xmltooling {
         /**
          * Manages factories for KeyResolver plugins.
          */
-        PluginManager<xmlsignature::KeyResolver,const DOMElement*> KeyResolverManager;
+        PluginManager<KeyResolver,const DOMElement*> KeyResolverManager;
 
         /**
          * Manages factories for CredentialResolver plugins.
          */
-        PluginManager<xmlsignature::CredentialResolver,const DOMElement*> CredentialResolverManager;
+        PluginManager<CredentialResolver,const DOMElement*> CredentialResolverManager;
 
         /**
          * Manages factories for TrustEngine plugins.

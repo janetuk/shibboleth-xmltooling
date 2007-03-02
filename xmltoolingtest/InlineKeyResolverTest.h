@@ -18,7 +18,7 @@
 
 #include <fstream>
 #include <xmltooling/signature/KeyInfo.h>
-#include <xmltooling/signature/KeyResolver.h>
+#include <xmltooling/security/KeyResolver.h>
 
 using namespace xmlsignature;
 

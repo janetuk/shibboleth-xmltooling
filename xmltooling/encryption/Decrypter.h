@@ -24,7 +24,7 @@
 #define __xmltooling_decrypter_h__
 
 #include <xmltooling/encryption/Encryption.h>
-#include <xmltooling/signature/KeyResolver.h>
+#include <xmltooling/security/KeyResolver.h>
 
 #include <xsec/enc/XSECCryptoKey.hpp>
 #include <xsec/xenc/XENCCipher.hpp>
@@ -44,7 +44,7 @@ namespace xmlencryption {
          * @param KEKresolver   resolves key decryption key
          * @param resolver      resolves data decryption key
          */
-        Decrypter(xmlsignature::KeyResolver* KEKresolver=NULL, xmlsignature::KeyResolver* resolver=NULL)
+        Decrypter(xmltooling::KeyResolver* KEKresolver=NULL, xmltooling::KeyResolver* resolver=NULL)
             : m_cipher(NULL), m_resolver(resolver), m_KEKresolver(KEKresolver) {
         }
 
@@ -55,7 +55,7 @@ namespace xmlencryption {
          * 
          * @param resolver  the KeyResolver to attach 
          */
-        void setKeyResolver(xmlsignature::KeyResolver* resolver) {
+        void setKeyResolver(xmltooling::KeyResolver* resolver) {
             delete m_resolver;
             m_resolver=resolver;
         }
@@ -65,7 +65,7 @@ namespace xmlencryption {
          * 
          * @param resolver  the KeyResolver to attach 
          */
-        void setKEKResolver(xmlsignature::KeyResolver* resolver) {
+        void setKEKResolver(xmltooling::KeyResolver* resolver) {
             delete m_KEKresolver;
             m_KEKresolver=resolver;
         }
@@ -100,8 +100,8 @@ namespace xmlencryption {
         
     private:
         XENCCipher* m_cipher;
-        xmlsignature::KeyResolver* m_resolver;
-        xmlsignature::KeyResolver* m_KEKresolver;
+        xmltooling::KeyResolver* m_resolver;
+        xmltooling::KeyResolver* m_KEKresolver;
     };
 
     DECL_XMLTOOLING_EXCEPTION(DecryptionException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmlencryption,xmltooling::XMLToolingException,Exceptions in decryption processing);

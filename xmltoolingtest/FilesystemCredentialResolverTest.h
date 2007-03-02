@@ -16,7 +16,7 @@
 
 #include "XMLObjectBaseTestCase.h"
 
-#include <xmltooling/signature/CredentialResolver.h>
+#include <xmltooling/security/CredentialResolver.h>
 
 #include <fstream>
 

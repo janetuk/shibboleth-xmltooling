@@ -23,7 +23,7 @@
 #if !defined(__xmltooling_sigval_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_sigval_h__
 
-#include <xmltooling/signature/KeyResolver.h>
+#include <xmltooling/security/KeyResolver.h>
 #include <xmltooling/signature/Signature.h>
 #include <xmltooling/validation/Validator.h>
 
@@ -40,7 +40,7 @@ namespace xmlsignature {
          * 
          * @param resolver the key resolver to use, will be freed by Validator
          */
-        SignatureValidator(KeyResolver* resolver) : m_key(NULL), m_resolver(resolver) {
+        SignatureValidator(xmltooling::KeyResolver* resolver) : m_key(NULL), m_resolver(resolver) {
         }
 
         /**
@@ -82,7 +82,7 @@ namespace xmlsignature {
          * 
          * @param resolver  the KeyResolver to attach 
          */
-        void setKeyResolver(KeyResolver* resolver) {
+        void setKeyResolver(xmltooling::KeyResolver* resolver) {
             delete m_key;
             delete m_resolver;
             m_key=NULL;
@@ -94,7 +94,7 @@ namespace xmlsignature {
         XSECCryptoKey* m_key;
         
         /** KeyResolver to use against signature. */
-        KeyResolver* m_resolver;
+        xmltooling::KeyResolver* m_resolver;
     };
 
 };

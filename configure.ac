@@ -186,7 +186,7 @@ int i = 0;
 #error cannot use version 2.6.0
 #endif])],
     [AC_MSG_RESULT(OK)],
-    [AC_MSG_FAILURE([Xerces-C v2.6.0 has bugs that inhibit use with signed XML, please use special 2.6.1 tarball provided by Shibboleth Project])])
+    [AC_MSG_FAILURE([Xerces-C v2.6.0 has bugs that inhibit use with signed XML, please use a newer version])])
 AC_TRY_LINK(
         [#include <xercesc/util/PlatformUtils.hpp>],
         [xercesc::XMLPlatformUtils::Initialize()],

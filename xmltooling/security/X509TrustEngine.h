@@ -71,7 +71,7 @@ namespace xmltooling {
             const std::vector<XSECCryptoX509*>& certChain,
             const KeyInfoSource& keyInfoSource,
             bool checkName=true,
-            const xmlsignature::KeyResolver* keyResolver=NULL
+            const KeyResolver* keyResolver=NULL
             ) const=0;
     };
     

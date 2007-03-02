@@ -103,7 +103,7 @@ namespace xmltooling {
          * @param credResolver  a locked CredentialResolver instance, or NULL
          * @return true iff the transport supports the use of a CredentialResolver
          */
-        virtual bool setCredentialResolver(const xmlsignature::CredentialResolver* credResolver)=0;
+        virtual bool setCredentialResolver(const CredentialResolver* credResolver)=0;
 
         /**
          * Provides a TrustEngine to the transport to authenticate the transport peer.
@@ -118,7 +118,7 @@ namespace xmltooling {
         virtual bool setTrustEngine(
             const X509TrustEngine* trustEngine,
             bool mandatory=true,
-            const xmlsignature::KeyResolver* keyResolver=NULL
+            const KeyResolver* keyResolver=NULL
             )=0;
 #endif
 

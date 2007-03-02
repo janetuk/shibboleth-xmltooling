@@ -27,7 +27,7 @@
 #include "impl/UnknownElement.h"
 #include "security/TrustEngine.h"
 #include "security/OpenSSLCryptoX509CRL.h"
-#include "signature/CredentialResolver.h"
+#include "security/CredentialResolver.h"
 #include "soap/SOAP.h"
 #include "soap/SOAPTransport.h"
 #include "util/NDC.h"

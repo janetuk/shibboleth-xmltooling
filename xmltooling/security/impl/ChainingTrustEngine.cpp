@@ -117,7 +117,7 @@ bool ChainingTrustEngine::validate(
     STACK_OF(X509)* certChain,
     const KeyInfoSource& keyInfoSource,
     bool checkName,
-    const xmlsignature::KeyResolver* keyResolver
+    const KeyResolver* keyResolver
     ) const
 {
     OpenSSLTrustEngine* down;

@@ -21,8 +21,8 @@
  */
 
 #include "internal.h"
-#include "signature/KeyResolver.h"
-#include "signature/OpenSSLCredentialResolver.h"
+#include "security/KeyResolver.h"
+#include "security/OpenSSLCredentialResolver.h"
 #include "util/NDC.h"
 #include "util/XMLHelper.h"
 
@@ -55,8 +55,8 @@ static int passwd_callback(char* buf, int len, int verify, void* passwd)
     return 0;
 }
 
-namespace xmlsignature {
-    class FilesystemCredentialResolver : public OpenSSLCredentialResolver, public KeyResolver
+namespace xmltooling {
+    class XMLTOOL_DLLLOCAL FilesystemCredentialResolver : public OpenSSLCredentialResolver, public KeyResolver
     {
     public:
         FilesystemCredentialResolver(const DOMElement* e);

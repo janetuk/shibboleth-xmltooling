@@ -64,7 +64,7 @@ namespace xmltooling {
         bool checkEntityNames(X509* certEE, const KeyInfoSource& keyInfoSource) const;
         
         /** An inline KeyResolver for extracting certificates out of a signature. */
-        xmlsignature::KeyResolver* m_inlineResolver;
+        KeyResolver* m_inlineResolver;
         
     public:
         virtual ~AbstractPKIXTrustEngine();
@@ -72,7 +72,7 @@ namespace xmltooling {
         virtual bool validate(
             xmlsignature::Signature& sig,
             const KeyInfoSource& keyInfoSource,
-            const xmlsignature::KeyResolver* keyResolver=NULL
+            const KeyResolver* keyResolver=NULL
             ) const;
 
         virtual bool validate(
@@ -82,7 +82,7 @@ namespace xmltooling {
             const char* in,
             unsigned int in_len,
             const KeyInfoSource& keyInfoSource,
-            const xmlsignature::KeyResolver* keyResolver=NULL
+            const KeyResolver* keyResolver=NULL
             ) const;
 
         virtual bool validate(
@@ -90,7 +90,7 @@ namespace xmltooling {
             const std::vector<XSECCryptoX509*>& certChain,
             const KeyInfoSource& keyInfoSource,
             bool checkName=true,
-            const xmlsignature::KeyResolver* keyResolver=NULL
+            const KeyResolver* keyResolver=NULL
             ) const;
 
         virtual bool validate(
@@ -98,7 +98,7 @@ namespace xmltooling {
             STACK_OF(X509)* certChain,
             const KeyInfoSource& keyInfoSource,
             bool checkName=true,
-            const xmlsignature::KeyResolver* keyResolver=NULL
+            const KeyResolver* keyResolver=NULL
             ) const;
 
         /**
@@ -111,14 +111,14 @@ namespace xmltooling {
             MAKE_NONCOPYABLE(PKIXValidationInfoIterator);
         protected:
             /** Reference to KeyResolver to use. */
-            const xmlsignature::KeyResolver& m_keyResolver;
+            const KeyResolver& m_keyResolver;
             
             /**
              * Constructor
              * 
              * @param keyResolver   reference to KeyResolver to use
              */
-            PKIXValidationInfoIterator(const xmlsignature::KeyResolver& keyResolver) : m_keyResolver(keyResolver) {}
+            PKIXValidationInfoIterator(const KeyResolver& keyResolver) : m_keyResolver(keyResolver) {}
             
         public:
             virtual ~PKIXValidationInfoIterator() {}
@@ -171,7 +171,7 @@ namespace xmltooling {
          */
         virtual PKIXValidationInfoIterator* getPKIXValidationInfoIterator(
             const KeyInfoSource& pkixSource,
-            const xmlsignature::KeyResolver& keyResolver
+            const KeyResolver& keyResolver
             ) const=0;
     };
 };

@@ -18,7 +18,7 @@
 
 #include <xmltooling/encryption/Decrypter.h>
 #include <xmltooling/encryption/Encrypter.h>
-#include <xmltooling/signature/CredentialResolver.h>
+#include <xmltooling/security/CredentialResolver.h>
 
 #include <fstream>
 #include <xercesc/util/XMLUniDefs.hpp>

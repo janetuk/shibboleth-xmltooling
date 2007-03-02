@@ -58,8 +58,12 @@ ioinclude_HEADERS = \
 
 secinclude_HEADERS = \
 	security/AbstractPKIXTrustEngine.h \
+	security/CachingKeyResolver.h \
 	security/ChainingTrustEngine.h \
+	security/CredentialResolver.h \
 	security/KeyInfoSource.h \
+	security/KeyResolver.h \
+	security/OpenSSLCredentialResolver.h \
 	security/TrustEngine.h \
 	security/X509TrustEngine.h \
 	security/OpenSSLTrustEngine.h \
@@ -67,12 +71,8 @@ secinclude_HEADERS = \
 	security/OpenSSLCryptoX509CRL.h
 
 siginclude_HEADERS = \
-	signature/CachingKeyResolver.h \
 	signature/ContentReference.h \
-	signature/CredentialResolver.h \
 	signature/KeyInfo.h \
-	signature/KeyResolver.h \
-	signature/OpenSSLCredentialResolver.h \
 	signature/Signature.h \
 	signature/SignatureValidator.h
 
@@ -110,13 +110,13 @@ xmlsec_sources = \
 	security/impl/TrustEngine.cpp \
 	security/impl/AbstractPKIXTrustEngine.cpp \
 	security/impl/ChainingTrustEngine.cpp \
+	security/impl/CredentialResolver.cpp \
+	security/impl/FilesystemCredentialResolver.cpp \
+	security/impl/InlineKeyResolver.cpp \
 	security/impl/ExplicitKeyTrustEngine.cpp \
+	security/impl/KeyResolver.cpp \
 	security/impl/XSECCryptoX509CRL.cpp \
 	security/impl/OpenSSLCryptoX509CRL.cpp \
-	signature/impl/CredentialResolver.cpp \
-	signature/impl/FilesystemCredentialResolver.cpp \
-	signature/impl/InlineKeyResolver.cpp \
-	signature/impl/KeyResolver.cpp \
 	signature/impl/SignatureValidator.cpp \
 	signature/impl/XMLSecSignatureImpl.cpp
 else

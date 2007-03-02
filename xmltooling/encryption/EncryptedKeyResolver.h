@@ -24,14 +24,14 @@
 #define __xmltooling_enckeyres_h__
 
 #include <xmltooling/encryption/Encryption.h>
-#include <xmltooling/signature/KeyResolver.h>
+#include <xmltooling/security/KeyResolver.h>
 
 namespace xmlencryption {
 
     /**
      * An API for resolving encrypted decryption keys.
      */
-    class XMLTOOL_API EncryptedKeyResolver : public xmlsignature::KeyResolver {
+    class XMLTOOL_API EncryptedKeyResolver : public xmltooling::KeyResolver {
     public:
         virtual ~EncryptedKeyResolver() {}
         

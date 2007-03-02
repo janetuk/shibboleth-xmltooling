@@ -21,7 +21,7 @@
  */
 
 #include "internal.h"
-#include "signature/CachingKeyResolver.h"
+#include "security/CachingKeyResolver.h"
 #include "signature/KeyInfo.h"
 #include "util/NDC.h"
 #include "util/Threads.h"
@@ -43,7 +43,7 @@ using namespace xmltooling;
 using namespace log4cpp;
 using namespace std;
 
-namespace xmlsignature {
+namespace xmltooling {
     class XMLTOOL_DLLLOCAL InlineKeyResolver : public CachingKeyResolver
     {
     public:

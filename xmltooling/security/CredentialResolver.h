@@ -29,12 +29,12 @@
 #include <xsec/enc/XSECCryptoKey.hpp>
 #include <xsec/enc/XSECCryptoX509.hpp>
 
-namespace xmlsignature {
+namespace xmltooling {
 
     /**
      * An API for resolving local/owned keys and certificates
      */
-    class XMLTOOL_API CredentialResolver : public xmltooling::Lockable
+    class XMLTOOL_API CredentialResolver : public Lockable
     {
         MAKE_NONCOPYABLE(CredentialResolver);
     protected:

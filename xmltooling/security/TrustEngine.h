@@ -25,7 +25,7 @@
 #define __xmltooling_trust_h__
 
 #include <xmltooling/security/KeyInfoSource.h>
-#include <xmltooling/signature/KeyResolver.h>
+#include <xmltooling/security/KeyResolver.h>
 #include <xmltooling/signature/Signature.h>
 
 namespace xmltooling {
@@ -53,7 +53,7 @@ namespace xmltooling {
         TrustEngine(const DOMElement* e=NULL);
         
         /** Default KeyResolver instance. */
-        xmlsignature::KeyResolver* m_keyResolver;
+        KeyResolver* m_keyResolver;
         
     public:
         virtual ~TrustEngine();
@@ -76,7 +76,7 @@ namespace xmltooling {
         virtual bool validate(
             xmlsignature::Signature& sig,
             const KeyInfoSource& keyInfoSource,
-            const xmlsignature::KeyResolver* keyResolver=NULL
+            const KeyResolver* keyResolver=NULL
             ) const=0;
 
         /**
@@ -109,7 +109,7 @@ namespace xmltooling {
             const char* in,
             unsigned int in_len,
             const KeyInfoSource& keyInfoSource,
-            const xmlsignature::KeyResolver* keyResolver=NULL
+            const KeyResolver* keyResolver=NULL
             ) const=0;
     };
 

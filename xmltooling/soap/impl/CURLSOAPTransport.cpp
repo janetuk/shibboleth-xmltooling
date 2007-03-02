@@ -23,7 +23,7 @@
 #include "internal.h"
 #include "exceptions.h"
 #include "security/OpenSSLTrustEngine.h"
-#include "signature/OpenSSLCredentialResolver.h"
+#include "security/OpenSSLCredentialResolver.h"
 #include "soap/HTTPSOAPTransport.h"
 #include "soap/OpenSSLSOAPTransport.h"
 #include "util/NDC.h"
@@ -34,7 +34,6 @@
 #include <log4cpp/Category.hh>
 #include <openssl/x509_vfy.h>
 
-using namespace xmlsignature;
 using namespace xmltooling;
 using namespace log4cpp;
 using namespace std;

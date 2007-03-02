@@ -21,19 +21,19 @@
  */
 
 #include "internal.h"
-#include "signature/KeyResolver.h"
+#include "security/KeyResolver.h"
 #include "signature/Signature.h"
 
 using namespace xmlsignature;
 using namespace xmltooling;
 using namespace std;
 
-namespace xmlsignature {
+namespace xmltooling {
     XMLTOOL_DLLLOCAL PluginManager<KeyResolver,const DOMElement*>::Factory FilesystemKeyResolverFactory;
     XMLTOOL_DLLLOCAL PluginManager<KeyResolver,const DOMElement*>::Factory InlineKeyResolverFactory;
 };
 
-void XMLTOOL_API xmlsignature::registerKeyResolvers()
+void XMLTOOL_API xmltooling::registerKeyResolvers()
 {
     XMLToolingConfig& conf=XMLToolingConfig::getConfig();
     conf.KeyResolverManager.registerFactory(FILESYSTEM_KEY_RESOLVER, FilesystemKeyResolverFactory);
