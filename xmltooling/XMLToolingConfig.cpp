@@ -34,6 +34,7 @@
 #include "util/ReplayCache.h"
 #include "util/StorageService.h"
 #include "util/TemplateEngine.h"
+#include "util/URLEncoder.h"
 #include "util/XMLConstants.h"
 #include "validation/ValidatorSuite.h"
 
@@ -176,6 +177,12 @@ void XMLToolingConfig::setTemplateEngine(TemplateEngine* templateEngine)
     m_templateEngine = templateEngine;
 }
 
+void XMLToolingConfig::setURLEncoder(URLEncoder* urlEncoder)
+{
+    delete m_urlEncoder;
+    m_urlEncoder = urlEncoder;
+}
+
 bool XMLToolingInternalConfig::init()
 {
 #ifdef _DEBUG
@@ -226,6 +233,8 @@ bool XMLToolingInternalConfig::init()
         registerKeyInfoClasses();
         registerEncryptionClasses();
         registerSOAPClasses();
+
+        m_urlEncoder = new URLEncoder();
         
         REGISTER_XMLTOOLING_EXCEPTION_FACTORY(XMLParserException,xmltooling);
         REGISTER_XMLTOOLING_EXCEPTION_FACTORY(XMLObjectException,xmltooling);
@@ -296,6 +305,9 @@ void XMLToolingInternalConfig::term()
     
     delete m_templateEngine;
     m_templateEngine = NULL;
+
+    delete m_urlEncoder;
+    m_urlEncoder = NULL;
 
     for (vector<void*>::reverse_iterator i=m_libhandles.rbegin(); i!=m_libhandles.rend(); i++) {
 #if defined(WIN32)

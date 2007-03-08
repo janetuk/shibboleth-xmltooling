@@ -48,6 +48,7 @@ namespace xmltooling {
     class XMLTOOL_API SOAPTransport;
     class XMLTOOL_API StorageService;
     class XMLTOOL_API TemplateEngine;
+    class XMLTOOL_API URLEncoder;
 
     /**
      * Singleton object that manages library startup/shutdown.configuration.
@@ -60,13 +61,17 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(XMLToolingConfig);
     protected:
-        XMLToolingConfig() : m_replayCache(NULL), m_templateEngine(NULL), clock_skew_secs(180) {}
+        XMLToolingConfig() : m_replayCache(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180) {}
         
         /** Global ReplayCache instance. */
         ReplayCache* m_replayCache;
         
         /** Global TemplateEngine instance. */
         TemplateEngine* m_templateEngine;
+
+        /** Global URLEncoder instance for use by URL-related functions. */
+        URLEncoder* m_urlEncoder;
+
     public:
         virtual ~XMLToolingConfig() {}
 
@@ -157,6 +162,24 @@ namespace xmltooling {
             return m_replayCache;
         }
 
+        /**
+         * Sets the global URLEncoder instance.
+         * This method must be externally synchronized with any code that uses the object.
+         * Any previously set object is destroyed.
+         * 
+         * @param urlEncoder   new URLEncoder instance to store
+         */
+        void setURLEncoder(URLEncoder* urlEncoder);
+        
+        /**
+         * Returns the global URLEncoder instance.
+         * 
+         * @return  global URLEncoder or NULL
+         */
+        const URLEncoder* getURLEncoder() const {
+            return m_urlEncoder;
+        }
+        
         /**
          * Sets the global TemplateEngine instance.
          * This method must be externally synchronized with any code that uses the object.

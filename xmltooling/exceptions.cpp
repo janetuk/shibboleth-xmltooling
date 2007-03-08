@@ -23,6 +23,7 @@
 #include "internal.h"
 #include "exceptions.h"
 #include "XMLToolingConfig.h"
+#include "util/URLEncoder.h"
 #include "util/XMLConstants.h"
 #include "util/XMLHelper.h"
 
@@ -222,11 +223,20 @@ string XMLToolingException::toString() const
     const char* msg=getMessage();
     if (msg)
         xml=xml + "<message>" + msg + "</message>";
-    for (map<string,string>::const_iterator i=m_params.begin(); i!=m_params.end(); i++) {
+    for (map<string,string>::const_iterator i=m_params.begin(); i!=m_params.end(); i++)
         xml=xml + "<param name=\"" + i->first + "\">" + i->second + "</param>";
-    }
     xml+="</exception>";
     return xml;
+}
+
+string XMLToolingException::toQueryString() const
+{
+    const URLEncoder* enc = XMLToolingConfig::getConfig().getURLEncoder();
+    string q("type=");
+    q = q + enc->encode(getClassName()) + "&message=" + enc->encode(what());
+    for (map<string,string>::const_iterator i=m_params.begin(); i!=m_params.end(); i++)
+        q = q + '&' + i->first + '=' + enc->encode(i->second.c_str());
+    return q;
 }
 
 XMLToolingException* XMLToolingException::fromStream(std::istream& in)

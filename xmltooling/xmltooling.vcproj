@@ -259,6 +259,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\util\URLEncoder.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\util\Win32Threads.cpp"
 					>
 				</File>
@@ -558,6 +562,10 @@
 				</File>
 				<File
 					RelativePath=".\util\Threads.h"
+					>
+				</File>
+				<File
+					RelativePath=".\util\URLEncoder.h"
 					>
 				</File>
 				<File

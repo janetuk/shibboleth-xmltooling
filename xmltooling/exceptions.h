@@ -276,6 +276,14 @@ namespace xmltooling {
          */
         std::string toString() const;
 
+        /**
+         * Returns a set of query string name/value pairs, URL-encoded, representing the
+         * exception's type, message, and parameters.
+         *
+         * @return  the query string representation
+         */
+        std::string toQueryString() const;
+
     private:
         std::string m_msg;
         mutable std::string m_processedmsg;

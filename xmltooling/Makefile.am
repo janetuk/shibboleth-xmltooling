@@ -92,6 +92,7 @@ utilinclude_HEADERS = \
 	util/StorageService.h \
 	util/TemplateEngine.h \
 	util/Threads.h \
+	util/URLEncoder.h \
 	util/XMLConstants.h \
 	util/XMLHelper.h \
 	util/XMLObjectChildrenList.h
@@ -161,6 +162,7 @@ libxmltooling_la_SOURCES = \
 	util/ReplayCache.cpp \
 	util/StorageService.cpp \
 	util/TemplateEngine.cpp \
+	util/URLEncoder.cpp \
 	util/XMLConstants.cpp \
 	util/XMLHelper.cpp \
 	validation/ValidatorSuite.cpp \
