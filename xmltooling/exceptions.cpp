@@ -231,11 +231,13 @@ string XMLToolingException::toString() const
 
 string XMLToolingException::toQueryString() const
 {
+    string q;
     const URLEncoder* enc = XMLToolingConfig::getConfig().getURLEncoder();
-    string q("errorType=");
-    q = q + enc->encode(getClassName()) + "&errorText=" + enc->encode(what());
-    for (map<string,string>::const_iterator i=m_params.begin(); i!=m_params.end(); i++)
-        q = q + '&' + i->first + '=' + enc->encode(i->second.c_str());
+    for (map<string,string>::const_iterator i=m_params.begin(); i!=m_params.end(); i++) {
+        if (!q.empty())
+            q += '&';
+        q = q + i->first + '=' + enc->encode(i->second.c_str());
+    }
     return q;
 }
 
