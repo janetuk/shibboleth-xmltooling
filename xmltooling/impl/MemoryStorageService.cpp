@@ -247,12 +247,12 @@ int MemoryStorageService::readString(const char* context, const char* key, strin
         return 0;
     else if (time(NULL) >= i->second.expiration)
         return 0;
+    if (pexpiration)
+        *pexpiration = i->second.expiration;
     if (i->second.version == version)
         return version; // nothing's changed, so just echo back the version
     if (pvalue)
         *pvalue = i->second.data;
-    if (pexpiration)
-        *pexpiration = i->second.expiration;
     return i->second.version;
 }
 
