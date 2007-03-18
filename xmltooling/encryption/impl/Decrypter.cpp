@@ -23,6 +23,7 @@
 #include "internal.h"
 #include "encryption/Decrypter.h"
 #include "encryption/EncryptedKeyResolver.h"
+#include "security/CredentialResolver.h"
 
 #include <log4cpp/Category.hh>
 #include <xsec/enc/XSECCryptoException.hpp>
@@ -41,45 +42,43 @@ Decrypter::~Decrypter()
 {
     if (m_cipher)
         XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
-    delete m_resolver;
-    delete m_KEKresolver;
 }
 
-DOMDocumentFragment* Decrypter::decryptData(EncryptedData* encryptedData)
+DOMDocumentFragment* Decrypter::decryptData(EncryptedData& encryptedData)
 {
-    if (encryptedData->getDOM()==NULL)
+    if (encryptedData.getDOM()==NULL)
         throw DecryptionException("The object must be marshalled before decryption.");
     
     // We can reuse the cipher object if the document hasn't changed.
 
-    if (m_cipher && m_cipher->getDocument()!=encryptedData->getDOM()->getOwnerDocument()) {
+    if (m_cipher && m_cipher->getDocument()!=encryptedData.getDOM()->getOwnerDocument()) {
         XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
         m_cipher=NULL;
     }
     
     if (!m_cipher)
-        m_cipher=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(encryptedData->getDOM()->getOwnerDocument());
+        m_cipher=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(encryptedData.getDOM()->getOwnerDocument());
     
     try {
         // Resolve decryption key.
         XSECCryptoKey* key=NULL;
         if (m_resolver)
-            key=m_resolver->resolveKey(encryptedData->getKeyInfo());
+            key=m_resolver->resolveKey(encryptedData.getKeyInfo());
 
         if (!key && m_KEKresolver) {
             // See if there's an encrypted key available. We'll need the algorithm...
             const XMLCh* algorithm=
-                encryptedData->getEncryptionMethod() ? encryptedData->getEncryptionMethod()->getAlgorithm() : NULL;
+                encryptedData.getEncryptionMethod() ? encryptedData.getEncryptionMethod()->getAlgorithm() : NULL;
             if (!algorithm)
                 throw DecryptionException("No EncryptionMethod/@Algorithm set, key decryption cannot proceed.");
             
-            if (encryptedData->getKeyInfo()) {
-                const vector<XMLObject*>& others=const_cast<const KeyInfo*>(encryptedData->getKeyInfo())->getUnknownXMLObjects();
+            if (encryptedData.getKeyInfo()) {
+                const vector<XMLObject*>& others=const_cast<const KeyInfo*>(encryptedData.getKeyInfo())->getUnknownXMLObjects();
                 for (vector<XMLObject*>::const_iterator i=others.begin(); i!=others.end(); i++) {
                     EncryptedKey* encKey=dynamic_cast<EncryptedKey*>(*i);
                     if (encKey) {
                         try {
-                            key=decryptKey(encKey, algorithm);
+                            key=decryptKey(*encKey, algorithm);
                         }
                         catch (DecryptionException& e) {
                             log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".Decrypter").warn(e.what());
@@ -90,12 +89,12 @@ DOMDocumentFragment* Decrypter::decryptData(EncryptedData* encryptedData)
             
             if (!key) {
                 // Check for a non-trivial resolver.
-                EncryptedKeyResolver* ekr=dynamic_cast<EncryptedKeyResolver*>(m_resolver);
+                const EncryptedKeyResolver* ekr=dynamic_cast<const EncryptedKeyResolver*>(m_resolver);
                 if (ekr) {
                     EncryptedKey* encKey=ekr->resolveKey(encryptedData);
                     if (encKey) {
                         try {
-                            key=decryptKey(encKey, algorithm);
+                            key=decryptKey(*encKey, algorithm);
                         }
                         catch (DecryptionException& e) {
                             log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".Decrypter").warn(e.what());
@@ -109,7 +108,7 @@ DOMDocumentFragment* Decrypter::decryptData(EncryptedData* encryptedData)
             throw DecryptionException("Unable to resolve a decryption key.");
         
         m_cipher->setKey(key);
-        DOMNode* ret=m_cipher->decryptElementDetached(encryptedData->getDOM());
+        DOMNode* ret=m_cipher->decryptElementDetached(encryptedData.getDOM());
         if (ret->getNodeType()!=DOMNode::DOCUMENT_FRAGMENT_NODE) {
             ret->release();
             throw DecryptionException("Decryption operation did not result in DocumentFragment.");
@@ -125,32 +124,32 @@ DOMDocumentFragment* Decrypter::decryptData(EncryptedData* encryptedData)
     }
 }
 
-XSECCryptoKey* Decrypter::decryptKey(EncryptedKey* encryptedKey, const XMLCh* algorithm)
+XSECCryptoKey* Decrypter::decryptKey(EncryptedKey& encryptedKey, const XMLCh* algorithm)
 {
-    if (encryptedKey->getDOM()==NULL)
+    if (encryptedKey.getDOM()==NULL)
         throw DecryptionException("The object must be marshalled before decryption.");
     
     // We can reuse the cipher object if the document hasn't changed.
 
-    if (m_cipher && m_cipher->getDocument()!=encryptedKey->getDOM()->getOwnerDocument()) {
+    if (m_cipher && m_cipher->getDocument()!=encryptedKey.getDOM()->getOwnerDocument()) {
         XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
         m_cipher=NULL;
     }
     
     if (!m_cipher)
-        m_cipher=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(encryptedKey->getDOM()->getOwnerDocument());
+        m_cipher=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(encryptedKey.getDOM()->getOwnerDocument());
     
     try {
         // Resolve key decryption key.
         XSECCryptoKey* key=NULL;
         if (m_KEKresolver)
-            key=m_KEKresolver->resolveKey(encryptedKey->getKeyInfo());
+            key=m_KEKresolver->getKey(encryptedKey.getKeyInfo());
         if (!key)
             throw DecryptionException("Unable to resolve a key decryption key.");
         m_cipher->setKEK(key);
         
         XMLByte buffer[1024];
-        int keySize = m_cipher->decryptKey(encryptedKey->getDOM(), buffer, 1024);
+        int keySize = m_cipher->decryptKey(encryptedKey.getDOM(), buffer, 1024);
         if (keySize > 0) {
             // Try to map the key.
             XSECAlgorithmHandler* handler = XSECPlatformUtils::g_algorithmMapper->mapURIToHandler(algorithm);

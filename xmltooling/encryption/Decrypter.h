@@ -24,10 +24,13 @@
 #define __xmltooling_decrypter_h__
 
 #include <xmltooling/encryption/Encryption.h>
-#include <xmltooling/security/KeyResolver.h>
 
-#include <xsec/enc/XSECCryptoKey.hpp>
 #include <xsec/xenc/XENCCipher.hpp>
+
+namespace xmltooling {
+    class XMLTOOL_API CredentialResolver;
+    class XMLTOOL_API KeyResolver;
+};
 
 namespace xmlencryption {
 
@@ -39,13 +42,12 @@ namespace xmlencryption {
     public:
         /**
          * Constructor.
-         * Resolvers will be deleted when Decrypter is.
          * 
-         * @param KEKresolver   resolves key decryption key
-         * @param resolver      resolves data decryption key
+         * @param KEKresolver   locked credential resolver to supply key decryption key
+         * @param resolver      directly or indirectly resolves the data decryption key
          */
-        Decrypter(xmltooling::KeyResolver* KEKresolver=NULL, xmltooling::KeyResolver* resolver=NULL)
-            : m_cipher(NULL), m_resolver(resolver), m_KEKresolver(KEKresolver) {
+        Decrypter(const xmltooling::CredentialResolver* KEKresolver=NULL, const xmltooling::KeyResolver* resolver=NULL)
+            : m_cipher(NULL), m_KEKresolver(KEKresolver), m_resolver(resolver) {
         }
 
         ~Decrypter();
@@ -55,18 +57,16 @@ namespace xmlencryption {
          * 
          * @param resolver  the KeyResolver to attach 
          */
-        void setKeyResolver(xmltooling::KeyResolver* resolver) {
-            delete m_resolver;
+        void setKeyResolver(const xmltooling::KeyResolver* resolver) {
             m_resolver=resolver;
         }
 
         /**
-         * Replace the current key encryption KeyResolver interface, if any, with a new one.
+         * Replace the current key encryption CredentialResolver interface, if any, with a new one.
          * 
-         * @param resolver  the KeyResolver to attach 
+         * @param resolver  the locked CredentialResolver to attach 
          */
-        void setKEKResolver(xmltooling::KeyResolver* resolver) {
-            delete m_KEKresolver;
+        void setKEKResolver(const xmltooling::CredentialResolver* resolver) {
             m_KEKresolver=resolver;
         }
 
@@ -81,10 +81,10 @@ namespace xmlencryption {
          * approach should be to unmarshall the DOM and then release it, or the
          * DOM can also be imported into a separately owned document.
          * 
-         * @param encryptedData the encrypted data to decrypt
+         * @param encryptedData the data to decrypt
          * @return  the decrypted DOM fragment
          */
-        DOMDocumentFragment* decryptData(EncryptedData* encryptedData);
+        DOMDocumentFragment* decryptData(EncryptedData& encryptedData);
         
         /**
          * Decrypts the supplied information and returns the resulting key.
@@ -96,12 +96,12 @@ namespace xmlencryption {
          * @param algorithm     the algorithm associated with the decrypted key
          * @return  the decrypted key
          */
-        XSECCryptoKey* decryptKey(EncryptedKey* encryptedKey, const XMLCh* algorithm);
+        XSECCryptoKey* decryptKey(EncryptedKey& encryptedKey, const XMLCh* algorithm);
         
     private:
         XENCCipher* m_cipher;
-        xmltooling::KeyResolver* m_resolver;
-        xmltooling::KeyResolver* m_KEKresolver;
+        const xmltooling::CredentialResolver* m_KEKresolver;
+        const xmltooling::KeyResolver* m_resolver;
     };
 
     DECL_XMLTOOLING_EXCEPTION(DecryptionException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmlencryption,xmltooling::XMLToolingException,Exceptions in decryption processing);

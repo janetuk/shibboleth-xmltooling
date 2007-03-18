@@ -67,7 +67,7 @@ namespace xmltooling {
         
         XSECCryptoKey* loadKey();
         
-        XSECCryptoKey* getKey() const { return m_key ? m_key->clone() : NULL; }
+        XSECCryptoKey* getKey(const KeyInfo* keyInfo=NULL) const { return m_key ? m_key->clone() : NULL; }
         const vector<XSECCryptoX509*>& getCertificates() const { return m_xseccerts; }
         void attach(SSL_CTX* ctx) const;
         

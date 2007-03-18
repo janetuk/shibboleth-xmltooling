@@ -36,12 +36,12 @@ namespace xmlencryption {
         virtual ~EncryptedKeyResolver() {}
         
         /**
-         * Returns an encrypted key based on the supplied KeyInfo information.
+         * Returns an encrypted key based on the supplied object's KeyInfo information.
          * 
          * @param encryptedData an encrypted object
          * @return  the resolved EncryptedKey object
          */
-        virtual EncryptedKey* resolveKey(EncryptedData* encryptedData)=0;
+        virtual EncryptedKey* resolveKey(EncryptedData& encryptedData) const=0;
     };
 
 };

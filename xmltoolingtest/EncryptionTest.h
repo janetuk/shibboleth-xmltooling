@@ -75,8 +75,8 @@ public:
                 dynamic_cast<EncryptedData*>(XMLObjectBuilder::buildOneFromElement(doc2->getDocumentElement(),true))
                 );
 
-            Decrypter decrypter(new KeyResolver(m_resolver->getKey()));
-            DOMDocumentFragment* frag = decrypter.decryptData(encData2.get());
+            Decrypter decrypter(m_resolver);
+            DOMDocumentFragment* frag = decrypter.decryptData(*encData2.get());
             XMLHelper::serialize(static_cast<DOMElement*>(frag->getFirstChild()), buf);
             //TS_TRACE(buf.c_str());
             TS_ASSERT(doc->getDocumentElement()->isEqualNode(frag->getFirstChild()));

@@ -29,6 +29,10 @@
 #include <xsec/enc/XSECCryptoKey.hpp>
 #include <xsec/enc/XSECCryptoX509.hpp>
 
+namespace xmlsignature {
+    class XMLTOOL_API KeyInfo;
+};
+
 namespace xmltooling {
 
     /**
@@ -44,12 +48,13 @@ namespace xmltooling {
         virtual ~CredentialResolver() {}
         
         /**
-         * Returns a secret or private key to use for signing operations.
+         * Returns a secret or private key to use for signing or decryption operations.
          * The caller is responsible for deleting the key when finished with it.
          * 
+         * @param keyInfo   optional material identifying a decryption key 
          * @return  a secret or private key
          */
-        virtual XSECCryptoKey* getKey() const=0;
+        virtual XSECCryptoKey* getKey(const xmlsignature::KeyInfo* keyInfo=NULL) const=0;
         
         /**
          * Returns a set of certificates to publish during signing operations.
