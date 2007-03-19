@@ -165,7 +165,7 @@
     <sequence>
       <element ref="ds:Transforms" minOccurs="0"/> 
     </sequence>  
-    <attribute name="URI" type="anyURI"/>
+    <attribute name="URI" type="anyURI" use="required"/>
     <attribute name="Type" type="anyURI" use="optional"/>
   </complexType>
 
