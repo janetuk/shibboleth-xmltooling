@@ -16,6 +16,8 @@
 
 #include "XMLObjectBaseTestCase.h"
 
+#include <xmltooling/security/Credential.h>
+#include <xmltooling/security/CredentialCriteria.h>
 #include <xmltooling/security/CredentialResolver.h>
 #include <xmltooling/signature/KeyInfo.h>
 #include <xmltooling/signature/SignatureValidator.h>
@@ -49,7 +51,7 @@ class TestValidator : public SignatureValidator
     XMLCh* m_uri;
     
 public:
-    TestValidator(const XMLCh* uri) : SignatureValidator(XMLToolingConfig::getConfig().KeyResolverManager.newPlugin(INLINE_KEY_RESOLVER,NULL)) {
+    TestValidator(const XMLCh* uri, const Credential* credential) : SignatureValidator(credential) {
         m_uri=XMLString::replicate(uri);
     }
     
@@ -64,16 +66,6 @@ public:
         const XMLCh* uri=sig->getReferenceList()->item(0)->getURI();
         TSM_ASSERT_SAME_DATA("Reference URI does not match.",uri,m_uri,XMLString::stringLen(uri));
         SignatureValidator::validate(sigObj);
-    }
-};
-
-class _addcert : public std::binary_function<X509Data*,XSECCryptoX509*,void> {
-public:
-    void operator()(X509Data* bag, XSECCryptoX509* cert) const {
-        safeBuffer& buf=cert->getDEREncodingSB();
-        X509Certificate* x=X509CertificateBuilder::buildX509Certificate();
-        x->setValue(buf.sbStrToXMLCh());
-        bag->getX509Certificates().push_back(x);
     }
 };
 
@@ -126,20 +118,16 @@ public:
         sxObject->setSignature(sig);
         sig->setContentReference(new TestContext(&chNull));
 
+        CredentialCriteria cc;
+        cc.setUsage(CredentialCriteria::SIGNING_CREDENTIAL);
         Locker locker(m_resolver);
-        sig->setSigningKey(m_resolver->getKey());
-        
-        // Build KeyInfo.
-        KeyInfo* keyInfo=KeyInfoBuilder::buildKeyInfo();
-        X509Data* x509Data=X509DataBuilder::buildX509Data();
-        keyInfo->getX509Datas().push_back(x509Data);
-        for_each(m_resolver->getCertificates().begin(),m_resolver->getCertificates().end(),bind1st(_addcert(),x509Data));
-        sig->setKeyInfo(keyInfo);
+        const Credential* cred = m_resolver->resolve(&cc);
+        TSM_ASSERT("Retrieved credential was null", cred!=NULL);
         
         DOMElement* rootElement = NULL;
         try {
-            rootElement=sxObject->marshall((DOMDocument*)NULL);
-            sig->sign();
+            vector<Signature*> sigs(1,sig);
+            rootElement=sxObject->marshall((DOMDocument*)NULL,&sigs,cred);
         }
         catch (XMLToolingException& e) {
             TS_TRACE(e.what());
@@ -157,7 +145,7 @@ public:
         TS_ASSERT(sxObject2->getSignature()!=NULL);
         
         try {
-            TestValidator tv(&chNull);
+            TestValidator tv(&chNull, cred);
             tv.validate(sxObject2->getSignature());
         }
         catch (XMLToolingException& e) {

@@ -48,6 +48,7 @@ namespace xmltooling {
         virtual ~AbstractXMLObject() {
             delete m_typeQname;
             XMLString::release(&m_schemaLocation);
+            XMLString::release(&m_noNamespaceSchemaLocation);
         }
 
         void detach();
@@ -200,6 +201,11 @@ namespace xmltooling {
          * Stores off xsi:schemaLocation attribute.
          */
         XMLCh* m_schemaLocation;
+
+        /**
+         * Stores off xsi:noNamespaceSchemaLocation attribute.
+         */
+        XMLCh* m_noNamespaceSchemaLocation;
 
     private:
         XMLObject* m_parent;

@@ -17,8 +17,8 @@
 /**
  * @file xmltooling/security/AbstractPKIXTrustEngine.h
  * 
- * A trust engine that uses X.509 trust anchors and CRLs associated with a KeyInfoSource
- * to perform PKIX validation of signatures and certificates.
+ * A trust engine that uses X.509 trust anchors and CRLs associated with a peer
+ * to perform PKIX validation of signatures and credentials.
  */
 
 #if !defined(__xmltooling_pkixtrust_h__) && !defined(XMLTOOLING_NO_XMLSEC)
@@ -30,8 +30,8 @@
 namespace xmltooling {
 
     /**
-     * A trust engine that uses X.509 trust anchors and CRLs associated with a KeyInfoSource
-     * to perform PKIX validation of signatures and certificates.
+     * A trust engine that uses X.509 trust anchors and CRLs associated with a peer
+     * to perform PKIX validation of signatures and credentials.
      */
     class XMLTOOL_API AbstractPKIXTrustEngine : public OpenSSLTrustEngine
     {
@@ -42,37 +42,34 @@ namespace xmltooling {
          * If a DOM is supplied, the following XML content is supported:
          * 
          * <ul>
-         *  <li>&lt;KeyResolver&gt; elements with a type attribute
+         *  <li>&lt;KeyInfoResolver&gt; elements with a type attribute
          * </ul>
          * 
          * XML namespaces are ignored in the processing of this content.
          * 
          * @param e DOM to supply configuration for provider
          */
-        AbstractPKIXTrustEngine(const DOMElement* e=NULL);
+        AbstractPKIXTrustEngine(const DOMElement* e=NULL) : OpenSSLTrustEngine(e) {}
         
         /**
-         * Checks that either the ID for the entity with the given role or the key names
-         * for the given role match the subject or subject alternate names
-         * of the entity's certificate.
+         * Checks that either the name of the peer with the given credentials or the names
+         * of the credentials match the subject or subject alternate names of the certificate.
          * 
          * @param certEE        the credential for the entity to validate
-         * @param keyInfoSource supplies KeyInfo objects to the TrustEngine
+         * @param credResolver  source of credentials
+         * @param criteria      criteria for selecting credentials, including the peer name
          * 
          * @return true the name check succeeds, false if not
          */
-        bool checkEntityNames(X509* certEE, const KeyInfoSource& keyInfoSource) const;
-        
-        /** An inline KeyResolver for extracting certificates out of a signature. */
-        KeyResolver* m_inlineResolver;
+        bool checkEntityNames(X509* certEE, const CredentialResolver& credResolver, const CredentialCriteria& criteria) const;
         
     public:
-        virtual ~AbstractPKIXTrustEngine();
+        virtual ~AbstractPKIXTrustEngine() {}
 
         virtual bool validate(
             xmlsignature::Signature& sig,
-            const KeyInfoSource& keyInfoSource,
-            const KeyResolver* keyResolver=NULL
+            const CredentialResolver& credResolver,
+            CredentialCriteria* criteria=NULL
             ) const;
 
         virtual bool validate(
@@ -81,24 +78,22 @@ namespace xmltooling {
             xmlsignature::KeyInfo* keyInfo,
             const char* in,
             unsigned int in_len,
-            const KeyInfoSource& keyInfoSource,
-            const KeyResolver* keyResolver=NULL
+            const CredentialResolver& credResolver,
+            CredentialCriteria* criteria=NULL
             ) const;
 
         virtual bool validate(
             XSECCryptoX509* certEE,
             const std::vector<XSECCryptoX509*>& certChain,
-            const KeyInfoSource& keyInfoSource,
-            bool checkName=true,
-            const KeyResolver* keyResolver=NULL
+            const CredentialResolver& credResolver,
+            CredentialCriteria* criteria=NULL
             ) const;
 
         virtual bool validate(
             X509* certEE,
             STACK_OF(X509)* certChain,
-            const KeyInfoSource& keyInfoSource,
-            bool checkName=true,
-            const KeyResolver* keyResolver=NULL
+            const CredentialResolver& credResolver,
+            CredentialCriteria* criteria=NULL
             ) const;
 
         /**
@@ -110,15 +105,7 @@ namespace xmltooling {
         class XMLTOOL_API PKIXValidationInfoIterator {
             MAKE_NONCOPYABLE(PKIXValidationInfoIterator);
         protected:
-            /** Reference to KeyResolver to use. */
-            const KeyResolver& m_keyResolver;
-            
-            /**
-             * Constructor
-             * 
-             * @param keyResolver   reference to KeyResolver to use
-             */
-            PKIXValidationInfoIterator(const KeyResolver& keyResolver) : m_keyResolver(keyResolver) {}
+            PKIXValidationInfoIterator() {}
             
         public:
             virtual ~PKIXValidationInfoIterator() {}
@@ -160,18 +147,20 @@ namespace xmltooling {
         };
         
         /**
-         * Provides access to the information necessary, for the given key source, for
+         * Provides access to the information necessary, for the given credential source, for
          * PKIX validation of credentials. Each set of validation information returned
          * will be tried, in turn, until one succeeds or no more remain.
          * The caller must free the returned interface when finished with it.
          * 
-         * @param pkixSource    the peer for which validation rules are required
-         * @param keyResolver   reference to KeyResolver to use for any KeyInfo operations
+         * @param pkixSource        the peer for which validation rules are required
+         * @param criteria          criteria for selecting validation rules
+         * @param keyInfoResolver   custom KeyInfoResolver to use for KeyInfo extraction
          * @return interface for obtaining validation data
          */
         virtual PKIXValidationInfoIterator* getPKIXValidationInfoIterator(
-            const KeyInfoSource& pkixSource,
-            const KeyResolver& keyResolver
+            const CredentialResolver& pkixSource,
+            CredentialCriteria* criteria=NULL,
+            const KeyInfoResolver* keyInfoResolver=NULL
             ) const=0;
     };
 };

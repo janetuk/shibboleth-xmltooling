@@ -31,7 +31,7 @@
 namespace xmltooling {
     class XMLTOOL_API CredentialResolver;
     class XMLTOOL_API KeyInfoSource;
-    class XMLTOOL_API KeyResolver;
+    class XMLTOOL_API KeyInfoResolver;
     class XMLTOOL_API TrustEngine;
     class XMLTOOL_API XSECCryptoX509CRL;
 };
@@ -61,8 +61,11 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(XMLToolingConfig);
     protected:
-        XMLToolingConfig() : m_replayCache(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180) {}
+        XMLToolingConfig() : m_keyInfoResolver(NULL), m_replayCache(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180) {}
         
+        /** Global KeyInfoResolver instance. */
+        KeyInfoResolver* m_keyInfoResolver;
+
         /** Global ReplayCache instance. */
         ReplayCache* m_replayCache;
         
@@ -145,6 +148,24 @@ namespace xmltooling {
         virtual ParserPool& getValidatingParser() const=0;
 
         /**
+         * Sets the global KeyInfoResolver instance.
+         * This method must be externally synchronized with any code that uses the object.
+         * Any previously set object is destroyed.
+         * 
+         * @param keyInfoResolver   new KeyInfoResolver instance to store
+         */
+        void setKeyInfoResolver(KeyInfoResolver* keyInfoResolver);
+
+        /**
+         * Returns the global KeyInfoResolver instance.
+         * 
+         * @return  global KeyInfoResolver or NULL
+         */
+        const KeyInfoResolver* getKeyInfoResolver() const {
+            return m_keyInfoResolver;
+        }
+
+        /**
          * Sets the global ReplayCache instance.
          * This method must be externally synchronized with any code that uses the object.
          * Any previously set object is destroyed.
@@ -218,9 +239,9 @@ namespace xmltooling {
         virtual XSECCryptoX509CRL* X509CRL() const=0;
 
         /**
-         * Manages factories for KeyResolver plugins.
+         * Manages factories for KeyInfoResolver plugins.
          */
-        PluginManager<KeyResolver,const DOMElement*> KeyResolverManager;
+        PluginManager<KeyInfoResolver,const DOMElement*> KeyInfoResolverManager;
 
         /**
          * Manages factories for CredentialResolver plugins.
@@ -235,8 +256,10 @@ namespace xmltooling {
 
         /**
          * Manages factories for SOAPTransport plugins.
+         * 
+         * <p>The factory interface takes a peer name/endpoint pair.
          */
-        PluginManager<SOAPTransport,std::pair<const KeyInfoSource*,const char*> > SOAPTransportManager;
+        PluginManager<SOAPTransport,std::pair<const char*,const char*> > SOAPTransportManager;
 
         /**
          * Manages factories for StorageService plugins.

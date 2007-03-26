@@ -44,6 +44,7 @@ namespace xmltooling {
             DOMDocument* document=NULL
 #ifndef XMLTOOLING_NO_XMLSEC
             ,const std::vector<xmlsignature::Signature*>* sigs=NULL
+            ,const Credential* credential=NULL
 #endif
             ) const;
 
@@ -51,6 +52,7 @@ namespace xmltooling {
             DOMElement* parentElement
 #ifndef XMLTOOLING_NO_XMLSEC
             ,const std::vector<xmlsignature::Signature*>* sigs=NULL
+            ,const Credential* credential=NULL
 #endif
             ) const;
         
@@ -79,11 +81,14 @@ namespace xmltooling {
          * 
          * @param targetElement the Element into which the XMLObject is marshalled into
          * @param sigs          optional array of signatures to create after marshalling          
+         * @param credential    optional credential to supply signing key and related info
          * 
          * @throws MarshallingException thrown if there is a problem marshalling the object
          * @throws SignatureException thrown if a problem occurs during signature creation 
          */
-        void marshallInto(DOMElement* targetElement, const std::vector<xmlsignature::Signature*>* sigs) const;
+        void marshallInto(
+            DOMElement* targetElement, const std::vector<xmlsignature::Signature*>* sigs, const Credential* credential=NULL
+            ) const;
 #else
         /**
          * Marshalls the XMLObject into the given DOM Element.
@@ -113,6 +118,17 @@ namespace xmltooling {
          */
         void marshallNamespaces(DOMElement* domElement) const;
     
+#ifndef XMLTOOLING_NO_XMLSEC
+        /**
+         * Marshalls the text content and/or child elements of the XMLObject.
+         * 
+         * @param domElement the DOM element that will recieved the marshalled children
+         * @param credential    optional credential to supply signing key and related info
+         * 
+         * @throws MarshallingException thrown if there is a problem marshalling a child element
+         */
+        void marshallContent(DOMElement* domElement, const Credential* credential) const;
+#else
         /**
          * Marshalls the text content and/or child elements of the XMLObject.
          * 
@@ -121,6 +137,7 @@ namespace xmltooling {
          * @throws MarshallingException thrown if there is a problem marshalling a child element
          */
         void marshallContent(DOMElement* domElement) const;
+#endif
 
         /**
          * Marshalls the attributes from the XMLObject into the given DOM element.

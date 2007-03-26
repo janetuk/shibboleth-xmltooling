@@ -24,24 +24,26 @@
 #define __xmltooling_enckeyres_h__
 
 #include <xmltooling/encryption/Encryption.h>
-#include <xmltooling/security/KeyResolver.h>
 
 namespace xmlencryption {
 
     /**
      * An API for resolving encrypted decryption keys.
      */
-    class XMLTOOL_API EncryptedKeyResolver : public xmltooling::KeyResolver {
+    class XMLTOOL_API EncryptedKeyResolver {
+        MAKE_NONCOPYABLE(EncryptedKeyResolver);
     public:
+        EncryptedKeyResolver() {}
         virtual ~EncryptedKeyResolver() {}
         
         /**
          * Returns an encrypted key based on the supplied object's KeyInfo information.
          * 
          * @param encryptedData an encrypted object
+         * @param recipient identifier of recipient of encrypted key
          * @return  the resolved EncryptedKey object
          */
-        virtual EncryptedKey* resolveKey(EncryptedData& encryptedData) const=0;
+        virtual const EncryptedKey* resolveKey(const EncryptedData& encryptedData, const XMLCh* recipient=NULL) const;
     };
 
 };

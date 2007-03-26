@@ -17,6 +17,7 @@
 #include "XMLObjectBaseTestCase.h"
 
 #include <xmltooling/security/CredentialResolver.h>
+#include <xmltooling/security/X509Credential.h>
 
 #include <fstream>
 
@@ -41,8 +42,9 @@ public:
             );
 
         Locker locker(credResolver.get());
-        auto_ptr<XSECCryptoKey> key(credResolver->getKey());
-        TSM_ASSERT("Retrieved key was null", key.get()!=NULL);
-        TSM_ASSERT_EQUALS("Unexpected number of certificates", 1, credResolver->getCertificates().size());
+        const X509Credential* cred=dynamic_cast<const X509Credential*>(credResolver->resolve());
+        TSM_ASSERT("Retrieved credential was null", cred!=NULL);
+        TSM_ASSERT("Retrieved key was null", cred->getPrivateKey()!=NULL);
+        TSM_ASSERT_EQUALS("Unexpected number of certificates", 1, cred->getEntityCertificateChain().size());
     }
 };

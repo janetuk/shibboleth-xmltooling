@@ -61,6 +61,7 @@ namespace xmltooling {
             DOMDocument* document=NULL
 #ifndef XMLTOOLING_NO_XMLSEC
             ,const std::vector<xmlsignature::Signature*>* sigs=NULL
+            ,const Credential* credential=NULL
 #endif
             ) const;
 
@@ -68,6 +69,7 @@ namespace xmltooling {
             DOMElement* parentElement
 #ifndef XMLTOOLING_NO_XMLSEC
             ,const std::vector<xmlsignature::Signature*>* sigs=NULL
+            ,const Credential* credential=NULL
 #endif
             ) const;
         XMLObject* unmarshall(DOMElement* element, bool bindDocument=false);

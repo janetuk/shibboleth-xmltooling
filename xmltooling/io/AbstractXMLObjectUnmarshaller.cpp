@@ -110,6 +110,7 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
         else if (XMLString::equals(nsuri,XSI_NS)) {
             static const XMLCh type[]= UNICODE_LITERAL_4(t,y,p,e);
             static const XMLCh schemaLocation[]= UNICODE_LITERAL_14(s,c,h,e,m,a,L,o,c,a,t,i,o,n);
+            static const XMLCh noNamespaceSchemaLocation[]= UNICODE_LITERAL_25(n,o,N,a,m,e,s,p,a,c,e,S,c,h,e,m,a,L,o,c,a,t,i,o,n);
             if (XMLString::equals(attribute->getLocalName(),type)) {
                 m_log.debug("skipping xsi:type declaration");
                 continue;
@@ -119,6 +120,14 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
                 if (m_schemaLocation)
                     XMLString::release(&m_schemaLocation);
                 m_schemaLocation=XMLString::replicate(attribute->getValue());
+                continue;
+            }
+            else if (XMLString::equals(attribute->getLocalName(),noNamespaceSchemaLocation)) {
+                m_log.debug("storing off xsi:noNamespaceSchemaLocation attribute");
+                if (m_noNamespaceSchemaLocation)
+                    XMLString::release(&m_noNamespaceSchemaLocation);
+                m_schemaLocation=XMLString::replicate(attribute->getValue());
+                m_noNamespaceSchemaLocation=XMLString::replicate(attribute->getValue());
                 continue;
             }
         }

@@ -23,38 +23,33 @@
 #if !defined(__xmltooling_sigval_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_sigval_h__
 
-#include <xmltooling/security/KeyResolver.h>
+#include <xmltooling/security/Credential.h>
 #include <xmltooling/signature/Signature.h>
 #include <xmltooling/validation/Validator.h>
 
 namespace xmlsignature {
 
     /**
-     * Validator for signatures based on a Key or a KeyResolver
+     * Validator for signatures based on a Credential
      */
     class XMLTOOL_API SignatureValidator : public xmltooling::Validator
     {
     public:
         /**
-         * Constructor using a KeyResolver
+         * Constructor using a key
          * 
-         * @param resolver the key resolver to use, will be freed by Validator
+         * @param key the key to use
          */
-        SignatureValidator(xmltooling::KeyResolver* resolver) : m_key(NULL), m_resolver(resolver) {
-        }
+        SignatureValidator(XSECCryptoKey* key=NULL) : m_key(key), m_credential(NULL) {}
 
         /**
-         * Constructor using a Key
+         * Constructor using a Credential
          * 
-         * @param key the verification key to use, will be freed by Validator
+         * @param credential the credential to use
          */
-        SignatureValidator(XSECCryptoKey* key=NULL) : m_key(key), m_resolver(NULL) {
-        }
-        
-        virtual ~SignatureValidator() {
-            delete m_key;
-            delete m_resolver;
-        }
+        SignatureValidator(const xmltooling::Credential* credential) : m_key(NULL), m_credential(credential) {}
+
+        virtual ~SignatureValidator() {}
 
         virtual void validate(const xmltooling::XMLObject* xmlObject) const;
 
@@ -66,35 +61,31 @@ namespace xmlsignature {
         virtual void validate(const Signature* signature) const;
         
         /**
-         * Replace the current Key, if any, with a new one.
+         * Replace the current key, if any, with a new one.
          * 
-         * @param key  the Key to attach 
+         * @param key  the key to attach 
          */
         void setKey(XSECCryptoKey* key) {
-            delete m_key;
-            delete m_resolver;
-            m_resolver=NULL;
-            m_key=key;
+            m_key = key;
+            m_credential = NULL;
         }
 
         /**
-         * Replace the current KeyResolver, if any, with a new one.
+         * Replace the current Credential, if any, with a new one.
          * 
-         * @param resolver  the KeyResolver to attach 
+         * @param credential  the Credential to attach 
          */
-        void setKeyResolver(xmltooling::KeyResolver* resolver) {
-            delete m_key;
-            delete m_resolver;
-            m_key=NULL;
-            m_resolver=resolver;
+        void setCredential(const xmltooling::Credential* credential) {
+            m_key = NULL;
+            m_credential = credential;
         }
     
     protected:
         /** Verification key. */
         XSECCryptoKey* m_key;
-        
-        /** KeyResolver to use against signature. */
-        xmltooling::KeyResolver* m_resolver;
+
+        /** Verification credential. */
+        const xmltooling::Credential* m_credential;
     };
 
 };

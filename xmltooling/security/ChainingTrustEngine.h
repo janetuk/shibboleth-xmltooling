@@ -79,8 +79,8 @@ namespace xmltooling {
 
         bool validate(
             xmlsignature::Signature& sig,
-            const KeyInfoSource& keyInfoSource,
-            const KeyResolver* keyResolver=NULL
+            const CredentialResolver& credResolver,
+            CredentialCriteria* criteria=NULL
             ) const;
         bool validate(
             const XMLCh* sigAlgorithm,
@@ -88,22 +88,20 @@ namespace xmltooling {
             xmlsignature::KeyInfo* keyInfo,
             const char* in,
             unsigned int in_len,
-            const KeyInfoSource& keyInfoSource,
-            const KeyResolver* keyResolver=NULL
+            const CredentialResolver& credResolver,
+            CredentialCriteria* criteria=NULL
             ) const;
         bool validate(
             XSECCryptoX509* certEE,
             const std::vector<XSECCryptoX509*>& certChain,
-            const KeyInfoSource& keyInfoSource,
-            bool checkName=true,
-            const KeyResolver* keyResolver=NULL
+            const CredentialResolver& credResolver,
+            CredentialCriteria* criteria=NULL
             ) const;
         bool validate(
             X509* certEE,
             STACK_OF(X509)* certChain,
-            const KeyInfoSource& keyInfoSource,
-            bool checkName=true,
-            const KeyResolver* keyResolver=NULL
+            const CredentialResolver& credResolver,
+            CredentialCriteria* criteria=NULL
             ) const;
     private:
         std::vector<TrustEngine*> m_engines;

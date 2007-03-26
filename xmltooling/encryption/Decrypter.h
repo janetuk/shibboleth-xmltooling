@@ -28,11 +28,13 @@
 #include <xsec/xenc/XENCCipher.hpp>
 
 namespace xmltooling {
+    class XMLTOOL_API CredentialCriteria;
     class XMLTOOL_API CredentialResolver;
-    class XMLTOOL_API KeyResolver;
 };
 
 namespace xmlencryption {
+
+    class XMLTOOL_API EncryptedKeyResolver;
 
     /**
      * Wrapper API for XML Decryption functionality.
@@ -43,32 +45,55 @@ namespace xmlencryption {
         /**
          * Constructor.
          * 
-         * @param KEKresolver   locked credential resolver to supply key decryption key
-         * @param resolver      directly or indirectly resolves the data decryption key
+         * @param credResolver  locked credential resolver to supply decryption keys
+         * @param criteria      optional external criteria to use with resolver
+         * @param EKresolver    locates an EncryptedKey pertaining to the EncryptedData
          */
-        Decrypter(const xmltooling::CredentialResolver* KEKresolver=NULL, const xmltooling::KeyResolver* resolver=NULL)
-            : m_cipher(NULL), m_KEKresolver(KEKresolver), m_resolver(resolver) {
+        Decrypter(
+            const xmltooling::CredentialResolver* credResolver=NULL,
+            xmltooling::CredentialCriteria* criteria=NULL,
+            const EncryptedKeyResolver* EKResolver=NULL
+            ) : m_cipher(NULL), m_credResolver(credResolver), m_criteria(criteria), m_EKResolver(EKResolver) {
         }
 
         ~Decrypter();
         
         /**
-         * Replace the current data encryption KeyResolver interface, if any, with a new one.
+         * Replace the current EncryptedKeyResolver interface, if any, with a new one.
          * 
-         * @param resolver  the KeyResolver to attach 
+         * @param EKresolver  the EncryptedKeyResolver to attach 
          */
-        void setKeyResolver(const xmltooling::KeyResolver* resolver) {
-            m_resolver=resolver;
+        void setEncryptedKeyResolver(const EncryptedKeyResolver* EKResolver) {
+            m_EKResolver=EKResolver;
         }
 
         /**
-         * Replace the current key encryption CredentialResolver interface, if any, with a new one.
+         * Replace the current CredentialResolver interface, if any, with a new one.
          * 
-         * @param resolver  the locked CredentialResolver to attach 
+         * @param resolver  the locked CredentialResolver to attach, or NULL to clear
+         * @param criteria  optional external criteria to use with resolver
          */
-        void setKEKResolver(const xmltooling::CredentialResolver* resolver) {
-            m_KEKresolver=resolver;
+        void setKEKResolver(const xmltooling::CredentialResolver* resolver, xmltooling::CredentialCriteria* criteria) {
+            m_credResolver=resolver;
+            m_criteria=criteria;
         }
+
+        /**
+         * Decrypts the supplied information using the supplied key, and returns
+         * the resulting as a DOM fragment owned by the document associated with the
+         * marshalled EncryptedData object.
+         * 
+         * Note that the DOM nodes will be invalidated once that document
+         * is released. The caller should therefore process the DOM fragment as
+         * required and drop all references to it before that happens. The usual
+         * approach should be to unmarshall the DOM and then release it, or the
+         * DOM can also be imported into a separately owned document.
+         * 
+         * @param encryptedData the data to decrypt
+         * @param key           the decryption key to use (it will not be freed internally)
+         * @return  the decrypted DOM fragment
+         */
+        DOMDocumentFragment* decryptData(const EncryptedData& encryptedData, XSECCryptoKey* key);
 
         /**
          * Decrypts the supplied information and returns the resulting as a DOM
@@ -82,9 +107,10 @@ namespace xmlencryption {
          * DOM can also be imported into a separately owned document.
          * 
          * @param encryptedData the data to decrypt
+         * @param recipient identifier of decrypting entity for use in identifying multi-cast keys
          * @return  the decrypted DOM fragment
          */
-        DOMDocumentFragment* decryptData(EncryptedData& encryptedData);
+        DOMDocumentFragment* decryptData(const EncryptedData& encryptedData, const XMLCh* recipient=NULL);
         
         /**
          * Decrypts the supplied information and returns the resulting key.
@@ -96,12 +122,13 @@ namespace xmlencryption {
          * @param algorithm     the algorithm associated with the decrypted key
          * @return  the decrypted key
          */
-        XSECCryptoKey* decryptKey(EncryptedKey& encryptedKey, const XMLCh* algorithm);
+        XSECCryptoKey* decryptKey(const EncryptedKey& encryptedKey, const XMLCh* algorithm);
         
     private:
         XENCCipher* m_cipher;
-        const xmltooling::CredentialResolver* m_KEKresolver;
-        const xmltooling::KeyResolver* m_resolver;
+        const xmltooling::CredentialResolver* m_credResolver;
+        xmltooling::CredentialCriteria* m_criteria;
+        const EncryptedKeyResolver* m_EKResolver;
     };
 
     DECL_XMLTOOLING_EXCEPTION(DecryptionException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmlencryption,xmltooling::XMLToolingException,Exceptions in decryption processing);

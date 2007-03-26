@@ -22,6 +22,7 @@
 
 #include "internal.h"
 #include "encryption/Encrypter.h"
+#include "security/Credential.h"
 
 #include <xsec/enc/XSECCryptoException.hpp>
 #include <xsec/framework/XSECException.hpp>
@@ -44,11 +45,11 @@ Encrypter::~Encrypter()
 void Encrypter::checkParams(EncryptionParams& encParams, KeyEncryptionParams* kencParams)
 {
     if (encParams.m_keyBufferSize==0) {
-        if (encParams.m_key) {
+        if (encParams.m_credential) {
             if (kencParams)
                 throw EncryptionException("Generating EncryptedKey inline requires the encryption key in raw form.");
         }
-        else if (!encParams.m_key) {
+        else if (!encParams.m_credential) {
             if (!kencParams)
                 throw EncryptionException("Using a generated encryption key requires a KeyEncryptionParams object.");
 
@@ -60,20 +61,27 @@ void Encrypter::checkParams(EncryptionParams& encParams, KeyEncryptionParams* ke
         }
     }
     
-    if (!encParams.m_key) {
+    XSECCryptoKey* key=NULL;
+    if (encParams.m_credential) {
+        key = encParams.m_credential->getPrivateKey();
+        if (!key)
+            throw EncryptionException("Credential in EncryptionParams structure did not supply a private/secret key.");
+        // Set the encryption key.
+        m_cipher->setKey(key->clone());
+    }
+    else {
         // We have to have a raw key now, so we need to build a wrapper around it.
         XSECAlgorithmHandler* handler =XSECPlatformUtils::g_algorithmMapper->mapURIToHandler(encParams.m_algorithm);
         if (handler != NULL)
-            encParams.m_key = handler->createKeyForURI(
+            key = handler->createKeyForURI(
                 encParams.m_algorithm,const_cast<unsigned char*>(encParams.m_keyBuffer),encParams.m_keyBufferSize
                 );
 
-        if (!encParams.m_key)
+        if (!key)
             throw EncryptionException("Unable to build wrapper for key, unknown algorithm?");
+        // Set the encryption key.
+        m_cipher->setKey(key);
     }
-    
-    // Set the encryption key.
-    m_cipher->setKey(encParams.m_key->clone());
 }
 
 EncryptedData* Encrypter::encryptElement(DOMElement* element, EncryptionParams& encParams, KeyEncryptionParams* kencParams)
@@ -151,8 +159,7 @@ EncryptedData* Encrypter::encryptStream(istream& input, EncryptionParams& encPar
         checkParams(encParams,kencParams);
         StreamInputSource::StreamBinInputStream xstream(input);
         m_cipher->encryptBinInputStream(&xstream, ENCRYPT_NONE, encParams.m_algorithm);
-        EncryptedData* xmlEncData = decorateAndUnmarshall(encParams, kencParams);
-        return xmlEncData;
+        return decorateAndUnmarshall(encParams, kencParams);
     }
     catch(XSECException& e) {
         auto_ptr_char temp(e.getMsg());
@@ -179,14 +186,17 @@ EncryptedData* Encrypter::decorateAndUnmarshall(EncryptionParams& encParams, Key
     xmlEncData->releaseThisAndChildrenDOM();
     
     // KeyInfo?
-    if (encParams.m_keyInfo) {
-        xmlEncData->setKeyInfo(encParams.m_keyInfo);
-        encParams.m_keyInfo=NULL;   // transfer ownership
-    }
+    const KeyInfo* kinfo = encParams.m_credential ? encParams.m_credential->getKeyInfo(encParams.m_compact) : NULL;
+    if (kinfo)
+        xmlEncData->setKeyInfo(kinfo->cloneKeyInfo());
     
     // Are we doing a key encryption?
     if (kencParams) {
-        m_cipher->setKEK(kencParams->m_key->clone());
+        XSECCryptoKey* kek = kencParams->m_credential.getPublicKey();
+        if (!kek)
+            throw EncryptionException("Credential in KeyEncryptionParams structure did not supply a public key.");
+
+        m_cipher->setKEK(kek->clone());
         // ownership of this belongs to us, for some reason...
         auto_ptr<XENCEncryptedKey> encKey(
             m_cipher->encryptKey(encParams.m_keyBuffer, encParams.m_keyBufferSize, ENCRYPT_NONE, kencParams->m_algorithm)
@@ -203,12 +213,11 @@ EncryptedData* Encrypter::decorateAndUnmarshall(EncryptionParams& encParams, Key
             xmlEncKey->setRecipient(kencParams->m_recipient);
         
         // KeyInfo?
-        if (kencParams->m_keyInfo) {
-            xmlEncKey->setKeyInfo(kencParams->m_keyInfo);
-            kencParams->m_keyInfo=NULL;   // transfer ownership
-        }
+        kinfo = kencParams->m_credential.getKeyInfo(encParams.m_compact);
+        if (kinfo)
+            xmlEncKey->setKeyInfo(kinfo->cloneKeyInfo());
         
-        // Add the EncryptedKey.
+        // Add the EncryptedKey inline.
         if (!xmlEncData->getKeyInfo())
             xmlEncData->setKeyInfo(KeyInfoBuilder::buildKeyInfo());
         xmlEncData->getKeyInfo()->getUnknownXMLObjects().push_back(xmlEncKey);
@@ -219,7 +228,7 @@ EncryptedData* Encrypter::decorateAndUnmarshall(EncryptionParams& encParams, Key
     return xmlEncData;
 }
 
-EncryptedKey* Encrypter::encryptKey(const unsigned char* keyBuffer, unsigned int keyBufferSize, KeyEncryptionParams& kencParams)
+EncryptedKey* Encrypter::encryptKey(const unsigned char* keyBuffer, unsigned int keyBufferSize, KeyEncryptionParams& kencParams, bool compact)
 {
     // Get a fresh cipher object and document.
 
@@ -227,14 +236,18 @@ EncryptedKey* Encrypter::encryptKey(const unsigned char* keyBuffer, unsigned int
         XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
         m_cipher=NULL;
     }
-    
+
+    XSECCryptoKey* kek = kencParams.m_credential.getPublicKey();
+    if (!kek)
+        throw EncryptionException("Credential in KeyEncryptionParams structure did not supply a public key.");
+
     DOMDocument* doc=NULL;
     try {
         doc=XMLToolingConfig::getConfig().getParser().newDocument();
         XercesJanitor<DOMDocument> janitor(doc);
         m_cipher=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(doc);
         m_cipher->setExclusiveC14nSerialisation(false);
-        m_cipher->setKEK(kencParams.m_key->clone());
+        m_cipher->setKEK(kek->clone());
         auto_ptr<XENCEncryptedKey> encKey(m_cipher->encryptKey(keyBuffer, keyBufferSize, ENCRYPT_NONE, kencParams.m_algorithm));
         
         EncryptedKey* xmlEncKey=NULL;
@@ -249,10 +262,9 @@ EncryptedKey* Encrypter::encryptKey(const unsigned char* keyBuffer, unsigned int
             xmlEncKey->setRecipient(kencParams.m_recipient);
 
         // KeyInfo?
-        if (kencParams.m_keyInfo) {
-            xmlEncKey->setKeyInfo(kencParams.m_keyInfo);
-            kencParams.m_keyInfo=NULL;   // transfer ownership
-        }
+        const KeyInfo* kinfo = kencParams.m_credential.getKeyInfo(compact);
+        if (kinfo)
+            xmlEncKey->setKeyInfo(kinfo->cloneKeyInfo());
 
         xmlObjectKey.release();
         return xmlEncKey;

@@ -53,6 +53,24 @@ namespace xmltooling {
         }
         
         /**
+         * Returns resource held by this object.
+         * 
+         * @return  the resource held or NULL
+         */
+        T* get() {
+            return m_held;
+        }
+
+        /**
+         * Returns resource held by this object.
+         * 
+         * @return  the resource held or NULL
+         */
+        T* operator->() {
+            return m_held;
+        }
+
+        /**
          * Returns resource held by this object and releases it to the caller.
          * 
          * @return  the resource held or NULL

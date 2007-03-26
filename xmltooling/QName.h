@@ -27,7 +27,12 @@
 #include <algorithm>
 
 namespace xmltooling {
-    
+
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4251 )
+#endif
+
     /**
      * A data structure for encapsulating XML QNames.
      * The Xerces class is too limited to use at the moment.
@@ -167,6 +172,10 @@ namespace xmltooling {
         XMLCh* m_prefix;
 #endif
     };
+
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
 
     /**
      * Returns true iff op1's namespace lexically compares less than op2's namespace,

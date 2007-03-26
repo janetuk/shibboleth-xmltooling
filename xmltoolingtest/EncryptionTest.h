@@ -18,6 +18,8 @@
 
 #include <xmltooling/encryption/Decrypter.h>
 #include <xmltooling/encryption/Encrypter.h>
+#include <xmltooling/security/Credential.h>
+#include <xmltooling/security/CredentialCriteria.h>
 #include <xmltooling/security/CredentialResolver.h>
 
 #include <fstream>
@@ -25,16 +27,6 @@
 #include <xsec/dsig/DSIGReference.hpp>
 
 using namespace xmlencryption;
-
-class _addcert : public std::binary_function<X509Data*,XSECCryptoX509*,void> {
-public:
-    void operator()(X509Data* bag, XSECCryptoX509* cert) const {
-        safeBuffer& buf=cert->getDEREncodingSB();
-        X509Certificate* x=X509CertificateBuilder::buildX509Certificate();
-        x->setValue(buf.sbStrToXMLCh());
-        bag->getX509Certificates().push_back(x);
-    }
-};
 
 class EncryptionTest : public CxxTest::TestSuite {
     CredentialResolver* m_resolver;
@@ -61,14 +53,20 @@ public:
         TS_ASSERT(doc!=NULL);
 
         try {
+            CredentialCriteria cc;
+            cc.setUsage(CredentialCriteria::ENCRYPTION_CREDENTIAL);
             Locker locker(m_resolver);
+            const Credential* cred=m_resolver->resolve(&cc);
+            TSM_ASSERT("Retrieved credential was null", cred!=NULL);
+
             Encrypter encrypter;
             Encrypter::EncryptionParams ep;
-            Encrypter::KeyEncryptionParams kep(DSIGConstants::s_unicodeStrURIRSA_1_5,m_resolver->getKey());
+            Encrypter::KeyEncryptionParams kep(*cred,DSIGConstants::s_unicodeStrURIRSA_1_5);
             auto_ptr<EncryptedData> encData(encrypter.encryptElement(doc->getDocumentElement(),ep,&kep));
 
             string buf;
             XMLHelper::serialize(encData->marshall(), buf);
+            //TS_TRACE(buf.c_str());
             istringstream is(buf);
             DOMDocument* doc2=XMLToolingConfig::getConfig().getValidatingParser().parse(is);
             auto_ptr<EncryptedData> encData2(

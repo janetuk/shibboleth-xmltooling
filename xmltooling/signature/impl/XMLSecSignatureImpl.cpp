@@ -23,6 +23,7 @@
 #include "internal.h"
 #include "exceptions.h"
 #include "impl/UnknownElement.h"
+#include "security/Credential.h"
 #include "signature/KeyInfo.h"
 #include "signature/Signature.h"
 #include "util/NDC.h"
@@ -75,8 +76,8 @@ namespace xmlsignature {
         XMLObject* clone() const;
         Signature* cloneSignature() const;
 
-        DOMElement* marshall(DOMDocument* document=NULL, const vector<Signature*>* sigs=NULL) const;
-        DOMElement* marshall(DOMElement* parentElement, const vector<Signature*>* sigs=NULL) const;
+        DOMElement* marshall(DOMDocument* document=NULL, const vector<Signature*>* sigs=NULL, const Credential* credential=NULL) const;
+        DOMElement* marshall(DOMElement* parentElement, const vector<Signature*>* sigs=NULL, const Credential* credential=NULL) const;
         XMLObject* unmarshall(DOMElement* element, bool bindDocument=false);
         
         // Getters
@@ -102,14 +103,14 @@ namespace xmlsignature {
             m_reference=reference;
         }
         
-        void sign();
+        void sign(const Credential* credential=NULL);
 
     private:
         mutable DSIGSignature* m_signature;
         XMLCh* m_c14n;
         XMLCh* m_sm;
         XSECCryptoKey* m_key;
-        KeyInfo* m_keyInfo;
+        mutable KeyInfo* m_keyInfo;
         ContentReference* m_reference;
     };
     
@@ -171,17 +172,19 @@ Signature* XMLSecSignatureImpl::cloneSignature() const
     return ret;
 }
 
-void XMLSecSignatureImpl::sign()
+void XMLSecSignatureImpl::sign(const Credential* credential)
 {
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Signature");
     log.debug("applying signature");
 
     if (!m_signature)
         throw SignatureException("Only a marshalled Signature object can be signed.");
-    else if (!m_key)
-        throw SignatureException("No signing key available for signature creation.");
     else if (!m_reference)
         throw SignatureException("No ContentReference object set for signature creation.");
+
+    XSECCryptoKey* key = credential ? credential->getPrivateKey() : m_key;
+    if (!key)
+        throw SignatureException("No signing key available for signature creation.");
 
     try {
         log.debug("creating signature reference(s)");
@@ -191,7 +194,7 @@ void XMLSecSignatureImpl::sign()
         m_reference->createReferences(m_signature);
         
         log.debug("computing signature");
-        m_signature->setSigningKey(m_key->clone());
+        m_signature->setSigningKey(key->clone());
         m_signature->sign();
     }
     catch(XSECException& e) {
@@ -203,7 +206,7 @@ void XMLSecSignatureImpl::sign()
     }
 }
 
-DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, const vector<Signature*>* sigs) const
+DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, const vector<Signature*>* sigs, const Credential* credential) const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("marshall");
@@ -285,6 +288,13 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, const vector<Si
     }
     
     // Marshall KeyInfo data.
+    if (credential) {
+        delete m_keyInfo;
+        m_keyInfo = NULL;
+        const KeyInfo* fromcred = credential->getKeyInfo();
+        if (fromcred)
+            m_keyInfo = fromcred->cloneKeyInfo();
+    }
     if (m_keyInfo && (!m_signature->getKeyInfoList() || m_signature->getKeyInfoList()->isEmpty())) {
         m_keyInfo->marshall(cachedDOM);
     }
@@ -298,7 +308,7 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, const vector<Si
     return cachedDOM;
 }
 
-DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, const vector<Signature*>* sigs) const
+DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, const vector<Signature*>* sigs, const Credential* credential) const
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("marshall");
@@ -364,6 +374,13 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, const vecto
     }
 
     // Marshall KeyInfo data.
+    if (credential) {
+        delete m_keyInfo;
+        m_keyInfo = NULL;
+        const KeyInfo* fromcred = credential->getKeyInfo();
+        if (fromcred)
+            m_keyInfo = fromcred->cloneKeyInfo();
+    }
     if (m_keyInfo && (!m_signature->getKeyInfoList() || m_signature->getKeyInfoList()->isEmpty())) {
         m_keyInfo->marshall(cachedDOM);
     }

@@ -24,6 +24,7 @@
 #include "exceptions.h"
 #include "io/AbstractXMLObjectMarshaller.h"
 #ifndef XMLTOOLING_NO_XMLSEC
+    #include "security/Credential.h"
     #include "signature/Signature.h"
 #endif
 #include "util/NDC.h"
@@ -44,7 +45,8 @@ using namespace std;
 DOMElement* AbstractXMLObjectMarshaller::marshall(
     DOMDocument* document
 #ifndef XMLTOOLING_NO_XMLSEC
-    ,const std::vector<xmlsignature::Signature*>* sigs
+    ,const vector<Signature*>* sigs
+    ,const Credential* credential
 #endif
     ) const
 {
@@ -91,7 +93,7 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(
         );
     setDocumentElement(document, domElement);
 #ifndef XMLTOOLING_NO_XMLSEC
-    marshallInto(domElement, sigs);
+    marshallInto(domElement, sigs, credential);
 #else
     marshallInto(domElement);
 #endif
@@ -107,7 +109,8 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(
 DOMElement* AbstractXMLObjectMarshaller::marshall(
     DOMElement* parentElement
 #ifndef XMLTOOLING_NO_XMLSEC
-    ,const std::vector<xmlsignature::Signature*>* sigs
+    ,const vector<Signature*>* sigs
+    ,const Credential* credential
 #endif
     ) const
 {
@@ -146,7 +149,7 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(
         );
     parentElement->appendChild(domElement);
 #ifndef XMLTOOLING_NO_XMLSEC
-    marshallInto(domElement, sigs);
+    marshallInto(domElement, sigs, credential);
 #else
     marshallInto(domElement);
 #endif
@@ -162,28 +165,45 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(
 void AbstractXMLObjectMarshaller::marshallInto(
     DOMElement* targetElement
 #ifndef XMLTOOLING_NO_XMLSEC
-    ,const std::vector<xmlsignature::Signature*>* sigs
+    ,const vector<Signature*>* sigs
+    ,const Credential* credential
 #endif
     ) const
 {
     if (getElementQName().hasPrefix())
         targetElement->setPrefix(getElementQName().getPrefix());
 
-    if (m_schemaLocation) {
-        static const XMLCh schemaLocation[]= UNICODE_LITERAL_14(s,c,h,e,m,a,L,o,c,a,t,i,o,n);
-        if (targetElement->getParentNode()==NULL || targetElement->getParentNode()->getNodeType()==DOMNode::DOCUMENT_NODE)
-            targetElement->setAttributeNS(XSI_NS,schemaLocation,m_schemaLocation); 
+    if (m_schemaLocation || m_noNamespaceSchemaLocation) {
+        static const XMLCh schemaLocation[] = {
+            chLatin_x, chLatin_s, chLatin_i, chColon,
+            chLatin_s, chLatin_c, chLatin_h, chLatin_e, chLatin_m, chLatin_a,
+            chLatin_L, chLatin_o, chLatin_c, chLatin_a, chLatin_t, chLatin_i, chLatin_o, chLatin_n, chNull
+            };
+        static const XMLCh noNamespaceSchemaLocation[] = {
+            chLatin_x, chLatin_s, chLatin_i, chColon,
+            chLatin_n, chLatin_o, chLatin_N, chLatin_a, chLatin_m, chLatin_e, chLatin_s, chLatin_p, chLatin_a, chLatin_c, chLatin_e,
+            chLatin_S, chLatin_c, chLatin_h, chLatin_e, chLatin_m, chLatin_a,
+            chLatin_L, chLatin_o, chLatin_c, chLatin_a, chLatin_t, chLatin_i, chLatin_o, chLatin_n, chNull
+            };
+        if (targetElement->getParentNode()==NULL || targetElement->getParentNode()->getNodeType()==DOMNode::DOCUMENT_NODE) {
+            if (m_schemaLocation)
+                targetElement->setAttributeNS(XSI_NS,schemaLocation,m_schemaLocation); 
+            if (m_noNamespaceSchemaLocation)
+                targetElement->setAttributeNS(XSI_NS,noNamespaceSchemaLocation,m_noNamespaceSchemaLocation); 
+        }
     }
 
     marshallElementType(targetElement);
     marshallNamespaces(targetElement);
     marshallAttributes(targetElement);
-    marshallContent(targetElement);
     
 #ifndef XMLTOOLING_NO_XMLSEC
+    marshallContent(targetElement,credential);
     if (sigs) {
-        for_each(sigs->begin(),sigs->end(),mem_fun<void,Signature>(&Signature::sign));
+        for_each(sigs->begin(),sigs->end(),bind2nd(mem_fun1<void,Signature,const Credential*>(&Signature::sign),credential));
     }
+#else
+    marshallContent(targetElement);
 #endif
 }
 
@@ -216,7 +236,7 @@ void AbstractXMLObjectMarshaller::marshallElementType(DOMElement* domElement) co
         if (xsivalue != typeLocalName)
             XMLString::release(&xsivalue);
 
-        m_log.debug("Adding XSI namespace to list of namespaces used by XMLObject");
+        m_log.debug("adding XSI namespace to list of namespaces used by XMLObject");
         addNamespace(Namespace(XSI_NS, XSI_PREFIX));
     }
 }
@@ -287,7 +307,12 @@ void AbstractXMLObjectMarshaller::marshallNamespaces(DOMElement* domElement) con
     for_each(namespaces.begin(),namespaces.end(),bind1st(_addns(),domElement));
 }
 
-void AbstractXMLObjectMarshaller::marshallContent(DOMElement* domElement) const
+void AbstractXMLObjectMarshaller::marshallContent(
+    DOMElement* domElement
+#ifndef XMLTOOLING_NO_XMLSEC
+    ,const Credential* credential
+#endif
+    ) const
 {
     m_log.debug("marshalling text and child elements for XMLObject");
     
@@ -298,8 +323,13 @@ void AbstractXMLObjectMarshaller::marshallContent(DOMElement* domElement) const
         val = getTextContent(pos);
         if (val && *val)
             domElement->appendChild(domElement->getOwnerDocument()->createTextNode(val));
-        if (*i)
+        if (*i) {
+#ifndef XMLTOOLING_NO_XMLSEC
+            (*i)->marshall(domElement,NULL,credential);
+#else
             (*i)->marshall(domElement);
+#endif
+        }
     }
     val = getTextContent(pos);
     if (val && *val)

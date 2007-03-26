@@ -15,34 +15,34 @@
  */
 
 /**
- * @file xmltooling/security/OpenSSLCredentialResolver.h
+ * @file xmltooling/security/OpenSSLCredential.h
  * 
- * OpenSSL-specific credential resolver
+ * OpenSSL-specific credential
  */
 
-#if !defined(__xmltooling_opensslcredres_h__) && !defined(XMLTOOLING_NO_XMLSEC)
-#define __xmltooling_opensslcredres_h__
+#if !defined(__xmltooling_opensslcred_h__) && !defined(XMLTOOLING_NO_XMLSEC)
+#define __xmltooling_opensslcred_h__
 
-#include <xmltooling/security/CredentialResolver.h>
+#include <xmltooling/security/X509Credential.h>
 
 #include <openssl/ssl.h>
 
 namespace xmltooling {
 
     /**
-     * An OpenSSL-specific API for resolving local/owned keys and certificates
+     * An OpenSSL-specific credential
      */
-    class XMLTOOL_API OpenSSLCredentialResolver : public CredentialResolver
+    class XMLTOOL_API OpenSSLCredential : public virtual X509Credential
     {
     protected:
-        OpenSSLCredentialResolver() {}
+        OpenSSLCredential() {}
         
     public:
-        virtual ~OpenSSLCredentialResolver() {}
+        virtual ~OpenSSLCredential() {}
         
         /**
-         * Attaches credentials to an OpenSSL SSL context object.
-         * The resolver <strong>MUST</strong> be unlockable after attachment.
+         * Attaches credential to an OpenSSL SSL context object.
+         * The credential <strong>MUST</strong> be disposable after attachment.
          * 
          * @param ctx   an SSL context
          */
@@ -51,4 +51,4 @@ namespace xmltooling {
 
 };
 
-#endif /* __xmltooling_opensslcredres_h__ */
+#endif /* __xmltooling_opensslcred_h__ */

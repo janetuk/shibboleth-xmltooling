@@ -43,16 +43,17 @@ void SignatureValidator::validate(const Signature* sigObj) const
     DSIGSignature* sig=sigObj->getXMLSignature();
     if (!sig)
         throw ValidationException("Signature does not exist yet.");
-    else if (!m_key && !m_resolver)
-        throw ValidationException("No KeyResolver or signing key set on Validator.");
+    else if (!m_key && !m_credential)
+        throw ValidationException("No Credential or key set on Validator.");
+
+    XSECCryptoKey* key = m_key ? m_key : (m_credential ? m_credential->getPublicKey() : NULL);
+    if (!key)
+        throw ValidationException("Credential did not contain a verification key.");
 
     try {
-        XSECCryptoKey* key = m_key ? m_key->clone() : m_resolver->resolveKey(sig->getKeyInfoList());
-        if (!key)
-            throw ValidationException("Unable to resolve signing key.");
-        sig->setSigningKey(key);
+        sig->setSigningKey(key->clone());
         if (!sig->verify())
-            throw ValidationException("Digital signature does not validate with the given key.");
+            throw ValidationException("Digital signature does not validate with the supplied key.");
     }
     catch(XSECException& e) {
         auto_ptr_char temp(e.getMsg());

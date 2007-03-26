@@ -346,6 +346,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\encryption\impl\EncryptedKeyResolver.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\encryption\impl\Encrypter.cpp"
 						>
 					</File>
@@ -370,7 +374,15 @@
 						>
 					</File>
 					<File
+						RelativePath=".\security\impl\BasicX509Credential.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\security\impl\ChainingTrustEngine.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\security\impl\Credential.cpp"
 						>
 					</File>
 					<File
@@ -390,7 +402,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\security\impl\KeyResolver.cpp"
+						RelativePath=".\security\impl\KeyInfoResolver.cpp"
 						>
 					</File>
 					<File
@@ -487,10 +499,6 @@
 			</File>
 			<File
 				RelativePath=".\Lockable.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MixedElement.h"
 				>
 			</File>
 			<File
@@ -665,7 +673,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\security\CachingKeyResolver.h"
+					RelativePath=".\security\BasicX509Credential.h"
 					>
 				</File>
 				<File
@@ -673,19 +681,23 @@
 					>
 				</File>
 				<File
+					RelativePath=".\security\Credential.h"
+					>
+				</File>
+				<File
+					RelativePath=".\security\CredentialCriteria.h"
+					>
+				</File>
+				<File
 					RelativePath=".\security\CredentialResolver.h"
 					>
 				</File>
 				<File
-					RelativePath=".\security\KeyInfoSource.h"
+					RelativePath=".\security\KeyInfoResolver.h"
 					>
 				</File>
 				<File
-					RelativePath=".\security\KeyResolver.h"
-					>
-				</File>
-				<File
-					RelativePath=".\security\OpenSSLCredentialResolver.h"
+					RelativePath=".\security\OpenSSLCredential.h"
 					>
 				</File>
 				<File
@@ -698,6 +710,10 @@
 				</File>
 				<File
 					RelativePath=".\security\TrustEngine.h"
+					>
+				</File>
+				<File
+					RelativePath=".\security\X509Credential.h"
 					>
 				</File>
 				<File

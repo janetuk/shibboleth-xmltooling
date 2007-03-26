@@ -46,6 +46,10 @@ namespace xmlsignature {
 
 namespace xmltooling {
 
+#ifndef XMLTOOLING_NO_XMLSEC
+    class XMLTOOL_API Credential;
+#endif
+
     /**
      * Object that represents an XML Element that has been unmarshalled into this C++ object.
      */
@@ -261,6 +265,7 @@ namespace xmltooling {
          * 
          * @param document  the DOM document the marshalled element will be placed in, or NULL
          * @param sigs      ordered array of signatures to create after marshalling is complete
+         * @param credential    optional credential to supply signing key and related info
          * @return the DOM element representing this XMLObject
          * 
          * @throws MarshallingException thrown if there is a problem marshalling the given object
@@ -270,6 +275,7 @@ namespace xmltooling {
             DOMDocument* document=NULL
 #ifndef XMLTOOLING_NO_XMLSEC
             ,const std::vector<xmlsignature::Signature*>* sigs=NULL
+            ,const Credential* credential=NULL
 #endif
             ) const=0;
         
@@ -281,6 +287,7 @@ namespace xmltooling {
          * 
          * @param parentElement the parent element to append the resulting DOM tree
          * @param sigs          ordered array of signatures to create after marshalling is complete
+         * @param credential    optional credential to supply signing key and related info
          * @return the marshalled element tree
 
          * @throws MarshallingException thrown if the given XMLObject can not be marshalled.
@@ -290,6 +297,7 @@ namespace xmltooling {
             DOMElement* parentElement
 #ifndef XMLTOOLING_NO_XMLSEC
             ,const std::vector<xmlsignature::Signature*>* sigs=NULL
+            ,const Credential* credential=NULL
 #endif
             ) const=0;
 

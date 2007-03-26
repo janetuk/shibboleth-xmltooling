@@ -28,6 +28,8 @@
 #include "security/TrustEngine.h"
 #include "security/OpenSSLCryptoX509CRL.h"
 #include "security/CredentialResolver.h"
+#include "security/KeyInfoResolver.h"
+#include "signature/Signature.h"
 #include "soap/SOAP.h"
 #include "soap/SOAPTransport.h"
 #include "util/NDC.h"
@@ -234,8 +236,6 @@ bool XMLToolingInternalConfig::init()
         registerEncryptionClasses();
         registerSOAPClasses();
 
-        m_urlEncoder = new URLEncoder();
-        
         REGISTER_XMLTOOLING_EXCEPTION_FACTORY(XMLParserException,xmltooling);
         REGISTER_XMLTOOLING_EXCEPTION_FACTORY(XMLObjectException,xmltooling);
         REGISTER_XMLTOOLING_EXCEPTION_FACTORY(MarshallingException,xmltooling);
@@ -250,7 +250,7 @@ bool XMLToolingInternalConfig::init()
         REGISTER_XMLTOOLING_EXCEPTION_FACTORY(XMLSecurityException,xmltooling);
         REGISTER_XMLTOOLING_EXCEPTION_FACTORY(SignatureException,xmlsignature);
         REGISTER_XMLTOOLING_EXCEPTION_FACTORY(EncryptionException,xmlencryption);
-        registerKeyResolvers();
+        registerKeyInfoResolvers();
         registerCredentialResolvers();
         registerTrustEngines();
 #endif
@@ -258,6 +258,9 @@ bool XMLToolingInternalConfig::init()
         initSOAPTransports();
         registerStorageServices();
 
+        m_urlEncoder = new URLEncoder();
+        m_keyInfoResolver = KeyInfoResolverManager.newPlugin(INLINE_KEYINFO_RESOLVER,NULL);
+        
         // Register xml:id as an ID attribute.        
         static const XMLCh xmlid[] = UNICODE_LITERAL_2(i,d);
         AttributeExtensibleXMLObject::registerIDAttribute(QName(xmlconstants::XML_NS, xmlid)); 
@@ -297,8 +300,11 @@ void XMLToolingInternalConfig::term()
 #ifndef XMLTOOLING_NO_XMLSEC
     TrustEngineManager.deregisterFactories();
     CredentialResolverManager.deregisterFactories();
-    KeyResolverManager.deregisterFactories();
+    KeyInfoResolverManager.deregisterFactories();
 #endif
+
+    delete m_keyInfoResolver;
+    m_keyInfoResolver = NULL;
 
     delete m_replayCache;
     m_replayCache = NULL;

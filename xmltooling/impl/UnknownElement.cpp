@@ -34,6 +34,7 @@
 using namespace xmltooling;
 using namespace log4cpp;
 using namespace std;
+using xmlsignature::Signature;
 
 void UnknownElementImpl::releaseDOM() const
 {
@@ -73,7 +74,8 @@ void UnknownElementImpl::serialize(string& s) const
 DOMElement* UnknownElementImpl::marshall(
     DOMDocument* document
 #ifndef XMLTOOLING_NO_XMLSEC
-    ,const std::vector<xmlsignature::Signature*>* sigs
+    ,const vector<Signature*>* sigs
+    ,const Credential* credential
 #endif
     ) const
 {
@@ -140,7 +142,8 @@ DOMElement* UnknownElementImpl::marshall(
 DOMElement* UnknownElementImpl::marshall(
     DOMElement* parentElement
 #ifndef XMLTOOLING_NO_XMLSEC
-    ,const std::vector<xmlsignature::Signature*>* sigs
+    ,const vector<Signature*>* sigs
+    ,const Credential* credential
 #endif
     ) const
 {

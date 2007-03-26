@@ -21,7 +21,8 @@
  */
 
 #include "internal.h"
-#include "security/CachingKeyResolver.h"
+#include "security/BasicX509Credential.h"
+#include "security/KeyInfoResolver.h"
 #include "signature/KeyInfo.h"
 #include "util/NDC.h"
 #include "util/Threads.h"
@@ -44,116 +45,122 @@ using namespace log4cpp;
 using namespace std;
 
 namespace xmltooling {
-    class XMLTOOL_DLLLOCAL InlineKeyResolver : public CachingKeyResolver
-    {
-    public:
-        InlineKeyResolver(const DOMElement* e);
-        virtual ~InlineKeyResolver();
 
-        XSECCryptoKey* resolveKey(const KeyInfo* keyInfo) const;
-        XSECCryptoKey* resolveKey(DSIGKeyInfoList* keyInfo) const;
-        vector<XSECCryptoX509*>::size_type resolveCertificates(const KeyInfo* keyInfo, ResolvedCertificates& certs) const;
-        vector<XSECCryptoX509*>::size_type resolveCertificates(DSIGKeyInfoList* keyInfo, ResolvedCertificates& certs) const;
-        XSECCryptoX509CRL* resolveCRL(const KeyInfo* keyInfo) const;
-        XSECCryptoX509CRL* resolveCRL(DSIGKeyInfoList* keyInfo) const;
-        
-        void clearCache() {
-            if (m_lock)
-                m_lock->wrlock();
-            m_cache.clear();
-            if (m_lock)
-                m_lock->unlock();
+    class XMLTOOL_DLLLOCAL InlineCredential : public BasicX509Credential
+    {
+        const KeyInfo* m_inlineKeyInfo;
+        DSIGKeyInfoList* m_nativeKeyInfo;
+    public:
+        InlineCredential(const KeyInfo* keyInfo=NULL)
+            : BasicX509Credential(keyInfo!=NULL), m_inlineKeyInfo(keyInfo), m_nativeKeyInfo(NULL) {
+        }
+        InlineCredential(DSIGKeyInfoList* keyInfo)
+            : BasicX509Credential(false), m_inlineKeyInfo(NULL), m_nativeKeyInfo(keyInfo) {
+        }
+        virtual ~InlineCredential() {}
+
+        XSECCryptoKey* getPrivateKey() const {
+            return NULL;
+        }
+
+        const KeyInfo* getKeyInfo(bool compact=false) const {
+            return m_inlineKeyInfo;
         }
         
-    private:
-        struct XMLTOOL_DLLLOCAL CacheEntry {
-            CacheEntry() : m_key(NULL), m_crl(NULL) {}
-            ~CacheEntry() {
-                delete m_key;
-                for_each(m_certs.begin(),m_certs.end(),xmltooling::cleanup<XSECCryptoX509>());
-                delete m_crl;
+        vector<string>::size_type getKeyNames(vector<string>& results) const {
+            if (m_inlineKeyInfo) {
+                const vector<KeyName*>& knames=m_inlineKeyInfo->getKeyNames();
+                for (vector<KeyName*>::const_iterator kn_i=knames.begin(); kn_i!=knames.end(); ++kn_i) {
+                    const XMLCh* n=(*kn_i)->getName();
+                    if (n && *n) {
+                        char* kn=toUTF8(n);
+                        results.push_back(kn);
+                        delete[] kn;
+                    }
+                }
             }
-            XSECCryptoKey* m_key;
-            vector<XSECCryptoX509*> m_certs;
-            XSECCryptoX509CRL* m_crl;
-        };
+            else if (m_nativeKeyInfo) {
+                for (size_t s=0; s<m_nativeKeyInfo->getSize(); s++) {
+                    const XMLCh* n=m_nativeKeyInfo->item(s)->getKeyName();
+                    if (n && *n) {
+                        char* kn=toUTF8(n);
+                        results.push_back(kn);
+                        delete[] kn;
+                    }
+                }
+            }
+            return results.size();
+        }
 
-        void _resolve(const KeyInfo* keyInfo, CacheEntry& entry) const;
-        XSECCryptoKey* _resolveKey(const KeyInfo* keyInfo) const;
-        vector<XSECCryptoX509*>::size_type _resolveCertificates(const KeyInfo* keyInfo, vector<XSECCryptoX509*>& certs) const;
-        XSECCryptoX509CRL* _resolveCRL(const KeyInfo* keyInfo) const;
+        void setKey(XSECCryptoKey* key) {
+            m_key = key;
+        }
 
-        RWLock* m_lock;
-        mutable map<const KeyInfo*,CacheEntry> m_cache;
+        void addCert(XSECCryptoX509* cert) {
+            m_xseccerts.push_back(cert);
+        }
+
+        void setCRL(XSECCryptoX509CRL* crl) {
+            m_crl = crl;
+        }
     };
 
-    KeyResolver* XMLTOOL_DLLLOCAL InlineKeyResolverFactory(const DOMElement* const & e)
+    class XMLTOOL_DLLLOCAL InlineKeyResolver : public KeyInfoResolver
     {
-        return new InlineKeyResolver(e);
+    public:
+        InlineKeyResolver() : m_log(Category::getInstance(XMLTOOLING_LOGCAT".KeyInfoResolver")) {}
+        virtual ~InlineKeyResolver() {}
+
+        Credential* resolve(const KeyInfo* keyInfo, int types=0) const;
+        Credential* resolve(DSIGKeyInfoList* keyInfo, int types=0) const;
+    
+    private:
+        bool resolveCerts(const KeyInfo* keyInfo, InlineCredential* credential) const;
+        bool resolveKey(const KeyInfo* keyInfo, InlineCredential* credential) const;
+        bool resolveCRL(const KeyInfo* keyInfo, InlineCredential* credential) const;
+
+        Category& m_log;
+    };
+
+    KeyInfoResolver* XMLTOOL_DLLLOCAL InlineKeyInfoResolverFactory(const DOMElement* const & e)
+    {
+        return new InlineKeyResolver();
     }
 };
 
-static const XMLCh cache[] = UNICODE_LITERAL_5(c,a,c,h,e);
-
-InlineKeyResolver::InlineKeyResolver(const DOMElement* e) : m_lock(NULL)
-{
-    const XMLCh* flag = e ? e->getAttributeNS(NULL,cache) : NULL;
-    if (flag && XMLString::equals(flag,xmlconstants::XML_TRUE) || XMLString::equals(flag,xmlconstants::XML_ONE))
-        m_lock=RWLock::create();
-}
-
-InlineKeyResolver::~InlineKeyResolver()
-{
-    clearCache();
-    delete m_lock;
-}
-
-void InlineKeyResolver::_resolve(const KeyInfo* keyInfo, CacheEntry& entry) const
-{
-    if (_resolveCertificates(keyInfo, entry.m_certs)>0)
-        entry.m_key = entry.m_certs.front()->clonePublicKey();
-    else
-        entry.m_key = _resolveKey(keyInfo);
-    entry.m_crl = _resolveCRL(keyInfo);
-}
-
-XSECCryptoKey* InlineKeyResolver::_resolveKey(const KeyInfo* keyInfo) const
+Credential* InlineKeyResolver::resolve(const KeyInfo* keyInfo, int types) const
 {
 #ifdef _DEBUG
-    NDC ndc("_resolveKey");
+    NDC ndc("resolve");
 #endif
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver");
 
     if (!keyInfo)
         return NULL;
 
-    // Check for ds:X509Data
-    const vector<X509Data*>& x509Datas=keyInfo->getX509Datas();
-    for (vector<X509Data*>::const_iterator j=x509Datas.begin(); j!=x509Datas.end(); ++j) {
-        try {
-            const vector<X509Certificate*> x509Certs=const_cast<const X509Data*>(*j)->getX509Certificates();
-            if (!x509Certs.empty()) {
-                auto_ptr_char x(x509Certs.front()->getValue());
-                if (!x.get()) {
-                    log.warn("skipping empty ds:X509Certificate");
-                }
-                else {
-                    log.debug("resolving ds:X509Certificate");
-                    auto_ptr<XSECCryptoX509> x509(XSECPlatformUtils::g_cryptoProvider->X509());
-                    x509->loadX509Base64Bin(x.get(), strlen(x.get()));
-                    return x509->clonePublicKey();
-                }
-            }
-        }
-        catch(XSECException& e) {
-            auto_ptr_char temp(e.getMsg());
-            log.error("caught XML-Security exception loading certificate: %s", temp.get());
-        }
-        catch(XSECCryptoException& e) {
-            log.error("caught XML-Security exception loading certificate: %s", e.getMsg());
-        }
+    auto_ptr<InlineCredential> credential(new InlineCredential(keyInfo));
+    if (types == 0)
+        types = Credential::RESOLVE_KEYS|X509Credential::RESOLVE_CERTS|X509Credential::RESOLVE_CRLS;
+
+    if (types & X509Credential::RESOLVE_CERTS)
+        resolveCerts(keyInfo, credential.get());
+    
+    if (types & Credential::RESOLVE_KEYS) {
+        // If we have a cert, just use it.
+        if (types & X509Credential::RESOLVE_CERTS && !credential->getEntityCertificateChain().empty())
+            credential->setKey(credential->getEntityCertificateChain().front()->clonePublicKey());
+        // Otherwise try directly for a key and then go for certs if none is found.
+        else if (!resolveKey(keyInfo, credential.get()) && resolveCerts(keyInfo, credential.get()))
+            credential->setKey(credential->getEntityCertificateChain().front()->clonePublicKey());
     }
 
+    if (types & X509Credential::RESOLVE_CRLS)
+        resolveCRL(keyInfo, credential.get());
+
+    return credential.release();
+}
+
+bool InlineKeyResolver::resolveKey(const KeyInfo* keyInfo, InlineCredential* credential) const
+{
     // Check for ds:KeyValue
     const vector<KeyValue*>& keyValues = keyInfo->getKeyValues();
     for (vector<KeyValue*>::const_iterator i=keyValues.begin(); i!=keyValues.end(); ++i) {
@@ -161,17 +168,18 @@ XSECCryptoKey* InlineKeyResolver::_resolveKey(const KeyInfo* keyInfo) const
             SchemaValidators.validate(*i);    // see if it's a "valid" key
             RSAKeyValue* rsakv = (*i)->getRSAKeyValue();
             if (rsakv) {
-                log.debug("resolving ds:RSAKeyValue");
+                m_log.debug("resolving ds:RSAKeyValue");
                 auto_ptr_char mod(rsakv->getModulus()->getValue());
                 auto_ptr_char exp(rsakv->getExponent()->getValue());
                 auto_ptr<XSECCryptoKeyRSA> rsa(XSECPlatformUtils::g_cryptoProvider->keyRSA());
                 rsa->loadPublicModulusBase64BigNums(mod.get(), strlen(mod.get()));
                 rsa->loadPublicExponentBase64BigNums(exp.get(), strlen(exp.get()));
-                return rsa.release();
+                credential->setKey(rsa.release());
+                return true;
             }
             DSAKeyValue* dsakv = (*i)->getDSAKeyValue();
             if (dsakv) {
-                log.debug("resolving ds:DSAKeyValue");
+                m_log.debug("resolving ds:DSAKeyValue");
                 auto_ptr<XSECCryptoKeyDSA> dsa(XSECPlatformUtils::g_cryptoProvider->keyDSA());
                 auto_ptr_char y(dsakv->getY()->getValue());
                 dsa->loadYBase64BigNums(y.get(), strlen(y.get()));
@@ -187,34 +195,33 @@ XSECCryptoKey* InlineKeyResolver::_resolveKey(const KeyInfo* keyInfo) const
                     auto_ptr_char g(dsakv->getG()->getValue());
                     dsa->loadGBase64BigNums(g.get(), strlen(g.get()));
                 }
-                return dsa.release();
+                credential->setKey(dsa.release());
+                return true;
             }
         }
         catch (ValidationException& ex) {
-            log.warn("skipping invalid ds:KeyValue (%s)", ex.what());
+            m_log.warn("skipping invalid ds:KeyValue (%s)", ex.what());
         }
         catch(XSECException& e) {
             auto_ptr_char temp(e.getMsg());
-            log.error("caught XML-Security exception loading key: %s", temp.get());
+            m_log.error("caught XML-Security exception loading key: %s", temp.get());
         }
         catch(XSECCryptoException& e) {
-            log.error("caught XML-Security exception loading key: %s", e.getMsg());
+            m_log.error("caught XML-Security exception loading key: %s", e.getMsg());
         }
     }
 
     // Check for RetrievalMethod.
     const XMLCh* fragID=NULL;
     const XMLObject* treeRoot=NULL;
-    XSECCryptoKey* remote=NULL;
-    const vector<RetrievalMethod*> methods=keyInfo->getRetrievalMethods();
+    const vector<RetrievalMethod*>& methods=keyInfo->getRetrievalMethods();
     for (vector<RetrievalMethod*>::const_iterator m=methods.begin(); m!=methods.end(); ++m) {
-        if (!XMLString::equals((*m)->getType(),RetrievalMethod::TYPE_X509DATA) &&
-            !XMLString::equals((*m)->getType(),RetrievalMethod::TYPE_RSAKEYVALUE) &&
+        if (!XMLString::equals((*m)->getType(),RetrievalMethod::TYPE_RSAKEYVALUE) &&
             !XMLString::equals((*m)->getType(),RetrievalMethod::TYPE_DSAKEYVALUE))
             continue;
         fragID = (*m)->getURI();
         if (!fragID || *fragID != chPound || !*(fragID+1)) {
-            log.warn("skipping ds:RetrievalMethod with an empty or non-local reference");
+            m_log.warn("skipping ds:RetrievalMethod with an empty or non-local reference");
             continue;
         }
         if (!treeRoot) {
@@ -224,68 +231,55 @@ XSECCryptoKey* InlineKeyResolver::_resolveKey(const KeyInfo* keyInfo) const
         }
         keyInfo = dynamic_cast<const KeyInfo*>(XMLHelper::getXMLObjectById(*treeRoot, fragID+1));
         if (!keyInfo) {
-            log.warn("skipping ds:RetrievalMethod, local reference did not resolve to a ds:KeyInfo");
+            m_log.warn("skipping ds:RetrievalMethod, local reference did not resolve to a ds:KeyInfo");
             continue;
         }
-        remote = _resolveKey(keyInfo);
-        if (remote)
-            return remote;
+        if (resolveKey(keyInfo,credential))
+            return true;
     }
-
-    log.warn("unable to resolve key");
-    return NULL;
+    return false;
 }
 
-vector<XSECCryptoX509*>::size_type InlineKeyResolver::_resolveCertificates(
-    const KeyInfo* keyInfo, vector<XSECCryptoX509*>& certs
-    ) const
+bool InlineKeyResolver::resolveCerts(const KeyInfo* keyInfo, InlineCredential* credential) const
 {
-#ifdef _DEBUG
-    NDC ndc("_resolveCertificates");
-#endif
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver");
-
-    if (!keyInfo)
-        return 0;
-
     // Check for ds:X509Data
     const vector<X509Data*>& x509Datas=keyInfo->getX509Datas();
-    for (vector<X509Data*>::const_iterator j=x509Datas.begin(); certs.empty() && j!=x509Datas.end(); ++j) {
+    for (vector<X509Data*>::const_iterator j=x509Datas.begin(); credential->getEntityCertificateChain().empty() && j!=x509Datas.end(); ++j) {
         const vector<X509Certificate*> x509Certs=const_cast<const X509Data*>(*j)->getX509Certificates();
         for (vector<X509Certificate*>::const_iterator k=x509Certs.begin(); k!=x509Certs.end(); ++k) {
             try {
                 auto_ptr_char x((*k)->getValue());
                 if (!x.get()) {
-                    log.warn("skipping empty ds:X509Certificate");
+                    m_log.warn("skipping empty ds:X509Certificate");
                 }
                 else {
-                    log.debug("resolving ds:X509Certificate");
+                    m_log.debug("resolving ds:X509Certificate");
                     auto_ptr<XSECCryptoX509> x509(XSECPlatformUtils::g_cryptoProvider->X509());
                     x509->loadX509Base64Bin(x.get(), strlen(x.get()));
-                    certs.push_back(x509.release());
+                    credential->addCert(x509.release());
                 }
             }
             catch(XSECException& e) {
                 auto_ptr_char temp(e.getMsg());
-                log.error("caught XML-Security exception loading certificate: %s", temp.get());
+                m_log.error("caught XML-Security exception loading certificate: %s", temp.get());
             }
             catch(XSECCryptoException& e) {
-                log.error("caught XML-Security exception loading certificate: %s", e.getMsg());
+                m_log.error("caught XML-Security exception loading certificate: %s", e.getMsg());
             }
         }
     }
-    
-    if (certs.empty()) {
+
+    if (credential->getEntityCertificateChain().empty()) {
         // Check for RetrievalMethod.
         const XMLCh* fragID=NULL;
         const XMLObject* treeRoot=NULL;
         const vector<RetrievalMethod*> methods=keyInfo->getRetrievalMethods();
-        for (vector<RetrievalMethod*>::const_iterator m=methods.begin(); certs.empty() && m!=methods.end(); ++m) {
+        for (vector<RetrievalMethod*>::const_iterator m=methods.begin(); m!=methods.end(); ++m) {
             if (!XMLString::equals((*m)->getType(),RetrievalMethod::TYPE_X509DATA))
                 continue;
             fragID = (*m)->getURI();
             if (!fragID || *fragID != chPound || !*(fragID+1)) {
-                log.warn("skipping ds:RetrievalMethod with an empty or non-local reference");
+                m_log.warn("skipping ds:RetrievalMethod with an empty or non-local reference");
                 continue;
             }
             if (!treeRoot) {
@@ -295,29 +289,23 @@ vector<XSECCryptoX509*>::size_type InlineKeyResolver::_resolveCertificates(
             }
             keyInfo = dynamic_cast<const KeyInfo*>(XMLHelper::getXMLObjectById(*treeRoot, fragID+1));
             if (!keyInfo) {
-                log.warn("skipping ds:RetrievalMethod, local reference did not resolve to a ds:KeyInfo");
+                m_log.warn("skipping ds:RetrievalMethod, local reference did not resolve to a ds:KeyInfo");
                 continue;
             }
-            _resolveCertificates(keyInfo, certs);
+            if (resolveCerts(keyInfo,credential))
+                return true;
         }
+        return false;
     }
     
-    if (log.isDebugEnabled()) {
-        log.debug("resolved %d certificate%s", certs.size(), certs.size()==1 ? "" : "s");
+    if (m_log.isDebugEnabled()) {
+        m_log.debug("resolved %d certificate(s)", credential->getEntityCertificateChain().size());
     }
-    return certs.size();
+    return !credential->getEntityCertificateChain().empty();
 }
 
-XSECCryptoX509CRL* InlineKeyResolver::_resolveCRL(const KeyInfo* keyInfo) const
+bool InlineKeyResolver::resolveCRL(const KeyInfo* keyInfo, InlineCredential* credential) const
 {
-#ifdef _DEBUG
-    NDC ndc("_resolveCRL");
-#endif
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver");
-
-    if (!keyInfo)
-        return NULL;
-
     // Check for ds:X509Data
     const vector<X509Data*>& x509Datas=keyInfo->getX509Datas();
     for (vector<X509Data*>::const_iterator j=x509Datas.begin(); j!=x509Datas.end(); ++j) {
@@ -326,21 +314,22 @@ XSECCryptoX509CRL* InlineKeyResolver::_resolveCRL(const KeyInfo* keyInfo) const
             try {
                 auto_ptr_char x((*k)->getValue());
                 if (!x.get()) {
-                    log.warn("skipping empty ds:X509CRL");
+                    m_log.warn("skipping empty ds:X509CRL");
                 }
                 else {
-                    log.debug("resolving ds:X509CRL");
+                    m_log.debug("resolving ds:X509CRL");
                     auto_ptr<XSECCryptoX509CRL> crl(XMLToolingConfig::getConfig().X509CRL());
                     crl->loadX509CRLBase64Bin(x.get(), strlen(x.get()));
-                    return crl.release();
+                    credential->setCRL(crl.release());
+                    return true;
                 }
             }
             catch(XSECException& e) {
                 auto_ptr_char temp(e.getMsg());
-                log.error("caught XML-Security exception loading certificate: %s", temp.get());
+                m_log.error("caught XML-Security exception loading certificate: %s", temp.get());
             }
             catch(XSECCryptoException& e) {
-                log.error("caught XML-Security exception loading certificate: %s", e.getMsg());
+                m_log.error("caught XML-Security exception loading certificate: %s", e.getMsg());
             }
         }
     }
@@ -348,14 +337,13 @@ XSECCryptoX509CRL* InlineKeyResolver::_resolveCRL(const KeyInfo* keyInfo) const
     // Check for RetrievalMethod.
     const XMLCh* fragID=NULL;
     const XMLObject* treeRoot=NULL;
-    XSECCryptoX509CRL* remote=NULL;
     const vector<RetrievalMethod*> methods=keyInfo->getRetrievalMethods();
     for (vector<RetrievalMethod*>::const_iterator m=methods.begin(); m!=methods.end(); ++m) {
         if (!XMLString::equals((*m)->getType(),RetrievalMethod::TYPE_X509DATA))
             continue;
         fragID = (*m)->getURI();
         if (!fragID || *fragID != chPound || !*(fragID+1)) {
-            log.warn("skipping ds:RetrievalMethod with an empty or non-local reference");
+            m_log.warn("skipping ds:RetrievalMethod with an empty or non-local reference");
             continue;
         }
         if (!treeRoot) {
@@ -365,186 +353,83 @@ XSECCryptoX509CRL* InlineKeyResolver::_resolveCRL(const KeyInfo* keyInfo) const
         }
         keyInfo = dynamic_cast<const KeyInfo*>(XMLHelper::getXMLObjectById(*treeRoot, fragID+1));
         if (!keyInfo) {
-            log.warn("skipping ds:RetrievalMethod, local reference did not resolve to a ds:KeyInfo");
+            m_log.warn("skipping ds:RetrievalMethod, local reference did not resolve to a ds:KeyInfo");
             continue;
         }
-        remote = _resolveCRL(keyInfo);
-        if (remote)
-            return remote;
+        if (resolveCRL(keyInfo,credential))
+            return true;
     }
 
-    return NULL;
+    return false;
 }
 
-XSECCryptoKey* InlineKeyResolver::resolveKey(const KeyInfo* keyInfo) const
-{
-    // Caching?
-    if (m_lock) {
-        // Get read lock.
-        m_lock->rdlock();
-        map<const KeyInfo*,CacheEntry>::iterator i=m_cache.find(keyInfo);
-        if (i != m_cache.end()) {
-            // Found in cache, so just return the results.
-            SharedLock locker(m_lock,false);
-            return i->second.m_key ? i->second.m_key->clone() : NULL;
-        }
-        else {
-            // Elevate lock.
-            m_lock->unlock();
-            m_lock->wrlock();
-            SharedLock locker(m_lock,false);
-            // Recheck cache.
-            i=m_cache.find(keyInfo);
-            if (i == m_cache.end()) {
-                i = m_cache.insert(make_pair(keyInfo,CacheEntry())).first;
-                _resolve(i->first, i->second);
-            }
-            return i->second.m_key ? i->second.m_key->clone() : NULL;
-        }
-    }
-    return _resolveKey(keyInfo);
-}
-
-XSECCryptoX509CRL* InlineKeyResolver::resolveCRL(const KeyInfo* keyInfo) const
-{
-    // Caching?
-    if (m_lock) {
-        // Get read lock.
-        m_lock->rdlock();
-        map<const KeyInfo*,CacheEntry>::iterator i=m_cache.find(keyInfo);
-        if (i != m_cache.end()) {
-            // Found in cache, so just return the results.
-            SharedLock locker(m_lock,false);
-            return i->second.m_crl ? i->second.m_crl->clone() : NULL;
-        }
-        else {
-            // Elevate lock.
-            m_lock->unlock();
-            m_lock->wrlock();
-            SharedLock locker(m_lock,false);
-            // Recheck cache.
-            i=m_cache.find(keyInfo);
-            if (i == m_cache.end()) {
-                i = m_cache.insert(make_pair(keyInfo,CacheEntry())).first;
-                _resolve(i->first, i->second);
-            }
-            return i->second.m_crl ? i->second.m_crl->clone() : NULL;
-        }
-    }
-    return _resolveCRL(keyInfo);
-}
-
-vector<XSECCryptoX509*>::size_type InlineKeyResolver::resolveCertificates(
-    const KeyInfo* keyInfo, ResolvedCertificates& certs
-    ) const
-{
-    // Caching?
-    if (m_lock) {
-        // Get read lock.
-        m_lock->rdlock();
-        map<const KeyInfo*,CacheEntry>::iterator i=m_cache.find(keyInfo);
-        if (i != m_cache.end()) {
-            // Found in cache, so just return the results.
-            SharedLock locker(m_lock,false);
-            accessCertificates(certs).assign(i->second.m_certs.begin(), i->second.m_certs.end());
-            accessOwned(certs) = false;
-            return accessCertificates(certs).size();
-        }
-        else {
-            // Elevate lock.
-            m_lock->unlock();
-            m_lock->wrlock();
-            SharedLock locker(m_lock,false);
-            // Recheck cache.
-            i=m_cache.find(keyInfo);
-            if (i == m_cache.end()) {
-                i = m_cache.insert(make_pair(keyInfo,CacheEntry())).first;
-                _resolve(i->first, i->second);
-            }
-            accessCertificates(certs).assign(i->second.m_certs.begin(), i->second.m_certs.end());
-            accessOwned(certs) = false;
-            return accessCertificates(certs).size();
-        }
-    }
-    accessOwned(certs) = true;
-    return _resolveCertificates(keyInfo, accessCertificates(certs));
-}
-
-XSECCryptoKey* InlineKeyResolver::resolveKey(DSIGKeyInfoList* keyInfo) const
+Credential* InlineKeyResolver::resolve(DSIGKeyInfoList* keyInfo, int types) const
 {
 #ifdef _DEBUG
-    NDC ndc("resolveKey");
+    NDC ndc("resolve");
 #endif
 
     if (!keyInfo)
         return NULL;
 
-    // Default resolver handles RSA/DSAKeyValue and X509Certificate elements.
-    try {
-        XSECKeyInfoResolverDefault def;
-        return def.resolveKey(keyInfo);
-    }
-    catch(XSECException& e) {
-        auto_ptr_char temp(e.getMsg());
-        Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver").error("caught XML-Security exception loading certificate: %s", temp.get());
-    }
-    catch(XSECCryptoException& e) {
-        Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver").error("caught XML-Security exception loading certificate: %s", e.getMsg());
-    }
-    return NULL;
-}
+    if (types == 0)
+        types = Credential::RESOLVE_KEYS|X509Credential::RESOLVE_CERTS|X509Credential::RESOLVE_CRLS;
 
-vector<XSECCryptoX509*>::size_type InlineKeyResolver::resolveCertificates(
-    DSIGKeyInfoList* keyInfo, ResolvedCertificates& certs
-    ) const
-{
-    accessCertificates(certs).clear();
-    accessOwned(certs) = false;
+    auto_ptr<InlineCredential> credential(new InlineCredential(keyInfo));
 
-    if (!keyInfo)
-        return 0;
+    if (types & Credential::RESOLVE_KEYS) {
+        // Default resolver handles RSA/DSAKeyValue and X509Certificate elements.
+        try {
+            XSECKeyInfoResolverDefault def;
+            credential->setKey(def.resolveKey(keyInfo));
+        }
+        catch(XSECException& e) {
+            auto_ptr_char temp(e.getMsg());
+            Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver").error("caught XML-Security exception loading certificate: %s", temp.get());
+        }
+        catch(XSECCryptoException& e) {
+            Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver").error("caught XML-Security exception loading certificate: %s", e.getMsg());
+        }
+    }
 
 	DSIGKeyInfoList::size_type sz = keyInfo->getSize();
-    for (DSIGKeyInfoList::size_type i=0; accessCertificates(certs).empty() && i<sz; ++i) {
-        if (keyInfo->item(i)->getKeyInfoType()==DSIGKeyInfo::KEYINFO_X509) {
-            DSIGKeyInfoX509* x509 = static_cast<DSIGKeyInfoX509*>(keyInfo->item(i));
-            int count = x509->getCertificateListSize();
-            for (int j=0; j<count; ++j) {
-                accessCertificates(certs).push_back(x509->getCertificateCryptoItem(j));
-            }
-        }
-    }
-    return accessCertificates(certs).size();
-}
 
-XSECCryptoX509CRL* InlineKeyResolver::resolveCRL(DSIGKeyInfoList* keyInfo) const
-{
-#ifdef _DEBUG
-    NDC ndc("resolveCRL");
-#endif
-
-    if (!keyInfo)
-        return NULL;
-
-    DSIGKeyInfoList::size_type sz = keyInfo->getSize();
-    for (DSIGKeyInfoList::size_type i=0; i<sz; ++i) {
-        if (keyInfo->item(i)->getKeyInfoType()==DSIGKeyInfo::KEYINFO_X509) {
-            auto_ptr_char buf(static_cast<DSIGKeyInfoX509*>(keyInfo->item(i))->getX509CRL());
-            if (buf.get()) {
-                try {
-                    auto_ptr<XSECCryptoX509CRL> crlobj(XMLToolingConfig::getConfig().X509CRL());
-                    crlobj->loadX509CRLBase64Bin(buf.get(), strlen(buf.get()));
-                    return crlobj.release();
-                }
-                catch(XSECException& e) {
-                    auto_ptr_char temp(e.getMsg());
-                    Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver").error("caught XML-Security exception loading CRL: %s", temp.get());
-                }
-                catch(XSECCryptoException& e) {
-                    Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver").error("caught XML-Security exception loading CRL: %s", e.getMsg());
+    if (types & X509Credential::RESOLVE_CERTS) {
+        for (DSIGKeyInfoList::size_type i=0; i<sz; ++i) {
+            if (keyInfo->item(i)->getKeyInfoType()==DSIGKeyInfo::KEYINFO_X509) {
+                DSIGKeyInfoX509* x509 = static_cast<DSIGKeyInfoX509*>(keyInfo->item(i));
+                int count = x509->getCertificateListSize();
+                if (count) {
+                    for (int j=0; j<count; ++j)
+                        credential->addCert(x509->getCertificateCryptoItem(j));
+                    break;
                 }
             }
         }
     }
-    return NULL;
+
+    if (types & X509Credential::RESOLVE_CRLS) {
+        for (DSIGKeyInfoList::size_type i=0; i<sz; ++i) {
+            if (keyInfo->item(i)->getKeyInfoType()==DSIGKeyInfo::KEYINFO_X509) {
+                auto_ptr_char buf(static_cast<DSIGKeyInfoX509*>(keyInfo->item(i))->getX509CRL());
+                if (buf.get()) {
+                    try {
+                        auto_ptr<XSECCryptoX509CRL> crlobj(XMLToolingConfig::getConfig().X509CRL());
+                        crlobj->loadX509CRLBase64Bin(buf.get(), strlen(buf.get()));
+                        credential->setCRL(crlobj.release());
+                        break;
+                    }
+                    catch(XSECException& e) {
+                        auto_ptr_char temp(e.getMsg());
+                        Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver").error("caught XML-Security exception loading CRL: %s", temp.get());
+                    }
+                    catch(XSECCryptoException& e) {
+                        Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver").error("caught XML-Security exception loading CRL: %s", e.getMsg());
+                    }
+                }
+            }
+        }
+    }
+
+    return credential.release();
 }

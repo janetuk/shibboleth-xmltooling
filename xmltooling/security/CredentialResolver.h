@@ -15,9 +15,9 @@
  */
 
 /**
- * @file xmltooling/signature/CredentialResolver.h
+ * @file xmltooling/security/CredentialResolver.h
  * 
- * Resolves keys and certificates "owned" by an entity 
+ * An API for resolving keys and certificates based on application criteria.
  */
 
 #if !defined(__xmltooling_credres_h__) && !defined(XMLTOOLING_NO_XMLSEC)
@@ -25,20 +25,15 @@
 
 #include <xmltooling/Lockable.h>
 
-#include <vector>
-#include <xsec/enc/XSECCryptoKey.hpp>
-#include <xsec/enc/XSECCryptoX509.hpp>
-
-namespace xmlsignature {
-    class XMLTOOL_API KeyInfo;
-};
-
 namespace xmltooling {
 
+    class XMLTOOL_API Credential;
+    class XMLTOOL_API CredentialCriteria;
+
     /**
-     * An API for resolving local/owned keys and certificates
+     * An API for resolving keys and certificates based on application criteria.
      */
-    class XMLTOOL_API CredentialResolver : public Lockable
+    class XMLTOOL_API CredentialResolver : public virtual Lockable
     {
         MAKE_NONCOPYABLE(CredentialResolver);
     protected:
@@ -48,21 +43,23 @@ namespace xmltooling {
         virtual ~CredentialResolver() {}
         
         /**
-         * Returns a secret or private key to use for signing or decryption operations.
-         * The caller is responsible for deleting the key when finished with it.
+         * Returns a single Credential according to the supplied criteria.
          * 
-         * @param keyInfo   optional material identifying a decryption key 
-         * @return  a secret or private key
+         * @param criteria   an optional CredentialCriteria object 
+         * @return  a Credential, or NULL if none could be found
          */
-        virtual XSECCryptoKey* getKey(const xmlsignature::KeyInfo* keyInfo=NULL) const=0;
-        
+        virtual const Credential* resolve(const CredentialCriteria* criteria=NULL) const=0;
+
         /**
-         * Returns a set of certificates to publish during signing operations.
-         * The certificates must be cloned if kept beyond the scope of a lock.
+         * Returns all matching Credentials according to the supplied criteria.
          * 
-         * @return  a set of certificates
+         * @param results   array to store matching Credentials
+         * @param criteria  an optional CredentialCriteria object 
+         * @return  number of credentials found
          */
-        virtual const std::vector<XSECCryptoX509*>& getCertificates() const=0;
+        virtual std::vector<const Credential*>::size_type resolve(
+            std::vector<const Credential*>& results, const CredentialCriteria* criteria=NULL
+            ) const=0;
     };
 
     /**
@@ -70,7 +67,7 @@ namespace xmltooling {
      */
     void XMLTOOL_API registerCredentialResolvers();
 
-    /** CredentialResolver based on local files */
+    /** CredentialResolver based on local files with no criteria support. */
     #define FILESYSTEM_CREDENTIAL_RESOLVER  "File"
 };
 

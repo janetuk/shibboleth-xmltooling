@@ -23,7 +23,7 @@
 #ifndef __xmltooling_soap11client_h__
 #define __xmltooling_soap11client_h__
 
-#include <xmltooling/security/KeyInfoSource.h>
+#include <xmltooling/security/CredentialResolver.h>
 #include <xmltooling/soap/SOAPTransport.h>
 
 namespace soap11 {
@@ -68,11 +68,15 @@ namespace soap11 {
          * appropriate for the endpoint URL provided and supply it to the
          * prepareTransport() method below.
          * 
-         * @param env       SOAP envelope to send
-         * @param peer      peer to send message to, expressed in TrustEngine terms
-         * @param endpoint  URL of endpoint to recieve message
+         * <p>To authenticate the server end, the transport layer object
+         * exposes a method to load a TrustEngine and CredentialResolver
+         * in a subclass-specific version of the prepareTransport() method.   
+         * 
+         * @param env           SOAP envelope to send
+         * @param peerName      name of peer
+         * @param endpoint      URL of endpoint to recieve message
          */
-        virtual void send(const Envelope& env, const xmltooling::KeyInfoSource& peer, const char* endpoint);
+        virtual void send(const Envelope& env, const char* peerName, const char* endpoint);
         
         /**
          * Returns the response message, if any. As long as a response is

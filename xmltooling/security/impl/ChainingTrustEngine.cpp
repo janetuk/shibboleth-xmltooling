@@ -23,6 +23,7 @@
 #include "internal.h"
 #include "exceptions.h"
 #include "security/ChainingTrustEngine.h"
+#include "util/XMLHelper.h"
 
 #include <log4cpp/Category.hh>
 #include <xercesc/util/XMLUniDefs.hpp>
@@ -65,14 +66,10 @@ ChainingTrustEngine::~ChainingTrustEngine() {
     for_each(m_engines.begin(), m_engines.end(), xmltooling::cleanup<TrustEngine>());
 }
 
-bool ChainingTrustEngine::validate(
-    Signature& sig,
-    const KeyInfoSource& keyInfoSource,
-    const KeyResolver* keyResolver
-    ) const
+bool ChainingTrustEngine::validate(Signature& sig, const CredentialResolver& credResolver, CredentialCriteria* criteria) const
 {
     for (vector<TrustEngine*>::const_iterator i=m_engines.begin(); i!=m_engines.end(); ++i) {
-        if ((*i)->validate(sig,keyInfoSource,keyResolver))
+        if ((*i)->validate(sig,credResolver,criteria))
             return true;
     }
     return false;
@@ -84,12 +81,12 @@ bool ChainingTrustEngine::validate(
     KeyInfo* keyInfo,
     const char* in,
     unsigned int in_len,
-    const KeyInfoSource& keyInfoSource,
-    const KeyResolver* keyResolver
+    const CredentialResolver& credResolver,
+    CredentialCriteria* criteria
     ) const
 {
     for (vector<TrustEngine*>::const_iterator i=m_engines.begin(); i!=m_engines.end(); ++i) {
-        if ((*i)->validate(sigAlgorithm, sig, keyInfo, in, in_len, keyInfoSource, keyResolver))
+        if ((*i)->validate(sigAlgorithm, sig, keyInfo, in, in_len, credResolver, criteria))
             return true;
     }
     return false;
@@ -98,15 +95,14 @@ bool ChainingTrustEngine::validate(
 bool ChainingTrustEngine::validate(
     XSECCryptoX509* certEE,
     const vector<XSECCryptoX509*>& certChain,
-    const KeyInfoSource& keyInfoSource,
-    bool checkName,
-    const KeyResolver* keyResolver
+    const CredentialResolver& credResolver,
+    CredentialCriteria* criteria
     ) const
 {
     X509TrustEngine* down;
     for (vector<TrustEngine*>::const_iterator i=m_engines.begin(); i!=m_engines.end(); ++i) {
         if ((down = dynamic_cast<X509TrustEngine*>(*i)) &&
-                down->validate(certEE,certChain,keyInfoSource,checkName,keyResolver))
+                down->validate(certEE,certChain,credResolver,criteria))
             return true;
     }
     return false;
@@ -115,15 +111,13 @@ bool ChainingTrustEngine::validate(
 bool ChainingTrustEngine::validate(
     X509* certEE,
     STACK_OF(X509)* certChain,
-    const KeyInfoSource& keyInfoSource,
-    bool checkName,
-    const KeyResolver* keyResolver
+    const CredentialResolver& credResolver,
+    CredentialCriteria* criteria
     ) const
 {
     OpenSSLTrustEngine* down;
     for (vector<TrustEngine*>::const_iterator i=m_engines.begin(); i!=m_engines.end(); ++i) {
-        if ((down = dynamic_cast<OpenSSLTrustEngine*>(*i)) &&
-                down->validate(certEE,certChain,keyInfoSource,checkName,keyResolver))
+        if ((down = dynamic_cast<OpenSSLTrustEngine*>(*i)) && down->validate(certEE,certChain,credResolver,criteria))
             return true;
     }
     return false;

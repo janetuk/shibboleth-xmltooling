@@ -58,13 +58,15 @@ ioinclude_HEADERS = \
 
 secinclude_HEADERS = \
 	security/AbstractPKIXTrustEngine.h \
-	security/CachingKeyResolver.h \
+	security/BasicX509Credential.h \
 	security/ChainingTrustEngine.h \
+	security/Credential.h \
+	security/CredentialCriteria.h \
 	security/CredentialResolver.h \
-	security/KeyInfoSource.h \
-	security/KeyResolver.h \
-	security/OpenSSLCredentialResolver.h \
+	security/KeyInfoResolver.h \
+	security/OpenSSLCredential.h \
 	security/TrustEngine.h \
+	security/X509Credential.h \
 	security/X509TrustEngine.h \
 	security/OpenSSLTrustEngine.h \
 	security/XSECCryptoX509CRL.h \
@@ -107,17 +109,20 @@ noinst_HEADERS = \
 if BUILD_XMLSEC
 xmlsec_sources = \
 	encryption/impl/Decrypter.cpp \
+	encryption/impl/EncryptedKeyResolver.cpp \
 	encryption/impl/Encrypter.cpp \
-	security/impl/TrustEngine.cpp \
 	security/impl/AbstractPKIXTrustEngine.cpp \
+	security/impl/BasicX509Credential.cpp \
 	security/impl/ChainingTrustEngine.cpp \
+	security/impl/Credential.cpp \
 	security/impl/CredentialResolver.cpp \
+	security/impl/ExplicitKeyTrustEngine.cpp \
 	security/impl/FilesystemCredentialResolver.cpp \
 	security/impl/InlineKeyResolver.cpp \
-	security/impl/ExplicitKeyTrustEngine.cpp \
-	security/impl/KeyResolver.cpp \
-	security/impl/XSECCryptoX509CRL.cpp \
+	security/impl/KeyInfoResolver.cpp \
 	security/impl/OpenSSLCryptoX509CRL.cpp \
+	security/impl/TrustEngine.cpp \
+	security/impl/XSECCryptoX509CRL.cpp \
 	signature/impl/SignatureValidator.cpp \
 	signature/impl/XMLSecSignatureImpl.cpp
 else

@@ -28,8 +28,8 @@
 
 namespace xmltooling {
     
+    class XMLTOOL_API Credential;
     class XMLTOOL_API CredentialResolver;
-    class XMLTOOL_API KeyResolver;
     class XMLTOOL_API X509TrustEngine;
     
     /**
@@ -92,30 +92,31 @@ namespace xmltooling {
 
 #ifndef XMLTOOLING_NO_XMLSEC
         /**
-         * Provides a CredentialResolver to the transport to supply transport credentials.
-         * The lifetime of the resolver must be longer than the lifetime of this object.
+         * Supplies transport credentials.
+         *
+         * <p>The lifetime of the credential must be longer than the lifetime of this object.
          * 
-         * <p>The CredentialResolver <strong>MUST</strong> be locked by the caller. 
-         * 
-         * @param credResolver  a locked CredentialResolver instance, or NULL
-         * @return true iff the transport supports the use of a CredentialResolver
+         * @param credential  a Credential instance, or NULL
+         * @return true iff the transport supports the use of the Credential
          */
-        virtual bool setCredentialResolver(const CredentialResolver* credResolver)=0;
+        virtual bool setCredential(const Credential* credential=NULL)=0;
 
         /**
-         * Provides a TrustEngine to the transport to authenticate the transport peer.
+         * Provides an X509TrustEngine to the transport to authenticate the transport peer.
          * The lifetime of the engine must be longer than the lifetime of this object.
          * 
-         * @param trustEngine   a TrustEngine instance, or NULL
+         * @param trustEngine   an X509TrustEngine instance, or NULL
+         * @param credResolver  a CredentialResolver to supply the peer's trusted credentials, or NULL
+         * @param criteria      optional criteria for selecting peer credentials
          * @param mandatory     flag controls whether message is sent at all if the
          *                      transport isn't authenticated using the TrustEngine
-         * @param keyResolver   optional externally supplied KeyResolver, or NULL
          * @return true iff the transport supports the use of a TrustEngine
          */
         virtual bool setTrustEngine(
-            const X509TrustEngine* trustEngine,
-            bool mandatory=true,
-            const KeyResolver* keyResolver=NULL
+            const X509TrustEngine* trustEngine=NULL,
+            const CredentialResolver* credResolver=NULL,
+            CredentialCriteria* criteria=NULL,
+            bool mandatory=true
             )=0;
 #endif
 

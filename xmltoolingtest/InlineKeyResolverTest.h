@@ -17,13 +17,14 @@
 #include "XMLObjectBaseTestCase.h"
 
 #include <fstream>
+#include <xmltooling/security/X509Credential.h>
+#include <xmltooling/security/KeyInfoResolver.h>
 #include <xmltooling/signature/KeyInfo.h>
-#include <xmltooling/security/KeyResolver.h>
 
 using namespace xmlsignature;
 
 class InlineKeyResolverTest : public CxxTest::TestSuite {
-    KeyResolver* m_resolver;
+    KeyInfoResolver* m_resolver;
 public:
     InlineKeyResolverTest() : m_resolver(NULL) {}
 
@@ -32,7 +33,7 @@ public:
         ifstream in(config.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(in);
         XercesJanitor<DOMDocument> janitor(doc);
-        m_resolver=XMLToolingConfig::getConfig().KeyResolverManager.newPlugin(INLINE_KEY_RESOLVER,doc->getDocumentElement());
+        m_resolver=XMLToolingConfig::getConfig().KeyInfoResolverManager.newPlugin(INLINE_KEYINFO_RESOLVER,doc->getDocumentElement());
     }
 
     void tearDown() {
@@ -50,14 +51,12 @@ public:
         auto_ptr<KeyInfo> kiObject(dynamic_cast<KeyInfo*>(b->buildFromDocument(doc)));
         TS_ASSERT(kiObject.get()!=NULL);
 
-        auto_ptr<XSECCryptoKey> key(m_resolver->resolveKey(kiObject.get()));
-        TSM_ASSERT("Unable to resolve public key.", key.get()!=NULL);
-        TSM_ASSERT_EQUALS("Unexpected key type.", key->getKeyType(), XSECCryptoKey::KEY_RSA_PUBLIC);
+        auto_ptr<X509Credential> cred(dynamic_cast<X509Credential*>(m_resolver->resolve(kiObject.get())));
+        TSM_ASSERT("Unable to resolve KeyInfo into Credential.", cred.get()!=NULL);
 
-        auto_ptr<XSECCryptoX509CRL> crl(m_resolver->resolveCRL(kiObject.get()));
-        TSM_ASSERT("Unable to resolve CRL.", crl.get()!=NULL);
-
-        KeyResolver::ResolvedCertificates certs;
-        TSM_ASSERT_EQUALS("Wrong certificate count.", m_resolver->resolveCertificates(kiObject.get(), certs), 1);
+        TSM_ASSERT("Unable to resolve public key.", cred->getPublicKey()!=NULL);
+        TSM_ASSERT_EQUALS("Unexpected key type.", cred->getPublicKey()->getKeyType(), XSECCryptoKey::KEY_RSA_PUBLIC);
+        TSM_ASSERT_EQUALS("Wrong certificate count.", cred->getEntityCertificateChain().size(), 1);
+        TSM_ASSERT("Unable to resolve CRL.", cred->getCRL()!=NULL);
     }
 };

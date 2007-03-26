@@ -30,7 +30,7 @@
 using namespace xmltooling;
 
 AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
-    : m_log(log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".XMLObject")), m_schemaLocation(NULL),
+    : m_log(log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".XMLObject")), m_schemaLocation(NULL), m_noNamespaceSchemaLocation(NULL),
         m_parent(NULL), m_elementQname(nsURI, localName, prefix), m_typeQname(NULL)
 {
     addNamespace(Namespace(nsURI, prefix));
@@ -42,6 +42,7 @@ AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName,
 
 AbstractXMLObject::AbstractXMLObject(const AbstractXMLObject& src)
     : m_namespaces(src.m_namespaces), m_log(src.m_log), m_schemaLocation(XMLString::replicate(src.m_schemaLocation)),
+        m_noNamespaceSchemaLocation(XMLString::replicate(src.m_noNamespaceSchemaLocation)),
         m_parent(NULL), m_elementQname(src.m_elementQname), m_typeQname(NULL)
 {
     if (src.m_typeQname)

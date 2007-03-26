@@ -28,7 +28,11 @@
 #include <log4cpp/Category.hh>
 #include <openssl/x509_vfy.h>
 #include <openssl/x509v3.h>
+#include <xmltooling/security/CredentialCriteria.h>
+#include <xmltooling/security/CredentialResolver.h>
+#include <xmltooling/security/KeyInfoResolver.h>
 #include <xmltooling/security/OpenSSLCryptoX509CRL.h>
+#include <xmltooling/security/X509Credential.h>
 #include <xmltooling/signature/SignatureValidator.h>
 #include <xmltooling/util/NDC.h>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
@@ -38,15 +42,6 @@ using namespace xmltooling;
 using namespace log4cpp;
 using namespace std;
 
-AbstractPKIXTrustEngine::AbstractPKIXTrustEngine(const DOMElement* e) : OpenSSLTrustEngine(e), m_inlineResolver(NULL)
-{
-    m_inlineResolver = XMLToolingConfig::getConfig().KeyResolverManager.newPlugin(INLINE_KEY_RESOLVER,NULL);
-}
-
-AbstractPKIXTrustEngine::~AbstractPKIXTrustEngine()
-{
-    delete m_inlineResolver;
-}
 
 namespace {
     static int XMLTOOL_DLLLOCAL error_callback(int ok, X509_STORE_CTX* ctx)
@@ -91,10 +86,7 @@ namespace {
         for (vector<XSECCryptoX509CRL*>::const_iterator j=crls.begin(); j!=crls.end(); ++j) {
             if ((*j)->getProviderName()==DSIGConstants::s_unicodeStrPROVOpenSSL) {
                 // owned by store
-                X509_STORE_add_crl(
-                    store,
-                    X509_CRL_dup(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL())
-                    );
+                X509_STORE_add_crl(store, X509_CRL_dup(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL()));
             }
         }
      
@@ -144,31 +136,20 @@ namespace {
     }
 };
 
-bool AbstractPKIXTrustEngine::checkEntityNames(X509* certEE, const KeyInfoSource& keyInfoSource) const
+bool AbstractPKIXTrustEngine::checkEntityNames(
+    X509* certEE, const CredentialResolver& credResolver, const CredentialCriteria& criteria
+    ) const
 {
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine");
-    
-    // Build a list of acceptable names. Transcode the possible key "names" to UTF-8.
-    // For some simple cases, this should handle UTF-8 encoded DNs in certificates.
-    vector<string> keynames;
-    auto_ptr<KeyInfoIterator> keyInfoIter(keyInfoSource.getKeyInfoIterator());
-    while (keyInfoIter->hasNext()) {
-        const KeyInfo* keyInfo = keyInfoIter->next();
-        const vector<KeyName*>& knames=keyInfo->getKeyNames();
-        for (vector<KeyName*>::const_iterator kn_i=knames.begin(); kn_i!=knames.end(); ++kn_i) {
-            const XMLCh* n=(*kn_i)->getName();
-            if (n && *n) {
-                char* kn=toUTF8(n);
-                keynames.push_back(kn);
-                delete[] kn;
-            }
-        }
-    }
 
-    string peername = keyInfoSource.getName();
-    if (!peername.empty())
-        keynames.push_back(peername);
-    
+    vector<const Credential*> creds;
+    credResolver.resolve(creds,&criteria);
+
+    // Build a list of acceptable names.
+    vector<string> keynames(1,criteria.getPeerName());
+    for (vector<const Credential*>::const_iterator cred = creds.begin(); cred!=creds.end(); ++cred)
+        (*cred)->getKeyNames(keynames);
+
     char buf[256];
     X509_NAME* subject=X509_get_subject_name(certEE);
     if (subject) {
@@ -264,9 +245,8 @@ bool AbstractPKIXTrustEngine::checkEntityNames(X509* certEE, const KeyInfoSource
 bool AbstractPKIXTrustEngine::validate(
     X509* certEE,
     STACK_OF(X509)* certChain,
-    const KeyInfoSource& keyInfoSource,
-    bool checkName,
-    const KeyResolver* keyResolver
+    const CredentialResolver& credResolver,
+    CredentialCriteria* criteria
     ) const
 {
 #ifdef _DEBUG
@@ -279,19 +259,19 @@ bool AbstractPKIXTrustEngine::validate(
         return false;
     }
 
-    if (checkName) {
+    if (criteria && criteria->getPeerName() && *(criteria->getPeerName())) {
         log.debug("checking that the certificate name is acceptable");
-        if (!checkEntityNames(certEE,keyInfoSource)) {
-            log.debug("certificate name was not acceptable");
+        if (criteria->getUsage()==CredentialCriteria::UNSPECIFIED_CREDENTIAL)
+            criteria->setUsage(CredentialCriteria::SIGNING_CREDENTIAL);
+        if (!checkEntityNames(certEE,credResolver,*criteria)) {
+            log.error("certificate name was not acceptable");
             return false;
         }
     }
     
     log.debug("performing certificate path validation...");
 
-    auto_ptr<PKIXValidationInfoIterator> pkix(
-        getPKIXValidationInfoIterator(keyInfoSource, *(keyResolver ? keyResolver : m_inlineResolver))
-        );
+    auto_ptr<PKIXValidationInfoIterator> pkix(getPKIXValidationInfoIterator(credResolver, criteria, m_keyInfoResolver));
     while (pkix->next()) {
         if (::validate(certEE,certChain,pkix.get())) {
             return true;
@@ -305,9 +285,8 @@ bool AbstractPKIXTrustEngine::validate(
 bool AbstractPKIXTrustEngine::validate(
     XSECCryptoX509* certEE,
     const vector<XSECCryptoX509*>& certChain,
-    const KeyInfoSource& keyInfoSource,
-    bool checkName,
-    const KeyResolver* keyResolver
+    const CredentialResolver& credResolver,
+    CredentialCriteria* criteria
     ) const
 {
 #ifdef _DEBUG
@@ -326,15 +305,15 @@ bool AbstractPKIXTrustEngine::validate(
     for (vector<XSECCryptoX509*>::const_iterator i=certChain.begin(); i!=certChain.end(); ++i)
         sk_X509_push(untrusted,static_cast<OpenSSLCryptoX509*>(*i)->getOpenSSLX509());
 
-    bool ret = validate(static_cast<OpenSSLCryptoX509*>(certEE)->getOpenSSLX509(),untrusted,keyInfoSource,checkName,keyResolver);
+    bool ret = validate(static_cast<OpenSSLCryptoX509*>(certEE)->getOpenSSLX509(), untrusted, credResolver, criteria);
     sk_X509_free(untrusted);
     return ret;
 }
 
 bool AbstractPKIXTrustEngine::validate(
     Signature& sig,
-    const KeyInfoSource& keyInfoSource,
-    const KeyResolver* keyResolver
+    const CredentialResolver& credResolver,
+    CredentialCriteria* criteria
     ) const
 {
 #ifdef _DEBUG
@@ -342,9 +321,23 @@ bool AbstractPKIXTrustEngine::validate(
 #endif
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine");
 
-    // Pull the certificate chain out of the signature using an inline KeyResolver.
-    KeyResolver::ResolvedCertificates certs;
-    if (0==m_inlineResolver->resolveCertificates(&sig, certs)) {
+    const KeyInfoResolver* inlineResolver = m_keyInfoResolver;
+    if (!inlineResolver)
+        inlineResolver = XMLToolingConfig::getConfig().getKeyInfoResolver();
+    if (!inlineResolver) {
+        log.error("unable to perform PKIX validation, no KeyInfoResolver available");
+        return false;
+    }
+
+    // Pull the certificate chain out of the signature.
+    X509Credential* x509cred;
+    auto_ptr<Credential> cred(inlineResolver->resolve(&sig,X509Credential::RESOLVE_CERTS));
+    if (!cred.get() || !(x509cred=dynamic_cast<X509Credential*>(cred.get()))) {
+        log.error("unable to perform PKIX validation, signature does not contain any certificates");
+        return false;
+    }
+    const vector<XSECCryptoX509*>& certs = x509cred->getEntityCertificateChain();
+    if (certs.empty()) {
         log.error("unable to perform PKIX validation, signature does not contain any certificates");
         return false;
     }
@@ -355,20 +348,21 @@ bool AbstractPKIXTrustEngine::validate(
     // Most of the time, this will be the first one anyway.
     XSECCryptoX509* certEE=NULL;
     SignatureValidator keyValidator;
-    for (vector<XSECCryptoX509*>::const_iterator i=certs.v().begin(); !certEE && i!=certs.v().end(); ++i) {
+    for (vector<XSECCryptoX509*>::const_iterator i=certs.begin(); !certEE && i!=certs.end(); ++i) {
         try {
-            keyValidator.setKey((*i)->clonePublicKey());
+            auto_ptr<XSECCryptoKey> key((*i)->clonePublicKey());
+            keyValidator.setKey(key.get());
             keyValidator.validate(&sig);
             log.debug("signature verified with key inside signature, attempting certificate validation...");
             certEE=(*i);
         }
-        catch (ValidationException&) {
-            // trap failures
+        catch (ValidationException& ex) {
+            log.debug(ex.what());
         }
     }
     
     if (certEE)
-        return validate(certEE,certs.v(),keyInfoSource,true,keyResolver);
+        return validate(certEE,certs,credResolver,criteria);
         
     log.debug("failed to verify signature with embedded certificates");
     return false;
@@ -380,8 +374,8 @@ bool AbstractPKIXTrustEngine::validate(
     KeyInfo* keyInfo,
     const char* in,
     unsigned int in_len,
-    const KeyInfoSource& keyInfoSource,
-    const KeyResolver* keyResolver
+    const CredentialResolver& credResolver,
+    CredentialCriteria* criteria
     ) const
 {
 #ifdef _DEBUG
@@ -389,9 +383,28 @@ bool AbstractPKIXTrustEngine::validate(
 #endif
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine");
 
-    // Pull the certificate chain out of the KeyInfo using an inline KeyResolver.
-    KeyResolver::ResolvedCertificates certs;
-    if (!keyInfo || 0==m_inlineResolver->resolveCertificates(keyInfo, certs)) {
+    if (!keyInfo) {
+        log.error("unable to perform PKIX validation, KeyInfo not present");
+        return false;
+    }
+
+    const KeyInfoResolver* inlineResolver = m_keyInfoResolver;
+    if (!inlineResolver)
+        inlineResolver = XMLToolingConfig::getConfig().getKeyInfoResolver();
+    if (!inlineResolver) {
+        log.error("unable to perform PKIX validation, no KeyInfoResolver available");
+        return false;
+    }
+
+    // Pull the certificate chain out of the signature.
+    X509Credential* x509cred;
+    auto_ptr<Credential> cred(inlineResolver->resolve(keyInfo,X509Credential::RESOLVE_CERTS));
+    if (!cred.get() || !(x509cred=dynamic_cast<X509Credential*>(cred.get()))) {
+        log.error("unable to perform PKIX validation, KeyInfo does not contain any certificates");
+        return false;
+    }
+    const vector<XSECCryptoX509*>& certs = x509cred->getEntityCertificateChain();
+    if (certs.empty()) {
         log.error("unable to perform PKIX validation, KeyInfo does not contain any certificates");
         return false;
     }
@@ -401,8 +414,7 @@ bool AbstractPKIXTrustEngine::validate(
     // Find and save off a pointer to the certificate that unlocks the object.
     // Most of the time, this will be the first one anyway.
     XSECCryptoX509* certEE=NULL;
-    SignatureValidator keyValidator;
-    for (vector<XSECCryptoX509*>::const_iterator i=certs.v().begin(); !certEE && i!=certs.v().end(); ++i) {
+    for (vector<XSECCryptoX509*>::const_iterator i=certs.begin(); !certEE && i!=certs.end(); ++i) {
         try {
             auto_ptr<XSECCryptoKey> key((*i)->clonePublicKey());
             if (Signature::verifyRawSignature(key.get(), sigAlgorithm, sig, in, in_len)) {
@@ -410,13 +422,13 @@ bool AbstractPKIXTrustEngine::validate(
                 certEE=(*i);
             }
         }
-        catch (SignatureException&) {
-            // trap failures
+        catch (SignatureException& ex) {
+            log.debug(ex.what());
         }
     }
     
     if (certEE)
-        return validate(certEE,certs.v(),keyInfoSource,true,keyResolver);
+        return validate(certEE,certs,credResolver,criteria);
         
     log.debug("failed to verify signature with embedded certificates");
     return false;

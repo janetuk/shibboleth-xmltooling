@@ -22,8 +22,9 @@
 
 #include "internal.h"
 #include "exceptions.h"
+#include "security/CredentialCriteria.h"
 #include "security/OpenSSLTrustEngine.h"
-#include "security/OpenSSLCredentialResolver.h"
+#include "security/OpenSSLCredential.h"
 #include "soap/HTTPSOAPTransport.h"
 #include "soap/OpenSSLSOAPTransport.h"
 #include "util/NDC.h"
@@ -48,8 +49,8 @@ namespace xmltooling {
             m_log(Category::getInstance(XMLTOOLING_LOGCAT".SOAPTransport.CURLPool")) {}
         ~CURLPool();
         
-        CURL* get(const string& to, const char* endpoint);
-        void put(const string& to, const char* endpoint, CURL* handle);
+        CURL* get(const char* to, const char* endpoint);
+        void put(const char* to, const char* endpoint, CURL* handle);
     
     private:    
         typedef map<string,vector<CURL*> > poolmap_t;
@@ -65,13 +66,13 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL CURLSOAPTransport : public HTTPSOAPTransport, public OpenSSLSOAPTransport
     {
     public:
-        CURLSOAPTransport(const KeyInfoSource& peer, const char* endpoint)
-                : m_peer(peer), m_endpoint(endpoint), m_handle(NULL), m_headers(NULL),
+        CURLSOAPTransport(const char* peerName, const char* endpoint)
+                : m_peerName(peerName ? peerName : ""), m_endpoint(endpoint), m_handle(NULL), m_headers(NULL),
 #ifndef XMLTOOLING_NO_XMLSEC
-                    m_credResolver(NULL), m_trustEngine(NULL), m_mandatory(false), m_keyResolver(NULL),
+                    m_cred(NULL), m_trustEngine(NULL), m_peerResolver(NULL), m_mandatory(false),
 #endif
                     m_ssl_callback(NULL), m_ssl_userptr(NULL), m_chunked(true), m_secure(false) {
-            m_handle = g_CURLPool->get(peer.getName(), endpoint);
+            m_handle = g_CURLPool->get(peerName, endpoint);
             curl_easy_setopt(m_handle,CURLOPT_URL,endpoint);
             curl_easy_setopt(m_handle,CURLOPT_CONNECTTIMEOUT,15);
             curl_easy_setopt(m_handle,CURLOPT_TIMEOUT,30);
@@ -85,7 +86,7 @@ namespace xmltooling {
             curl_slist_free_all(m_headers);
             curl_easy_setopt(m_handle,CURLOPT_ERRORBUFFER,NULL);
             curl_easy_setopt(m_handle,CURLOPT_PRIVATE,m_secure ? "secure" : NULL); // Save off security "state".
-            g_CURLPool->put(m_peer.getName(), m_endpoint.c_str(), m_handle);
+            g_CURLPool->put(m_peerName.c_str(), m_endpoint.c_str(), m_handle);
         }
 
         bool isConfidential() const {
@@ -103,25 +104,32 @@ namespace xmltooling {
         bool setAuth(transport_auth_t authType, const char* username=NULL, const char* password=NULL);
         
 #ifndef XMLTOOLING_NO_XMLSEC
-        bool setCredentialResolver(const CredentialResolver* credResolver) {
-            const OpenSSLCredentialResolver* down = dynamic_cast<const OpenSSLCredentialResolver*>(credResolver);
+        bool setCredential(const Credential* cred=NULL) {
+            const OpenSSLCredential* down = dynamic_cast<const OpenSSLCredential*>(cred);
             if (!down) {
-                m_credResolver = NULL;
-                return (credResolver==NULL);
+                m_cred = NULL;
+                return (cred==NULL);
             }
-            m_credResolver = down;
+            m_cred = down;
             return true;
         }
         
-        bool setTrustEngine(const X509TrustEngine* trustEngine, bool mandatory=true, const KeyResolver* keyResolver=NULL) {
+        bool setTrustEngine(
+            const X509TrustEngine* trustEngine=NULL,
+            const CredentialResolver* peerResolver=NULL,
+            CredentialCriteria* criteria=NULL,
+            bool mandatory=true
+            ) {
             const OpenSSLTrustEngine* down = dynamic_cast<const OpenSSLTrustEngine*>(trustEngine);
             if (!down) {
                 m_trustEngine = NULL;
-                m_keyResolver = NULL;
+                m_peerResolver = NULL;
+                m_criteria = NULL;
                 return (trustEngine==NULL);
             }
             m_trustEngine = down;
-            m_keyResolver = keyResolver;
+            m_peerResolver = peerResolver;
+            m_criteria = criteria;
             m_mandatory = mandatory;
             return true;
         }
@@ -166,17 +174,17 @@ namespace xmltooling {
 
     private:        
         // per-call state
-        const KeyInfoSource& m_peer;
-        string m_endpoint;
+        string m_peerName,m_endpoint;
         CURL* m_handle;
         stringstream m_stream;
         struct curl_slist* m_headers;
         map<string,vector<string> > m_response_headers;
 #ifndef XMLTOOLING_NO_XMLSEC
-        const OpenSSLCredentialResolver* m_credResolver;
+        const OpenSSLCredential* m_cred;
         const OpenSSLTrustEngine* m_trustEngine;
+        const CredentialResolver* m_peerResolver;
+        CredentialCriteria* m_criteria;
         bool m_mandatory;
-        const KeyResolver* m_keyResolver;
 #endif
         ssl_ctx_callback_fn m_ssl_callback;
         void* m_ssl_userptr;
@@ -198,9 +206,9 @@ namespace xmltooling {
     int XMLTOOL_DLLLOCAL verify_callback(X509_STORE_CTX* x509_ctx, void* arg);
 #endif
 
-    SOAPTransport* CURLSOAPTransportFactory(const pair<const KeyInfoSource*,const char*>& dest)
+    SOAPTransport* CURLSOAPTransportFactory(const pair<const char*,const char*>& dest)
     {
-        return new CURLSOAPTransport(*dest.first, dest.second);
+        return new CURLSOAPTransport(dest.first, dest.second);
     }
 };
 
@@ -231,14 +239,14 @@ CURLPool::~CURLPool()
     delete m_lock;
 }
 
-CURL* CURLPool::get(const string& to, const char* endpoint)
+CURL* CURLPool::get(const char* to, const char* endpoint)
 {
 #ifdef _DEBUG
     xmltooling::NDC("get");
 #endif
     m_log.debug("getting connection handle to %s", endpoint);
     m_lock->lock();
-    poolmap_t::iterator i=m_bindingMap.find(to + "|" + endpoint);
+    poolmap_t::iterator i=m_bindingMap.find(string(to) + "|" + endpoint);
     
     if (i!=m_bindingMap.end()) {
         // Move this pool to the front of the list.
@@ -277,9 +285,9 @@ CURL* CURLPool::get(const string& to, const char* endpoint)
     return handle;
 }
 
-void CURLPool::put(const string& to, const char* endpoint, CURL* handle)
+void CURLPool::put(const char* to, const char* endpoint, CURL* handle)
 {
-    string key = to + "|" + endpoint;
+    string key = string(to) + "|" + endpoint;
     m_lock->lock();
     poolmap_t::iterator i=m_bindingMap.find(key);
     if (i==m_bindingMap.end())
@@ -404,7 +412,7 @@ void CURLSOAPTransport::send(istream& in)
     // Set request headers.
     curl_easy_setopt(m_handle,CURLOPT_HTTPHEADER,m_headers);
 
-    if (m_ssl_callback || m_credResolver || m_trustEngine) {
+    if (m_ssl_callback || m_cred || m_trustEngine) {
         curl_easy_setopt(m_handle,CURLOPT_SSL_CTX_FUNCTION,xml_ssl_ctx_callback);
         curl_easy_setopt(m_handle,CURLOPT_SSL_CTX_DATA,this);
 
@@ -504,8 +512,21 @@ int xmltooling::verify_callback(X509_STORE_CTX* x509_ctx, void* arg)
         );
 #endif
 
-     // Bypass name check (handled for us by curl).
-    if (!ctx->m_trustEngine->validate(x509_ctx->cert,x509_ctx->untrusted,ctx->m_peer,false,ctx->m_keyResolver)) {
+    bool success=false;
+    if (ctx->m_criteria) {
+        ctx->m_criteria->setUsage(CredentialCriteria::TLS_CREDENTIAL);
+        // Bypass name check (handled for us by curl).
+        ctx->m_criteria->setPeerName(NULL);
+        success = ctx->m_trustEngine->validate(x509_ctx->cert,x509_ctx->untrusted,*(ctx->m_peerResolver),ctx->m_criteria);
+    }
+    else {
+        // Bypass name check (handled for us by curl).
+        CredentialCriteria cc;
+        cc.setUsage(CredentialCriteria::TLS_CREDENTIAL);
+        success = ctx->m_trustEngine->validate(x509_ctx->cert,x509_ctx->untrusted,*(ctx->m_peerResolver),&cc);
+    }
+    
+    if (!success) {
         log.error("supplied TrustEngine failed to validate SSL/TLS server certificate");
         x509_ctx->error=X509_V_ERR_APPLICATION_VERIFICATION;     // generic error, check log for plugin specifics
         ctx->setSecure(false);
@@ -524,8 +545,8 @@ CURLcode xmltooling::xml_ssl_ctx_callback(CURL* curl, SSL_CTX* ssl_ctx, void* us
     CURLSOAPTransport* conf = reinterpret_cast<CURLSOAPTransport*>(userptr);
 
 #ifndef XMLTOOLING_NO_XMLSEC
-    if (conf->m_credResolver)
-        conf->m_credResolver->attach(ssl_ctx);
+    if (conf->m_cred)
+        conf->m_cred->attach(ssl_ctx);
 
     if (conf->m_trustEngine) {
         SSL_CTX_set_verify(ssl_ctx,SSL_VERIFY_PEER,NULL);

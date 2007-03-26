@@ -42,7 +42,7 @@ namespace xmltooling {
          * If a DOM is supplied, the following XML content is supported:
          * 
          * <ul>
-         *  <li>&lt;KeyResolver&gt; elements with a type attribute
+         *  <li>&lt;KeyInfoResolver&gt; elements with a type attribute
          * </ul>
          * 
          * XML namespaces are ignored in the processing of this content.
@@ -56,26 +56,26 @@ namespace xmltooling {
         
         /**
          * Determines whether an X.509 credential is valid with respect to the
-         * source of KeyInfo data supplied. It is the responsibility of the
-         * application to ensure that the KeyInfo information supplied is in fact
-         * associated with the peer who presented the credential. 
+         * source of credentials supplied.
          * 
-         * A custom KeyResolver can be supplied from outside the TrustEngine.
-         * Alternatively, one may be specified to the plugin constructor.
-         * A non-caching, inline resolver will be used as a fallback.
+         * <p>It is the responsibility of the application to ensure that the credentials
+         * supplied are in fact associated with the peer who presented the credential.
+         * 
+         * <p>If criteria with a peer name are supplied, the "name" of the EE certificate
+         * may also be checked to ensure that it identifies the intended peer.
+         * The peer name itself or implementation-specific rules based on the content of the
+         * peer credentials may be applied. Implementations may omit this check if they
+         * deem it unnecessary.
          * 
          * @param certEE        end-entity certificate to validate
-         * @param certChain     stack of certificates presented for validation (includes certEE)
-         * @param keyInfoSource supplies KeyInfo objects to the TrustEngine
-         * @param checkName     true iff certificate subject/name checking has <b>NOT</b> already occurred
-         * @param keyResolver   optional externally supplied KeyResolver, or NULL
+         * @param certChain     the complete set of certificates presented for validation (includes certEE)
+         * @param credResolver  a locked resolver to supply trusted peer credentials to the TrustEngine
+         * @param criteria      criteria for selecting peer credentials
          */
         virtual bool validate(
-            X509* certEE,
-            STACK_OF(X509)* certChain,
-            const KeyInfoSource& keyInfoSource,
-            bool checkName=true,
-            const KeyResolver* keyResolver=NULL
+            X509* certEE, STACK_OF(X509)* certChain,
+            const CredentialResolver& credResolver,
+            CredentialCriteria* criteria=NULL
             ) const=0;
     };
     

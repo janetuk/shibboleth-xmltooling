@@ -28,6 +28,10 @@
 #include <xsec/enc/XSECCryptoKey.hpp>
 #include <xsec/xenc/XENCCipher.hpp>
 
+namespace xmltooling {
+    class XMLTOOL_API Credential;
+};
+
 namespace xmlencryption {
 
     /**
@@ -60,34 +64,33 @@ namespace xmlencryption {
             
             /**
              * Constructor.
+             *
              * The algorithm constant and key buffer <strong>MUST</strong> be accessible for the life of
-             * the structure. The other objects will be destroyed if need be when the structure is destroyed. 
+             * the structure.
              * 
-             * @param algorithm     the XML Encryption key wrapping or transport algorithm constant
+             * @param algorithm     the XML Encryption algorithm constant
              * @param keyBuffer     buffer containing the raw key information
              * @param keyBufferSize the size of the raw key buffer in bytes  
-             * @param key           the key encryption key to use, or NULL
-             * @param keyInfo       a KeyInfo object to place within the EncryptedData structure
+             * @param credential    optional Credential supplying the encryption key
+             * @param compact       true iff the encrypted representation should be made as small as possible
              */
             EncryptionParams(
                 const XMLCh* algorithm=DSIGConstants::s_unicodeStrURIAES256_CBC,
                 const unsigned char* keyBuffer=NULL,
                 unsigned int keyBufferSize=0,
-                XSECCryptoKey* key=NULL,
-                xmlsignature::KeyInfo* keyInfo=NULL
-                ) : m_keyBuffer(keyBuffer), m_keyBufferSize(keyBufferSize), m_key(key), m_keyInfo(keyInfo), m_algorithm(algorithm) {
+                const xmltooling::Credential* credential=NULL,
+                bool compact=false
+                ) :  m_algorithm(algorithm), m_keyBuffer(keyBuffer), m_keyBufferSize(keyBufferSize),
+                    m_credential(credential), m_compact(compact) {
             }
 
-            ~EncryptionParams() {
-                delete m_key;
-                delete m_keyInfo;
-            }
+            ~EncryptionParams() {}
         private:
+            const XMLCh* m_algorithm;
             const unsigned char* m_keyBuffer;
             unsigned int m_keyBufferSize;
-            XSECCryptoKey* m_key;
-            xmlsignature::KeyInfo* m_keyInfo;
-            const XMLCh* m_algorithm;
+            const xmltooling::Credential* m_credential;
+            bool m_compact;
             
             friend class Encrypter;
         };
@@ -99,32 +102,23 @@ namespace xmlencryption {
             
             /**
              * Constructor.
-             * The algorithm and recipient constants <strong>MUST</strong> be accessible for the life of the
-             * structure. Using a static constant suffices for this. The other objects will be destroyed if
-             * when the structure is destroyed. 
              * 
+             * @param credential    a Credential supplying the key encryption key
              * @param algorithm     the XML Encryption key wrapping or transport algorithm constant
-             * @param key           the key encryption key to use
              * @param recipient     optional name of recipient of encrypted key
-             * @param keyInfo       a KeyInfo object to place within the EncryptedKey structure that describes the KEK
              */
             KeyEncryptionParams(
+                const xmltooling::Credential& credential,
                 const XMLCh* algorithm,
-                XSECCryptoKey* key,
-                const XMLCh* recipient=NULL,
-                xmlsignature::KeyInfo* keyInfo=NULL
-                ) : m_algorithm(algorithm), m_key(key), m_recipient(recipient), m_keyInfo(keyInfo) {
+                const XMLCh* recipient=NULL
+                ) : m_credential(credential), m_algorithm(algorithm), m_recipient(recipient) {
             }
         
-            ~KeyEncryptionParams() {
-                delete m_key;
-                delete m_keyInfo;
-            }
+            ~KeyEncryptionParams() {}
         private:
+            const xmltooling::Credential& m_credential;
             const XMLCh* m_algorithm;
-            XSECCryptoKey* m_key;
             const XMLCh* m_recipient;
-            xmlsignature::KeyInfo* m_keyInfo;
             
             friend class Encrypter;
         };
@@ -190,9 +184,10 @@ namespace xmlencryption {
          * @param keyBuffer     raw key material to encrypt
          * @param keyBufferSize size in bytes of raw key material
          * @param kencParams    key encryption settings
+         * @param compact       true iff the encrypted representation should be made as small as possible
          * @return a stand-alone EncryptedKey object, unconnected to any DOM 
          */
-        EncryptedKey* encryptKey(const unsigned char* keyBuffer, unsigned int keyBufferSize, KeyEncryptionParams& kencParams);
+        EncryptedKey* encryptKey(const unsigned char* keyBuffer, unsigned int keyBufferSize, KeyEncryptionParams& kencParams, bool compact=false);
         
     private:
         void checkParams(EncryptionParams& encParams, KeyEncryptionParams* kencParams);

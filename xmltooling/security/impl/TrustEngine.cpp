@@ -21,7 +21,9 @@
  */
 
 #include "internal.h"
+#include "security/KeyInfoResolver.h"
 #include "security/TrustEngine.h"
+#include "util/XMLHelper.h"
 
 #include <xercesc/util/XMLUniDefs.hpp>
 
@@ -40,25 +42,22 @@ void XMLTOOL_API xmltooling::registerTrustEngines()
     conf.TrustEngineManager.registerFactory(CHAINING_TRUSTENGINE, ChainingTrustEngineFactory);
 }
 
-static const XMLCh GenericKeyResolver[] =           UNICODE_LITERAL_11(K,e,y,R,e,s,o,l,v,e,r);
-static const XMLCh type[] =                         UNICODE_LITERAL_4(t,y,p,e);
+static const XMLCh _KeyInfoResolver[] = UNICODE_LITERAL_15(K,e,y,I,n,f,o,R,e,s,o,l,v,e,r);
+static const XMLCh type[] =             UNICODE_LITERAL_4(t,y,p,e);
 
-TrustEngine::TrustEngine(const DOMElement* e) : m_keyResolver(NULL)
+TrustEngine::TrustEngine(const DOMElement* e) : m_keyInfoResolver(NULL)
 {
-    DOMElement* child = e ? XMLHelper::getFirstChildElement(e,GenericKeyResolver) : NULL;
+    DOMElement* child = e ? XMLHelper::getFirstChildElement(e,_KeyInfoResolver) : NULL;
     if (child) {
         auto_ptr_char t(child->getAttributeNS(NULL,type));
         if (t.get())
-            m_keyResolver = XMLToolingConfig::getConfig().KeyResolverManager.newPlugin(t.get(),child);
+            m_keyInfoResolver = XMLToolingConfig::getConfig().KeyInfoResolverManager.newPlugin(t.get(),child);
         else
-            throw UnknownExtensionException("<KeyResolver> element found with no type attribute");
-    }
-    else if (!m_keyResolver) {
-        m_keyResolver = XMLToolingConfig::getConfig().KeyResolverManager.newPlugin(INLINE_KEY_RESOLVER, child);
+            throw UnknownExtensionException("<KeyInfoResolver> element found with no type attribute");
     }
 }
 
 TrustEngine::~TrustEngine()
 {
-    delete m_keyResolver;
+    delete m_keyInfoResolver;
 }

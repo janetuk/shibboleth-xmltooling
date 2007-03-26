@@ -21,14 +21,16 @@
  */
 
 #include "internal.h"
-#include "security/KeyResolver.h"
-#include "security/OpenSSLCredentialResolver.h"
+#include "security/BasicX509Credential.h"
+#include "security/CredentialCriteria.h"
+#include "security/CredentialResolver.h"
+#include "security/KeyInfoResolver.h"
+#include "security/OpenSSLCredential.h"
 #include "util/NDC.h"
 #include "util/XMLHelper.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <algorithm>
 #include <openssl/pkcs12.h>
 #include <log4cpp/Category.hh>
 #include <xercesc/util/XMLUniDefs.hpp>
@@ -56,35 +58,84 @@ static int passwd_callback(char* buf, int len, int verify, void* passwd)
 }
 
 namespace xmltooling {
-    class XMLTOOL_DLLLOCAL FilesystemCredentialResolver : public OpenSSLCredentialResolver, public KeyResolver
+
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4250 )
+#endif
+
+    class XMLTOOL_DLLLOCAL FilesystemCredentialResolver;
+    class XMLTOOL_DLLLOCAL FilesystemCredential : public OpenSSLCredential, public BasicX509Credential
+    {
+    public:
+        FilesystemCredential(FilesystemCredentialResolver* resolver, XSECCryptoKey* key, const std::vector<XSECCryptoX509*>& xseccerts)
+                : BasicX509Credential(key, xseccerts), m_resolver(resolver) {
+            initKeyInfo();
+        }
+        virtual ~FilesystemCredential() {}
+        void attach(SSL_CTX* ctx) const;
+
+        FilesystemCredentialResolver* m_resolver;
+    };
+
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
+
+    class XMLTOOL_DLLLOCAL FilesystemCredentialResolver : public CredentialResolver
     {
     public:
         FilesystemCredentialResolver(const DOMElement* e);
-        virtual ~FilesystemCredentialResolver();
+        virtual ~FilesystemCredentialResolver() {
+            delete m_credential;
+            for_each(m_certs.begin(),m_certs.end(),X509_free);
+        }
 
         Lockable* lock() { return this; }
         void unlock() {}
         
-        XSECCryptoKey* loadKey();
-        
-        XSECCryptoKey* getKey(const KeyInfo* keyInfo=NULL) const { return m_key ? m_key->clone() : NULL; }
-        const vector<XSECCryptoX509*>& getCertificates() const { return m_xseccerts; }
+        const Credential* resolve(const CredentialCriteria* criteria=NULL) const {
+            return matches(criteria) ? m_credential : NULL;
+        }
+
+        virtual vector<const Credential*>::size_type resolve(
+            vector<const Credential*>& results, const CredentialCriteria* criteria=NULL
+            ) const {
+            if (matches(criteria)) {
+                results.push_back(m_credential);
+                return 1;
+            }
+            return 0;
+        }
+
         void attach(SSL_CTX* ctx) const;
-        
-        XSECCryptoKey* resolveKey(const KeyInfo* keyInfo) const { return m_key ? m_key->clone() : NULL; }
-        XSECCryptoKey* resolveKey(DSIGKeyInfoList* keyInfo) const { return m_key ? m_key->clone() : NULL; }
-        vector<XSECCryptoX509*>::size_type resolveCertificates(const KeyInfo* keyInfo, ResolvedCertificates& certs) const {
-            accessCertificates(certs).assign(m_xseccerts.begin(), m_xseccerts.end());
-            accessOwned(certs) = false;
-            return accessCertificates(certs).size();
-        }
-        vector<XSECCryptoX509*>::size_type resolveCertificates(DSIGKeyInfoList* keyInfo, ResolvedCertificates& certs) const {
-            accessCertificates(certs).assign(m_xseccerts.begin(), m_xseccerts.end());
-            accessOwned(certs) = false;
-            return accessCertificates(certs).size();
-        }
-        
+
     private:
+        XSECCryptoKey* loadKey();
+        bool matches(const CredentialCriteria* criteria) const {
+            bool match = true;
+            if (criteria) {
+                // See if algorithm is kosher.
+                const char* alg = criteria->getKeyAlgorithm();
+                if (alg && *alg) {
+                    match = false;
+                    for (vector<string>::const_iterator a = m_algorithms.begin(); a!=m_algorithms.end(); ++a) {
+                        if (strstr(alg, a->c_str()))
+                            match = true;
+                    }
+                }
+                if (match && m_credential->getPublicKey()) {
+                    // See if we have to match a specific key.
+                    auto_ptr<Credential> cred(
+                        XMLToolingConfig::getConfig().getKeyInfoResolver()->resolve(*criteria,Credential::RESOLVE_KEYS)
+                        );
+                    if (cred.get())
+                        match = cred->isEqual(*(m_credential->getPublicKey()));
+                }
+            }
+            return match;
+        }
+        
         enum format_t { PEM=SSL_FILETYPE_PEM, DER=SSL_FILETYPE_ASN1, _PKCS12, UNKNOWN };
     
         format_t getEncodingFormat(BIO* in) const;
@@ -94,21 +145,17 @@ namespace xmltooling {
         format_t m_keyformat;
         string m_keypath,m_keypass;
         vector<X509*> m_certs;
-        vector<XSECCryptoX509*> m_xseccerts;
-        XSECCryptoKey* m_key;
+        FilesystemCredential* m_credential;
+        vector<string> m_algorithms;
     };
 
     CredentialResolver* XMLTOOL_DLLLOCAL FilesystemCredentialResolverFactory(const DOMElement* const & e)
     {
         return new FilesystemCredentialResolver(e);
     }
-
-    KeyResolver* XMLTOOL_DLLLOCAL FilesystemKeyResolverFactory(const DOMElement* const & e)
-    {
-        return new FilesystemCredentialResolver(e);
-    }
 };
 
+static const XMLCh AlgorithmPrefix[] =  UNICODE_LITERAL_15(A,l,g,o,r,i,t,h,m,P,r,e,f,i,x);
 static const XMLCh CAPath[] =           UNICODE_LITERAL_6(C,A,P,a,t,h);
 static const XMLCh Certificate[] =      UNICODE_LITERAL_11(C,e,r,t,i,f,i,c,a,t,e);
 static const XMLCh format[] =           UNICODE_LITERAL_6(f,o,r,m,a,t);
@@ -116,19 +163,38 @@ static const XMLCh Key[] =              UNICODE_LITERAL_3(K,e,y);
 static const XMLCh password[] =         UNICODE_LITERAL_8(p,a,s,s,w,o,r,d);
 static const XMLCh Path[] =             UNICODE_LITERAL_4(P,a,t,h);
 
-FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) : m_key(NULL)
+FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) : m_credential(NULL)
 {
 #ifdef _DEBUG
     NDC ndc("FilesystemCredentialResolver");
 #endif
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver");
 
+    const DOMElement* root=e;
+    e=XMLHelper::getFirstChildElement(root,AlgorithmPrefix);
+    while (e) {
+        if (e->hasChildNodes()) {
+            auto_ptr_char alg(e->getFirstChild()->getNodeValue());
+            if (alg.get())
+                m_algorithms.push_back(alg.get());
+        }
+        e=XMLHelper::getNextSiblingElement(e,AlgorithmPrefix);
+    }
+
+    if (m_algorithms.empty()) {
+        m_algorithms.push_back(URI_ID_SIG_BASE);
+        m_algorithms.push_back(URI_ID_SIG_BASEMORE);
+        m_algorithms.push_back("http://www.w3.org/2001/04/xmlenc#rsa");
+    }
+
+    XSECCryptoKey* key=NULL;
+    vector<XSECCryptoX509*> xseccerts;
+
     format_t fformat;
     const XMLCh* format_xml=NULL;
     BIO* in = NULL;
     
     // Move to Key
-    const DOMElement* root=e;
     e=XMLHelper::getFirstChildElement(root,Key);
     if (e) {
 
@@ -192,18 +258,21 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
         }
         
         // Load the key.
-        m_key = loadKey();
+        key = loadKey();
     }
         
     // Check for Certificate
     e=XMLHelper::getFirstChildElement(root,Certificate);
-    if (!e)
+    if (!e) {
+        m_credential = new FilesystemCredential(this,key,xseccerts);
         return;
+    }
     auto_ptr_char certpass(e->getAttributeNS(NULL,password));
     
     DOMElement* ep=XMLHelper::getFirstChildElement(e,Path);
     if (!ep || !ep->hasChildNodes()) {
         log.error("Path element missing inside Certificate element or is empty");
+        delete key;
         throw XMLSecurityException("FilesystemCredentialResolver can't access certificate file, missing or empty Path element.");
     }
     
@@ -214,6 +283,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
         if (fformat == UNKNOWN) {
             auto_ptr_char unknown(format_xml);
             log.error("configuration specifies unknown certificate encoding format (%s)", unknown.get());
+            delete key;
             throw XMLSecurityException("FilesystemCredentialResolver configuration contains unknown certificate encoding format ($1)",params(1,unknown.get()));
         }
     }
@@ -276,9 +346,8 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
             in=NULL;
         }
 
-        if (m_certs.empty()) {
+        if (m_certs.empty())
             throw XMLSecurityException("FilesystemCredentialResolver unable to load any certificate(s)");
-        }
 
         // Load any extra CA files.
         DOMElement* extra=XMLHelper::getFirstChildElement(e,CAPath);
@@ -348,14 +417,17 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
         }
     }
     catch (XMLToolingException&) {
-        for (vector<X509*>::iterator j=m_certs.begin(); j!=m_certs.end(); j++)
-            X509_free(*j);
+        delete key;
+        for_each(m_certs.begin(), m_certs.end(), X509_free);
         throw;
     }
 
-    // Reflect certs over to XSEC form.
+    // Reflect certs over to XSEC form and wrap with credential object.
     for (vector<X509*>::iterator j=m_certs.begin(); j!=m_certs.end(); j++)
-        m_xseccerts.push_back(new OpenSSLCryptoX509(*j));
+        xseccerts.push_back(new OpenSSLCryptoX509(*j));
+    if (!key && !xseccerts.empty())
+        key = xseccerts.front()->clonePublicKey();
+    m_credential = new FilesystemCredential(this, key, xseccerts);
 }
 
 XSECCryptoKey* FilesystemCredentialResolver::loadKey()
@@ -411,77 +483,6 @@ XSECCryptoKey* FilesystemCredentialResolver::loadKey()
 
     log_openssl();
     throw XMLSecurityException("FilesystemCredentialResolver unable to load private key from file."); 
-}
-
-FilesystemCredentialResolver::~FilesystemCredentialResolver()
-{
-    delete m_key;
-    for_each(m_certs.begin(),m_certs.end(),X509_free);
-    for_each(m_xseccerts.begin(),m_xseccerts.end(),xmltooling::cleanup<XSECCryptoX509>());
-}
-
-void FilesystemCredentialResolver::attach(SSL_CTX* ctx) const
-{
-#ifdef _DEBUG
-    NDC ndc("attach");
-#endif
-    
-    // Attach key.
-    SSL_CTX_set_default_passwd_cb(ctx, passwd_callback);
-    SSL_CTX_set_default_passwd_cb_userdata(ctx, const_cast<char*>(m_keypass.c_str()));
-
-    int ret=0;
-    switch (m_keyformat) {
-        case PEM:
-            ret=SSL_CTX_use_PrivateKey_file(ctx, m_keypath.c_str(), m_keyformat);
-            break;
-            
-        case DER:
-            ret=SSL_CTX_use_RSAPrivateKey_file(ctx, m_keypath.c_str(), m_keyformat);
-            break;
-            
-        default: {
-            BIO* in=BIO_new(BIO_s_file_internal());
-            if (in && BIO_read_filename(in,m_keypath.c_str())>0) {
-                EVP_PKEY* pkey=NULL;
-                PKCS12* p12 = d2i_PKCS12_bio(in, NULL);
-                if (p12) {
-                    PKCS12_parse(p12, const_cast<char*>(m_keypass.c_str()), &pkey, NULL, NULL);
-                    PKCS12_free(p12);
-                    if (pkey) {
-                        ret=SSL_CTX_use_PrivateKey(ctx, pkey);
-                        EVP_PKEY_free(pkey);
-                    }
-                }
-            }
-            if (in)
-                BIO_free(in);
-        }
-    }
-    
-    if (ret!=1) {
-        log_openssl();
-        throw XMLSecurityException("Unable to attach private key to SSL context.");
-    }
-
-    // Attach certs.
-    for (vector<X509*>::const_iterator i=m_certs.begin(); i!=m_certs.end(); i++) {
-        if (i==m_certs.begin()) {
-            if (SSL_CTX_use_certificate(ctx, *i) != 1) {
-                log_openssl();
-                throw XMLSecurityException("Unable to attach client certificate to SSL context.");
-            }
-        }
-        else {
-            // When we add certs, they don't get ref counted, so we need to duplicate them.
-            X509* dup = X509_dup(*i);
-            if (SSL_CTX_add_extra_chain_cert(ctx, dup) != 1) {
-                X509_free(dup);
-                log_openssl();
-                throw XMLSecurityException("Unable to attach CA certificate to SSL context.");
-            }
-        }
-    }
 }
 
 // Used to determine the encoding format of credentials files
@@ -571,4 +572,73 @@ FilesystemCredentialResolver::format_t FilesystemCredentialResolver::xmlFormatTo
         format=UNKNOWN;
 
     return format;
+}
+
+void FilesystemCredentialResolver::attach(SSL_CTX* ctx) const
+{
+#ifdef _DEBUG
+    NDC ndc("attach");
+#endif
+    
+    // Attach key.
+    SSL_CTX_set_default_passwd_cb(ctx, passwd_callback);
+    SSL_CTX_set_default_passwd_cb_userdata(ctx, const_cast<char*>(m_keypass.c_str()));
+
+    int ret=0;
+    switch (m_keyformat) {
+        case PEM:
+            ret=SSL_CTX_use_PrivateKey_file(ctx, m_keypath.c_str(), m_keyformat);
+            break;
+            
+        case DER:
+            ret=SSL_CTX_use_RSAPrivateKey_file(ctx, m_keypath.c_str(), m_keyformat);
+            break;
+            
+        default: {
+            BIO* in=BIO_new(BIO_s_file_internal());
+            if (in && BIO_read_filename(in,m_keypath.c_str())>0) {
+                EVP_PKEY* pkey=NULL;
+                PKCS12* p12 = d2i_PKCS12_bio(in, NULL);
+                if (p12) {
+                    PKCS12_parse(p12, const_cast<char*>(m_keypass.c_str()), &pkey, NULL, NULL);
+                    PKCS12_free(p12);
+                    if (pkey) {
+                        ret=SSL_CTX_use_PrivateKey(ctx, pkey);
+                        EVP_PKEY_free(pkey);
+                    }
+                }
+            }
+            if (in)
+                BIO_free(in);
+        }
+    }
+    
+    if (ret!=1) {
+        log_openssl();
+        throw XMLSecurityException("Unable to attach private key to SSL context.");
+    }
+
+    // Attach certs.
+    for (vector<X509*>::const_iterator i=m_certs.begin(); i!=m_certs.end(); i++) {
+        if (i==m_certs.begin()) {
+            if (SSL_CTX_use_certificate(ctx, *i) != 1) {
+                log_openssl();
+                throw XMLSecurityException("Unable to attach client certificate to SSL context.");
+            }
+        }
+        else {
+            // When we add certs, they don't get ref counted, so we need to duplicate them.
+            X509* dup = X509_dup(*i);
+            if (SSL_CTX_add_extra_chain_cert(ctx, dup) != 1) {
+                X509_free(dup);
+                log_openssl();
+                throw XMLSecurityException("Unable to attach CA certificate to SSL context.");
+            }
+        }
+    }
+}
+
+void FilesystemCredential::attach(SSL_CTX* ctx) const
+{
+    return m_resolver->attach(ctx);
 }

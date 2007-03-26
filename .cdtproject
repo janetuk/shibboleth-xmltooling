@@ -55,19 +55,19 @@
 <pathentry kind="out" path="debug"/>
 <pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
 <pathentry excluding="util/|io/|impl/|validation/|signature/|signature/impl/|encryption/|encryption/impl/|security/|security/impl/|soap/|soap/impl/" kind="src" path="xmltooling"/>
-<pathentry kind="src" path="xmltooling/util"/>
-<pathentry kind="src" path="xmltooling/io"/>
 <pathentry kind="src" path="xmltooling/impl"/>
-<pathentry kind="src" path="xmltoolingtest"/>
-<pathentry kind="src" path="xmltooling/validation"/>
-<pathentry excluding="impl/" kind="src" path="xmltooling/signature"/>
-<pathentry kind="src" path="xmltooling/signature/impl"/>
+<pathentry kind="src" path="xmltooling/io"/>
 <pathentry excluding="impl/" kind="src" path="xmltooling/encryption"/>
 <pathentry kind="src" path="xmltooling/encryption/impl"/>
+<pathentry excluding="impl/" kind="src" path="xmltooling/signature"/>
+<pathentry kind="src" path="xmltooling/signature/impl"/>
 <pathentry excluding="impl/" kind="src" path="xmltooling/security"/>
 <pathentry kind="src" path="xmltooling/security/impl"/>
 <pathentry excluding="impl/" kind="src" path="xmltooling/soap"/>
 <pathentry kind="src" path="xmltooling/soap/impl"/>
+<pathentry kind="src" path="xmltooling/util"/>
+<pathentry kind="src" path="xmltooling/validation"/>
+<pathentry kind="src" path="xmltoolingtest"/>
 <pathentry include="C:/log4cpp-0.3.5rc1/include" kind="inc" path="" system="true"/>
 <pathentry include="C:/xerces-c2_7_0-win32/include" kind="inc" path="" system="true"/>
 <pathentry include="C:/xml-security-c-1.2.0/include" kind="inc" path="" system="true"/>

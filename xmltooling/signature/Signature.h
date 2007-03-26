@@ -122,8 +122,10 @@ namespace xmlsignature {
         /**
          * Compute and append the signature based on the assigned
          * ContentReference, KeyInfo, and signing key.
+         *
+         * @param credential    optional source of signing key and KeyInfo
          */
-        virtual void sign()=0;
+        virtual void sign(const xmltooling::Credential* credential=NULL)=0;
 
         /**
          * Type-safe clone operation.

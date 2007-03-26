@@ -21,6 +21,9 @@
  */
 
 #include "internal.h"
+#include "security/Credential.h"
+#include "security/CredentialCriteria.h"
+#include "security/CredentialResolver.h"
 #include "security/OpenSSLTrustEngine.h"
 #include "signature/SignatureValidator.h"
 #include "util/NDC.h"
@@ -45,8 +48,8 @@ namespace xmltooling {
 
         virtual bool validate(
             Signature& sig,
-            const KeyInfoSource& keyInfoSource,
-            const KeyResolver* keyResolver=NULL
+            const CredentialResolver& credResolver,
+            CredentialCriteria* criteria=NULL
             ) const;
         virtual bool validate(
             const XMLCh* sigAlgorithm,
@@ -54,22 +57,20 @@ namespace xmltooling {
             KeyInfo* keyInfo,
             const char* in,
             unsigned int in_len,
-            const KeyInfoSource& keyInfoSource,
-            const KeyResolver* keyResolver=NULL
+            const CredentialResolver& credResolver,
+            CredentialCriteria* criteria=NULL
             ) const;
         virtual bool validate(
             XSECCryptoX509* certEE,
             const vector<XSECCryptoX509*>& certChain,
-            const KeyInfoSource& keyInfoSource,
-            bool checkName=true,
-            const KeyResolver* keyResolver=NULL
+            const CredentialResolver& credResolver,
+            CredentialCriteria* criteria=NULL
             ) const;
         virtual bool validate(
             X509* certEE,
             STACK_OF(X509)* certChain,
-            const KeyInfoSource& keyInfoSource,
-            bool checkName=true,
-            const KeyResolver* keyResolver=NULL
+            const CredentialResolver& credResolver,
+            CredentialCriteria* criteria=NULL
             ) const;
     };
 
@@ -81,43 +82,47 @@ namespace xmltooling {
 
 bool ExplicitKeyTrustEngine::validate(
     Signature& sig,
-    const KeyInfoSource& keyInfoSource,
-    const KeyResolver* keyResolver
+    const CredentialResolver& credResolver,
+    CredentialCriteria* criteria
     ) const
 {
 #ifdef _DEBUG
     NDC ndc("validate");
 #endif
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine");
-    
-    auto_ptr<KeyInfoIterator> keyInfoIter(keyInfoSource.getKeyInfoIterator());
-    if (!keyInfoIter->hasNext()) {
-        log.warn("unable to validate signature, no key information available for peer");
+
+    vector<const Credential*> credentials;
+    if (criteria) {
+        criteria->setUsage(CredentialCriteria::SIGNING_CREDENTIAL);
+        criteria->setSignature(sig);
+        credResolver.resolve(credentials,criteria);
+    }
+    else {
+        CredentialCriteria cc;
+        cc.setUsage(CredentialCriteria::SIGNING_CREDENTIAL);
+        cc.setSignature(sig);
+        credResolver.resolve(credentials,&cc);
+    }
+    if (credentials.empty()) {
+        log.warn("unable to validate signature, no credentials available from peer");
         return false;
     }
     
-    log.debug("attempting to validate signature with the key information for peer");
+    log.debug("attempting to validate signature with the peer's credentials");
     SignatureValidator sigValidator;
-    while (keyInfoIter->hasNext()) {
-        XSECCryptoKey* key = (keyResolver ? keyResolver : m_keyResolver)->resolveKey(keyInfoIter->next());
-        if (key) {
-            log.debug("attempting to validate signature with public key...");
-            try {
-                sigValidator.setKey(key);   // key now owned by validator
-                sigValidator.validate(&sig);
-                log.debug("signature validated with public key");
-                return true;
-            }
-            catch (ValidationException& e) {
-                log.debug("public key did not validate signature: %s", e.what());
-            }
+    for (vector<const Credential*>::const_iterator c=credentials.begin(); c!=credentials.end(); ++c) {
+        sigValidator.setCredential(*c);
+        try {
+            sigValidator.validate(&sig);
+            log.debug("signature validated with credential");
+            return true;
         }
-        else {
-            log.debug("key information does not resolve to a public key, skipping it");
+        catch (ValidationException& e) {
+            log.debug("public key did not validate signature: %s", e.what());
         }
     }
 
-    log.error("no peer key information validated the signature");
+    log.error("no peer credentials validated the signature");
     return false;
 }
 
@@ -127,8 +132,8 @@ bool ExplicitKeyTrustEngine::validate(
     KeyInfo* keyInfo,
     const char* in,
     unsigned int in_len,
-    const KeyInfoSource& keyInfoSource,
-    const KeyResolver* keyResolver
+    const CredentialResolver& credResolver,
+    CredentialCriteria* criteria
     ) const
 {
 #ifdef _DEBUG
@@ -136,19 +141,28 @@ bool ExplicitKeyTrustEngine::validate(
 #endif
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine");
     
-    auto_ptr<KeyInfoIterator> keyInfoIter(keyInfoSource.getKeyInfoIterator());
-    if (!keyInfoIter->hasNext()) {
-        log.warn("unable to validate signature, no key information available for peer");
+    vector<const Credential*> credentials;
+    if (criteria) {
+        criteria->setUsage(CredentialCriteria::SIGNING_CREDENTIAL);
+        criteria->setKeyInfo(keyInfo);
+        credResolver.resolve(credentials,criteria);
+    }
+    else {
+        CredentialCriteria cc;
+        cc.setUsage(CredentialCriteria::SIGNING_CREDENTIAL);
+        cc.setKeyInfo(keyInfo);
+        credResolver.resolve(credentials,&cc);
+    }
+    if (credentials.empty()) {
+        log.warn("unable to validate signature, no credentials available from peer");
         return false;
     }
     
-    log.debug("attempting to validate signature with the key information for peer");
-    while (keyInfoIter->hasNext()) {
-        auto_ptr<XSECCryptoKey> key((keyResolver ? keyResolver : m_keyResolver)->resolveKey(keyInfoIter->next()));
-        if (key.get()) {
-            log.debug("attempting to validate signature with public key...");
+    log.debug("attempting to validate signature with the peer's credentials");
+    for (vector<const Credential*>::const_iterator c=credentials.begin(); c!=credentials.end(); ++c) {
+        if ((*c)->getPublicKey()) {
             try {
-                if (Signature::verifyRawSignature(key.get(), sigAlgorithm, sig, in, in_len)) {
+                if (Signature::verifyRawSignature((*c)->getPublicKey(), sigAlgorithm, sig, in, in_len)) {
                     log.debug("signature validated with public key");
                     return true;
                 }
@@ -159,21 +173,17 @@ bool ExplicitKeyTrustEngine::validate(
                 }
             }
         }
-        else {
-            log.debug("key information does not resolve to a public key, skipping it");
-        }
     }
 
-    log.error("no peer key information validated the signature");
+    log.error("no peer credentials validated the signature");
     return false;
 }
 
 bool ExplicitKeyTrustEngine::validate(
     XSECCryptoX509* certEE,
     const vector<XSECCryptoX509*>& certChain,
-    const KeyInfoSource& keyInfoSource,
-    bool checkName,
-    const KeyResolver* keyResolver
+    const CredentialResolver& credResolver,
+    CredentialCriteria* criteria
     ) const
 {
 #ifdef _DEBUG
@@ -188,15 +198,14 @@ bool ExplicitKeyTrustEngine::validate(
         return false;
     }
 
-    return validate(static_cast<OpenSSLCryptoX509*>(certEE)->getOpenSSLX509(), NULL, keyInfoSource, checkName, keyResolver);
+    return validate(static_cast<OpenSSLCryptoX509*>(certEE)->getOpenSSLX509(), NULL, credResolver, criteria);
 }
 
 bool ExplicitKeyTrustEngine::validate(
     X509* certEE,
     STACK_OF(X509)* certChain,
-    const KeyInfoSource& keyInfoSource,
-    bool checkName,
-    const KeyResolver* keyResolver
+    const CredentialResolver& credResolver,
+    CredentialCriteria* criteria
     ) const
 {
 #ifdef _DEBUG
@@ -209,19 +218,29 @@ bool ExplicitKeyTrustEngine::validate(
         return false;
     }
 
-    auto_ptr<KeyInfoIterator> keyInfoIter(keyInfoSource.getKeyInfoIterator());
-    if (!keyInfoIter->hasNext()) {
-        log.warn("unable to validate, no key information available for peer");
+    vector<const Credential*> credentials;
+    if (criteria) {
+        if (criteria->getUsage()==CredentialCriteria::UNSPECIFIED_CREDENTIAL)
+            criteria->setUsage(CredentialCriteria::SIGNING_CREDENTIAL);
+        credResolver.resolve(credentials,criteria);
+    }
+    else {
+        CredentialCriteria cc;
+        cc.setUsage(CredentialCriteria::SIGNING_CREDENTIAL);
+        credResolver.resolve(credentials,&cc);
+    }
+    if (credentials.empty()) {
+        log.warn("unable to validate certificate, no credentials available from peer");
         return false;
     }
 
     // The "explicit" trust implementation relies solely on keys living within the
-    // peer interface to verify the EE certificate.
+    // peer resolver to verify the EE certificate.
 
-    log.debug("attempting to match key information from peer with end-entity certificate");
-    while (keyInfoIter->hasNext()) {
-        auto_ptr<XSECCryptoKey> key((keyResolver ? keyResolver : m_keyResolver)->resolveKey(keyInfoIter->next()));
-        if (key.get()) {
+    log.debug("attempting to match credentials from peer with end-entity certificate");
+    for (vector<const Credential*>::const_iterator c=credentials.begin(); c!=credentials.end(); ++c) {
+        XSECCryptoKey* key = (*c)->getPublicKey();
+        if (key) {
             log.debug("checking if peer key matches end-entity certificate");
             if (key->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
                 log.error("only the OpenSSL XSEC provider is supported");
@@ -230,13 +249,13 @@ bool ExplicitKeyTrustEngine::validate(
             switch (key->getKeyType()) {
                 case XSECCryptoKey::KEY_RSA_PUBLIC:
                 {
-                    RSA* rsa = static_cast<OpenSSLCryptoKeyRSA*>(key.get())->getOpenSSLRSA();
+                    RSA* rsa = static_cast<OpenSSLCryptoKeyRSA*>(key)->getOpenSSLRSA();
                     EVP_PKEY* evp = X509_PUBKEY_get(X509_get_X509_PUBKEY(certEE));
                     if (rsa && evp && evp->type == EVP_PKEY_RSA &&
                             BN_cmp(rsa->n,evp->pkey.rsa->n) == 0 && BN_cmp(rsa->e,evp->pkey.rsa->e) == 0) {
-                        log.debug("end-entity certificate matches peer RSA key information");
                         if (evp)
                             EVP_PKEY_free(evp);
+                        log.debug("end-entity certificate matches peer RSA key information");
                         return true;
                     }
                     if (evp)
@@ -246,12 +265,12 @@ bool ExplicitKeyTrustEngine::validate(
                 
                 case XSECCryptoKey::KEY_DSA_PUBLIC:
                 {
-                    DSA* dsa = static_cast<OpenSSLCryptoKeyDSA*>(key.get())->getOpenSSLDSA();
+                    DSA* dsa = static_cast<OpenSSLCryptoKeyDSA*>(key)->getOpenSSLDSA();
                     EVP_PKEY* evp = X509_PUBKEY_get(X509_get_X509_PUBKEY(certEE));
                     if (dsa && evp && evp->type == EVP_PKEY_DSA && BN_cmp(dsa->pub_key,evp->pkey.dsa->pub_key) == 0) {
-                        log.debug("end-entity certificate matches peer DSA key information");
                         if (evp)
                             EVP_PKEY_free(evp);
+                        log.debug("end-entity certificate matches peer DSA key information");
                         return true;
                     }
                     if (evp)
@@ -262,9 +281,6 @@ bool ExplicitKeyTrustEngine::validate(
                 default:
                     log.warn("unknown peer key type, skipping...");
             }
-        }
-        else {
-            log.debug("key information does not resolve to a public key, skipping it");
         }
     }
 
