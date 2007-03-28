@@ -153,6 +153,10 @@ XSECCryptoKey* Decrypter::decryptKey(const EncryptedKey& encryptedKey, const XML
 
     if (encryptedKey.getDOM()==NULL)
         throw DecryptionException("The object must be marshalled before decryption.");
+
+    XSECAlgorithmHandler* handler = XSECPlatformUtils::g_algorithmMapper->mapURIToHandler(algorithm);
+    if (!handler)
+        throw DecryptionException("Unrecognized algorithm, no way to build object around decrypted key.");
     
     // We can reuse the cipher object if the document hasn't changed.
 
@@ -166,7 +170,7 @@ XSECCryptoKey* Decrypter::decryptKey(const EncryptedKey& encryptedKey, const XML
     
     // Resolve key decryption key. We can't loop over possible credentials because
     // we can't tell a valid decrypt from an invalid one.
-    const Credential* cred=NULL;
+    vector<const Credential*> creds;
     if (m_criteria) {
         m_criteria->setUsage(CredentialCriteria::ENCRYPTION_CREDENTIAL);
         m_criteria->setKeyInfo(encryptedKey.getKeyInfo());
@@ -175,7 +179,7 @@ XSECCryptoKey* Decrypter::decryptKey(const EncryptedKey& encryptedKey, const XML
             auto_ptr_char alg(meth->getAlgorithm());
             m_criteria->setKeyAlgorithm(alg.get());
         }
-        cred = m_credResolver->resolve(m_criteria);
+        m_credResolver->resolve(creds, m_criteria);
     }
     else {
         CredentialCriteria criteria;
@@ -186,30 +190,39 @@ XSECCryptoKey* Decrypter::decryptKey(const EncryptedKey& encryptedKey, const XML
             auto_ptr_char alg(meth->getAlgorithm());
             criteria.setKeyAlgorithm(alg.get());
         }
-        cred = m_credResolver->resolve(&criteria);
+        m_credResolver->resolve(creds, &criteria);
     }
-    if (!cred || !cred->getPrivateKey())
-        throw DecryptionException("Unable to resolve a key decryption key.");
+    if (creds.empty())
+        throw DecryptionException("Unable to resolve any key decryption keys.");
 
-    try {
-        m_cipher->setKEK(cred->getPrivateKey()->clone());
-        XMLByte buffer[1024];
-        memset(buffer,0,sizeof(buffer));
-        int keySize = m_cipher->decryptKey(encryptedKey.getDOM(), buffer, 1024);
-        if (keySize<=0)
-            throw DecryptionException("Unable to decrypt key.");
+    XMLByte buffer[1024];
+    for (vector<const Credential*>::const_iterator cred = creds.begin(); cred!=creds.end(); ++cred) {
+        try {
+            if (!(*cred)->getPrivateKey())
+                throw DecryptionException("Credential did not contain a private key.");
+            memset(buffer,0,sizeof(buffer));
+            m_cipher->setKEK((*cred)->getPrivateKey()->clone());
 
-        // Try to map the key.
-        XSECAlgorithmHandler* handler = XSECPlatformUtils::g_algorithmMapper->mapURIToHandler(algorithm);
-        if (handler != NULL)
-            return handler->createKeyForURI(algorithm, buffer, keySize);
-        throw DecryptionException("Unrecognized algorithm, could not build object around decrypted key.");
+            try {
+                int keySize = m_cipher->decryptKey(encryptedKey.getDOM(), buffer, 1024);
+                if (keySize<=0)
+                    throw DecryptionException("Unable to decrypt key.");
+        
+                // Try to wrap the key.
+                return handler->createKeyForURI(algorithm, buffer, keySize);
+            }
+            catch(XSECException& e) {
+                auto_ptr_char temp(e.getMsg());
+                throw DecryptionException(string("XMLSecurity exception while decrypting key: ") + temp.get());
+            }
+            catch(XSECCryptoException& e) {
+                throw DecryptionException(string("XMLSecurity exception while decrypting key: ") + e.getMsg());
+            }
+        }
+        catch(DecryptionException& ex) {
+            log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".Decrypter").warn(ex.what());
+        }
     }
-    catch(XSECException& e) {
-        auto_ptr_char temp(e.getMsg());
-        throw DecryptionException(string("XMLSecurity exception while decrypting key: ") + temp.get());
-    }
-    catch(XSECCryptoException& e) {
-        throw DecryptionException(string("XMLSecurity exception while decrypting key: ") + e.getMsg());
-    }
+    
+    throw DecryptionException("Unable to decrypt key.");
 }
