@@ -66,13 +66,13 @@ namespace xmltooling {
     public:
         virtual ~AbstractPKIXTrustEngine() {}
 
-        virtual bool validate(
+        bool validate(
             xmlsignature::Signature& sig,
             const CredentialResolver& credResolver,
             CredentialCriteria* criteria=NULL
             ) const;
 
-        virtual bool validate(
+        bool validate(
             const XMLCh* sigAlgorithm,
             const char* sig,
             xmlsignature::KeyInfo* keyInfo,
@@ -82,14 +82,14 @@ namespace xmltooling {
             CredentialCriteria* criteria=NULL
             ) const;
 
-        virtual bool validate(
+        bool validate(
             XSECCryptoX509* certEE,
             const std::vector<XSECCryptoX509*>& certChain,
             const CredentialResolver& credResolver,
             CredentialCriteria* criteria=NULL
             ) const;
 
-        virtual bool validate(
+        bool validate(
             X509* certEE,
             STACK_OF(X509)* certChain,
             const CredentialResolver& credResolver,
@@ -154,13 +154,10 @@ namespace xmltooling {
          * 
          * @param pkixSource        the peer for which validation rules are required
          * @param criteria          criteria for selecting validation rules
-         * @param keyInfoResolver   custom KeyInfoResolver to use for KeyInfo extraction
          * @return interface for obtaining validation data
          */
         virtual PKIXValidationInfoIterator* getPKIXValidationInfoIterator(
-            const CredentialResolver& pkixSource,
-            CredentialCriteria* criteria=NULL,
-            const KeyInfoResolver* keyInfoResolver=NULL
+            const CredentialResolver& pkixSource, CredentialCriteria* criteria=NULL
             ) const=0;
     };
 };

@@ -271,7 +271,7 @@ bool AbstractPKIXTrustEngine::validate(
     
     log.debug("performing certificate path validation...");
 
-    auto_ptr<PKIXValidationInfoIterator> pkix(getPKIXValidationInfoIterator(credResolver, criteria, m_keyInfoResolver));
+    auto_ptr<PKIXValidationInfoIterator> pkix(getPKIXValidationInfoIterator(credResolver, criteria));
     while (pkix->next()) {
         if (::validate(certEE,certChain,pkix.get())) {
             return true;
