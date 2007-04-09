@@ -145,12 +145,14 @@ bool ExplicitKeyTrustEngine::validate(
     if (criteria) {
         criteria->setUsage(CredentialCriteria::SIGNING_CREDENTIAL);
         criteria->setKeyInfo(keyInfo);
+        criteria->setXMLAlgorithm(sigAlgorithm);
         credResolver.resolve(credentials,criteria);
     }
     else {
         CredentialCriteria cc;
         cc.setUsage(CredentialCriteria::SIGNING_CREDENTIAL);
         cc.setKeyInfo(keyInfo);
+        cc.setXMLAlgorithm(sigAlgorithm);
         credResolver.resolve(credentials,&cc);
     }
     if (credentials.empty()) {
@@ -241,7 +243,6 @@ bool ExplicitKeyTrustEngine::validate(
     for (vector<const Credential*>::const_iterator c=credentials.begin(); c!=credentials.end(); ++c) {
         XSECCryptoKey* key = (*c)->getPublicKey();
         if (key) {
-            log.debug("checking if peer key matches end-entity certificate");
             if (key->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
                 log.error("only the OpenSSL XSEC provider is supported");
                 continue;

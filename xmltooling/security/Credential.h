@@ -24,7 +24,6 @@
 #define __xmltooling_cred_h__
 
 #include <xmltooling/base.h>
-
 #include <xsec/enc/XSECCryptoKey.hpp>
 
 namespace xmlsignature {
@@ -51,6 +50,20 @@ namespace xmltooling {
         enum ResolveTypes {
             RESOLVE_KEYS = 1
         };
+
+        /**
+         * Returns an algorithm identifier for the Credential.
+         *
+         * @return  the Credential algorithm, or NULL if indeterminate
+         */
+        virtual const char* getAlgorithm() const=0;
+
+        /**
+         * Returns the size of the key.
+         *
+         * @return  the key size, or 0 if indeterminate
+         */
+        virtual unsigned int getKeySize() const=0;
 
         /**
          * Returns a secret or private key to use for signing or decryption operations.

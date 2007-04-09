@@ -52,7 +52,21 @@ namespace xmlsignature {
         static const XMLCh LOCAL_NAME[];
 
         /**
-         * Sets the canonicalization method for the ds:SignedInfo element
+         * Gets the canonicalization method for the ds:SignedInfo element.
+         * 
+         * @return the canonicalization method
+         */
+        virtual const XMLCh* getCanonicalizationMethod() const=0;
+        
+        /**
+         * Gets the signing algorithm for the signature.
+         * 
+         * @return    the signature algorithm
+         */
+        virtual const XMLCh* getSignatureAlgorithm() const=0;
+
+        /**
+         * Sets the canonicalization method for the ds:SignedInfo element.
          * 
          * @param c14n  the canonicalization method
          */

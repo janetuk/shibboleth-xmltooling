@@ -301,6 +301,7 @@ void XMLToolingInternalConfig::term()
     TrustEngineManager.deregisterFactories();
     CredentialResolverManager.deregisterFactories();
     KeyInfoResolverManager.deregisterFactories();
+    registerXMLAlgorithms();
 #endif
 
     delete m_keyInfoResolver;
@@ -462,5 +463,38 @@ void xmltooling::log_openssl()
 XSECCryptoX509CRL* XMLToolingInternalConfig::X509CRL() const
 {
     return new OpenSSLCryptoX509CRL();
+}
+
+void XMLToolingInternalConfig::registerXMLAlgorithms()
+{
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_MD5, "RSA", 0);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA1, "RSA", 0);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA224, "RSA", 0);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA256, "RSA", 0);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA384, "RSA", 0);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA512, "RSA", 0);
+
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_1_5, "RSA", 0);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1, "RSA", 0);
+
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIDSA_SHA1, "DSA", 0);
+
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA1, "HMAC", 0);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA224, "HMAC", 0);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA256, "HMAC", 0);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA384, "HMAC", 0);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA512, "HMAC", 0);
+
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURI3DES_CBC, "DESede", 192);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_3DES, "DESede", 192);
+
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES128_CBC, "AES", 128);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES128, "AES", 128);
+
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES192_CBC, "AES", 192);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES192, "AES", 192);
+
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES256_CBC, "AES", 256);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES256, "AES", 256);
 }
 #endif

@@ -79,6 +79,68 @@ namespace xmltooling {
     public:
         virtual ~BasicX509Credential();
         
+        const char* getAlgorithm() const {
+            if (m_key) {
+                switch (m_key->getKeyType()) {
+                    case XSECCryptoKey::KEY_RSA_PRIVATE:
+                    case XSECCryptoKey::KEY_RSA_PUBLIC:
+                    case XSECCryptoKey::KEY_RSA_PAIR:
+                        return "RSA";
+
+                    case XSECCryptoKey::KEY_DSA_PRIVATE:
+                    case XSECCryptoKey::KEY_DSA_PUBLIC:
+                    case XSECCryptoKey::KEY_DSA_PAIR:
+                        return "DSA";
+                    
+                    case XSECCryptoKey::KEY_HMAC:
+                        return "HMAC";
+
+                    case XSECCryptoKey::KEY_SYMMETRIC: {
+                        XSECCryptoSymmetricKey* skey = static_cast<XSECCryptoSymmetricKey*>(m_key);
+                        switch (skey->getSymmetricKeyType()) {
+                            case XSECCryptoSymmetricKey::KEY_3DES_192:
+                                return "DESede";
+                            case XSECCryptoSymmetricKey::KEY_AES_128:
+                                return "AES";
+                            case XSECCryptoSymmetricKey::KEY_AES_192:
+                                return "AES";
+                            case XSECCryptoSymmetricKey::KEY_AES_256:
+                                return "AES";
+                        }
+                    }
+                }
+            }
+            return NULL;
+        }
+
+        unsigned int getKeySize() const {
+            if (m_key) {
+                switch (m_key->getKeyType()) {
+                    case XSECCryptoKey::KEY_RSA_PRIVATE:
+                    case XSECCryptoKey::KEY_RSA_PUBLIC:
+                    case XSECCryptoKey::KEY_RSA_PAIR: {
+                        XSECCryptoKeyRSA* rkey = static_cast<XSECCryptoKeyRSA*>(m_key);
+                        return rkey->getLength();
+                    }
+
+                    case XSECCryptoKey::KEY_SYMMETRIC: {
+                        XSECCryptoSymmetricKey* skey = static_cast<XSECCryptoSymmetricKey*>(m_key);
+                        switch (skey->getSymmetricKeyType()) {
+                            case XSECCryptoSymmetricKey::KEY_3DES_192:
+                                return 192;
+                            case XSECCryptoSymmetricKey::KEY_AES_128:
+                                return 128;
+                            case XSECCryptoSymmetricKey::KEY_AES_192:
+                                return 192;
+                            case XSECCryptoSymmetricKey::KEY_AES_256:
+                                return 256;
+                        }
+                    }
+                }
+            }
+            return 0;
+        }
+
         XSECCryptoKey* getPrivateKey() const {
             if (m_key) {
                 XSECCryptoKey::KeyType type = m_key->getKeyType();
@@ -96,7 +158,7 @@ namespace xmltooling {
             }
             return NULL;
         }
-
+        
         std::vector<std::string>::size_type getKeyNames(std::vector<std::string>& results) const;
 
         const xmlsignature::KeyInfo* getKeyInfo(bool compact=false) const {

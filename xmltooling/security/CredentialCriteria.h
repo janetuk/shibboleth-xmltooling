@@ -23,7 +23,7 @@
 #if !defined(__xmltooling_credcrit_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_credcrit_h__
 
-#include <xmltooling/unicode.h>
+#include <xmltooling/XMLToolingConfig.h>
 #include <xmltooling/signature/KeyInfo.h>
 #include <xmltooling/signature/Signature.h>
 
@@ -40,7 +40,7 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(CredentialCriteria);
     public:
-        CredentialCriteria() : m_keyUsage(UNSPECIFIED_CREDENTIAL), m_keyInfo(NULL), m_nativeKeyInfo(NULL) {}
+        CredentialCriteria() : m_keyUsage(UNSPECIFIED_CREDENTIAL), m_keySize(0), m_keyInfo(NULL), m_nativeKeyInfo(NULL) {}
         virtual ~CredentialCriteria() {}
 
         enum UsageType {
@@ -91,7 +91,7 @@ namespace xmltooling {
         /**
          * Get the key algorithm criteria.
          * 
-         * @return returns the keyAlgorithm.
+         * @return the key algorithm
          */
         const char* getKeyAlgorithm() const {
             return m_keyAlgorithm.c_str();
@@ -100,14 +100,50 @@ namespace xmltooling {
         /**
          * Set the key algorithm criteria.
          * 
-         * @param keyAlgorithm The keyAlgorithm to set.
+         * @param keyAlgorithm The key algorithm to set
          */
         void setKeyAlgorithm(const char* keyAlgorithm) {
             m_keyAlgorithm.erase();
             if (keyAlgorithm)
                 m_keyAlgorithm = keyAlgorithm;
         }
+
+        /**
+         * Get the key size criteria.
+         *
+         * @return  the key size, or 0
+         */
+        unsigned int getKeySize() const {
+            return m_keySize;
+        }
+
+        /**
+         * Set the key size criteria.
+         *
+         * @param keySize Key size to set
+         */
+        void setKeySize(unsigned int keySize) {
+            m_keySize = keySize;
+        }
     
+        /**
+         * Set the key algorithm and size criteria based on an XML algorithm specifier.
+         *
+         * @param algorithm XML algorithm specifier
+         */
+        void setXMLAlgorithm(const XMLCh* algorithm) {
+            if (algorithm) {
+                std::pair<const char*,unsigned int> mapped =
+                    XMLToolingConfig::getConfig().mapXMLAlgorithmToKeyAlgorithm(algorithm);
+                setKeyAlgorithm(mapped.first);
+                setKeySize(mapped.second);
+            }
+            else {
+                setKeyAlgorithm(NULL);
+                setKeySize(0);
+            }
+        }
+
         /**
          * Get the key name criteria.
          * 
@@ -165,6 +201,7 @@ namespace xmltooling {
         }
 
         void setSignature(const xmlsignature::Signature& sig) {
+            setXMLAlgorithm(sig.getSignatureAlgorithm());
             xmlsignature::KeyInfo* k = sig.getKeyInfo();
             if (k)
                 return setKeyInfo(k);
@@ -175,6 +212,7 @@ namespace xmltooling {
 
     private:
         UsageType m_keyUsage;
+        unsigned int m_keySize;
         std::string m_peerName,m_keyAlgorithm,m_keyName;
         const xmlsignature::KeyInfo* m_keyInfo;
         DSIGKeyInfoList* m_nativeKeyInfo;

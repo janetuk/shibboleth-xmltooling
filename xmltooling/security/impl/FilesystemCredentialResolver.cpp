@@ -72,9 +72,12 @@ namespace xmltooling {
                 : BasicX509Credential(key, xseccerts), m_resolver(resolver) {
             initKeyInfo();
         }
-        virtual ~FilesystemCredential() {}
-        void attach(SSL_CTX* ctx) const;
+        virtual ~FilesystemCredential() {
+        }
 
+        void attach(SSL_CTX* ctx) const;
+    
+    private:
         FilesystemCredentialResolver* m_resolver;
     };
 
@@ -115,15 +118,14 @@ namespace xmltooling {
         bool matches(const CredentialCriteria* criteria) const {
             bool match = true;
             if (criteria) {
-                // See if algorithm is kosher.
                 const char* alg = criteria->getKeyAlgorithm();
                 if (alg && *alg) {
-                    match = false;
-                    for (vector<string>::const_iterator a = m_algorithms.begin(); a!=m_algorithms.end(); ++a) {
-                        if (strstr(alg, a->c_str()))
-                            match = true;
-                    }
+                    const char* alg2 = m_credential->getAlgorithm();
+                    if (alg2 && *alg2)
+                        match = XMLString::equals(alg,alg2);
                 }
+                if (match && criteria->getKeySize()>0 && m_credential->getKeySize()>0)
+                    match = (criteria->getKeySize() == m_credential->getKeySize());
                 if (match && m_credential->getPublicKey()) {
                     // See if we have to match a specific key.
                     auto_ptr<Credential> cred(
@@ -146,7 +148,6 @@ namespace xmltooling {
         string m_keypath,m_keypass;
         vector<X509*> m_certs;
         FilesystemCredential* m_credential;
-        vector<string> m_algorithms;
     };
 
     CredentialResolver* XMLTOOL_DLLLOCAL FilesystemCredentialResolverFactory(const DOMElement* const & e)
@@ -155,7 +156,6 @@ namespace xmltooling {
     }
 };
 
-static const XMLCh AlgorithmPrefix[] =  UNICODE_LITERAL_15(A,l,g,o,r,i,t,h,m,P,r,e,f,i,x);
 static const XMLCh CAPath[] =           UNICODE_LITERAL_6(C,A,P,a,t,h);
 static const XMLCh Certificate[] =      UNICODE_LITERAL_11(C,e,r,t,i,f,i,c,a,t,e);
 static const XMLCh format[] =           UNICODE_LITERAL_6(f,o,r,m,a,t);
@@ -171,21 +171,6 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver");
 
     const DOMElement* root=e;
-    e=XMLHelper::getFirstChildElement(root,AlgorithmPrefix);
-    while (e) {
-        if (e->hasChildNodes()) {
-            auto_ptr_char alg(e->getFirstChild()->getNodeValue());
-            if (alg.get())
-                m_algorithms.push_back(alg.get());
-        }
-        e=XMLHelper::getNextSiblingElement(e,AlgorithmPrefix);
-    }
-
-    if (m_algorithms.empty()) {
-        m_algorithms.push_back(URI_ID_SIG_BASE);
-        m_algorithms.push_back(URI_ID_SIG_BASEMORE);
-        m_algorithms.push_back("http://www.w3.org/2001/04/xmlenc#rsa");
-    }
 
     XSECCryptoKey* key=NULL;
     vector<XSECCryptoX509*> xseccerts;

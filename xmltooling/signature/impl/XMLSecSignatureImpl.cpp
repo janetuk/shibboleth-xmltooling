@@ -61,7 +61,8 @@ namespace xmlsignature {
     class XMLTOOL_DLLLOCAL XMLSecSignatureImpl : public UnknownElementImpl, public virtual Signature
     {
     public:
-        XMLSecSignatureImpl() : UnknownElementImpl(XMLSIG_NS, Signature::LOCAL_NAME, XMLSIG_PREFIX),
+        XMLSecSignatureImpl() : AbstractXMLObject(XMLSIG_NS, Signature::LOCAL_NAME, XMLSIG_PREFIX),
+            UnknownElementImpl(XMLSIG_NS, Signature::LOCAL_NAME, XMLSIG_PREFIX),
             m_signature(NULL), m_c14n(NULL), m_sm(NULL), m_key(NULL), m_keyInfo(NULL), m_reference(NULL) {}
         virtual ~XMLSecSignatureImpl();
         
@@ -81,8 +82,21 @@ namespace xmlsignature {
         XMLObject* unmarshall(DOMElement* element, bool bindDocument=false);
         
         // Getters
-        const XMLCh* getCanonicalizationMethod() const { return m_c14n ? m_c14n : DSIGConstants::s_unicodeStrURIEXC_C14N_NOC; }
-        const XMLCh* getSignatureAlgorithm() const { return m_sm ? m_sm : DSIGConstants::s_unicodeStrURIRSA_SHA1; }
+        const XMLCh* getCanonicalizationMethod() const {
+            if (m_signature)
+                return canonicalizationMethod2UNICODEURI(m_signature->getCanonicalizationMethod());
+            return m_c14n ? m_c14n : DSIGConstants::s_unicodeStrURIEXC_C14N_NOC;
+        }
+        const XMLCh* getSignatureAlgorithm() const {
+            if (!m_sm && m_signature) {
+                safeBuffer sURI;
+                if (signatureHashMethod2URI(sURI, m_signature->getSignatureMethod(), m_signature->getHashMethod()) == false)
+                    return NULL;
+                m_sm = XMLString::replicate(sURI.sbStrToXMLCh());
+            }
+            return m_sm ? m_sm : DSIGConstants::s_unicodeStrURIRSA_SHA1;
+        }
+
         KeyInfo* getKeyInfo() const { return m_keyInfo; }
         ContentReference* getContentReference() const { return m_reference; }
         DSIGSignature* getXMLSignature() const { return m_signature; }
@@ -108,7 +122,7 @@ namespace xmlsignature {
     private:
         mutable DSIGSignature* m_signature;
         XMLCh* m_c14n;
-        XMLCh* m_sm;
+        mutable XMLCh* m_sm;
         XSECCryptoKey* m_key;
         mutable KeyInfo* m_keyInfo;
         ContentReference* m_reference;
@@ -243,9 +257,10 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, const vector<Si
             document=DOMImplementationRegistry::getDOMImplementation(NULL)->createDocument();
             bindDocument=true;
         }
-        m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignature();
-        m_signature->setDSIGNSPrefix(XMLSIG_PREFIX);
-        cachedDOM=m_signature->createBlankSignature(document, getCanonicalizationMethod(), getSignatureAlgorithm());
+        DSIGSignature* temp=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignature();
+        temp->setDSIGNSPrefix(XMLSIG_PREFIX);
+        cachedDOM=temp->createBlankSignature(document, getCanonicalizationMethod(), getSignatureAlgorithm());
+        m_signature = temp;
     }
     else {
         // We need to reparse the XML we saved off into a new DOM.
@@ -341,11 +356,10 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, const vecto
     if (m_xml.empty()) {
         // Fresh signature, so we just create an empty one.
         log.debug("creating empty Signature element");
-        m_signature=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignature();
-        m_signature->setDSIGNSPrefix(XMLSIG_PREFIX);
-        cachedDOM=m_signature->createBlankSignature(
-            parentElement->getOwnerDocument(), getCanonicalizationMethod(), getSignatureAlgorithm()
-            );
+        DSIGSignature* temp=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignature();
+        temp->setDSIGNSPrefix(XMLSIG_PREFIX);
+        cachedDOM=temp->createBlankSignature(parentElement->getOwnerDocument(), getCanonicalizationMethod(), getSignatureAlgorithm());
+        m_signature = temp;
     }
     else {
         MemBufInputSource src(reinterpret_cast<const XMLByte*>(m_xml.c_str()),m_xml.length(),"XMLSecSignatureImpl");

@@ -30,7 +30,6 @@
 #ifndef XMLTOOLING_NO_XMLSEC
 namespace xmltooling {
     class XMLTOOL_API CredentialResolver;
-    class XMLTOOL_API KeyInfoSource;
     class XMLTOOL_API KeyInfoResolver;
     class XMLTOOL_API TrustEngine;
     class XMLTOOL_API XSECCryptoX509CRL;
@@ -252,6 +251,25 @@ namespace xmltooling {
          * Manages factories for TrustEngine plugins.
          */
         PluginManager<TrustEngine,const DOMElement*> TrustEngineManager;
+
+        /**
+         * Maps an XML Signature/Encryption algorithm identifier to a library-specific
+         * key algorithm and size for use in resolving credentials.
+         *
+         * @param xmlAlgorithm  XML Signature/Encryption algorithm identifier
+         * @return  a general key algorithm and key size (or 0 if the size is irrelevant)
+         */
+        virtual std::pair<const char*,unsigned int> mapXMLAlgorithmToKeyAlgorithm(const XMLCh* xmlAlgorithm) const=0;
+
+        /**
+         * Registers an XML Signature/Encryption algorithm identifier against a library-specific
+         * key algorithm and size for use in resolving credentials.
+         *
+         * @param xmlAlgorithm  XML Signature/Encryption algorithm identifier
+         * @param keyAlgorithm  a key algorithm
+         * @param size          a key size (or 0 if the size is irrelevant)
+         */
+        virtual void registerXMLAlgorithm(const XMLCh* xmlAlgorithm, const char* keyAlgorithm, unsigned int size=0)=0;
 #endif
 
         /**

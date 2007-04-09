@@ -90,10 +90,8 @@ DOMDocumentFragment* Decrypter::decryptData(const EncryptedData& encryptedData, 
         m_criteria->setUsage(CredentialCriteria::ENCRYPTION_CREDENTIAL);
         m_criteria->setKeyInfo(encryptedData.getKeyInfo());
         const EncryptionMethod* meth = encryptedData.getEncryptionMethod();
-        if (meth) {
-            auto_ptr_char alg(meth->getAlgorithm());
-            m_criteria->setKeyAlgorithm(alg.get());
-        }
+        if (meth)
+            m_criteria->setXMLAlgorithm(meth->getAlgorithm());
         m_credResolver->resolve(creds,m_criteria);
     }
     else {
@@ -101,10 +99,8 @@ DOMDocumentFragment* Decrypter::decryptData(const EncryptedData& encryptedData, 
         criteria.setUsage(CredentialCriteria::ENCRYPTION_CREDENTIAL);
         criteria.setKeyInfo(encryptedData.getKeyInfo());
         const EncryptionMethod* meth = encryptedData.getEncryptionMethod();
-        if (meth) {
-            auto_ptr_char alg(meth->getAlgorithm());
-            criteria.setKeyAlgorithm(alg.get());
-        }
+        if (meth)
+            criteria.setXMLAlgorithm(meth->getAlgorithm());
         m_credResolver->resolve(creds,&criteria);
     }
 
@@ -175,10 +171,8 @@ XSECCryptoKey* Decrypter::decryptKey(const EncryptedKey& encryptedKey, const XML
         m_criteria->setUsage(CredentialCriteria::ENCRYPTION_CREDENTIAL);
         m_criteria->setKeyInfo(encryptedKey.getKeyInfo());
         const EncryptionMethod* meth = encryptedKey.getEncryptionMethod();
-        if (meth) {
-            auto_ptr_char alg(meth->getAlgorithm());
-            m_criteria->setKeyAlgorithm(alg.get());
-        }
+        if (meth)
+            m_criteria->setXMLAlgorithm(meth->getAlgorithm());
         m_credResolver->resolve(creds, m_criteria);
     }
     else {
@@ -186,10 +180,8 @@ XSECCryptoKey* Decrypter::decryptKey(const EncryptedKey& encryptedKey, const XML
         criteria.setUsage(CredentialCriteria::ENCRYPTION_CREDENTIAL);
         criteria.setKeyInfo(encryptedKey.getKeyInfo());
         const EncryptionMethod* meth = encryptedKey.getEncryptionMethod();
-        if (meth) {
-            auto_ptr_char alg(meth->getAlgorithm());
-            criteria.setKeyAlgorithm(alg.get());
-        }
+        if (meth)
+            criteria.setXMLAlgorithm(meth->getAlgorithm());
         m_credResolver->resolve(creds, &criteria);
     }
     if (creds.empty())
