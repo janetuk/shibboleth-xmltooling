@@ -94,13 +94,13 @@ bool ExplicitKeyTrustEngine::validate(
     vector<const Credential*> credentials;
     if (criteria) {
         criteria->setUsage(CredentialCriteria::SIGNING_CREDENTIAL);
-        criteria->setSignature(sig);
+        criteria->setSignature(sig, CredentialCriteria::KEYINFO_EXTRACTION_KEY);
         credResolver.resolve(credentials,criteria);
     }
     else {
         CredentialCriteria cc;
         cc.setUsage(CredentialCriteria::SIGNING_CREDENTIAL);
-        cc.setSignature(sig);
+        cc.setSignature(sig, CredentialCriteria::KEYINFO_EXTRACTION_KEY);
         credResolver.resolve(credentials,&cc);
     }
     if (credentials.empty()) {
@@ -144,14 +144,14 @@ bool ExplicitKeyTrustEngine::validate(
     vector<const Credential*> credentials;
     if (criteria) {
         criteria->setUsage(CredentialCriteria::SIGNING_CREDENTIAL);
-        criteria->setKeyInfo(keyInfo);
+        criteria->setKeyInfo(keyInfo, CredentialCriteria::KEYINFO_EXTRACTION_KEY);
         criteria->setXMLAlgorithm(sigAlgorithm);
         credResolver.resolve(credentials,criteria);
     }
     else {
         CredentialCriteria cc;
         cc.setUsage(CredentialCriteria::SIGNING_CREDENTIAL);
-        cc.setKeyInfo(keyInfo);
+        cc.setKeyInfo(keyInfo, CredentialCriteria::KEYINFO_EXTRACTION_KEY);
         cc.setXMLAlgorithm(sigAlgorithm);
         credResolver.resolve(credentials,&cc);
     }

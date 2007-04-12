@@ -56,6 +56,9 @@ namespace xmltooling {
         /** The private/secret key/keypair. */
         XSECCryptoKey* m_key;
 
+        /** Key names (derived from credential, KeyInfo, or both). */
+        std::set<std::string> m_keyNames;
+
         /** The X.509 certificate chain. */
         std::vector<XSECCryptoX509*> m_xseccerts;
 
@@ -159,18 +162,14 @@ namespace xmltooling {
             return NULL;
         }
         
-        std::vector<std::string>::size_type getKeyNames(std::vector<std::string>& results) const;
+        const std::set<std::string>& getKeyNames() const {
+            return m_keyNames;
+        }
 
         const xmlsignature::KeyInfo* getKeyInfo(bool compact=false) const {
             return compact ? m_compactKeyInfo : (m_keyInfo ? m_keyInfo : m_compactKeyInfo);
         }
         
-        /**
-         * Gets an immutable collection of certificates in the entity's trust chain. The entity certificate is contained
-         * within this list. No specific ordering of the certificates is guaranteed.
-         * 
-         * @return a certificate chain
-         */
         const std::vector<XSECCryptoX509*>& getEntityCertificateChain() const {
             return m_xseccerts;
         }

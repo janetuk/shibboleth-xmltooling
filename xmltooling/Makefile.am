@@ -61,8 +61,10 @@ secinclude_HEADERS = \
 	security/BasicX509Credential.h \
 	security/ChainingTrustEngine.h \
 	security/Credential.h \
+	security/CredentialContext.h \
 	security/CredentialCriteria.h \
 	security/CredentialResolver.h \
+	security/KeyInfoCredentialContext.h \
 	security/KeyInfoResolver.h \
 	security/OpenSSLCredential.h \
 	security/TrustEngine.h \

@@ -533,3 +533,18 @@ bool Signature::verifyRawSignature(
         throw SignatureException(string("Caught an XMLSecurity exception while verifying raw signature: ") + e.getMsg());
     }
 }
+
+void Signature::extractNames(DSIGKeyInfoList* keyInfo, set<string>& names)
+{
+    char* kn;
+    const XMLCh* n;
+
+    for (size_t s=0; s<keyInfo->getSize(); s++) {
+        n=keyInfo->item(s)->getKeyName();
+        if (n && *n) {
+            kn=toUTF8(n);
+            names.insert(kn);
+            delete[] kn;
+        }
+    }
+}

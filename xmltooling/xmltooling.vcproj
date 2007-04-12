@@ -685,11 +685,19 @@
 					>
 				</File>
 				<File
+					RelativePath=".\security\CredentialContext.h"
+					>
+				</File>
+				<File
 					RelativePath=".\security\CredentialCriteria.h"
 					>
 				</File>
 				<File
 					RelativePath=".\security\CredentialResolver.h"
+					>
+				</File>
+				<File
+					RelativePath=".\security\KeyInfoCredentialContext.h"
 					>
 				</File>
 				<File

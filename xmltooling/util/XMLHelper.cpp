@@ -29,8 +29,7 @@
 #include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmltooling;
-using std::ostream;
-using std::list;
+using namespace std;
 
 static const XMLCh type[]={chLatin_t, chLatin_y, chLatin_p, chLatin_e, chNull };
     

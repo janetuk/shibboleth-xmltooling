@@ -86,9 +86,13 @@ DOMDocumentFragment* Decrypter::decryptData(const EncryptedData& encryptedData, 
 
     // Resolve a decryption key directly.
     vector<const Credential*> creds;
+    int types =
+        CredentialCriteria::KEYINFO_EXTRACTION_KEY |
+        CredentialCriteria::KEYINFO_EXTRACTION_KEYNAMES |
+        CredentialCriteria::KEYINFO_EXTRACTION_IMPLICIT_KEYNAMES;
     if (m_criteria) {
         m_criteria->setUsage(CredentialCriteria::ENCRYPTION_CREDENTIAL);
-        m_criteria->setKeyInfo(encryptedData.getKeyInfo());
+        m_criteria->setKeyInfo(encryptedData.getKeyInfo(), types);
         const EncryptionMethod* meth = encryptedData.getEncryptionMethod();
         if (meth)
             m_criteria->setXMLAlgorithm(meth->getAlgorithm());
@@ -97,7 +101,7 @@ DOMDocumentFragment* Decrypter::decryptData(const EncryptedData& encryptedData, 
     else {
         CredentialCriteria criteria;
         criteria.setUsage(CredentialCriteria::ENCRYPTION_CREDENTIAL);
-        criteria.setKeyInfo(encryptedData.getKeyInfo());
+        criteria.setKeyInfo(encryptedData.getKeyInfo(), types);
         const EncryptionMethod* meth = encryptedData.getEncryptionMethod();
         if (meth)
             criteria.setXMLAlgorithm(meth->getAlgorithm());
@@ -164,12 +168,15 @@ XSECCryptoKey* Decrypter::decryptKey(const EncryptedKey& encryptedKey, const XML
     if (!m_cipher)
         m_cipher=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(encryptedKey.getDOM()->getOwnerDocument());
     
-    // Resolve key decryption key. We can't loop over possible credentials because
-    // we can't tell a valid decrypt from an invalid one.
+    // Resolve key decryption keys.
+    int types =
+        CredentialCriteria::KEYINFO_EXTRACTION_KEY |
+        CredentialCriteria::KEYINFO_EXTRACTION_KEYNAMES |
+        CredentialCriteria::KEYINFO_EXTRACTION_IMPLICIT_KEYNAMES;
     vector<const Credential*> creds;
     if (m_criteria) {
         m_criteria->setUsage(CredentialCriteria::ENCRYPTION_CREDENTIAL);
-        m_criteria->setKeyInfo(encryptedKey.getKeyInfo());
+        m_criteria->setKeyInfo(encryptedKey.getKeyInfo(), types);
         const EncryptionMethod* meth = encryptedKey.getEncryptionMethod();
         if (meth)
             m_criteria->setXMLAlgorithm(meth->getAlgorithm());
@@ -178,7 +185,7 @@ XSECCryptoKey* Decrypter::decryptKey(const EncryptedKey& encryptedKey, const XML
     else {
         CredentialCriteria criteria;
         criteria.setUsage(CredentialCriteria::ENCRYPTION_CREDENTIAL);
-        criteria.setKeyInfo(encryptedKey.getKeyInfo());
+        criteria.setKeyInfo(encryptedKey.getKeyInfo(), types);
         const EncryptionMethod* meth = encryptedKey.getEncryptionMethod();
         if (meth)
             criteria.setXMLAlgorithm(meth->getAlgorithm());

@@ -24,10 +24,12 @@
 #define __xmltooling_credcrit_h__
 
 #include <xmltooling/XMLToolingConfig.h>
+#include <xmltooling/security/KeyInfoResolver.h>
+#include <xmltooling/security/X509Credential.h>
 #include <xmltooling/signature/KeyInfo.h>
 #include <xmltooling/signature/Signature.h>
 
-#include <string>
+#include <set>
 #include <xsec/dsig/DSIGKeyInfoList.hpp>
 #include <xsec/dsig/DSIGKeyInfoName.hpp>
 
@@ -40,8 +42,12 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(CredentialCriteria);
     public:
-        CredentialCriteria() : m_keyUsage(UNSPECIFIED_CREDENTIAL), m_keySize(0), m_keyInfo(NULL), m_nativeKeyInfo(NULL) {}
-        virtual ~CredentialCriteria() {}
+        CredentialCriteria() : m_keyUsage(UNSPECIFIED_CREDENTIAL), m_keySize(0), m_key(NULL),
+            m_keyInfo(NULL), m_nativeKeyInfo(NULL), m_credential(NULL) {
+        }
+        virtual ~CredentialCriteria() {
+            delete m_credential;
+        }
 
         enum UsageType {
             UNSPECIFIED_CREDENTIAL,
@@ -145,25 +151,50 @@ namespace xmltooling {
         }
 
         /**
-         * Get the key name criteria.
+         * Gets key name criteria.
          * 
-         * @return the key name
+         * @return an immutable set of key names
          */
-        const char* getKeyName() const {
-            return m_keyName.c_str();
+        const std::set<std::string>& getKeyNames() const {
+            return m_keyNames;
         }
-    
+
         /**
-         * Set the key name criteria.
+         * Gets key name criteria.
          * 
-         * @param keyName key name to set
+         * @return a mutable set of key names
          */
-        void setKeyName(const char* keyName) {
-            m_keyName.erase();
-            if (keyName)
-                m_keyName = keyName;
+        std::set<std::string>& getKeyNames() {
+            return m_keyNames;
         }
-        
+
+        /**
+         * Returns the public key criteria.
+         * 
+         * @return  a public key
+         */
+        virtual XSECCryptoKey* getPublicKey() const {
+            return m_key;
+        }
+
+        /**
+         * Sets the public key criteria.
+         *
+         * <p>The lifetime of the key <strong>MUST</strong> extend
+         * for the lifetime of this object.
+         * 
+         * @param key a public key
+         */
+        void setPublicKey(XSECCryptoKey* key) {
+            m_key = key;
+        }
+
+        enum keyinfo_extraction_t {
+            KEYINFO_EXTRACTION_KEY = 1,
+            KEYINFO_EXTRACTION_KEYNAMES = 2,
+            KEYINFO_EXTRACTION_IMPLICIT_KEYNAMES = 4
+        };
+
         /**
          * Gets the KeyInfo criteria.
          * 
@@ -176,10 +207,29 @@ namespace xmltooling {
         /**
          * Sets the KeyInfo criteria.
          * 
-         * @param keyInfo   the KeyInfo criteria
+         * @param keyInfo       the KeyInfo criteria
+         * @param extraction    bitmask of criteria to auto-extract from KeyInfo
          */
-        void setKeyInfo(const xmlsignature::KeyInfo* keyInfo) {
+        virtual void setKeyInfo(const xmlsignature::KeyInfo* keyInfo, int extraction=0) {
+            delete m_credential;
+            m_credential = NULL;
             m_keyInfo = keyInfo;
+            if (!keyInfo || !extraction)
+                return;
+
+            int types = (extraction & KEYINFO_EXTRACTION_KEY) ? Credential::RESOLVE_KEYS : 0;
+            types |= (extraction & KEYINFO_EXTRACTION_IMPLICIT_KEYNAMES) ? X509Credential::RESOLVE_CERTS : 0;
+            m_credential = XMLToolingConfig::getConfig().getKeyInfoResolver()->resolve(keyInfo,types);
+
+            if (extraction & KEYINFO_EXTRACTION_KEY)
+                setPublicKey(m_credential->getPublicKey());
+            if (extraction & KEYINFO_EXTRACTION_KEYNAMES)
+                m_keyNames.insert(m_credential->getKeyNames().begin(), m_credential->getKeyNames().end());
+            if (extraction & KEYINFO_EXTRACTION_IMPLICIT_KEYNAMES) {
+                const X509Credential* xcred = dynamic_cast<const X509Credential*>(m_credential);
+                if (xcred && !xcred->getEntityCertificateChain().empty())
+                    X509Credential::extractNames(xcred->getEntityCertificateChain().front(), m_keyNames);
+            }
         } 
 
         /**
@@ -194,28 +244,56 @@ namespace xmltooling {
         /**
          * Sets the KeyInfo criteria.
          * 
-         * @param keyInfo   the KeyInfo criteria
+         * @param keyInfo       the KeyInfo criteria
+         * @param extraction    bitmask of criteria to auto-extract from KeyInfo
          */
-        void setNativeKeyInfo(DSIGKeyInfoList* keyInfo) {
+        virtual void setNativeKeyInfo(DSIGKeyInfoList* keyInfo, int extraction=0) {
+            delete m_credential;
+            m_credential = NULL;
             m_nativeKeyInfo = keyInfo;
+            if (!keyInfo || !extraction)
+                return;
+
+            int types = (extraction & KEYINFO_EXTRACTION_KEY) ? Credential::RESOLVE_KEYS : 0;
+            types |= (extraction & KEYINFO_EXTRACTION_IMPLICIT_KEYNAMES) ? X509Credential::RESOLVE_CERTS : 0;
+            m_credential = XMLToolingConfig::getConfig().getKeyInfoResolver()->resolve(keyInfo,types);
+
+            if (extraction & KEYINFO_EXTRACTION_KEY)
+                setPublicKey(m_credential->getPublicKey());
+            if (extraction & KEYINFO_EXTRACTION_KEYNAMES)
+                m_keyNames.insert(m_credential->getKeyNames().begin(), m_credential->getKeyNames().end());
+            if (extraction & KEYINFO_EXTRACTION_IMPLICIT_KEYNAMES) {
+                const X509Credential* xcred = dynamic_cast<const X509Credential*>(m_credential);
+                if (xcred && !xcred->getEntityCertificateChain().empty())
+                    X509Credential::extractNames(xcred->getEntityCertificateChain().front(), m_keyNames);
+            }
         }
 
-        void setSignature(const xmlsignature::Signature& sig) {
+        /**
+         * Sets the KeyInfo criteria from an XML Signature.
+         * 
+         * @param sig           the Signature containing KeyInfo criteria
+         * @param extraction    bitmask of criteria to auto-extract from KeyInfo
+         */
+        void setSignature(const xmlsignature::Signature& sig, int extraction=0) {
             setXMLAlgorithm(sig.getSignatureAlgorithm());
             xmlsignature::KeyInfo* k = sig.getKeyInfo();
             if (k)
-                return setKeyInfo(k);
+                return setKeyInfo(k,extraction);
             DSIGSignature* dsig = sig.getXMLSignature();
             if (dsig)
-                setNativeKeyInfo(dsig->getKeyInfoList());
+                setNativeKeyInfo(dsig->getKeyInfoList(),extraction);
         }
 
     private:
         UsageType m_keyUsage;
         unsigned int m_keySize;
-        std::string m_peerName,m_keyAlgorithm,m_keyName;
+        std::string m_peerName,m_keyAlgorithm;
+        std::set<std::string> m_keyNames;
+        XSECCryptoKey* m_key;
         const xmlsignature::KeyInfo* m_keyInfo;
         DSIGKeyInfoList* m_nativeKeyInfo;
+        Credential* m_credential;
     };
 };
 

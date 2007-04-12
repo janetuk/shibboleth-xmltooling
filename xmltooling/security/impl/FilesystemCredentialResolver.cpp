@@ -70,6 +70,8 @@ namespace xmltooling {
     public:
         FilesystemCredential(FilesystemCredentialResolver* resolver, XSECCryptoKey* key, const std::vector<XSECCryptoX509*>& xseccerts)
                 : BasicX509Credential(key, xseccerts), m_resolver(resolver) {
+            if (!m_xseccerts.empty())
+                extractNames(m_xseccerts.front(), m_keyNames);
             initKeyInfo();
         }
         virtual ~FilesystemCredential() {
@@ -98,13 +100,13 @@ namespace xmltooling {
         void unlock() {}
         
         const Credential* resolve(const CredentialCriteria* criteria=NULL) const {
-            return matches(criteria) ? m_credential : NULL;
+            return (criteria ? (m_credential->matches(*criteria) ? m_credential : NULL) : m_credential);
         }
 
         virtual vector<const Credential*>::size_type resolve(
             vector<const Credential*>& results, const CredentialCriteria* criteria=NULL
             ) const {
-            if (matches(criteria)) {
+            if (!criteria || m_credential->matches(*criteria)) {
                 results.push_back(m_credential);
                 return 1;
             }
@@ -115,28 +117,6 @@ namespace xmltooling {
 
     private:
         XSECCryptoKey* loadKey();
-        bool matches(const CredentialCriteria* criteria) const {
-            bool match = true;
-            if (criteria) {
-                const char* alg = criteria->getKeyAlgorithm();
-                if (alg && *alg) {
-                    const char* alg2 = m_credential->getAlgorithm();
-                    if (alg2 && *alg2)
-                        match = XMLString::equals(alg,alg2);
-                }
-                if (match && criteria->getKeySize()>0 && m_credential->getKeySize()>0)
-                    match = (criteria->getKeySize() == m_credential->getKeySize());
-                if (match && m_credential->getPublicKey()) {
-                    // See if we have to match a specific key.
-                    auto_ptr<Credential> cred(
-                        XMLToolingConfig::getConfig().getKeyInfoResolver()->resolve(*criteria,Credential::RESOLVE_KEYS)
-                        );
-                    if (cred.get())
-                        match = cred->isEqual(*(m_credential->getPublicKey()));
-                }
-            }
-            return match;
-        }
         
         enum format_t { PEM=SSL_FILETYPE_PEM, DER=SSL_FILETYPE_ASN1, _PKCS12, UNKNOWN };
     

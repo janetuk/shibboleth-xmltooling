@@ -34,11 +34,16 @@ namespace xmltooling {
 
     class XMLTOOL_API Credential;
     class XMLTOOL_API CredentialCriteria;
+    class XMLTOOL_API KeyInfoCredentialContext;
 
     /**
      * Resolves credentials from KeyInfo information.
      *
      * <p>Credential-specific bitmasks can be provided to control what to resolve.
+     *
+     * <p>Implementations should only establish KeyNames on the basis of explicit names
+     * within the KeyInfo object, never by extracting names out of physical credentials
+     * found within it.
      */
     class XMLTOOL_API KeyInfoResolver {
         MAKE_NONCOPYABLE(KeyInfoResolver);
@@ -66,6 +71,18 @@ namespace xmltooling {
          * @return  the resolved credential, or NULL
          */
         virtual Credential* resolve(DSIGKeyInfoList* keyInfo, int types=0) const=0;
+
+        /**
+         * Returns a credential based on the KeyInfo information in the supplied
+         * context. The caller must release the credential when done with it.
+         *
+         * <p>The context object will be owned by the Credential and freed with it.
+         * 
+         * @param context   context containing the key information
+         * @param types types of credentials to resolve, or 0 for any/all
+         * @return  the resolved credential, or NULL
+         */
+        virtual Credential* resolve(KeyInfoCredentialContext* context, int types=0) const=0;
 
         /**
          * Returns a credential based on the supplied KeyInfo information.

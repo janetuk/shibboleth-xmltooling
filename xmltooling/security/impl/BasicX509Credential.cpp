@@ -49,12 +49,12 @@ void BasicX509Credential::initKeyInfo()
     delete m_compactKeyInfo;
     m_compactKeyInfo = NULL;
 
-    vector<string> names;
-    if (getKeyNames(names)>0) {
+    const set<string>& names = getKeyNames();
+    if (!names.empty()) {
         m_compactKeyInfo = KeyInfoBuilder::buildKeyInfo();
         VectorOf(KeyName) knames = m_compactKeyInfo->getKeyNames();
-        for (vector<string>::const_iterator n = names.begin(); n!=names.end(); ++n) {
-            xmltooling::auto_ptr_XMLCh wide(n->c_str());
+        for (set<string>::const_iterator n = names.begin(); n!=names.end(); ++n) {
+            auto_ptr_XMLCh wide(n->c_str());
             KeyName* kname = KeyNameBuilder::buildKeyName();
             kname->setName(wide.get());
             knames.push_back(kname);
@@ -74,21 +74,21 @@ void BasicX509Credential::initKeyInfo()
     }
 }
 
-vector<string>::size_type BasicX509Credential::getKeyNames(vector<string>& results) const
+void X509Credential::extractNames(XSECCryptoX509* x509, set<string>& names)
 {
-    if (m_xseccerts.empty() || m_xseccerts.front()->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL)
-        return 0;
+    if (!x509 || x509->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL)
+        return;
     
-    X509* cert = static_cast<OpenSSLCryptoX509*>(m_xseccerts.front())->getOpenSSLX509();
+    X509* cert = static_cast<OpenSSLCryptoX509*>(x509)->getOpenSSLX509();
     if (!cert)
-        return 0;
+        return;
         
     X509_NAME* subject=X509_get_subject_name(cert);
     if (subject) {
         char buf[256];
         memset(buf,0,sizeof(buf));
         if (X509_NAME_get_text_by_NID(subject,NID_commonName,buf,255)>0)
-            results.push_back(buf);
+            names.insert(buf);
 
         STACK_OF(GENERAL_NAME)* altnames=(STACK_OF(GENERAL_NAME)*)X509_get_ext_d2i(cert, NID_subject_alt_name, NULL, NULL);
         if (altnames) {
@@ -102,13 +102,11 @@ vector<string>::size_type BasicX509Credential::getKeyNames(vector<string>& resul
                     if (altlen>0) {
                         alt.erase();
                         alt.append(altptr,altlen);
-                        results.push_back(alt);
+                        names.insert(alt);
                     }
                 }
             }
         }
         GENERAL_NAMES_free(altnames);
     }
-
-    return results.size();
 }

@@ -26,11 +26,17 @@
 #include <xmltooling/base.h>
 #include <xsec/enc/XSECCryptoKey.hpp>
 
+#include <set>
+#include <string>
+
 namespace xmlsignature {
     class XMLTOOL_API KeyInfo;
 };
 
 namespace xmltooling {
+
+    class XMLTOOL_API CredentialCriteria;
+    class XMLTOOL_API CredentialContext;
 
     /**
      * Wraps keys and related functionality.
@@ -48,7 +54,8 @@ namespace xmltooling {
         virtual ~Credential() {}
         
         enum ResolveTypes {
-            RESOLVE_KEYS = 1
+            RESOLVE_KEYS = 1,
+            RESOLVE_NAMES = 2
         };
 
         /**
@@ -80,13 +87,14 @@ namespace xmltooling {
         virtual XSECCryptoKey* getPublicKey() const=0;
         
         /**
-         * Returns names representing the Credential, generally when the Credential itself merely
-         * points to a Credential rather than containing one.
+         * Returns names representing the Credential.
+         *
+         * <p>Names should be unique in the context of the comparisons against CredentialCriteria
+         * that deployments expect to see.
          * 
-         * @param results   array to populate with names
-         * @return  the number of names returned
+         * @return  a sorted set of names
          */
-        virtual std::vector<std::string>::size_type getKeyNames(std::vector<std::string>& results) const=0;
+        virtual const std::set<std::string>& getKeyNames() const=0;
         
         /**
          * Returns a ds:KeyInfo object representing the Credential for use in
@@ -98,12 +106,22 @@ namespace xmltooling {
         virtual const xmlsignature::KeyInfo* getKeyInfo(bool compact=false) const=0;
 
         /**
-         * Compares the public key inside the Credential to a second public key.
-         *
-         * @param key   the public key to compare
-         * @return true iff the keys are equal
+         * Get the credential context information, which provides additional information
+         * specific to the context in which the credential was resolved.
+         * 
+         * @return resolution context of the credential
          */
-        virtual bool isEqual(XSECCryptoKey& key) const;
+        virtual const CredentialContext* getCredentalContext() const {
+            return NULL;
+        }
+
+        /**
+         * Determines whether the supplied CredentialCriteria matches this Credential.
+         *
+         * @param criteria  the CredentialCriteria to evaluate
+         * @return true iff this Credential is consistent with the criteria
+         */
+        virtual bool matches(const CredentialCriteria& criteria) const;
     };
 };
 

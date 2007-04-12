@@ -26,7 +26,6 @@
 #include <xmltooling/security/Credential.h>
 #include <xmltooling/security/XSECCryptoX509CRL.h>
 
-#include <vector>
 #include <xsec/enc/XSECCryptoX509.hpp>
 
 namespace xmltooling {
@@ -43,8 +42,8 @@ namespace xmltooling {
         virtual ~X509Credential() {}
 
         enum ResolveTypes {
-            RESOLVE_CERTS = 2,
-            RESOLVE_CRLS = 4
+            RESOLVE_CERTS = 4,
+            RESOLVE_CRLS = 8
         };
 
         /**
@@ -61,6 +60,14 @@ namespace xmltooling {
          * @return CRL associated with the credential
          */
         virtual XSECCryptoX509CRL* getCRL() const=0;
+
+        /**
+         * Extracts Subject CN and DNS/URI subjectAltNames from a certificate.
+         *
+         * @param x509  certificate to extract
+         * @param names a set to insert names into
+         */
+        static void extractNames(XSECCryptoX509* x509, std::set<std::string>& names);
     };
 };
 

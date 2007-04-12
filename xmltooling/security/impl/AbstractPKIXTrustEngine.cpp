@@ -142,13 +142,15 @@ bool AbstractPKIXTrustEngine::checkEntityNames(
 {
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine");
 
+    // We resolve to a set of trusted credentials.
     vector<const Credential*> creds;
     credResolver.resolve(creds,&criteria);
 
     // Build a list of acceptable names.
-    vector<string> keynames(1,criteria.getPeerName());
+    set<string> trustednames;
+    trustednames.insert(criteria.getPeerName());
     for (vector<const Credential*>::const_iterator cred = creds.begin(); cred!=creds.end(); ++cred)
-        (*cred)->getKeyNames(keynames);
+        trustednames.insert((*cred)->getKeyNames().begin(), (*cred)->getKeyNames().end());
 
     char buf[256];
     X509_NAME* subject=X509_get_subject_name(certEE);
@@ -177,7 +179,7 @@ bool AbstractPKIXTrustEngine::checkEntityNames(
         }
         
         // Check each keyname.
-        for (vector<string>::const_iterator n=keynames.begin(); n!=keynames.end(); n++) {
+        for (set<string>::const_iterator n=trustednames.begin(); n!=trustednames.end(); n++) {
 #ifdef HAVE_STRCASECMP
             if (!strcasecmp(n->c_str(),subjectstr.c_str()) || !strcasecmp(n->c_str(),subjectstr2.c_str())) {
 #else
@@ -201,8 +203,7 @@ bool AbstractPKIXTrustEngine::checkEntityNames(
                 if (check->type==GEN_DNS || check->type==GEN_URI) {
                     const char* altptr = (char*)ASN1_STRING_data(check->d.ia5);
                     const int altlen = ASN1_STRING_length(check->d.ia5);
-                    
-                    for (vector<string>::const_iterator n=keynames.begin(); n!=keynames.end(); n++) {
+                    for (set<string>::const_iterator n=trustednames.begin(); n!=trustednames.end(); n++) {
 #ifdef HAVE_STRCASECMP
                         if ((check->type==GEN_DNS && !strncasecmp(altptr,n->c_str(),altlen))
 #else
@@ -222,7 +223,7 @@ bool AbstractPKIXTrustEngine::checkEntityNames(
         log.debug("unable to match subjectAltName, trying TLS CN match");
         memset(buf,0,sizeof(buf));
         if (X509_NAME_get_text_by_NID(subject,NID_commonName,buf,255)>0) {
-            for (vector<string>::const_iterator n=keynames.begin(); n!=keynames.end(); n++) {
+            for (set<string>::const_iterator n=trustednames.begin(); n!=trustednames.end(); n++) {
 #ifdef HAVE_STRCASECMP
                 if (!strcasecmp(buf,n->c_str())) {
 #else

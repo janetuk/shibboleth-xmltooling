@@ -253,6 +253,7 @@ bool XMLToolingInternalConfig::init()
         registerKeyInfoResolvers();
         registerCredentialResolvers();
         registerTrustEngines();
+        registerXMLAlgorithms();
 #endif
         registerSOAPTransports();
         initSOAPTransports();
@@ -301,7 +302,7 @@ void XMLToolingInternalConfig::term()
     TrustEngineManager.deregisterFactories();
     CredentialResolverManager.deregisterFactories();
     KeyInfoResolverManager.deregisterFactories();
-    registerXMLAlgorithms();
+    m_algorithmMap.clear();
 #endif
 
     delete m_keyInfoResolver;
