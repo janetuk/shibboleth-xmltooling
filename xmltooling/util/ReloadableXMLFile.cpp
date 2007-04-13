@@ -29,7 +29,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include <log4cpp/Category.hh>
 #include <xercesc/framework/LocalFileInputSource.hpp>
 #include <xercesc/framework/Wrapper4InputSource.hpp>
 #include <xercesc/framework/URLInputSource.hpp>
@@ -48,13 +47,12 @@ static const XMLCh filename[] =     UNICODE_LITERAL_8(f,i,l,e,n,a,m,e);
 static const XMLCh validate[] =     UNICODE_LITERAL_8(v,a,l,i,d,a,t,e);
 static const XMLCh reloadChanges[] =UNICODE_LITERAL_13(r,e,l,o,a,d,C,h,a,n,g,e,s);
 
-ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e)
-    : m_root(e), m_local(true), m_validate(false), m_filestamp(0), m_lock(NULL)
+ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
+    : m_root(e), m_local(true), m_validate(false), m_filestamp(0), m_lock(NULL), m_log(log)
 {
 #ifdef _DEBUG
     NDC ndc("ReloadableXMLFile");
 #endif
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".ReloadableXMLFile");
 
     // Establish source of data...
     const XMLCh* source=e->getAttributeNS(NULL,uri);
@@ -121,17 +119,16 @@ pair<bool,DOMElement*> ReloadableXMLFile::load()
 #ifdef _DEBUG
     NDC ndc("init");
 #endif
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".ReloadableXMLFile");
 
     try {
         if (m_source.empty()) {
             // Data comes from the DOM we were handed.
-            log.debug("loading inline configuration...");
+            m_log.debug("loading inline configuration...");
             return make_pair(false,XMLHelper::getFirstChildElement(m_root));
         }
         else {
             // Data comes from a file we have to parse.
-            log.debug("loading configuration from external resource...");
+            m_log.debug("loading configuration from external resource...");
 
             DOMDocument* doc=NULL;
             auto_ptr_XMLCh widenit(m_source.c_str());
@@ -152,18 +149,18 @@ pair<bool,DOMElement*> ReloadableXMLFile::load()
                     doc=XMLToolingConfig::getConfig().getParser().parse(dsrc);
             }
 
-            log.infoStream() << "loaded XML resource (" << m_source << ")" << CategoryStream::ENDLINE;
+            m_log.infoStream() << "loaded XML resource (" << m_source << ")" << CategoryStream::ENDLINE;
             return make_pair(true,doc->getDocumentElement());
         }
     }
     catch (XMLException& e) {
         auto_ptr_char msg(e.getMessage());
-        log.critStream() << "Xerces error while loading resource (" << m_source << "): "
+        m_log.critStream() << "Xerces error while loading resource (" << m_source << "): "
             << msg.get() << CategoryStream::ENDLINE;
         throw XMLParserException(msg.get());
     }
     catch (exception& e) {
-        log.critStream() << "error while loading configuration from ("
+        m_log.critStream() << "error while loading configuration from ("
             << (m_source.empty() ? "inline" : m_source) << "): " << e.what() << CategoryStream::ENDLINE;
         throw;
     }
@@ -202,7 +199,7 @@ Lockable* ReloadableXMLFile::lock()
 
         // Update the timestamp regardless. No point in repeatedly trying.
         m_filestamp=stat_buf.st_mtime;
-        Category::getInstance(XMLTOOLING_LOGCAT".ReloadableXMLFile").info("change detected, reloading local resource...");
+        m_log.info("change detected, reloading local resource...");
     }
     else {
         if (isValid())
@@ -217,7 +214,7 @@ Lockable* ReloadableXMLFile::lock()
             m_lock->rdlock();
             return this;
         }
-        Category::getInstance(XMLTOOLING_LOGCAT".ReloadableXMLFile").info("local copy invalid, reloading remote resource...");
+        m_log.info("local copy invalid, reloading remote resource...");
     }
     
     // Do this once...
@@ -228,9 +225,7 @@ Lockable* ReloadableXMLFile::lock()
         if (ret.first)
             ret.second->getOwnerDocument()->release();
     } catch (exception& ex) {
-        Category::getInstance(XMLTOOLING_LOGCAT".ReloadableXMLFile").crit(
-            "maintaining existing configuration, error reloading resource (%s): %s", m_source.c_str(), ex.what()
-            );
+        m_log.crit("maintaining existing configuration, error reloading resource (%s): %s", m_source.c_str(), ex.what());
     }
     
     // If we made it here, the swap may or may not have worked, but we need to relock.

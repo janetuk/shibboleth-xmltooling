@@ -29,6 +29,7 @@
 #include <ctime>
 #include <string>
 #include <xercesc/dom/DOM.hpp>
+#include <log4cpp/Category.hh>
 
 namespace xmltooling {
 
@@ -54,9 +55,10 @@ namespace xmltooling {
          *  <dd>enables monitoring of resources for changes</dd>
          * </dl>
          * 
-         * @param e DOM to supply configuration
+         * @param e     DOM to supply configuration
+         * @param log   logging object to use
          */
-        ReloadableXMLFile(const xercesc::DOMElement* e);
+        ReloadableXMLFile(const xercesc::DOMElement* e, log4cpp::Category& log);
     
         virtual ~ReloadableXMLFile() {
             delete m_lock;
@@ -100,6 +102,9 @@ namespace xmltooling {
         
         /** Shared lock for guarding reloads. */
         RWLock* m_lock;
+        
+        /** Logging object. */
+        log4cpp::Category& m_log;
 
     public:
         Lockable* lock();
