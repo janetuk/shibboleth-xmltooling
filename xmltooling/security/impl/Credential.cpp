@@ -71,7 +71,7 @@ bool Credential::matches(const CredentialCriteria& criteria) const
 
     XSECCryptoKey* key2 = getPublicKey();
     if (!key2)
-        return false;   // no key here, so we can't possibly match the criteria
+        return true;   // no key here, so we can't test it
 
     if (key1->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL ||
         key2->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
