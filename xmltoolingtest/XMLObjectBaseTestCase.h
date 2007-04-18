@@ -35,6 +35,7 @@
 #endif
 
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 
 extern string data_path;
@@ -122,14 +123,14 @@ public:
     }
 
 protected:
-    void marshallAttributes(DOMElement* domElement) const {
+    void marshallAttributes(xercesc::DOMElement* domElement) const {
         if(getId()) {
             domElement->setAttributeNS(NULL, SimpleXMLObject::ID_ATTRIB_NAME, getId());
             domElement->setIdAttributeNS(NULL, SimpleXMLObject::ID_ATTRIB_NAME);
         }
     }
 
-    void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
+    void processChildElement(XMLObject* childXMLObject, const xercesc::DOMElement* root) {
         SimpleXMLObject* simple=dynamic_cast<SimpleXMLObject*>(childXMLObject);
         if (simple) {
             getSimpleXMLObjects().push_back(simple);
@@ -147,7 +148,7 @@ protected:
         throw UnmarshallingException("Unknown child element cannot be added to parent object.");
     }
 
-    void processAttribute(const DOMAttr* attribute) {
+    void processAttribute(const xercesc::DOMAttr* attribute) {
         if (XMLHelper::isNodeNamed(attribute, NULL, SimpleXMLObject::ID_ATTRIB_NAME))
             setId(attribute->getValue());
         else

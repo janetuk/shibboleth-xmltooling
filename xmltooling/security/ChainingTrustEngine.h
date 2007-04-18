@@ -45,7 +45,7 @@ namespace xmltooling {
          * 
          * @param e DOM to supply configuration for provider
          */
-        ChainingTrustEngine(const DOMElement* e=NULL);
+        ChainingTrustEngine(const xercesc::DOMElement* e=NULL);
         
         /**
          * Destructor will delete any embedded engines.

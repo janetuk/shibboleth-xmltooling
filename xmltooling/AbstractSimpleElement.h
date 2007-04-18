@@ -40,7 +40,7 @@ namespace xmltooling {
     {
     public:
         virtual ~AbstractSimpleElement() {
-            XMLString::release(&m_value);
+            xercesc::XMLString::release(&m_value);
         }
         
         bool hasChildren() const {
@@ -68,7 +68,7 @@ namespace xmltooling {
         
         /** Copy constructor. */
         AbstractSimpleElement(const AbstractSimpleElement& src)
-            : AbstractXMLObject(src), m_value(XMLString::replicate(src.m_value)) {}
+            : AbstractXMLObject(src), m_value(xercesc::XMLString::replicate(src.m_value)) {}
 
     private:
         XMLCh* m_value;

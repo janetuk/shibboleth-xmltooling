@@ -27,8 +27,6 @@
 #include <xmltooling/ElementExtensibleXMLObject.h>
 #include <xmltooling/util/XMLObjectChildrenList.h>
 
-using namespace xercesc;
-
 namespace xmltooling {
 
     /**

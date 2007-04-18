@@ -62,9 +62,9 @@ namespace xmltooling {
         
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject,m_children.end());
         
-        void marshallAttributes(DOMElement* domElement) const;
-        void processChildElement(XMLObject* childXMLObject, const DOMElement* childRoot);
-        void processAttribute(const DOMAttr* attribute);
+        void marshallAttributes(xercesc::DOMElement* domElement) const;
+        void processChildElement(XMLObject* childXMLObject, const xercesc::DOMElement* childRoot);
+        void processAttribute(const xercesc::DOMAttr* attribute);
     };
     /// @endcond
 

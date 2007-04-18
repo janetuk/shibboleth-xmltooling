@@ -33,8 +33,6 @@
 #include <xercesc/sax/InputSource.hpp>
 #include <xercesc/util/BinInputStream.hpp>
 
-using namespace xercesc;
-
 #if defined (_MSC_VER)
     #pragma warning( push )
     #pragma warning( disable : 4250 4251 )
@@ -45,7 +43,7 @@ namespace xmltooling {
     /**
      * A thread-safe pool of DOMBuilders that share characteristics
      */
-    class XMLTOOL_API ParserPool : public DOMEntityResolver, DOMErrorHandler
+    class XMLTOOL_API ParserPool : public xercesc::DOMEntityResolver, xercesc::DOMErrorHandler
     {
         MAKE_NONCOPYABLE(ParserPool);
     public:
@@ -64,7 +62,7 @@ namespace xmltooling {
          * @return new XML document
          * 
          */
-        DOMDocument* newDocument();
+        xercesc::DOMDocument* newDocument();
 
         /**
          * Parses a document using a pooled parser with the proper settings
@@ -73,7 +71,7 @@ namespace xmltooling {
          * @return The DOM document resulting from the parse
          * @throws XMLParserException thrown if there was a problem reading, parsing, or validating the XML
          */
-        DOMDocument* parse(DOMInputSource& domsrc);
+        xercesc::DOMDocument* parse(xercesc::DOMInputSource& domsrc);
 
         /**
          * Parses a document using a pooled parser with the proper settings
@@ -82,7 +80,7 @@ namespace xmltooling {
          * @return The DOM document resulting from the parse
          * @throws XMLParserException thrown if there was a problem reading, parsing, or validating the XML
          */
-        DOMDocument* parse(std::istream& is);
+        xercesc::DOMDocument* parse(std::istream& is);
 
         /**
          * Load an OASIS catalog file to map schema namespace URIs to filenames.
@@ -110,17 +108,17 @@ namespace xmltooling {
         /**
          * Supplies all external entities (primarily schemas) to the parser
          */
-        DOMInputSource* resolveEntity(const XMLCh* const publicId, const XMLCh* const systemId, const XMLCh* const baseURI);
+        xercesc::DOMInputSource* resolveEntity(const XMLCh* const publicId, const XMLCh* const systemId, const XMLCh* const baseURI);
 
         /**
          * Handles parsing errors
          */
-        bool handleError(const DOMError& e);
+        bool handleError(const xercesc::DOMError& e);
 
     private:
-        DOMBuilder* createBuilder();
-        DOMBuilder* checkoutBuilder();
-        void checkinBuilder(DOMBuilder* builder);
+        xercesc::DOMBuilder* createBuilder();
+        xercesc::DOMBuilder* checkoutBuilder();
+        void checkinBuilder(xercesc::DOMBuilder* builder);
 
 #ifdef HAVE_GOOD_STL
         xstring m_schemaLocations;
@@ -130,14 +128,14 @@ namespace xmltooling {
         std::map<std::string,std::string> m_schemaLocMap;
 #endif
         bool m_namespaceAware,m_schemaAware;
-        std::stack<DOMBuilder*> m_pool;
+        std::stack<xercesc::DOMBuilder*> m_pool;
         Mutex* m_lock;
     };
 
     /**
      * A parser source that wraps a C++ input stream
      */
-    class XMLTOOL_API StreamInputSource : public InputSource
+    class XMLTOOL_API StreamInputSource : public xercesc::InputSource
     {
     MAKE_NONCOPYABLE(StreamInputSource);
     public:
@@ -147,15 +145,15 @@ namespace xmltooling {
          * @param is        reference to an input stream
          * @param systemId  optional system identifier to attach to the stream
          */
-        StreamInputSource(std::istream& is, const char* systemId=NULL) : InputSource(systemId), m_is(is) {}
+        StreamInputSource(std::istream& is, const char* systemId=NULL) : xercesc::InputSource(systemId), m_is(is) {}
         /// @cond off
-        virtual BinInputStream* makeStream() const { return new StreamBinInputStream(m_is); }
+        virtual xercesc::BinInputStream* makeStream() const { return new StreamBinInputStream(m_is); }
         /// @endcond
 
         /**
          * A Xerces input stream that wraps a C++ input stream
          */
-        class XMLTOOL_API StreamBinInputStream : public BinInputStream
+        class XMLTOOL_API StreamBinInputStream : public xercesc::BinInputStream
         {
         public:
             /**

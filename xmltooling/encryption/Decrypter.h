@@ -93,7 +93,7 @@ namespace xmlencryption {
          * @param key           the decryption key to use (it will not be freed internally)
          * @return  the decrypted DOM fragment
          */
-        DOMDocumentFragment* decryptData(const EncryptedData& encryptedData, XSECCryptoKey* key);
+        xercesc::DOMDocumentFragment* decryptData(const EncryptedData& encryptedData, XSECCryptoKey* key);
 
         /**
          * Decrypts the supplied information and returns the resulting as a DOM
@@ -110,7 +110,7 @@ namespace xmlencryption {
          * @param recipient identifier of decrypting entity for use in identifying multi-cast keys
          * @return  the decrypted DOM fragment
          */
-        DOMDocumentFragment* decryptData(const EncryptedData& encryptedData, const XMLCh* recipient=NULL);
+        xercesc::DOMDocumentFragment* decryptData(const EncryptedData& encryptedData, const XMLCh* recipient=NULL);
         
         /**
          * Decrypts the supplied information and returns the resulting key.

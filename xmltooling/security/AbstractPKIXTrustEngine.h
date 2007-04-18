@@ -49,7 +49,7 @@ namespace xmltooling {
          * 
          * @param e DOM to supply configuration for provider
          */
-        AbstractPKIXTrustEngine(const DOMElement* e=NULL) : OpenSSLTrustEngine(e) {}
+        AbstractPKIXTrustEngine(const xercesc::DOMElement* e=NULL) : OpenSSLTrustEngine(e) {}
         
         /**
          * Checks that either the name of the peer with the given credentials or the names

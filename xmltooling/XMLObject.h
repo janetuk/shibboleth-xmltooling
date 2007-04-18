@@ -31,8 +31,6 @@
 #include <vector>
 #include <xercesc/dom/DOM.hpp>
 
-using namespace xercesc;
-
 #ifndef XMLTOOLING_NO_XMLSEC
 namespace xmlsignature {
     class XMLTOOL_API Signature;
@@ -198,7 +196,7 @@ namespace xmltooling {
          * 
          * @return the DOM representation of this XMLObject
          */
-        virtual DOMElement* getDOM() const=0;
+        virtual xercesc::DOMElement* getDOM() const=0;
         
         /**
          * Sets the DOM representation of this XMLObject.
@@ -206,7 +204,7 @@ namespace xmltooling {
          * @param dom       DOM representation of this XMLObject
          * @param bindDocument  true if the object should take ownership of the associated Document
          */
-        virtual void setDOM(DOMElement* dom, bool bindDocument=false) const=0;
+        virtual void setDOM(xercesc::DOMElement* dom, bool bindDocument=false) const=0;
     
         /**
          * Assigns ownership of a DOM document to the XMLObject.
@@ -214,7 +212,7 @@ namespace xmltooling {
          * 
          * @param doc DOM document bound to this object 
          */
-        virtual void setDocument(DOMDocument* doc) const=0;
+        virtual void setDocument(xercesc::DOMDocument* doc) const=0;
 
         /**
          * Releases the DOM representation of this XMLObject, if there is one.
@@ -271,8 +269,8 @@ namespace xmltooling {
          * @throws MarshallingException thrown if there is a problem marshalling the given object
          * @throws SignatureException thrown if a problem occurs during signature creation 
          */
-        virtual DOMElement* marshall(
-            DOMDocument* document=NULL
+        virtual xercesc::DOMElement* marshall(
+            xercesc::DOMDocument* document=NULL
 #ifndef XMLTOOLING_NO_XMLSEC
             ,const std::vector<xmlsignature::Signature*>* sigs=NULL
             ,const Credential* credential=NULL
@@ -293,8 +291,8 @@ namespace xmltooling {
          * @throws MarshallingException thrown if the given XMLObject can not be marshalled.
          * @throws SignatureException thrown if a problem occurs during signature creation 
          */
-        virtual DOMElement* marshall(
-            DOMElement* parentElement
+        virtual xercesc::DOMElement* marshall(
+            xercesc::DOMElement* parentElement
 #ifndef XMLTOOLING_NO_XMLSEC
             ,const std::vector<xmlsignature::Signature*>* sigs=NULL
             ,const Credential* credential=NULL
@@ -313,7 +311,7 @@ namespace xmltooling {
          * 
          * @throws UnmarshallingException thrown if an error occurs unmarshalling the DOM element into the XMLObject
          */
-        virtual XMLObject* unmarshall(DOMElement* element, bool bindDocument=false)=0;
+        virtual XMLObject* unmarshall(xercesc::DOMElement* element, bool bindDocument=false)=0;
 
     protected:
         XMLObject() {}

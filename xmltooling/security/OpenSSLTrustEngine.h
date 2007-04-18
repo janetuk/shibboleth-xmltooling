@@ -49,7 +49,7 @@ namespace xmltooling {
          * 
          * @param e DOM to supply configuration for provider
          */
-        OpenSSLTrustEngine(const DOMElement* e=NULL) : X509TrustEngine(e) {}
+        OpenSSLTrustEngine(const xercesc::DOMElement* e=NULL) : X509TrustEngine(e) {}
         
     public:
         virtual ~OpenSSLTrustEngine() {}

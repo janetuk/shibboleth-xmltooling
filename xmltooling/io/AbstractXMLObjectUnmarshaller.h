@@ -40,7 +40,7 @@ namespace xmltooling {
     public:
         virtual ~AbstractXMLObjectUnmarshaller() {}
 
-        XMLObject* unmarshall(DOMElement* element, bool bindDocument=false);
+        XMLObject* unmarshall(xercesc::DOMElement* element, bool bindDocument=false);
             
     protected:
         AbstractXMLObjectUnmarshaller() {}
@@ -55,7 +55,7 @@ namespace xmltooling {
          * 
          * @throws UnmarshallingException thrown if there is a problem unmarshalling an attribute
          */
-        virtual void unmarshallAttributes(const DOMElement* domElement);
+        virtual void unmarshallAttributes(const xercesc::DOMElement* domElement);
 
         /**
          * Unmarshalls a given Element's child nodes. The resulting XMLObject children and content
@@ -65,7 +65,7 @@ namespace xmltooling {
          * 
          * @throws UnmarshallingException thrown if an error occurs unmarshalling the child elements
          */
-        virtual void unmarshallContent(const DOMElement* domElement);
+        virtual void unmarshallContent(const xercesc::DOMElement* domElement);
 
         /**
          * Called after a child element has been unmarshalled so that it can be added to the parent XMLObject.
@@ -75,7 +75,7 @@ namespace xmltooling {
          * 
          * @throws UnmarshallingException thrown if there is a problem adding the child to the parent
          */
-        virtual void processChildElement(XMLObject* child, const DOMElement* childRoot);
+        virtual void processChildElement(XMLObject* child, const xercesc::DOMElement* childRoot);
     
         /**
          * Called after an attribute has been unmarshalled so that it can be added to the XMLObject.
@@ -84,7 +84,7 @@ namespace xmltooling {
          * 
          * @throws UnmarshallingException thrown if there is a problem adding the attribute to the XMLObject
          */
-        virtual void processAttribute(const DOMAttr* attribute);
+        virtual void processAttribute(const xercesc::DOMAttr* attribute);
     };
     
 };

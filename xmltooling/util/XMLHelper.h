@@ -28,8 +28,6 @@
 
 #include <iostream>
 
-using namespace xercesc;
-
 namespace xmltooling {
     
     /**
@@ -94,7 +92,7 @@ namespace xmltooling {
          * @param e the DOM element
          * @return true if there is a type, false if not
          */
-        static bool hasXSIType(const DOMElement* e);
+        static bool hasXSIType(const xercesc::DOMElement* e);
 
         /**
          * Gets the XSI type for a given element if it has one.
@@ -102,7 +100,7 @@ namespace xmltooling {
          * @param e the element
          * @return the type or null
          */
-        static QName* getXSIType(const DOMElement* e);
+        static QName* getXSIType(const xercesc::DOMElement* e);
 
         /**
          * Gets the ID attribute of a DOM element.
@@ -110,7 +108,7 @@ namespace xmltooling {
          * @param domElement the DOM element
          * @return the ID attribute or null if there isn't one
          */
-        static DOMAttr* getIdAttribute(const DOMElement* domElement);
+        static xercesc::DOMAttr* getIdAttribute(const xercesc::DOMElement* domElement);
 
         /**
          * Attempts to locate an XMLObject from this point downward in the tree whose
@@ -129,7 +127,7 @@ namespace xmltooling {
          * @param domNode the DOM node
          * @return the QName for the element or null if the element was null
          */
-        static QName* getNodeQName(const DOMNode* domNode);
+        static QName* getNodeQName(const xercesc::DOMNode* domNode);
 
         /**
          * Constructs a QName from an attribute's value.
@@ -137,7 +135,7 @@ namespace xmltooling {
          * @param attribute the attribute with a QName value
          * @return a QName from an attribute's value, or null if the given attribute is null
          */
-        static QName* getAttributeValueAsQName(const DOMAttr* attribute);
+        static QName* getAttributeValueAsQName(const xercesc::DOMAttr* attribute);
 
         /**
          * Appends the child Element to the parent Element,
@@ -147,7 +145,7 @@ namespace xmltooling {
          * @param childElement the child Element
          * @return the child Element that was added (may be an imported copy)
          */
-        static DOMElement* appendChildElement(DOMElement* parentElement, DOMElement* childElement);
+        static xercesc::DOMElement* appendChildElement(xercesc::DOMElement* parentElement, xercesc::DOMElement* childElement);
         
         /**
          * Checks the qualified name of a node.
@@ -157,8 +155,8 @@ namespace xmltooling {
          * @param local local name to compare with
          * @return  true iff the node's qualified name matches the other parameters
          */
-        static bool isNodeNamed(const DOMNode* n, const XMLCh* ns, const XMLCh* local) {
-            return (n && XMLString::equals(local,n->getLocalName()) && XMLString::equals(ns,n->getNamespaceURI()));
+        static bool isNodeNamed(const xercesc::DOMNode* n, const XMLCh* ns, const XMLCh* local) {
+            return (n && xercesc::XMLString::equals(local,n->getLocalName()) && xercesc::XMLString::equals(ns,n->getNamespaceURI()));
         }
 
         /**
@@ -168,7 +166,7 @@ namespace xmltooling {
          * @param localName local name to compare with or NULL for any match
          * @return  the first matching child node of type Element, or NULL
          */
-        static DOMElement* getFirstChildElement(const DOMNode* n, const XMLCh* localName=NULL);
+        static xercesc::DOMElement* getFirstChildElement(const xercesc::DOMNode* n, const XMLCh* localName=NULL);
         
         /**
          * Returns the last matching child element of the node if any.
@@ -177,7 +175,7 @@ namespace xmltooling {
          * @param localName local name to compare with or NULL for any match
          * @return  the last matching child node of type Element, or NULL
          */
-        static DOMElement* getLastChildElement(const DOMNode* n, const XMLCh* localName=NULL);
+        static xercesc::DOMElement* getLastChildElement(const xercesc::DOMNode* n, const XMLCh* localName=NULL);
         
         /**
          * Returns the next matching sibling element of the node if any.
@@ -186,7 +184,7 @@ namespace xmltooling {
          * @param localName local name to compare with or NULL for any match
          * @return  the next matching sibling node of type Element, or NULL
          */
-        static DOMElement* getNextSiblingElement(const DOMNode* n, const XMLCh* localName=NULL);
+        static xercesc::DOMElement* getNextSiblingElement(const xercesc::DOMNode* n, const XMLCh* localName=NULL);
         
         /**
          * Returns the previous matching sibling element of the node if any.
@@ -195,7 +193,7 @@ namespace xmltooling {
          * @param localName local name to compare with or NULL for any match
          * @return  the previous matching sibling node of type Element, or NULL
          */
-        static DOMElement* getPreviousSiblingElement(const DOMNode* n, const XMLCh* localName=NULL);
+        static xercesc::DOMElement* getPreviousSiblingElement(const xercesc::DOMNode* n, const XMLCh* localName=NULL);
         
         /**
          * Returns the first matching child element of the node if any.
@@ -205,7 +203,7 @@ namespace xmltooling {
          * @param localName local name to compare with
          * @return  the first matching child node of type Element, or NULL
          */
-        static DOMElement* getFirstChildElement(const DOMNode* n, const XMLCh* ns, const XMLCh* localName);
+        static xercesc::DOMElement* getFirstChildElement(const xercesc::DOMNode* n, const XMLCh* ns, const XMLCh* localName);
         
         /**
          * Returns the last matching child element of the node if any.
@@ -215,7 +213,7 @@ namespace xmltooling {
          * @param localName local name to compare with
          * @return  the last matching child node of type Element, or NULL
          */
-        static DOMElement* getLastChildElement(const DOMNode* n, const XMLCh* ns, const XMLCh* localName);
+        static xercesc::DOMElement* getLastChildElement(const xercesc::DOMNode* n, const XMLCh* ns, const XMLCh* localName);
         
         /**
          * Returns the next matching sibling element of the node if any.
@@ -225,7 +223,7 @@ namespace xmltooling {
          * @param localName local name to compare with
          * @return  the next matching sibling node of type Element, or NULL
          */
-        static DOMElement* getNextSiblingElement(const DOMNode* n, const XMLCh* ns, const XMLCh* localName);
+        static xercesc::DOMElement* getNextSiblingElement(const xercesc::DOMNode* n, const XMLCh* ns, const XMLCh* localName);
         
         /**
          * Returns the previous matching sibling element of the node if any.
@@ -235,7 +233,7 @@ namespace xmltooling {
          * @param localName local name to compare with
          * @return  the previous matching sibling node of type Element, or NULL
          */
-        static DOMElement* getPreviousSiblingElement(const DOMNode* n, const XMLCh* ns, const XMLCh* localName);
+        static xercesc::DOMElement* getPreviousSiblingElement(const xercesc::DOMNode* n, const XMLCh* ns, const XMLCh* localName);
 
         /**
          * Returns the content of the first Text node found in the element, if any.
@@ -245,7 +243,7 @@ namespace xmltooling {
          * @param e     element to examine
          * @return the content of the first Text node found, or NULL
          */
-        static const XMLCh* getTextContent(const DOMElement* e);
+        static const XMLCh* getTextContent(const xercesc::DOMElement* e);
 
         /**
          * Serializes the DOM node provided into a buffer using UTF-8 encoding and
@@ -254,7 +252,7 @@ namespace xmltooling {
          * @param n     node to serialize
          * @param buf   buffer to serialize element into
          */
-        static void serialize(const DOMNode* n, std::string& buf);
+        static void serialize(const xercesc::DOMNode* n, std::string& buf);
 
         /**
          * Serializes the DOM node provided to a stream using UTF-8 encoding and
@@ -264,7 +262,7 @@ namespace xmltooling {
          * @param out   stream to serialize element into
          * @return reference to output stream
          */
-        static std::ostream& serialize(const DOMNode* n, std::ostream& out);
+        static std::ostream& serialize(const xercesc::DOMNode* n, std::ostream& out);
     };
 
     /**
@@ -275,7 +273,7 @@ namespace xmltooling {
      * @param ostr   stream to serialize element into
      * @return reference to output stream
      */
-    extern XMLTOOL_API std::ostream& operator<<(std::ostream& ostr, const DOMNode& n);
+    extern XMLTOOL_API std::ostream& operator<<(std::ostream& ostr, const xercesc::DOMNode& n);
 
     /**
      * Marshalls and serializes the XMLObject provided to a stream using UTF-8 encoding and

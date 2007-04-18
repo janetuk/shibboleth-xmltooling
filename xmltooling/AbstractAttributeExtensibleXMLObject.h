@@ -72,14 +72,14 @@ namespace xmltooling {
          * 
          * @param attribute the DOM attribute node being unmarshalled
          */
-        void unmarshallExtensionAttribute(const DOMAttr* attribute);
+        void unmarshallExtensionAttribute(const xercesc::DOMAttr* attribute);
 
         /**
          * Assists in the marshalling of extension attributes.
          * 
          * @param domElement    the DOM element against which to marshall the attributes
          */
-        void marshallExtensionAttributes(DOMElement* domElement) const;
+        void marshallExtensionAttributes(xercesc::DOMElement* domElement) const;
     
     private:
         /** Map of arbitrary attributes. */

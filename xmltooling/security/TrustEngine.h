@@ -57,7 +57,7 @@ namespace xmltooling {
          * 
          * @param e DOM to supply configuration for provider
          */
-        TrustEngine(const DOMElement* e=NULL);
+        TrustEngine(const xercesc::DOMElement* e=NULL);
         
         /** Custom KeyInfoResolver instance. */
         KeyInfoResolver* m_keyInfoResolver;

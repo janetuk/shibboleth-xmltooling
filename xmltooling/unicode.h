@@ -29,8 +29,6 @@
 #include <iostream>
 #include <xercesc/util/XMLString.hpp>
 
-using namespace xercesc;
-
 namespace xmltooling {
     
     #ifdef HAVE_GOOD_STL
@@ -73,41 +71,51 @@ namespace xmltooling {
      */
     class XMLTOOL_API auto_ptr_char
     {
+        MAKE_NONCOPYABLE(auto_ptr_char);
     public:
         /**
          * Constructor transcodes a 16-bit Unicode string into the local code page (NOT UTF-8) and wraps the result.
          * @param src   the 16-bit string to transcode and wrap
          * @param trim  trims leading/trailing whitespace from the result (defaults to true) 
          */
-        auto_ptr_char(const XMLCh* src, bool trim=true) : m_buf(XMLString::transcode(src)) {if (trim && m_buf) XMLString::trim(m_buf);}
+        auto_ptr_char(const XMLCh* src, bool trim=true) : m_buf(xercesc::XMLString::transcode(src)) {
+            if (trim && m_buf) xercesc::XMLString::trim(m_buf);
+        }
 
         /**
          * Constructor copies a local code page (NOT UTF-8) string and wraps the result.
          * @param src   the local string to copy and wrap
          * @param trim  trims leading/trailing whitespace from the result (defaults to true) 
          */
-        auto_ptr_char(const char* src, bool trim=true) : m_buf(XMLString::replicate(src)) {if (trim && m_buf) XMLString::trim(m_buf);}
+        auto_ptr_char(const char* src, bool trim=true) : m_buf(xercesc::XMLString::replicate(src)) {
+            if (trim && m_buf) xercesc::XMLString::trim(m_buf);
+        }
 
         /**
          * Destructor frees the wrapped buffer using the Xerces memory manager.
          */
-        ~auto_ptr_char() { XMLString::release(&m_buf); }
+        ~auto_ptr_char() {
+            xercesc::XMLString::release(&m_buf);
+        }
 
         /**
          * Returns the wrapped buffer.
          * @return a null-terminated local code page string
          */
-        const char* get() const { return m_buf; }
+        const char* get() const {
+            return m_buf;
+        }
 
         /**
          * Returns the wrapped buffer and transfers ownership of it to the caller.
          * @return a null-terminated local code page string
          */
-        char* release() { char* temp=m_buf; m_buf=NULL; return temp; }
+        char* release() {
+            char* temp=m_buf; m_buf=NULL; return temp;
+        }
 
     private:    
         char* m_buf;
-    MAKE_NONCOPYABLE(auto_ptr_char);
     };
 
     /**
@@ -119,41 +127,51 @@ namespace xmltooling {
      */
     class XMLTOOL_API auto_ptr_XMLCh
     {
+        MAKE_NONCOPYABLE(auto_ptr_XMLCh);
     public:
         /**
          * Constructor transcodes a local code page (NOT UTF-8) string into 16-bit Unicode and wraps the result.
          * @param src   the local string to transcode and wrap
          * @param trim  trims leading/trailing whitespace from the result (defaults to true) 
          */
-        auto_ptr_XMLCh(const char* src, bool trim=true) : m_buf(XMLString::transcode(src)) {if (trim && m_buf) XMLString::trim(m_buf);}
+        auto_ptr_XMLCh(const char* src, bool trim=true) : m_buf(xercesc::XMLString::transcode(src)) {
+            if (trim && m_buf) xercesc::XMLString::trim(m_buf);
+        }
 
         /**
          * Constructor copies a 16-bit Unicode string and wraps the result.
          * @param src   the Unicode string to copy and wrap
          * @param trim  trims leading/trailing whitespace from the result (defaults to true) 
          */
-        auto_ptr_XMLCh(const XMLCh* src, bool trim=true) : m_buf(XMLString::replicate(src)) {if (trim && m_buf) XMLString::trim(m_buf);}
+        auto_ptr_XMLCh(const XMLCh* src, bool trim=true) : m_buf(xercesc::XMLString::replicate(src)) {
+            if (trim && m_buf) xercesc::XMLString::trim(m_buf);
+        }
 
         /**
          * Destructor frees the wrapped buffer using the Xerces memory manager.
          */
-        ~auto_ptr_XMLCh() { XMLString::release(&m_buf); }
+        ~auto_ptr_XMLCh() {
+            xercesc::XMLString::release(&m_buf);
+        }
 
         /**
          * Returns the wrapped buffer.
          * @return a null-terminated Unicode string
          */
-        const XMLCh* get() const { return m_buf; }
+        const XMLCh* get() const {
+            return m_buf;
+        }
         
         /**
          * Returns the wrapped buffer and transfers ownership of it to the caller.
          * @return a null-terminated Unicode string
          */
-        XMLCh* release() { XMLCh* temp=m_buf; m_buf=NULL; return temp; }
+        XMLCh* release() {
+            XMLCh* temp=m_buf; m_buf=NULL; return temp;
+        }
 
     private:
         XMLCh* m_buf;
-    MAKE_NONCOPYABLE(auto_ptr_XMLCh);
     };
 
 };

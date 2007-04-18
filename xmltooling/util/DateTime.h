@@ -161,7 +161,7 @@ namespace xmltooling
     inline void DateTime::setBuffer(const XMLCh* const aString)
     {
         reset();
-        fEnd = XMLString::stringLen(aString);
+        fEnd = xercesc::XMLString::stringLen(aString);
         if (fEnd > 0) {
             if (fEnd > fBufferMaxLen) {
                 delete[] fBuffer;
@@ -174,7 +174,7 @@ namespace xmltooling
     
     inline void DateTime::reset()
     {
-        for ( int i=0; i < XMLDateTime::TOTAL_SIZE; i++ )
+        for ( int i=0; i < xercesc::XMLDateTime::TOTAL_SIZE; i++ )
             fValue[i] = 0;
     
         fMiliSecond   = 0;
@@ -188,7 +188,7 @@ namespace xmltooling
     
     inline void DateTime::copy(const DateTime& rhs)
     {
-        for ( int i = 0; i < XMLDateTime::TOTAL_SIZE; i++ )
+        for ( int i = 0; i < xercesc::XMLDateTime::TOTAL_SIZE; i++ )
             fValue[i] = rhs.fValue[i];
     
         fMiliSecond   = rhs.fMiliSecond;
@@ -216,16 +216,16 @@ namespace xmltooling
     
     inline bool DateTime::isNormalized() const
     {
-        return (fValue[XMLDateTime::utc] == XMLDateTime::UTC_STD ? true : false);
+        return (fValue[xercesc::XMLDateTime::utc] == xercesc::XMLDateTime::UTC_STD ? true : false);
     }
     
     inline int DateTime::getRetVal(int c1, int c2)
     {
-        if ((c1 == XMLDateTime::LESS_THAN && c2 == XMLDateTime::GREATER_THAN) ||
-            (c1 == XMLDateTime::GREATER_THAN && c2 == XMLDateTime::LESS_THAN))
-            return XMLDateTime::INDETERMINATE;
+        if ((c1 == xercesc::XMLDateTime::LESS_THAN && c2 == xercesc::XMLDateTime::GREATER_THAN) ||
+            (c1 == xercesc::XMLDateTime::GREATER_THAN && c2 == xercesc::XMLDateTime::LESS_THAN))
+            return xercesc::XMLDateTime::INDETERMINATE;
     
-        return (c1 != XMLDateTime::INDETERMINATE) ? c1 : c2;
+        return (c1 != xercesc::XMLDateTime::INDETERMINATE) ? c1 : c2;
     }
 
 }

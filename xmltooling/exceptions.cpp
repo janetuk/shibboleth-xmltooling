@@ -243,11 +243,11 @@ string XMLToolingException::toQueryString() const
 
 XMLToolingException* XMLToolingException::fromStream(std::istream& in)
 {
-    static const XMLCh exception[] = { chLatin_e, chLatin_x, chLatin_c, chLatin_e, chLatin_p, chLatin_t, chLatin_i, chLatin_o, chLatin_n, chNull };
-    static const XMLCh message[] = { chLatin_m, chLatin_e, chLatin_s, chLatin_s, chLatin_a, chLatin_g, chLatin_e, chNull };
-    static const XMLCh name[] = { chLatin_n, chLatin_a, chLatin_m, chLatin_e, chNull };
-    static const XMLCh param[] = { chLatin_p, chLatin_a, chLatin_r, chLatin_a, chLatin_m, chNull };
-    static const XMLCh type[] = { chLatin_t, chLatin_y, chLatin_p, chLatin_e, chNull };
+    static const XMLCh exception[] =    UNICODE_LITERAL_9(e,x,c,e,p,t,i,o,n);
+    static const XMLCh message[] =      UNICODE_LITERAL_7(m,e,s,s,a,g,e);
+    static const XMLCh name[] =         UNICODE_LITERAL_4(n,a,m,e);
+    static const XMLCh param[] =        UNICODE_LITERAL_5(p,a,r,a,m);
+    static const XMLCh type[] =         UNICODE_LITERAL_4(t,y,p,e);
 
     DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(in);
     

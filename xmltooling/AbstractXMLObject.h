@@ -47,8 +47,8 @@ namespace xmltooling {
     public:
         virtual ~AbstractXMLObject() {
             delete m_typeQname;
-            XMLString::release(&m_schemaLocation);
-            XMLString::release(&m_noNamespaceSchemaLocation);
+            xercesc::XMLString::release(&m_schemaLocation);
+            xercesc::XMLString::release(&m_noNamespaceSchemaLocation);
         }
 
         void detach();

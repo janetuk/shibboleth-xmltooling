@@ -142,7 +142,9 @@ namespace xmlencryption {
          * @param kencParams    key encryption settings, or NULL
          * @return a stand-alone EncryptedData object, unconnected to the source DOM 
          */
-        EncryptedData* encryptElement(DOMElement* element, EncryptionParams& encParams, KeyEncryptionParams* kencParams=NULL);
+        EncryptedData* encryptElement(
+            xercesc::DOMElement* element, EncryptionParams& encParams, KeyEncryptionParams* kencParams=NULL
+            );
 
         /**
          * Encrypts the supplied element's children and returns the resulting object.
@@ -159,7 +161,9 @@ namespace xmlencryption {
          * @param kencParams    key encryption settings, or NULL
          * @return a stand-alone EncryptedData object, unconnected to the source DOM 
          */
-        EncryptedData* encryptElementContent(DOMElement* element, EncryptionParams& encParams, KeyEncryptionParams* kencParams=NULL);
+        EncryptedData* encryptElementContent(
+            xercesc::DOMElement* element, EncryptionParams& encParams, KeyEncryptionParams* kencParams=NULL
+            );
 
         /**
          * Encrypts the supplied input stream and returns the resulting object.
@@ -187,7 +191,9 @@ namespace xmlencryption {
          * @param compact       true iff the encrypted representation should be made as small as possible
          * @return a stand-alone EncryptedKey object, unconnected to any DOM 
          */
-        EncryptedKey* encryptKey(const unsigned char* keyBuffer, unsigned int keyBufferSize, KeyEncryptionParams& kencParams, bool compact=false);
+        EncryptedKey* encryptKey(
+            const unsigned char* keyBuffer, unsigned int keyBufferSize, KeyEncryptionParams& kencParams, bool compact=false
+            );
         
     private:
         void checkParams(EncryptionParams& encParams, KeyEncryptionParams* kencParams);

@@ -40,6 +40,8 @@
 #include "XMLToolingConfig.h"
 #include "util/ParserPool.h"
 
+using namespace xercesc;
+
 #include <vector>
 #ifndef XMLTOOLING_NO_XMLSEC
     #include <xsec/framework/XSECProvider.hpp>
@@ -75,7 +77,7 @@
 namespace xmltooling {
     
     /// @cond OFF
-    class XMLToolingInternalConfig : public xmltooling::XMLToolingConfig
+    class XMLToolingInternalConfig : public XMLToolingConfig
     {
     public:
         XMLToolingInternalConfig() : m_lock(NULL), m_parserPool(NULL), m_validatingPool(NULL) {

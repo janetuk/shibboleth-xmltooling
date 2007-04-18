@@ -40,16 +40,16 @@ namespace xmltooling {
     public:
         virtual ~AbstractXMLObjectMarshaller() {}
 
-        DOMElement* marshall(
-            DOMDocument* document=NULL
+        xercesc::DOMElement* marshall(
+            xercesc::DOMDocument* document=NULL
 #ifndef XMLTOOLING_NO_XMLSEC
             ,const std::vector<xmlsignature::Signature*>* sigs=NULL
             ,const Credential* credential=NULL
 #endif
             ) const;
 
-        DOMElement* marshall(
-            DOMElement* parentElement
+        xercesc::DOMElement* marshall(
+            xercesc::DOMElement* parentElement
 #ifndef XMLTOOLING_NO_XMLSEC
             ,const std::vector<xmlsignature::Signature*>* sigs=NULL
             ,const Credential* credential=NULL
@@ -66,8 +66,8 @@ namespace xmltooling {
          * @param document the document
          * @param element the Element that will serve as the Document Element
          */
-        void setDocumentElement(DOMDocument* document, DOMElement* element) const {
-            DOMElement* documentRoot = document->getDocumentElement();
+        void setDocumentElement(xercesc::DOMDocument* document, xercesc::DOMElement* element) const {
+            xercesc::DOMElement* documentRoot = document->getDocumentElement();
             if (documentRoot)
                 document->replaceChild(element, documentRoot);
             else
@@ -87,7 +87,7 @@ namespace xmltooling {
          * @throws SignatureException thrown if a problem occurs during signature creation 
          */
         void marshallInto(
-            DOMElement* targetElement, const std::vector<xmlsignature::Signature*>* sigs, const Credential* credential=NULL
+            xercesc::DOMElement* targetElement, const std::vector<xmlsignature::Signature*>* sigs, const Credential* credential=NULL
             ) const;
 #else
         /**
@@ -98,7 +98,7 @@ namespace xmltooling {
          * 
          * @throws MarshallingException thrown if there is a problem marshalling the object
          */
-        void marshallInto(DOMElement* targetElement) const;
+        void marshallInto(xercesc::DOMElement* targetElement) const;
 #endif
     
         /**
@@ -109,14 +109,14 @@ namespace xmltooling {
          * @throws MarshallingException thrown if the type on the XMLObject is doesn't contain
          * a local name, prefix, and namespace URI
          */
-        void marshallElementType(DOMElement* domElement) const;
+        void marshallElementType(xercesc::DOMElement* domElement) const;
 
         /**
          * Creates the xmlns attributes for any namespaces set on the XMLObject.
          * 
          * @param domElement the DOM element the namespaces will be added to
          */
-        void marshallNamespaces(DOMElement* domElement) const;
+        void marshallNamespaces(xercesc::DOMElement* domElement) const;
     
 #ifndef XMLTOOLING_NO_XMLSEC
         /**
@@ -127,7 +127,7 @@ namespace xmltooling {
          * 
          * @throws MarshallingException thrown if there is a problem marshalling a child element
          */
-        void marshallContent(DOMElement* domElement, const Credential* credential) const;
+        void marshallContent(xercesc::DOMElement* domElement, const Credential* credential) const;
 #else
         /**
          * Marshalls the text content and/or child elements of the XMLObject.
@@ -136,7 +136,7 @@ namespace xmltooling {
          * 
          * @throws MarshallingException thrown if there is a problem marshalling a child element
          */
-        void marshallContent(DOMElement* domElement) const;
+        void marshallContent(xercesc::DOMElement* domElement) const;
 #endif
 
         /**
@@ -146,7 +146,7 @@ namespace xmltooling {
          * 
          * @throws MarshallingException thrown if there is a problem marshalling an attribute
          */
-        virtual void marshallAttributes(DOMElement* domElement) const {}
+        virtual void marshallAttributes(xercesc::DOMElement* domElement) const {}
     };
     
 };

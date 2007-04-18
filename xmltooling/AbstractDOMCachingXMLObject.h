@@ -41,13 +41,13 @@ namespace xmltooling {
     public:
         virtual ~AbstractDOMCachingXMLObject();
         
-        DOMElement* getDOM() const {
+        xercesc::DOMElement* getDOM() const {
             return m_dom;
         }
         
-        void setDOM(DOMElement* dom, bool bindDocument=false) const;
+        void setDOM(xercesc::DOMElement* dom, bool bindDocument=false) const;
         
-        void setDocument(DOMDocument* doc) const {
+        void setDocument(xercesc::DOMDocument* doc) const {
             if (m_document)
                 m_document->release();
             m_document=doc;
@@ -76,11 +76,11 @@ namespace xmltooling {
          * @param doc   the document to clone into, or NULL, in which case a new document is created
          * @return  the cloned DOM
          */
-        DOMElement* cloneDOM(DOMDocument* doc=NULL) const;
+        xercesc::DOMElement* cloneDOM(xercesc::DOMDocument* doc=NULL) const;
 
     private:
-        mutable DOMElement* m_dom;
-        mutable DOMDocument* m_document;
+        mutable xercesc::DOMElement* m_dom;
+        mutable xercesc::DOMDocument* m_document;
     };
     
 };

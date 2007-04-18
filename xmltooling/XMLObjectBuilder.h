@@ -76,7 +76,7 @@ namespace xmltooling {
          * @param bindDocument  true iff the XMLObject should take ownership of the DOM Document
          * @return the unmarshalled XMLObject
          */
-        XMLObject* buildFromElement(DOMElement* element, bool bindDocument=false) const {
+        XMLObject* buildFromElement(xercesc::DOMElement* element, bool bindDocument=false) const {
             std::auto_ptr<XMLObject> ret(
                 buildObject(element->getNamespaceURI(),element->getLocalName(),element->getPrefix(),XMLHelper::getXSIType(element))
                 );
@@ -91,7 +91,7 @@ namespace xmltooling {
          * @param bindDocument  true iff the XMLObject should take ownership of the DOM Document
          * @return the unmarshalled XMLObject
          */
-        XMLObject* buildFromDocument(DOMDocument* doc, bool bindDocument=true) const {
+        XMLObject* buildFromDocument(xercesc::DOMDocument* doc, bool bindDocument=true) const {
             return buildFromElement(doc->getDocumentElement(),bindDocument);
         }
 
@@ -102,7 +102,7 @@ namespace xmltooling {
          * @param bindDocument  true iff the new XMLObject should take ownership of the DOM Document
          * @return  the unmarshalled object or NULL if no builder is available 
          */
-        static XMLObject* buildOneFromElement(DOMElement* element, bool bindDocument=false) {
+        static XMLObject* buildOneFromElement(xercesc::DOMElement* element, bool bindDocument=false) {
             const XMLObjectBuilder* b=getBuilder(element);
             return b ? b->buildFromElement(element,bindDocument) : NULL;
         }
@@ -125,7 +125,7 @@ namespace xmltooling {
          * @param element the element for which to locate a builder
          * @return the builder or NULL
          */
-        static const XMLObjectBuilder* getBuilder(const DOMElement* element);
+        static const XMLObjectBuilder* getBuilder(const xercesc::DOMElement* element);
 
         /**
          * Retrieves the default XMLObjectBuilder for DOM elements

@@ -57,26 +57,26 @@ namespace xmltooling {
             throw XMLObjectException("Direct access to content is not permitted.");
         }
 
-        DOMElement* marshall(
-            DOMDocument* document=NULL
+        xercesc::DOMElement* marshall(
+            xercesc::DOMDocument* document=NULL
 #ifndef XMLTOOLING_NO_XMLSEC
             ,const std::vector<xmlsignature::Signature*>* sigs=NULL
             ,const Credential* credential=NULL
 #endif
             ) const;
 
-        DOMElement* marshall(
-            DOMElement* parentElement
+        xercesc::DOMElement* marshall(
+            xercesc::DOMElement* parentElement
 #ifndef XMLTOOLING_NO_XMLSEC
             ,const std::vector<xmlsignature::Signature*>* sigs=NULL
             ,const Credential* credential=NULL
 #endif
             ) const;
-        XMLObject* unmarshall(DOMElement* element, bool bindDocument=false);
+        XMLObject* unmarshall(xercesc::DOMElement* element, bool bindDocument=false);
         
     protected:
-        void setDocumentElement(DOMDocument* document, DOMElement* element) const {
-            DOMElement* documentRoot = document->getDocumentElement();
+        void setDocumentElement(xercesc::DOMDocument* document, xercesc::DOMElement* element) const {
+            xercesc::DOMElement* documentRoot = document->getDocumentElement();
             if (documentRoot)
                 document->replaceChild(element, documentRoot);
             else

@@ -45,7 +45,7 @@ namespace xmltooling {
          * 
          * @param e DOM to supply configuration for provider
          */
-        X509TrustEngine(const DOMElement* e=NULL) : TrustEngine(e) {}
+        X509TrustEngine(const xercesc::DOMElement* e=NULL) : TrustEngine(e) {}
         
     public:
         virtual ~X509TrustEngine() {}
