@@ -51,7 +51,10 @@ namespace xmlencryption {
      * Summing up, if KeyEncryptionParams are used, a raw key must be available or the
      * key can be generated when the encryption algorithm itself is a standard one. If
      * no KeyEncryptionParams are supplied, then the key must be supplied either in raw
-     * or object form. 
+     * or object form.
+     *
+     * Finally, when encrypting data, the key transport algorithm can be left blank to
+     * derive it from the data encryption algorithm.
      */
     class XMLTOOL_API Encrypter
     {
@@ -104,12 +107,12 @@ namespace xmlencryption {
              * Constructor.
              * 
              * @param credential    a Credential supplying the key encryption key
-             * @param algorithm     the XML Encryption key wrapping or transport algorithm constant
+             * @param algorithm     XML Encryption key wrapping or transport algorithm constant
              * @param recipient     optional name of recipient of encrypted key
              */
             KeyEncryptionParams(
                 const xmltooling::Credential& credential,
-                const XMLCh* algorithm,
+                const XMLCh* algorithm=NULL,
                 const XMLCh* recipient=NULL
                 ) : m_credential(credential), m_algorithm(algorithm), m_recipient(recipient) {
             }
@@ -194,6 +197,19 @@ namespace xmlencryption {
         EncryptedKey* encryptKey(
             const unsigned char* keyBuffer, unsigned int keyBufferSize, KeyEncryptionParams& kencParams, bool compact=false
             );
+        
+        /**
+         * Maps a data encryption algorithm to an appropriate key transport algorithm to use.
+         * 
+         * @param algorithm data encryption algorithm
+         * @return a key transport algorithm
+         */
+        static const XMLCh* getKeyTransportAlgorithm(const XMLCh* algorithm) {
+            if (xercesc::XMLString::equals(algorithm,DSIGConstants::s_unicodeStrURI3DES_CBC))
+                return DSIGConstants::s_unicodeStrURIRSA_1_5;
+            else
+                return DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1;
+        }
         
     private:
         void checkParams(EncryptionParams& encParams, KeyEncryptionParams* kencParams);

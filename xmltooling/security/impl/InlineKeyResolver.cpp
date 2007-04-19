@@ -65,8 +65,21 @@ namespace xmltooling {
             return NULL;
         }
 
-        const KeyInfo* getKeyInfo(bool compact=false) const {
-            return m_credctx->getKeyInfo();
+        KeyInfo* getKeyInfo(bool compact=false) const {
+            KeyInfo* ret = m_credctx->getKeyInfo() ? m_credctx->getKeyInfo()->cloneKeyInfo() : NULL;
+            if (ret && compact) {
+                ret->getKeyValues().clear();
+                ret->getSPKIDatas().clear();
+                ret->getPGPDatas().clear();
+                ret->getUnknownXMLObjects().clear();
+                const vector<X509Data*> x509Datas=const_cast<const KeyInfo*>(ret)->getX509Datas();
+                for (vector<X509Data*>::const_iterator x=x509Datas.begin(); x!=x509Datas.end(); ++x) {
+                    (*x)->getX509Certificates().clear();
+                    (*x)->getX509CRLs().clear();
+                    (*x)->getUnknownXMLObjects().clear();
+                }
+            }
+            return ret;
         }
         
         const CredentialContext* getCredentialContext() const {

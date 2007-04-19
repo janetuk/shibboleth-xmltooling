@@ -40,9 +40,11 @@ public:
         m_resolver = XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(
             FILESYSTEM_CREDENTIAL_RESOLVER,doc->getDocumentElement()
             );
+        XMLObjectBuilder::registerDefaultBuilder(new UnknownElementBuilder());
     }
 
     void tearDown() {
+        XMLObjectBuilder::deregisterDefaultBuilder();
         delete m_resolver;
     }
 
@@ -61,7 +63,7 @@ public:
 
             Encrypter encrypter;
             Encrypter::EncryptionParams ep;
-            Encrypter::KeyEncryptionParams kep(*cred,DSIGConstants::s_unicodeStrURIRSA_1_5);
+            Encrypter::KeyEncryptionParams kep(*cred);
             auto_ptr<EncryptedData> encData(encrypter.encryptElement(doc->getDocumentElement(),ep,&kep));
 
             string buf;

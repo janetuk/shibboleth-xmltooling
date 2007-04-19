@@ -24,12 +24,9 @@
 #define __xmltooling_basicx509cred_h__
 
 #include <xmltooling/security/X509Credential.h>
+#include <xmltooling/signature/KeyInfo.h>
 
 #include <algorithm>
-
-namespace xmlsignature {
-    class XMLTOOL_API KeyInfo;
-};
 
 namespace xmltooling {
 
@@ -166,8 +163,10 @@ namespace xmltooling {
             return m_keyNames;
         }
 
-        const xmlsignature::KeyInfo* getKeyInfo(bool compact=false) const {
-            return compact ? m_compactKeyInfo : (m_keyInfo ? m_keyInfo : m_compactKeyInfo);
+        xmlsignature::KeyInfo* getKeyInfo(bool compact=false) const {
+            if (compact || !m_keyInfo)
+                return m_compactKeyInfo ? m_compactKeyInfo->cloneKeyInfo() : NULL;
+            return m_keyInfo->cloneKeyInfo();
         }
         
         const std::vector<XSECCryptoX509*>& getEntityCertificateChain() const {

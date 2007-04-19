@@ -306,9 +306,7 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, const vector<Si
     if (credential) {
         delete m_keyInfo;
         m_keyInfo = NULL;
-        const KeyInfo* fromcred = credential->getKeyInfo();
-        if (fromcred)
-            m_keyInfo = fromcred->cloneKeyInfo();
+        m_keyInfo = credential->getKeyInfo();
     }
     if (m_keyInfo && (!m_signature->getKeyInfoList() || m_signature->getKeyInfoList()->isEmpty())) {
         m_keyInfo->marshall(cachedDOM);
@@ -391,9 +389,7 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, const vecto
     if (credential) {
         delete m_keyInfo;
         m_keyInfo = NULL;
-        const KeyInfo* fromcred = credential->getKeyInfo();
-        if (fromcred)
-            m_keyInfo = fromcred->cloneKeyInfo();
+        m_keyInfo = credential->getKeyInfo();
     }
     if (m_keyInfo && (!m_signature->getKeyInfoList() || m_signature->getKeyInfoList()->isEmpty())) {
         m_keyInfo->marshall(cachedDOM);

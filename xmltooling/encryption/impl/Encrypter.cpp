@@ -186,15 +186,17 @@ EncryptedData* Encrypter::decorateAndUnmarshall(EncryptionParams& encParams, Key
     xmlEncData->releaseThisAndChildrenDOM();
     
     // KeyInfo?
-    const KeyInfo* kinfo = encParams.m_credential ? encParams.m_credential->getKeyInfo(encParams.m_compact) : NULL;
+    KeyInfo* kinfo = encParams.m_credential ? encParams.m_credential->getKeyInfo(encParams.m_compact) : NULL;
     if (kinfo)
-        xmlEncData->setKeyInfo(kinfo->cloneKeyInfo());
+        xmlEncData->setKeyInfo(kinfo);
     
     // Are we doing a key encryption?
     if (kencParams) {
         XSECCryptoKey* kek = kencParams->m_credential.getPublicKey();
         if (!kek)
             throw EncryptionException("Credential in KeyEncryptionParams structure did not supply a public key.");
+        if (!kencParams->m_algorithm)
+            kencParams->m_algorithm = getKeyTransportAlgorithm(encParams.m_algorithm);
 
         m_cipher->setKEK(kek->clone());
         // ownership of this belongs to us, for some reason...
@@ -215,7 +217,7 @@ EncryptedData* Encrypter::decorateAndUnmarshall(EncryptionParams& encParams, Key
         // KeyInfo?
         kinfo = kencParams->m_credential.getKeyInfo(encParams.m_compact);
         if (kinfo)
-            xmlEncKey->setKeyInfo(kinfo->cloneKeyInfo());
+            xmlEncKey->setKeyInfo(kinfo);
         
         // Add the EncryptedKey inline.
         if (!xmlEncData->getKeyInfo())
@@ -262,9 +264,9 @@ EncryptedKey* Encrypter::encryptKey(const unsigned char* keyBuffer, unsigned int
             xmlEncKey->setRecipient(kencParams.m_recipient);
 
         // KeyInfo?
-        const KeyInfo* kinfo = kencParams.m_credential.getKeyInfo(compact);
+        KeyInfo* kinfo = kencParams.m_credential.getKeyInfo(compact);
         if (kinfo)
-            xmlEncKey->setKeyInfo(kinfo->cloneKeyInfo());
+            xmlEncKey->setKeyInfo(kinfo);
 
         xmlObjectKey.release();
         return xmlEncKey;

@@ -101,9 +101,9 @@ namespace xmltooling {
          * communicating with other entities.
          * 
          * @param compact   true iff the communication medium is such that only compact forms should be included
-         * @return reference to a KeyInfo object
+         * @return a KeyInfo object, which must be freed by the caller
          */
-        virtual const xmlsignature::KeyInfo* getKeyInfo(bool compact=false) const=0;
+        virtual xmlsignature::KeyInfo* getKeyInfo(bool compact=false) const=0;
 
         /**
          * Get the credential context information, which provides additional information
