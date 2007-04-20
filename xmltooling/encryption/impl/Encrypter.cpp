@@ -196,7 +196,7 @@ EncryptedData* Encrypter::decorateAndUnmarshall(EncryptionParams& encParams, Key
         if (!kek)
             throw EncryptionException("Credential in KeyEncryptionParams structure did not supply a public key.");
         if (!kencParams->m_algorithm)
-            kencParams->m_algorithm = getKeyTransportAlgorithm(encParams.m_algorithm);
+            kencParams->m_algorithm = getKeyTransportAlgorithm(kencParams->m_credential, encParams.m_algorithm);
 
         m_cipher->setKEK(kek->clone());
         // ownership of this belongs to us, for some reason...
@@ -278,4 +278,30 @@ EncryptedKey* Encrypter::encryptKey(const unsigned char* keyBuffer, unsigned int
     catch(XSECCryptoException& e) {
         throw EncryptionException(string("XMLSecurity exception while encrypting: ") + e.getMsg());
     }
+}
+
+const XMLCh* Encrypter::getKeyTransportAlgorithm(const Credential& credential, const XMLCh* encryptionAlg)
+{
+    const char* alg = credential.getAlgorithm();
+    if (!alg || !strcmp(alg, "RSA")) {
+        if (XMLString::equals(encryptionAlg,DSIGConstants::s_unicodeStrURI3DES_CBC))
+            return DSIGConstants::s_unicodeStrURIRSA_1_5;
+        else
+            return DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1;
+    }
+    else if (!strcmp(alg, "AES")) {
+        switch (credential.getKeySize()) {
+            case 128:
+                return DSIGConstants::s_unicodeStrURIKW_AES128;
+            case 192:
+                return DSIGConstants::s_unicodeStrURIKW_AES192;
+            case 256:
+                return DSIGConstants::s_unicodeStrURIKW_AES256;
+        }
+    }
+    else if (!strcmp(alg, "DESede")) {
+        return DSIGConstants::s_unicodeStrURIKW_3DES;
+    }
+
+    return NULL;
 }

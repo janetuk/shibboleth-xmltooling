@@ -201,15 +201,11 @@ namespace xmlencryption {
         /**
          * Maps a data encryption algorithm to an appropriate key transport algorithm to use.
          * 
-         * @param algorithm data encryption algorithm
+         * @param credential    the key encryption key
+         * @param encryptionAlg data encryption algorithm
          * @return a key transport algorithm
          */
-        static const XMLCh* getKeyTransportAlgorithm(const XMLCh* algorithm) {
-            if (xercesc::XMLString::equals(algorithm,DSIGConstants::s_unicodeStrURI3DES_CBC))
-                return DSIGConstants::s_unicodeStrURIRSA_1_5;
-            else
-                return DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1;
-        }
+        static const XMLCh* getKeyTransportAlgorithm(const xmltooling::Credential& credential, const XMLCh* encryptionAlg);
         
     private:
         void checkParams(EncryptionParams& encParams, KeyEncryptionParams* kencParams);
