@@ -24,6 +24,9 @@
 #define __xmltooling_list_h__
 
 #include <xmltooling/exceptions.h>
+#include <xmltooling/XMLObject.h>
+
+#include <list>
 
 /**
  * Shorthand for an XMLObjectChildrenList wrapped around a vector

@@ -25,7 +25,6 @@
 
 #include <xmltooling/AttributeExtensibleXMLObject.h>
 #include <xmltooling/ElementExtensibleXMLObject.h>
-#include <xmltooling/util/XMLObjectChildrenList.h>
 
 namespace xmltooling {
 

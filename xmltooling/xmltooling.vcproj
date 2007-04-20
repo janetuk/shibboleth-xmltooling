@@ -486,6 +486,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ElementExtensibleXMLObject.h"
+				>
+			</File>
+			<File
 				RelativePath=".\ElementProxy.h"
 				>
 			</File>

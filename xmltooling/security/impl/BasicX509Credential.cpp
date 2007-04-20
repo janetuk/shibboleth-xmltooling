@@ -129,8 +129,7 @@ const char* BasicX509Credential::getAlgorithm() const
                 return "HMAC";
 
             case XSECCryptoKey::KEY_SYMMETRIC: {
-                XSECCryptoSymmetricKey* skey = static_cast<XSECCryptoSymmetricKey*>(m_key);
-                switch (skey->getSymmetricKeyType()) {
+                switch (static_cast<XSECCryptoSymmetricKey*>(m_key)->getSymmetricKeyType()) {
                     case XSECCryptoSymmetricKey::KEY_3DES_192:
                         return "DESede";
                     case XSECCryptoSymmetricKey::KEY_AES_128:
@@ -158,8 +157,7 @@ unsigned int BasicX509Credential::getKeySize() const
             }
 
             case XSECCryptoKey::KEY_SYMMETRIC: {
-                XSECCryptoSymmetricKey* skey = static_cast<XSECCryptoSymmetricKey*>(m_key);
-                switch (skey->getSymmetricKeyType()) {
+                switch (static_cast<XSECCryptoSymmetricKey*>(m_key)->getSymmetricKeyType()) {
                     case XSECCryptoSymmetricKey::KEY_3DES_192:
                         return 192;
                     case XSECCryptoSymmetricKey::KEY_AES_128:

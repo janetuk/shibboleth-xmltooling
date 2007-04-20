@@ -67,17 +67,29 @@ namespace xmltooling {
 
         KeyInfo* getKeyInfo(bool compact=false) const {
             KeyInfo* ret = m_credctx->getKeyInfo() ? m_credctx->getKeyInfo()->cloneKeyInfo() : NULL;
-            if (ret && compact) {
-                ret->getKeyValues().clear();
-                ret->getSPKIDatas().clear();
-                ret->getPGPDatas().clear();
-                ret->getUnknownXMLObjects().clear();
-                const vector<X509Data*> x509Datas=const_cast<const KeyInfo*>(ret)->getX509Datas();
-                for (vector<X509Data*>::const_iterator x=x509Datas.begin(); x!=x509Datas.end(); ++x) {
-                    (*x)->getX509Certificates().clear();
-                    (*x)->getX509CRLs().clear();
-                    (*x)->getUnknownXMLObjects().clear();
+            if (ret) {
+                ret->setId(NULL);
+                ret->getRetrievalMethods().clear();
+                if (compact) {
+                    ret->getKeyValues().clear();
+                    ret->getSPKIDatas().clear();
+                    ret->getPGPDatas().clear();
+                    ret->getUnknownXMLObjects().clear();
+                    VectorOf(X509Data) x509Datas=ret->getX509Datas();
+                    for (VectorOf(X509Data)::size_type pos = 0; pos < x509Datas.size();) {
+                        x509Datas[pos]->getX509Certificates().clear();
+                        x509Datas[pos]->getX509CRLs().clear();
+                        x509Datas[pos]->getUnknownXMLObjects().clear();
+                        if (x509Datas[pos]->hasChildren())
+                            ++pos;
+                        else
+                            x509Datas.erase(x509Datas.begin() + pos);
+                    }
                 }
+            }
+            if (!ret->hasChildren()) {
+                delete ret;
+                ret = NULL;
             }
             return ret;
         }
