@@ -49,7 +49,7 @@ void Encrypter::checkParams(EncryptionParams& encParams, KeyEncryptionParams* ke
             if (kencParams)
                 throw EncryptionException("Generating EncryptedKey inline requires the encryption key in raw form.");
         }
-        else if (!encParams.m_credential) {
+        else {
             if (!kencParams)
                 throw EncryptionException("Using a generated encryption key requires a KeyEncryptionParams object.");
 
@@ -79,6 +79,21 @@ void Encrypter::checkParams(EncryptionParams& encParams, KeyEncryptionParams* ke
 
         if (!key)
             throw EncryptionException("Unable to build wrapper for key, unknown algorithm?");
+        // Overwrite the length if known.
+        switch (static_cast<XSECCryptoSymmetricKey*>(key)->getSymmetricKeyType()) {
+            case XSECCryptoSymmetricKey::KEY_3DES_192:
+                encParams.m_keyBufferSize = 192/8;
+                break;
+            case XSECCryptoSymmetricKey::KEY_AES_128:
+                encParams.m_keyBufferSize = 128/8;
+                break;
+            case XSECCryptoSymmetricKey::KEY_AES_192:
+                encParams.m_keyBufferSize = 192/8;
+                break;
+            case XSECCryptoSymmetricKey::KEY_AES_256:
+                encParams.m_keyBufferSize = 256/8;
+                break;
+        }
         // Set the encryption key.
         m_cipher->setKey(key);
     }
@@ -230,7 +245,9 @@ EncryptedData* Encrypter::decorateAndUnmarshall(EncryptionParams& encParams, Key
     return xmlEncData;
 }
 
-EncryptedKey* Encrypter::encryptKey(const unsigned char* keyBuffer, unsigned int keyBufferSize, KeyEncryptionParams& kencParams, bool compact)
+EncryptedKey* Encrypter::encryptKey(
+    const unsigned char* keyBuffer, unsigned int keyBufferSize, KeyEncryptionParams& kencParams, bool compact
+    )
 {
     // Get a fresh cipher object and document.
 

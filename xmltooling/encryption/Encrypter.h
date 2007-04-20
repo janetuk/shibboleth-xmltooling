@@ -64,7 +64,6 @@ namespace xmlencryption {
          * Structure to collect encryption requirements.
          */
         struct XMLTOOL_API EncryptionParams {
-            
             /**
              * Constructor.
              *
@@ -88,21 +87,18 @@ namespace xmlencryption {
             }
 
             ~EncryptionParams() {}
-        private:
+
             const XMLCh* m_algorithm;
             const unsigned char* m_keyBuffer;
             unsigned int m_keyBufferSize;
             const xmltooling::Credential* m_credential;
             bool m_compact;
-            
-            friend class Encrypter;
         };
         
         /**
          * Structure to collect key wrapping/transport requirements.
          */
         struct XMLTOOL_API KeyEncryptionParams {
-            
             /**
              * Constructor.
              * 
@@ -118,12 +114,10 @@ namespace xmlencryption {
             }
         
             ~KeyEncryptionParams() {}
-        private:
+
             const xmltooling::Credential& m_credential;
             const XMLCh* m_algorithm;
             const XMLCh* m_recipient;
-            
-            friend class Encrypter;
         };
     
         Encrypter() : m_cipher(NULL) {}
