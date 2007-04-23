@@ -382,7 +382,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\security\impl\Credential.cpp"
+						RelativePath=".\security\impl\CredentialCriteria.cpp"
 						>
 					</File>
 					<File

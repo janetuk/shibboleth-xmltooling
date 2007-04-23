@@ -116,7 +116,7 @@ xmlsec_sources = \
 	security/impl/AbstractPKIXTrustEngine.cpp \
 	security/impl/BasicX509Credential.cpp \
 	security/impl/ChainingTrustEngine.cpp \
-	security/impl/Credential.cpp \
+	security/impl/CredentialCriteria.cpp \
 	security/impl/CredentialResolver.cpp \
 	security/impl/ExplicitKeyTrustEngine.cpp \
 	security/impl/FilesystemCredentialResolver.cpp \

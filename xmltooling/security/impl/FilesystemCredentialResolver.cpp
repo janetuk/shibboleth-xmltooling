@@ -100,13 +100,13 @@ namespace xmltooling {
         void unlock() {}
         
         const Credential* resolve(const CredentialCriteria* criteria=NULL) const {
-            return (criteria ? (m_credential->matches(*criteria) ? m_credential : NULL) : m_credential);
+            return (criteria ? (criteria->matches(*m_credential) ? m_credential : NULL) : m_credential);
         }
 
         virtual vector<const Credential*>::size_type resolve(
             vector<const Credential*>& results, const CredentialCriteria* criteria=NULL
             ) const {
-            if (!criteria || m_credential->matches(*criteria)) {
+            if (!criteria || criteria->matches(*m_credential)) {
                 results.push_back(m_credential);
                 return 1;
             }

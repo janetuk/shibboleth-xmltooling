@@ -15,9 +15,9 @@
  */
 
 /**
- * Credential.cpp
+ * CredentialCriteria.cpp
  * 
- * Wraps keys and related functionality. 
+ * Class for specifying criteria by which a CredentialResolver should resolve credentials.
  */
 
 #include "internal.h"
@@ -34,24 +34,24 @@
 using namespace xmltooling;
 using namespace std;
 
-bool Credential::matches(const CredentialCriteria& criteria) const
+bool CredentialCriteria::matches(const Credential& credential) const
 {
     // Algorithm check, if specified and we have one.
-    const char* alg = criteria.getKeyAlgorithm();
+    const char* alg = getKeyAlgorithm();
     if (alg && *alg) {
-        const char* alg2 = getAlgorithm();
+        const char* alg2 = credential.getAlgorithm();
         if (alg2 && *alg2)
             if (strcmp(alg,alg2))
                 return false;
     }
 
     // KeySize check, if specified and we have one.
-    if (criteria.getKeySize()>0 && getKeySize()>0 && criteria.getKeySize() != getKeySize())
+    if (credential.getKeySize()>0 && getKeySize()>0 && credential.getKeySize() != getKeySize())
         return false;
 
     // See if we can test key names.
-    const set<string>& critnames = criteria.getKeyNames();
-    const set<string>& crednames = getKeyNames();
+    const set<string>& critnames = getKeyNames();
+    const set<string>& crednames = credential.getKeyNames();
     if (!critnames.empty() && !crednames.empty()) {
         bool found = false;
         for (set<string>::const_iterator n = critnames.begin(); n!=critnames.end(); ++n) {
@@ -65,11 +65,11 @@ bool Credential::matches(const CredentialCriteria& criteria) const
     }
 
     // See if we have to match a specific key.
-    XSECCryptoKey* key1 = criteria.getPublicKey();
+    XSECCryptoKey* key1 = getPublicKey();
     if (!key1)
         return true;    // no key to compare against, so we're done
 
-    XSECCryptoKey* key2 = getPublicKey();
+    XSECCryptoKey* key2 = credential.getPublicKey();
     if (!key2)
         return true;   // no key here, so we can't test it
 
@@ -95,6 +95,6 @@ bool Credential::matches(const CredentialCriteria& criteria) const
         return (BN_cmp(dsa1->pub_key,dsa2->pub_key) == 0);
     }
     
-    log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".Credential").warn("unsupported key type for comparison");
+    log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".CredentialCriteria").warn("unsupported key type for comparison");
     return false;
 }

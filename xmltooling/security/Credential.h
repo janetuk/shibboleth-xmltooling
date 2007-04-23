@@ -114,14 +114,6 @@ namespace xmltooling {
         virtual const CredentialContext* getCredentalContext() const {
             return NULL;
         }
-
-        /**
-         * Determines whether the supplied CredentialCriteria matches this Credential.
-         *
-         * @param criteria  the CredentialCriteria to evaluate
-         * @return true iff this Credential is consistent with the criteria
-         */
-        virtual bool matches(const CredentialCriteria& criteria) const;
     };
 };
 

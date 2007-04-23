@@ -17,7 +17,7 @@
 /**
  * @file xmltooling/security/CredentialCriteria.h
  * 
- * Class for specifying criteria by which a CredentialResolver should resolve credentials. 
+ * Class for specifying criteria by which a CredentialResolver should resolve credentials.
  */
 
 #if !defined(__xmltooling_credcrit_h__) && !defined(XMLTOOLING_NO_XMLSEC)
@@ -48,6 +48,14 @@ namespace xmltooling {
         virtual ~CredentialCriteria() {
             delete m_credential;
         }
+
+        /**
+         * Determines whether the supplied Credential matches this CredentialCriteria.
+         *
+         * @param credential    the Credential to evaluate
+         * @return true iff the Credential is consistent with this criteria
+         */
+        virtual bool matches(const Credential& credential) const;
 
         enum UsageType {
             UNSPECIFIED_CREDENTIAL,
