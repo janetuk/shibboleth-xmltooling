@@ -15,7 +15,7 @@
  */
 
 /**
- * @file EncryptedKeyResolver.h
+ * @file xmltooling/encryption/EncryptedKeyResolver.h
  * 
  * Resolves encrypted keys based on EncryptedData information or other external factors.
  */

@@ -15,12 +15,12 @@
  */
 
 /**
- * @file NDC.h
+ * @file xmltooling/util/NDC.h
  * 
  * Diagnostic context for logging 
  */
 
-#if !defined(__xmltooling_ndc_h__)
+#ifndef __xmltooling_ndc_h__
 #define __xmltooling_ndc_h__
 
 #include <string>

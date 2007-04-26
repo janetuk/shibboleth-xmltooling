@@ -15,7 +15,7 @@
  */
 
 /**
- * version.h
+ * xmltooling/version.h
  * 
  * Library version macros and constants 
  */

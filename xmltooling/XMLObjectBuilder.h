@@ -15,12 +15,12 @@
  */
 
 /**
- * @file XMLObjectBuilder.h
+ * @file xmltooling/XMLObjectBuilder.h
  * 
  * Factory interface for XMLObjects 
  */
 
-#if !defined(__xmltooling_xmlobjbuilder_h__)
+#ifndef __xmltooling_xmlobjbuilder_h__
 #define __xmltooling_xmlobjbuilder_h__
 
 #include <map>

@@ -15,7 +15,7 @@
  */
 
 /**
- * @file Threads.h
+ * @file xmltooling/util/Threads.h
  * 
  * Thread and locking wrappers 
  */

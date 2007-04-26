@@ -15,7 +15,7 @@
  */
 
 /**
- * @file Namespace.h
+ * @file xmltooling/Namespace.h
  * 
  * Representing XML namespace attributes 
  */

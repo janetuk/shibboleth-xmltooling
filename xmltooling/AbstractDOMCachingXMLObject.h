@@ -15,12 +15,12 @@
  */
 
 /**
- * @file AbstractDOMCachingXMLObject.h
+ * @file xmltooling/AbstractDOMCachingXMLObject.h
  * 
  * AbstractXMLObject mixin that implements DOM caching
  */
 
-#if !defined(__xmltooling_abstractdomxmlobj_h__)
+#ifndef __xmltooling_abstractdomxmlobj_h__
 #define __xmltooling_abstractdomxmlobj_h__
 
 #include <xmltooling/AbstractXMLObject.h>

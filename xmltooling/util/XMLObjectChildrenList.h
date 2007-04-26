@@ -15,7 +15,7 @@
  */
 
 /**
- * @file XMLObjectChildrenList.h
+ * @file xmltooling/util/XMLObjectChildrenList.h
  * 
  * STL-compatible container wrapper
  */

@@ -15,7 +15,7 @@
  */
 
 /**
- * @file AbstractXMLObject.h
+ * @file xmltooling/AbstractXMLObject.h
  * 
  * An abstract implementation of XMLObject.
  */

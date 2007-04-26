@@ -15,7 +15,7 @@
  */
 
 /**
- * @file SignatureValidator.h
+ * @file xmltooling/signature/SignatureValidator.h
  * 
  * Validator for signatures based on an externally-supplied key 
  */

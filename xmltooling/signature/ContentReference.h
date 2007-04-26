@@ -15,7 +15,7 @@
  */
 
 /**
- * @file ContentReference.h
+ * @file xmltooling/signature/ContentReference.h
  * 
  * Interface for creating signature references 
  */

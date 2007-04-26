@@ -15,7 +15,7 @@
  */
 
 /**
- * @file AbstractXMLObjectUnmarshaller.h
+ * @file xmltooling/io/AbstractXMLObjectUnmarshaller.h
  * 
  * A mix-in to implement object unmarshalling.
  */

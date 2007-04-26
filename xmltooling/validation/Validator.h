@@ -15,7 +15,7 @@
  */
 
 /**
- * @file Validator.h
+ * @file xmltooling/validation/Validator.h
  * 
  * Rules checking of XMLObjects 
  */

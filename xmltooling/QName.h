@@ -15,7 +15,7 @@
  */
 
 /**
- * @file QName.h
+ * @file xmltooling/QName.h
  * 
  * Representing XML QNames 
  */

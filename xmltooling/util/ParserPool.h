@@ -15,12 +15,12 @@
  */
 
 /**
- * @file ParserPool.h
+ * @file xmltooling/util/ParserPool.h
  * 
- * XML parsing
+ * A thread-safe pool of DOMBuilders that share characteristics.
  */
 
-#if !defined(__xmltooling_pool_h__)
+#ifndef __xmltooling_pool_h__
 #define __xmltooling_pool_h__
 
 #include <xmltooling/unicode.h>
@@ -41,7 +41,7 @@
 namespace xmltooling {
 
     /**
-     * A thread-safe pool of DOMBuilders that share characteristics
+     * A thread-safe pool of DOMBuilders that share characteristics.
      */
     class XMLTOOL_API ParserPool : public xercesc::DOMEntityResolver, xercesc::DOMErrorHandler
     {

@@ -15,12 +15,12 @@
  */
 
 /**
- * @file XMLConstants.h
+ * @file xmltooling/util/XMLConstants.h
  * 
  * Fundamental XML namespace constants 
  */
 
-#if !defined(__xmltooling_xmlconstants_h__)
+#ifndef __xmltooling_xmlconstants_h__
 #define __xmltooling_xmlconstants_h__
 
 #include <xmltooling/unicode.h>

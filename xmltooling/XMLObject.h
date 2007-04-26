@@ -15,7 +15,7 @@
  */
 
 /**
- * @file XMLObject.h
+ * @file xmltooling/XMLObject.h
  * 
  * Abstract interface to objects that can be manipulated in and out of XML form. 
  */

@@ -15,7 +15,7 @@
  */
 
 /**
- * OpenSSLCryptoX509CRL.h
+ * @file xmltooling/security/OpenSSLCryptoX509CRL.h
  * 
  * OpenSSL-based class for handling X.509 CRLs
  */
@@ -42,7 +42,6 @@ namespace xmltooling {
             return DSIGConstants::s_unicodeStrPROVOpenSSL;
         }
     	virtual void loadX509CRLBase64Bin(const char* buf, unsigned int len);
-    
     	virtual safeBuffer& getDEREncodingSB(void) {
             return m_DERX509CRL;
         }

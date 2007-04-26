@@ -15,7 +15,7 @@
  */
 
 /**
- * @file unicode.h
+ * @file xmltooling/unicode.h
  * 
  * Helper classes and types for manipulating Unicode
  */

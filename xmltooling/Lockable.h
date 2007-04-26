@@ -15,7 +15,7 @@
  */
 
 /**
- * @file Lockable.h
+ * @file xmltooling/Lockable.h
  * 
  * Locking abstraction 
  */

@@ -15,7 +15,7 @@
  */
 
 /**
- * @file exceptions.h
+ * @file xmltooling/exceptions.h
  * 
  * Exception classes
  */

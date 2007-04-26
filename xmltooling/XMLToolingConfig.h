@@ -15,7 +15,7 @@
  */
 
 /**
- * @file XMLToolingConfig.h
+ * @file xmltooling/XMLToolingConfig.h
  * 
  * Library configuration 
  */

@@ -15,12 +15,12 @@
  */
 
 /**
- * @file AbstractXMLObjectMarshaller.h
+ * @file xmltooling/io/AbstractXMLObjectMarshaller.h
  * 
  * A mix-in to implement object marshalling with DOM reuse.
  */
 
-#if !defined(__xmltooling_xmlmarshaller_h__)
+#ifndef __xmltooling_xmlmarshaller_h__
 #define __xmltooling_xmlmarshaller_h__
 
 #include <xmltooling/AbstractDOMCachingXMLObject.h>

@@ -15,7 +15,7 @@
  */
 
 /**
- * @file ValidatorSuite.h
+ * @file xmltooling/validation/ValidatorSuite.h
  * 
  * Groups of rule checkers of XMLObjects based on type or element name. 
  */

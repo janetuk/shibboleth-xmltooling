@@ -15,7 +15,7 @@
  */
 
 /**
- * @file base.h
+ * @file xmltooling/base.h
  * 
  * Base header file definitions
  * Must be included prior to including any other header

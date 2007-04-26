@@ -15,7 +15,7 @@
  */
 
 /**
- * @file XMLHelper.h
+ * @file xmltooling/util/XMLHelper.h
  * 
  * A helper class for working with W3C DOM objects. 
  */

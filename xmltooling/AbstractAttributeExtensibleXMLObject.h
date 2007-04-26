@@ -15,7 +15,7 @@
  */
 
 /**
- * @file AbstractAttributeExtensibleXMLObject.h
+ * @file xmltooling/AbstractAttributeExtensibleXMLObject.h
  * 
  * AbstractXMLObject mixin that implements AttributeExtensibleXMLObject
  */
