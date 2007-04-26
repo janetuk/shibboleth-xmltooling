@@ -57,6 +57,9 @@ namespace xmltooling {
          */
         virtual bool matches(const Credential& credential) const;
 
+        /**
+         * Enumeration of use cases for credentials. 
+         */
         enum UsageType {
             UNSPECIFIED_CREDENTIAL,
             SIGNING_CREDENTIAL,
@@ -197,6 +200,10 @@ namespace xmltooling {
             m_key = key;
         }
 
+        /**
+         * Bitmask constants controlling the kinds of criteria set automatically
+         * based on a KeyInfo object.
+         */
         enum keyinfo_extraction_t {
             KEYINFO_EXTRACTION_KEY = 1,
             KEYINFO_EXTRACTION_KEYNAMES = 2,

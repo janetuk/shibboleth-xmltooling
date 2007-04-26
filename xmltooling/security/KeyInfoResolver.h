@@ -23,18 +23,13 @@
 #if !defined(__xmltooling_keyres_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_keyres_h__
 
+#include <xmltooling/security/Credential.h>
+#include <xmltooling/security/CredentialCriteria.h>
+#include <xmltooling/security/KeyInfoCredentialContext.h>
+
 #include <xsec/dsig/DSIGKeyInfoList.hpp>
 
-namespace xmlsignature {
-    class XMLTOOL_API KeyInfo;
-    class XMLTOOL_API Signature;
-};
-
 namespace xmltooling {
-
-    class XMLTOOL_API Credential;
-    class XMLTOOL_API CredentialCriteria;
-    class XMLTOOL_API KeyInfoCredentialContext;
 
     /**
      * Resolves credentials from KeyInfo information.
