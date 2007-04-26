@@ -24,12 +24,13 @@
 #define __xmltooling_keyres_h__
 
 #include <xmltooling/security/Credential.h>
-#include <xmltooling/security/CredentialCriteria.h>
 #include <xmltooling/security/KeyInfoCredentialContext.h>
 
 #include <xsec/dsig/DSIGKeyInfoList.hpp>
 
 namespace xmltooling {
+
+    class XMLTOOL_API CredentialCriteria;
 
     /**
      * Resolves credentials from KeyInfo information.

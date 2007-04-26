@@ -200,7 +200,7 @@ void AbstractXMLObjectMarshaller::marshallInto(
 #ifndef XMLTOOLING_NO_XMLSEC
     marshallContent(targetElement,credential);
     if (sigs) {
-        for_each(sigs->begin(),sigs->end(),bind2nd(mem_fun1<void,Signature,const Credential*>(&Signature::sign),credential));
+        for_each(sigs->begin(),sigs->end(),bind2nd(mem_fun1_t<void,Signature,const Credential*>(&Signature::sign),credential));
     }
 #else
     marshallContent(targetElement);
