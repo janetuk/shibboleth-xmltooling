@@ -88,10 +88,19 @@ namespace xmlencryption {
 
             ~EncryptionParams() {}
 
+            /** Data encryption algorithm. */
             const XMLCh* m_algorithm;
+            
+            /** Buffer containing encryption key. */
             const unsigned char* m_keyBuffer;
+
+            /** Size of buffer. */
             unsigned int m_keyBufferSize;
+
+            /** Credential containing the encryption key. */
             const xmltooling::Credential* m_credential;
+
+            /** Flag limiting the size of the encrypted XML representation. */
             bool m_compact;
         };
         
@@ -115,8 +124,13 @@ namespace xmlencryption {
         
             ~KeyEncryptionParams() {}
 
+            /** Credential containing key encryption key. */
             const xmltooling::Credential& m_credential;
+
+            /** Key transport or wrapping algorithm. */
             const XMLCh* m_algorithm;
+
+            /** Name of recipient that owns the key encryption key. */
             const XMLCh* m_recipient;
         };
     

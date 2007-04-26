@@ -47,7 +47,7 @@ namespace xmlencryption {
          * 
          * @param credResolver  locked credential resolver to supply decryption keys
          * @param criteria      optional external criteria to use with resolver
-         * @param EKresolver    locates an EncryptedKey pertaining to the EncryptedData
+         * @param EKResolver    locates an EncryptedKey pertaining to the EncryptedData
          */
         Decrypter(
             const xmltooling::CredentialResolver* credResolver=NULL,
@@ -61,7 +61,7 @@ namespace xmlencryption {
         /**
          * Replace the current EncryptedKeyResolver interface, if any, with a new one.
          * 
-         * @param EKresolver  the EncryptedKeyResolver to attach 
+         * @param EKResolver  the EncryptedKeyResolver to attach 
          */
         void setEncryptedKeyResolver(const EncryptedKeyResolver* EKResolver) {
             m_EKResolver=EKResolver;
