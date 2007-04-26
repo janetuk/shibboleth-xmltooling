@@ -41,6 +41,9 @@ namespace xmltooling {
     public:
         virtual ~X509Credential() {}
 
+        /**
+         * Bitmask constants for limiting resolution process inside a CredentialResolver. 
+         */
         enum ResolveTypes {
             RESOLVE_CERTS = 4,
             RESOLVE_CRLS = 8

@@ -36,6 +36,11 @@ namespace xmltooling {
     class XMLTOOL_API BasicX509Credential : public virtual X509Credential
     {
     protected:
+        /**
+         * Constructor.
+         * 
+         * @param ownCerts  true iff any certificates subsequently stored should be freed by destructor
+         */
         BasicX509Credential(bool ownCerts) : m_key(NULL), m_ownCerts(ownCerts), m_crl(NULL), m_keyInfo(NULL), m_compactKeyInfo(NULL) {
         }
 
