@@ -60,7 +60,7 @@ namespace xmltooling {
          * @param factory   the factory function for the plugin type
          */
         void registerFactory(const Key& type, typename PluginManager::Factory* factory) {
-            if (!type.empty() && factory)
+            if (factory)
                 m_map[type]=factory;
         }
 
@@ -70,8 +70,7 @@ namespace xmltooling {
          * @param type  the key to the plugin type
          */
         void deregisterFactory(const Key& type) {
-            if (!type.empty())
-                m_map.erase(type);
+            m_map.erase(type);
         }
 
         /**
