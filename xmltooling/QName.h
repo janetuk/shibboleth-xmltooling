@@ -42,11 +42,21 @@ namespace xmltooling {
     public:
         /**
          * Constructor
+         * 
          * @param uri       namespace URI
          * @param localPart local name
          * @param prefix    namespace prefix (without the colon)
          */
         QName(const XMLCh* uri=NULL, const XMLCh* localPart=NULL, const XMLCh* prefix=NULL);
+
+        /**
+         * Constructor
+         * 
+         * @param uri       namespace URI
+         * @param localPart local name
+         * @param prefix    namespace prefix (without the colon)
+         */
+        QName(const char* uri, const char* localPart, const char* prefix=NULL);
         
         ~QName();
 #ifndef HAVE_GOOD_STL
@@ -152,6 +162,24 @@ namespace xmltooling {
          * @param localPart  Null-terminated Unicode string containing the local name
          */
         void setLocalPart(const XMLCh* localPart);
+        
+        /**
+         * Sets the namespace prefix
+         * @param prefix    Null-terminated ASCII string containing the prefix, without the colon
+         */
+        void setPrefix(const char* prefix);
+
+        /**
+         * Sets the namespace URI
+         * @param uri  Null-terminated ASCII string containing the URI
+         */
+        void setNamespaceURI(const char* uri);
+        
+        /**
+         * Sets the local part of the name
+         * @param localPart  Null-terminated ASCII string containing the local name
+         */
+        void setLocalPart(const char* localPart);
         
         /**
          * Gets a string representation of the QName for logging, etc.

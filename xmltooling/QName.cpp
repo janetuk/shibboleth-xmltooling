@@ -36,6 +36,16 @@ QName::QName(const XMLCh* uri, const XMLCh* localPart, const XMLCh* prefix)
     setPrefix(prefix);
 }
 
+QName::QName(const char* uri, const char* localPart, const char* prefix)
+{
+#ifndef HAVE_GOOD_STL
+    m_uri=m_prefix=m_local=NULL;
+#endif
+    setNamespaceURI(uri);
+    setLocalPart(localPart);
+    setPrefix(prefix);
+}
+
 QName::~QName()
 {
 #ifndef HAVE_GOOD_STL
@@ -84,6 +94,54 @@ void QName::setLocalPart(const XMLCh* localPart)
     if (m_local)
         XMLString::release(&m_local);
     m_local=XMLString::replicate(localPart);
+#endif
+}
+
+void QName::setPrefix(const char* prefix)
+{
+#ifdef HAVE_GOOD_STL
+    if (prefix) {
+        auto_ptr_XMLCh temp(prefix);
+        m_prefix=temp.get();
+    }
+    else
+        m_prefix.erase();
+#else
+    if (m_prefix)
+        XMLString::release(&m_prefix);
+    m_prefix=XMLString::transcode(prefix);
+#endif
+}
+
+void QName::setNamespaceURI(const char* uri)
+{
+#ifdef HAVE_GOOD_STL
+    if (uri) {
+        auto_ptr_XMLCh temp(uri);
+        m_uri=temp.get();
+    }
+    else
+        m_uri.erase();
+#else
+    if (m_uri)
+        XMLString::release(&m_uri);
+    m_uri=XMLString::transcode(uri);
+#endif
+}
+
+void QName::setLocalPart(const char* localPart)
+{
+#ifdef HAVE_GOOD_STL
+    if (localPart) {
+        auto_ptr_XMLCh temp(localPart);
+        m_local=temp.get();
+    }
+    else
+        m_local.erase();
+#else
+    if (m_local)
+        XMLString::release(&m_local);
+    m_local=XMLString::transcode(localPart);
 #endif
 }
 
