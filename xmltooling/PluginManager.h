@@ -59,7 +59,7 @@ namespace xmltooling {
          * @param type      the key to the plugin type
          * @param factory   the factory function for the plugin type
          */
-        void registerFactory(const typename Key& type, typename PluginManager::Factory* factory) {
+        void registerFactory(const Key& type, typename PluginManager::Factory* factory) {
             if (!type.empty() && factory)
                 m_map[type]=factory;
         }
@@ -69,7 +69,7 @@ namespace xmltooling {
          * 
          * @param type  the key to the plugin type
          */
-        void deregisterFactory(const typename Key& type) {
+        void deregisterFactory(const Key& type) {
             if (!type.empty())
                 m_map.erase(type);
         }
@@ -89,15 +89,15 @@ namespace xmltooling {
          * @param p     parameters to configure plugin
          * @return      the constructed plugin  
          */
-        T* newPlugin(const typename Key& type, const Params& p) {
-            typename std::map<typename Key, typename PluginManager::Factory*>::const_iterator i=m_map.find(type);
+        T* newPlugin(const Key& type, const Params& p) {
+            typename std::map<Key, typename PluginManager::Factory*>::const_iterator i=m_map.find(type);
             if (i==m_map.end())
                 throw UnknownExtensionException("Unknown plugin type.");
             return i->second(p);
         }
         
     private:
-        std::map<typename Key, typename PluginManager::Factory*> m_map;
+        std::map<Key, typename PluginManager::Factory*> m_map;
     };
 
 };
