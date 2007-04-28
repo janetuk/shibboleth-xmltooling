@@ -240,17 +240,17 @@ namespace xmltooling {
         /**
          * Manages factories for KeyInfoResolver plugins.
          */
-        PluginManager<KeyInfoResolver,const xercesc::DOMElement*> KeyInfoResolverManager;
+        PluginManager<KeyInfoResolver,std::string,const xercesc::DOMElement*> KeyInfoResolverManager;
 
         /**
          * Manages factories for CredentialResolver plugins.
          */
-        PluginManager<CredentialResolver,const xercesc::DOMElement*> CredentialResolverManager;
+        PluginManager<CredentialResolver,std::string,const xercesc::DOMElement*> CredentialResolverManager;
 
         /**
          * Manages factories for TrustEngine plugins.
          */
-        PluginManager<TrustEngine,const xercesc::DOMElement*> TrustEngineManager;
+        PluginManager<TrustEngine,std::string,const xercesc::DOMElement*> TrustEngineManager;
 
         /**
          * Maps an XML Signature/Encryption algorithm identifier to a library-specific
@@ -277,12 +277,12 @@ namespace xmltooling {
          * 
          * <p>The factory interface takes a peer name/endpoint pair.
          */
-        PluginManager<SOAPTransport,std::pair<const char*,const char*> > SOAPTransportManager;
+        PluginManager<SOAPTransport,std::string,std::pair<const char*,const char*> > SOAPTransportManager;
 
         /**
          * Manages factories for StorageService plugins.
          */
-        PluginManager<StorageService,const xercesc::DOMElement*> StorageServiceManager;
+        PluginManager<StorageService,std::string,const xercesc::DOMElement*> StorageServiceManager;
     };
 
 };

@@ -31,8 +31,8 @@ using namespace xmltooling;
 using namespace std;
 
 namespace xmltooling {
-    XMLTOOL_DLLLOCAL PluginManager<TrustEngine,const DOMElement*>::Factory ExplicitKeyTrustEngineFactory;
-    XMLTOOL_DLLLOCAL PluginManager<TrustEngine,const DOMElement*>::Factory ChainingTrustEngineFactory;
+    XMLTOOL_DLLLOCAL PluginManager<TrustEngine,string,const DOMElement*>::Factory ExplicitKeyTrustEngineFactory;
+    XMLTOOL_DLLLOCAL PluginManager<TrustEngine,string,const DOMElement*>::Factory ChainingTrustEngineFactory;
 };
 
 void XMLTOOL_API xmltooling::registerTrustEngines()

@@ -26,7 +26,7 @@
 using namespace xmltooling;
 
 namespace xmltooling {
-    XMLTOOL_DLLLOCAL PluginManager<CredentialResolver,const DOMElement*>::Factory FilesystemCredentialResolverFactory; 
+    XMLTOOL_DLLLOCAL PluginManager<CredentialResolver,std::string,const DOMElement*>::Factory FilesystemCredentialResolverFactory; 
 };
 
 void XMLTOOL_API xmltooling::registerCredentialResolvers()

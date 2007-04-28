@@ -37,13 +37,14 @@
 namespace xmltooling {
 
     /**
-     * Template for management/access to plugins constructed based on a string type
+     * Template for management/access to plugins constructed based on a Key type
      * and arbitrary parameters.
      * 
      * @param T         class of plugin to manage
+     * @param Key       the key for type lookup
      * @param Params    parameters for plugin construction
      */
-    template <class T, typename Params> class PluginManager
+    template <class T, class Key, typename Params> class PluginManager
     {
     public:
         PluginManager() {}
@@ -55,10 +56,10 @@ namespace xmltooling {
         /**
          * Registers the factory for a given type.
          * 
-         * @param type      the name of the plugin type
+         * @param type      the key to the plugin type
          * @param factory   the factory function for the plugin type
          */
-        void registerFactory(const std::string& type, typename PluginManager::Factory* factory) {
+        void registerFactory(const typename Key& type, typename PluginManager::Factory* factory) {
             if (!type.empty() && factory)
                 m_map[type]=factory;
         }
@@ -66,9 +67,9 @@ namespace xmltooling {
         /**
          * Unregisters the factory for a given type.
          * 
-         * @param type  the name of the plugin type
+         * @param type  the key to the plugin type
          */
-        void deregisterFactory(const std::string& type) {
+        void deregisterFactory(const typename Key& type) {
             if (!type.empty())
                 m_map.erase(type);
         }
@@ -84,19 +85,19 @@ namespace xmltooling {
          * Builds a new instance of a plugin of a given type, configuring it
          * with the supplied parameters.
          * 
-         * @param type  the name of the plugin type
+         * @param type  the key to the plugin type
          * @param p     parameters to configure plugin
          * @return      the constructed plugin  
          */
-        T* newPlugin(const std::string& type, const Params& p) {
-            typename std::map<std::string, typename PluginManager::Factory*>::const_iterator i=m_map.find(type);
+        T* newPlugin(const typename Key& type, const Params& p) {
+            typename std::map<typename Key, typename PluginManager::Factory*>::const_iterator i=m_map.find(type);
             if (i==m_map.end())
-                throw UnknownExtensionException("Unknown plugin type ('$1')",params(1,type.c_str()));
+                throw UnknownExtensionException("Unknown plugin type.");
             return i->second(p);
         }
         
     private:
-        std::map<std::string, typename PluginManager::Factory*> m_map;
+        std::map<typename Key, typename PluginManager::Factory*> m_map;
     };
 
 };
