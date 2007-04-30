@@ -60,7 +60,7 @@ QName* XMLHelper::getXSIType(const DOMElement* e)
                 return ret;
             }
             else {
-                return new QName(e->lookupNamespaceURI(&chNull), attributeValue);
+                return new QName(e->lookupNamespaceURI(NULL), attributeValue);
             }
         }
     }
