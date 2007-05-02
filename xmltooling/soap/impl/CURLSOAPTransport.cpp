@@ -174,7 +174,7 @@ namespace xmltooling {
 
     private:        
         // per-call state
-        string m_peerName,m_endpoint;
+        string m_peerName,m_endpoint,m_simplecreds;
         CURL* m_handle;
         stringstream m_stream;
         struct curl_slist* m_headers;
@@ -339,8 +339,8 @@ bool CURLSOAPTransport::setAuth(transport_auth_t authType, const char* username,
     }
     if (curl_easy_setopt(m_handle,CURLOPT_HTTPAUTH,flag)!=CURLE_OK)
         return false;
-    string creds = string(username ? username : "") + ':' + (password ? password : "");
-    return (curl_easy_setopt(m_handle,CURLOPT_USERPWD,creds.c_str())==CURLE_OK);
+    m_simplecreds = string(username ? username : "") + ':' + (password ? password : "");
+    return (curl_easy_setopt(m_handle,CURLOPT_USERPWD,m_simplecreds.c_str())==CURLE_OK);
 }
 
 const vector<string>& CURLSOAPTransport::getResponseHeader(const char* name) const
