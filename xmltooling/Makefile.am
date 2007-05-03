@@ -88,6 +88,8 @@ soapinclude_HEADERS = \
 	soap/OpenSSLSOAPTransport.h
 
 utilinclude_HEADERS = \
+	util/CurlNetAccessor.h \
+	util/CurlURLInputStream.h \
 	util/DateTime.h \
 	util/NDC.h \
 	util/ParserPool.h \
@@ -162,6 +164,8 @@ libxmltooling_la_SOURCES = \
 	soap/impl/SOAPImpl.cpp \
 	soap/impl/SOAPSchemaValidators.cpp \
 	soap/impl/CURLSOAPTransport.cpp \
+	util/CurlNetAccessor.cpp \
+	util/CurlURLInputStream.cpp \
 	util/DateTime.cpp \
 	util/NDC.cpp \
 	util/ParserPool.cpp \

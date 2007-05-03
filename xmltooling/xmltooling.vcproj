@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="log4cppD.lib xerces-c_2D.lib xsec_1D.lib libeay32_0_9_8D.lib ssleay32_0_9_8D.lib libcurld_imp.lib"
+				AdditionalDependencies="wsock32.lib log4cppD.lib xerces-c_2D.lib xsec_1D.lib libeay32_0_9_8D.lib ssleay32_0_9_8D.lib libcurld_imp.lib"
 				OutputFile="$(OutDir)\$(ProjectName)1_0D.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -139,7 +139,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="log4cpp.lib xerces-c_2.lib xsec_1.lib libeay32_0_9_8.lib ssleay32_0_9_8.lib libcurl_imp.lib"
+				AdditionalDependencies="wsock32.lib log4cpp.lib xerces-c_2.lib xsec_1.lib libeay32_0_9_8.lib ssleay32_0_9_8.lib libcurl_imp.lib"
 				OutputFile="$(OutDir)\$(ProjectName)1_0.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -230,6 +230,14 @@
 			<Filter
 				Name="util"
 				>
+				<File
+					RelativePath=".\util\CurlNetAccessor.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\util\CurlURLInputStream.cpp"
+					>
+				</File>
 				<File
 					RelativePath=".\util\DateTime.cpp"
 					>
@@ -544,6 +552,14 @@
 			<Filter
 				Name="util"
 				>
+				<File
+					RelativePath=".\util\CurlNetAccessor.h"
+					>
+				</File>
+				<File
+					RelativePath=".\util\CurlURLInputStream.h"
+					>
+				</File>
 				<File
 					RelativePath=".\util\DateTime.h"
 					>
