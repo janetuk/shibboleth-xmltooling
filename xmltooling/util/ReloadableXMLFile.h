@@ -52,7 +52,7 @@ namespace xmltooling {
          *  <dt>validate</dt>
          *  <dd>use a validating parser</dd>
          *  <dt>reloadChanges</dt>
-         *  <dd>enables monitoring of resources for changes</dd>
+         *  <dd>enables monitoring of local file for changes</dd>
          * </dl>
          * 
          * @param e     DOM to supply configuration
@@ -74,17 +74,10 @@ namespace xmltooling {
          * @return a pair consisting of a flag indicating whether to take ownership of
          *      the document, and the root element of the tree to load
          */
-        virtual std::pair<bool,xercesc::DOMElement*> load();
-        
-        /**
-         * Overrideable method to determine whether a remote resource remains valid.
-         * 
-         * @return  true iff the resource remains valid and should not be reloaded
-         */
-        virtual bool isValid() const {
-            return true;
+        virtual std::pair<bool,xercesc::DOMElement*> load() {
+            return load(false);
         }
-
+        
         /** Root of the original DOM element passed into constructor. */
         const xercesc::DOMElement* m_root;
         
@@ -96,10 +89,16 @@ namespace xmltooling {
         
         /** Resource location, may be a local path or a URI. */
         std::string m_source;
+
+        /** Path to backup copy for remote resources. */
+        std::string m_backing;
         
-        /** Last modification of local resource. */
+        /** Last modification of local resource or reload of remote resource. */
         time_t m_filestamp;
-        
+
+        /** Time in seconds to wait before trying for new copy of remote resource. */
+        time_t m_reloadInterval;
+
         /** Shared lock for guarding reloads. */
         RWLock* m_lock;
         
@@ -113,6 +112,9 @@ namespace xmltooling {
             if (m_lock)
                 m_lock->unlock();
         }
+
+    private:
+        std::pair<bool,xercesc::DOMElement*> load(bool backup);
     };
 
 };

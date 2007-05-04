@@ -26,6 +26,7 @@
 #include "util/XMLConstants.h"
 #include "util/XMLHelper.h"
 
+#include <fstream>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -38,17 +39,19 @@ using namespace xmltooling;
 using namespace log4cpp;
 using namespace std;
 
-static const XMLCh uri[] =          UNICODE_LITERAL_3(u,r,i);
-static const XMLCh url[] =          UNICODE_LITERAL_3(u,r,l);
-static const XMLCh path[] =         UNICODE_LITERAL_4(p,a,t,h);
-static const XMLCh pathname[] =     UNICODE_LITERAL_8(p,a,t,h,n,a,m,e);
-static const XMLCh file[] =         UNICODE_LITERAL_4(f,i,l,e);
-static const XMLCh filename[] =     UNICODE_LITERAL_8(f,i,l,e,n,a,m,e);
-static const XMLCh validate[] =     UNICODE_LITERAL_8(v,a,l,i,d,a,t,e);
-static const XMLCh reloadChanges[] =UNICODE_LITERAL_13(r,e,l,o,a,d,C,h,a,n,g,e,s);
+static const XMLCh uri[] =              UNICODE_LITERAL_3(u,r,i);
+static const XMLCh url[] =              UNICODE_LITERAL_3(u,r,l);
+static const XMLCh path[] =             UNICODE_LITERAL_4(p,a,t,h);
+static const XMLCh pathname[] =         UNICODE_LITERAL_8(p,a,t,h,n,a,m,e);
+static const XMLCh file[] =             UNICODE_LITERAL_4(f,i,l,e);
+static const XMLCh filename[] =         UNICODE_LITERAL_8(f,i,l,e,n,a,m,e);
+static const XMLCh validate[] =         UNICODE_LITERAL_8(v,a,l,i,d,a,t,e);
+static const XMLCh reloadChanges[] =    UNICODE_LITERAL_13(r,e,l,o,a,d,C,h,a,n,g,e,s);
+static const XMLCh reloadInterval[] =   UNICODE_LITERAL_14(r,e,l,o,a,d,I,n,t,e,r,v,a,l);
+static const XMLCh backingFilePath[] =  UNICODE_LITERAL_15(b,a,c,k,i,n,g,F,i,l,e,P,a,t,h);
 
 ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
-    : m_root(e), m_local(true), m_validate(false), m_filestamp(0), m_lock(NULL), m_log(log)
+    : m_root(e), m_local(true), m_validate(false), m_filestamp(0), m_reloadInterval(0), m_lock(NULL), m_log(log)
 {
 #ifdef _DEBUG
     NDC ndc("ReloadableXMLFile");
@@ -88,33 +91,47 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
             m_local=true;
         }
 
-        flag=e->getAttributeNS(NULL,reloadChanges);
-        if (!XMLString::equals(flag,xmlconstants::XML_FALSE) && !XMLString::equals(flag,xmlconstants::XML_ZERO)) {
-            if (m_local) {
+        if (m_local) {
+            flag=e->getAttributeNS(NULL,reloadChanges);
+            if (!XMLString::equals(flag,xmlconstants::XML_FALSE) && !XMLString::equals(flag,xmlconstants::XML_ZERO)) {
 #ifdef WIN32
                 struct _stat stat_buf;
                 if (_stat(m_source.c_str(), &stat_buf) == 0)
-                    m_filestamp=stat_buf.st_mtime;
-                else
-                    m_local=false;
 #else
                 struct stat stat_buf;
                 if (stat(m_source.c_str(), &stat_buf) == 0)
+#endif
                     m_filestamp=stat_buf.st_mtime;
                 else
-                    m_local=false;
-#endif
+                    throw IOException("Unable to access local file ($1)", params(1,m_source.c_str()));
+                m_lock=RWLock::create();
             }
-            m_lock=RWLock::create();
+            log.debug("using local resource (%s), will %smonitor for changes", m_source.c_str(), m_lock ? "" : "not ");
         }
-
-        log.debug("using external resource (%s), will %smonitor for changes", m_source.c_str(), m_lock ? "" : "not ");
+        else {
+            log.debug("using remote resource (%s)", m_source.c_str());
+            source = e->getAttributeNS(NULL,backingFilePath);
+            if (source && *source) {
+                auto_ptr_char temp2(source);
+                m_backing=temp2.get();
+                log.debug("backup remote resource with (%s)", m_backing.c_str());
+            }
+            source = e->getAttributeNS(NULL,reloadInterval);
+            if (source && *source) {
+                m_reloadInterval = XMLString::parseInt(source);
+                if (m_reloadInterval > 0) {
+                    m_log.debug("will reload remote resource at most every %d seconds", m_reloadInterval);
+                    m_lock=RWLock::create();
+                }
+            }
+        }
     }
-    else
+    else {
         log.debug("no resource uri/path/name supplied, will load inline configuration");
+    }
 }
 
-pair<bool,DOMElement*> ReloadableXMLFile::load()
+pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
 {
 #ifdef _DEBUG
     NDC ndc("init");
@@ -128,11 +145,14 @@ pair<bool,DOMElement*> ReloadableXMLFile::load()
         }
         else {
             // Data comes from a file we have to parse.
-            m_log.debug("loading configuration from external resource...");
+            if (backup)
+                m_log.warn("using local backup of remote resource");
+            else
+                m_log.debug("loading configuration from external resource...");
 
             DOMDocument* doc=NULL;
-            auto_ptr_XMLCh widenit(m_source.c_str());
-            if (m_local) {
+            auto_ptr_XMLCh widenit(backup ? m_backing.c_str() : m_source.c_str());
+            if (m_local || backup) {
                 LocalFileInputSource src(widenit.get());
                 Wrapper4InputSource dsrc(&src,false);
                 if (m_validate)
@@ -149,19 +169,35 @@ pair<bool,DOMElement*> ReloadableXMLFile::load()
                     doc=XMLToolingConfig::getConfig().getParser().parse(dsrc);
             }
 
-            m_log.infoStream() << "loaded XML resource (" << m_source << ")" << CategoryStream::ENDLINE;
+            m_log.infoStream() << "loaded XML resource (" << (backup ? m_backing : m_source) << ")" << CategoryStream::ENDLINE;
+
+            if (!backup && !m_backing.empty()) {
+                m_log.debug("backing up remote resource to (%s)", m_backing.c_str());
+                try {
+                    ofstream backer(m_backing.c_str());
+                    backer << *(doc->getDocumentElement());
+                }
+                catch (exception& ex) {
+                    m_log.crit("exception while backing up resource: %s", ex.what());
+                }
+            }
+
             return make_pair(true,doc->getDocumentElement());
         }
     }
     catch (XMLException& e) {
         auto_ptr_char msg(e.getMessage());
-        m_log.critStream() << "Xerces error while loading resource (" << m_source << "): "
+        m_log.critStream() << "Xerces error while loading resource (" << (backup ? m_backing : m_source) << "): "
             << msg.get() << CategoryStream::ENDLINE;
+        if (!backup && !m_backing.empty())
+            return load(true);
         throw XMLParserException(msg.get());
     }
     catch (exception& e) {
         m_log.critStream() << "error while loading configuration from ("
-            << (m_source.empty() ? "inline" : m_source) << "): " << e.what() << CategoryStream::ENDLINE;
+            << (m_source.empty() ? "inline" : (backup ? m_backing : m_source)) << "): " << e.what() << CategoryStream::ENDLINE;
+        if (!backup && !m_backing.empty())
+            return load(true);
         throw;
     }
 }
@@ -202,19 +238,25 @@ Lockable* ReloadableXMLFile::lock()
         m_log.info("change detected, reloading local resource...");
     }
     else {
-        if (isValid())
+        time_t now = time(NULL);
+
+        // Time to reload? If we have no data, filestamp is zero
+        // and there's no way current time is less than the interval.
+        if (now - m_filestamp < m_reloadInterval)
             return this;
 
         // Elevate lock and recheck.
         m_lock->unlock();
         m_lock->wrlock();
-        if (isValid()) {
+        if (now - m_filestamp < m_reloadInterval) {
             // Somebody else handled it, just downgrade.
             m_lock->unlock();
             m_lock->rdlock();
             return this;
         }
-        m_log.info("local copy invalid, reloading remote resource...");
+
+        m_filestamp = now;
+        m_log.info("reloading remote resource...");
     }
     
     // Do this once...

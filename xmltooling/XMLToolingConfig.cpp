@@ -32,7 +32,6 @@
 #include "signature/Signature.h"
 #include "soap/SOAP.h"
 #include "soap/SOAPTransport.h"
-#include "util/CurlNetAccessor.h"
 #include "util/NDC.h"
 #include "util/ReplayCache.h"
 #include "util/StorageService.h"
@@ -202,9 +201,6 @@ bool XMLToolingInternalConfig::init()
         log.debug("libcurl %s initialization complete", LIBCURL_VERSION);
 
         XMLPlatformUtils::Initialize();
-        auto_ptr<XMLNetAccessor> curler(new CurlNetAccessor());
-        delete XMLPlatformUtils::fgNetAccessor;
-        XMLPlatformUtils::fgNetAccessor = curler.release();
         log.debug("Xerces initialization complete");
 
 #ifndef XMLTOOLING_NO_XMLSEC
