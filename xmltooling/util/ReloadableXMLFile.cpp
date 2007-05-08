@@ -124,6 +124,7 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
                     m_lock=RWLock::create();
                 }
             }
+            m_filestamp = time(NULL);   // assume it gets loaded initially
         }
     }
     else {
