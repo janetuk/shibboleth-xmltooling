@@ -45,20 +45,20 @@ static const XMLCh type[] =                         UNICODE_LITERAL_4(t,y,p,e);
 
 ChainingTrustEngine::ChainingTrustEngine(const DOMElement* e) : OpenSSLTrustEngine(e) {
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine");
-    try {
-        e = e ? XMLHelper::getFirstChildElement(e, _TrustEngine) : NULL;
-        while (e) {
+    e = e ? XMLHelper::getFirstChildElement(e, _TrustEngine) : NULL;
+    while (e) {
+        try {
             auto_ptr_char temp(e->getAttributeNS(NULL,type));
             if (temp.get() && *temp.get()) {
                 log.info("building TrustEngine of type %s", temp.get());
-                m_engines.push_back(XMLToolingConfig::getConfig().TrustEngineManager.newPlugin(temp.get(), e));
+                TrustEngine* engine = XMLToolingConfig::getConfig().TrustEngineManager.newPlugin(temp.get(), e);
+                m_engines.push_back(engine);
             }
-            e = XMLHelper::getNextSiblingElement(e, _TrustEngine);
         }
-    }
-    catch (exception&) {
-        for_each(m_engines.begin(), m_engines.end(), xmltooling::cleanup<TrustEngine>());
-        throw;
+        catch (exception& ex) {
+            log.error("error building TrustEngine: %s", ex.what());
+        }
+        e = XMLHelper::getNextSiblingElement(e, _TrustEngine);
     }
 }
 
