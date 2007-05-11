@@ -462,10 +462,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\AbstractElementProxy.h"
-				>
-			</File>
-			<File
 				RelativePath=".\AbstractSimpleElement.h"
 				>
 			</File>
@@ -515,10 +511,6 @@
 			</File>
 			<File
 				RelativePath=".\QName.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SimpleElement.h"
 				>
 			</File>
 			<File

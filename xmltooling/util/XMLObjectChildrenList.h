@@ -110,7 +110,7 @@ namespace xmltooling {
         }
 
         const_reference operator->() const {
-            return *(m_iter.operator->());
+            return *m_iter;
         }
 
         XMLObjectChildrenIterator& operator++() {
