@@ -200,7 +200,7 @@ unsigned long MemoryStorageService::Context::reap(time_t exp)
     // Garbage collect any expired entries.
     unsigned long count=0;
     map<string,Record>::iterator cur = m_dataMap.begin();
-    map<string,Record>::const_iterator stop = m_dataMap.end();
+    map<string,Record>::iterator stop = m_dataMap.end();
     while (cur != stop) {
         if (cur->second.expiration <= exp) {
             map<string,Record>::iterator tmp = cur++;
@@ -314,7 +314,7 @@ void MemoryStorageService::updateContext(const char* context, time_t expiration)
     SharedLock wrapper(ctx.m_lock, false);
 
     time_t now = time(NULL);
-    map<string,Record>::const_iterator stop=ctx.m_dataMap.end();
+    map<string,Record>::iterator stop=ctx.m_dataMap.end();
     for (map<string,Record>::iterator i = ctx.m_dataMap.begin(); i!=stop; ++i) {
         if (now >= i->second.expiration)
             i->second.expiration = expiration;
