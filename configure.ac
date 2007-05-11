@@ -43,6 +43,15 @@ if test "$GCC" = "yes" ; then
 #        ])
     CFLAGS="$GCC_CFLAGS"
     CXXFLAGS="$GCC_CXXFLAGS"
+else
+# Fix for Sun Workshop compiler in debug mode, may be Sun case #6360993
+	case "${host_cpu}-${host_os}" in
+	        *solaris*)
+			if test "$CXX" = "CC" ; then
+				CXXFLAGS="$CXXFLAGS -Qoption ccfe -stabs=no%dfltlit+no%dflthlp"
+			fi
+	        ;;
+	esac
 fi
 
 AC_DISABLE_STATIC
