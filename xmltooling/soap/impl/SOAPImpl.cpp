@@ -227,14 +227,14 @@ namespace {
         IMPL_STRING_ATTRIB(EncodingStyle);
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject, m_children.end());
 
-        void setAttribute(QName& qualifiedName, const XMLCh* value) {
+        void setAttribute(QName& qualifiedName, const XMLCh* value, bool ID=false) {
             if (qualifiedName.hasNamespaceURI() && XMLString::equals(qualifiedName.getNamespaceURI(),SOAP11ENV_NS)) {
                 if (XMLString::equals(qualifiedName.getLocalPart(),ENCODINGSTYLE_ATTRIB_NAME)) {
                     setEncodingStyle(value);
                     return;
                 }
             }
-            AbstractAttributeExtensibleXMLObject::setAttribute(qualifiedName, value);
+            AbstractAttributeExtensibleXMLObject::setAttribute(qualifiedName, value, ID);
         }
 
     protected:
@@ -291,7 +291,7 @@ namespace {
         IMPL_BOOLEAN_ATTRIB(MustUnderstand);
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject, m_children.end());
 
-        void setAttribute(QName& qualifiedName, const XMLCh* value) {
+        void setAttribute(QName& qualifiedName, const XMLCh* value, bool ID=false) {
             if (qualifiedName.hasNamespaceURI() && XMLString::equals(qualifiedName.getNamespaceURI(),SOAP11ENV_NS)) {
                 if (XMLString::equals(qualifiedName.getLocalPart(),MUSTUNDERSTAND_ATTRIB_NAME)) {
                     setMustUnderstand(value);
@@ -302,7 +302,7 @@ namespace {
                     return;
                 }
             }
-            AbstractAttributeExtensibleXMLObject::setAttribute(qualifiedName, value);
+            AbstractAttributeExtensibleXMLObject::setAttribute(qualifiedName, value, ID);
         }
 
     protected:

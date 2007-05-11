@@ -49,7 +49,23 @@ namespace xmltooling {
         
     public:
         virtual ~X509TrustEngine() {}
-        
+
+        virtual bool validate(
+            xmlsignature::Signature& sig,
+            const CredentialResolver& credResolver,
+            CredentialCriteria* criteria=NULL
+            ) const=0;
+
+        virtual bool validate(
+            const XMLCh* sigAlgorithm,
+            const char* sig,
+            xmlsignature::KeyInfo* keyInfo,
+            const char* in,
+            unsigned int in_len,
+            const CredentialResolver& credResolver,
+            CredentialCriteria* criteria=NULL
+            ) const=0;
+
         /**
          * Determines whether an X.509 credential is valid with respect to the
          * source of credentials supplied.
