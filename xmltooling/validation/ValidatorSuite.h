@@ -82,7 +82,7 @@ namespace xmltooling {
          * @param validator the validator
          */
         void registerValidator(const QName& key, Validator* validator) {
-            m_map.insert(std::make_pair(key,validator));
+            m_map.insert(std::pair<const QName,Validator*>(key, validator));
         }
 
         /**
