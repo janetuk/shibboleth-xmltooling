@@ -26,6 +26,8 @@
 #include <xmltooling/base.h>
 #include <xmltooling/exceptions.h>
 
+#include <signal.h>
+
 namespace xmltooling
 {
     DECL_XMLTOOLING_EXCEPTION(ThreadingException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmltooling,XMLToolingException,Exceptions during threading/locking operations);

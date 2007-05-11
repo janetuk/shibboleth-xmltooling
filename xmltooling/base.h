@@ -77,7 +77,7 @@
 #define MAKE_NONCOPYABLE(type) \
     private: \
         type(const type&); \
-        type& operator=(const type&);
+        type& operator=(const type&)
 
 #ifndef DOXYGEN_SKIP
 #ifndef NULL
@@ -1509,7 +1509,7 @@ namespace xmltooling {
          * 
          * @param p   a pair in which the second component is the object to delete
          */
-        void operator()(const std::pair<A,B*>& p) {delete p.second;}
+        void operator()(const std::pair<const A,B*>& p) {delete p.second;}
     };
 
     /**
@@ -1522,7 +1522,7 @@ namespace xmltooling {
          * 
          * @param p   a pair in which the second component is the const object to delete
          */
-        void operator()(const std::pair<A,const B*>& p) {delete const_cast<B*>(p.second);}
+        void operator()(const std::pair<const A,const B*>& p) {delete const_cast<B*>(p.second);}
     };
 };
 
