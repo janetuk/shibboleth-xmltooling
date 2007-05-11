@@ -91,7 +91,7 @@ template <class T> class doubleit
 {
 public:
     doubleit(T& t, const typename T::value_type& s) : temp(t), sep(s) {}
-    void operator() (const pair<T,T>& s) { temp += s.first + sep + s.first + sep; }
+    void operator() (const pair<const T,T>& s) { temp += s.first + sep + s.first + sep; }
     T& temp;
     const typename T::value_type& sep;
 };
