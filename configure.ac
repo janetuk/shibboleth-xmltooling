@@ -32,6 +32,7 @@ fi
 
 AC_PROG_CC([gcc gcc3 cc])
 AC_PROG_CXX([g++ g++3 c++ CC])
+AC_CANONICAL_HOST
 
 if test "$GCC" = "yes" ; then
 #    AC_HAVE_GCC_VERSION(4,0,0,0,
