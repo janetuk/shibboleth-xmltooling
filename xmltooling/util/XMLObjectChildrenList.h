@@ -91,13 +91,12 @@ namespace xmltooling {
         template <class _Tx, class _Tz> friend class XMLObjectChildrenList;
         template <class _Tx, class _Tz> friend class XMLObjectPairList;
     public:
-        typedef typename _Ty::iterator::iterator_category iterator_category;
-        typedef typename _Ty::iterator::value_type value_type;
-        typedef typename _Ty::iterator::reference reference;
-        typedef typename _Ty::iterator::pointer pointer;
-        typedef typename _Ty::const_iterator::reference const_reference;
-        typedef typename _Ty::const_iterator::pointer const_pointer;
-        typedef typename _Ty::iterator::difference_type difference_type;
+        typedef typename _Ty::value_type value_type;
+        typedef typename _Ty::reference reference;
+        typedef typename _Ty::pointer pointer;
+        typedef typename _Ty::const_reference const_reference;
+        typedef typename _Ty::const_pointer const_pointer;
+        typedef typename _Ty::difference_type difference_type;
 
         XMLObjectChildrenIterator() {
         }
