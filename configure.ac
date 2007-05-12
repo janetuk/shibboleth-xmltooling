@@ -267,4 +267,4 @@ AM_CONDITIONAL(BUILD_UNITTEST,test -f ${CXXTEST})
 LIBTOOL="$LIBTOOL --silent"
 
 # output makefiles
-AC_OUTPUT(Makefile xmltooling/Makefile xmltoolingtest/Makefile schemas/Makefile)
+AC_OUTPUT(Makefile xmltooling/Makefile xmltoolingtest/Makefile schemas/Makefile doc/Makefile)
