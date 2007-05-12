@@ -2,14 +2,17 @@
 
 AUTOMAKE_OPTIONS = foreign
 
+schemafiles = \
+	xenc-schema.xsd \
+        xmldsig-core-schema.xsd \
+        xml.xsd \
+        xmltooling.xsd
+
 pkgxmldir = $(datadir)/xml/@PACKAGE@
 
 pkgxml_DATA = \
 	catalog.xml \
-	xenc-schema.xsd \
-	xmldsig-core-schema.xsd \
-	xml.xsd \
-	xmltooling.xsd
+	$(schemafiles)
 
 #
 # Some of these need building
@@ -26,4 +29,5 @@ catalog.xml: ${srcdir}/catalog.xml.in Makefile ${top_builddir}/config.status
 
 CLEANFILES = catalog.xml
 
-EXTRA_DIST = catalog.xml.in
+EXTRA_DIST = catalog.xml.in \
+	$(schemafiles)
