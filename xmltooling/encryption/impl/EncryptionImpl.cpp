@@ -286,7 +286,7 @@ namespace xmlencryption {
         IMPL_STRING_ATTRIB(Target);
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject, m_children.end());
 
-        void setAttribute(QName& qualifiedName, const XMLCh* value, bool ID=false) {
+        void setAttribute(const QName& qualifiedName, const XMLCh* value, bool ID=false) {
             if (!qualifiedName.hasNamespaceURI()) {
                 if (XMLString::equals(qualifiedName.getLocalPart(),ID_ATTRIB_NAME)) {
                     setId(value);
