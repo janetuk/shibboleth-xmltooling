@@ -79,6 +79,8 @@ else
     CXXFLAGS="$PTHREAD_CFLAGS $CXXFLAGS"
 fi
 
+AC_CHECK_FUNCS([pthread_rwlock_init])
+
 # OpenSSL settings
 AC_ARG_WITH(openssl,
     AC_HELP_STRING([--with-openssl=PATH], [where openssl is installed]),
