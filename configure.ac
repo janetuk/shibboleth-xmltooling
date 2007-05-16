@@ -175,17 +175,13 @@ AC_ARG_WITH(xmlsec,
 
 if test x_$with_xmlsec != x_no; then
     if test x_$with_xmlsec != x_/usr; then
-        XMLSEC_CPPFLAGS="-I${with_xmlsec}/include"
-        XMLSEC_LDFLAGS="-L${with_xmlsec}/lib"
+        CPPFLAGS="-I${with_xmlsec}/include"
+        LDFLAGS="-L${with_xmlsec}/lib"
     fi        
     XMLSEC_LIBS="-lxml-security-c"
     
-    # save and append master flags
-    save_CPPFLAGS="$CPPFLAGS"
-    save_LDFLAGS="$LDFLAGS"
+    # save and append master libs
     save_LIBS="$LIBS"
-    CPPFLAGS="$XMLSEC_CPPFLAGS $CPPFLAGS"
-    LDFLAGS="$XMLSEC_LDFLAGS $LDFLAGS"
     LIBS="$XMLSEC_LIBS $LIBS"
     
     AC_CHECK_HEADER([xsec/utils/XSECPlatformUtils.hpp],,AC_MSG_ERROR([unable to find XML-Security header files]))
@@ -204,9 +200,7 @@ int i = 0;
             [XSECPlatformUtils::Initialise()],,
             [AC_MSG_ERROR([unable to link with XML-Sec])])
 
-	# restore master flags
-	CPPFLAGS="$save_CPPFLAGS"
-	LDFLAGS="$save_LDFLAGS"
+	# restore master libs
 	LIBS="$save_LIBS"
 
 	AC_LANG(C)
@@ -237,17 +231,13 @@ int i = 0;
 	
 	AC_MSG_CHECKING(for OpenSSL cflags)
 	AC_MSG_RESULT($SSLFLAGS)
-	XMLSEC_CPPFLAGS="$XMLSEC_CPPFLAGS $SSLFLAGS"
+	CPPFLAGS="$CPPFLAGS $SSLFLAGS"
 	AC_MSG_CHECKING(for OpenSSL libraries)
 	AC_MSG_RESULT($SSLLIBS)
 	XMLSEC_LIBS="$XMLSEC_LIBS $SSLLIBS"
 
-	# save and append master flags
-	save_CPPFLAGS="$CPPFLAGS"
-	save_LDFLAGS="$LDFLAGS"
+	# save and append master libs
 	save_LIBS="$LIBS"
-	CPPFLAGS="$XMLSEC_CPPFLAGS $CPPFLAGS"
-	LDFLAGS="$XMLSEC_LDFLAGS $LDFLAGS"
 	LIBS="$XMLSEC_LIBS $LIBS"
 	
 	AC_CHECK_HEADER([openssl/pem.h],,
@@ -257,13 +247,9 @@ int i = 0;
 	             AC_MSG_ERROR([unable to link with openssl libraries]))
 	AC_MSG_RESULT(yes)
 
-	# restore master flags
-	CPPFLAGS="$save_CPPFLAGS"
-	LDFLAGS="$save_LDFLAGS"
+	# restore master libs
 	LIBS="$save_LIBS"
 
-	AC_SUBST(XMLSEC_CPPFLAGS)
-	AC_SUBST(XMLSEC_LDFLAGS)
 	AC_SUBST(XMLSEC_LIBS)
 	
 	AC_LANG(C++)
