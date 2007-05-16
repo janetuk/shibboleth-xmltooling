@@ -1,6 +1,10 @@
 AUTOMAKE_OPTIONS = foreign
 
+if BUILD_XMLSEC
 lib_LTLIBRARIES = libxmltooling-lite.la
+else
+lib_LTLIBRARIES = libxmltooling-lite.la libxmltooling.la
+endif
 
 libxmltoolingincludedir = $(includedir)/xmltooling
 
@@ -172,13 +176,12 @@ common_sources = \
 	${xmlsec_sources} \
 	$(thread_sources)
 
-libxmltooling-lite_la_SOURCES = \
+libxmltooling_lite_la_SOURCES = \
 	${common_sources}
 
-libxmltooling-lite_la_LDFLAGS = -version-info 1:0:0
+libxmltooling_lite_la_LDFLAGS = -version-info 1:0:0
 
 if BUILD_XMLSEC
-lib_LTLIBRARIES = libxmltooling.la
 libxmltooling_la_SOURCES = \
 	${common_sources} \
 	${xmlsec_sources} \
