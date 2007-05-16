@@ -45,6 +45,10 @@ do-cxxtestgen:
 $(nodist_xmltoolingtest_SOURCES): %.cpp: %.h
 	$(MAKE) do-cxxtestgen HFILE=$< CPPFILE=$@
 
+if BUILD_XMLSEC
 xmltoolingtest_LDADD = $(top_builddir)/xmltooling/libxmltooling.la
+else
+xmltoolingtest_LDADD = $(top_builddir)/xmltooling/libxmltooling-lite.la
+endif
 
 EXTRA_DIST = xmltoolingtest.vcproj $(xmltoolingtest_h) data

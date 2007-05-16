@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = foreign
 
-lib_LTLIBRARIES = libxmltooling.la
+lib_LTLIBRARIES = libxmltooling-lite.la
 
 libxmltoolingincludedir = $(includedir)/xmltooling
 
@@ -108,7 +108,6 @@ valinclude_HEADERS = \
 noinst_HEADERS = \
 	internal.h
 
-if BUILD_XMLSEC
 xmlsec_sources = \
 	encryption/impl/Decrypter.cpp \
 	encryption/impl/EncryptedKeyResolver.cpp \
@@ -127,9 +126,6 @@ xmlsec_sources = \
 	security/impl/XSECCryptoX509CRL.cpp \
 	signature/impl/SignatureValidator.cpp \
 	signature/impl/XMLSecSignatureImpl.cpp
-else
-xmlsec_sources =
-endif
 
 if BUILD_PTHREAD
 thread_sources = util/PThreads.cpp
@@ -137,7 +133,7 @@ else
 thread_sources =
 endif
 
-libxmltooling_la_SOURCES = \
+common_sources = \
 	AbstractAttributeExtensibleXMLObject.cpp \
 	AbstractComplexElement.cpp \
 	AbstractDOMCachingXMLObject.cpp \
@@ -176,9 +172,19 @@ libxmltooling_la_SOURCES = \
 	${xmlsec_sources} \
 	$(thread_sources)
 
-# this is different from the project version
-# http://sources.redhat.com/autobook/autobook/autobook_91.html
+libxmltooling-lite_la_SOURCES = \
+	${common_sources}
+
+libxmltooling-lite_la_LDFLAGS = -version-info 1:0:0
+
+if BUILD_XMLSEC
+lib_LTLIBRARIES = libxmltooling.la
+libxmltooling_la_SOURCES = \
+	${common_sources} \
+	${xmlsec_sources} \
+	$(thread_sources)
 libxmltooling_la_LDFLAGS = -version-info 1:0:0
+endif
 
 install-exec-hook:
 	for la in $(lib_LTLIBRARIES) ; do rm -f $(DESTDIR)$(libdir)/$$la ; done

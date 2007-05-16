@@ -81,44 +81,6 @@ fi
 
 AC_CHECK_FUNCS([pthread_rwlock_init])
 
-# OpenSSL settings
-AC_ARG_WITH(openssl,
-    AC_HELP_STRING([--with-openssl=PATH], [where openssl is installed]),
-    [if test x_$with_openssl != x_/usr; then
-        SSLLIBS="-L${with_openssl}/lib -lcrypto -lssl"
-        SSLFLAGS="-I${with_openssl}/include"
-    fi])
-
-if test "x$SSLLIBS" = "x" ; then
-    AC_PATH_PROG(PKG_CONFIG, pkg-config)
-    if test "x$PKG_CONFIG" != x && test "x$PKG_CONFIG" != "xno" ; then
-        if pkg-config openssl ; then
-            SSLLIBS="`$PKG_CONFIG --libs openssl`"
-            SSLFLAGS="`$PKG_CONFIG --cflags openssl`"
-        else
-            AC_MSG_ERROR([OpenSSL not supported by pkg-config, try --with-openssl instead])
-        fi
-    fi
-fi
-
-if test "x$SSLLIBS" = "x" ; then
-    SSLLIBS="-lcrypto -lssl"
-fi
-
-AC_MSG_CHECKING(for OpenSSL libraries)
-AC_MSG_RESULT($SSLLIBS)
-LIBS="$LIBS $SSLLIBS"
-AC_MSG_CHECKING(for OpenSSL cflags)
-AC_MSG_RESULT($SSLFLAGS)
-CPPFLAGS="$SSLFLAGS $CPPFLAGS"
-
-AC_CHECK_HEADER([openssl/pem.h],,
-                AC_MSG_ERROR([unable to find openssl header files]))
-AC_MSG_CHECKING(for ERR_load_CRYPTO_string)
-AC_TRY_LINK_FUNC([ERR_load_CRYPTO_strings],,
-             AC_MSG_ERROR([unable to link with openssl libraries]))
-AC_MSG_RESULT(yes)
-
 # libcurl settings
 AC_PATH_PROG(CURL_CONFIG,curl-config)
 AC_ARG_WITH(curl,
@@ -213,10 +175,19 @@ AC_ARG_WITH(xmlsec,
 
 if test x_$with_xmlsec != x_no; then
     if test x_$with_xmlsec != x_/usr; then
-        LDFLAGS="-L${with_xmlsec}/lib $LDFLAGS"
-        CPPFLAGS="-I${with_xmlsec}/include $CPPFLAGS"
+        XMLSEC_CPPFLAGS="-I${with_xmlsec}/include"
+        XMLSEC_LDFLAGS="-L${with_xmlsec}/lib"
     fi        
-    LIBS="-lxml-security-c $LIBS"
+    XMLSEC_LIBS="-lxml-security-c"
+    
+    # save and append master flags
+    save_CPPFLAGS = "$CPPFLAGS"
+    save_LDFLAGS = "$LDFLAGS"
+    save_LIBS = "$LIBS"
+    CPPFLAGS = "$XMLSEC_CPPFLAGS $CPPFLAGS"
+    LDFLAGS = "$XMLSEC_LDFLAGS $LDFLAGS"
+    LIBS = "$XMLSEC_LIBS $LIBS"
+    
     AC_CHECK_HEADER([xsec/utils/XSECPlatformUtils.hpp],,AC_MSG_ERROR([unable to find XML-Security header files]))
     AC_MSG_CHECKING([XML-Security version])
     AC_PREPROC_IFELSE(
@@ -232,6 +203,70 @@ int i = 0;
             [#include <xsec/utils/XSECPlatformUtils.hpp>],
             [XSECPlatformUtils::Initialise()],,
             [AC_MSG_ERROR([unable to link with XML-Sec])])
+
+	# restore master flags
+	CPPFLAGS = "$save_CPPFLAGS"
+	LDFLAGS = "$save_LDFLAGS"
+	LIBS = "$save_LIBS"
+
+	AC_LANG(C)
+
+	# OpenSSL settings
+	AC_ARG_WITH(openssl,
+	    AC_HELP_STRING([--with-openssl=PATH], [where openssl is installed]),
+	    [if test x_$with_openssl != x_/usr; then
+	        SSLFLAGS="-I${with_openssl}/include"
+	        SSLLIBS="-L${with_openssl}/lib -lcrypto -lssl"
+	    fi])
+	
+	if test "x$SSLLIBS" = "x" ; then
+	    AC_PATH_PROG(PKG_CONFIG, pkg-config)
+	    if test "x$PKG_CONFIG" != x && test "x$PKG_CONFIG" != "xno" ; then
+	        if pkg-config openssl ; then
+	            SSLLIBS="`$PKG_CONFIG --libs openssl`"
+	            SSLFLAGS="`$PKG_CONFIG --cflags openssl`"
+	        else
+	            AC_MSG_ERROR([OpenSSL not supported by pkg-config, try --with-openssl instead])
+	        fi
+	    fi
+	fi
+	
+	if test "x$SSLLIBS" = "x" ; then
+	    SSLLIBS="-lcrypto -lssl"
+	fi
+	
+	AC_MSG_CHECKING(for OpenSSL cflags)
+	AC_MSG_RESULT($SSLFLAGS)
+	XMLSEC_CPPFLAGS="$XMLSEC_CPPFLAGS $SSLFLAGS"
+	AC_MSG_CHECKING(for OpenSSL libraries)
+	AC_MSG_RESULT($SSLLIBS)
+	XMLSEC_LIBS="$XMLSEC_LIBS $SSLLIBS"
+
+    # save and append master flags
+    save_CPPFLAGS = "$CPPFLAGS"
+    save_LDFLAGS = "$LDFLAGS"
+    save_LIBS = "$LIBS"
+    CPPFLAGS = "$XMLSEC_CPPFLAGS $CPPFLAGS"
+    LDFLAGS = "$XMLSEC_LDFLAGS $LDFLAGS"
+    LIBS = "$XMLSEC_LIBS $LIBS"
+	
+	AC_CHECK_HEADER([openssl/pem.h],,
+	                AC_MSG_ERROR([unable to find openssl header files]))
+	AC_MSG_CHECKING(for ERR_load_CRYPTO_string)
+	AC_TRY_LINK_FUNC([ERR_load_CRYPTO_strings],,
+	             AC_MSG_ERROR([unable to link with openssl libraries]))
+	AC_MSG_RESULT(yes)
+
+	# restore master flags
+	CPPFLAGS = "$save_CPPFLAGS"
+	LDFLAGS = "$save_LDFLAGS"
+	LIBS = "$save_LIBS"
+
+	AC_SUBST(XMLSEC_CPPFLAGS)
+	AC_SUBST(XMLSEC_LDFLAGS)
+	AC_SUBST(XMLSEC_LIBS)
+	
+	AC_LANG(C++)
 else
     AC_MSG_WARN([xmlsec disabled, building without signature/encryption support])
     AC_DEFINE(XMLTOOLING_NO_XMLSEC,1,
