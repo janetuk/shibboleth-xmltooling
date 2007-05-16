@@ -207,7 +207,7 @@ int i = 0;
 	# restore master flags
 	CPPFLAGS="$save_CPPFLAGS"
 	LDFLAGS="$save_LDFLAGS"
-	LIBS= $save_LIBS"
+	LIBS="$save_LIBS"
 
 	AC_LANG(C)
 
@@ -242,13 +242,13 @@ int i = 0;
 	AC_MSG_RESULT($SSLLIBS)
 	XMLSEC_LIBS="$XMLSEC_LIBS $SSLLIBS"
 
-    # save and append master flags
-    save_CPPFLAGS="$CPPFLAGS"
-    save_LDFLAGS="$LDFLAGS"
-    save_LIBS="$LIBS"
-    CPPFLAGS="$XMLSEC_CPPFLAGS $CPPFLAGS"
-    LDFLAGS="$XMLSEC_LDFLAGS $LDFLAGS"
-    LIBS="$XMLSEC_LIBS $LIBS"
+	# save and append master flags
+	save_CPPFLAGS="$CPPFLAGS"
+	save_LDFLAGS="$LDFLAGS"
+	save_LIBS="$LIBS"
+	CPPFLAGS="$XMLSEC_CPPFLAGS $CPPFLAGS"
+	LDFLAGS="$XMLSEC_LDFLAGS $LDFLAGS"
+	LIBS="$XMLSEC_LIBS $LIBS"
 	
 	AC_CHECK_HEADER([openssl/pem.h],,
 	                AC_MSG_ERROR([unable to find openssl header files]))

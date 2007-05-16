@@ -182,6 +182,8 @@ libxmltooling_lite_la_SOURCES = \
 libxmltooling_lite_la_LDFLAGS = -version-info 1:0:0
 
 if BUILD_XMLSEC
+libxmltooling_CPPFLAGS = "$(CPPFLAGS) $(XMLSEC_CPPFLAGS)"
+libxmltooling_LDFLAGS = "$(LDFLAGS) $(XMLSEC_LDFLAGS) $(XMLSEC_LIBS)"
 libxmltooling_la_SOURCES = \
 	${common_sources} \
 	${xmlsec_sources} \
