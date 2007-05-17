@@ -60,10 +60,14 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(XMLToolingConfig);
     protected:
+#ifndef XMLTOOLING_NO_XMLSEC
         XMLToolingConfig() : m_keyInfoResolver(NULL), m_replayCache(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180) {}
-        
+
         /** Global KeyInfoResolver instance. */
         KeyInfoResolver* m_keyInfoResolver;
+#else
+        XMLToolingConfig() : m_replayCache(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180) {}
+#endif
 
         /** Global ReplayCache instance. */
         ReplayCache* m_replayCache;
@@ -146,6 +150,7 @@ namespace xmltooling {
          */
         virtual ParserPool& getValidatingParser() const=0;
 
+#ifndef XMLTOOLING_NO_XMLSEC
         /**
          * Sets the global KeyInfoResolver instance.
          * This method must be externally synchronized with any code that uses the object.
@@ -163,6 +168,7 @@ namespace xmltooling {
         const KeyInfoResolver* getKeyInfoResolver() const {
             return m_keyInfoResolver;
         }
+#endif
 
         /**
          * Sets the global ReplayCache instance.

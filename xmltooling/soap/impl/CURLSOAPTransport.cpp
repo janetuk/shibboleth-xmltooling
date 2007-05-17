@@ -412,7 +412,11 @@ void CURLSOAPTransport::send(istream& in)
     // Set request headers.
     curl_easy_setopt(m_handle,CURLOPT_HTTPHEADER,m_headers);
 
+#ifndef XMLTOOLING_NO_XMLSEC
     if (m_ssl_callback || m_cred || m_trustEngine) {
+#else
+    if (m_ssl_callback) {
+#endif
         curl_easy_setopt(m_handle,CURLOPT_SSL_CTX_FUNCTION,xml_ssl_ctx_callback);
         curl_easy_setopt(m_handle,CURLOPT_SSL_CTX_DATA,this);
 

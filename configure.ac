@@ -175,8 +175,8 @@ AC_ARG_WITH(xmlsec,
 
 if test x_$with_xmlsec != x_no; then
     if test x_$with_xmlsec != x_/usr; then
-        CPPFLAGS="-I${with_xmlsec}/include"
-        LDFLAGS="-L${with_xmlsec}/lib"
+        CPPFLAGS="-I${with_xmlsec}/include $CPPFLAGS"
+        LDFLAGS="-L${with_xmlsec}/lib $LDFLAGS"
     fi        
     XMLSEC_LIBS="-lxml-security-c"
     

@@ -30,6 +30,10 @@
   #include <xmltooling/config_pub.h>
 #endif
 
+#ifdef XMLTOOLING_LITE
+# define XMLTOOLING_NO_XMLSEC 1
+#endif
+
 // Windows and GCC4 Symbol Visibility Macros
 #ifdef WIN32
   #define XMLTOOL_IMPORT __declspec(dllimport)

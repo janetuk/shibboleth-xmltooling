@@ -34,7 +34,9 @@
 using namespace xmltooling;
 using namespace log4cpp;
 using namespace std;
+#ifndef XMLTOOLING_NO_XMLSEC
 using xmlsignature::Signature;
+#endif
 
 void UnknownElementImpl::releaseDOM() const
 {

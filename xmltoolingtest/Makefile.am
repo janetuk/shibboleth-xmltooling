@@ -1,10 +1,20 @@
 AUTOMAKE_OPTIONS = foreign
 
 if BUILD_UNITTEST
+
 bin_PROGRAMS = xmltoolingtest
-xmltoolingtest_CXXFLAGS = $(CXXFLAGS) $(CXXTESTFLAGS)
+xmltoolingtest_CXXFLAGS = $(CXXTESTFLAGS)
+if BUILD_XMLSEC
+xmltoolingtest_LDFLAGS = $(XMLSEC_LIBS)
+xmltoolingtest_LDADD = $(top_builddir)/xmltooling/libxmltooling.la
 else
+xmltoolingtest_LDADD = $(top_builddir)/xmltooling/libxmltooling-lite.la
+endif
+
+else
+
 bin_PROGRAMS = 
+
 endif
 
 if BUILD_XMLSEC
@@ -44,11 +54,5 @@ do-cxxtestgen:
 
 $(nodist_xmltoolingtest_SOURCES): %.cpp: %.h
 	$(MAKE) do-cxxtestgen HFILE=$< CPPFILE=$@
-
-if BUILD_XMLSEC
-xmltoolingtest_LDADD = $(top_builddir)/xmltooling/libxmltooling.la
-else
-xmltoolingtest_LDADD = $(top_builddir)/xmltooling/libxmltooling-lite.la
-endif
 
 EXTRA_DIST = xmltoolingtest.vcproj $(xmltoolingtest_h) data

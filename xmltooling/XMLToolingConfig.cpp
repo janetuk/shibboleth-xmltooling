@@ -23,6 +23,7 @@
 #include "internal.h"
 #include "exceptions.h"
 #include "XMLToolingConfig.h"
+#include "encryption/Encryption.h"
 #include "encryption/Encrypter.h"
 #include "impl/UnknownElement.h"
 #include "security/TrustEngine.h"
@@ -80,6 +81,7 @@ DECL_XMLTOOLING_EXCEPTION_FACTORY(IOException,xmltooling);
 
 namespace xmltooling {
     static XMLToolingInternalConfig g_config;
+#ifndef XMLTOOLING_NO_XMLSEC
     static vector<Mutex*> g_openssl_locks;
 
     extern "C" void openssl_locking_callback(int mode,int n,const char *file,int line)
@@ -90,12 +92,13 @@ namespace xmltooling {
             g_openssl_locks[n]->unlock();
     }
     
-    #ifndef WIN32
+# ifndef WIN32
     extern "C" unsigned long openssl_thread_id(void)
     {
         return (unsigned long)(pthread_self());
     }
-    #endif
+# endif
+#endif
 }
 
 XMLToolingConfig& XMLToolingConfig::getConfig()
@@ -260,7 +263,9 @@ bool XMLToolingInternalConfig::init()
         registerStorageServices();
 
         m_urlEncoder = new URLEncoder();
+#ifndef XMLTOOLING_NO_XMLSEC
         m_keyInfoResolver = KeyInfoResolverManager.newPlugin(INLINE_KEYINFO_RESOLVER,NULL);
+#endif
         
         // Register xml:id as an ID attribute.        
         static const XMLCh xmlid[] = UNICODE_LITERAL_2(i,d);
@@ -272,12 +277,14 @@ bool XMLToolingInternalConfig::init()
         return false;
     }
 
+#ifndef XMLTOOLING_NO_XMLSEC
     // Set up OpenSSL locking.
     for (int i=0; i<CRYPTO_num_locks(); i++)
         g_openssl_locks.push_back(Mutex::create());
     CRYPTO_set_locking_callback(openssl_locking_callback);
-#ifndef WIN32
+# ifndef WIN32
     CRYPTO_set_id_callback(openssl_thread_id);
+# endif
 #endif
 
     log.info("library initialization complete");
@@ -286,9 +293,11 @@ bool XMLToolingInternalConfig::init()
 
 void XMLToolingInternalConfig::term()
 {
+#ifndef XMLTOOLING_NO_XMLSEC
     CRYPTO_set_locking_callback(NULL);
     for_each(g_openssl_locks.begin(), g_openssl_locks.end(), xmltooling::cleanup<Mutex>());
     g_openssl_locks.clear();
+#endif
 
     SchemaValidators.destroyValidators();
     XMLObjectBuilder::destroyBuilders();
@@ -298,15 +307,16 @@ void XMLToolingInternalConfig::term()
     StorageServiceManager.deregisterFactories();
     termSOAPTransports();
     SOAPTransportManager.deregisterFactories();
+
 #ifndef XMLTOOLING_NO_XMLSEC
     TrustEngineManager.deregisterFactories();
     CredentialResolverManager.deregisterFactories();
     KeyInfoResolverManager.deregisterFactories();
     m_algorithmMap.clear();
-#endif
 
     delete m_keyInfoResolver;
     m_keyInfoResolver = NULL;
+#endif
 
     delete m_replayCache;
     m_replayCache = NULL;

@@ -1,9 +1,9 @@
 AUTOMAKE_OPTIONS = foreign
 
 if BUILD_XMLSEC
-lib_LTLIBRARIES = libxmltooling-lite.la
-else
 lib_LTLIBRARIES = libxmltooling-lite.la libxmltooling.la
+else
+lib_LTLIBRARIES = libxmltooling-lite.la
 endif
 
 libxmltoolingincludedir = $(includedir)/xmltooling
@@ -172,23 +172,19 @@ common_sources = \
 	util/URLEncoder.cpp \
 	util/XMLConstants.cpp \
 	util/XMLHelper.cpp \
-	validation/ValidatorSuite.cpp \
-	${xmlsec_sources} \
+	validation/ValidatorSuite.cpp \ 
 	$(thread_sources)
 
 libxmltooling_lite_la_SOURCES = \
 	${common_sources}
-
+libxmltooling_lite_la_CPPFLAGS = -DXMLTOOLING_LITE
 libxmltooling_lite_la_LDFLAGS = -version-info 1:0:0
 
 if BUILD_XMLSEC
-libxmltooling_la_CPPFLAGS = "$(CPPFLAGS) $(XMLSEC_CPPFLAGS)"
-libxmltooling_la_LDFLAGS = "$(LDFLAGS) $(XMLSEC_LDFLAGS) $(XMLSEC_LIBS)"
+libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 1:0:0
 libxmltooling_la_SOURCES = \
 	${common_sources} \
-	${xmlsec_sources} \
-	$(thread_sources)
-libxmltooling_la_LDFLAGS = -version-info 1:0:0
+	${xmlsec_sources}
 endif
 
 install-exec-hook:

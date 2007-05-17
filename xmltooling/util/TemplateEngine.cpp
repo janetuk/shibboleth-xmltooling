@@ -23,8 +23,6 @@
 #include "internal.h"
 #include "util/TemplateEngine.h"
 
-#include <ctime>
-
 using namespace xmltooling;
 using namespace std;
 
@@ -86,15 +84,6 @@ void TemplateEngine::process(
     const XMLToolingException* e
     ) const
 {
-    // Create a timestamp
-    time_t now = time(NULL);
-#ifdef HAVE_CTIME_R
-    char nowbuf[32];
-    ctime_r(&now);
-#else
-    const char* nowbuf = ctime(&now);
-#endif
-
     const char* line = buf.c_str();
     const char* thispos;
 
