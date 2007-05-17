@@ -192,7 +192,7 @@ int i = 0;
 	    fi
 	    ])
 	if test -f "${CURL_CONFIG}" ; then
-	    CPPFLAGS="`${CURL_CONFIG} --cflags`"
+	    CPPFLAGS="`${CURL_CONFIG} --cflags` $CPPFLAGS"
 	    XMLSEC_LIBS="`${CURL_CONFIG} --libs` $XMLSEC_LIBS"
 	else
 	    AC_MSG_ERROR([curl-config not found, may need to use --with-curl option])
