@@ -129,7 +129,8 @@ xmlsec_sources = \
 	security/impl/TrustEngine.cpp \
 	security/impl/XSECCryptoX509CRL.cpp \
 	signature/impl/SignatureValidator.cpp \
-	signature/impl/XMLSecSignatureImpl.cpp
+	signature/impl/XMLSecSignatureImpl.cpp \
+	soap/impl/CURLSOAPTransport.cpp
 
 if BUILD_PTHREAD
 thread_sources = util/PThreads.cpp
@@ -161,7 +162,6 @@ common_sources = \
 	soap/impl/SOAPClient.cpp \
 	soap/impl/SOAPImpl.cpp \
 	soap/impl/SOAPSchemaValidators.cpp \
-	soap/impl/CURLSOAPTransport.cpp \
 	util/DateTime.cpp \
 	util/NDC.cpp \
 	util/ParserPool.cpp \

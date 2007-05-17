@@ -23,11 +23,11 @@ AC_ARG_ENABLE(debug,
     enable_debug=$enableval, enable_debug=no)
 
 if test "$enable_debug" = "yes" ; then
-    GCC_CFLAGS="$CFLAGS -Wall -g -D_DEBUG"
-    GCC_CXXFLAGS="$CXXFLAGS -Wall -g -D_DEBUG"
+    GCC_CFLAGS="$CFLAGS -g -D_DEBUG"
+    GCC_CXXFLAGS="$CXXFLAGS -g -D_DEBUG"
 else
-    GCC_CFLAGS="$CFLAGS -Wall -O2 -DNDEBUG"
-    GCC_CXXFLAGS="$CXXFLAGS -Wall -O2 -DNDEBUG"
+    GCC_CFLAGS="$CFLAGS -O2 -DNDEBUG"
+    GCC_CXXFLAGS="$CXXFLAGS -O2 -DNDEBUG"
 fi
 
 AC_PROG_CC([gcc gcc3 cc])
@@ -42,8 +42,8 @@ if test "$GCC" = "yes" ; then
 #        GCC_CFLAGS="$GCC_CFLAGS -fvisibility=hidden -fvisibility-inlines-hidden"
 #        GCC_CXXFLAGS="$GCC_CXXFLAGS -fvisibility=hidden -fvisibility-inlines-hidden"
 #        ])
-    CFLAGS="$GCC_CFLAGS"
-    CXXFLAGS="$GCC_CXXFLAGS"
+    CFLAGS="-Wall $GCC_CFLAGS"
+    CXXFLAGS="-Wall $GCC_CXXFLAGS"
 else
 # Fix for Sun Workshop compiler in debug mode, may be Sun case #6360993
 	case "${host_cpu}-${host_os}" in
@@ -80,30 +80,6 @@ else
 fi
 
 AC_CHECK_FUNCS([pthread_rwlock_init])
-
-# libcurl settings
-AC_PATH_PROG(CURL_CONFIG,curl-config)
-AC_ARG_WITH(curl,
-    AC_HELP_STRING([--with-curl=PATH], [where curl-config is installed]),
-    [
-    CURL_CONFIG="${with_curl}"
-    if ! test -f "${CURL_CONFIG}" ; then
-    	CURL_CONFIG="${with_curl}/bin/curl-config"
-    fi
-    ])
-if test -f "${CURL_CONFIG}" ; then
-    LDFLAGS="`${CURL_CONFIG} --libs` $LDFLAGS"
-    CPPFLAGS="`${CURL_CONFIG} --cflags` $CPPFLAGS"
-else
-    AC_MSG_ERROR([curl-config not found, may need to use --with-curl option])
-fi
-AC_CHECK_HEADER([curl/curl.h],,AC_MSG_ERROR([unable to find libcurl header files]))
-AC_CHECK_LIB([curl],[curl_global_init],,AC_MSG_ERROR([unable to link with libcurl]))
-AC_MSG_CHECKING([for CURLOPT_SSL_CTX_FUNCTION in curl.h])
-AC_EGREP_HEADER([CURLOPT_SSL_CTX_FUNCTION], [curl/curl.h],
-		[AC_MSG_RESULT(yes)],
-		[AC_MSG_ERROR([need libcurl that supports CURLOPT_SSL_CTX_FUNCTION])])
-
 
 AC_LANG(C++)
 
@@ -204,6 +180,37 @@ int i = 0;
 	LIBS="$save_LIBS"
 
 	AC_LANG(C)
+
+	# libcurl settings
+	AC_PATH_PROG(CURL_CONFIG,curl-config)
+	AC_ARG_WITH(curl,
+	    AC_HELP_STRING([--with-curl=PATH], [where curl-config is installed]),
+	    [
+	    CURL_CONFIG="${with_curl}"
+	    if ! test -f "${CURL_CONFIG}" ; then
+	    	CURL_CONFIG="${with_curl}/bin/curl-config"
+	    fi
+	    ])
+	if test -f "${CURL_CONFIG}" ; then
+	    CPPFLAGS="`${CURL_CONFIG} --cflags`"
+	    XMLSEC_LIBS="`${CURL_CONFIG} --libs` $XMLSEC_LIBS"
+	else
+	    AC_MSG_ERROR([curl-config not found, may need to use --with-curl option])
+	fi
+
+	# save and append master libs
+	save_LIBS="$LIBS"
+	LIBS="$XMLSEC_LIBS $LIBS"
+	
+	AC_CHECK_HEADER([curl/curl.h],,AC_MSG_ERROR([unable to find libcurl header files]))
+	AC_CHECK_LIB([curl],[curl_global_init],,AC_MSG_ERROR([unable to link with libcurl]))
+	AC_MSG_CHECKING([for CURLOPT_SSL_CTX_FUNCTION in curl.h])
+	AC_EGREP_HEADER([CURLOPT_SSL_CTX_FUNCTION], [curl/curl.h],
+			[AC_MSG_RESULT(yes)],
+			[AC_MSG_ERROR([need libcurl that supports CURLOPT_SSL_CTX_FUNCTION])])
+
+	# restore master libs
+	LIBS="$save_LIBS"
 
 	# OpenSSL settings
 	AC_ARG_WITH(openssl,

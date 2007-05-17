@@ -46,14 +46,14 @@
 #endif
 
 #include <stdexcept>
-#include <curl/curl.h>
 #include <log4cpp/Category.hh>
 #include <log4cpp/PropertyConfigurator.hh>
 #include <log4cpp/OstreamAppender.hh>
 #include <xercesc/util/PlatformUtils.hpp>
 #ifndef XMLTOOLING_NO_XMLSEC
-    #include <xsec/framework/XSECProvider.hpp>
-    #include <openssl/err.h>
+# include <curl/curl.h>
+# include <openssl/err.h>
+# include <xsec/framework/XSECProvider.hpp>
 #endif
 
 using namespace soap11;
@@ -197,11 +197,13 @@ bool XMLToolingInternalConfig::init()
     try {
         log.debug("library initialization started");
 
+#ifndef XMLTOOLING_NO_XMLSEC
         if (curl_global_init(CURL_GLOBAL_ALL)) {
             log.fatal("failed to initialize libcurl, OpenSSL, or Winsock");
             return false;
         }
         log.debug("libcurl %s initialization complete", LIBCURL_VERSION);
+#endif
 
         XMLPlatformUtils::Initialize();
         log.debug("Xerces initialization complete");
@@ -257,9 +259,9 @@ bool XMLToolingInternalConfig::init()
         registerCredentialResolvers();
         registerTrustEngines();
         registerXMLAlgorithms();
-#endif
         registerSOAPTransports();
         initSOAPTransports();
+#endif
         registerStorageServices();
 
         m_urlEncoder = new URLEncoder();
@@ -273,7 +275,9 @@ bool XMLToolingInternalConfig::init()
     }
     catch (const xercesc::XMLException&) {
         log.fatal("caught exception while initializing Xerces");
+#ifndef XMLTOOLING_NO_XMLSEC
         curl_global_cleanup();
+#endif
         return false;
     }
 
@@ -305,10 +309,10 @@ void XMLToolingInternalConfig::term()
     AttributeExtensibleXMLObject::deregisterIDAttributes();
 
     StorageServiceManager.deregisterFactories();
-    termSOAPTransports();
-    SOAPTransportManager.deregisterFactories();
 
 #ifndef XMLTOOLING_NO_XMLSEC
+    termSOAPTransports();
+    SOAPTransportManager.deregisterFactories();
     TrustEngineManager.deregisterFactories();
     CredentialResolverManager.deregisterFactories();
     KeyInfoResolverManager.deregisterFactories();
@@ -359,9 +363,10 @@ void XMLToolingInternalConfig::term()
     m_lock=NULL;
     XMLPlatformUtils::Terminate();
 
+#ifndef XMLTOOLING_NO_XMLSEC
     curl_global_cleanup();
-    
- #ifdef _DEBUG
+#endif   
+#ifdef _DEBUG
     xmltooling::NDC ndc("term");
 #endif
    Category::getInstance(XMLTOOLING_LOGCAT".XMLToolingConfig").info("library shutdown complete");

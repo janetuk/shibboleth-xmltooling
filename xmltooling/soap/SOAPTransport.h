@@ -151,6 +151,7 @@ namespace xmltooling {
         virtual std::string getContentType() const=0;
     };
 
+#ifndef XMLTOOLING_NO_XMLSEC
     /**
      * Registers SOAPTransport classes into the runtime.
      */
@@ -165,6 +166,7 @@ namespace xmltooling {
      * Notifies transport infrastructure to shutdown. 
      */
     void XMLTOOL_API termSOAPTransports();
+#endif
 
 };
 
