@@ -58,7 +58,11 @@ implinclude_HEADERS = \
 
 ioinclude_HEADERS = \
 	io/AbstractXMLObjectMarshaller.h \
-	io/AbstractXMLObjectUnmarshaller.h
+	io/AbstractXMLObjectUnmarshaller.h \
+	io/GenericRequest.h \
+	io/GenericResponse.h \
+	io/HTTPRequest.h \
+	io/HTTPResponse.h
 
 secinclude_HEADERS = \
 	security/AbstractPKIXTrustEngine.h \

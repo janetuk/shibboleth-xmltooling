@@ -596,6 +596,22 @@
 					RelativePath=".\io\AbstractXMLObjectUnmarshaller.h"
 					>
 				</File>
+				<File
+					RelativePath=".\io\GenericRequest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\io\GenericResponse.h"
+					>
+				</File>
+				<File
+					RelativePath=".\io\HTTPRequest.h"
+					>
+				</File>
+				<File
+					RelativePath=".\io\HTTPResponse.h"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="impl"

@@ -25,6 +25,8 @@
 #include "XMLToolingConfig.h"
 #include "encryption/Encryption.h"
 #include "encryption/Encrypter.h"
+#include "io/HTTPRequest.h"
+#include "io/HTTPResponse.h"
 #include "impl/UnknownElement.h"
 #include "security/TrustEngine.h"
 #include "security/OpenSSLCryptoX509CRL.h"
