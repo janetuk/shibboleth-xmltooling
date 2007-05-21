@@ -113,6 +113,24 @@ namespace xmlencryption {
         xercesc::DOMDocumentFragment* decryptData(const EncryptedData& encryptedData, const XMLCh* recipient=NULL);
         
         /**
+         * Decrypts the supplied information to an output stream.
+         *
+         * @param out           output stream to receive the decrypted data 
+         * @param encryptedData the data to decrypt
+         * @param key           the decryption key to use (it will not be freed internally)
+         */
+        void decryptData(std::ostream& out, const EncryptedData& encryptedData, XSECCryptoKey* key);
+
+        /**
+         * Decrypts the supplied information to an output stream.
+         *
+         * @param out           output stream to receive the decrypted data 
+         * @param encryptedData the data to decrypt
+         * @param recipient     identifier of decrypting entity for use in identifying multi-cast keys
+         */
+        void decryptData(std::ostream& out, const EncryptedData& encryptedData, const XMLCh* recipient=NULL);
+
+        /**
          * Decrypts the supplied information and returns the resulting key.
          * The caller is responsible for deleting the key. The algorithm of the
          * key must be supplied by the caller based on knowledge of the associated

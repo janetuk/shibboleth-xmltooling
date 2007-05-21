@@ -32,6 +32,7 @@
 #include <xsec/framework/XSECException.hpp>
 #include <xsec/framework/XSECAlgorithmMapper.hpp>
 #include <xsec/framework/XSECAlgorithmHandler.hpp>
+#include <xsec/utils/XSECBinTXFMInputStream.hpp>
 #include <xsec/xenc/XENCEncryptedData.hpp>
 #include <xsec/xenc/XENCEncryptedKey.hpp>
 
@@ -144,6 +145,106 @@ DOMDocumentFragment* Decrypter::decryptData(const EncryptedData& encryptedData, 
     if (!keywrapper.get())
         throw DecryptionException("Unable to decrypt the encrypted key.");
     return decryptData(encryptedData, keywrapper.get());
+}
+
+void Decrypter::decryptData(ostream& out, const EncryptedData& encryptedData, XSECCryptoKey* key)
+{
+    if (encryptedData.getDOM()==NULL)
+        throw DecryptionException("The object must be marshalled before decryption.");
+
+    // We can reuse the cipher object if the document hasn't changed.
+
+    if (m_cipher && m_cipher->getDocument()!=encryptedData.getDOM()->getOwnerDocument()) {
+        XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
+        m_cipher=NULL;
+    }
+    
+    if (!m_cipher)
+        m_cipher=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(encryptedData.getDOM()->getOwnerDocument());
+
+    try {
+        m_cipher->setKey(key->clone());
+        auto_ptr<XSECBinTXFMInputStream> in(m_cipher->decryptToBinInputStream(encryptedData.getDOM()));
+        
+        XMLByte buf[8192];
+        unsigned int count = in->readBytes(buf, sizeof(buf));
+        while (count > 0)
+            out.write(reinterpret_cast<char*>(buf),count);
+    }
+    catch(XSECException& e) {
+        auto_ptr_char temp(e.getMsg());
+        throw DecryptionException(string("XMLSecurity exception while decrypting: ") + temp.get());
+    }
+    catch(XSECCryptoException& e) {
+        throw DecryptionException(string("XMLSecurity exception while decrypting: ") + e.getMsg());
+    }
+}
+
+void Decrypter::decryptData(ostream& out, const EncryptedData& encryptedData, const XMLCh* recipient)
+{
+    if (!m_credResolver)
+        throw DecryptionException("No CredentialResolver supplied to provide decryption keys.");
+
+    // Resolve a decryption key directly.
+    vector<const Credential*> creds;
+    int types =
+        CredentialCriteria::KEYINFO_EXTRACTION_KEY |
+        CredentialCriteria::KEYINFO_EXTRACTION_KEYNAMES |
+        CredentialCriteria::KEYINFO_EXTRACTION_IMPLICIT_KEYNAMES;
+    if (m_criteria) {
+        m_criteria->setUsage(CredentialCriteria::ENCRYPTION_CREDENTIAL);
+        m_criteria->setKeyInfo(encryptedData.getKeyInfo(), types);
+        const EncryptionMethod* meth = encryptedData.getEncryptionMethod();
+        if (meth)
+            m_criteria->setXMLAlgorithm(meth->getAlgorithm());
+        m_credResolver->resolve(creds,m_criteria);
+    }
+    else {
+        CredentialCriteria criteria;
+        criteria.setUsage(CredentialCriteria::ENCRYPTION_CREDENTIAL);
+        criteria.setKeyInfo(encryptedData.getKeyInfo(), types);
+        const EncryptionMethod* meth = encryptedData.getEncryptionMethod();
+        if (meth)
+            criteria.setXMLAlgorithm(meth->getAlgorithm());
+        m_credResolver->resolve(creds,&criteria);
+    }
+
+    // Loop over them and try each one.
+    XSECCryptoKey* key;
+    for (vector<const Credential*>::const_iterator cred = creds.begin(); cred!=creds.end(); ++cred) {
+        try {
+            key = (*cred)->getPrivateKey();
+            if (!key)
+                continue;
+            return decryptData(out, encryptedData, key);
+        }
+        catch(DecryptionException& ex) {
+            log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".Decrypter").warn(ex.what());
+        }
+    }
+
+    // We need to find an encrypted decryption key somewhere. We'll need the underlying algorithm...
+    const XMLCh* algorithm=
+        encryptedData.getEncryptionMethod() ? encryptedData.getEncryptionMethod()->getAlgorithm() : NULL;
+    if (!algorithm)
+        throw DecryptionException("No EncryptionMethod/@Algorithm set, key decryption cannot proceed.");
+    
+    // Check for external resolver.
+    const EncryptedKey* encKey=NULL;
+    if (m_EKResolver)
+        encKey = m_EKResolver->resolveKey(encryptedData, recipient);
+    else {
+        EncryptedKeyResolver ekr;
+        encKey = ekr.resolveKey(encryptedData, recipient);
+    }
+
+    if (!encKey)
+        throw DecryptionException("Unable to locate an encrypted key.");
+
+    auto_ptr<XSECCryptoKey> keywrapper(decryptKey(*encKey, algorithm));
+    if (!keywrapper.get())
+        throw DecryptionException("Unable to decrypt the encrypted key.");
+    decryptData(out, encryptedData, keywrapper.get());
 }
 
 XSECCryptoKey* Decrypter::decryptKey(const EncryptedKey& encryptedKey, const XMLCh* algorithm)
