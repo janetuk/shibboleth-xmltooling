@@ -22,6 +22,7 @@ xmlsec_sources = \
     EncryptionTest.h \
     FilesystemCredentialResolverTest.h \
     InlineKeyResolverTest.h \
+    MemoryStorageServiceTest.h \
     SignatureTest.h
 else
 xmlsec_sources =
@@ -32,7 +33,6 @@ xmltoolingtest_h = \
     ExceptionTest.h \
     KeyInfoTest.h \
     MarshallingTest.h \
-    MemoryStorageServiceTest.h \
     UnmarshallingTest.h \
     TemplateEngineTest.h \
     xmltoolingtest.h \

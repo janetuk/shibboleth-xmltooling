@@ -20,7 +20,7 @@
  * Helper class on top of StorageService for detecting message replay.
  */
 
-#ifndef __xmltooling_replay_h__
+#if !defined(__xmltooling_replay_h__) && !defined(XMLTOOLING_LITE)
 #define __xmltooling_replay_h__
 
 #include <xmltooling/util/StorageService.h>

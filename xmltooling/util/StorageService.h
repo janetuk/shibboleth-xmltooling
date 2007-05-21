@@ -20,7 +20,7 @@
  * Generic data storage interface
  */
 
-#ifndef __xmltooling_storage_h__
+#if !defined(__xmltooling_storage_h__) && !defined(XMLTOOLING_LITE)
 #define __xmltooling_storage_h__
 
 #include <xmltooling/XMLObject.h>

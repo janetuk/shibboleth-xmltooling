@@ -43,11 +43,13 @@ namespace xmltooling {
 
 namespace xmltooling {
     
-    class XMLTOOL_API ReplayCache;
     class XMLTOOL_API SOAPTransport;
-    class XMLTOOL_API StorageService;
     class XMLTOOL_API TemplateEngine;
     class XMLTOOL_API URLEncoder;
+#ifndef XMLTOOLING_LITE
+    class XMLTOOL_API ReplayCache;
+    class XMLTOOL_API StorageService;
+#endif
 
     /**
      * Singleton object that manages library startup/shutdown.configuration.
@@ -65,13 +67,13 @@ namespace xmltooling {
 
         /** Global KeyInfoResolver instance. */
         KeyInfoResolver* m_keyInfoResolver;
-#else
-        XMLToolingConfig() : m_replayCache(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180) {}
-#endif
 
         /** Global ReplayCache instance. */
         ReplayCache* m_replayCache;
-        
+#else
+        XMLToolingConfig() : m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180) {}
+#endif
+
         /** Global TemplateEngine instance. */
         TemplateEngine* m_templateEngine;
 
@@ -168,7 +170,6 @@ namespace xmltooling {
         const KeyInfoResolver* getKeyInfoResolver() const {
             return m_keyInfoResolver;
         }
-#endif
 
         /**
          * Sets the global ReplayCache instance.
@@ -187,6 +188,7 @@ namespace xmltooling {
         ReplayCache* getReplayCache() const {
             return m_replayCache;
         }
+#endif
 
         /**
          * Sets the global URLEncoder instance.
@@ -259,6 +261,11 @@ namespace xmltooling {
         PluginManager<TrustEngine,std::string,const xercesc::DOMElement*> TrustEngineManager;
 
         /**
+         * Manages factories for StorageService plugins.
+         */
+        PluginManager<StorageService,std::string,const xercesc::DOMElement*> StorageServiceManager;
+
+        /**
          * Maps an XML Signature/Encryption algorithm identifier to a library-specific
          * key algorithm and size for use in resolving credentials.
          *
@@ -284,11 +291,6 @@ namespace xmltooling {
          * <p>The factory interface takes a peer name/endpoint pair.
          */
         PluginManager<SOAPTransport,std::string,std::pair<const char*,const char*> > SOAPTransportManager;
-
-        /**
-         * Manages factories for StorageService plugins.
-         */
-        PluginManager<StorageService,std::string,const xercesc::DOMElement*> StorageServiceManager;
     };
 
 };

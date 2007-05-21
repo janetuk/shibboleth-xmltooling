@@ -172,11 +172,13 @@ bool XMLToolingInternalConfig::log_config(const char* config)
     return true;
 }
 
+#ifndef XMLTOOLING_LITE
 void XMLToolingConfig::setReplayCache(ReplayCache* replayCache)
 {
     delete m_replayCache;
     m_replayCache = replayCache;
 }
+#endif
 
 void XMLToolingConfig::setTemplateEngine(TemplateEngine* templateEngine)
 {
@@ -263,13 +265,11 @@ bool XMLToolingInternalConfig::init()
         registerXMLAlgorithms();
         registerSOAPTransports();
         initSOAPTransports();
-#endif
         registerStorageServices();
-
-        m_urlEncoder = new URLEncoder();
-#ifndef XMLTOOLING_NO_XMLSEC
         m_keyInfoResolver = KeyInfoResolverManager.newPlugin(INLINE_KEYINFO_RESOLVER,NULL);
 #endif
+
+        m_urlEncoder = new URLEncoder();
         
         // Register xml:id as an ID attribute.        
         static const XMLCh xmlid[] = UNICODE_LITERAL_2(i,d);
@@ -310,9 +310,8 @@ void XMLToolingInternalConfig::term()
     XMLToolingException::deregisterFactories();
     AttributeExtensibleXMLObject::deregisterIDAttributes();
 
-    StorageServiceManager.deregisterFactories();
-
 #ifndef XMLTOOLING_NO_XMLSEC
+    StorageServiceManager.deregisterFactories();
     termSOAPTransports();
     SOAPTransportManager.deregisterFactories();
     TrustEngineManager.deregisterFactories();
@@ -322,11 +321,11 @@ void XMLToolingInternalConfig::term()
 
     delete m_keyInfoResolver;
     m_keyInfoResolver = NULL;
-#endif
 
     delete m_replayCache;
     m_replayCache = NULL;
-    
+#endif
+
     delete m_templateEngine;
     m_templateEngine = NULL;
 

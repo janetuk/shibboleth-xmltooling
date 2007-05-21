@@ -247,14 +247,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\util\ReplayCache.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\util\StorageService.cpp"
-					>
-				</File>
-				<File
 					RelativePath=".\util\TemplateEngine.cpp"
 					>
 				</File>
@@ -292,10 +284,6 @@
 				>
 				<File
 					RelativePath=".\impl\AnyElement.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\impl\MemoryStorageService.cpp"
 					>
 				</File>
 				<File
@@ -473,14 +461,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\util\ReplayCache.h"
-					>
-				</File>
-				<File
-					RelativePath=".\util\StorageService.h"
-					>
-				</File>
-				<File
 					RelativePath=".\util\TemplateEngine.h"
 					>
 				</File>
@@ -545,19 +525,7 @@
 				Name="signature"
 				>
 				<File
-					RelativePath=".\signature\ContentReference.h"
-					>
-				</File>
-				<File
 					RelativePath=".\signature\KeyInfo.h"
-					>
-				</File>
-				<File
-					RelativePath=".\signature\Signature.h"
-					>
-				</File>
-				<File
-					RelativePath=".\signature\SignatureValidator.h"
 					>
 				</File>
 			</Filter>
@@ -565,87 +533,7 @@
 				Name="encryption"
 				>
 				<File
-					RelativePath=".\encryption\Decrypter.h"
-					>
-				</File>
-				<File
-					RelativePath=".\encryption\EncryptedKeyResolver.h"
-					>
-				</File>
-				<File
-					RelativePath=".\encryption\Encrypter.h"
-					>
-				</File>
-				<File
 					RelativePath=".\encryption\Encryption.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="security"
-				>
-				<File
-					RelativePath=".\security\AbstractPKIXTrustEngine.h"
-					>
-				</File>
-				<File
-					RelativePath=".\security\BasicX509Credential.h"
-					>
-				</File>
-				<File
-					RelativePath=".\security\ChainingTrustEngine.h"
-					>
-				</File>
-				<File
-					RelativePath=".\security\Credential.h"
-					>
-				</File>
-				<File
-					RelativePath=".\security\CredentialContext.h"
-					>
-				</File>
-				<File
-					RelativePath=".\security\CredentialCriteria.h"
-					>
-				</File>
-				<File
-					RelativePath=".\security\CredentialResolver.h"
-					>
-				</File>
-				<File
-					RelativePath=".\security\KeyInfoCredentialContext.h"
-					>
-				</File>
-				<File
-					RelativePath=".\security\KeyInfoResolver.h"
-					>
-				</File>
-				<File
-					RelativePath=".\security\OpenSSLCredential.h"
-					>
-				</File>
-				<File
-					RelativePath=".\security\OpenSSLCryptoX509CRL.h"
-					>
-				</File>
-				<File
-					RelativePath=".\security\OpenSSLTrustEngine.h"
-					>
-				</File>
-				<File
-					RelativePath=".\security\TrustEngine.h"
-					>
-				</File>
-				<File
-					RelativePath=".\security\X509Credential.h"
-					>
-				</File>
-				<File
-					RelativePath=".\security\X509TrustEngine.h"
-					>
-				</File>
-				<File
-					RelativePath=".\security\XSECCryptoX509CRL.h"
 					>
 				</File>
 			</Filter>

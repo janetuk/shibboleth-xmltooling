@@ -120,6 +120,7 @@ xmlsec_sources = \
 	encryption/impl/Decrypter.cpp \
 	encryption/impl/EncryptedKeyResolver.cpp \
 	encryption/impl/Encrypter.cpp \
+	impl/MemoryStorageService.cpp \
 	security/impl/AbstractPKIXTrustEngine.cpp \
 	security/impl/BasicX509Credential.cpp \
 	security/impl/ChainingCredentialResolver.cpp \
@@ -135,7 +136,9 @@ xmlsec_sources = \
 	security/impl/XSECCryptoX509CRL.cpp \
 	signature/impl/SignatureValidator.cpp \
 	signature/impl/XMLSecSignatureImpl.cpp \
-	soap/impl/CURLSOAPTransport.cpp
+	soap/impl/CURLSOAPTransport.cpp \
+	util/ReplayCache.cpp \
+	util/StorageService.cpp
 
 if BUILD_PTHREAD
 thread_sources = util/PThreads.cpp
@@ -158,7 +161,6 @@ common_sources = \
 	encryption/impl/EncryptionImpl.cpp \
 	encryption/impl/EncryptionSchemaValidators.cpp \
 	impl/AnyElement.cpp \
-	impl/MemoryStorageService.cpp \
 	impl/UnknownElement.cpp \
 	io/AbstractXMLObjectMarshaller.cpp \
 	io/AbstractXMLObjectUnmarshaller.cpp \
@@ -171,8 +173,6 @@ common_sources = \
 	util/NDC.cpp \
 	util/ParserPool.cpp \
 	util/ReloadableXMLFile.cpp \
-	util/ReplayCache.cpp \
-	util/StorageService.cpp \
 	util/TemplateEngine.cpp \
 	util/URLEncoder.cpp \
 	util/XMLConstants.cpp \
