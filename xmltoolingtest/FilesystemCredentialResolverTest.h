@@ -46,5 +46,6 @@ public:
         TSM_ASSERT("Retrieved credential was null", cred!=NULL);
         TSM_ASSERT("Retrieved key was null", cred->getPrivateKey()!=NULL);
         TSM_ASSERT_EQUALS("Unexpected number of certificates", 1, cred->getEntityCertificateChain().size());
+        TSM_ASSERT_EQUALS("Custom key name not found", 1, cred->getKeyNames().count("Sample Key"));
     }
 };

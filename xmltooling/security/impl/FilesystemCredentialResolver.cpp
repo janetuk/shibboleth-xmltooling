@@ -77,6 +77,8 @@ namespace xmltooling {
         virtual ~FilesystemCredential() {
         }
 
+        void addKeyNames(const DOMElement* e);
+
         void attach(SSL_CTX* ctx) const;
     
     private:
@@ -134,14 +136,15 @@ namespace xmltooling {
     {
         return new FilesystemCredentialResolver(e);
     }
-};
 
-static const XMLCh CAPath[] =           UNICODE_LITERAL_6(C,A,P,a,t,h);
-static const XMLCh Certificate[] =      UNICODE_LITERAL_11(C,e,r,t,i,f,i,c,a,t,e);
-static const XMLCh format[] =           UNICODE_LITERAL_6(f,o,r,m,a,t);
-static const XMLCh Key[] =              UNICODE_LITERAL_3(K,e,y);
-static const XMLCh password[] =         UNICODE_LITERAL_8(p,a,s,s,w,o,r,d);
-static const XMLCh Path[] =             UNICODE_LITERAL_4(P,a,t,h);
+    static const XMLCh CAPath[] =           UNICODE_LITERAL_6(C,A,P,a,t,h);
+    static const XMLCh Certificate[] =      UNICODE_LITERAL_11(C,e,r,t,i,f,i,c,a,t,e);
+    static const XMLCh format[] =           UNICODE_LITERAL_6(f,o,r,m,a,t);
+    static const XMLCh Key[] =              UNICODE_LITERAL_3(K,e,y);
+    static const XMLCh Name[] =             UNICODE_LITERAL_4(N,a,m,e);
+    static const XMLCh password[] =         UNICODE_LITERAL_8(p,a,s,s,w,o,r,d);
+    static const XMLCh Path[] =             UNICODE_LITERAL_4(P,a,t,h);
+};
 
 FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) : m_credential(NULL)
 {
@@ -160,20 +163,20 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
     BIO* in = NULL;
     
     // Move to Key
-    e=XMLHelper::getFirstChildElement(root,Key);
-    if (e) {
+    const DOMElement* keynode=XMLHelper::getFirstChildElement(root,Key);
+    if (keynode) {
 
         // Get raw format attrib value, but defer processing til later since may need to 
         // determine format dynamically, and we need the Path for that.
-        format_xml=e->getAttributeNS(NULL,format);
+        format_xml=keynode->getAttributeNS(NULL,format);
             
-        const XMLCh* password_xml=e->getAttributeNS(NULL,password);
+        const XMLCh* password_xml=keynode->getAttributeNS(NULL,password);
         if (password_xml) {
             auto_ptr_char kp(password_xml);
             m_keypass=kp.get();
         }
         
-        e=XMLHelper::getFirstChildElement(e,Path);
+        e=XMLHelper::getFirstChildElement(keynode,Path);
         if (e && e->hasChildNodes()) {
             const XMLCh* s=e->getFirstChild()->getNodeValue();
             auto_ptr_char kpath(s);
@@ -230,11 +233,12 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
     e=XMLHelper::getFirstChildElement(root,Certificate);
     if (!e) {
         m_credential = new FilesystemCredential(this,key,xseccerts);
+        m_credential->addKeyNames(keynode);
         return;
     }
     auto_ptr_char certpass(e->getAttributeNS(NULL,password));
     
-    DOMElement* ep=XMLHelper::getFirstChildElement(e,Path);
+    const DOMElement* ep=XMLHelper::getFirstChildElement(e,Path);
     if (!ep || !ep->hasChildNodes()) {
         log.error("Path element missing inside Certificate element or is empty");
         delete key;
@@ -315,7 +319,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
             throw XMLSecurityException("FilesystemCredentialResolver unable to load any certificate(s)");
 
         // Load any extra CA files.
-        DOMElement* extra=XMLHelper::getFirstChildElement(e,CAPath);
+        const DOMElement* extra=XMLHelper::getFirstChildElement(e,CAPath);
         while (extra) {
             if (!extra->hasChildNodes()) {
                 log.warn("skipping empty CAPath element");
@@ -393,6 +397,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
     if (!key && !xseccerts.empty())
         key = xseccerts.front()->clonePublicKey();
     m_credential = new FilesystemCredential(this, key, xseccerts);
+    m_credential->addKeyNames(keynode);
 }
 
 XSECCryptoKey* FilesystemCredentialResolver::loadKey()
@@ -600,6 +605,19 @@ void FilesystemCredentialResolver::attach(SSL_CTX* ctx) const
                 throw XMLSecurityException("Unable to attach CA certificate to SSL context.");
             }
         }
+    }
+}
+
+void FilesystemCredential::addKeyNames(const DOMElement* e)
+{
+    e = XMLHelper::getFirstChildElement(e, Name);
+    while (e) {
+        if (e->hasChildNodes()) {
+            auto_ptr_char n(e->getFirstChild()->getNodeValue());
+            if (n.get() && *n.get())
+                m_keyNames.insert(n.get());
+        }
+        e = XMLHelper::getNextSiblingElement(e, Name);
     }
 }
 
