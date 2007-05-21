@@ -378,6 +378,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\security\impl\ChainingCredentialResolver.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\security\impl\ChainingTrustEngine.cpp"
 						>
 					</File>

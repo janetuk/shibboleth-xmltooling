@@ -69,6 +69,9 @@ namespace xmltooling {
 
     /** CredentialResolver based on local files with no criteria support. */
     #define FILESYSTEM_CREDENTIAL_RESOLVER  "File"
+
+    /** CredentialResolver based on chaining together other resolvers. */
+    #define CHAINING_CREDENTIAL_RESOLVER    "Chaining"
 };
 
 #endif /* __xmltooling_credres_h__ */
