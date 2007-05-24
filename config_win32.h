@@ -96,6 +96,9 @@
 /* Define if you wish to disable XML-Security-dependent features. */
 /* #undef XMLTOOLING_NO_XMLSEC */
 
+/* Define if you wish to disable Xalan-dependent features. */
+#define XSEC_NO_XALAN
+
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */
 

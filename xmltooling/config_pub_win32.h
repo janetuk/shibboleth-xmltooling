@@ -7,3 +7,6 @@
 
 /* Define to 1 to disable XML-Security-dependent features. */
 /* #undef XMLTOOLING_NO_XMLSEC */
+
+/* Define if you wish to disable Xalan-dependent features. */
+#define XSEC_NO_XALAN
