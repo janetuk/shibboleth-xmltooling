@@ -610,7 +610,7 @@ void FilesystemCredentialResolver::attach(SSL_CTX* ctx) const
 
 void FilesystemCredential::addKeyNames(const DOMElement* e)
 {
-    e = XMLHelper::getFirstChildElement(e, Name);
+    e = e ? XMLHelper::getFirstChildElement(e, Name) : NULL;
     while (e) {
         if (e->hasChildNodes()) {
             auto_ptr_char n(e->getFirstChild()->getNodeValue());
