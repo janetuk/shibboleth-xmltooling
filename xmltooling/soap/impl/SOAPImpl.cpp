@@ -36,6 +36,7 @@ using namespace soap11;
 using namespace xmltooling;
 using namespace std;
 using xmlconstants::SOAP11ENV_NS;
+using xmlconstants::SOAP11ENV_PREFIX;
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -409,3 +410,13 @@ const XMLCh Header::LOCAL_NAME[] =                      UNICODE_LITERAL_6(H,e,a,
 const XMLCh Header::TYPE_NAME[] =                       UNICODE_LITERAL_6(H,e,a,d,e,r);
 const XMLCh Header::ACTOR_ATTRIB_NAME[] =               UNICODE_LITERAL_5(a,c,t,o,r);
 const XMLCh Header::MUSTUNDERSTAND_ATTRIB_NAME[] =      UNICODE_LITERAL_14(m,u,s,t,U,n,d,e,r,s,t,a,n,d);
+
+static const XMLCh _CLIENT[] =                          UNICODE_LITERAL_6(C,l,i,e,n,t);
+static const XMLCh _SERVER[] =                          UNICODE_LITERAL_6(S,e,r,v,e,r);
+static const XMLCh _MUSTUNDERSTAND[] =                  UNICODE_LITERAL_14(M,u,s,t,U,n,d,e,r,s,t,a,n,d);
+static const XMLCh _VERSIONMISMATCH[] =                 UNICODE_LITERAL_15(V,e,r,s,i,o,n,M,i,s,m,a,t,c,h);
+ 
+QName Faultcode::CLIENT(SOAP11ENV_NS,_CLIENT,SOAP11ENV_PREFIX);
+QName Faultcode::SERVER(SOAP11ENV_NS,_SERVER,SOAP11ENV_PREFIX);
+QName Faultcode::MUSTUNDERSTAND(SOAP11ENV_NS,_MUSTUNDERSTAND,SOAP11ENV_PREFIX);
+QName Faultcode::VERSIONMISMATCH(SOAP11ENV_NS,_VERSIONMISMATCH,SOAP11ENV_PREFIX);

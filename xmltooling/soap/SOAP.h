@@ -50,6 +50,14 @@ namespace soap11 {
         virtual const xmltooling::QName* getCode() const=0;
         /** Sets the QName content of the element. */
         virtual void setCode(const xmltooling::QName* qname)=0;
+        /** Client Fault code. **/
+        static xmltooling::QName CLIENT;
+        /** Server Fault code. **/
+        static xmltooling::QName SERVER;
+        /** MustUnderstand Fault code. **/
+        static xmltooling::QName MUSTUNDERSTAND;
+        /** Version Mismatch Fault code. **/
+        static xmltooling::QName VERSIONMISMATCH;
     END_XMLOBJECT;
 
     BEGIN_XMLOBJECT(XMLTOOL_API,Detail,xmltooling::ElementProxy,SOAP 1.1 detail element);
