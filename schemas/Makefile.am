@@ -3,6 +3,7 @@
 AUTOMAKE_OPTIONS = foreign
 
 schemafiles = \
+	soap-envelope.xsd \
 	xenc-schema.xsd \
         xmldsig-core-schema.xsd \
         xml.xsd \
@@ -20,7 +21,7 @@ pkgxml_DATA = \
 do-build-file:
 	rm -f ${FILE}.tmp
 	sed < ${srcdir}/${FILE}.in > ${FILE}.tmp \
-	    -e 's:@-PKGXMLDIR-@:${pkgxmldir}:'
+	    -e 's:@-PKGXMLDIR-@:${pkgxmldir}:g'
 	cmp -s ${FILE} ${FILE}.tmp || mv ${FILE}.tmp ${FILE}
 	rm -f ${FILE}.tmp
 
