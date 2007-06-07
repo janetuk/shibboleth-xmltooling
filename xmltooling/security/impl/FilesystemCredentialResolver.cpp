@@ -549,7 +549,10 @@ void FilesystemCredentialResolver::attach(SSL_CTX* ctx) const
 #ifdef _DEBUG
     NDC ndc("attach");
 #endif
-    
+
+    if (m_keypath.empty())
+        throw XMLSecurityException("No key available, unable to attach private key to SSL context.");
+
     // Attach key.
     SSL_CTX_set_default_passwd_cb(ctx, passwd_callback);
     SSL_CTX_set_default_passwd_cb_userdata(ctx, const_cast<char*>(m_keypass.c_str()));
