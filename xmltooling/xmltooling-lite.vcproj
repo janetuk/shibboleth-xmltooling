@@ -141,7 +141,6 @@
 				Name="VCLinkerTool"
 				AdditionalDependencies="wsock32.lib log4cpp.lib xerces-c_2.lib"
 				OutputFile="$(OutDir)\$(ProjectName)1_0.dll"
-				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

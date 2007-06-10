@@ -61,8 +61,9 @@ namespace xmltooling {
         void reap(const char* context);
         void updateContext(const char* context, time_t expiration);
         void deleteContext(const char* context) {
-            Lock wrapper(contextLock);
+            m_lock->wrlock();
             m_contextMap.erase(context);
+            m_lock->unlock();
         }
 
     private:
@@ -77,32 +78,37 @@ namespace xmltooling {
         };
         
         struct XMLTOOL_DLLLOCAL Context {
-            Context() : m_lock(RWLock::create()) {}
+            Context() {}
             Context(const Context& src) {
                 m_dataMap = src.m_dataMap;
-                m_lock = RWLock::create();
             }
-            ~Context() { delete m_lock; }
             map<string,Record> m_dataMap;
-            RWLock* m_lock;
             unsigned long reap(time_t exp);
         };
 
-        Context& getContext(const char* context) {
-            Lock wrapper(contextLock);
+        Context& readContext(const char* context) {
+            m_lock->rdlock();
+            map<string,Context>::iterator i = m_contextMap.find(context);
+            if (i != m_contextMap.end())
+                return i->second;
+            m_lock->unlock();
+            m_lock->wrlock();
+            return m_contextMap[context];
+        }
+
+        Context& writeContext(const char* context) {
+            m_lock->wrlock();
             return m_contextMap[context];
         }
 
         map<string,Context> m_contextMap;
-        Mutex* contextLock;
+        RWLock* m_lock;
         CondWait* shutdown_wait;
         Thread* cleanup_thread;
         static void* cleanup_fn(void*);
         bool shutdown;
         int m_cleanupInterval;
         Category& m_log;
-
-        friend class _expcheck;
     };
 
     StorageService* XMLTOOL_DLLLOCAL MemoryStorageServiceFactory(const DOMElement* const & e)
@@ -114,7 +120,7 @@ namespace xmltooling {
 static const XMLCh cleanupInterval[] = UNICODE_LITERAL_15(c,l,e,a,n,u,p,I,n,t,e,r,v,a,l);
 
 MemoryStorageService::MemoryStorageService(const DOMElement* e)
-    : contextLock(NULL), shutdown_wait(NULL), cleanup_thread(NULL), shutdown(false), m_cleanupInterval(0),
+    : m_lock(NULL), shutdown_wait(NULL), cleanup_thread(NULL), shutdown(false), m_cleanupInterval(0),
         m_log(Category::getInstance(XMLTOOLING_LOGCAT".StorageService"))
 {
     const XMLCh* tag=e ? e->getAttributeNS(NULL,cleanupInterval) : NULL;
@@ -124,7 +130,7 @@ MemoryStorageService::MemoryStorageService(const DOMElement* e)
     if (!m_cleanupInterval)
         m_cleanupInterval=900;
 
-    contextLock = Mutex::create();
+    m_lock = RWLock::create();
     shutdown_wait = CondWait::create();
     cleanup_thread = Thread::create(&cleanup_fn, (void*)this);
 }
@@ -137,7 +143,7 @@ MemoryStorageService::~MemoryStorageService()
     cleanup_thread->join(NULL);
 
     delete shutdown_wait;
-    delete contextLock;
+    delete m_lock;
 }
 
 void* MemoryStorageService::cleanup_fn(void* cache_p)
@@ -172,7 +178,8 @@ void MemoryStorageService::cleanup()
         
         unsigned long count=0;
         time_t now = time(NULL);
-        Lock wrapper(contextLock);
+        m_lock->wrlock();
+        SharedLock locker(m_lock, false);
         for (map<string,Context>::iterator i=m_contextMap.begin(); i!=m_contextMap.end(); ++i)
             count += i->second.reap(now);
         
@@ -188,15 +195,13 @@ void MemoryStorageService::cleanup()
 
 void MemoryStorageService::reap(const char* context)
 {
-    getContext(context).reap(time(NULL));
+    Context& ctx = writeContext(context);
+    SharedLock locker(m_lock, false);
+    ctx.reap(time(NULL));
 }
 
 unsigned long MemoryStorageService::Context::reap(time_t exp)
 {
-    // Lock the "database".
-    m_lock->wrlock();
-    SharedLock wrapper(m_lock, false);
-    
     // Garbage collect any expired entries.
     unsigned long count=0;
     map<string,Record>::iterator cur = m_dataMap.begin();
@@ -216,12 +221,9 @@ unsigned long MemoryStorageService::Context::reap(time_t exp)
 
 void MemoryStorageService::createString(const char* context, const char* key, const char* value, time_t expiration)
 {
-    Context& ctx = getContext(context);
+    Context& ctx = writeContext(context);
+    SharedLock locker(m_lock, false);
 
-    // Lock the maps.
-    ctx.m_lock->wrlock();
-    SharedLock wrapper(ctx.m_lock, false);
-    
     // Check for a duplicate.
     map<string,Record>::iterator i=ctx.m_dataMap.find(key);
     if (i!=ctx.m_dataMap.end()) {
@@ -239,9 +241,9 @@ void MemoryStorageService::createString(const char* context, const char* key, co
 
 int MemoryStorageService::readString(const char* context, const char* key, string* pvalue, time_t* pexpiration, int version)
 {
-    Context& ctx = getContext(context);
+    Context& ctx = readContext(context);
+    SharedLock locker(m_lock, false);
 
-    SharedLock wrapper(ctx.m_lock);
     map<string,Record>::iterator i=ctx.m_dataMap.find(key);
     if (i==ctx.m_dataMap.end())
         return 0;
@@ -258,11 +260,8 @@ int MemoryStorageService::readString(const char* context, const char* key, strin
 
 int MemoryStorageService::updateString(const char* context, const char* key, const char* value, time_t expiration, int version)
 {
-    Context& ctx = getContext(context);
-
-    // Lock the map.
-    ctx.m_lock->wrlock();
-    SharedLock wrapper(ctx.m_lock, false);
+    Context& ctx = writeContext(context);
+    SharedLock locker(m_lock, false);
 
     map<string,Record>::iterator i=ctx.m_dataMap.find(key);
     if (i==ctx.m_dataMap.end())
@@ -287,11 +286,8 @@ int MemoryStorageService::updateString(const char* context, const char* key, con
 
 bool MemoryStorageService::deleteString(const char* context, const char* key)
 {
-    Context& ctx = getContext(context);
-
-    // Lock the map.
-    ctx.m_lock->wrlock();
-    SharedLock wrapper(ctx.m_lock, false);
+    Context& ctx = writeContext(context);
+    SharedLock locker(m_lock, false);
     
     // Find the record.
     map<string,Record>::iterator i=ctx.m_dataMap.find(key);
@@ -307,11 +303,8 @@ bool MemoryStorageService::deleteString(const char* context, const char* key)
 
 void MemoryStorageService::updateContext(const char* context, time_t expiration)
 {
-    Context& ctx = getContext(context);
-
-    // Lock the map.
-    ctx.m_lock->wrlock();
-    SharedLock wrapper(ctx.m_lock, false);
+    Context& ctx = writeContext(context);
+    SharedLock locker(m_lock, false);
 
     time_t now = time(NULL);
     map<string,Record>::iterator stop=ctx.m_dataMap.end();
