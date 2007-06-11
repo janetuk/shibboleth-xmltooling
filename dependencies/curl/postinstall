@@ -1,0 +1,8 @@
+#!/bin/sh
+
+cd ${CLIENT_BASEDIR}/bin
+sed "s|^prefix=.*|prefix=${CLIENT_BASEDIR}|1" curl-config > curl-config.tmp
+mv curl-config.tmp curl-config
+chmod 755 curl-config
+
+exit 0

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+cd ${CLIENT_BASEDIR}/bin
+sed "s|^  prefix=.*|  prefix=${CLIENT_BASEDIR}|1" log4cpp-config > log4cpp-config.tmp
+mv log4cpp-config.tmp log4cpp-config
+chmod 755 log4cpp-config
+
+exit 0

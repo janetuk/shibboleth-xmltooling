@@ -1,0 +1,10 @@
+ARCH=sparc
+PKG=SHIBxmlsec
+NAME=Apache XML-Security library for C++
+VERSION=1.3.1
+CATEGORY=system
+VENDOR=http://xml.apache.org packaged for Shibboleth by Scott Cantor
+HOTLINE=http://bugs.internet2.edu/
+EMAIL=cantor.2@osu.edu
+PSTAMP=11Jun2007
+CLASSES=none
