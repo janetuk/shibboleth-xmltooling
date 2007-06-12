@@ -25,6 +25,7 @@
 #define __xmltooling_pkixtrust_h__
 
 #include <xmltooling/security/OpenSSLTrustEngine.h>
+#include <xmltooling/security/SignatureTrustEngine.h>
 #include <xmltooling/security/XSECCryptoX509CRL.h>
 
 namespace xmltooling {
@@ -33,7 +34,7 @@ namespace xmltooling {
      * A trust engine that uses X.509 trust anchors and CRLs associated with a peer
      * to perform PKIX validation of signatures and credentials.
      */
-    class XMLTOOL_API AbstractPKIXTrustEngine : public OpenSSLTrustEngine
+    class XMLTOOL_API AbstractPKIXTrustEngine : public SignatureTrustEngine, public OpenSSLTrustEngine
     {
     protected:
         /**
@@ -49,7 +50,7 @@ namespace xmltooling {
          * 
          * @param e DOM to supply configuration for provider
          */
-        AbstractPKIXTrustEngine(const xercesc::DOMElement* e=NULL) : OpenSSLTrustEngine(e) {}
+        AbstractPKIXTrustEngine(const xercesc::DOMElement* e=NULL) : TrustEngine(e) {}
         
         /**
          * Checks that either the name of the peer with the given credentials or the names

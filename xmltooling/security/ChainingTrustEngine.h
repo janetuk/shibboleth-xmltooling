@@ -24,13 +24,14 @@
 #define __xmltooling_chaintrust_h__
 
 #include <xmltooling/security/OpenSSLTrustEngine.h>
+#include <xmltooling/security/SignatureTrustEngine.h>
 
 namespace xmltooling {
 
     /**
      * OpenSSLTrustEngine that uses multiple engines in sequence.
      */
-    class XMLTOOL_API ChainingTrustEngine : public OpenSSLTrustEngine {
+    class XMLTOOL_API ChainingTrustEngine : public SignatureTrustEngine, public OpenSSLTrustEngine {
     public:
         /**
          * Constructor.
@@ -105,6 +106,9 @@ namespace xmltooling {
             ) const;
     private:
         std::vector<TrustEngine*> m_engines;
+        std::vector<SignatureTrustEngine*> m_sigEngines;
+        std::vector<X509TrustEngine*> m_x509Engines;
+        std::vector<OpenSSLTrustEngine*> m_osslEngines;
     };
     
 };

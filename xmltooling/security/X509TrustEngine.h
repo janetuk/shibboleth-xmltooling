@@ -17,7 +17,7 @@
 /**
  * @file xmltooling/security/X509TrustEngine.h
  * 
- * Extended TrustEngine interface that adds validation of X.509 credentials.
+ * TrustEngine interface that adds validation of X.509 credentials.
  */
 
 #if !defined(__xmltooling_x509trust_h__) && !defined(XMLTOOLING_NO_XMLSEC)
@@ -27,10 +27,13 @@
 
 namespace xmltooling {
 
+    class XMLTOOL_API CredentialCriteria;
+    class XMLTOOL_API CredentialResolver;
+
     /**
-     * Extended TrustEngine interface that adds validation of X.509 credentials.
+     * TrustEngine interface that adds validation of X.509 credentials.
      */
-    class XMLTOOL_API X509TrustEngine : public TrustEngine {
+    class XMLTOOL_API X509TrustEngine : public virtual TrustEngine {
     protected:
         /**
          * Constructor.
@@ -49,8 +52,6 @@ namespace xmltooling {
         
     public:
         virtual ~X509TrustEngine() {}
-
-        using TrustEngine::validate;
 
         /**
          * Determines whether an X.509 credential is valid with respect to the

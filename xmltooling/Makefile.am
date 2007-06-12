@@ -75,6 +75,7 @@ secinclude_HEADERS = \
 	security/KeyInfoCredentialContext.h \
 	security/KeyInfoResolver.h \
 	security/OpenSSLCredential.h \
+	security/SignatureTrustEngine.h \
 	security/TrustEngine.h \
 	security/X509Credential.h \
 	security/X509TrustEngine.h \

@@ -43,7 +43,7 @@ namespace xmltooling {
 static const XMLCh _TrustEngine[] =                 UNICODE_LITERAL_11(T,r,u,s,t,E,n,g,i,n,e);
 static const XMLCh type[] =                         UNICODE_LITERAL_4(t,y,p,e);
 
-ChainingTrustEngine::ChainingTrustEngine(const DOMElement* e) : OpenSSLTrustEngine(e) {
+ChainingTrustEngine::ChainingTrustEngine(const DOMElement* e) : TrustEngine(e) {
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine");
     e = e ? XMLHelper::getFirstChildElement(e, _TrustEngine) : NULL;
     while (e) {
@@ -53,6 +53,15 @@ ChainingTrustEngine::ChainingTrustEngine(const DOMElement* e) : OpenSSLTrustEngi
                 log.info("building TrustEngine of type %s", temp.get());
                 TrustEngine* engine = XMLToolingConfig::getConfig().TrustEngineManager.newPlugin(temp.get(), e);
                 m_engines.push_back(engine);
+                SignatureTrustEngine* sig = dynamic_cast<SignatureTrustEngine*>(engine);
+                if (sig)
+                    m_sigEngines.push_back(sig);
+                X509TrustEngine* x509 = dynamic_cast<X509TrustEngine*>(engine);
+                if (x509)
+                    m_x509Engines.push_back(x509);
+                OpenSSLTrustEngine* ossl = dynamic_cast<OpenSSLTrustEngine*>(engine);
+                if (ossl)
+                    m_osslEngines.push_back(ossl);
             }
         }
         catch (exception& ex) {
@@ -68,7 +77,7 @@ ChainingTrustEngine::~ChainingTrustEngine() {
 
 bool ChainingTrustEngine::validate(Signature& sig, const CredentialResolver& credResolver, CredentialCriteria* criteria) const
 {
-    for (vector<TrustEngine*>::const_iterator i=m_engines.begin(); i!=m_engines.end(); ++i) {
+    for (vector<SignatureTrustEngine*>::const_iterator i=m_sigEngines.begin(); i!=m_sigEngines.end(); ++i) {
         if ((*i)->validate(sig,credResolver,criteria))
             return true;
     }
@@ -85,7 +94,7 @@ bool ChainingTrustEngine::validate(
     CredentialCriteria* criteria
     ) const
 {
-    for (vector<TrustEngine*>::const_iterator i=m_engines.begin(); i!=m_engines.end(); ++i) {
+    for (vector<SignatureTrustEngine*>::const_iterator i=m_sigEngines.begin(); i!=m_sigEngines.end(); ++i) {
         if ((*i)->validate(sigAlgorithm, sig, keyInfo, in, in_len, credResolver, criteria))
             return true;
     }
@@ -99,10 +108,8 @@ bool ChainingTrustEngine::validate(
     CredentialCriteria* criteria
     ) const
 {
-    X509TrustEngine* down;
-    for (vector<TrustEngine*>::const_iterator i=m_engines.begin(); i!=m_engines.end(); ++i) {
-        if ((down = dynamic_cast<X509TrustEngine*>(*i)) &&
-                down->validate(certEE,certChain,credResolver,criteria))
+    for (vector<X509TrustEngine*>::const_iterator i=m_x509Engines.begin(); i!=m_x509Engines.end(); ++i) {
+        if ((*i)->validate(certEE,certChain,credResolver,criteria))
             return true;
     }
     return false;
@@ -115,9 +122,8 @@ bool ChainingTrustEngine::validate(
     CredentialCriteria* criteria
     ) const
 {
-    OpenSSLTrustEngine* down;
-    for (vector<TrustEngine*>::const_iterator i=m_engines.begin(); i!=m_engines.end(); ++i) {
-        if ((down = dynamic_cast<OpenSSLTrustEngine*>(*i)) && down->validate(certEE,certChain,credResolver,criteria))
+    for (vector<OpenSSLTrustEngine*>::const_iterator i=m_osslEngines.begin(); i!=m_osslEngines.end(); ++i) {
+        if ((*i)->validate(certEE,certChain,credResolver,criteria))
             return true;
     }
     return false;

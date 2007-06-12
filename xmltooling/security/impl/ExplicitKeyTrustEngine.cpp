@@ -25,6 +25,7 @@
 #include "security/CredentialCriteria.h"
 #include "security/CredentialResolver.h"
 #include "security/OpenSSLTrustEngine.h"
+#include "security/SignatureTrustEngine.h"
 #include "signature/SignatureValidator.h"
 #include "util/NDC.h"
 
@@ -40,10 +41,10 @@ using namespace log4cpp;
 using namespace std;
 
 namespace xmltooling {
-    class XMLTOOL_DLLLOCAL ExplicitKeyTrustEngine : public OpenSSLTrustEngine
+    class XMLTOOL_DLLLOCAL ExplicitKeyTrustEngine : public SignatureTrustEngine, public OpenSSLTrustEngine
     {
     public:
-        ExplicitKeyTrustEngine(const DOMElement* e) : OpenSSLTrustEngine(e) {}
+        ExplicitKeyTrustEngine(const DOMElement* e) : TrustEngine(e) {}
         virtual ~ExplicitKeyTrustEngine() {}
 
         virtual bool validate(

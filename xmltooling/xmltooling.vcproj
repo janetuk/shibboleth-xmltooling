@@ -732,6 +732,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\security\SignatureTrustEngine.h"
+					>
+				</File>
+				<File
 					RelativePath=".\security\TrustEngine.h"
 					>
 				</File>
