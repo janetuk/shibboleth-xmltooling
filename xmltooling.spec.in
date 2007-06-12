@@ -73,11 +73,11 @@ make check
 %files
 %defattr(-,root,root,-)
 %doc _docs/LICENSE.txt _docs/NOTICE.txt
-%{_bindir}/xmltoolingtest
 %{_libdir}/libxmltooling.so.*
 %{_libdir}/libxmltooling-lite.so.*
 %dir %{_datadir}/xml/xmltooling
 %{_datadir}/xml/xmltooling
+%exclude %{_bindir}/xmltoolingtest
 
 %files devel
 %defattr(-,root,root,-)
