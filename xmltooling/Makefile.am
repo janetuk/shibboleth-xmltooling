@@ -178,7 +178,7 @@ common_sources = \
 	util/URLEncoder.cpp \
 	util/XMLConstants.cpp \
 	util/XMLHelper.cpp \
-	validation/ValidatorSuite.cpp \ 
+	validation/ValidatorSuite.cpp \
 	$(thread_sources)
 
 libxmltooling_lite_la_SOURCES = \

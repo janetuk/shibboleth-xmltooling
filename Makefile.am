@@ -12,16 +12,16 @@ dist-hook:
 
 SUBDIRS = doc schemas xmltooling xmltoolingtest
 
-all-local: xmltooling.spec pkginfo
-
 if DX_COND_doc
-all-local: doxygen-doc
+all-local: doxygen-doc xmltooling.spec pkginfo
 APIDOCS = doc/api
+else
+all-local: xmltooling.spec pkginfo
 endif
 
 install-data-hook:
-	rm -rf $(prefix)/doc/@PACKAGE@/api
-	cp -r doc/api $(prefix)/doc/@PACKAGE@
+	rm -rf $(DESTDIR)/$(prefix)/doc/@PACKAGE@/api
+	cp -r doc/api $(DESTDIR)/$(prefix)/doc/@PACKAGE@
 
 xmltooling.spec: xmltooling.spec.in Makefile
 	rm -f $@.tmp
