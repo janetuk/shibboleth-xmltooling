@@ -11,7 +11,7 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-root
 
 BuildRequires:	xerces%{?xercesver}-c-devel >= 2.6.1
 BuildRequires:	xml-security-c-devel >= 1.3.1
-BuildRequires:	log4cpp-devel >= 0.3.5, cxxtest
+BuildRequires:	openssl-devel log4cpp-devel >= 0.3.5, cxxtest
 
 %description
 The XMLTooling library contains generic XML parsing and processing
@@ -73,11 +73,11 @@ make check
 %files
 %defattr(-,root,root,-)
 %doc _docs/LICENSE.txt _docs/NOTICE.txt
-%{_bindir}/xmltoolingtest
 %{_libdir}/libxmltooling.so.*
 %{_libdir}/libxmltooling-lite.so.*
 %dir %{_datadir}/xml/xmltooling
 %{_datadir}/xml/xmltooling
+%exclude %{_bindir}/xmltoolingtest
 
 %files devel
 %defattr(-,root,root,-)
