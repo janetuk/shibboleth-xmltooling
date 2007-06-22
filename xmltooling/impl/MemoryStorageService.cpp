@@ -309,7 +309,7 @@ void MemoryStorageService::updateContext(const char* context, time_t expiration)
     time_t now = time(NULL);
     map<string,Record>::iterator stop=ctx.m_dataMap.end();
     for (map<string,Record>::iterator i = ctx.m_dataMap.begin(); i!=stop; ++i) {
-        if (now >= i->second.expiration)
+        if (now < i->second.expiration)
             i->second.expiration = expiration;
     }
 
