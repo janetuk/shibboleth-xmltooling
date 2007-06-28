@@ -40,12 +40,12 @@ namespace xmltooling {
         MemoryStorageService(const DOMElement* e);
         virtual ~MemoryStorageService();
         
-        void createString(const char* context, const char* key, const char* value, time_t expiration);
+        bool createString(const char* context, const char* key, const char* value, time_t expiration);
         int readString(const char* context, const char* key, string* pvalue=NULL, time_t* pexpiration=NULL, int version=0);
         int updateString(const char* context, const char* key, const char* value=NULL, time_t expiration=0, int version=0);
         bool deleteString(const char* context, const char* key);
         
-        void createText(const char* context, const char* key, const char* value, time_t expiration) {
+        bool createText(const char* context, const char* key, const char* value, time_t expiration) {
             return createString(context, key, value, expiration);
         }
         int readText(const char* context, const char* key, string* pvalue=NULL, time_t* pexpiration=NULL, int version=0) {
@@ -219,7 +219,7 @@ unsigned long MemoryStorageService::Context::reap(time_t exp)
     return count;
 }
 
-void MemoryStorageService::createString(const char* context, const char* key, const char* value, time_t expiration)
+bool MemoryStorageService::createString(const char* context, const char* key, const char* value, time_t expiration)
 {
     Context& ctx = writeContext(context);
     SharedLock locker(m_lock, false);
@@ -229,7 +229,7 @@ void MemoryStorageService::createString(const char* context, const char* key, co
     if (i!=ctx.m_dataMap.end()) {
         // Not yet expired?
         if (time(NULL) < i->second.expiration)
-            throw IOException("attempted to insert a record with duplicate key ($1)", params(1,key));
+            return false;
         // It's dead, so we can just remove it now and create the new record.
         ctx.m_dataMap.erase(i);
     }
@@ -237,6 +237,7 @@ void MemoryStorageService::createString(const char* context, const char* key, co
     ctx.m_dataMap[key]=Record(value,expiration);
     
     m_log.debug("inserted record (%s) in context (%s)", key, context);
+    return true;
 }
 
 int MemoryStorageService::readString(const char* context, const char* key, string* pvalue, time_t* pexpiration, int version)
