@@ -1,7 +1,7 @@
 Name:		xmltooling
 Summary:	Open source XMLTooling library
 Version:	@-VERSION-@
-Release:	1
+Release:	2
 Group:		System Environment/Libraries
 Vendor:		Internet2
 License:	Apache 2.0
@@ -90,5 +90,8 @@ make check
 %doc _docs/api
 
 %changelog
+* Fri Jul 13 2007  Scott Cantor  <cantor.2@osu.edu>  - 1.0-2
+- Second alpha.
+
 * Wed Apr 12 2006  Scott Cantor  <cantor.2@osu.edu>  - 1.0-1
 - First SPEC file based on various versions in existence.
