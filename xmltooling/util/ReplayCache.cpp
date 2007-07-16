@@ -43,6 +43,6 @@ bool ReplayCache::check(const char* context, const char* s, time_t expires)
     // In storage already?
     if (m_storage->readString(context, s))
         return false;
-    m_storage->createText(context, s, "x", expires);
+    m_storage->createString(context, s, "x", expires);
     return true;
 }

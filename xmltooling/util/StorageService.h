@@ -52,10 +52,11 @@ namespace xmltooling {
          * @param key           null-terminated unique key of up to 255 bytes
          * @param value         null-terminated value of up to 255 bytes to store
          * @param expiration    an expiration timestamp, after which the record can be purged
+         * @return  true iff record was inserted, false iff a duplicate was found
          * 
-         * @throws IOException  raised if errors occur in the insertion process 
+         * @throws IOException  raised if fatal errors occur in the insertion process 
          */
-        virtual void createString(const char* context, const char* key, const char* value, time_t expiration)=0;
+        virtual bool createString(const char* context, const char* key, const char* value, time_t expiration)=0;
         
         /**
          * Returns an existing "short" record from the storage service.
@@ -110,10 +111,11 @@ namespace xmltooling {
          * @param key           null-terminated unique key of up to 255 bytes
          * @param value         null-terminated value of arbitrary length
          * @param expiration    an expiration timestamp, after which the record can be purged
+         * @return  true iff record was inserted, false iff a duplicate was found
          * 
          * @throws IOException  raised if errors occur in the insertion process 
          */
-        virtual void createText(const char* context, const char* key, const char* value, time_t expiration)=0;
+        virtual bool createText(const char* context, const char* key, const char* value, time_t expiration)=0;
         
         /**
          * Returns an existing "long" record from the storage service.
