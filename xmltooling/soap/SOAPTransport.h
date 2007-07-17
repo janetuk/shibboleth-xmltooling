@@ -90,6 +90,16 @@ namespace xmltooling {
          */
         virtual bool setAuth(transport_auth_t authType, const char* username=NULL, const char* password=NULL)=0;
 
+        /**
+         * Determines whether TLS/SSL connections include a check of the server's certificate
+         * against the expected hostname or address. Defaults to true, and has no effect for
+         * insecure protocols.
+         * 
+         * @param verify    true iff the hostname should be verified against the server's certificate
+         * @return  true iff the transport supports hostname verification
+         */
+        virtual bool setVerifyHost(bool verify)=0;
+        
 #ifndef XMLTOOLING_NO_XMLSEC
         /**
          * Supplies transport credentials.

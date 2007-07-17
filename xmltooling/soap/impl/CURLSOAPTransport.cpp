@@ -78,6 +78,7 @@ namespace xmltooling {
             curl_easy_setopt(m_handle,CURLOPT_TIMEOUT,30);
             curl_easy_setopt(m_handle,CURLOPT_HTTPAUTH,0);
             curl_easy_setopt(m_handle,CURLOPT_USERPWD,NULL);
+            curl_easy_setopt(m_handle,CURLOPT_SSL_VERIFYHOST,2);
             curl_easy_setopt(m_handle,CURLOPT_HEADERDATA,this);
             m_headers=curl_slist_append(m_headers,"Content-Type: text/xml");
         }
@@ -102,6 +103,10 @@ namespace xmltooling {
         }
         
         bool setAuth(transport_auth_t authType, const char* username=NULL, const char* password=NULL);
+        
+        bool setVerifyHost(bool verify) {
+            return (curl_easy_setopt(m_handle,CURLOPT_SSL_VERIFYHOST,verify ? 2 : 0)==CURLE_OK);
+        }
         
 #ifndef XMLTOOLING_NO_XMLSEC
         bool setCredential(const Credential* cred=NULL) {
@@ -277,7 +282,6 @@ CURL* CURLPool::get(const char* to, const char* endpoint)
     curl_easy_setopt(handle,CURLOPT_SSLVERSION,3);
     // Verification of the peer is via TrustEngine only.
     curl_easy_setopt(handle,CURLOPT_SSL_VERIFYPEER,0);
-    curl_easy_setopt(handle,CURLOPT_SSL_VERIFYHOST,2);
     curl_easy_setopt(handle,CURLOPT_HEADERFUNCTION,&curl_header_hook);
     curl_easy_setopt(handle,CURLOPT_WRITEFUNCTION,&curl_write_hook);
     curl_easy_setopt(handle,CURLOPT_DEBUGFUNCTION,&curl_debug_hook);
