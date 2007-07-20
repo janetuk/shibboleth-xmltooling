@@ -105,7 +105,7 @@ bool ExplicitKeyTrustEngine::validate(
         credResolver.resolve(credentials,&cc);
     }
     if (credentials.empty()) {
-        log.warn("unable to validate signature, no credentials available from peer");
+        log.debug("unable to validate signature, no credentials available from peer");
         return false;
     }
     
@@ -123,7 +123,7 @@ bool ExplicitKeyTrustEngine::validate(
         }
     }
 
-    log.error("no peer credentials validated the signature");
+    log.debug("no peer credentials validated the signature");
     return false;
 }
 
@@ -157,7 +157,7 @@ bool ExplicitKeyTrustEngine::validate(
         credResolver.resolve(credentials,&cc);
     }
     if (credentials.empty()) {
-        log.warn("unable to validate signature, no credentials available from peer");
+        log.debug("unable to validate signature, no credentials available from peer");
         return false;
     }
     
@@ -178,7 +178,7 @@ bool ExplicitKeyTrustEngine::validate(
         }
     }
 
-    log.error("no peer credentials validated the signature");
+    log.debug("no peer credentials validated the signature");
     return false;
 }
 
@@ -233,7 +233,7 @@ bool ExplicitKeyTrustEngine::validate(
         credResolver.resolve(credentials,&cc);
     }
     if (credentials.empty()) {
-        log.warn("unable to validate certificate, no credentials available from peer");
+        log.debug("unable to validate certificate, no credentials available from peer");
         return false;
     }
 
