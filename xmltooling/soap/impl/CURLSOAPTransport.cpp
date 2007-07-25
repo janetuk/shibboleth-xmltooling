@@ -495,9 +495,8 @@ int xmltooling::curl_debug_hook(CURL* handle, curl_infotype type, char* data, si
     // *ptr is actually a logging object
     if (!ptr) return 0;
     CategoryStream log=reinterpret_cast<Category*>(ptr)->debugStream();
-    for (char* ch=data; len && (isprint(*ch) || isspace(*ch)); len--)
+    for (unsigned char* ch=(unsigned char*)data; len && (isprint(*ch) || isspace(*ch)); len--)
         log << *ch++;
-    log << CategoryStream::ENDLINE;
     return 0;
 }
 
