@@ -44,7 +44,7 @@ static const XMLCh _TrustEngine[] =                 UNICODE_LITERAL_11(T,r,u,s,t
 static const XMLCh type[] =                         UNICODE_LITERAL_4(t,y,p,e);
 
 ChainingTrustEngine::ChainingTrustEngine(const DOMElement* e) : TrustEngine(e) {
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine");
+    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine."CHAINING_TRUSTENGINE);
     e = e ? XMLHelper::getFirstChildElement(e, _TrustEngine) : NULL;
     while (e) {
         try {

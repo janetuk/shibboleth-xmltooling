@@ -95,7 +95,7 @@ ChainingCredentialResolver::ChainingCredentialResolver(const DOMElement* e)
                 m_resolvers.push_back(conf.CredentialResolverManager.newPlugin(type.get(),e));
             }
             catch (exception& ex) {
-                Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver").error(
+                Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver.Chaining").error(
                     "caught exception processing embedded CredentialResolver element: %s", ex.what()
                     );
             }

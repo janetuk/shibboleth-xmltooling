@@ -151,7 +151,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
 #ifdef _DEBUG
     NDC ndc("FilesystemCredentialResolver");
 #endif
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver");
+    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver."FILESYSTEM_CREDENTIAL_RESOLVER);
 
     const DOMElement* root=e;
 
@@ -444,7 +444,7 @@ XSECCryptoKey* FilesystemCredentialResolver::loadKey()
                 break;
             
             default:
-                Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver").error("unsupported private key type");
+                Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver."FILESYSTEM_CREDENTIAL_RESOLVER).error("unsupported private key type");
         }
         EVP_PKEY_free(pkey);
         if (ret)
