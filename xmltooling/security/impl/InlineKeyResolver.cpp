@@ -21,6 +21,7 @@
  */
 
 #include "internal.h"
+#include "logging.h"
 #include "security/BasicX509Credential.h"
 #include "security/KeyInfoCredentialContext.h"
 #include "security/KeyInfoResolver.h"
@@ -31,7 +32,6 @@
 #include "util/XMLConstants.h"
 #include "validation/ValidatorSuite.h"
 
-#include <log4cpp/Category.hh>
 #include <xercesc/util/XMLUniDefs.hpp>
 #include <xsec/dsig/DSIGKeyInfoX509.hpp>
 #include <xsec/enc/XSECKeyInfoResolverDefault.hpp>
@@ -42,8 +42,8 @@
 #include <xsec/framework/XSECException.hpp>
 
 using namespace xmlsignature;
+using namespace xmltooling::logging;
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
 
 namespace xmltooling {

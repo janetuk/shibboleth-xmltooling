@@ -21,14 +21,13 @@
  */
 
 #include "internal.h"
+#include "logging.h"
 #include "XMLObjectBuilder.h"
 #include "util/NDC.h"
 #include "util/XMLHelper.h"
 
-#include <log4cpp/Category.hh>
-
+using namespace xmltooling::logging;
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
 
 map<QName,XMLObjectBuilder*> XMLObjectBuilder::m_map;

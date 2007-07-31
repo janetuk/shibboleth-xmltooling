@@ -25,12 +25,11 @@
 #include "exceptions.h"
 
 #include <algorithm>
-#include <log4cpp/Category.hh>
 
 using namespace xmltooling;
 
 AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
-    : m_log(log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".XMLObject")), m_schemaLocation(NULL), m_noNamespaceSchemaLocation(NULL),
+    : m_log(logging::Category::getInstance(XMLTOOLING_LOGCAT".XMLObject")), m_schemaLocation(NULL), m_noNamespaceSchemaLocation(NULL),
         m_parent(NULL), m_elementQname(nsURI, localName, prefix), m_typeQname(NULL)
 {
     addNamespace(Namespace(nsURI, prefix));

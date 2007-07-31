@@ -22,6 +22,7 @@
 
 #include "internal.h"
 #include "exceptions.h"
+#include "logging.h"
 #include "security/CredentialCriteria.h"
 #include "security/OpenSSLTrustEngine.h"
 #include "security/OpenSSLCredential.h"
@@ -32,11 +33,10 @@
 
 #include <list>
 #include <curl/curl.h>
-#include <log4cpp/Category.hh>
 #include <openssl/x509_vfy.h>
 
+using namespace xmltooling::logging;
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
 
 namespace xmltooling {

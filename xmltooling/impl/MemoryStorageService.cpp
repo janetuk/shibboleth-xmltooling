@@ -21,16 +21,16 @@
  */
 
 #include "internal.h"
+#include "logging.h"
 #include "util/NDC.h"
 #include "util/StorageService.h"
 #include "util/Threads.h"
 #include "util/XMLHelper.h"
 
-#include <log4cpp/Category.hh>
 #include <xercesc/util/XMLUniDefs.hpp>
 
+using namespace xmltooling::logging;
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
 
 namespace xmltooling {

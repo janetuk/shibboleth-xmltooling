@@ -21,11 +21,11 @@
  */
 
 #include "internal.h"
+#include "logging.h"
 #include "security/Credential.h"
 #include "security/CredentialCriteria.h"
 #include "security/KeyInfoResolver.h"
 
-#include <log4cpp/Category.hh>
 #include <openssl/dsa.h>
 #include <openssl/rsa.h>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyDSA.hpp>
@@ -75,7 +75,7 @@ bool CredentialCriteria::matches(const Credential& credential) const
 
     if (key1->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL ||
         key2->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
-        log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".Credential").warn("comparison of non-OpenSSL credentials are not supported");
+        logging::Category::getInstance(XMLTOOLING_LOGCAT".Credential").warn("comparison of non-OpenSSL credentials are not supported");
         return false;
     }
 
@@ -95,6 +95,6 @@ bool CredentialCriteria::matches(const Credential& credential) const
         return (BN_cmp(dsa1->pub_key,dsa2->pub_key) == 0);
     }
     
-    log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".CredentialCriteria").warn("unsupported key type for comparison");
+    logging::Category::getInstance(XMLTOOLING_LOGCAT".CredentialCriteria").warn("unsupported key type for comparison");
     return false;
 }

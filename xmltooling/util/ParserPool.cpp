@@ -22,6 +22,7 @@
 
 #include "internal.h"
 #include "exceptions.h"
+#include "logging.h"
 #include "util/NDC.h"
 #include "util/ParserPool.h"
 #include "util/XMLHelper.h"
@@ -30,7 +31,6 @@
 #include <functional>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <log4cpp/Category.hh>
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
 #include <xercesc/sax/SAXException.hpp>
@@ -38,9 +38,9 @@
 #include <xercesc/framework/LocalFileInputSource.hpp>
 #include <xercesc/framework/Wrapper4InputSource.hpp>
 
+using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace std;
-using namespace log4cpp;
 
 ParserPool::ParserPool(bool namespaceAware, bool schemaAware)
     : m_namespaceAware(namespaceAware), m_schemaAware(schemaAware), m_lock(Mutex::create()) {}

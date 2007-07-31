@@ -21,6 +21,7 @@
  */
 
 #include "internal.h"
+#include "logging.h"
 #include "security/Credential.h"
 #include "security/CredentialCriteria.h"
 #include "security/CredentialResolver.h"
@@ -29,15 +30,14 @@
 #include "signature/SignatureValidator.h"
 #include "util/NDC.h"
 
-#include <log4cpp/Category.hh>
 #include <xercesc/util/XMLUniDefs.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyDSA.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyRSA.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
 
 using namespace xmlsignature;
+using namespace xmltooling::logging;
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
 
 namespace xmltooling {

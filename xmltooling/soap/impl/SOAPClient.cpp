@@ -22,17 +22,17 @@
 
 #include "internal.h"
 #include "exceptions.h"
+#include "logging.h"
 #include "soap/SOAP.h"
 #include "soap/SOAPClient.h"
 #include "util/XMLHelper.h"
 #include "validation/ValidatorSuite.h"
 
 #include <sstream>
-#include <log4cpp/Category.hh>
 
 using namespace soap11;
+using namespace xmltooling::logging;
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
 
 SOAPClient::~SOAPClient()

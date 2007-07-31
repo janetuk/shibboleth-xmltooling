@@ -21,6 +21,7 @@
  */
 
 #include "internal.h"
+#include "logging.h"
 #include "security/BasicX509Credential.h"
 #include "security/CredentialCriteria.h"
 #include "security/CredentialResolver.h"
@@ -32,15 +33,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <openssl/pkcs12.h>
-#include <log4cpp/Category.hh>
 #include <xercesc/util/XMLUniDefs.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyRSA.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyDSA.hpp>
 
 using namespace xmlsignature;
+using namespace xmltooling::logging;
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
 
 // OpenSSL password callback...

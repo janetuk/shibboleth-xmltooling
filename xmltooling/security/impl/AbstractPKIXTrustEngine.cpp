@@ -22,10 +22,10 @@
  */
 
 #include "internal.h"
+#include "logging.h"
 #include "security/AbstractPKIXTrustEngine.h"
 #include "signature/KeyInfo.h"
 
-#include <log4cpp/Category.hh>
 #include <openssl/x509_vfy.h>
 #include <openssl/x509v3.h>
 #include <xmltooling/security/CredentialCriteria.h>
@@ -38,8 +38,8 @@
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
 
 using namespace xmlsignature;
+using namespace xmltooling::logging;
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
 
 

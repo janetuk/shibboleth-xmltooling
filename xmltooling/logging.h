@@ -15,34 +15,30 @@
  */
 
 /**
- * NDC.cpp
+ * @file xmltooling/logging.h
  * 
- * Diagnostic context for logging 
+ * Assist with logging portability.
  */
+ 
+#ifndef __xmltooling_logging_h__
+#define __xmltooling_logging_h__
 
-#include "internal.h"
-#include "logging.h"
-#include "util/NDC.h"
+#include <xmltooling/base.h>
 
 #if defined(XMLTOOLING_LOG4SHIB)
-# include <log4shib/NDC.hh>
+# include <log4shib/Category.hh>
+# include <log4shib/CategoryStream.hh>
+namespace xmltooling {
+    namespace logging = log4shib;
+};
 #elif defined(XMLTOOLING_LOG4CPP)
-# include <log4cpp/NDC.hh>
+# include <log4cpp/Category.hh>
+# include <log4cpp/CategoryStream.hh>
+namespace xmltooling {
+    namespace logging = log4cpp;
+};
+#else
+# error "Supported logging library not available."
 #endif
 
-using namespace xmltooling;
-
-NDC::NDC(const char* context)
-{
-    logging::NDC::push(context);
-}
-
-NDC::NDC(const std::string& context)
-{
-    logging::NDC::push(context);
-}
-
-NDC::~NDC()
-{
-    logging::NDC::pop();
-}
+#endif /* __xmltooling_logging_h__ */

@@ -23,10 +23,9 @@
 #ifndef __xmltooling_abstractxmlobj_h__
 #define __xmltooling_abstractxmlobj_h__
 
+#include <xmltooling/logging.h>
 #include <xmltooling/XMLObject.h>
 #include <xmltooling/util/DateTime.h>
-
-#include <log4cpp/Category.hh>
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -195,7 +194,7 @@ namespace xmltooling {
         /**
          * Logging object.
          */
-        log4cpp::Category& m_log;
+        logging::Category& m_log;
 
         /**
          * Stores off xsi:schemaLocation attribute.

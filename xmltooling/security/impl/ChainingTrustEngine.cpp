@@ -22,15 +22,15 @@
 
 #include "internal.h"
 #include "exceptions.h"
+#include "logging.h"
 #include "security/ChainingTrustEngine.h"
 #include "util/XMLHelper.h"
 
-#include <log4cpp/Category.hh>
 #include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmlsignature;
+using namespace xmltooling::logging;
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
 
 namespace xmltooling {

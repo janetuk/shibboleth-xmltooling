@@ -22,6 +22,7 @@
 
 #include "internal.h"
 #include "exceptions.h"
+#include "logging.h"
 #include "XMLToolingConfig.h"
 #include "encryption/Encryption.h"
 #include "encryption/Encrypter.h"
@@ -48,9 +49,13 @@
 #endif
 
 #include <stdexcept>
-#include <log4cpp/Category.hh>
-#include <log4cpp/PropertyConfigurator.hh>
-#include <log4cpp/OstreamAppender.hh>
+#if defined(XMLTOOLING_LOG4SHIB)
+# include <log4shib/PropertyConfigurator.hh>
+# include <log4shib/OstreamAppender.hh>
+#elif defined(XMLTOOLING_LOG4CPP)
+# include <log4cpp/PropertyConfigurator.hh>
+# include <log4cpp/OstreamAppender.hh>
+#endif
 #include <xercesc/util/PlatformUtils.hpp>
 #ifndef XMLTOOLING_NO_XMLSEC
 # include <curl/curl.h>
@@ -61,8 +66,8 @@
 using namespace soap11;
 using namespace xmlencryption;
 using namespace xmlsignature;
+using namespace xmltooling::logging;
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
 
 DECL_XMLTOOLING_EXCEPTION_FACTORY(XMLParserException,xmltooling);

@@ -21,16 +21,15 @@
  */
 
 #include "internal.h"
+#include "logging.h"
 #include "util/Threads.h"
-
-#include <log4cpp/Category.hh>
 
 #ifndef WIN32
 # error "This implementation is for WIN32 platforms."
 #endif
 
+using namespace xmltooling::logging;
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
 
 // base error code for a routine to return on failure

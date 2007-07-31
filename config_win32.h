@@ -3,9 +3,8 @@
 /* Define if C++ compiler supports covariant virtual methods. */
 #define HAVE_COVARIANT_RETURNS 1
 
-/* Define to 1 if you have the <dlfcn.h> header file.
-#define HAVE_DLFCN_H 1
-*/
+/* Define to 1 if you have the <dlfcn.h> header file. */
+/* #undef HAVE_DLFCN_H */
 
 /* Define to 1 if you have the `gmtime_r' function. */
 /* #undef HAVE_GMTIME_R */
@@ -14,12 +13,14 @@
    specialization. */
 #define HAVE_GOOD_STL 1
 
-/* Define to 1 if you have the <inttypes.h> header file.
-#define HAVE_INTTYPES_H 1
-*/
+/* Define to 1 if you have the <inttypes.h> header file. */
+/* #undef HAVE_INTTYPES_H */
 
-/* Define if log4cpp library was found */
-#define HAVE_LIBLOG4CPP 1
+/* Define if log4shib library is used. */
+#define XMLTOOLING_LOG4SHIB 1
+
+/* Define if log4cpp library is used. */
+/* #undef XMLTOOLING_LOG4CPP */
 
 /* Define if Xerces-C library was found */
 #define HAVE_LIBXERCESC 1
@@ -42,9 +43,8 @@
 /* Define to 1 if you have the `strdup' function. */
 #define HAVE_STRDUP 1
 
-/* Define to 1 if you have the <strings.h> header file.
-#define HAVE_STRINGS_H 1
-*/
+/* Define to 1 if you have the <strings.h> header file. */
+/* #undef HAVE_STRINGS_H */
 
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
@@ -58,9 +58,8 @@
 /* Define to 1 if you have the <sys/types.h> header file. */
 #define HAVE_SYS_TYPES_H 1
 
-/* Define to 1 if you have the <unistd.h> header file.
-#define HAVE_UNISTD_H 1
-*/
+/* Define to 1 if you have the <unistd.h> header file. */
+/* #undef HAVE_UNISTD_H */
 
 /* Name of package */
 #define PACKAGE "xmltooling"

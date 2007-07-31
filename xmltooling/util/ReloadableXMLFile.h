@@ -23,13 +23,13 @@
 #ifndef __xmltooling_reloadable_h__
 #define __xmltooling_reloadable_h__
 
+#include <xmltooling/logging.h>
 #include <xmltooling/Lockable.h>
 #include <xmltooling/util/Threads.h>
 
 #include <ctime>
 #include <string>
 #include <xercesc/dom/DOM.hpp>
-#include <log4cpp/Category.hh>
 
 namespace xmltooling {
 
@@ -58,7 +58,7 @@ namespace xmltooling {
          * @param e     DOM to supply configuration
          * @param log   logging object to use
          */
-        ReloadableXMLFile(const xercesc::DOMElement* e, log4cpp::Category& log);
+        ReloadableXMLFile(const xercesc::DOMElement* e, logging::Category& log);
     
         virtual ~ReloadableXMLFile() {
             delete m_lock;
@@ -103,7 +103,7 @@ namespace xmltooling {
         RWLock* m_lock;
         
         /** Logging object. */
-        log4cpp::Category& m_log;
+        logging::Category& m_log;
 
     public:
         Lockable* lock();

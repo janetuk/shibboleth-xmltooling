@@ -35,8 +35,8 @@
 #include <xercesc/framework/URLInputSource.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
 
+using namespace xmltooling::logging;
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
 
 static const XMLCh uri[] =              UNICODE_LITERAL_3(u,r,i);

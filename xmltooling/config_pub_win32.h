@@ -5,6 +5,12 @@
    specialization. */
 #define HAVE_GOOD_STL 1
 
+/* Define if log4shib library is used. */
+#define XMLTOOLING_LOG4SHIB 1
+
+/* Define if log4cpp library is used. */
+/* #undef XMLTOOLING_LOG4CPP */
+
 /* Define to 1 to disable XML-Security-dependent features. */
 /* #undef XMLTOOLING_NO_XMLSEC */
 

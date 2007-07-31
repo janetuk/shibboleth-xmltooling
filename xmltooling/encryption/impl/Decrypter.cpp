@@ -21,13 +21,13 @@
  */
 
 #include "internal.h"
+#include "logging.h"
 #include "encryption/Decrypter.h"
 #include "encryption/EncryptedKeyResolver.h"
 #include "security/Credential.h"
 #include "security/CredentialCriteria.h"
 #include "security/CredentialResolver.h"
 
-#include <log4cpp/Category.hh>
 #include <xsec/enc/XSECCryptoException.hpp>
 #include <xsec/framework/XSECException.hpp>
 #include <xsec/framework/XSECAlgorithmMapper.hpp>
@@ -119,7 +119,7 @@ DOMDocumentFragment* Decrypter::decryptData(const EncryptedData& encryptedData, 
             return decryptData(encryptedData, key);
         }
         catch(DecryptionException& ex) {
-            log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".Decrypter").warn(ex.what());
+            logging::Category::getInstance(XMLTOOLING_LOGCAT".Decrypter").warn(ex.what());
         }
     }
 
@@ -219,7 +219,7 @@ void Decrypter::decryptData(ostream& out, const EncryptedData& encryptedData, co
             return decryptData(out, encryptedData, key);
         }
         catch(DecryptionException& ex) {
-            log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".Decrypter").warn(ex.what());
+            logging::Category::getInstance(XMLTOOLING_LOGCAT".Decrypter").warn(ex.what());
         }
     }
 
@@ -320,7 +320,7 @@ XSECCryptoKey* Decrypter::decryptKey(const EncryptedKey& encryptedKey, const XML
             }
         }
         catch(DecryptionException& ex) {
-            log4cpp::Category::getInstance(XMLTOOLING_LOGCAT".Decrypter").warn(ex.what());
+            logging::Category::getInstance(XMLTOOLING_LOGCAT".Decrypter").warn(ex.what());
         }
     }
     

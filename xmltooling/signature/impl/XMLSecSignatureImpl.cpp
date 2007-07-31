@@ -22,6 +22,7 @@
 
 #include "internal.h"
 #include "exceptions.h"
+#include "logging.h"
 #include "impl/UnknownElement.h"
 #include "security/Credential.h"
 #include "signature/KeyInfo.h"
@@ -30,7 +31,6 @@
 #include "util/XMLConstants.h"
 #include "util/XMLHelper.h"
 
-#include <log4cpp/Category.hh>
 #include <xercesc/framework/MemBufInputSource.hpp>
 #include <xercesc/framework/Wrapper4InputSource.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
@@ -45,8 +45,8 @@
 #include <xsec/transformers/TXFMOutputFile.hpp>
 
 using namespace xmlsignature;
+using namespace xmltooling::logging;
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
 using xmlconstants::XMLSIG_NS;
 using xmlconstants::XMLSIG_PREFIX;

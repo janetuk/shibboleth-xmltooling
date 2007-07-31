@@ -22,17 +22,17 @@
 
 #include "internal.h"
 #include "exceptions.h"
+#include "logging.h"
 #include "impl/UnknownElement.h"
 #include "util/NDC.h"
 #include "util/XMLHelper.h"
 
-#include <log4cpp/Category.hh>
 #include <xercesc/framework/MemBufInputSource.hpp>
 #include <xercesc/framework/Wrapper4InputSource.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
 
+using namespace xmltooling::logging;
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
 #ifndef XMLTOOLING_NO_XMLSEC
 using xmlsignature::Signature;

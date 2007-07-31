@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wsock32.lib log4cppD.lib xerces-c_2D.lib"
+				AdditionalDependencies="wsock32.lib log4shib1D.lib xerces-c_2D.lib"
 				OutputFile="$(OutDir)\$(ProjectName)1_0D.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
@@ -139,7 +139,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wsock32.lib log4cpp.lib xerces-c_2.lib"
+				AdditionalDependencies="wsock32.lib log4shib1.lib xerces-c_2.lib"
 				OutputFile="$(OutDir)\$(ProjectName)1_0.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
