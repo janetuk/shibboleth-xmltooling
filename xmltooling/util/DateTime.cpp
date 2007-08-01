@@ -34,6 +34,7 @@
 #endif
 
 #include <ctime>
+#include <assert.h>
 #include <xercesc/util/Janitor.hpp>
 #include <xercesc/util/NumberFormatException.hpp>
 
