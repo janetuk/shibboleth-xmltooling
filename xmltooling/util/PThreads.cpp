@@ -21,11 +21,11 @@
  */
 
 #include "internal.h"
+#include "logging.h"
 #include "util/Threads.h"
 
 #include <ctime>
 #include <signal.h>
-#include <log4cpp/Category.hh>
 
 #ifdef HAVE_PTHREAD
 # include <pthread.h>
@@ -36,8 +36,8 @@
 # error "This implementation is for POSIX platforms."
 #endif
 
+using namespace xmltooling::logging;
 using namespace xmltooling;
-using namespace log4cpp;
 using namespace std;
 
 namespace xmltooling {
