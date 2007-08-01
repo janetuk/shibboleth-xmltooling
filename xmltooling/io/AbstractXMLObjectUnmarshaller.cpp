@@ -181,7 +181,7 @@ void AbstractXMLObjectUnmarshaller::unmarshallContent(const DOMElement* domEleme
             // Advance the text node position marker.
             ++position;
         }
-        else if (childNode->getNodeType() == DOMNode::TEXT_NODE) {
+        else if (childNode->getNodeType() == DOMNode::TEXT_NODE || childNode->getNodeType() == DOMNode::CDATA_SECTION_NODE) {
             m_log.debug("processing text content at position (%d)", position);
             setTextContent(childNode->getNodeValue(), position);
         }
