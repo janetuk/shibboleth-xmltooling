@@ -37,6 +37,7 @@ libxmltoolinginclude_HEADERS = \
 	ElementProxy.h \
 	exceptions.h \
 	Lockable.h \
+	logging.h \
 	Namespace.h \
 	PluginManager.h \
 	QName.h \
