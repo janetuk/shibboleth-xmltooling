@@ -29,6 +29,7 @@
 namespace xmltooling {
     
     class XMLTOOL_API Credential;
+    class XMLTOOL_API CredentialCriteria;
     class XMLTOOL_API CredentialResolver;
     class XMLTOOL_API X509TrustEngine;
     
