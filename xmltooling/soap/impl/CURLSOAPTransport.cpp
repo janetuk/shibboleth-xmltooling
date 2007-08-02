@@ -146,6 +146,20 @@ namespace xmltooling {
             return true;
         }
 
+        bool setProviderOption(const char* provider, void* option, void* value) {
+            if (!provider || strcmp(provider, "CURL"))
+                return false;
+            // For libcurl, the option is an enum and the value type depends on the option.
+            CURLoption opt = static_cast<CURLoption>(reinterpret_cast<long>(option));
+            if (opt < CURLOPTTYPE_OBJECTPOINT)
+                return (curl_easy_setopt(m_handle, opt, reinterpret_cast<long>(value))==CURLE_OK);
+            else if (opt < CURLOPTTYPE_OFF_T)
+                return (curl_easy_setopt(m_handle, opt, value)==CURLE_OK);
+            else if (sizeof(void*) == sizeof(curl_off_t))
+                return (curl_easy_setopt(m_handle, opt, reinterpret_cast<curl_off_t>(value))==CURLE_OK);
+            return false;
+        }
+        
         void send(istream& in);
         
         istream& receive() {

@@ -131,6 +131,21 @@ namespace xmltooling {
 #endif
 
         /**
+         * Sets an implementation-specific transport provider option.
+         * 
+         * <p>Requires knowledge of the underlying SOAPTransport implementation.
+         * Without the proper knowledge and inputs, crashes may result.
+         * 
+         * @param provider  name of the SOAPTransport class the caller believes is in use
+         * @param option    implementation-specific data containing the option to set
+         * @param value     implementation- and option-specific data to use
+         * @return  true iff the transport supports the option and value supplied
+         */
+        virtual bool setProviderOption(const char* provider, void* option, void* value) {
+            return false;
+        }
+        
+        /**
          * Sends a stream of data over the transport. The function may return without
          * having received any data, depending on the nature of the transport.
          * 
