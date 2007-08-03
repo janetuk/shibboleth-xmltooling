@@ -28,26 +28,45 @@
 
 static const XMLCh UTF8[]={ chLatin_U, chLatin_T, chLatin_F, chDigit_8, chNull };
 
-char* xmltooling::toUTF8(const XMLCh* src)
+char* xmltooling::toUTF8(const XMLCh* src, bool use_malloc)
 {
-    unsigned int eaten;
+    unsigned int eaten,factor=1,bufsize;
     unsigned int srclen=XMLString::stringLen(src);
-    XMLUTF8Transcoder t(UTF8, srclen*4 + 1);
-    char* buf=new char[srclen*4 + 1];
-    memset(buf,0,srclen*4 + 1);
-    t.transcodeTo(
-        src,srclen,
-        reinterpret_cast<XMLByte*>(buf),srclen*4,
-        eaten,XMLTranscoder::UnRep_RepChar);
-    return buf;
+    XMLUTF8Transcoder t(UTF8, 4096);    // block size isn't used any more anyway
+    do {
+        bufsize = factor*srclen + 10;
+        char* buf = use_malloc ? reinterpret_cast<char*>(malloc(bufsize)) : new char[bufsize];
+        memset(buf,0,bufsize);
+        try {
+            t.transcodeTo(
+                src,srclen,
+                reinterpret_cast<XMLByte*>(buf),bufsize-1,
+                eaten,
+                XMLTranscoder::UnRep_Throw);
+        }
+        catch (XMLException&) {
+            if (use_malloc)
+                free(buf);
+            else
+                delete[] buf;
+            throw XMLToolingException("Source string contained an unrepresentable character.");
+        }
+        if (eaten >= srclen)
+            return buf;
+        if (use_malloc)
+            free(buf);
+        else
+            delete[] buf;
+        factor++;
+    } while (1);
 }
 
-XMLCh* xmltooling::fromUTF8(const char* src)
+XMLCh* xmltooling::fromUTF8(const char* src, bool use_malloc)
 {
     unsigned int eaten;
     unsigned int srclen=strlen(src);
-    XMLUTF8Transcoder t(UTF8, srclen + 1);
-    XMLCh* buf=new XMLCh[srclen + 1];
+    XMLUTF8Transcoder t(UTF8, 4096);    // block size isn't used any more anyway
+    XMLCh* buf = use_malloc ? reinterpret_cast<XMLCh*>(malloc((srclen+1)*sizeof(XMLCh))) : new XMLCh[srclen + 1];
     unsigned char* sizes=new unsigned char[srclen];
     memset(buf,0,(srclen+1)*sizeof(XMLCh));
     t.transcodeFrom(

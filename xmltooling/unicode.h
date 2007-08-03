@@ -41,17 +41,21 @@ namespace xmltooling {
 
     /**
      * Transcodes a 16-bit Unicode string into UTF-8.
-     * @param src   the 16-bit string to transcode
+     * 
+     * @param src           the 16-bit string to transcode
+     * @param use_malloc    true iff the result should be allocated with malloc, false to use new
      * @return      a UTF-8 string allocated by the Xerces memory manager 
      */
-    extern XMLTOOL_API char* toUTF8(const XMLCh* src);
+    extern XMLTOOL_API char* toUTF8(const XMLCh* src, bool use_malloc=false);
 
     /**
      * Transcodes a UTF-8 string into 16-bit Unicode.
-     * @param src   the UTF-8 string to transcode
+     * 
+     * @param src           the UTF-8 string to transcode
+     * @param use_malloc    true iff the result should be allocated with malloc, false to use new
      * @return      a 16-bit Unicode string allocated by the Xerces memory manager 
      */
-    extern XMLTOOL_API XMLCh* fromUTF8(const char* src);
+    extern XMLTOOL_API XMLCh* fromUTF8(const char* src, bool use_malloc=false);
 
     /**
      * Writes a Unicode string to an ASCII stream by transcoding to UTF8.
