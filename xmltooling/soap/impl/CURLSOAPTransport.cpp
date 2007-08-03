@@ -293,10 +293,8 @@ CURL* CURLPool::get(const char* to, const char* endpoint)
     curl_easy_setopt(handle,CURLOPT_NOPROGRESS,1);
     curl_easy_setopt(handle,CURLOPT_NOSIGNAL,1);
     curl_easy_setopt(handle,CURLOPT_FAILONERROR,1);
-    // I can't disable v2 without disallowing SSLv3 or TLS,
-    // so I'll rely on the cipher list to disable v2.
-    //curl_easy_setopt(handle,CURLOPT_SSLVERSION,3);
-    curl_easy_setopt(handle,CURLOPT_SSL_CIPHER_LIST,"HIGH:MEDIUM:!SSLv2");
+    curl_easy_setopt(handle,CURLOPT_SSLVERSION,CURL_SSLVERSION_SSLv3);
+    curl_easy_setopt(handle,CURLOPT_SSL_CIPHER_LIST,"ALL:!aNULL:!LOW:!EXPORT:!SSLv2");
     // Verification of the peer is via TrustEngine only.
     curl_easy_setopt(handle,CURLOPT_SSL_VERIFYPEER,0);
     curl_easy_setopt(handle,CURLOPT_HEADERFUNCTION,&curl_header_hook);
