@@ -178,6 +178,49 @@ namespace xmltooling {
         XMLCh* m_buf;
     };
 
+    /**
+     * An auto_ptr that uses array delete on its contents.
+     *
+     * @param T type of pointer to wrap
+     */
+    template <typename T> class auto_arrayptr
+    {
+        T* m_ptr;
+
+        auto_arrayptr(const auto_arrayptr<T>&);
+        auto_arrayptr<T>& operator=(const auto_arrayptr<T>&);
+    public:
+        /**
+         * Constructor.
+         *
+         * @param ptr pointer to wrap
+         */
+        auto_arrayptr(T* ptr) : m_ptr(ptr) {
+        }
+
+        /**
+         * Destructor, uses array delete operation on wrapped pointer.
+         */
+        ~auto_arrayptr() {
+            delete[] m_ptr;
+        }
+
+        /**
+         * Returns the wrapped pointer.
+         * @return the wrapped pointer
+         */
+        const T* get() const {
+            return m_ptr;
+        }
+
+        /**
+         * Returns the wrapped pointer and transfers ownership of it to the caller.
+         * @return the wrapped pointer
+         */
+        T* release() {
+            T* temp=m_ptr; m_ptr=NULL; return temp;
+        }
+    };
 };
 
 #endif /* __xmltooling_unicode_h__ */
