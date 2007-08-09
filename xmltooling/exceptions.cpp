@@ -217,14 +217,40 @@ const char* XMLToolingException::getMessage() const
     return m_processedmsg.c_str();
 }
 
+void xml_encode(string& s, const char* pre, const char* start, const char* post)
+{
+    s += pre;
+    size_t pos;
+    while (start && *start) {
+        pos = strcspn(start, "\"<>&");
+        if (pos > 0) {
+            s.append(start, pos);
+            start += pos;
+        }
+        else {
+            switch (*start) {
+                case '\'':  s += "&apos;";     break;
+                case '<':   s += "&lt;";       break;
+                case '>':   s += "&gt;";       break;
+                case '&':   s += "&amp;";      break;
+                default:    s += *start;
+            }
+            start++;
+        }
+    }
+    s += post;
+}
+
 string XMLToolingException::toString() const
 {
-    string xml=string("<exception xmlns=\"http://www.opensaml.org/xmltooling\" type=\"") + getClassName() + "\">";
+    string xml=string("<exception xmlns='http://www.opensaml.org/xmltooling' type='") + getClassName() + "'>";
     const char* msg=getMessage();
     if (msg)
-        xml=xml + "<message>" + msg + "</message>";
-    for (map<string,string>::const_iterator i=m_params.begin(); i!=m_params.end(); i++)
-        xml=xml + "<param name=\"" + i->first + "\">" + i->second + "</param>";
+        xml_encode(xml, "<message>", msg, "</message>");
+    for (map<string,string>::const_iterator i=m_params.begin(); i!=m_params.end(); i++) {
+        xml_encode(xml, "<param name='", i->first.c_str(), "'");
+        xml_encode(xml, ">", i->second.c_str(), "</param>");
+    }
     xml+="</exception>";
     return xml;
 }
@@ -273,8 +299,8 @@ XMLToolingException* XMLToolingException::fromStream(std::istream& in)
         char* v=toUTF8(child->getFirstChild()->getNodeValue());
         if (n.get() && v)
             excep->addProperty(n.get(), v);
-        XMLString::release(&v);
-        child=XMLHelper::getNextSiblingElement(root,XMLTOOLING_NS,param);
+        delete[] v;
+        child=XMLHelper::getNextSiblingElement(child,XMLTOOLING_NS,param);
     }
 
     doc->release();
