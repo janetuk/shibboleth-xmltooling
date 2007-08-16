@@ -25,6 +25,7 @@
 
 #include <xmltooling/Lockable.h>
 #include <xmltooling/PluginManager.h>
+#include <xmltooling/soap/SOAPTransport.h>
 #include <xmltooling/util/ParserPool.h>
 
 #ifndef XMLTOOLING_NO_XMLSEC
@@ -43,7 +44,6 @@ namespace xmltooling {
 
 namespace xmltooling {
     
-    class XMLTOOL_API SOAPTransport;
     class XMLTOOL_API TemplateEngine;
     class XMLTOOL_API URLEncoder;
 #ifndef XMLTOOLING_LITE
@@ -290,7 +290,7 @@ namespace xmltooling {
          * 
          * <p>The factory interface takes a peer name/endpoint pair.
          */
-        PluginManager<SOAPTransport,std::string,std::pair<const char*,const char*> > SOAPTransportManager;
+        PluginManager<SOAPTransport,std::string,SOAPTransport::Address> SOAPTransportManager;
     };
 
 };

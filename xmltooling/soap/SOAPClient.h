@@ -63,7 +63,7 @@ namespace soap11 {
         
         /**
          * Sends the supplied envelope to the identified recipient/endpoint.
-         * 
+         *
          * <p>The client object will instantiate a transport layer object
          * appropriate for the endpoint URL provided and supply it to the
          * prepareTransport() method below.
@@ -73,10 +73,9 @@ namespace soap11 {
          * in a subclass-specific version of the prepareTransport() method.   
          * 
          * @param env           SOAP envelope to send
-         * @param peerName      name of peer
-         * @param endpoint      URL of endpoint to recieve message
+         * @param addr          addressing information
          */
-        virtual void send(const Envelope& env, const char* peerName, const char* endpoint);
+        virtual void send(const Envelope& env, const xmltooling::SOAPTransport::Address& addr);
         
         /**
          * Returns the response message, if any. As long as a response is

@@ -46,14 +46,14 @@ void SOAPClient::reset()
     m_transport=NULL;
 }
 
-void SOAPClient::send(const Envelope& env, const char* peerName, const char* endpoint)
+void SOAPClient::send(const Envelope& env, const SOAPTransport::Address& addr)
 {
     // Prepare a transport object.
-    const char* pch = strchr(endpoint,':');
+    const char* pch = strchr(addr.m_endpoint,':');
     if (!pch)
         throw IOException("SOAP endpoint was not a URL.");
-    string scheme(endpoint, pch-endpoint);
-    m_transport = XMLToolingConfig::getConfig().SOAPTransportManager.newPlugin(scheme.c_str(), make_pair(peerName,endpoint));
+    string scheme(addr.m_endpoint, pch-addr.m_endpoint);
+    m_transport = XMLToolingConfig::getConfig().SOAPTransportManager.newPlugin(scheme.c_str(), addr);
     prepareTransport(*m_transport);
     
     // Serialize envelope.

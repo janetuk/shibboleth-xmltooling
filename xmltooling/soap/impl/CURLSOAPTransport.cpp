@@ -49,8 +49,8 @@ namespace xmltooling {
             m_log(Category::getInstance(XMLTOOLING_LOGCAT".SOAPTransport.CURLPool")) {}
         ~CURLPool();
         
-        CURL* get(const char* to, const char* endpoint);
-        void put(const char* to, const char* endpoint, CURL* handle);
+        CURL* get(const SOAPTransport::Address& addr);
+        void put(const char* from, const char* to, const char* endpoint, CURL* handle);
     
     private:    
         typedef map<string,vector<CURL*> > poolmap_t;
@@ -66,14 +66,15 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL CURLSOAPTransport : public HTTPSOAPTransport, public OpenSSLSOAPTransport
     {
     public:
-        CURLSOAPTransport(const char* peerName, const char* endpoint)
-                : m_peerName(peerName ? peerName : ""), m_endpoint(endpoint), m_handle(NULL), m_headers(NULL),
+        CURLSOAPTransport(const Address& addr)
+            : m_sender(addr.m_from ? addr.m_from : ""), m_peerName(addr.m_to ? addr.m_to : ""), m_endpoint(addr.m_endpoint),
+                m_handle(NULL), m_headers(NULL),
 #ifndef XMLTOOLING_NO_XMLSEC
                     m_cred(NULL), m_trustEngine(NULL), m_peerResolver(NULL), m_mandatory(false),
 #endif
                     m_ssl_callback(NULL), m_ssl_userptr(NULL), m_chunked(true), m_secure(false) {
-            m_handle = g_CURLPool->get(peerName, endpoint);
-            curl_easy_setopt(m_handle,CURLOPT_URL,endpoint);
+            m_handle = g_CURLPool->get(addr);
+            curl_easy_setopt(m_handle,CURLOPT_URL,addr.m_endpoint);
             curl_easy_setopt(m_handle,CURLOPT_CONNECTTIMEOUT,15);
             curl_easy_setopt(m_handle,CURLOPT_TIMEOUT,30);
             curl_easy_setopt(m_handle,CURLOPT_HTTPAUTH,0);
@@ -87,7 +88,7 @@ namespace xmltooling {
             curl_slist_free_all(m_headers);
             curl_easy_setopt(m_handle,CURLOPT_ERRORBUFFER,NULL);
             curl_easy_setopt(m_handle,CURLOPT_PRIVATE,m_secure ? "secure" : NULL); // Save off security "state".
-            g_CURLPool->put(m_peerName.c_str(), m_endpoint.c_str(), m_handle);
+            g_CURLPool->put(m_sender.c_str(), m_peerName.c_str(), m_endpoint.c_str(), m_handle);
         }
 
         bool isConfidential() const {
@@ -193,7 +194,7 @@ namespace xmltooling {
 
     private:        
         // per-call state
-        string m_peerName,m_endpoint,m_simplecreds;
+        string m_sender,m_peerName,m_endpoint,m_simplecreds;
         CURL* m_handle;
         stringstream m_stream;
         struct curl_slist* m_headers;
@@ -225,9 +226,9 @@ namespace xmltooling {
     int XMLTOOL_DLLLOCAL verify_callback(X509_STORE_CTX* x509_ctx, void* arg);
 #endif
 
-    SOAPTransport* CURLSOAPTransportFactory(const pair<const char*,const char*>& dest)
+    SOAPTransport* CURLSOAPTransportFactory(const SOAPTransport::Address& addr)
     {
-        return new CURLSOAPTransport(dest.first, dest.second);
+        return new CURLSOAPTransport(addr);
     }
 };
 
@@ -258,14 +259,19 @@ CURLPool::~CURLPool()
     delete m_lock;
 }
 
-CURL* CURLPool::get(const char* to, const char* endpoint)
+CURL* CURLPool::get(const SOAPTransport::Address& addr)
 {
 #ifdef _DEBUG
     xmltooling::NDC("get");
 #endif
-    m_log.debug("getting connection handle to %s", endpoint);
+    m_log.debug("getting connection handle to %s", addr.m_endpoint);
+    string key(addr.m_endpoint);
+    if (addr.m_from)
+        key = key + '|' + addr.m_from;
+    if (addr.m_to)
+        key = key + '|' + addr.m_to;
     m_lock->lock();
-    poolmap_t::iterator i=m_bindingMap.find(string(to) + "|" + endpoint);
+    poolmap_t::iterator i=m_bindingMap.find(key);
     
     if (i!=m_bindingMap.end()) {
         // Move this pool to the front of the list.
@@ -304,9 +310,13 @@ CURL* CURLPool::get(const char* to, const char* endpoint)
     return handle;
 }
 
-void CURLPool::put(const char* to, const char* endpoint, CURL* handle)
+void CURLPool::put(const char* from, const char* to, const char* endpoint, CURL* handle)
 {
-    string key = string(to) + "|" + endpoint;
+    string key(endpoint);
+    if (from)
+        key = key + '|' + from;
+    if (to)
+        key = key + '|' + to;
     m_lock->lock();
     poolmap_t::iterator i=m_bindingMap.find(key);
     if (i==m_bindingMap.end())

@@ -46,7 +46,31 @@ namespace xmltooling {
         SOAPTransport() {}
     public:
         virtual ~SOAPTransport() {}
-        
+
+        /**
+         * A simple structure to capture SOAP addressing information.
+         */
+        struct XMLTOOL_API Address {
+            /**
+             * Constructor.
+             *
+             * @param from      name of sender
+             * @param to        name of recipient
+             * @param endpoint  endpoint URL
+             */
+            Address(const char* from, const char* to, const char* endpoint) : m_from(from), m_to(to), m_endpoint(endpoint) {
+            }
+
+            /** Name of sender. */
+            const char* m_from;
+
+            /** Name of recipient. */
+            const char* m_to;
+
+            /** Endpoint URL. */
+            const char* m_endpoint;
+        };
+
         /**
          * Indicates whether transport provides confidentiality.
          * 
