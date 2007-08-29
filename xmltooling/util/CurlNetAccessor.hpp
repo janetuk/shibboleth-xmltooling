@@ -46,11 +46,7 @@ public :
     virtual BinInputStream* makeNew(const XMLURL&  urlSource, const XMLNetHTTPInfo* httpInfo=0);
     virtual const XMLCh* getId() const;
 
-    virtual void initCurl(void);
-    virtual void cleanupCurl(void);
-
 private :
-	static int fgCurlInitCount;
     static const XMLCh fgMyName[];
 
     CurlNetAccessor(const CurlNetAccessor&);

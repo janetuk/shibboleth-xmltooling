@@ -40,46 +40,12 @@ const XMLCh CurlNetAccessor::fgMyName[] =
 
 CurlNetAccessor::CurlNetAccessor()
 {
-	initCurl();
 }
 
 
 CurlNetAccessor::~CurlNetAccessor()
 {
-	cleanupCurl();
 }
-
-
-//
-// Global once-only init and cleanup of curl
-//
-// The init count used here is not thread protected; we assume
-// that creation of the CurlNetAccessor will be serialized by
-// the application. If the application is also using curl, then
-// care must be taken that curl is initialized only once, by some
-// other means, or by overloading these methods.
-//
-int CurlNetAccessor::fgCurlInitCount = 0;
-
-void
-CurlNetAccessor::initCurl()
-{
-	if (fgCurlInitCount++ == 0)
-		curl_global_init(	0
-						  | CURL_GLOBAL_ALL			// Initialize all curl modules
-					//	  | CURL_GLOBAL_WIN32		// Initialize Windows sockets first
-					//	  | CURL_GLOBAL_SSL			// Initialize SSL first
-						  );
-}
-
-
-void
-CurlNetAccessor::cleanupCurl()
-{
-	if (fgCurlInitCount > 0 && --fgCurlInitCount == 0)
-		curl_global_cleanup();
-}
-
 
 BinInputStream*
 CurlNetAccessor::makeNew(const XMLURL&  urlSource, const XMLNetHTTPInfo* httpInfo/*=0*/)
@@ -90,4 +56,3 @@ CurlNetAccessor::makeNew(const XMLURL&  urlSource, const XMLNetHTTPInfo* httpInf
 		new (urlSource.getMemoryManager()) CurlURLInputStream(urlSource, httpInfo);
 	return retStrm;            
 }
-
