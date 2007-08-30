@@ -134,6 +134,7 @@ xmlsec_sources = \
 	security/impl/InlineKeyResolver.cpp \
 	security/impl/KeyInfoResolver.cpp \
 	security/impl/OpenSSLCryptoX509CRL.cpp \
+	security/impl/StaticPKIXTrustEngine.cpp \
 	security/impl/TrustEngine.cpp \
 	security/impl/XSECCryptoX509CRL.cpp \
 	signature/impl/SignatureValidator.cpp \

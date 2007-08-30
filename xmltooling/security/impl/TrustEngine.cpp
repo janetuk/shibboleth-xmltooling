@@ -32,6 +32,7 @@ using namespace std;
 
 namespace xmltooling {
     XMLTOOL_DLLLOCAL PluginManager<TrustEngine,string,const DOMElement*>::Factory ExplicitKeyTrustEngineFactory;
+    XMLTOOL_DLLLOCAL PluginManager<TrustEngine,string,const DOMElement*>::Factory StaticPKIXTrustEngineFactory;
     XMLTOOL_DLLLOCAL PluginManager<TrustEngine,string,const DOMElement*>::Factory ChainingTrustEngineFactory;
 };
 
@@ -39,6 +40,7 @@ void XMLTOOL_API xmltooling::registerTrustEngines()
 {
     XMLToolingConfig& conf=XMLToolingConfig::getConfig();
     conf.TrustEngineManager.registerFactory(EXPLICIT_KEY_TRUSTENGINE, ExplicitKeyTrustEngineFactory);
+    conf.TrustEngineManager.registerFactory(STATIC_PKIX_TRUSTENGINE, StaticPKIXTrustEngineFactory);
     conf.TrustEngineManager.registerFactory(CHAINING_TRUSTENGINE, ChainingTrustEngineFactory);
 }
 

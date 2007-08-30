@@ -421,6 +421,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\security\impl\StaticPKIXTrustEngine.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\security\impl\TrustEngine.cpp"
 						>
 					</File>

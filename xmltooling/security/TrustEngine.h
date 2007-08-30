@@ -25,6 +25,7 @@
 #define __xmltooling_trust_h__
 
 #include <xmltooling/base.h>
+#include <xercesc/dom/DOM.hpp>
 
 namespace xmltooling {
 
@@ -75,7 +76,10 @@ namespace xmltooling {
 
     /** TrustEngine based on explicit knowledge of peer key information. */
     #define EXPLICIT_KEY_TRUSTENGINE  "ExplicitKey"
-    
+
+    /** TrustEngine based on PKIX evaluation against a static set of trust anchors. */
+    #define STATIC_PKIX_TRUSTENGINE  "StaticPKIX"
+
     /** TrustEngine that tries multiple engines in sequence. */
     #define CHAINING_TRUSTENGINE  "Chaining"
     

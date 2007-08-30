@@ -25,6 +25,9 @@
 
 #include <xmltooling/security/TrustEngine.h>
 
+#include <vector>
+#include <xsec/enc/XSECCryptoX509.hpp>
+
 namespace xmltooling {
 
     class XMLTOOL_API CredentialCriteria;
