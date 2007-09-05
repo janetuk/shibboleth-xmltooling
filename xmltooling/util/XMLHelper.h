@@ -249,20 +249,22 @@ namespace xmltooling {
          * Serializes the DOM node provided into a buffer using UTF-8 encoding and
          * the default XML serializer available. No manipulation or formatting is applied.
          * 
-         * @param n     node to serialize
-         * @param buf   buffer to serialize element into
+         * @param n         node to serialize
+         * @param buf       buffer to serialize element into
+         * @param pretty    enable pretty printing if supported
          */
-        static void serialize(const xercesc::DOMNode* n, std::string& buf);
+        static void serialize(const xercesc::DOMNode* n, std::string& buf, bool pretty=false);
 
         /**
          * Serializes the DOM node provided to a stream using UTF-8 encoding and
          * the default XML serializer available. No manipulation or formatting is applied.
          * 
-         * @param n     node to serialize
-         * @param out   stream to serialize element into
+         * @param n         node to serialize
+         * @param out       stream to serialize element into
+         * @param pretty    enable pretty printing if supported
          * @return reference to output stream
          */
-        static std::ostream& serialize(const xercesc::DOMNode* n, std::ostream& out);
+        static std::ostream& serialize(const xercesc::DOMNode* n, std::ostream& out, bool pretty=false);
     };
 
     /**

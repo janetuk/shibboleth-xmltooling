@@ -232,7 +232,7 @@ DOMElement* XMLHelper::getPreviousSiblingElement(const DOMNode* n, const XMLCh* 
     return e;
 }
 
-void XMLHelper::serialize(const DOMNode* n, std::string& buf)
+void XMLHelper::serialize(const DOMNode* n, std::string& buf, bool pretty)
 {
     static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
     static const XMLCh UTF8[]={ chLatin_U, chLatin_T, chLatin_F, chDigit_8, chNull };
@@ -240,6 +240,8 @@ void XMLHelper::serialize(const DOMNode* n, std::string& buf)
     DOMWriter* serializer=(static_cast<DOMImplementationLS*>(impl))->createDOMWriter();
     XercesJanitor<DOMWriter> janitor(serializer);
     serializer->setEncoding(UTF8);
+    if (pretty && serializer->canSetFeature(XMLUni::fgDOMWRTFormatPrettyPrint, pretty))
+        serializer->setFeature(XMLUni::fgDOMWRTFormatPrettyPrint, pretty);
     MemBufFormatTarget target;
     if (!serializer->writeNode(&target,*n))
         throw XMLParserException("unable to serialize XML");
@@ -267,7 +269,7 @@ namespace {
     };
 };
 
-ostream& XMLHelper::serialize(const DOMNode* n, ostream& out)
+ostream& XMLHelper::serialize(const DOMNode* n, ostream& out, bool pretty)
 {
     static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
     static const XMLCh UTF8[]={ chLatin_U, chLatin_T, chLatin_F, chDigit_8, chNull };
@@ -275,6 +277,8 @@ ostream& XMLHelper::serialize(const DOMNode* n, ostream& out)
     DOMWriter* serializer=(static_cast<DOMImplementationLS*>(impl))->createDOMWriter();
     XercesJanitor<DOMWriter> janitor(serializer);
     serializer->setEncoding(UTF8);
+    if (pretty && serializer->canSetFeature(XMLUni::fgDOMWRTFormatPrettyPrint, pretty))
+        serializer->setFeature(XMLUni::fgDOMWRTFormatPrettyPrint, pretty);
     StreamFormatTarget target(out);
     if (!serializer->writeNode(&target,*n))
         throw XMLParserException("unable to serialize XML");
