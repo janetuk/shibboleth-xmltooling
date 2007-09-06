@@ -137,10 +137,13 @@ namespace xmltooling {
         return new FilesystemCredentialResolver(e);
     }
 
+    static const XMLCh _CredentialResolver[] =  UNICODE_LITERAL_18(C,r,e,d,e,n,t,i,a,l,R,e,s,o,l,v,e,r);
     static const XMLCh CAPath[] =           UNICODE_LITERAL_6(C,A,P,a,t,h);
     static const XMLCh Certificate[] =      UNICODE_LITERAL_11(C,e,r,t,i,f,i,c,a,t,e);
+    static const XMLCh _certificate[] =     UNICODE_LITERAL_11(c,e,r,t,i,f,i,c,a,t,e);
     static const XMLCh format[] =           UNICODE_LITERAL_6(f,o,r,m,a,t);
     static const XMLCh Key[] =              UNICODE_LITERAL_3(K,e,y);
+    static const XMLCh _key[] =             UNICODE_LITERAL_3(k,e,y);
     static const XMLCh Name[] =             UNICODE_LITERAL_4(N,a,m,e);
     static const XMLCh password[] =         UNICODE_LITERAL_8(p,a,s,s,w,o,r,d);
     static const XMLCh Path[] =             UNICODE_LITERAL_4(P,a,t,h);
@@ -153,6 +156,30 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
 #endif
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver."FILESYSTEM_CREDENTIAL_RESOLVER);
 
+    if (e && (e->hasAttributeNS(NULL,_certificate) || e->hasAttributeNS(NULL,_key))) {
+        // Dummy up a simple file resolver config using these attributes.
+        DOMElement* dummy = e->getOwnerDocument()->createElementNS(NULL,_CredentialResolver);
+        DOMElement* child;
+        DOMElement* path;
+        if (e->hasAttributeNS(NULL,_key)) {
+            child = e->getOwnerDocument()->createElementNS(NULL,Key);
+            dummy->appendChild(child);
+            path = e->getOwnerDocument()->createElementNS(NULL,Path);
+            child->appendChild(path);
+            path->appendChild(e->getOwnerDocument()->createTextNode(e->getAttributeNS(NULL,_key)));
+            if (e->hasAttributeNS(NULL,password))
+                child->setAttributeNS(NULL,password,e->getAttributeNS(NULL,password));
+        }
+        if (e->hasAttributeNS(NULL,_certificate)) {
+            child = e->getOwnerDocument()->createElementNS(NULL,Certificate);
+            dummy->appendChild(child);
+            path = e->getOwnerDocument()->createElementNS(NULL,Path);
+            child->appendChild(path);
+            path->appendChild(e->getOwnerDocument()->createTextNode(e->getAttributeNS(NULL,_certificate)));
+        }
+        e = dummy;  // reset "root" to the dummy config element
+    }
+    
     const DOMElement* root=e;
 
     XSECCryptoKey* key=NULL;
