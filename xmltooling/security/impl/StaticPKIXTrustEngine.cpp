@@ -121,14 +121,8 @@ StaticPKIXTrustEngine::StaticPKIXTrustEngine(const DOMElement* e) : AbstractPKIX
         m_depth = 1;
 
     if (e && e->hasAttributeNS(NULL,certificate)) {
-        // Dummy up a file resolver.
-        DOMElement* dummy = e->getOwnerDocument()->createElementNS(NULL,_CredentialResolver);
-        DOMElement* child = e->getOwnerDocument()->createElementNS(NULL,Certificate);
-        dummy->appendChild(child);
-        DOMElement* path = e->getOwnerDocument()->createElementNS(NULL,Path);
-        child->appendChild(path);
-        path->appendChild(e->getOwnerDocument()->createTextNode(e->getAttributeNS(NULL,certificate)));
-        m_credResolver = XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(FILESYSTEM_CREDENTIAL_RESOLVER,dummy);
+        // Simple File resolver config rooted here.
+        m_credResolver = XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(FILESYSTEM_CREDENTIAL_RESOLVER,e);
     }
     else {
         e = e ? XMLHelper::getFirstChildElement(e, _CredentialResolver) : NULL;
