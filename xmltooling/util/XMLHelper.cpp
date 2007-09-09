@@ -104,6 +104,24 @@ const XMLObject* XMLHelper::getXMLObjectById(const XMLObject& tree, const XMLCh*
     return NULL;
 }
 
+XMLObject* XMLHelper::getXMLObjectById(XMLObject& tree, const XMLCh* id)
+{
+    if (XMLString::equals(id, tree.getXMLID()))
+        return &tree;
+    
+    XMLObject* ret;
+    const list<XMLObject*>& children = tree.getOrderedChildren();
+    for (list<XMLObject*>::const_iterator i=children.begin(); i!=children.end(); ++i) {
+        if (*i) {
+            ret = getXMLObjectById(*(*i), id);
+            if (ret)
+                return ret;
+        }
+    }
+    
+    return NULL;
+}
+
 QName* XMLHelper::getNodeQName(const DOMNode* domNode)
 {
     if (domNode)
