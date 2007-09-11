@@ -319,7 +319,7 @@ void AbstractXMLObjectMarshaller::marshallContent(
     const XMLCh* val;
     unsigned int pos=0;
     const list<XMLObject*>& children=getOrderedChildren();
-    for (list<XMLObject*>::const_iterator i=children.begin(); i!=children.end(); ++i, ++pos) {
+    for (list<XMLObject*>::const_iterator i=children.begin(); i!=children.end(); ++i) {
         val = getTextContent(pos);
         if (val && *val)
             domElement->appendChild(domElement->getOwnerDocument()->createTextNode(val));
@@ -329,6 +329,7 @@ void AbstractXMLObjectMarshaller::marshallContent(
 #else
             (*i)->marshall(domElement);
 #endif
+            ++pos;
         }
     }
     val = getTextContent(pos);
