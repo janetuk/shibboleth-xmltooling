@@ -72,7 +72,7 @@ namespace xmltooling {
 #ifndef XMLTOOLING_NO_XMLSEC
                     m_cred(NULL), m_trustEngine(NULL), m_peerResolver(NULL), m_mandatory(false),
 #endif
-                    m_ssl_callback(NULL), m_ssl_userptr(NULL), m_chunked(true), m_secure(false) {
+                    m_ssl_callback(NULL), m_ssl_userptr(NULL), m_chunked(true), m_authenticated(false) {
             m_handle = g_CURLPool->get(addr);
             curl_easy_setopt(m_handle,CURLOPT_URL,addr.m_endpoint);
             curl_easy_setopt(m_handle,CURLOPT_CONNECTTIMEOUT,15);
@@ -87,7 +87,7 @@ namespace xmltooling {
         virtual ~CURLSOAPTransport() {
             curl_slist_free_all(m_headers);
             curl_easy_setopt(m_handle,CURLOPT_ERRORBUFFER,NULL);
-            curl_easy_setopt(m_handle,CURLOPT_PRIVATE,m_secure ? "secure" : NULL); // Save off security "state".
+            curl_easy_setopt(m_handle,CURLOPT_PRIVATE,m_authenticated ? "secure" : NULL); // Save off security "state".
             g_CURLPool->put(m_sender.c_str(), m_peerName.c_str(), m_endpoint.c_str(), m_handle);
         }
 
@@ -167,12 +167,12 @@ namespace xmltooling {
             return m_stream;
         }
         
-        bool isSecure() const {
-            return m_secure;
+        bool isAuthenticated() const {
+            return m_authenticated;
         }
 
-        void setSecure(bool secure) {
-            m_secure = secure;
+        void setAuthenticated(bool auth) {
+            m_authenticated = auth;
         }
 
         string getContentType() const;
@@ -209,7 +209,7 @@ namespace xmltooling {
         ssl_ctx_callback_fn m_ssl_callback;
         void* m_ssl_userptr;
         bool m_chunked;
-        bool m_secure;
+        bool m_authenticated;
         
         friend size_t XMLTOOL_DLLLOCAL curl_header_hook(void* ptr, size_t size, size_t nmemb, void* stream);
         friend CURLcode XMLTOOL_DLLLOCAL xml_ssl_ctx_callback(CURL* curl, SSL_CTX* ssl_ctx, void* userptr);
@@ -454,7 +454,7 @@ void CURLSOAPTransport::send(istream& in)
         char* priv=NULL;
         curl_easy_getinfo(m_handle,CURLINFO_PRIVATE,&priv);
         if (priv)
-            m_secure=true;
+            m_authenticated=true;
     }
     else {
         curl_easy_setopt(m_handle,CURLOPT_SSL_CTX_FUNCTION,NULL);
@@ -561,12 +561,12 @@ int xmltooling::verify_callback(X509_STORE_CTX* x509_ctx, void* arg)
     if (!success) {
         log.error("supplied TrustEngine failed to validate SSL/TLS server certificate");
         x509_ctx->error=X509_V_ERR_APPLICATION_VERIFICATION;     // generic error, check log for plugin specifics
-        ctx->setSecure(false);
+        ctx->setAuthenticated(false);
         return ctx->m_mandatory ? 0 : 1;
     }
     
     // Signal success. Hopefully it doesn't matter what's actually in the structure now.
-    ctx->setSecure(true);
+    ctx->setAuthenticated(true);
     return 1;
 }
 #endif

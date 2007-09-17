@@ -54,9 +54,9 @@ namespace xmltooling {
         /**
          * Sets indicator that the transport peer has been authenticated.
          * 
-         * @param secure    flag to set
+         * @param auth    flag to set
          */
-        virtual void setSecure(bool secure)=0;
+        virtual void setAuthenticated(bool auth)=0;
     };
 
 };

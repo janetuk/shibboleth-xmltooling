@@ -191,7 +191,7 @@ namespace xmltooling {
          * 
          * @return true iff TrustEngine or other mechanism successfully authenticated the peer
          */
-        virtual bool isSecure() const=0;
+        virtual bool isAuthenticated() const=0;
 
         /**
          * Returns the MIME type of the response, if any.
