@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = foreign
 
-pkgdocdir = $(prefix)/doc/@PACKAGE@
+pkgdocdir = $(datadir)/doc/@PACKAGE@
 
 docfiles = \
 	LICENSE.txt \
@@ -12,4 +12,3 @@ docfiles = \
 pkgdoc_DATA = $(docfiles)
 
 EXTRA_DIST = $(docfiles)
-
