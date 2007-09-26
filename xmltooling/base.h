@@ -1093,7 +1093,7 @@
 #define DECL_INTEGER_CONTENT(proper) \
     XMLTOOLING_DOXYGEN(Returns proper in integer form after a NULL indicator.) \
     std::pair<bool,int> get##proper() const { \
-        return std::make_pair((getTextContent()!=NULL), (getTextContent()!=NULL ? xercesc::XMLString::parseInt(getTextContent()) : NULL)); \
+        return std::make_pair((getTextContent()!=NULL), (getTextContent()!=NULL ? xercesc::XMLString::parseInt(getTextContent()) : 0)); \
     } \
     XMLTOOLING_DOXYGEN(Sets proper.) \
     void set##proper(int proper) { \
