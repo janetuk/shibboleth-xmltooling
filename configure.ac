@@ -188,17 +188,17 @@ if test x_$with_xmlsec != x_no; then
     AC_MSG_CHECKING([XML-Security version])
     AC_PREPROC_IFELSE(
 	    [AC_LANG_PROGRAM([#include <xsec/utils/XSECPlatformUtils.hpp>],
-        [#if XSEC_VERSION_MAJOR > 1 || (XSEC_VERSION_MAJOR == 1 && XSEC_VERSION_MEDIUM > 3) || (XSEC_VERSION_MAJOR == 1 && XSEC_VERSION_MEDIUM == 3 && XSEC_VERSION_MINOR > 0)
+        [#if XSEC_VERSION_MAJOR > 1 || (XSEC_VERSION_MAJOR == 1 && XSEC_VERSION_MEDIUM > 3)
 int i = 0;
 #else
-#error need version 1.3.1 or later
+#error need version 1.4.0 or later
 #endif])],
         [AC_MSG_RESULT(OK)],
-        [AC_MSG_FAILURE([XML-Security version 1.3.1 or greater is required.])])
+        [AC_MSG_FAILURE([XML-Security version 1.4.0 or greater is required.])])
     AC_TRY_LINK(
             [#include <xsec/utils/XSECPlatformUtils.hpp>],
             [XSECPlatformUtils::Initialise()],,
-            [AC_MSG_ERROR([unable to link with XML-Sec])])
+            [AC_MSG_ERROR([unable to link with XML-Security])])
 
 	# restore master libs
 	LIBS="$save_LIBS"
@@ -240,8 +240,10 @@ int i = 0;
 	AC_ARG_WITH(openssl,
 	    AC_HELP_STRING([--with-openssl=PATH], [where openssl is installed]),
 	    [if test x_$with_openssl != x_/usr; then
-	        SSLFLAGS="-I${with_openssl}/include"
+            SSLFLAGS="-I${with_openssl}/include"
 	        SSLLIBS="-L${with_openssl}/lib -lcrypto -lssl"
+        else
+            SSLLIBS="-lcrypto -lssl"
 	    fi])
 	
 	if test "x$SSLLIBS" = "x" ; then
