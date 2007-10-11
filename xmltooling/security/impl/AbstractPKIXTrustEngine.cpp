@@ -169,7 +169,7 @@ bool AbstractPKIXTrustEngine::checkEntityNames(
             buf[len] = '\0';
             subjectstr+=buf;
         }
-        log.debugStream() << "certificate subject: " << subjectstr << CategoryStream::ENDLINE;
+        log.debugStream() << "certificate subject: " << subjectstr << logging::eol;
         // The flags give us LDAP order instead of X.500, with a comma plus space separator.
         len=X509_NAME_print_ex(b2,subject,0,XN_FLAG_RFC2253 + XN_FLAG_SEP_CPLUS_SPC - XN_FLAG_SEP_COMMA_PLUS);
         BIO_flush(b2);

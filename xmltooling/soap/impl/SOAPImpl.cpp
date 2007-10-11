@@ -184,10 +184,10 @@ namespace {
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILD(Faultcode,SOAP11ENV_NS,false);
-            PROC_TYPED_CHILD(Faultstring,SOAP11ENV_NS,false);
-            PROC_TYPED_CHILD(Faultactor,SOAP11ENV_NS,false);
-            PROC_TYPED_CHILD(Detail,SOAP11ENV_NS,false);
+            PROC_TYPED_CHILD(Faultcode,NULL,false);
+            PROC_TYPED_CHILD(Faultstring,NULL,false);
+            PROC_TYPED_CHILD(Faultactor,NULL,false);
+            PROC_TYPED_CHILD(Detail,NULL,false);
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
     };

@@ -170,7 +170,7 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
                     doc=XMLToolingConfig::getConfig().getParser().parse(dsrc);
             }
 
-            m_log.infoStream() << "loaded XML resource (" << (backup ? m_backing : m_source) << ")" << CategoryStream::ENDLINE;
+            m_log.infoStream() << "loaded XML resource (" << (backup ? m_backing : m_source) << ")" << logging::eol;
 
             if (!backup && !m_backing.empty()) {
                 m_log.debug("backing up remote resource to (%s)", m_backing.c_str());
@@ -189,14 +189,14 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
     catch (XMLException& e) {
         auto_ptr_char msg(e.getMessage());
         m_log.critStream() << "Xerces error while loading resource (" << (backup ? m_backing : m_source) << "): "
-            << msg.get() << CategoryStream::ENDLINE;
+            << msg.get() << logging::eol;
         if (!backup && !m_backing.empty())
             return load(true);
         throw XMLParserException(msg.get());
     }
     catch (exception& e) {
         m_log.critStream() << "error while loading configuration from ("
-            << (m_source.empty() ? "inline" : (backup ? m_backing : m_source)) << "): " << e.what() << CategoryStream::ENDLINE;
+            << (m_source.empty() ? "inline" : (backup ? m_backing : m_source)) << "): " << e.what() << logging::eol;
         if (!backup && !m_backing.empty())
             return load(true);
         throw;

@@ -475,9 +475,9 @@ void xmltooling::log_openssl()
     unsigned long code=ERR_get_error_line_data(&file,&line,&data,&flags);
     while (code) {
         Category& log=Category::getInstance("OpenSSL");
-        log.errorStream() << "error code: " << code << " in " << file << ", line " << line << CategoryStream::ENDLINE;
+        log.errorStream() << "error code: " << code << " in " << file << ", line " << line << logging::eol;
         if (data && (flags & ERR_TXT_STRING))
-            log.errorStream() << "error data: " << data << CategoryStream::ENDLINE;
+            log.errorStream() << "error data: " << data << logging::eol;
         code=ERR_get_error_line_data(&file,&line,&data,&flags);
     }
 }

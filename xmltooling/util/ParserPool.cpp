@@ -280,19 +280,19 @@ bool ParserPool::handleError(const DOMError& e)
         case DOMError::DOM_SEVERITY_WARNING:
             log.warnStream() << "warning on line " << locator->getLineNumber()
                 << ", column " << locator->getColumnNumber()
-                << ", message: " << temp.get() << CategoryStream::ENDLINE;
+                << ", message: " << temp.get() << logging::eol;
             return true;
 
         case DOMError::DOM_SEVERITY_ERROR:
             log.errorStream() << "error on line " << locator->getLineNumber()
                 << ", column " << locator->getColumnNumber()
-                << ", message: " << temp.get() << CategoryStream::ENDLINE;
+                << ", message: " << temp.get() << logging::eol;
             throw XMLParserException(string("error during XML parsing: ") + (temp.get() ? temp.get() : "no message"));
 
         case DOMError::DOM_SEVERITY_FATAL_ERROR:
             log.critStream() << "fatal error on line " << locator->getLineNumber()
                 << ", column " << locator->getColumnNumber()
-                << ", message: " << temp.get() << CategoryStream::ENDLINE;
+                << ", message: " << temp.get() << logging::eol;
             throw XMLParserException(string("fatal error during XML parsing: ") + (temp.get() ? temp.get() : "no message"));
     }
     throw XMLParserException(string("unclassified error during XML parsing: ") + (temp.get() ? temp.get() : "no message"));
@@ -369,7 +369,7 @@ unsigned int StreamInputSource::StreamBinInputStream::readBytes(XMLByte* const t
         catch(ios_base::failure& e) {
             Category::getInstance(XMLTOOLING_LOGCAT".StreamInputSource").critStream()
                 << "XML::StreamInputSource::StreamBinInputStream::readBytes caught an exception: " << e.what()
-                << CategoryStream::ENDLINE;
+                << logging::eol;
             *toFill=0;
             return 0;
         }
