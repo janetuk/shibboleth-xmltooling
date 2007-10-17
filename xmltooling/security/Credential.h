@@ -62,6 +62,23 @@ namespace xmltooling {
         };
 
         /**
+         * Enumeration of use cases for credentials. 
+         */
+        enum UsageTypes {
+            UNSPECIFIED_CREDENTIAL,
+            SIGNING_CREDENTIAL,
+            TLS_CREDENTIAL,
+            ENCRYPTION_CREDENTIAL
+        };
+        
+        /**
+         * Get the credential usage type.
+         * 
+         * @return the usage
+         */
+        virtual UsageTypes getUsage() const=0;
+
+        /**
          * Returns an algorithm identifier for the Credential.
          *
          * @return  the Credential algorithm, or NULL if indeterminate

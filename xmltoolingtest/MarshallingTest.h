@@ -66,6 +66,10 @@ public:
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
         TS_ASSERT(doc!=NULL);
 
+        string buf;
+        XMLHelper::serialize(rootElement, buf);
+        cout << buf;
+        
         TS_ASSERT(rootElement->isEqualNode(doc->getDocumentElement()));
         doc->release();
     }

@@ -36,6 +36,13 @@ using namespace std;
 
 bool CredentialCriteria::matches(const Credential& credential) const
 {
+    // Usage check, if specified and we have one.
+    if (getUsage() != Credential::UNSPECIFIED_CREDENTIAL) {
+        if (credential.getUsage() != Credential::UNSPECIFIED_CREDENTIAL)
+            if (getUsage() != credential.getUsage())
+                return false;
+    }
+
     // Algorithm check, if specified and we have one.
     const char* alg = getKeyAlgorithm();
     if (alg && *alg) {

@@ -262,8 +262,8 @@ bool AbstractPKIXTrustEngine::validate(
 
     if (criteria && criteria->getPeerName() && *(criteria->getPeerName())) {
         log.debug("checking that the certificate name is acceptable");
-        if (criteria->getUsage()==CredentialCriteria::UNSPECIFIED_CREDENTIAL)
-            criteria->setUsage(CredentialCriteria::SIGNING_CREDENTIAL);
+        if (criteria->getUsage()==Credential::UNSPECIFIED_CREDENTIAL)
+            criteria->setUsage(Credential::SIGNING_CREDENTIAL);
         if (!checkEntityNames(certEE,credResolver,*criteria)) {
             log.error("certificate name was not acceptable");
             return false;

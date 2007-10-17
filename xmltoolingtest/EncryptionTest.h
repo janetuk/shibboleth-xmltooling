@@ -56,7 +56,7 @@ public:
 
         try {
             CredentialCriteria cc;
-            cc.setUsage(CredentialCriteria::ENCRYPTION_CREDENTIAL);
+            cc.setUsage(Credential::ENCRYPTION_CREDENTIAL);
             Locker locker(m_resolver);
             const Credential* cred=m_resolver->resolve(&cc);
             TSM_ASSERT("Retrieved credential was null", cred!=NULL);
