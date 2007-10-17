@@ -69,12 +69,28 @@ namespace xmltooling {
     {
     public:
         FilesystemCredential(FilesystemCredentialResolver* resolver, XSECCryptoKey* key, const std::vector<XSECCryptoX509*>& xseccerts)
-                : BasicX509Credential(key, xseccerts), m_resolver(resolver) {
+                : BasicX509Credential(key, xseccerts), m_resolver(resolver), m_usage(UNSPECIFIED_CREDENTIAL) {
             if (!m_xseccerts.empty())
                 extractNames(m_xseccerts.front(), m_keyNames);
             initKeyInfo();
         }
         virtual ~FilesystemCredential() {
+        }
+
+        unsigned int getUsage() const {
+            return m_usage;
+        }
+
+        void setUsage(const XMLCh* usage) {
+            if (usage && *usage) {
+                auto_ptr_char u(usage);
+                if (!strcmp(u.get(), "signing"))
+                    m_usage = SIGNING_CREDENTIAL | TLS_CREDENTIAL;
+                else if (!strcmp(u.get(), "TLS"))
+                    m_usage = TLS_CREDENTIAL;
+                else if (!strcmp(u.get(), "encryption"))
+                    m_usage = ENCRYPTION_CREDENTIAL;
+            }
         }
 
         void addKeyNames(const DOMElement* e);
@@ -83,6 +99,7 @@ namespace xmltooling {
     
     private:
         FilesystemCredentialResolver* m_resolver;
+        unsigned int m_usage;
     };
 
 #if defined (_MSC_VER)
@@ -147,6 +164,7 @@ namespace xmltooling {
     static const XMLCh Name[] =             UNICODE_LITERAL_4(N,a,m,e);
     static const XMLCh password[] =         UNICODE_LITERAL_8(p,a,s,s,w,o,r,d);
     static const XMLCh Path[] =             UNICODE_LITERAL_4(P,a,t,h);
+    static const XMLCh _use[] =             UNICODE_LITERAL_3(u,s,e);
 };
 
 FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) : m_credential(NULL)
@@ -181,6 +199,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
     }
     
     const DOMElement* root=e;
+    const XMLCh* usage = root->getAttributeNS(NULL,_use);
 
     XSECCryptoKey* key=NULL;
     vector<XSECCryptoX509*> xseccerts;
@@ -261,6 +280,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
     if (!e) {
         m_credential = new FilesystemCredential(this,key,xseccerts);
         m_credential->addKeyNames(keynode);
+        m_credential->setUsage(usage);
         return;
     }
     auto_ptr_char certpass(e->getAttributeNS(NULL,password));
@@ -425,6 +445,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
         key = xseccerts.front()->clonePublicKey();
     m_credential = new FilesystemCredential(this, key, xseccerts);
     m_credential->addKeyNames(keynode);
+    m_credential->setUsage(usage);
 }
 
 XSECCryptoKey* FilesystemCredentialResolver::loadKey()

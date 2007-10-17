@@ -58,20 +58,20 @@ namespace xmltooling {
         virtual bool matches(const Credential& credential) const;
        
         /**
-         * Get the key usage criteria.
+         * Get key usage criteria.
          * 
-         * @return the usage.
+         * @return the usage mask
          */
-        Credential::UsageTypes getUsage() const {
+        unsigned int getUsage() const {
             return m_keyUsage;
         }
     
         /**
-         * Set the key usage criteria.
+         * Set key usage criteria.
          * 
-         * @param usage the usage to set
+         * @param usage the usage mask to set
          */
-        void setUsage(Credential::UsageTypes usage) {
+        void setUsage(unsigned int usage) {
             m_keyUsage = usage;
         }
 
@@ -291,7 +291,7 @@ namespace xmltooling {
         }
 
     private:
-        Credential::UsageTypes m_keyUsage;
+        unsigned int m_keyUsage;
         unsigned int m_keySize;
         std::string m_peerName,m_keyAlgorithm;
         std::set<std::string> m_keyNames;

@@ -84,7 +84,7 @@ namespace xmltooling {
     public:
         virtual ~BasicX509Credential();
         
-        UsageTypes getUsage() const {
+        unsigned int getUsage() const {
             return UNSPECIFIED_CREDENTIAL;
         }
         const char* getAlgorithm() const;

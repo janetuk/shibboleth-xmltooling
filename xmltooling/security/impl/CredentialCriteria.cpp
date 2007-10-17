@@ -36,10 +36,10 @@ using namespace std;
 
 bool CredentialCriteria::matches(const Credential& credential) const
 {
-    // Usage check, if specified and we have one.
+    // Usage check, if specified and we have one, compare masks.
     if (getUsage() != Credential::UNSPECIFIED_CREDENTIAL) {
         if (credential.getUsage() != Credential::UNSPECIFIED_CREDENTIAL)
-            if (getUsage() != credential.getUsage())
+            if ((getUsage() & credential.getUsage()) == 0)
                 return false;
     }
 
