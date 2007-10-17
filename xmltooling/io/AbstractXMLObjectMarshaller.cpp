@@ -316,23 +316,22 @@ void AbstractXMLObjectMarshaller::marshallContent(
 {
     m_log.debug("marshalling text and child elements for XMLObject");
     
-    const XMLCh* val;
     unsigned int pos=0;
+    const XMLCh* val = getTextContent(pos);
+    if (val && *val)
+        domElement->appendChild(domElement->getOwnerDocument()->createTextNode(val));
+    
     const list<XMLObject*>& children=getOrderedChildren();
     for (list<XMLObject*>::const_iterator i=children.begin(); i!=children.end(); ++i) {
-        val = getTextContent(pos);
-        if (val && *val)
-            domElement->appendChild(domElement->getOwnerDocument()->createTextNode(val));
         if (*i) {
 #ifndef XMLTOOLING_NO_XMLSEC
             (*i)->marshall(domElement,NULL,credential);
 #else
             (*i)->marshall(domElement);
 #endif
-            ++pos;
+            val = getTextContent(++pos);
+            if (val && *val)
+                domElement->appendChild(domElement->getOwnerDocument()->createTextNode(val));
         }
     }
-    val = getTextContent(pos);
-    if (val && *val)
-        domElement->appendChild(domElement->getOwnerDocument()->createTextNode(val));
 }
