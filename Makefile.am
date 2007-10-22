@@ -8,6 +8,7 @@ MOSTLYCLEANFILES = $(DX_CLEANFILES)
 
 dist-hook:
 	rm -rf `find $(distdir)/xmltoolingtest/data -name .svn`
+	rm -rf `find $(distdir)/doc/api -name .svn`
 
 
 SUBDIRS = doc schemas xmltooling xmltoolingtest
