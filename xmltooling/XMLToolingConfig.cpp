@@ -215,12 +215,12 @@ bool XMLToolingInternalConfig::init()
 #endif
 
         XMLPlatformUtils::Initialize();
-        log.debug("Xerces initialization complete");
+        log.debug("Xerces %s initialization complete", XERCES_FULLVERSIONDOT);
 
 #ifndef XMLTOOLING_NO_XMLSEC
         XSECPlatformUtils::Initialise();
         m_xsecProvider=new XSECProvider();
-        log.debug("XMLSec initialization complete");
+        log.debug("XML-Security %s initialization complete", XSEC_FULLVERSIONDOT);
 #endif
 
         m_parserPool=new ParserPool();
@@ -298,7 +298,7 @@ bool XMLToolingInternalConfig::init()
 # endif
 #endif
 
-    log.info("library initialization complete");
+    log.info("%s library initialization complete", PACKAGE_STRING);
     return true;
 }
 
@@ -375,7 +375,7 @@ void XMLToolingInternalConfig::term()
 #ifdef _DEBUG
     xmltooling::NDC ndc("term");
 #endif
-   Category::getInstance(XMLTOOLING_LOGCAT".XMLToolingConfig").info("library shutdown complete");
+   Category::getInstance(XMLTOOLING_LOGCAT".XMLToolingConfig").info("%s library shutdown complete", PACKAGE_STRING);
 }
 
 Lockable* XMLToolingInternalConfig::lock()
