@@ -8,9 +8,8 @@ License:	Apache 2.0
 URL:		http://www.opensaml.org/
 Source0:	%{name}-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root
-BuildRequires:	xerces%{?xercesver}-c-devel >= 2.6.1
-BuildRequires:	xml-security-c-devel >= 1.4.0
-BuildRequires:	openssl-devel, cxxtest
+BuildRequires:  xerces%{?xercesver}-c-devel >= 2.8.0, xml-security-c-devel >= 1.4.0
+BuildRequires:	openssl-devel
 %{?_with_log4cpp:BuildRequires:	log4cpp-devel >= 1.0}
 %{!?_with_log4cpp:BuildRequires: log4shib-devel}
 
