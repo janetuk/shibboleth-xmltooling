@@ -30,7 +30,7 @@
 
 using namespace xmltooling;
 
-const XMLCh CurlNetAccessor::fgMyName[] =
+const XMLCh xmltooling::CurlNetAccessor::fgMyName[] =
 {
     chLatin_C, chLatin_u, chLatin_r, chLatin_l, chLatin_N, chLatin_e,
     chLatin_t, chLatin_A, chLatin_c, chLatin_c, chLatin_e, chLatin_s,
