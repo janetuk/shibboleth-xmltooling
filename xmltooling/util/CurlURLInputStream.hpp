@@ -19,7 +19,7 @@
  * $Id$
  */
 
-#if !defined(XERCESC_INCLUDE_GUARD_CURLURLINPUTSTREAM_HPP)
+#if !defined(XERCESC_INCLUDE_GUARD_CURLURLINPUTSTREAM_HPP) && !defined(XMLTOOLING_LITE)
 #define XERCESC_INCLUDE_GUARD_CURLURLINPUTSTREAM_HPP
 
 #include <xmltooling/base.h>
@@ -41,7 +41,7 @@ namespace xmltooling {
 // parser.
 //
 
-class XMLTOOL_EXPORT CurlURLInputStream : public BinInputStream
+class XMLTOOL_API CurlURLInputStream : public BinInputStream
 {
 public :
     CurlURLInputStream(const XMLURL&  urlSource, const XMLNetHTTPInfo* httpInfo=0);
