@@ -260,18 +260,12 @@ namespace {
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
-        void init() {
-            m_Actor=NULL;
-            m_MustUnderstand=xmlconstants::XML_BOOL_NULL;
-        }
     public:
         virtual ~HeaderImpl() {
-            XMLString::release(&m_Actor);
         }
 
         HeaderImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
-            init();
         }
             
         HeaderImpl(const HeaderImpl& src)
@@ -279,37 +273,16 @@ namespace {
                     AbstractAttributeExtensibleXMLObject(src),
                     AbstractComplexElement(src),
                     AbstractDOMCachingXMLObject(src) {
-            init();
-            setActor(src.getActor());
-            MustUnderstand(m_MustUnderstand);
             VectorOf(XMLObject) v=getUnknownXMLObjects();
             for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i)
                 v.push_back((*i)->clone());
         }
         
         IMPL_XMLOBJECT_CLONE(Header);
-        IMPL_STRING_ATTRIB(Actor);
-        IMPL_BOOLEAN_ATTRIB(MustUnderstand);
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject, m_children.end());
-
-        void setAttribute(QName& qualifiedName, const XMLCh* value, bool ID=false) {
-            if (qualifiedName.hasNamespaceURI() && XMLString::equals(qualifiedName.getNamespaceURI(),SOAP11ENV_NS)) {
-                if (XMLString::equals(qualifiedName.getLocalPart(),MUSTUNDERSTAND_ATTRIB_NAME)) {
-                    setMustUnderstand(value);
-                    return;
-                }
-                else if (XMLString::equals(qualifiedName.getLocalPart(),ACTOR_ATTRIB_NAME)) {
-                    setActor(value);
-                    return;
-                }
-            }
-            AbstractAttributeExtensibleXMLObject::setAttribute(qualifiedName, value, ID);
-        }
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_STRING_ATTRIB(Actor,ACTOR,SOAP11ENV_NS);
-            MARSHALL_BOOLEAN_ATTRIB(MustUnderstand,MUSTUNDERSTAND,SOAP11ENV_NS);
             marshallExtensionAttributes(domElement);
         }
 

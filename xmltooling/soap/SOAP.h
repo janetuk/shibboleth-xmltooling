@@ -81,8 +81,10 @@ namespace soap11 {
     END_XMLOBJECT;
 
     BEGIN_XMLOBJECT(XMLTOOL_API,Header,xmltooling::ElementProxy,SOAP 1.1 Header element);
-        DECL_BOOLEAN_ATTRIB(MustUnderstand,MUSTUNDERSTAND,false);
-        DECL_STRING_ATTRIB(Actor,ACTOR);
+        /** Actor header block attribute name */
+        static const XMLCh ACTOR_ATTRIB_NAME[];
+        /** mustUnderstand header block attribute name */
+        static const XMLCh MUSTUNDERSTAND_ATTRIB_NAME[];
         /** Header (type) local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
