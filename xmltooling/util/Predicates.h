@@ -48,7 +48,7 @@ namespace xmltooling {
          * 
          * @param xmlObject the object to examine
          */
-        bool operator()(const XMLObject* xmlObject) {
+        bool operator()(const XMLObject* xmlObject) const {
             return xmlObject ? (xmlObject->getElementQName() == m_q) : false;
         }
         
@@ -75,7 +75,7 @@ namespace xmltooling {
          * 
          * @param xmlObject the object to examine
          */
-        bool operator()(const XMLObject* xmlObject) {
+        bool operator()(const XMLObject* xmlObject) const {
             const QName* xsitype = xmlObject ? xmlObject->getSchemaType() : NULL;
             return xsitype ? (*xsitype == m_q) : false;
         }
