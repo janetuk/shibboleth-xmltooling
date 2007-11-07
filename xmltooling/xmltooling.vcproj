@@ -577,6 +577,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\util\Predicates.h"
+					>
+				</File>
+				<File
 					RelativePath=".\util\ReloadableXMLFile.h"
 					>
 				</File>
