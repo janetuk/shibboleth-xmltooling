@@ -101,6 +101,7 @@ utilinclude_HEADERS = \
 	util/DateTime.h \
 	util/NDC.h \
 	util/ParserPool.h \
+	util/Predicates.h \
 	util/ReloadableXMLFile.h \
 	util/ReplayCache.h \
 	util/StorageService.h \
