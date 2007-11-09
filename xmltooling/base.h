@@ -877,7 +877,7 @@
  * @param namespaceURI  the XML namespace of the attribute
  */
 #define MARSHALL_STRING_ATTRIB(proper,ucase,namespaceURI) \
-    if (m_##proper) { \
+    if (m_##proper && *m_##proper) { \
         domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, m_##proper); \
     }
 
@@ -901,7 +901,7 @@
  * @param namespaceURI  the XML namespace of the attribute
  */
 #define MARSHALL_INTEGER_ATTRIB(proper,ucase,namespaceURI) \
-    if (m_##proper) { \
+    if (m_##proper && *m_##proper) { \
         domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, m_##proper); \
     }
 
@@ -951,7 +951,7 @@
  * @param namespaceURI  the XML namespace of the attribute
  */
 #define MARSHALL_ID_ATTRIB(proper,ucase,namespaceURI) \
-    if (m_##proper) { \
+    if (m_##proper && *m_##proper) { \
         domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, m_##proper); \
         domElement->setIdAttributeNS(namespaceURI, ucase##_ATTRIB_NAME); \
     }
