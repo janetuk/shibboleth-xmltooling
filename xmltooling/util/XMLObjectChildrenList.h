@@ -89,7 +89,7 @@ namespace xmltooling {
     class XMLObjectChildrenIterator
     {
         /// @cond OFF
-        typename _Ty m_iter;
+        _Ty m_iter;
         template <class _Tx, class _Tz> friend class XMLObjectChildrenList;
         template <class _Tx, class _Tz> friend class XMLObjectPairList;
     public:
