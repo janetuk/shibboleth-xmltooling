@@ -5,7 +5,7 @@
    specialization. */
 #undef HAVE_GOOD_STL
 
-/* Defne to 1 if you have an STL implementation that supports
+/* Define to 1 if you have an STL implementation that supports
    std::iterator_traits. */
 #undef HAVE_ITERATOR_TRAITS
 
