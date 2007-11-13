@@ -228,6 +228,7 @@ namespace {
         IMPL_STRING_ATTRIB(EncodingStyle);
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject, m_children.end());
 
+        using AbstractAttributeExtensibleXMLObject::setAttribute;
         void setAttribute(QName& qualifiedName, const XMLCh* value, bool ID=false) {
             if (qualifiedName.hasNamespaceURI() && XMLString::equals(qualifiedName.getNamespaceURI(),SOAP11ENV_NS)) {
                 if (XMLString::equals(qualifiedName.getLocalPart(),ENCODINGSTYLE_ATTRIB_NAME)) {
