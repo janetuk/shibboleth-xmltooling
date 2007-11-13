@@ -13,6 +13,10 @@
    specialization. */
 #define HAVE_GOOD_STL 1
 
+/* Defne to 1 if you have an STL implementation that supports
+   std::iterator_traits. */
+#define HAVE_ITERATOR_TRAITS 1
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 /* #undef HAVE_INTTYPES_H */
 
