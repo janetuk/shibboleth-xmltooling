@@ -49,6 +49,7 @@ EXTRA_DIST = $(DX_CONFIG) \
         xmltooling.spec \
         pkginfo.in \
         pkginfo \
-        depend
+        depend \
+        postinstall
 
 DISTCLEANFILES = xmltooling.spec pkginfo
