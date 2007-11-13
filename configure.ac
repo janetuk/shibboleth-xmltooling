@@ -301,7 +301,7 @@ AC_TRY_LINK(
         [#include <vector>],
         [std::iterator_traits<std::vector<int>::iterator>::value_type foo=0],
         [AC_DEFINE(HAVE_ITERATOR_TRAITS,1,
-            [Defne to 1 if you have an STL implementation that supports std::iterator_traits.])],
+            [Define to 1 if you have an STL implementation that supports std::iterator_traits.])],
         )
 
 # Check for unit test support
