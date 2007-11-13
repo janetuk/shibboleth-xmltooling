@@ -204,8 +204,6 @@ int i = 0;
 	# restore master libs
 	LIBS="$save_LIBS"
 
-	AC_LANG(C)
-
 	# libcurl settings
 	AC_PATH_PROG(CURL_CONFIG,curl-config)
 	AC_ARG_WITH(curl,
@@ -285,8 +283,6 @@ int i = 0;
 	LIBS="$save_LIBS"
 
 	AC_SUBST(XMLSEC_LIBS)
-	
-	AC_LANG(C++)
 else
     AC_MSG_WARN([xmlsec disabled, building without signature/encryption support])
     AC_DEFINE(XMLTOOLING_NO_XMLSEC,1,
