@@ -96,7 +96,20 @@ namespace xmltooling {
         typename Container::const_iterator i = std::find_if(c.begin(), c.end(), p);
         return (i!=c.end()) ? *i : NULL;
     }
-    
+
+    /**
+     * Template algorithm returns first pointer element from a container that matches a predicate.
+     *
+     * @param c read-only container of pointer-based objects
+     * @param p a predicate function
+     * @return  the first object in the container matching the predicate, or NULL
+     */
+    template<typename Container, typename Predicate>
+    typename Container::value_type find_if(Container& c, const Predicate& p) {
+        typename Container::iterator i = std::find_if(c.begin(), c.end(), p);
+        return (i!=c.end()) ? *i : NULL;
+    }
+
 };
 
 #endif /* __xmltooling_predicates_h__ */
