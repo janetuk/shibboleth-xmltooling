@@ -488,12 +488,12 @@ namespace xmltooling {
 
         const_iterator begin() const {
             // return iterator for beginning of const sequence
-            return m_container.begin();
+            return const_cast<const Container&>(m_container).begin();
         }
 
         const_iterator end() const {
             // return iterator for end of const sequence
-            return m_container.end();
+            return const_cast<const Container&>(m_container).end();
         }
 
         const_reference at(size_type _Pos) const {
@@ -642,12 +642,12 @@ namespace xmltooling {
 
         const_iterator begin() const {
             // return iterator for beginning of const sequence
-            return m_container.begin();
+            return const_cast<const Container&>(m_container).begin();
         }
 
         const_iterator end() const {
             // return iterator for end of const sequence
-            return m_container.end();
+            return const_cast<const Container&>(m_container).end();
         }
 
         const_reference at(size_type _Pos) const {
