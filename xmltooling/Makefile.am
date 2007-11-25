@@ -172,6 +172,7 @@ common_sources = \
 	impl/UnknownElement.cpp \
 	io/AbstractXMLObjectMarshaller.cpp \
 	io/AbstractXMLObjectUnmarshaller.cpp \
+	io/HTTPRequest.cpp \
 	signature/impl/KeyInfoImpl.cpp \
 	signature/impl/KeyInfoSchemaValidators.cpp \
 	soap/impl/SOAPClient.cpp \
