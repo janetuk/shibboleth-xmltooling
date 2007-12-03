@@ -106,10 +106,11 @@ AC_ARG_WITH(log4shib,
 if test -f "${LOG4SHIB_CONFIG}"; then
     LDFLAGS="`${LOG4SHIB_CONFIG} --libs` $LDFLAGS"
     CPPFLAGS="`${LOG4SHIB_CONFIG} --cflags` $CPPFLAGS"
-	AC_CHECK_HEADER([log4shib/Category.hh],,AC_MSG_ERROR([unable to find log4shib header files]))
+	AC_CHECK_HEADER([log4shib/CategoryStream.hh],,AC_MSG_ERROR([unable to find log4shib header files]))
 	AC_TRY_LINK(
-		[#include <log4shib/Category.hh>],
-		[log4shib::Category::getInstance("foo")],
+		[#include <log4shib/Category.hh>
+#include <log4shib/CategoryStream.hh>],
+		[log4shib::Category::getInstance("foo").errorStream() << log4shib::eol],
 		[AC_DEFINE(XMLTOOLING_LOG4SHIB,1,[Define if log4shib library is used.])],
 		[AC_MSG_ERROR([unable to link with log4shib])])
 else
@@ -130,13 +131,13 @@ else
 		AC_MSG_WARN([will try to use log4cpp, note that most non-Internet2 supplied versions are not thread-safe])
 	    LDFLAGS="`${LOG4CPP_CONFIG} --libs` $LDFLAGS"
 	    CPPFLAGS="`${LOG4CPP_CONFIG} --cflags` $CPPFLAGS"
-		AC_CHECK_HEADER([log4cpp/Category.hh],,AC_MSG_ERROR([unable to find log4cpp header files]))
-		AC_CHECK_HEADER([log4cpp/PropertyConfigurator.hh],,AC_MSG_ERROR([you need at least log4cpp 0.3.x]))
+		AC_CHECK_HEADER([log4cpp/CategoryStream.hh],,AC_MSG_ERROR([unable to find log4cpp header files]))
 		AC_TRY_LINK(
-			[#include <log4cpp/Category.hh>],
-			[log4cpp::Category::getInstance("foo")],
+			[#include <log4cpp/Category.hh>
+#include <log4cpp/CategoryStream.hh>],
+			[log4cpp::Category::getInstance("foo").errorStream() << log4cpp::eol],
 			[AC_DEFINE(XMLTOOLING_LOG4CPP,1,[Define if log4cpp library is used.])],
-			[AC_MSG_ERROR([unable to link with log4cpp])])
+			[AC_MSG_ERROR([unable to link with log4cpp, need version 1.0 or later])])
 	else
 	    AC_MSG_ERROR([log4cpp-config not found, may need to use --with-log4cpp option])
 	fi
@@ -188,22 +189,20 @@ if test x_$with_xmlsec != x_no; then
     AC_MSG_CHECKING([XML-Security version])
     AC_PREPROC_IFELSE(
 	    [AC_LANG_PROGRAM([#include <xsec/utils/XSECPlatformUtils.hpp>],
-        [#if XSEC_VERSION_MAJOR > 1 || (XSEC_VERSION_MAJOR == 1 && XSEC_VERSION_MEDIUM > 3) || (XSEC_VERSION_MAJOR == 1 && XSEC_VERSION_MEDIUM == 3 && XSEC_VERSION_MINOR > 0)
+        [#if XSEC_VERSION_MAJOR > 1 || (XSEC_VERSION_MAJOR == 1 && XSEC_VERSION_MEDIUM > 3)
 int i = 0;
 #else
-#error need version 1.3.1 or later
+#error need version 1.4.0 or later
 #endif])],
         [AC_MSG_RESULT(OK)],
-        [AC_MSG_FAILURE([XML-Security version 1.3.1 or greater is required.])])
+        [AC_MSG_FAILURE([XML-Security version 1.4.0 or greater is required.])])
     AC_TRY_LINK(
             [#include <xsec/utils/XSECPlatformUtils.hpp>],
             [XSECPlatformUtils::Initialise()],,
-            [AC_MSG_ERROR([unable to link with XML-Sec])])
+            [AC_MSG_ERROR([unable to link with XML-Security])])
 
 	# restore master libs
 	LIBS="$save_LIBS"
-
-	AC_LANG(C)
 
 	# libcurl settings
 	AC_PATH_PROG(CURL_CONFIG,curl-config)
@@ -240,8 +239,10 @@ int i = 0;
 	AC_ARG_WITH(openssl,
 	    AC_HELP_STRING([--with-openssl=PATH], [where openssl is installed]),
 	    [if test x_$with_openssl != x_/usr; then
-	        SSLFLAGS="-I${with_openssl}/include"
+            SSLFLAGS="-I${with_openssl}/include"
 	        SSLLIBS="-L${with_openssl}/lib -lcrypto -lssl"
+        else
+            SSLLIBS="-lcrypto -lssl"
 	    fi])
 	
 	if test "x$SSLLIBS" = "x" ; then
@@ -282,8 +283,6 @@ int i = 0;
 	LIBS="$save_LIBS"
 
 	AC_SUBST(XMLSEC_LIBS)
-	
-	AC_LANG(C++)
 else
     AC_MSG_WARN([xmlsec disabled, building without signature/encryption support])
     AC_DEFINE(XMLTOOLING_NO_XMLSEC,1,
@@ -297,6 +296,12 @@ AC_TRY_LINK(
         [std::basic_string<unsigned short> foo; foo=foo+(unsigned short)65],
         [AC_DEFINE(HAVE_GOOD_STL,1,
             [Define if you have an STL implementation that supports useful string specialization.])],
+        )
+AC_TRY_LINK(
+        [#include <vector>],
+        [std::iterator_traits<std::vector<int>::iterator>::value_type foo=0],
+        [AC_DEFINE(HAVE_ITERATOR_TRAITS,1,
+            [Define to 1 if you have an STL implementation that supports std::iterator_traits.])],
         )
 
 # Check for unit test support

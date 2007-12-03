@@ -42,7 +42,7 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(CredentialCriteria);
     public:
-        CredentialCriteria() : m_keyUsage(UNSPECIFIED_CREDENTIAL), m_keySize(0), m_key(NULL),
+        CredentialCriteria() : m_keyUsage(Credential::UNSPECIFIED_CREDENTIAL), m_keySize(0), m_key(NULL),
             m_keyInfo(NULL), m_nativeKeyInfo(NULL), m_credential(NULL) {
         }
         virtual ~CredentialCriteria() {
@@ -56,32 +56,22 @@ namespace xmltooling {
          * @return true iff the Credential is consistent with this criteria
          */
         virtual bool matches(const Credential& credential) const;
-
+       
         /**
-         * Enumeration of use cases for credentials. 
-         */
-        enum UsageType {
-            UNSPECIFIED_CREDENTIAL,
-            SIGNING_CREDENTIAL,
-            TLS_CREDENTIAL,
-            ENCRYPTION_CREDENTIAL
-        };
-        
-        /**
-         * Get the key usage criteria.
+         * Get key usage criteria.
          * 
-         * @return the usage.
+         * @return the usage mask
          */
-        UsageType getUsage() const {
+        unsigned int getUsage() const {
             return m_keyUsage;
         }
     
         /**
-         * Set the key usage criteria.
+         * Set key usage criteria.
          * 
-         * @param usage the usage to set
+         * @param usage the usage mask to set
          */
-        void setUsage(UsageType usage) {
+        void setUsage(unsigned int usage) {
             m_keyUsage = usage;
         }
 
@@ -301,7 +291,7 @@ namespace xmltooling {
         }
 
     private:
-        UsageType m_keyUsage;
+        unsigned int m_keyUsage;
         unsigned int m_keySize;
         std::string m_peerName,m_keyAlgorithm;
         std::set<std::string> m_keyNames;

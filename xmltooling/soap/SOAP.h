@@ -81,8 +81,10 @@ namespace soap11 {
     END_XMLOBJECT;
 
     BEGIN_XMLOBJECT(XMLTOOL_API,Header,xmltooling::ElementProxy,SOAP 1.1 Header element);
-        DECL_BOOLEAN_ATTRIB(MustUnderstand,MUSTUNDERSTAND,false);
-        DECL_STRING_ATTRIB(Actor,ACTOR);
+        /** Actor header block attribute name */
+        static const XMLCh ACTOR_ATTRIB_NAME[];
+        /** mustUnderstand header block attribute name */
+        static const XMLCh MUSTUNDERSTAND_ATTRIB_NAME[];
         /** Header (type) local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
@@ -95,13 +97,13 @@ namespace soap11 {
     END_XMLOBJECT;
 
     DECL_SOAP11OBJECTBUILDER(Body);
-    DECL_SOAP11OBJECTBUILDER(Detail);
     DECL_SOAP11OBJECTBUILDER(Envelope);
     DECL_SOAP11OBJECTBUILDER(Fault);
-    DECL_SOAP11OBJECTBUILDER(Faultactor);
-    DECL_SOAP11OBJECTBUILDER(Faultcode);
-    DECL_SOAP11OBJECTBUILDER(Faultstring);
     DECL_SOAP11OBJECTBUILDER(Header);
+    DECL_XMLOBJECTBUILDER(XMLTOOL_API,Detail,NULL,NULL);
+    DECL_XMLOBJECTBUILDER(XMLTOOL_API,Faultactor,NULL,NULL);
+    DECL_XMLOBJECTBUILDER(XMLTOOL_API,Faultcode,NULL,NULL);
+    DECL_XMLOBJECTBUILDER(XMLTOOL_API,Faultstring,NULL,NULL);
 
     /**
      * Registers builders and validators for SOAP 1.1 classes into the runtime.

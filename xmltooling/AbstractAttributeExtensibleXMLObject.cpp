@@ -55,25 +55,22 @@ void AbstractAttributeExtensibleXMLObject::setAttribute(const QName& qualifiedNa
     if (i!=m_attributeMap.end()) {
         releaseThisandParentDOM();
         XMLString::release(&(i->second));
-        if (value) {
+        if (value && *value) {
             i->second=XMLString::replicate(value);
+            if (ID)
+                m_idAttribute=i;
         }
         else {
             if (m_idAttribute==i)
                 m_idAttribute=m_attributeMap.end();
             m_attributeMap.erase(i);
         }
-        
-        if (ID) {
-            m_idAttribute=i;
-        }
     }
-    else if (value) {
+    else if (value && *value) {
         releaseThisandParentDOM();
         m_attributeMap[qualifiedName]=XMLString::replicate(value);
-        if (ID) {
+        if (ID)
             m_idAttribute = m_attributeMap.find(qualifiedName);
-        } 
     }
 }
 

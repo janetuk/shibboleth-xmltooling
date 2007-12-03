@@ -5,6 +5,10 @@
    specialization. */
 #define HAVE_GOOD_STL 1
 
+/* Define to 1 if you have an STL implementation that supports
+   std::iterator_traits. */
+#define HAVE_ITERATOR_TRAITS 1
+
 /* Define if log4shib library is used. */
 #define XMLTOOLING_LOG4SHIB 1
 

@@ -75,6 +75,14 @@ CurlURLInputStream::CurlURLInputStream(const XMLURL& urlSource, const XMLNetHTTP
 	curl_easy_setopt(fEasy, CURLOPT_URL, fURL.get());
 	curl_easy_setopt(fEasy, CURLOPT_WRITEDATA, this);						// Pass this pointer to write function
 	curl_easy_setopt(fEasy, CURLOPT_WRITEFUNCTION, staticWriteCallback);	// Our static write function
+    curl_easy_setopt(fEasy, CURLOPT_CONNECTTIMEOUT, 15);
+    curl_easy_setopt(fEasy, CURLOPT_TIMEOUT, 30);
+    curl_easy_setopt(fEasy, CURLOPT_SSLVERSION, CURL_SSLVERSION_SSLv3);
+    curl_easy_setopt(fEasy, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_easy_setopt(fEasy, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_easy_setopt(fEasy, CURLOPT_NOPROGRESS, 1);
+    curl_easy_setopt(fEasy, CURLOPT_NOSIGNAL, 1);
+    curl_easy_setopt(fEasy, CURLOPT_FAILONERROR, 1);
 	
 	// Add easy handle to the multi stack
 	curl_multi_add_handle(fMulti, fEasy);
@@ -227,19 +235,22 @@ CurlURLInputStream::readBytes(XMLByte* const          toFill
 		// read any yet on this invocation, call select to wait for data
 		if (!tryAgain && fBytesRead == 0)
 		{
-			fd_set readSet[16];
-			fd_set writeSet[16];
-			fd_set exceptSet[16];
-			int fdcnt = 16;
+			fd_set readSet;
+			fd_set writeSet;
+			fd_set exceptSet;
+			int fdcnt=0;
 			
-			// As curl for the file descriptors to wait on
-			(void) curl_multi_fdset(fMulti, readSet, writeSet, exceptSet, &fdcnt);
+			// Ask curl for the file descriptors to wait on
+            FD_ZERO(&readSet);
+            FD_ZERO(&writeSet);
+            FD_ZERO(&exceptSet);
+			(void) curl_multi_fdset(fMulti, &readSet, &writeSet, &exceptSet, &fdcnt);
 			
 			// Wait on the file descriptors
 			timeval tv;
 			tv.tv_sec  = 2;
 			tv.tv_usec = 0;
-			(void) select(fdcnt, readSet, writeSet, exceptSet, &tv);
+			(void) select(fdcnt, &readSet, &writeSet, &exceptSet, &tv);
 		}
 	}
 	

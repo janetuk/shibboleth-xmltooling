@@ -47,7 +47,26 @@
 </scannerInfoProvider>
 </profile>
 </storageModule>
+
+<storageModule buildSystemId="org.eclipse.cdt.core.defaultConfigDataProvider" id="converted.config.943130369" moduleId="org.eclipse.cdt.core.settings" name="convertedConfig">
+<externalSettings/>
+<extensions>
+<extension id="org.eclipse.cdt.core.nullindexer" point="org.eclipse.cdt.core.CIndexer"/>
+<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
+</extensions>
+</storageModule>
 <storageModule moduleId="org.eclipse.cdt.core.pathentry">
+<pathentry include="C:/log4shib-1.0/include" kind="inc" path="" system="true"/>
+<pathentry include="C:/xerces-c_2_8_0-x86-windows-vc_8_0/include" kind="inc" path="" system="true"/>
+<pathentry include="C:/xml-security-c-1.4.0/include" kind="inc" path="" system="true"/>
+<pathentry include="C:/openssl-0.9.8g/inc32" kind="inc" path="" system="true"/>
+<pathentry include="C:/curl-7.17.1/include" kind="inc" path="" system="true"/>
+<pathentry include="C:/cxxtest" kind="inc" path="" system="true"/>
+<pathentry base-path="cpp-xmltooling" include="" kind="inc" path="" system="true"/>
+<pathentry base-path="cpp-xmltooling" include="xmltooling" kind="inc" path="" system="true"/>
+<pathentry kind="mac" name="_MSC_VER" path="" value=""/>
+<pathentry kind="mac" name="WIN32" path="" value=""/>
 <pathentry kind="out" path="xmltooling/Debug"/>
 <pathentry kind="out" path="xmltoolingtest/Debug"/>
 <pathentry kind="out" path="debug"/>
@@ -66,23 +85,9 @@
 <pathentry kind="src" path="xmltooling/util"/>
 <pathentry kind="src" path="xmltooling/validation"/>
 <pathentry kind="src" path="xmltoolingtest"/>
-<pathentry include="C:/log4cpp-0.3.5rc1/include" kind="inc" path="" system="true"/>
-<pathentry include="C:/xerces-c2_7_0-win32/include" kind="inc" path="" system="true"/>
-<pathentry include="C:/xml-security-c-1.2.0/include" kind="inc" path="" system="true"/>
-<pathentry include="C:/cxxtest" kind="inc" path="" system="true"/>
-<pathentry base-path="XMLTooling-C" include="" kind="inc" path="" system="true"/>
-<pathentry base-path="XMLTooling-C" include="xmltooling" kind="inc" path="" system="true"/>
-<pathentry kind="mac" name="_MSC_VER" path="" value=""/>
-<pathentry kind="mac" name="WIN32" path="" value=""/>
 </storageModule>
-<storageModule buildSystemId="org.eclipse.cdt.core.defaultConfigDataProvider" id="converted.config.943130369" moduleId="org.eclipse.cdt.core.settings" name="convertedConfig">
-<externalSettings/>
-<extensions>
-<extension id="org.eclipse.cdt.core.nullindexer" point="org.eclipse.cdt.core.CIndexer"/>
-<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-<extension id="org.eclipse.cdt.core.PE" point="org.eclipse.cdt.core.BinaryParser"/>
-</extensions>
-</storageModule>
+<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 </cconfiguration>
 </storageModule>
 </cproject>

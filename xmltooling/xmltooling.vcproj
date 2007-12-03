@@ -294,6 +294,10 @@
 					RelativePath=".\io\AbstractXMLObjectUnmarshaller.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\io\HTTPRequest.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="impl"
@@ -574,6 +578,10 @@
 				</File>
 				<File
 					RelativePath=".\util\ParserPool.h"
+					>
+				</File>
+				<File
+					RelativePath=".\util\Predicates.h"
 					>
 				</File>
 				<File

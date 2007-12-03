@@ -62,6 +62,23 @@ namespace xmltooling {
         };
 
         /**
+         * Bitmask of use cases for credentials. 
+         */
+        enum UsageTypes {
+            UNSPECIFIED_CREDENTIAL = 0,
+            SIGNING_CREDENTIAL = 1,
+            TLS_CREDENTIAL = 2,
+            ENCRYPTION_CREDENTIAL = 4
+        };
+        
+        /**
+         * Get credential usage types.
+         * 
+         * @return the usage bitmask
+         */
+        virtual unsigned int getUsage() const=0;
+
+        /**
          * Returns an algorithm identifier for the Credential.
          *
          * @return  the Credential algorithm, or NULL if indeterminate
