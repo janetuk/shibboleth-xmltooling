@@ -77,7 +77,7 @@ namespace xmlencryption {
              * @param compact       true iff the encrypted representation should be made as small as possible
              */
             EncryptionParams(
-                const XMLCh* algorithm=DSIGConstants::s_unicodeStrURIAES256_CBC,
+                const XMLCh* algorithm=DSIGConstants::s_unicodeStrURIAES128_CBC,
                 const unsigned char* keyBuffer=NULL,
                 unsigned int keyBufferSize=0,
                 const xmltooling::Credential* credential=NULL,
