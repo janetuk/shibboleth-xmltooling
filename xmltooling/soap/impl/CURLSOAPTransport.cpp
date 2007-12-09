@@ -154,11 +154,16 @@ namespace xmltooling {
             CURLoption opt = static_cast<CURLoption>(strtol(option, NULL, 10));
             if (opt < CURLOPTTYPE_OBJECTPOINT)
                 return (curl_easy_setopt(m_handle, opt, strtol(value, NULL, 10)) == CURLE_OK);
+#ifdef CURLOPTTYPE_OFF_T
             else if (opt < CURLOPTTYPE_OFF_T)
                 return (curl_easy_setopt(m_handle, opt, value) == CURLE_OK);
             else if (sizeof(curl_off_t) == sizeof(long))
                 return (curl_easy_setopt(m_handle, opt, strtol(value, NULL, 10)) == CURLE_OK);
             return false;
+#else
+            else
+                return (curl_easy_setopt(m_handle, opt, value) == CURLE_OK);
+#endif
         }
         
         void send(istream& in);
