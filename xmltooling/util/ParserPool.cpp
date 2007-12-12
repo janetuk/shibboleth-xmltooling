@@ -43,7 +43,7 @@ using namespace xmltooling;
 using namespace std;
 
 ParserPool::ParserPool(bool namespaceAware, bool schemaAware)
-    : m_namespaceAware(namespaceAware), m_schemaAware(schemaAware), m_lock(Mutex::create()) {}
+    : m_namespaceAware(namespaceAware), m_schemaAware(schemaAware), m_lock(Mutex::create()), m_security(new SecurityManager()) {}
 
 ParserPool::~ParserPool()
 {
@@ -52,6 +52,7 @@ ParserPool::~ParserPool()
         m_pool.pop();
     }
     delete m_lock;
+    delete m_security;
 }
 
 DOMDocument* ParserPool::newDocument()
@@ -320,6 +321,7 @@ DOMBuilder* ParserPool::createBuilder()
         parser->setProperty(XMLUni::fgXercesSchemaExternalSchemaLocation,const_cast<XMLCh*>(temp.get()));
 #endif
     }
+    parser->setProperty(XMLUni::fgXercesSecurityManager, m_security);
     parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument,true);
     parser->setEntityResolver(this);
     parser->setErrorHandler(this);
