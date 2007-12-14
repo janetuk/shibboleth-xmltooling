@@ -36,7 +36,6 @@
 #include <ctime>
 #include <assert.h>
 #include <xercesc/util/Janitor.hpp>
-#include <xercesc/util/NumberFormatException.hpp>
 
 using namespace xmltooling;
 using namespace std;
@@ -533,9 +532,7 @@ void DateTime::parseDateTime()
 
     //fStart is supposed to point to 'T'
     if (fBuffer[fStart++] != DATETIME_SEPARATOR)
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_gDay_invalid
-                , fBuffer);
+        throw XMLParserException("Invalid separator between date and time.");
 
     getTime();
     validateDateTime();
@@ -583,9 +580,7 @@ void DateTime::parseDay()
         fBuffer[1] != DATE_SEPARATOR ||
         fBuffer[2] != DATE_SEPARATOR  )
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_gDay_invalid
-                , fBuffer);
+        throw XMLParserException("Invalid character in date.");
     }
 
     //initialize values
@@ -598,9 +593,7 @@ void DateTime::parseDay()
         int sign = findUTCSign(DAY_SIZE);
         if ( sign < 0 )
         {
-            ThrowXML1(SchemaDateTimeException
-                    , XMLExcepts::DateTime_gDay_invalid
-                    , fBuffer);
+            throw XMLParserException("Invalid character in date.");
         }
         else
         {
@@ -624,9 +617,7 @@ void DateTime::parseMonth()
     if (fBuffer[0] != DATE_SEPARATOR ||
         fBuffer[1] != DATE_SEPARATOR  )
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_gMth_invalid
-                , fBuffer);
+        throw XMLParserException("Invalid character in date.");
     }
 
     //set constants
@@ -651,9 +642,7 @@ void DateTime::parseMonth()
         int sign = findUTCSign(fStart);
         if ( sign < 0 )
         {
-            ThrowXML1(SchemaDateTimeException
-                    , XMLExcepts::DateTime_gMth_invalid
-                    , fBuffer);
+            throw XMLParserException("Invalid character in date.");
         }
         else
         {
@@ -707,9 +696,7 @@ void DateTime::parseMonthDay()
         fBuffer[1] != DATE_SEPARATOR ||
         fBuffer[4] != DATE_SEPARATOR )
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_gMthDay_invalid
-                , fBuffer);
+        throw XMLParserException("Invalid character in date.");
     }
 
 
@@ -723,9 +710,7 @@ void DateTime::parseMonthDay()
         int sign = findUTCSign(MONTHDAY_SIZE);
         if ( sign<0 )
         {
-            ThrowXML1(SchemaDateTimeException
-                    , XMLExcepts::DateTime_gMthDay_invalid
-                    , fBuffer);
+            throw XMLParserException("Invalid character in date.");
         }
         else
         {
@@ -768,18 +753,14 @@ void DateTime::parseDuration()
     if ( (c != DURATION_STARTER) &&
          (c != chDash)            )
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_dur_Start_dashP
-                , fBuffer);
+        throw XMLParserException("Invalid character in time.");
     }
 
     // 'P' must ALWAYS be present in either case
     if ( (c == chDash) &&
          (fBuffer[fStart++]!= DURATION_STARTER ))
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_dur_noP
-                , fBuffer);
+        throw XMLParserException("Invalid character in time.");
     }
 
     // java code
@@ -796,9 +777,7 @@ void DateTime::parseDuration()
     //
     if (indexOf(fStart, fEnd, chDash) != NOT_FOUND)
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_dur_DashNotFirst
-                , fBuffer);
+        throw XMLParserException("Invalid character in time.");
     }
 
     //at least one number and designator must be seen after P
@@ -841,9 +820,7 @@ void DateTime::parseDuration()
     if ( (fEnd == endDate) &&   // 'T' absent
          (fStart != fEnd)   )   // something after Day
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_dur_inv_b4T
-                , fBuffer);
+        throw XMLParserException("Invalid character in time.");
     }
 
     if ( fEnd != endDate ) // 'T' present
@@ -889,9 +866,7 @@ void DateTime::parseDuration()
                  */
                 if ( mlsec+1 == end )
                 {
-                    ThrowXML1(SchemaDateTimeException
-                            , XMLExcepts::DateTime_dur_inv_seconds
-                            , fBuffer);
+                    throw XMLParserException("Invalid character in time.");
                 }
 
                 fValue[Second]     = negate * parseInt(fStart, mlsec);
@@ -911,17 +886,13 @@ void DateTime::parseDuration()
         if ( (fStart != fEnd) ||
               fBuffer[--fStart] == DATETIME_SEPARATOR )
         {
-            ThrowXML1(SchemaDateTimeException
-                    , XMLExcepts::DateTime_dur_NoTimeAfterT
-                    , fBuffer);
+            throw XMLParserException("Invalid character in time.");
         }
     }
 
     if ( !designator )
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_dur_NoElementAtAll
-                , fBuffer);
+        throw XMLParserException("Invalid character in time.");
     }
 
 }
@@ -943,19 +914,14 @@ void DateTime::getDate()
 
     // Ensure enough chars in buffer
     if ( (fStart+YMD_MIN_SIZE) > fEnd)
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_date_incomplete
-                , fBuffer);
+        throw XMLParserException("Date/time string not complete.");
 
     getYearMonth();    // Scan YearMonth and
                        // fStart point to the next '-'
 
     if (fBuffer[fStart++] != DATE_SEPARATOR)
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_date_invalid
-                , fBuffer);
-        //("CCYY-MM must be followed by '-' sign");
+        throw XMLParserException("CCYY-MM must be followed by '-' sign.");
     }
 
     fValue[Day] = parseInt(fStart, fStart+2);
@@ -978,19 +944,13 @@ void DateTime::getTime()
 
     // Ensure enough chars in buffer
     if ( (fStart+TIME_MIN_SIZE) > fEnd)
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_time_incomplete
-                , fBuffer);
-        //"Imcomplete Time Format"
+        throw XMLParserException("Incomplete Time Format.");
 
     // check (fixed) format first
     if ((fBuffer[fStart + 2] != TIME_SEPARATOR) ||
         (fBuffer[fStart + 5] != TIME_SEPARATOR)  )
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_time_invalid
-                , fBuffer);
-        //("Error in parsing time" );
+        throw XMLParserException("Error in parsing time.");
     }
 
     //
@@ -1016,10 +976,7 @@ void DateTime::getTime()
         // make sure we have some thing between the '.' and fEnd
         if (fStart >= fEnd)
         {
-            ThrowXML1(SchemaDateTimeException
-                    , XMLExcepts::DateTime_ms_noDigit
-                    , fBuffer);
-            //("ms shall be present once '.' is present" );
+            throw XMLParserException("ms should be present once '.' is present.");
         }
 
         if ( sign == NOT_FOUND )
@@ -1034,10 +991,7 @@ void DateTime::getTime()
 	}
     else if(sign == 0 || sign != fStart)
     {
-        // seconds has more than 2 digits
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_min_invalid
-                , fBuffer);
+        throw XMLParserException("Seconds has more than 2 digits.");
     }
 
     //parse UTC time zone (hh:mm)
@@ -1058,10 +1012,7 @@ void DateTime::getYearMonth()
 
     // Ensure enough chars in buffer
     if ( (fStart+YMONTH_MIN_SIZE) > fEnd)
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_ym_incomplete
-                , fBuffer);
-        //"Imcomplete YearMonth Format";
+        throw XMLParserException("Incomplete YearMonth Format.");
 
     // skip the first leading '-'
     int start = ( fBuffer[0] == chDash ) ? fStart + 1 : fStart;
@@ -1071,10 +1022,7 @@ void DateTime::getYearMonth()
     //
     int yearSeparator = indexOf(start, fEnd, DATE_SEPARATOR);
     if ( yearSeparator == NOT_FOUND)
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_ym_invalid
-                , fBuffer);
-        //("Year separator is missing or misplaced");
+        throw XMLParserException("Year separator is missing or misplaced.");
 
     fValue[CentYear] = parseIntYear(yearSeparator);
     fStart = yearSeparator + 1;  //skip the '-' and point to the first M
@@ -1083,10 +1031,7 @@ void DateTime::getYearMonth()
     //gonna check we have enough byte for month
     //
     if ((fStart + 2) > fEnd )
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_ym_noMonth
-                , fBuffer);
-        //"no month in buffer"
+        throw XMLParserException("No month in buffer.");
 
     fValue[Month] = parseInt(fStart, yearSeparator + 3);
     fStart += 2;  //fStart points right after the MONTH
@@ -1101,10 +1046,7 @@ void DateTime::parseTimeZone()
         int sign = findUTCSign(fStart);
         if ( sign < 0 )
         {
-            ThrowXML1(SchemaDateTimeException
-                    , XMLExcepts::DateTime_tz_noUTCsign
-                    , fBuffer);
-            //("Error in month parsing");
+            throw XMLParserException("Error in month parsing.");
         }
         else
         {
@@ -1129,10 +1071,7 @@ void DateTime::getTimeZone(const int sign)
     {
         if ((sign + 1) != fEnd )
         {
-            ThrowXML1(SchemaDateTimeException
-                    , XMLExcepts::DateTime_tz_stuffAfterZ
-                    , fBuffer);
-            //"Error in parsing time zone");
+            throw XMLParserException("Error in parsing time zone.");
         }		
 
         return;	
@@ -1147,10 +1086,7 @@ void DateTime::getTimeZone(const int sign)
     if ( ( ( sign + TIMEZONE_SIZE + 1) != fEnd )      ||
          ( fBuffer[sign + 3] != TIMEZONE_SEPARATOR ) )
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_tz_invalid
-                , fBuffer);
-        //("Error in parsing time zone");
+        throw XMLParserException("Error in parsing time zone.");
     }
 
     fTimeZone[hh] = parseInt(sign+1, sign+3);		
@@ -1226,29 +1162,20 @@ void DateTime::validateDateTime() const
     //          or reporting an error message should be sufficient?
     if ( fValue[CentYear] == 0 )
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_year_zero
-                , fBuffer);
-        //"The year \"0000\" is an illegal year value");
+        throw XMLParserException("The year \"0000\" is an illegal year value");
     }
 
     if ( fValue[Month] < 1  ||
          fValue[Month] > 12  )
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_mth_invalid
-                , fBuffer);
-		//"The month must have values 1 to 12");
+        throw XMLParserException("The month must have values 1 to 12");
     }
 
     //validate days
     if ( fValue[Day] > maxDayInMonthFor( fValue[CentYear], fValue[Month]) ||
          fValue[Day] == 0 )
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_day_invalid
-                , fBuffer);
-        //"The day must have values 1 to 31");
+        throw XMLParserException("The day must have values 1 to 31");
     }
 
     //validate hours
@@ -1258,49 +1185,34 @@ void DateTime::validateDateTime() const
                                   (fValue[Second] !=0) ||
                                   (fMiliSecond    !=0))))
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_hour_invalid
-                , fBuffer);
-        //("Hour must have values 0-23");
+        throw XMLParserException("Hour must have values 0-23");
     }
 
     //validate minutes
     if ( fValue[Minute] < 0 ||
          fValue[Minute] > 59 )
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_min_invalid
-                , fBuffer);
-        //"Minute must have values 0-59");
+        throw XMLParserException("Minute must have values 0-59");
     }
 
     //validate seconds
     if ( fValue[Second] < 0 ||
          fValue[Second] > 60 )
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_second_invalid
-                , fBuffer);
-        //"Second must have values 0-60");
+        throw XMLParserException("Second must have values 0-60");
     }
 
     //validate time-zone hours
     if ( (abs(fTimeZone[hh]) > 14) ||
          ((abs(fTimeZone[hh]) == 14) && (fTimeZone[mm] != 0)) )
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_tz_hh_invalid
-                , fBuffer);
-        //"Time zone should have range -14..+14");
+        throw XMLParserException("Time zone should have range -14..+14");
     }
 
     //validate time-zone minutes
     if ( abs(fTimeZone[mm]) > 59 )
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_min_invalid
-                , fBuffer);
-        //("Minute must have values 0-59");
+        throw XMLParserException("Minute must have values 0-59");
     }
 	
     return;
@@ -1346,7 +1258,7 @@ int DateTime::parseInt(const int start, const int end) const
     for (int i=start; i < end; i++) {
 
         if (fBuffer[i] < chDigit_0 || fBuffer[i] > chDigit_9)
-            ThrowXML(NumberFormatException, XMLExcepts::XMLNUM_Inv_chars);
+            throw XMLParserException("Invalid non-numeric characters.");
 
         retVal = (retVal * 10) + (unsigned int) (fBuffer[i] - chDigit_0);
     }
@@ -1381,7 +1293,7 @@ double DateTime::parseMiliSecond(const int start, const int end) const
 
     // check if all chars are valid char
     if ( (endptr - nptr) != strLen)
-        ThrowXML(NumberFormatException, XMLExcepts::XMLNUM_Inv_chars);
+        throw XMLParserException("Invalid non-numeric characters.");
 
     // we don't check underflow occurs since
     // nothing we can do about it.
@@ -1403,19 +1315,12 @@ int DateTime::parseIntYear(const int end) const
     int length = end - start;
     if (length < 4)
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_year_tooShort
-                , fBuffer);
-        //"Year must have 'CCYY' format");
+        throw XMLParserException("Year must have 'CCYY' format");
     }
     else if (length > 4 &&
              fBuffer[start] == chDigit_0)
     {
-        ThrowXML1(SchemaDateTimeException
-                , XMLExcepts::DateTime_year_leadingZero
-                , fBuffer);
-        //"Leading zeros are required if the year value would otherwise have fewer than four digits;
-        // otherwise they are forbidden");
+        throw XMLParserException("Leading zeros are required if the year value would otherwise have fewer than four digits; otherwise they are forbidden.");
     }
 
     bool negative = (fBuffer[0] == chDash);
