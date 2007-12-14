@@ -1070,8 +1070,9 @@
 #define PROC_TYPED_CHILD(proper,namespaceURI,force) \
     if (force || xmltooling::XMLHelper::isNodeNamed(root,namespaceURI,proper::LOCAL_NAME)) { \
         proper* typesafe=dynamic_cast<proper*>(childXMLObject); \
-        if (typesafe) { \
-            set##proper(typesafe); \
+        if (typesafe && !m_##proper) { \
+            typesafe->setParent(this); \
+            *m_pos_##proper = m_##proper = typesafe; \
             return; \
         } \
     }
@@ -1088,8 +1089,9 @@
 #define PROC_TYPED_FOREIGN_CHILD(proper,ns,namespaceURI,force) \
     if (force || xmltooling::XMLHelper::isNodeNamed(root,namespaceURI,ns::proper::LOCAL_NAME)) { \
         ns::proper* typesafe=dynamic_cast<ns::proper*>(childXMLObject); \
-        if (typesafe) { \
-            set##proper(typesafe); \
+        if (typesafe && !m_##proper) { \
+            typesafe->setParent(this); \
+            *m_pos_##proper = m_##proper = typesafe; \
             return; \
         } \
     }
@@ -1102,8 +1104,11 @@
  */
 #define PROC_XMLOBJECT_CHILD(proper,namespaceURI) \
     if (xmltooling::XMLHelper::isNodeNamed(root,namespaceURI,proper::LOCAL_NAME)) { \
-        set##proper(childXMLObject); \
-        return; \
+        if (!m_##proper) { \
+            childXMLObject->setParent(this); \
+            *m_pos_##proper = m_##proper = childXMLObject; \
+            return; \
+        } \
     }
 
 /**
