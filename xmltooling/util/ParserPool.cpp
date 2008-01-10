@@ -291,7 +291,7 @@ bool ParserPool::handleError(const DOMError& e)
             throw XMLParserException(string("error during XML parsing: ") + (temp.get() ? temp.get() : "no message"));
 
         case DOMError::DOM_SEVERITY_FATAL_ERROR:
-            log.critStream() << "fatal error on line " << locator->getLineNumber()
+            log.errorStream() << "fatal error on line " << locator->getLineNumber()
                 << ", column " << locator->getColumnNumber()
                 << ", message: " << temp.get() << logging::eol;
             throw XMLParserException(string("fatal error during XML parsing: ") + (temp.get() ? temp.get() : "no message"));

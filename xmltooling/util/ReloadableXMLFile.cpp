@@ -188,14 +188,14 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
     }
     catch (XMLException& e) {
         auto_ptr_char msg(e.getMessage());
-        m_log.critStream() << "Xerces error while loading resource (" << (backup ? m_backing : m_source) << "): "
+        m_log.errorStream() << "Xerces error while loading resource (" << (backup ? m_backing : m_source) << "): "
             << msg.get() << logging::eol;
         if (!backup && !m_backing.empty())
             return load(true);
         throw XMLParserException(msg.get());
     }
     catch (exception& e) {
-        m_log.critStream() << "error while loading configuration from ("
+        m_log.errorStream() << "error while loading configuration from ("
             << (m_source.empty() ? "inline" : (backup ? m_backing : m_source)) << "): " << e.what() << logging::eol;
         if (!backup && !m_backing.empty())
             return load(true);
