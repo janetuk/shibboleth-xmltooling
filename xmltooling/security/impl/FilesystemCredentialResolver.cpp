@@ -27,6 +27,7 @@
 #include "security/CredentialResolver.h"
 #include "security/KeyInfoResolver.h"
 #include "security/OpenSSLCredential.h"
+#include "security/OpenSSLCryptoX509CRL.h"
 #include "util/NDC.h"
 #include "util/XMLHelper.h"
 
@@ -68,8 +69,9 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL FilesystemCredential : public OpenSSLCredential, public BasicX509Credential
     {
     public:
-        FilesystemCredential(FilesystemCredentialResolver* resolver, XSECCryptoKey* key, const std::vector<XSECCryptoX509*>& xseccerts)
-                : BasicX509Credential(key, xseccerts), m_resolver(resolver), m_usage(UNSPECIFIED_CREDENTIAL) {
+        FilesystemCredential(
+            FilesystemCredentialResolver* resolver, XSECCryptoKey* key, const std::vector<XSECCryptoX509*>& xseccerts, XSECCryptoX509CRL* crl=NULL
+            ) : BasicX509Credential(key, xseccerts, crl), m_resolver(resolver), m_usage(UNSPECIFIED_CREDENTIAL) {
             if (!m_xseccerts.empty())
                 extractNames(m_xseccerts.front(), m_keyNames);
             initKeyInfo();
@@ -136,6 +138,7 @@ namespace xmltooling {
 
     private:
         XSECCryptoKey* loadKey();
+        XSECCryptoX509CRL* loadCRL();
         
         enum format_t { PEM=SSL_FILETYPE_PEM, DER=SSL_FILETYPE_ASN1, _PKCS12, UNKNOWN };
     
@@ -143,8 +146,8 @@ namespace xmltooling {
         string formatToString(format_t format) const;
         format_t xmlFormatToFormat(const XMLCh* format_xml) const;
     
-        format_t m_keyformat;
-        string m_keypath,m_keypass;
+        format_t m_keyformat,m_certformat,m_crlformat;
+        string m_keypath,m_keypass,m_certpath,m_certpass,m_crlpath;
         vector<X509*> m_certs;
         FilesystemCredential* m_credential;
     };
@@ -158,6 +161,7 @@ namespace xmltooling {
     static const XMLCh CAPath[] =           UNICODE_LITERAL_6(C,A,P,a,t,h);
     static const XMLCh Certificate[] =      UNICODE_LITERAL_11(C,e,r,t,i,f,i,c,a,t,e);
     static const XMLCh _certificate[] =     UNICODE_LITERAL_11(c,e,r,t,i,f,i,c,a,t,e);
+    static const XMLCh CRL[] =              UNICODE_LITERAL_3(C,R,L);
     static const XMLCh format[] =           UNICODE_LITERAL_6(f,o,r,m,a,t);
     static const XMLCh Key[] =              UNICODE_LITERAL_3(K,e,y);
     static const XMLCh _key[] =             UNICODE_LITERAL_3(k,e,y);
@@ -203,6 +207,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
 
     XSECCryptoKey* key=NULL;
     vector<XSECCryptoX509*> xseccerts;
+    XSECCryptoX509CRL* crl=NULL;
 
     format_t fformat;
     const XMLCh* format_xml=NULL;
@@ -211,7 +216,6 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
     // Move to Key
     const DOMElement* keynode=XMLHelper::getFirstChildElement(root,Key);
     if (keynode) {
-
         // Get raw format attrib value, but defer processing til later since may need to 
         // determine format dynamically, and we need the Path for that.
         format_xml=keynode->getAttributeNS(NULL,format);
@@ -274,11 +278,71 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
         // Load the key.
         key = loadKey();
     }
+    
+    // Check for CRL.
+    const DOMElement* crlnode=XMLHelper::getFirstChildElement(root,CRL);
+    if (crlnode) {
+        // Get raw format attrib value, but defer processing til later since may need to 
+        // determine format dynamically, and we need the Path for that.
+        format_xml=crlnode->getAttributeNS(NULL,format);
+            
+        e=XMLHelper::getFirstChildElement(crlnode,Path);
+        if (e && e->hasChildNodes()) {
+            const XMLCh* s=e->getFirstChild()->getNodeValue();
+            auto_ptr_char kpath(s);
+#ifdef WIN32
+            struct _stat stat_buf;
+            if (_stat(kpath.get(), &stat_buf) != 0)
+#else
+            struct stat stat_buf;
+            if (stat(kpath.get(), &stat_buf) != 0)
+#endif
+            {
+                log.error("CRL file (%s) can't be opened", kpath.get());
+                throw XMLSecurityException("FilesystemCredentialResolver can't access CRL file ($1)",params(1,kpath.get()));
+            }
+            m_crlpath=kpath.get();
+        }
+        else {
+            log.error("Path element missing inside CRL element");
+            throw XMLSecurityException("FilesystemCredentialResolver can't access CRL file, no Path element specified.");
+        }
+
+        // Determine the CRL encoding format dynamically, if not explicitly specified
+        if (format_xml && *format_xml) {
+            fformat = xmlFormatToFormat(format_xml);
+            if (fformat != UNKNOWN) {
+                m_crlformat = fformat;
+            }
+            else {
+                auto_ptr_char unknown(format_xml);
+                log.error("configuration specifies unknown CRL encoding format (%s)", unknown.get());
+                throw XMLSecurityException("FilesystemCredentialResolver configuration contains unknown CRL encoding format ($1)",params(1,unknown.get()));
+            }
+        }
+        else {
+            in=BIO_new(BIO_s_file_internal());
+            if (in && BIO_read_filename(in,m_crlpath.c_str())>0) {
+                m_crlformat = getEncodingFormat(in);
+                log.debug("CRL encoding format for (%s) dynamically resolved as (%s)", m_crlpath.c_str(), formatToString(m_crlformat).c_str());
+            }
+            else {
+                log.error("CRL file (%s) can't be read to determine encoding format", m_crlpath.c_str());
+                throw XMLSecurityException("FilesystemCredentialResolver can't read CRL file ($1) to determine encoding format",params(1,m_crlpath.c_str()));
+            }
+            if (in)
+                BIO_free(in);
+            in = NULL;
+        }
         
+        // Load the key.
+        crl = loadCRL();
+    }
+
     // Check for Certificate
     e=XMLHelper::getFirstChildElement(root,Certificate);
     if (!e) {
-        m_credential = new FilesystemCredential(this,key,xseccerts);
+        m_credential = new FilesystemCredential(this,key,xseccerts,crl);
         m_credential->addKeyNames(keynode);
         m_credential->setUsage(usage);
         return;
@@ -289,6 +353,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
     if (!ep || !ep->hasChildNodes()) {
         log.error("Path element missing inside Certificate element or is empty");
         delete key;
+        delete crl;
         throw XMLSecurityException("FilesystemCredentialResolver can't access certificate file, missing or empty Path element.");
     }
     
@@ -300,6 +365,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
             auto_ptr_char unknown(format_xml);
             log.error("configuration specifies unknown certificate encoding format (%s)", unknown.get());
             delete key;
+            delete crl;
             throw XMLSecurityException("FilesystemCredentialResolver configuration contains unknown certificate encoding format ($1)",params(1,unknown.get()));
         }
     }
@@ -434,6 +500,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
     }
     catch (XMLToolingException&) {
         delete key;
+        delete crl;
         for_each(m_certs.begin(), m_certs.end(), X509_free);
         throw;
     }
@@ -443,7 +510,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
         xseccerts.push_back(new OpenSSLCryptoX509(*j));
     if (!key && !xseccerts.empty())
         key = xseccerts.front()->clonePublicKey();
-    m_credential = new FilesystemCredential(this, key, xseccerts);
+    m_credential = new FilesystemCredential(this, key, xseccerts, crl);
     m_credential->addKeyNames(keynode);
     m_credential->setUsage(usage);
 }
@@ -501,6 +568,39 @@ XSECCryptoKey* FilesystemCredentialResolver::loadKey()
 
     log_openssl();
     throw XMLSecurityException("FilesystemCredentialResolver unable to load private key from file."); 
+}
+
+XSECCryptoX509CRL* FilesystemCredentialResolver::loadCRL()
+{
+#ifdef _DEBUG
+    NDC ndc("loadCRL");
+#endif
+
+    X509_CRL* crl=NULL;
+    BIO* in=BIO_new(BIO_s_file_internal());
+    if (in && BIO_read_filename(in,m_crlpath.c_str())>0) {
+        switch (m_crlformat) {
+            case PEM:
+                crl=PEM_read_bio_X509_CRL(in, NULL, NULL, NULL);
+                break;
+            
+            case DER:
+                crl=d2i_X509_CRL_bio(in, NULL);
+                break;
+        }
+    }
+    if (in)
+        BIO_free(in);
+    
+    // Now map it to an XSEC wrapper.
+    if (crl) {
+        XSECCryptoX509CRL* ret=new OpenSSLCryptoX509CRL(crl);
+        X509_CRL_free(crl);
+        return ret;
+    }
+
+    log_openssl();
+    throw XMLSecurityException("FilesystemCredentialResolver unable to load CRL from file."); 
 }
 
 // Used to determine the encoding format of credentials files
