@@ -8,6 +8,7 @@ MOSTLYCLEANFILES = $(DX_CLEANFILES)
 
 dist-hook:
 	rm -rf `find $(distdir)/xmltoolingtest/data -name .svn`
+	rm -rf `find $(distdir)/doc/api -name .svn`
 
 
 SUBDIRS = doc schemas xmltooling xmltoolingtest
@@ -48,6 +49,7 @@ EXTRA_DIST = $(DX_CONFIG) \
         xmltooling.spec \
         pkginfo.in \
         pkginfo \
-        checkinstall
+        depend \
+        postinstall
 
 DISTCLEANFILES = xmltooling.spec pkginfo

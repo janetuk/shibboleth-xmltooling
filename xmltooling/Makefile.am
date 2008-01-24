@@ -98,9 +98,12 @@ soapinclude_HEADERS = \
 	soap/OpenSSLSOAPTransport.h
 
 utilinclude_HEADERS = \
+    util/CurlNetAccessor.hpp \
+    util/CurlURLInputStream.hpp \
 	util/DateTime.h \
 	util/NDC.h \
 	util/ParserPool.h \
+	util/Predicates.h \
 	util/ReloadableXMLFile.h \
 	util/ReplayCache.h \
 	util/StorageService.h \
@@ -140,6 +143,8 @@ xmlsec_sources = \
 	signature/impl/SignatureValidator.cpp \
 	signature/impl/XMLSecSignatureImpl.cpp \
 	soap/impl/CURLSOAPTransport.cpp \
+	util/CurlNetAccessor.cpp \
+	util/CurlURLInputStream.cpp \
 	util/ReplayCache.cpp \
 	util/StorageService.cpp
 
@@ -167,6 +172,7 @@ common_sources = \
 	impl/UnknownElement.cpp \
 	io/AbstractXMLObjectMarshaller.cpp \
 	io/AbstractXMLObjectUnmarshaller.cpp \
+	io/HTTPRequest.cpp \
 	signature/impl/KeyInfoImpl.cpp \
 	signature/impl/KeyInfoSchemaValidators.cpp \
 	soap/impl/SOAPClient.cpp \

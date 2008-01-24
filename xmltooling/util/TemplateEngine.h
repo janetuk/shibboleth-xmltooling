@@ -23,7 +23,7 @@
 #ifndef __xmltooling_template_h__
 #define __xmltooling_template_h__
 
-#include <xmltooling/base.h>
+#include <xmltooling/io/GenericRequest.h>
 
 #include <map>
 #include <string>
@@ -72,11 +72,14 @@ namespace xmltooling {
         class XMLTOOL_API TemplateParameters {
             MAKE_NONCOPYABLE(TemplateParameters);
         public:
-            TemplateParameters() {}
+            TemplateParameters() : m_request(NULL) {}
             virtual ~TemplateParameters() {}
             
             /** Map of known parameters to supply to template. */
             std::map<std::string,std::string> m_map;
+            
+            /** Request from client that resulted in template being processed. */
+            const GenericRequest* m_request;
             
             /**
              * Returns the value of a parameter to plug into the template.
@@ -86,7 +89,7 @@ namespace xmltooling {
              */
             virtual const char* getParameter(const char* name) const {
                 std::map<std::string,std::string>::const_iterator i=m_map.find(name);
-                return (i!=m_map.end() ? i->second.c_str() : NULL); 
+                return (i!=m_map.end() ? i->second.c_str() : (m_request ? m_request->getParameter(name) : NULL));
             }
         };
         

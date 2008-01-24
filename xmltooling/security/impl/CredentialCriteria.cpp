@@ -36,6 +36,13 @@ using namespace std;
 
 bool CredentialCriteria::matches(const Credential& credential) const
 {
+    // Usage check, if specified and we have one, compare masks.
+    if (getUsage() != Credential::UNSPECIFIED_CREDENTIAL) {
+        if (credential.getUsage() != Credential::UNSPECIFIED_CREDENTIAL)
+            if ((getUsage() & credential.getUsage()) == 0)
+                return false;
+    }
+
     // Algorithm check, if specified and we have one.
     const char* alg = getKeyAlgorithm();
     if (alg && *alg) {
@@ -65,11 +72,11 @@ bool CredentialCriteria::matches(const Credential& credential) const
     }
 
     // See if we have to match a specific key.
-    XSECCryptoKey* key1 = getPublicKey();
+    const XSECCryptoKey* key1 = getPublicKey();
     if (!key1)
         return true;    // no key to compare against, so we're done
 
-    XSECCryptoKey* key2 = credential.getPublicKey();
+    const XSECCryptoKey* key2 = credential.getPublicKey();
     if (!key2)
         return true;   // no key here, so we can't test it
 
@@ -82,16 +89,16 @@ bool CredentialCriteria::matches(const Credential& credential) const
     if (key1->getKeyType()==XSECCryptoKey::KEY_RSA_PUBLIC || key1->getKeyType()==XSECCryptoKey::KEY_RSA_PAIR) {
         if (key2->getKeyType()!=XSECCryptoKey::KEY_RSA_PUBLIC && key2->getKeyType()!=XSECCryptoKey::KEY_RSA_PAIR)
             return false;
-        RSA* rsa1 = static_cast<OpenSSLCryptoKeyRSA*>(key1)->getOpenSSLRSA();
-        RSA* rsa2 = static_cast<OpenSSLCryptoKeyRSA*>(key2)->getOpenSSLRSA();
+        const RSA* rsa1 = static_cast<const OpenSSLCryptoKeyRSA*>(key1)->getOpenSSLRSA();
+        const RSA* rsa2 = static_cast<const OpenSSLCryptoKeyRSA*>(key2)->getOpenSSLRSA();
         return (BN_cmp(rsa1->n,rsa2->n) == 0 && BN_cmp(rsa1->e,rsa2->e) == 0);
     }
 
     if (key1->getKeyType()==XSECCryptoKey::KEY_DSA_PUBLIC || key1->getKeyType()==XSECCryptoKey::KEY_DSA_PAIR) {
         if (key2->getKeyType()!=XSECCryptoKey::KEY_DSA_PUBLIC && key2->getKeyType()!=XSECCryptoKey::KEY_DSA_PAIR)
             return false;
-        DSA* dsa1 = static_cast<OpenSSLCryptoKeyDSA*>(key1)->getOpenSSLDSA();
-        DSA* dsa2 = static_cast<OpenSSLCryptoKeyDSA*>(key2)->getOpenSSLDSA();
+        const DSA* dsa1 = static_cast<const OpenSSLCryptoKeyDSA*>(key1)->getOpenSSLDSA();
+        const DSA* dsa2 = static_cast<const OpenSSLCryptoKeyDSA*>(key2)->getOpenSSLDSA();
         return (BN_cmp(dsa1->pub_key,dsa2->pub_key) == 0);
     }
     

@@ -56,6 +56,10 @@ void SOAPClient::send(const Envelope& env, const SOAPTransport::Address& addr)
     m_transport = XMLToolingConfig::getConfig().SOAPTransportManager.newPlugin(scheme.c_str(), addr);
     prepareTransport(*m_transport);
     
+    Category& log = Category::getInstance(XMLTOOLING_LOGCAT".SOAPClient");
+    if (log.isDebugEnabled())
+        log.debugStream() << "marshalled envelope:" << logging::eol << env << logging::eol;
+    
     // Serialize envelope.
     stringstream s;
     s << env;
@@ -83,6 +87,11 @@ Envelope* SOAPClient::receive()
     DOMDocument* doc = (m_validate ? XMLToolingConfig::getConfig().getValidatingParser()
         : XMLToolingConfig::getConfig().getParser()).parse(out); 
     XercesJanitor<DOMDocument> janitor(doc);
+
+    Category& log = Category::getInstance(XMLTOOLING_LOGCAT".SOAPClient");
+    if (log.isDebugEnabled())
+        log.debugStream() << "received XML:" << logging::eol << *(doc->getDocumentElement()) << logging::eol;
+    
     auto_ptr<XMLObject> xmlObject(XMLObjectBuilder::buildOneFromElement(doc->getDocumentElement(), true));
     janitor.release();
     if (!m_validate)

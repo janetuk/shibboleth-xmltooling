@@ -239,32 +239,6 @@ bool InlineCredential::resolveKey(const KeyInfo* keyInfo)
         }
     }
 
-    // Check for RetrievalMethod.
-    const XMLCh* fragID=NULL;
-    const XMLObject* treeRoot=NULL;
-    const vector<RetrievalMethod*>& methods=keyInfo->getRetrievalMethods();
-    for (vector<RetrievalMethod*>::const_iterator m=methods.begin(); m!=methods.end(); ++m) {
-        if (!XMLString::equals((*m)->getType(),RetrievalMethod::TYPE_RSAKEYVALUE) &&
-            !XMLString::equals((*m)->getType(),RetrievalMethod::TYPE_DSAKEYVALUE))
-            continue;
-        fragID = (*m)->getURI();
-        if (!fragID || *fragID != chPound || !*(fragID+1)) {
-            log.warn("skipping ds:RetrievalMethod with an empty or non-local reference");
-            continue;
-        }
-        if (!treeRoot) {
-            treeRoot = keyInfo;
-            while (treeRoot->getParent())
-                treeRoot = treeRoot->getParent();
-        }
-        keyInfo = dynamic_cast<const KeyInfo*>(XMLHelper::getXMLObjectById(*treeRoot, fragID+1));
-        if (!keyInfo) {
-            log.warn("skipping ds:RetrievalMethod, local reference did not resolve to a ds:KeyInfo");
-            continue;
-        }
-        if (resolveKey(keyInfo))
-            return true;
-    }
     return false;
 }
 
@@ -298,35 +272,6 @@ bool InlineCredential::resolveCerts(const KeyInfo* keyInfo)
             }
         }
     }
-
-    if (m_xseccerts.empty()) {
-        // Check for RetrievalMethod.
-        const XMLCh* fragID=NULL;
-        const XMLObject* treeRoot=NULL;
-        const vector<RetrievalMethod*> methods=keyInfo->getRetrievalMethods();
-        for (vector<RetrievalMethod*>::const_iterator m=methods.begin(); m!=methods.end(); ++m) {
-            if (!XMLString::equals((*m)->getType(),RetrievalMethod::TYPE_X509DATA))
-                continue;
-            fragID = (*m)->getURI();
-            if (!fragID || *fragID != chPound || !*(fragID+1)) {
-                log.warn("skipping ds:RetrievalMethod with an empty or non-local reference");
-                continue;
-            }
-            if (!treeRoot) {
-                treeRoot = keyInfo;
-                while (treeRoot->getParent())
-                    treeRoot = treeRoot->getParent();
-            }
-            keyInfo = dynamic_cast<const KeyInfo*>(XMLHelper::getXMLObjectById(*treeRoot, fragID+1));
-            if (!keyInfo) {
-                log.warn("skipping ds:RetrievalMethod, local reference did not resolve to a ds:KeyInfo");
-                continue;
-            }
-            if (resolveCerts(keyInfo))
-                return true;
-        }
-        return false;
-    }
     
     log.debug("resolved %d certificate(s)", m_xseccerts.size());
     return !m_xseccerts.empty();
@@ -356,38 +301,12 @@ bool InlineCredential::resolveCRL(const KeyInfo* keyInfo)
             }
             catch(XSECException& e) {
                 auto_ptr_char temp(e.getMsg());
-                log.error("caught XML-Security exception loading certificate: %s", temp.get());
+                log.error("caught XML-Security exception loading CRL: %s", temp.get());
             }
             catch(XSECCryptoException& e) {
-                log.error("caught XML-Security exception loading certificate: %s", e.getMsg());
+                log.error("caught XML-Security exception loading CRL: %s", e.getMsg());
             }
         }
-    }
-
-    // Check for RetrievalMethod.
-    const XMLCh* fragID=NULL;
-    const XMLObject* treeRoot=NULL;
-    const vector<RetrievalMethod*> methods=keyInfo->getRetrievalMethods();
-    for (vector<RetrievalMethod*>::const_iterator m=methods.begin(); m!=methods.end(); ++m) {
-        if (!XMLString::equals((*m)->getType(),RetrievalMethod::TYPE_X509DATA))
-            continue;
-        fragID = (*m)->getURI();
-        if (!fragID || *fragID != chPound || !*(fragID+1)) {
-            log.warn("skipping ds:RetrievalMethod with an empty or non-local reference");
-            continue;
-        }
-        if (!treeRoot) {
-            treeRoot = keyInfo;
-            while (treeRoot->getParent())
-                treeRoot = treeRoot->getParent();
-        }
-        keyInfo = dynamic_cast<const KeyInfo*>(XMLHelper::getXMLObjectById(*treeRoot, fragID+1));
-        if (!keyInfo) {
-            log.warn("skipping ds:RetrievalMethod, local reference did not resolve to a ds:KeyInfo");
-            continue;
-        }
-        if (resolveCRL(keyInfo))
-            return true;
     }
 
     return false;

@@ -154,11 +154,16 @@ namespace xmltooling {
             CURLoption opt = static_cast<CURLoption>(strtol(option, NULL, 10));
             if (opt < CURLOPTTYPE_OBJECTPOINT)
                 return (curl_easy_setopt(m_handle, opt, strtol(value, NULL, 10)) == CURLE_OK);
+#ifdef CURLOPTTYPE_OFF_T
             else if (opt < CURLOPTTYPE_OFF_T)
                 return (curl_easy_setopt(m_handle, opt, value) == CURLE_OK);
             else if (sizeof(curl_off_t) == sizeof(long))
                 return (curl_easy_setopt(m_handle, opt, strtol(value, NULL, 10)) == CURLE_OK);
             return false;
+#else
+            else
+                return (curl_easy_setopt(m_handle, opt, value) == CURLE_OK);
+#endif
         }
         
         void send(istream& in);
@@ -546,7 +551,7 @@ int xmltooling::verify_callback(X509_STORE_CTX* x509_ctx, void* arg)
 
     bool success=false;
     if (ctx->m_criteria) {
-        ctx->m_criteria->setUsage(CredentialCriteria::TLS_CREDENTIAL);
+        ctx->m_criteria->setUsage(Credential::TLS_CREDENTIAL);
         // Bypass name check (handled for us by curl).
         ctx->m_criteria->setPeerName(NULL);
         success = ctx->m_trustEngine->validate(x509_ctx->cert,x509_ctx->untrusted,*(ctx->m_peerResolver),ctx->m_criteria);
@@ -554,7 +559,7 @@ int xmltooling::verify_callback(X509_STORE_CTX* x509_ctx, void* arg)
     else {
         // Bypass name check (handled for us by curl).
         CredentialCriteria cc;
-        cc.setUsage(CredentialCriteria::TLS_CREDENTIAL);
+        cc.setUsage(Credential::TLS_CREDENTIAL);
         success = ctx->m_trustEngine->validate(x509_ctx->cert,x509_ctx->untrusted,*(ctx->m_peerResolver),&cc);
     }
     

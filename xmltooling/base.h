@@ -349,6 +349,42 @@
 #define END_XMLOBJECT }
 
 /**
+ * Declares a static variable holding the XMLObject's element QName.
+ */
+#define DECL_ELEMENT_QNAME \
+    public: \
+        XMLTOOLING_DOXYGEN(Element QName) \
+        static xmltooling::QName ELEMENT_QNAME
+
+/**
+ * Declares a static variable holding the XMLObject's schema type QName.
+ */
+#define DECL_TYPE_QNAME \
+    public: \
+        XMLTOOLING_DOXYGEN(Type QName) \
+        static xmltooling::QName TYPE_QNAME
+
+/**
+ * Implements a static variable holding an XMLObject's element QName.
+ * 
+ * @param cname             the name of the XMLObject specialization
+ * @param namespaceURI      the XML namespace of the default associated element
+ * @param namespacePrefix   the XML namespace prefix of the default associated element
+ */
+#define IMPL_ELEMENT_QNAME(cname,namespaceURI,namespacePrefix) \
+    xmltooling::QName cname::ELEMENT_QNAME(namespaceURI,cname::LOCAL_NAME,namespacePrefix)
+
+/**
+ * Implements a static variable holding an XMLObject's schema type QName.
+ * 
+ * @param cname             the name of the XMLObject specialization
+ * @param namespaceURI      the XML namespace of the default associated element
+ * @param namespacePrefix   the XML namespace prefix of the default associated element
+ */
+#define IMPL_TYPE_QNAME(cname,namespaceURI,namespacePrefix) \
+    xmltooling::QName cname::TYPE_QNAME(namespaceURI,cname::TYPE_NAME,namespacePrefix)
+
+/**
  * Declares abstract set method for a typed XML attribute.
  * The get method is omitted.
  * 
@@ -841,7 +877,7 @@
  * @param namespaceURI  the XML namespace of the attribute
  */
 #define MARSHALL_STRING_ATTRIB(proper,ucase,namespaceURI) \
-    if (m_##proper) { \
+    if (m_##proper && *m_##proper) { \
         domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, m_##proper); \
     }
 
@@ -865,7 +901,7 @@
  * @param namespaceURI  the XML namespace of the attribute
  */
 #define MARSHALL_INTEGER_ATTRIB(proper,ucase,namespaceURI) \
-    if (m_##proper) { \
+    if (m_##proper && *m_##proper) { \
         domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, m_##proper); \
     }
 
@@ -915,7 +951,7 @@
  * @param namespaceURI  the XML namespace of the attribute
  */
 #define MARSHALL_ID_ATTRIB(proper,ucase,namespaceURI) \
-    if (m_##proper) { \
+    if (m_##proper && *m_##proper) { \
         domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, m_##proper); \
         domElement->setIdAttributeNS(namespaceURI, ucase##_ATTRIB_NAME); \
     }
@@ -1034,8 +1070,9 @@
 #define PROC_TYPED_CHILD(proper,namespaceURI,force) \
     if (force || xmltooling::XMLHelper::isNodeNamed(root,namespaceURI,proper::LOCAL_NAME)) { \
         proper* typesafe=dynamic_cast<proper*>(childXMLObject); \
-        if (typesafe) { \
-            set##proper(typesafe); \
+        if (typesafe && !m_##proper) { \
+            typesafe->setParent(this); \
+            *m_pos_##proper = m_##proper = typesafe; \
             return; \
         } \
     }
@@ -1052,8 +1089,9 @@
 #define PROC_TYPED_FOREIGN_CHILD(proper,ns,namespaceURI,force) \
     if (force || xmltooling::XMLHelper::isNodeNamed(root,namespaceURI,ns::proper::LOCAL_NAME)) { \
         ns::proper* typesafe=dynamic_cast<ns::proper*>(childXMLObject); \
-        if (typesafe) { \
-            set##proper(typesafe); \
+        if (typesafe && !m_##proper) { \
+            typesafe->setParent(this); \
+            *m_pos_##proper = m_##proper = typesafe; \
             return; \
         } \
     }
@@ -1066,8 +1104,11 @@
  */
 #define PROC_XMLOBJECT_CHILD(proper,namespaceURI) \
     if (xmltooling::XMLHelper::isNodeNamed(root,namespaceURI,proper::LOCAL_NAME)) { \
-        set##proper(childXMLObject); \
-        return; \
+        if (!m_##proper) { \
+            childXMLObject->setParent(this); \
+            *m_pos_##proper = m_##proper = childXMLObject; \
+            return; \
+        } \
     }
 
 /**
@@ -1093,7 +1134,7 @@
 #define DECL_INTEGER_CONTENT(proper) \
     XMLTOOLING_DOXYGEN(Returns proper in integer form after a NULL indicator.) \
     std::pair<bool,int> get##proper() const { \
-        return std::make_pair((getTextContent()!=NULL), (getTextContent()!=NULL ? xercesc::XMLString::parseInt(getTextContent()) : NULL)); \
+        return std::make_pair((getTextContent()!=NULL), (getTextContent()!=NULL ? xercesc::XMLString::parseInt(getTextContent()) : 0)); \
     } \
     XMLTOOLING_DOXYGEN(Sets proper.) \
     void set##proper(int proper) { \

@@ -19,7 +19,7 @@
  * $Id$
  */
 
-#if !defined(XERCESC_INCLUDE_GUARD_CURLNETACCESSOR_HPP)
+#if !defined(XERCESC_INCLUDE_GUARD_CURLNETACCESSOR_HPP) && !defined(XMLTOOLING_LITE)
 #define XERCESC_INCLUDE_GUARD_CURLNETACCESSOR_HPP
 
 #include <xmltooling/base.h>
@@ -37,7 +37,7 @@ namespace xmltooling {
 // a HTTP or FTP URL.
 //
 
-class XMLTOOL_EXPORT CurlNetAccessor : public XMLNetAccessor
+class XMLTOOL_API CurlNetAccessor : public XMLNetAccessor
 {
 public :
     CurlNetAccessor();

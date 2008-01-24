@@ -32,6 +32,7 @@
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/sax/InputSource.hpp>
 #include <xercesc/util/BinInputStream.hpp>
+#include <xercesc/util/SecurityManager.hpp>
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -130,6 +131,7 @@ namespace xmltooling {
         bool m_namespaceAware,m_schemaAware;
         std::stack<xercesc::DOMBuilder*> m_pool;
         Mutex* m_lock;
+        xercesc::SecurityManager* m_security;
     };
 
     /**

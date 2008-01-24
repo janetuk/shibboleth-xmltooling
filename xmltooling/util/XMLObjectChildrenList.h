@@ -81,27 +81,38 @@ namespace xmltooling {
 
     /**
      * STL iterator that mediates access to an iterator over typed XML children.
-     * @param _Ty   a bidrectional sequence of the subtype to iterate over
+     *
+     * @param Container type of container
+     * @param _Ty       a bidrectional iterator to guard
      */
-    template <class _Ty>
+    template <class Container, typename _Ty>
     class XMLObjectChildrenIterator
     {
         /// @cond OFF
-        typename _Ty::iterator m_iter;
+        _Ty m_iter;
         template <class _Tx, class _Tz> friend class XMLObjectChildrenList;
         template <class _Tx, class _Tz> friend class XMLObjectPairList;
     public:
+#ifdef HAVE_ITERATOR_TRAITS
+        typedef typename std::iterator_traits<_Ty>::iterator_category iterator_category;
+        typedef typename std::iterator_traits<_Ty>::value_type value_type;
+        typedef typename std::iterator_traits<_Ty>::difference_type difference_type;
+        typedef typename std::iterator_traits<_Ty>::pointer pointer;
+        typedef typename std::iterator_traits<_Ty>::reference reference;
+#else
+        typedef typename _Ty::iterator_category iterator_category;
         typedef typename _Ty::value_type value_type;
-        typedef typename _Ty::reference reference;
-        typedef typename _Ty::pointer pointer;
-        typedef typename _Ty::const_reference const_reference;
-        typedef typename _Ty::const_pointer const_pointer;
         typedef typename _Ty::difference_type difference_type;
+        typedef typename _Ty::pointer pointer;
+        typedef typename _Ty::reference reference;
+#endif
+        typedef typename Container::const_reference const_reference;
+        typedef typename Container::const_pointer const_pointer;
 
         XMLObjectChildrenIterator() {
         }
 
-        XMLObjectChildrenIterator(typename _Ty::iterator iter) {
+        XMLObjectChildrenIterator(_Ty iter) {
             m_iter=iter;
         }
 
@@ -180,8 +191,236 @@ namespace xmltooling {
 		    // test for iterator inequality
 		    return (!(m_iter == _Right.m_iter));
 	    }
+	    
+	    bool operator<(const XMLObjectChildrenIterator &_Right) const {
+	        return (m_iter < _Right.m_iter);
+	    }
         /// @endcond
     };
+
+#ifndef HAVE_ITERATOR_TRAITS
+    /**
+     * STL iterator that mediates access to an iterator that's a pointer.
+     *
+     * @param Container type of container
+     * @param _Ty       the type of object being referenced
+     */
+    template <class Container, typename _Ty>
+    class XMLObjectChildrenIterator<Container, _Ty*>
+    {
+        /// @cond OFF
+        typename _Ty* m_iter;
+        template <class _Tx, class _Tz> friend class XMLObjectChildrenList;
+        template <class _Tx, class _Tz> friend class XMLObjectPairList;
+    public:
+        typedef std::random_access_iterator_tag iterator_category;
+        typedef _Ty value_type;
+        typedef ptrdiff_t difference_type;
+        typedef _Ty* pointer;
+        typedef _Ty& reference;
+        typedef const _Ty& const_reference;
+        typedef const _Ty* const_pointer;
+
+        XMLObjectChildrenIterator() {
+        }
+
+        XMLObjectChildrenIterator(_Ty* iter) {
+            m_iter=iter;
+        }
+
+        const_reference operator*() const {
+            return *m_iter;
+        }
+
+        const_reference operator->() const {
+            return *m_iter;
+        }
+
+        XMLObjectChildrenIterator& operator++() {
+            // preincrement
+            ++m_iter;
+            return (*this);
+        }
+
+        XMLObjectChildrenIterator& operator--() {
+            // predecrement
+            --m_iter;
+            return (*this);
+        }
+
+        XMLObjectChildrenIterator operator++(int) {
+            // postincrement
+            XMLObjectChildrenIterator _Tmp = *this;
+            ++*this;
+            return (_Tmp);
+        }
+
+        XMLObjectChildrenIterator operator--(int) {
+            // postdecrement
+            XMLObjectChildrenIterator _Tmp = *this;
+            --*this;
+            return (_Tmp);
+        }
+
+        XMLObjectChildrenIterator& operator+=(difference_type _Off) {
+            // increment by integer
+            m_iter += _Off;
+            return (*this);
+        }
+
+        XMLObjectChildrenIterator operator+(difference_type _Off) const {
+            // return this + integer
+            return m_iter + _Off;
+        }
+
+        XMLObjectChildrenIterator& operator-=(difference_type _Off) {
+            // decrement by integer
+            return (*this += -_Off);
+        }
+
+        XMLObjectChildrenIterator operator-(difference_type _Off) const {
+            // return this - integer
+            XMLObjectChildrenIterator _Tmp = *this;
+            return (_Tmp -= _Off);
+        }
+
+        difference_type operator-(const XMLObjectChildrenIterator& _Right) const {
+            // return difference of iterators
+            return m_iter - _Right.m_iter;
+        }
+
+        const_reference operator[](difference_type _Off) const {
+            // subscript
+            return (*(*this + _Off));
+        }
+
+        bool operator==(const XMLObjectChildrenIterator &_Right) const {
+		    // test for iterator equality
+		    return (m_iter == _Right.m_iter);
+	    }
+
+	    bool operator!=(const XMLObjectChildrenIterator &_Right) const {
+		    // test for iterator inequality
+		    return (!(m_iter == _Right.m_iter));
+	    }
+	    
+	    bool operator<(const XMLObjectChildrenIterator &_Right) const {
+	        return (m_iter < _Right.m_iter);
+	    }
+        /// @endcond
+    };
+
+    /**
+     * STL iterator that mediates access to an iterator that's a const pointer.
+     *
+     * @param Container type of container
+     * @param _Ty       the type of object being referenced
+     */
+    template <class Container, typename _Ty>
+    class XMLObjectChildrenIterator<Container, const _Ty*>
+    {
+        /// @cond OFF
+        typename const _Ty* m_iter;
+        template <class _Tx, class _Tz> friend class XMLObjectChildrenList;
+        template <class _Tx, class _Tz> friend class XMLObjectPairList;
+    public:
+        typedef std::random_access_iterator_tag iterator_category;
+        typedef _Ty value_type;
+        typedef ptrdiff_t difference_type;
+        typedef const _Ty* pointer;
+        typedef const _Ty& reference;
+        typedef const _Ty& const_reference;
+        typedef const _Ty* const_pointer;
+
+        XMLObjectChildrenIterator() {
+        }
+
+        XMLObjectChildrenIterator(_Ty* iter) {
+            m_iter=iter;
+        }
+
+        const_reference operator*() const {
+            return *m_iter;
+        }
+
+        const_reference operator->() const {
+            return *m_iter;
+        }
+
+        XMLObjectChildrenIterator& operator++() {
+            // preincrement
+            ++m_iter;
+            return (*this);
+        }
+
+        XMLObjectChildrenIterator& operator--() {
+            // predecrement
+            --m_iter;
+            return (*this);
+        }
+
+        XMLObjectChildrenIterator operator++(int) {
+            // postincrement
+            XMLObjectChildrenIterator _Tmp = *this;
+            ++*this;
+            return (_Tmp);
+        }
+
+        XMLObjectChildrenIterator operator--(int) {
+            // postdecrement
+            XMLObjectChildrenIterator _Tmp = *this;
+            --*this;
+            return (_Tmp);
+        }
+
+        XMLObjectChildrenIterator& operator+=(difference_type _Off) {
+            // increment by integer
+            m_iter += _Off;
+            return (*this);
+        }
+
+        XMLObjectChildrenIterator operator+(difference_type _Off) const {
+            // return this + integer
+            return m_iter + _Off;
+        }
+
+        XMLObjectChildrenIterator& operator-=(difference_type _Off) {
+            // decrement by integer
+            return (*this += -_Off);
+        }
+
+        XMLObjectChildrenIterator operator-(difference_type _Off) const {
+            // return this - integer
+            XMLObjectChildrenIterator _Tmp = *this;
+            return (_Tmp -= _Off);
+        }
+
+        difference_type operator-(const XMLObjectChildrenIterator& _Right) const {
+            // return difference of iterators
+            return m_iter - _Right.m_iter;
+        }
+
+        const_reference operator[](difference_type _Off) const {
+            // subscript
+            return (*(*this + _Off));
+        }
+
+        bool operator==(const XMLObjectChildrenIterator &_Right) const {
+		    // test for iterator equality
+		    return (m_iter == _Right.m_iter);
+	    }
+
+	    bool operator!=(const XMLObjectChildrenIterator &_Right) const {
+		    // test for iterator inequality
+		    return (!(m_iter == _Right.m_iter));
+	    }
+	    
+	    bool operator<(const XMLObjectChildrenIterator &_Right) const {
+	        return (m_iter < _Right.m_iter);
+	    }
+        /// @endcond
+    };
+#endif
 
     /**
      * STL-compatible container that mediates access to underlying lists of typed XML children.
@@ -205,8 +444,8 @@ namespace xmltooling {
         typedef typename Container::size_type size_type;
 
         // We override the iterator types with our constrained wrapper.
-        typedef XMLObjectChildrenIterator<Container> iterator;
-        typedef XMLObjectChildrenIterator<Container> const_iterator;
+        typedef XMLObjectChildrenIterator<Container, typename Container::iterator> iterator;
+        typedef XMLObjectChildrenIterator<Container, typename Container::const_iterator> const_iterator;
         /// @endcond
 
         /**
@@ -249,12 +488,12 @@ namespace xmltooling {
 
         const_iterator begin() const {
             // return iterator for beginning of const sequence
-            return m_container.begin();
+            return const_cast<const Container&>(m_container).begin();
         }
 
         const_iterator end() const {
             // return iterator for end of const sequence
-            return m_container.end();
+            return const_cast<const Container&>(m_container).end();
         }
 
         const_reference at(size_type _Pos) const {
@@ -359,8 +598,8 @@ namespace xmltooling {
         typedef typename Container::size_type size_type;
 
         // We override the iterator types with our constrained wrapper.
-        typedef XMLObjectChildrenIterator<Container> iterator;
-        typedef XMLObjectChildrenIterator<Container> const_iterator;
+        typedef XMLObjectChildrenIterator<Container, typename Container::iterator> iterator;
+        typedef XMLObjectChildrenIterator<Container, typename Container::const_iterator> const_iterator;
         /// @endcond
 
         /**
@@ -403,12 +642,12 @@ namespace xmltooling {
 
         const_iterator begin() const {
             // return iterator for beginning of const sequence
-            return m_container.begin();
+            return const_cast<const Container&>(m_container).begin();
         }
 
         const_iterator end() const {
             // return iterator for end of const sequence
-            return m_container.end();
+            return const_cast<const Container&>(m_container).end();
         }
 
         const_reference at(size_type _Pos) const {

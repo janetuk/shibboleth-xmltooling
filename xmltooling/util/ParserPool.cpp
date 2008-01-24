@@ -43,7 +43,7 @@ using namespace xmltooling;
 using namespace std;
 
 ParserPool::ParserPool(bool namespaceAware, bool schemaAware)
-    : m_namespaceAware(namespaceAware), m_schemaAware(schemaAware), m_lock(Mutex::create()) {}
+    : m_namespaceAware(namespaceAware), m_schemaAware(schemaAware), m_lock(Mutex::create()), m_security(new SecurityManager()) {}
 
 ParserPool::~ParserPool()
 {
@@ -52,6 +52,7 @@ ParserPool::~ParserPool()
         m_pool.pop();
     }
     delete m_lock;
+    delete m_security;
 }
 
 DOMDocument* ParserPool::newDocument()
@@ -280,19 +281,19 @@ bool ParserPool::handleError(const DOMError& e)
         case DOMError::DOM_SEVERITY_WARNING:
             log.warnStream() << "warning on line " << locator->getLineNumber()
                 << ", column " << locator->getColumnNumber()
-                << ", message: " << temp.get() << CategoryStream::ENDLINE;
+                << ", message: " << temp.get() << logging::eol;
             return true;
 
         case DOMError::DOM_SEVERITY_ERROR:
             log.errorStream() << "error on line " << locator->getLineNumber()
                 << ", column " << locator->getColumnNumber()
-                << ", message: " << temp.get() << CategoryStream::ENDLINE;
+                << ", message: " << temp.get() << logging::eol;
             throw XMLParserException(string("error during XML parsing: ") + (temp.get() ? temp.get() : "no message"));
 
         case DOMError::DOM_SEVERITY_FATAL_ERROR:
-            log.critStream() << "fatal error on line " << locator->getLineNumber()
+            log.errorStream() << "fatal error on line " << locator->getLineNumber()
                 << ", column " << locator->getColumnNumber()
-                << ", message: " << temp.get() << CategoryStream::ENDLINE;
+                << ", message: " << temp.get() << logging::eol;
             throw XMLParserException(string("fatal error during XML parsing: ") + (temp.get() ? temp.get() : "no message"));
     }
     throw XMLParserException(string("unclassified error during XML parsing: ") + (temp.get() ? temp.get() : "no message"));
@@ -320,6 +321,7 @@ DOMBuilder* ParserPool::createBuilder()
         parser->setProperty(XMLUni::fgXercesSchemaExternalSchemaLocation,const_cast<XMLCh*>(temp.get()));
 #endif
     }
+    parser->setProperty(XMLUni::fgXercesSecurityManager, m_security);
     parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument,true);
     parser->setEntityResolver(this);
     parser->setErrorHandler(this);
@@ -369,7 +371,7 @@ unsigned int StreamInputSource::StreamBinInputStream::readBytes(XMLByte* const t
         catch(ios_base::failure& e) {
             Category::getInstance(XMLTOOLING_LOGCAT".StreamInputSource").critStream()
                 << "XML::StreamInputSource::StreamBinInputStream::readBytes caught an exception: " << e.what()
-                << CategoryStream::ENDLINE;
+                << logging::eol;
             *toFill=0;
             return 0;
         }

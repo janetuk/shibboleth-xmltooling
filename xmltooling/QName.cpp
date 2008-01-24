@@ -164,6 +164,8 @@ QName& QName::operator=(const QName& src)
 
 bool xmltooling::operator==(const QName& op1, const QName& op2)
 {
+    if (&op1 == &op2)
+        return true;
     return (!XMLString::compareString(op1.getNamespaceURI(),op2.getNamespaceURI()) &&
             !XMLString::compareString(op1.getLocalPart(),op2.getLocalPart()));
 }

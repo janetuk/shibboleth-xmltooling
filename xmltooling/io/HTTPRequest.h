@@ -25,8 +25,15 @@
 
 #include <xmltooling/io/GenericRequest.h>
 
+#include <map>
+
 namespace xmltooling {
-    
+
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4251 )
+#endif
+
     /**
      * Interface to HTTP requests.
      * 
@@ -83,7 +90,23 @@ namespace xmltooling {
          * @return the header's value, or an empty string
          */
         virtual std::string getHeader(const char* name) const=0;
+
+        /**
+         * Get a cookie value supplied by the client.
+         * 
+         * @param name  name of cookie
+         * @return  cookie value or NULL
+         */
+        virtual const char* getCookie(const char* name) const;
+
+    private:
+        mutable std::map<std::string,std::string> m_cookieMap;
     };
+
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
+
 };
 
 #endif /* __xmltooling_httpreq_h__ */
