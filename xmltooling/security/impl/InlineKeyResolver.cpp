@@ -301,10 +301,10 @@ bool InlineCredential::resolveCRL(const KeyInfo* keyInfo)
             }
             catch(XSECException& e) {
                 auto_ptr_char temp(e.getMsg());
-                log.error("caught XML-Security exception loading certificate: %s", temp.get());
+                log.error("caught XML-Security exception loading CRL: %s", temp.get());
             }
             catch(XSECCryptoException& e) {
-                log.error("caught XML-Security exception loading certificate: %s", e.getMsg());
+                log.error("caught XML-Security exception loading CRL: %s", e.getMsg());
             }
         }
     }
