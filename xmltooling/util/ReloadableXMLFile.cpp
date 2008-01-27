@@ -225,10 +225,12 @@ Lockable* ReloadableXMLFile::lock()
             return this;
         
         // Elevate lock and recheck.
+        m_log.debug("timestamp of local resource changed, elevating to a write lock");
         m_lock->unlock();
         m_lock->wrlock();
         if (m_filestamp>=stat_buf.st_mtime) {
             // Somebody else handled it, just downgrade.
+            m_log.debug("update of local resource handled by another thread, downgrading lock");
             m_lock->unlock();
             m_lock->rdlock();
             return this;
@@ -247,10 +249,12 @@ Lockable* ReloadableXMLFile::lock()
             return this;
 
         // Elevate lock and recheck.
+        m_log.debug("reload interval for remote resource elapsed, elevating to a write lock");
         m_lock->unlock();
         m_lock->wrlock();
         if (now - m_filestamp < m_reloadInterval) {
             // Somebody else handled it, just downgrade.
+            m_log.debug("update of remote resource handled by another thread, downgrading lock");
             m_lock->unlock();
             m_lock->rdlock();
             return this;
@@ -272,6 +276,7 @@ Lockable* ReloadableXMLFile::lock()
     }
     
     // If we made it here, the swap may or may not have worked, but we need to relock.
+    m_log.debug("attempt to update resource complete, relocking");
     m_lock->rdlock();
     return this;
 }
