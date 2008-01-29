@@ -244,6 +244,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\util\PathResolver.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\util\ReloadableXMLFile.cpp"
 					>
 				</File>
@@ -463,6 +467,10 @@
 				</File>
 				<File
 					RelativePath=".\util\ParserPool.h"
+					>
+				</File>
+				<File
+					RelativePath=".\util\PathResolver.h"
 					>
 				</File>
 				<File

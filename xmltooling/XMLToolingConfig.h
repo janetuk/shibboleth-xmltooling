@@ -44,6 +44,7 @@ namespace xmltooling {
 
 namespace xmltooling {
     
+    class XMLTOOL_API PathResolver;
     class XMLTOOL_API TemplateEngine;
     class XMLTOOL_API URLEncoder;
 #ifndef XMLTOOLING_LITE
@@ -63,7 +64,8 @@ namespace xmltooling {
         MAKE_NONCOPYABLE(XMLToolingConfig);
     protected:
 #ifndef XMLTOOLING_NO_XMLSEC
-        XMLToolingConfig() : m_keyInfoResolver(NULL), m_replayCache(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180) {}
+        XMLToolingConfig() : m_keyInfoResolver(NULL), m_replayCache(NULL),
+            m_pathResolver(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180) {}
 
         /** Global KeyInfoResolver instance. */
         KeyInfoResolver* m_keyInfoResolver;
@@ -71,9 +73,12 @@ namespace xmltooling {
         /** Global ReplayCache instance. */
         ReplayCache* m_replayCache;
 #else
-        XMLToolingConfig() : m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180) {}
+        XMLToolingConfig() : m_pathResolver(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180) {}
 #endif
 
+        /** Global PathResolver instance. */
+        PathResolver* m_pathResolver;
+        
         /** Global TemplateEngine instance. */
         TemplateEngine* m_templateEngine;
 
@@ -225,7 +230,25 @@ namespace xmltooling {
         TemplateEngine* getTemplateEngine() const {
             return m_templateEngine;
         }
-                
+
+        /**
+         * Sets the global PathResolver instance.
+         * This method must be externally synchronized with any code that uses the object.
+         * Any previously set object is destroyed.
+         * 
+         * @param pathResolver   new PathResolver instance to store
+         */
+        void setPathResolver(PathResolver* pathResolver);
+
+        /**
+         * Returns the global PathResolver instance.
+         * 
+         * @return  global PathResolver or NULL
+         */
+        PathResolver* getPathResolver() const {
+            return m_pathResolver;
+        }
+        
         /**
          * List of catalog files to load into validating parser pool at initialization time.
          * Like other path settings, the separator depends on the platform

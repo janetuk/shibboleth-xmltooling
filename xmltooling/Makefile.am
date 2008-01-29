@@ -103,6 +103,7 @@ utilinclude_HEADERS = \
 	util/DateTime.h \
 	util/NDC.h \
 	util/ParserPool.h \
+	util/PathResolver.h \
 	util/Predicates.h \
 	util/ReloadableXMLFile.h \
 	util/ReplayCache.h \
@@ -181,6 +182,7 @@ common_sources = \
 	util/DateTime.cpp \
 	util/NDC.cpp \
 	util/ParserPool.cpp \
+	util/PathResolver.cpp \
 	util/ReloadableXMLFile.cpp \
 	util/TemplateEngine.cpp \
 	util/URLEncoder.cpp \

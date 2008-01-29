@@ -37,6 +37,7 @@
 #include "soap/SOAP.h"
 #include "soap/SOAPTransport.h"
 #include "util/NDC.h"
+#include "util/PathResolver.h"
 #include "util/ReplayCache.h"
 #include "util/StorageService.h"
 #include "util/TemplateEngine.h"
@@ -185,6 +186,12 @@ void XMLToolingConfig::setReplayCache(ReplayCache* replayCache)
 }
 #endif
 
+void XMLToolingConfig::setPathResolver(PathResolver* pathResolver)
+{
+    delete m_pathResolver;
+    m_pathResolver = pathResolver;
+}
+
 void XMLToolingConfig::setTemplateEngine(TemplateEngine* templateEngine)
 {
     delete m_templateEngine;
@@ -274,6 +281,7 @@ bool XMLToolingInternalConfig::init()
         m_keyInfoResolver = KeyInfoResolverManager.newPlugin(INLINE_KEYINFO_RESOLVER,NULL);
 #endif
 
+        m_pathResolver = new PathResolver();
         m_urlEncoder = new URLEncoder();
         
         // Register xml:id as an ID attribute.        
@@ -331,6 +339,9 @@ void XMLToolingInternalConfig::term()
     m_replayCache = NULL;
 #endif
 
+    delete m_pathResolver;
+    m_pathResolver = NULL;
+    
     delete m_templateEngine;
     m_templateEngine = NULL;
 
