@@ -22,6 +22,7 @@
 
 #include "internal.h"
 #include "util/NDC.h"
+#include "util/PathResolver.h"
 #include "util/ReloadableXMLFile.h"
 #include "util/XMLConstants.h"
 #include "util/XMLHelper.h"
@@ -92,6 +93,8 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
         }
 
         if (m_local) {
+            XMLToolingConfig::getConfig().getPathResolver()->resolve(m_source, PathResolver::XMLTOOLING_CFG_FILE);
+
             flag=e->getAttributeNS(NULL,reloadChanges);
             if (!XMLString::equals(flag,xmlconstants::XML_FALSE) && !XMLString::equals(flag,xmlconstants::XML_ZERO)) {
 #ifdef WIN32
@@ -114,6 +117,7 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
             if (source && *source) {
                 auto_ptr_char temp2(source);
                 m_backing=temp2.get();
+                XMLToolingConfig::getConfig().getPathResolver()->resolve(m_backing, PathResolver::XMLTOOLING_RUN_FILE);
                 log.debug("backup remote resource with (%s)", m_backing.c_str());
             }
             source = e->getAttributeNS(NULL,reloadInterval);

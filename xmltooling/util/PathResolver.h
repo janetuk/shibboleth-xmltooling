@@ -36,7 +36,7 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(PathResolver);
     public:
-        PathResolver() {}
+        PathResolver() : m_defaultPackage("xmltooling"), m_defaultPrefix("/usr") {}
 
         virtual ~PathResolver() {}
         
@@ -81,7 +81,14 @@ namespace xmltooling {
 
     private:
         bool isAbsolute(const char* s) const {
-            return (*s == '/' || *s == '\\' || *(s+1) == ':');
+            switch (*s) {
+                case '/':
+                case '\\':
+                    return true;
+                case '.':
+                    return (*(s+1) == '.' || *(s+1) == '/' || *(s+1) == '\\');
+            }
+            return *(s+1) == ':';
         }
 
         std::string m_defaultPackage,m_defaultPrefix;

@@ -29,6 +29,7 @@
 #include "security/OpenSSLCredential.h"
 #include "security/OpenSSLCryptoX509CRL.h"
 #include "util/NDC.h"
+#include "util/PathResolver.h"
 #include "util/XMLHelper.h"
 
 #include <sys/types.h>
@@ -146,8 +147,8 @@ namespace xmltooling {
         string formatToString(format_t format) const;
         format_t xmlFormatToFormat(const XMLCh* format_xml) const;
     
-        format_t m_keyformat,m_certformat,m_crlformat;
-        string m_keypath,m_keypass,m_certpath,m_certpass,m_crlpath;
+        format_t m_keyformat,m_crlformat;
+        string m_keypath,m_keypass,m_crlpath;
         vector<X509*> m_certs;
         FilesystemCredential* m_credential;
     };
@@ -230,6 +231,8 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
         if (e && e->hasChildNodes()) {
             const XMLCh* s=e->getFirstChild()->getNodeValue();
             auto_ptr_char kpath(s);
+            m_keypath = kpath.get();
+            XMLToolingConfig::getConfig().getPathResolver()->resolve(m_keypath, PathResolver::XMLTOOLING_CFG_FILE);
 #ifdef WIN32
             struct _stat stat_buf;
             if (_stat(kpath.get(), &stat_buf) != 0)
@@ -241,7 +244,6 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
                 log.error("key file (%s) can't be opened", kpath.get());
                 throw XMLSecurityException("FilesystemCredentialResolver can't access key file ($1)",params(1,kpath.get()));
             }
-            m_keypath=kpath.get();
         }
         else {
             log.error("Path element missing inside Key element");
@@ -290,6 +292,8 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
         if (e && e->hasChildNodes()) {
             const XMLCh* s=e->getFirstChild()->getNodeValue();
             auto_ptr_char kpath(s);
+            m_crlpath=kpath.get();
+            XMLToolingConfig::getConfig().getPathResolver()->resolve(m_crlpath, PathResolver::XMLTOOLING_CFG_FILE);
 #ifdef WIN32
             struct _stat stat_buf;
             if (_stat(kpath.get(), &stat_buf) != 0)
@@ -301,7 +305,6 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
                 log.error("CRL file (%s) can't be opened", kpath.get());
                 throw XMLSecurityException("FilesystemCredentialResolver can't access CRL file ($1)",params(1,kpath.get()));
             }
-            m_crlpath=kpath.get();
         }
         else {
             log.error("Path element missing inside CRL element");
@@ -357,7 +360,10 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
         throw XMLSecurityException("FilesystemCredentialResolver can't access certificate file, missing or empty Path element.");
     }
     
-    auto_ptr_char certpath(ep->getFirstChild()->getNodeValue());
+    auto_ptr_char certpath2(ep->getFirstChild()->getNodeValue());
+    string certpath(certpath2.get());
+    XMLToolingConfig::getConfig().getPathResolver()->resolve(certpath, PathResolver::XMLTOOLING_CFG_FILE);
+
     format_xml=e->getAttributeNS(NULL,format);
     if (format_xml && *format_xml) {
         fformat = xmlFormatToFormat(format_xml);
@@ -374,11 +380,11 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
         X509* x=NULL;
         PKCS12* p12=NULL;
         in=BIO_new(BIO_s_file_internal());
-        if (in && BIO_read_filename(in,certpath.get())>0) {
+        if (in && BIO_read_filename(in,certpath.c_str())>0) {
             if (!format_xml || !*format_xml) {
                 // Determine the cert encoding format dynamically, if not explicitly specified
                 fformat = getEncodingFormat(in);
-                log.debug("certificate encoding format for (%s) dynamically resolved as (%s)", certpath.get(), formatToString(fformat).c_str());
+                log.debug("certificate encoding format for (%s) dynamically resolved as (%s)", certpath.c_str(), formatToString(fformat).c_str());
             }
 
             switch(fformat) {
@@ -394,7 +400,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
                     else {
                         log_openssl();
                         BIO_free(in);
-                        throw XMLSecurityException("FilesystemCredentialResolver unable to load DER certificate from file ($1)",params(1,certpath.get()));
+                        throw XMLSecurityException("FilesystemCredentialResolver unable to load DER certificate from file ($1)",params(1,certpath.c_str()));
                     }
                     break;
 
@@ -410,7 +416,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
                     } else {
                         log_openssl();
                         BIO_free(in);
-                        throw XMLSecurityException("FilesystemCredentialResolver unable to load PKCS12 certificate from file ($1)",params(1,certpath.get()));
+                        throw XMLSecurityException("FilesystemCredentialResolver unable to load PKCS12 certificate from file ($1)",params(1,certpath.c_str()));
                     }
                     break;
             } // end switch
@@ -421,7 +427,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
                 BIO_free(in);
                 in=NULL;
             }
-            throw XMLSecurityException("FilesystemCredentialResolver unable to load certificate(s) from file ($1)",params(1,certpath.get()));
+            throw XMLSecurityException("FilesystemCredentialResolver unable to load certificate(s) from file ($1)",params(1,certpath.c_str()));
         }
         if (in) {
             BIO_free(in);
@@ -439,20 +445,22 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
                 extra = XMLHelper::getNextSiblingElement(extra,CAPath);
                 continue;
             }
-            auto_ptr_char capath(extra->getFirstChild()->getNodeValue());
+            auto_ptr_char capath2(extra->getFirstChild()->getNodeValue());
+            string capath(capath2.get());
+            XMLToolingConfig::getConfig().getPathResolver()->resolve(capath, PathResolver::XMLTOOLING_CFG_FILE);
             x=NULL;
             p12=NULL;
             in=BIO_new(BIO_s_file_internal());
-            if (in && BIO_read_filename(in,capath.get())>0) {
+            if (in && BIO_read_filename(in,capath.c_str())>0) {
                 if (!format_xml || !*format_xml) {
                     // Determine the cert encoding format dynamically, if not explicitly specified
                     fformat = getEncodingFormat(in);
-                    log.debug("CA certificate encoding format for (%s) dynamically resolved as (%s)", certpath.get(), formatToString(fformat).c_str());
+                    log.debug("CA certificate encoding format for (%s) dynamically resolved as (%s)", capath.c_str(), formatToString(fformat).c_str());
                 }
 
                 switch (fformat) {
                     case PEM:
-                        while (x=PEM_read_bio_X509(in,NULL,passwd_callback,const_cast<char*>(certpass.get())))
+                        while (x=PEM_read_bio_X509(in,NULL,NULL,NULL))
                             m_certs.push_back(x);
                         break;
 
@@ -463,14 +471,14 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
                         else {
                             log_openssl();
                             BIO_free(in);
-                            throw XMLSecurityException("FilesystemCredentialResolver unable to load DER CA certificate from file ($1)",params(1,capath.get()));
+                            throw XMLSecurityException("FilesystemCredentialResolver unable to load DER CA certificate from file ($1)",params(1,capath.c_str()));
                         }
                         break;
 
                     case _PKCS12:
                         p12 = d2i_PKCS12_bio(in, NULL);
                         if (p12) {
-                            PKCS12_parse(p12, certpass.get(), NULL, &x, NULL);
+                            PKCS12_parse(p12, NULL, NULL, &x, NULL);
                             PKCS12_free(p12);
                         }
                         if (x) {
@@ -480,7 +488,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
                         else {
                             log_openssl();
                             BIO_free(in);
-                            throw XMLSecurityException("FilesystemCredentialResolver unable to load PKCS12 CA certificate from file ($1)",params(1,capath.get()));
+                            throw XMLSecurityException("FilesystemCredentialResolver unable to load PKCS12 CA certificate from file ($1)",params(1,capath.c_str()));
                         }
                         break;
                 } //end switch
@@ -491,8 +499,8 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
                 if (in)
                     BIO_free(in);
                 log_openssl();
-                log.error("CA file (%s) can't be opened", capath.get());
-                throw XMLSecurityException("FilesystemCredentialResolver can't open CA file ($1)",params(1,capath.get()));
+                log.error("CA file (%s) can't be opened", capath.c_str());
+                throw XMLSecurityException("FilesystemCredentialResolver can't open CA file ($1)",params(1,capath.c_str()));
             }
             
             extra = XMLHelper::getNextSiblingElement(extra,CAPath);

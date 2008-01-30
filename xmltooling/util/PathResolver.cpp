@@ -29,40 +29,35 @@ using namespace std;
 
 const string& PathResolver::resolve(string& s, file_type_t filetype, const char* pkgname, const char* prefix) const
 {
-#ifdef WIN32
-    static const char sep = '\\';
-#else
-    static const char sep = '/';
-#endif
     if (!isAbsolute(s.c_str())) {
         switch (filetype) {
             case XMLTOOLING_LIB_FILE:
-                s = string(prefix ? prefix : m_defaultPrefix) + sep + "lib" + sep + (pkgname ? pkgname : m_defaultPackage) + sep + s;
+                s = string(prefix ? prefix : m_defaultPrefix) + "/lib/" + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
                 break;
                 
             case XMLTOOLING_LOG_FILE:
                 if (prefix || m_defaultPrefix != "/usr")
-                    s = string(prefix ? prefix : m_defaultPrefix) + sep + "var" + sep + "log" + sep + (pkgname ? pkgname : m_defaultPackage) + sep + s;
+                    s = string(prefix ? prefix : m_defaultPrefix) + "/var/log/" + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
                 else
-                    s = string(sep,1) + "var" + sep + "log" + sep + (pkgname ? pkgname : m_defaultPackage) + sep + s;
+                    s = string("/var/log/") + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
                 break;
 
             case XMLTOOLING_XML_FILE:
-                s = string(prefix ? prefix : m_defaultPrefix) + sep + "share" + sep + "xml" + (pkgname ? pkgname : m_defaultPackage) + sep + s;
+                s = string(prefix ? prefix : m_defaultPrefix) + "/share/xml/" + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
                 break;
 
             case XMLTOOLING_RUN_FILE:
                 if (prefix || m_defaultPrefix != "/usr")
-                    s = string(prefix ? prefix : m_defaultPrefix) + sep + "var" + sep + "run" + sep + (pkgname ? pkgname : m_defaultPackage) + sep + s;
+                    s = string(prefix ? prefix : m_defaultPrefix) + "/var/run/" + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
                 else
-                    s = string(sep,1) + "var" + sep + "run" + sep + (pkgname ? pkgname : m_defaultPackage) + sep + s;
+                    s = string("/var/run/") + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
                 break;
 
             case XMLTOOLING_CFG_FILE:
                 if (prefix || m_defaultPrefix != "/usr")
-                    s = string(prefix ? prefix : m_defaultPrefix) + sep + "etc" + sep + (pkgname ? pkgname : m_defaultPackage) + sep + s;
+                    s = string(prefix ? prefix : m_defaultPrefix) + "/etc/" + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
                 else
-                    s = string(sep,1) + "etc" + sep + (pkgname ? pkgname : m_defaultPackage) + sep + s;
+                    s = string("/etc/") + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
                 break;
             
             default:
