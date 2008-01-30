@@ -165,10 +165,13 @@ bool XMLToolingInternalConfig::log_config(const char* config)
             root.setPriority(Priority::FATAL);
             level=true;
         }
-        if (level)
+        if (level) {
             root.setAppender(new OstreamAppender("default",&cerr));
-        else
-            PropertyConfigurator::configure(config);
+        }
+        else {
+            string path(config);
+            PropertyConfigurator::configure(m_pathResolver ? m_pathResolver->resolve(path, PathResolver::XMLTOOLING_CFG_FILE).c_str() : config);
+        }
     }
     catch (const ConfigureFailure& e) {
         Category::getInstance(XMLTOOLING_LOGCAT".Logging").crit("failed to initialize log4cpp: %s", e.what());
