@@ -235,14 +235,14 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
             XMLToolingConfig::getConfig().getPathResolver()->resolve(m_keypath, PathResolver::XMLTOOLING_CFG_FILE);
 #ifdef WIN32
             struct _stat stat_buf;
-            if (_stat(kpath.get(), &stat_buf) != 0)
+            if (_stat(m_keypath.c_str(), &stat_buf) != 0)
 #else
             struct stat stat_buf;
-            if (stat(kpath.get(), &stat_buf) != 0)
+            if (stat(m_keypath.c_str(), &stat_buf) != 0)
 #endif
             {
-                log.error("key file (%s) can't be opened", kpath.get());
-                throw XMLSecurityException("FilesystemCredentialResolver can't access key file ($1)",params(1,kpath.get()));
+                log.error("key file (%s) can't be opened", m_keypath.c_str());
+                throw XMLSecurityException("FilesystemCredentialResolver can't access key file ($1)",params(1,m_keypath.c_str()));
             }
         }
         else {
@@ -296,14 +296,14 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
             XMLToolingConfig::getConfig().getPathResolver()->resolve(m_crlpath, PathResolver::XMLTOOLING_CFG_FILE);
 #ifdef WIN32
             struct _stat stat_buf;
-            if (_stat(kpath.get(), &stat_buf) != 0)
+            if (_stat(m_crlpath.c_str(), &stat_buf) != 0)
 #else
             struct stat stat_buf;
-            if (stat(kpath.get(), &stat_buf) != 0)
+            if (stat(m_crlpath.c_str(), &stat_buf) != 0)
 #endif
             {
-                log.error("CRL file (%s) can't be opened", kpath.get());
-                throw XMLSecurityException("FilesystemCredentialResolver can't access CRL file ($1)",params(1,kpath.get()));
+                log.error("CRL file (%s) can't be opened", m_crlpath.c_str());
+                throw XMLSecurityException("FilesystemCredentialResolver can't access CRL file ($1)",params(1,m_crlpath.c_str()));
             }
         }
         else {
