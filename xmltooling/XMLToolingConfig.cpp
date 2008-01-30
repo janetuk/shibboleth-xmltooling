@@ -410,30 +410,27 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
 
     Locker locker(this);
 
+    string resolved(path);
+    m_pathResolver->resolve(resolved, PathResolver::XMLTOOLING_LIB_FILE);
+    
 #if defined(WIN32)
     HMODULE handle=NULL;
-    char* fixed=const_cast<char*>(path);
-    if (strchr(fixed,'/')) {
-        fixed=strdup(path);
-        char* p=fixed;
-        while (p=strchr(p,'/'))
-            *p='\\';
-    }
-
+    for (string::iterator i = resolved.begin(); i != resolved.end(); ++i)
+        if (*i == '/')
+            *i = '\\';
+    
     UINT em=SetErrorMode(SEM_FAILCRITICALERRORS);
     try {
-        handle=LoadLibraryEx(fixed,NULL,LOAD_WITH_ALTERED_SEARCH_PATH);
+        handle=LoadLibraryEx(resolved.c_str(),NULL,LOAD_WITH_ALTERED_SEARCH_PATH);
         if (!handle)
-             handle=LoadLibraryEx(fixed,NULL,0);
+             handle=LoadLibraryEx(resolved.c_str(),NULL,0);
         if (!handle)
-            throw runtime_error(string("unable to load extension library: ") + fixed);
+            throw runtime_error(string("unable to load extension library: ") + resolved);
         FARPROC fn=GetProcAddress(handle,"xmltooling_extension_init");
         if (!fn)
-            throw runtime_error(string("unable to locate xmltooling_extension_init entry point: ") + fixed);
+            throw runtime_error(string("unable to locate xmltooling_extension_init entry point: ") + resolved);
         if (reinterpret_cast<int(*)(void*)>(fn)(context)!=0)
-            throw runtime_error(string("detected error in xmltooling_extension_init: ") + fixed);
-        if (fixed!=path)
-            free(fixed);
+            throw runtime_error(string("detected error in xmltooling_extension_init: ") + resolved);
         SetErrorMode(em);
     }
     catch(runtime_error& e) {
@@ -441,26 +438,24 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
         if (handle)
             FreeLibrary(handle);
         SetErrorMode(em);
-        if (fixed!=path)
-            free(fixed);
         return false;
     }
 
 #elif defined(HAVE_DLFCN_H)
-    void* handle=dlopen(path,RTLD_LAZY);
+    void* handle=dlopen(resolved.c_str(),RTLD_LAZY);
     if (!handle)
-        throw runtime_error(string("unable to load extension library '") + path + "': " + dlerror());
+        throw runtime_error(string("unable to load extension library '") + resolved + "': " + dlerror());
     int (*fn)(void*)=(int (*)(void*))(dlsym(handle,"xmltooling_extension_init"));
     if (!fn) {
         dlclose(handle);
         throw runtime_error(
-            string("unable to locate xmltooling_extension_init entry point in '") + path + "': " +
+            string("unable to locate xmltooling_extension_init entry point in '") + resolved + "': " +
                 (dlerror() ? dlerror() : "unknown error")
             );
     }
     try {
         if (fn(context)!=0)
-            throw runtime_error(string("detected error in xmltooling_extension_init in ") + path);
+            throw runtime_error(string("detected error in xmltooling_extension_init in ") + resolved);
     }
     catch(runtime_error& e) {
         log.error(e.what());
@@ -472,7 +467,7 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
 # error "Don't know about dynamic loading on this platform!"
 #endif
     m_libhandles.push_back(handle);
-    log.info("loaded extension: %s", path);
+    log.info("loaded extension: %s", resolved.c_str());
     return true;
 }
 
