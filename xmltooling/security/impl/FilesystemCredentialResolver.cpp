@@ -166,6 +166,7 @@ namespace xmltooling {
     static const XMLCh format[] =           UNICODE_LITERAL_6(f,o,r,m,a,t);
     static const XMLCh Key[] =              UNICODE_LITERAL_3(K,e,y);
     static const XMLCh _key[] =             UNICODE_LITERAL_3(k,e,y);
+    static const XMLCh keyName[] =          UNICODE_LITERAL_7(k,e,y,N,a,m,e);
     static const XMLCh Name[] =             UNICODE_LITERAL_4(N,a,m,e);
     static const XMLCh password[] =         UNICODE_LITERAL_8(p,a,s,s,w,o,r,d);
     static const XMLCh Path[] =             UNICODE_LITERAL_4(P,a,t,h);
@@ -192,6 +193,11 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
             path->appendChild(e->getOwnerDocument()->createTextNode(e->getAttributeNS(NULL,_key)));
             if (e->hasAttributeNS(NULL,password))
                 child->setAttributeNS(NULL,password,e->getAttributeNS(NULL,password));
+            if (e->hasAttributeNS(NULL,keyName)) {
+                path = e->getOwnerDocument()->createElementNS(NULL,Name);
+                child->appendChild(path);
+                path->appendChild(e->getOwnerDocument()->createTextNode(e->getAttributeNS(NULL,keyName)));
+            }
         }
         if (e->hasAttributeNS(NULL,_certificate)) {
             child = e->getOwnerDocument()->createElementNS(NULL,Certificate);
