@@ -73,8 +73,7 @@ namespace xmltooling {
         FilesystemCredential(
             FilesystemCredentialResolver* resolver, XSECCryptoKey* key, const std::vector<XSECCryptoX509*>& xseccerts, XSECCryptoX509CRL* crl=NULL
             ) : BasicX509Credential(key, xseccerts, crl), m_resolver(resolver), m_usage(UNSPECIFIED_CREDENTIAL) {
-            if (!m_xseccerts.empty())
-                extractNames(m_xseccerts.front(), m_keyNames);
+            extract();
             initKeyInfo();
         }
         virtual ~FilesystemCredential() {

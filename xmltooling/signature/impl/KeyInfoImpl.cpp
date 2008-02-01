@@ -705,41 +705,6 @@ namespace xmlsignature {
         IMPL_TYPED_CHILDREN(PGPData,m_children.end());
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject,m_children.end());
 
-        void extractNames(set<string>& names) const {
-            const XMLCh* n;
-            char* kn;
-            const vector<KeyName*>& knames=getKeyNames();
-            for (vector<KeyName*>::const_iterator kn_i=knames.begin(); kn_i!=knames.end(); ++kn_i) {
-                n=(*kn_i)->getName();
-                if (n && *n) {
-                    kn=toUTF8(n);
-                    names.insert(kn);
-                    delete[] kn;
-                }
-            }
-            const vector<X509Data*> datas=getX509Datas();
-            for (vector<X509Data*>::const_iterator x_i=datas.begin(); x_i!=datas.end(); ++x_i) {
-                const vector<X509SubjectName*> snames = const_cast<const X509Data*>(*x_i)->getX509SubjectNames();
-                for (vector<X509SubjectName*>::const_iterator sn_i = snames.begin(); sn_i!=snames.end(); ++sn_i) {
-                    n = (*sn_i)->getName();
-                    if (n && *n) {
-                        kn=toUTF8(n);
-                        names.insert(kn);
-                        delete[] kn;
-                    }
-                }
-                const vector<X509SKI*> skis = const_cast<const X509Data*>(*x_i)->getX509SKIs();
-                for (vector<X509SKI*>::const_iterator sk_i = skis.begin(); sk_i!=skis.end(); ++sk_i) {
-                    n = (*sk_i)->getValue();
-                    if (n && *n) {
-                        kn=toUTF8(n);
-                        names.insert(kn);
-                        delete[] kn;
-                    }
-                }
-            }
-        }
-
     protected:
         void marshallAttributes(DOMElement* domElement) const {
             MARSHALL_ID_ATTRIB(Id,ID,NULL);

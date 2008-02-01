@@ -182,7 +182,45 @@ void InlineCredential::resolve(const KeyInfo* keyInfo, int types)
     if (types & X509Credential::RESOLVE_CRLS)
         resolveCRL(keyInfo);
 
-    keyInfo->extractNames(m_keyNames);
+    const XMLCh* n;
+    char* kn;
+    const vector<KeyName*>& knames=keyInfo->getKeyNames();
+    for (vector<KeyName*>::const_iterator kn_i=knames.begin(); kn_i!=knames.end(); ++kn_i) {
+        n=(*kn_i)->getName();
+        if (n && *n) {
+            kn=toUTF8(n);
+            m_keyNames.insert(kn);
+            delete[] kn;
+        }
+    }
+    const vector<X509Data*> datas=keyInfo->getX509Datas();
+    for (vector<X509Data*>::const_iterator x_i=datas.begin(); x_i!=datas.end(); ++x_i) {
+        const vector<X509SubjectName*> snames = const_cast<const X509Data*>(*x_i)->getX509SubjectNames();
+        for (vector<X509SubjectName*>::const_iterator sn_i = snames.begin(); sn_i!=snames.end(); ++sn_i) {
+            n = (*sn_i)->getName();
+            if (n && *n) {
+                kn=toUTF8(n);
+                m_keyNames.insert(kn);
+                m_subjectName = kn;
+                delete[] kn;
+            }
+        }
+
+        const vector<X509IssuerSerial*> inames = const_cast<const X509Data*>(*x_i)->getX509IssuerSerials();
+        if (!inames.empty()) {
+            const X509IssuerName* iname = inames.front()->getX509IssuerName();
+            if (iname) {
+                kn = toUTF8(iname->getName());
+                if (kn)
+                    m_issuerName = kn;
+                delete[] kn;
+            }
+
+            const X509SerialNumber* ser = inames.front()->getX509SerialNumber();
+            if (ser)
+                m_serial = XMLString::parseInt(ser->getSerialNumber());
+        }
+    }
 }
 
 bool InlineCredential::resolveKey(const KeyInfo* keyInfo)
@@ -372,5 +410,31 @@ void InlineCredential::resolve(DSIGKeyInfoList* keyInfo, int types)
         }
     }
 
-    Signature::extractNames(keyInfo, m_keyNames);
+    char* kn;
+    const XMLCh* n;
+
+    for (size_t s=0; s<keyInfo->getSize(); s++) {
+        DSIGKeyInfo* dki = keyInfo->item(s);
+        n=dki->getKeyName();
+        if (n && *n) {
+            kn=toUTF8(n);
+            m_keyNames.insert(kn);
+            if (dki->getKeyInfoType() == DSIGKeyInfo::KEYINFO_X509)
+                m_subjectName = kn;
+            delete[] kn;
+        }
+
+        if (dki->getKeyInfoType() == DSIGKeyInfo::KEYINFO_X509) {
+            DSIGKeyInfoX509* kix = static_cast<DSIGKeyInfoX509*>(dki);
+            n = kix->getX509IssuerName();
+            if (n && *n) {
+                kn=toUTF8(n);
+                m_issuerName = kn;
+                delete[] kn;
+            }
+            n = kix->getX509IssuerSerialNumber();
+            if (n && *n)
+                m_serial = XMLString::parseInt(n);
+        }
+    }
 }

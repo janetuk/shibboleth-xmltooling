@@ -65,12 +65,30 @@ namespace xmltooling {
         virtual XSECCryptoX509CRL* getCRL() const=0;
 
         /**
-         * Extracts Subject CN and DNS/URI subjectAltNames from a certificate.
+         * Gets the subject name of the first certificate in the chain.
          *
-         * @param x509  certificate to extract
-         * @param names a set to insert names into
+         * @return the Subject DN
          */
-        static void extractNames(XSECCryptoX509* x509, std::set<std::string>& names);
+        virtual const char* getSubjectName() const=0;
+
+        /**
+         * Gets the issuer name of the first certificate in the chain.
+         *
+         * @return the Issuer DN
+         */
+        virtual const char* getIssuerName() const=0;
+
+        /**
+         * Gets the serial number of the first certificate in the chain.
+         *
+         * @return the serial number
+         */
+        virtual int getSerialNumber() const=0;
+
+        /**
+         * Extracts properties like issuer and subject from the first certificate in the chain.
+         */
+        virtual void extract()=0;
     };
 };
 

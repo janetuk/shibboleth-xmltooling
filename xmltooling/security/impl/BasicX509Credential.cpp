@@ -54,41 +54,113 @@ void BasicX509Credential::initKeyInfo()
         m_compactKeyInfo = KeyInfoBuilder::buildKeyInfo();
         VectorOf(KeyName) knames = m_compactKeyInfo->getKeyNames();
         for (set<string>::const_iterator n = names.begin(); n!=names.end(); ++n) {
+            if (*n == m_subjectName)
+                continue;
             auto_ptr_XMLCh wide(n->c_str());
             KeyName* kname = KeyNameBuilder::buildKeyName();
             kname->setName(wide.get());
             knames.push_back(kname);
         }
     }
+
+    if (!m_subjectName.empty() || (!m_issuerName.empty() && m_serial >= 0)) {
+        if (!m_compactKeyInfo)
+            m_compactKeyInfo = KeyInfoBuilder::buildKeyInfo();
+        X509Data* x509Data=X509DataBuilder::buildX509Data();
+        m_compactKeyInfo->getX509Datas().push_back(x509Data);
+        if (!m_subjectName.empty()) {
+            X509SubjectName* sn = X509SubjectNameBuilder::buildX509SubjectName();
+            auto_ptr_XMLCh wide(m_subjectName.c_str());
+            sn->setName(wide.get());
+            x509Data->getX509SubjectNames().push_back(sn);
+        }
+        
+        if (!m_issuerName.empty() && m_serial >= 0) {
+            X509IssuerSerial* is = X509IssuerSerialBuilder::buildX509IssuerSerial();
+            X509IssuerName* in = X509IssuerNameBuilder::buildX509IssuerName();
+            auto_ptr_XMLCh wide(m_issuerName.c_str());
+            in->setName(wide.get());
+            is->setX509IssuerName(in);
+            X509SerialNumber* ser = X509SerialNumberBuilder::buildX509SerialNumber();
+            char buf[64];
+            sprintf(buf,"%d",m_serial);
+            auto_ptr_XMLCh wide2(buf);
+            ser->setSerialNumber(wide2.get());
+            is->setX509SerialNumber(ser);
+            x509Data->getX509IssuerSerials().push_back(is);
+        }
+    }
     
     if (!m_xseccerts.empty()) {
         m_keyInfo = m_compactKeyInfo ? m_compactKeyInfo->cloneKeyInfo() : KeyInfoBuilder::buildKeyInfo();
-        X509Data* x509Data=X509DataBuilder::buildX509Data();
-        m_keyInfo->getX509Datas().push_back(x509Data);
+        if (m_keyInfo->getX509Datas().empty())
+            m_keyInfo->getX509Datas().push_back(X509DataBuilder::buildX509Data());
         for (vector<XSECCryptoX509*>::const_iterator x = m_xseccerts.begin(); x!=m_xseccerts.end(); ++x) {
             safeBuffer& buf=(*x)->getDEREncodingSB();
             X509Certificate* x509=X509CertificateBuilder::buildX509Certificate();
             x509->setValue(buf.sbStrToXMLCh());
-            x509Data->getX509Certificates().push_back(x509);
+            m_keyInfo->getX509Datas().front()->getX509Certificates().push_back(x509);
         }
     }
 }
 
-void X509Credential::extractNames(XSECCryptoX509* x509, set<string>& names)
+void BasicX509Credential::extract()
 {
+    XSECCryptoX509* x509 = m_xseccerts.empty() ? NULL : m_xseccerts.front();
     if (!x509 || x509->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL)
         return;
-    
     X509* cert = static_cast<OpenSSLCryptoX509*>(x509)->getOpenSSLX509();
     if (!cert)
         return;
-        
+
+    BIO* b;
+    int len;
+    char buf[256];
+
+    X509_NAME* issuer=X509_get_issuer_name(cert);
+    if (issuer) {
+        memset(buf,0,sizeof(buf));
+        b = BIO_new(BIO_s_mem());
+        BIO_set_mem_eof_return(b, 0);
+        len=X509_NAME_print_ex(b,issuer,0,XN_FLAG_RFC2253);
+        BIO_flush(b);
+        m_issuerName.erase();
+        while ((len = BIO_read(b, buf, 255)) > 0) {
+            buf[len] = '\0';
+            m_issuerName+=buf;
+        }
+        BIO_free(b);
+    }
+
+    ASN1_INTEGER* serialASN = X509_get_serialNumber(cert);
+    BIGNUM* serialBN = ASN1_INTEGER_to_BN(serialASN, NULL);
+    if (serialBN) {
+        char* serial = BN_bn2dec(serialBN);
+        if (serial) {
+            m_serial = atoi(serial);
+            free(serial);
+        }
+        BN_free(serialBN);
+    }
+    
     X509_NAME* subject=X509_get_subject_name(cert);
     if (subject) {
-        char buf[256];
+        memset(buf,0,sizeof(buf));
+        b = BIO_new(BIO_s_mem());
+        BIO_set_mem_eof_return(b, 0);
+        len=X509_NAME_print_ex(b,subject,0,XN_FLAG_RFC2253);
+        BIO_flush(b);
+        m_subjectName.erase();
+        while ((len = BIO_read(b, buf, 255)) > 0) {
+            buf[len] = '\0';
+            m_subjectName+=buf;
+        }
+        m_keyNames.insert(m_subjectName);
+        BIO_free(b);
+
         memset(buf,0,sizeof(buf));
         if (X509_NAME_get_text_by_NID(subject,NID_commonName,buf,255)>0)
-            names.insert(buf);
+            m_keyNames.insert(buf);
 
         STACK_OF(GENERAL_NAME)* altnames=(STACK_OF(GENERAL_NAME)*)X509_get_ext_d2i(cert, NID_subject_alt_name, NULL, NULL);
         if (altnames) {
@@ -102,7 +174,7 @@ void X509Credential::extractNames(XSECCryptoX509* x509, set<string>& names)
                     if (altlen>0) {
                         alt.erase();
                         alt.append(altptr,altlen);
-                        names.insert(alt);
+                        m_keyNames.insert(alt);
                     }
                 }
             }

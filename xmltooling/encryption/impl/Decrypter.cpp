@@ -87,10 +87,7 @@ DOMDocumentFragment* Decrypter::decryptData(const EncryptedData& encryptedData, 
 
     // Resolve a decryption key directly.
     vector<const Credential*> creds;
-    int types =
-        CredentialCriteria::KEYINFO_EXTRACTION_KEY |
-        CredentialCriteria::KEYINFO_EXTRACTION_KEYNAMES |
-        CredentialCriteria::KEYINFO_EXTRACTION_IMPLICIT_KEYNAMES;
+    int types = CredentialCriteria::KEYINFO_EXTRACTION_KEY | CredentialCriteria::KEYINFO_EXTRACTION_KEYNAMES;
     if (m_criteria) {
         m_criteria->setUsage(Credential::ENCRYPTION_CREDENTIAL);
         m_criteria->setKeyInfo(encryptedData.getKeyInfo(), types);
@@ -187,10 +184,7 @@ void Decrypter::decryptData(ostream& out, const EncryptedData& encryptedData, co
 
     // Resolve a decryption key directly.
     vector<const Credential*> creds;
-    int types =
-        CredentialCriteria::KEYINFO_EXTRACTION_KEY |
-        CredentialCriteria::KEYINFO_EXTRACTION_KEYNAMES |
-        CredentialCriteria::KEYINFO_EXTRACTION_IMPLICIT_KEYNAMES;
+    int types = CredentialCriteria::KEYINFO_EXTRACTION_KEY | CredentialCriteria::KEYINFO_EXTRACTION_KEYNAMES;
     if (m_criteria) {
         m_criteria->setUsage(Credential::ENCRYPTION_CREDENTIAL);
         m_criteria->setKeyInfo(encryptedData.getKeyInfo(), types);
@@ -270,10 +264,7 @@ XSECCryptoKey* Decrypter::decryptKey(const EncryptedKey& encryptedKey, const XML
         m_cipher=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(encryptedKey.getDOM()->getOwnerDocument());
     
     // Resolve key decryption keys.
-    int types =
-        CredentialCriteria::KEYINFO_EXTRACTION_KEY |
-        CredentialCriteria::KEYINFO_EXTRACTION_KEYNAMES |
-        CredentialCriteria::KEYINFO_EXTRACTION_IMPLICIT_KEYNAMES;
+    int types = CredentialCriteria::KEYINFO_EXTRACTION_KEY | CredentialCriteria::KEYINFO_EXTRACTION_KEYNAMES;
     vector<const Credential*> creds;
     if (m_criteria) {
         m_criteria->setUsage(Credential::ENCRYPTION_CREDENTIAL);

@@ -160,13 +160,6 @@ namespace xmlsignature {
         DECL_TYPED_CHILDREN(SPKIData);
         /** KeyInfoType local name */
         static const XMLCh TYPE_NAME[];
-
-        /**
-         * Populates a set of key names using the information found in this KeyInfo object.
-         *
-         * @param names a set of names to populate
-         */
-        virtual void extractNames(std::set<std::string>& names) const=0;
     END_XMLOBJECT;
 
     DECL_XMLSIGOBJECTBUILDER(PGPData);

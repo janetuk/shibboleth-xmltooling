@@ -193,14 +193,6 @@ namespace xmlsignature {
             unsigned int in_len
             );
 
-        /**
-         * Populates a set of key names using the information found in a native KeyInfo object.
-         *
-         * @param keyInfo   a native KeyInfo object
-         * @param names     a set of names to populate
-         */
-        static void extractNames(DSIGKeyInfoList* keyInfo, std::set<std::string>& names);
-
     protected:
         Signature() {}
     };

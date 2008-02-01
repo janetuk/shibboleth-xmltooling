@@ -41,7 +41,7 @@ namespace xmltooling {
          * 
          * @param ownCerts  true iff any certificates subsequently stored should be freed by destructor
          */
-        BasicX509Credential(bool ownCerts) : m_key(NULL), m_ownCerts(ownCerts), m_crl(NULL), m_keyInfo(NULL), m_compactKeyInfo(NULL) {
+        BasicX509Credential(bool ownCerts) : m_key(NULL), m_serial(-1), m_ownCerts(ownCerts), m_crl(NULL), m_keyInfo(NULL), m_compactKeyInfo(NULL) {
         }
 
         /**
@@ -52,7 +52,7 @@ namespace xmltooling {
          * @param crl   optional CRL
          */
         BasicX509Credential(XSECCryptoKey* key, const std::vector<XSECCryptoX509*>& certs, XSECCryptoX509CRL* crl=NULL)
-                : m_key(key), m_xseccerts(certs), m_ownCerts(true), m_crl(crl), m_keyInfo(NULL), m_compactKeyInfo(NULL) {
+                : m_key(key), m_serial(-1), m_xseccerts(certs), m_ownCerts(true), m_crl(crl), m_keyInfo(NULL), m_compactKeyInfo(NULL) {
         }
 
         /** The private/secret key/keypair. */
@@ -60,6 +60,15 @@ namespace xmltooling {
 
         /** Key names (derived from credential, KeyInfo, or both). */
         std::set<std::string> m_keyNames;
+
+        /** Subject DN. */
+        std::string m_subjectName;
+
+        /** Issuer DN. */
+        std::string m_issuerName;
+
+        /** Serial number. */
+        int m_serial;
 
         /** The X.509 certificate chain. */
         std::vector<XSECCryptoX509*> m_xseccerts;
@@ -80,7 +89,7 @@ namespace xmltooling {
          * Initializes (or reinitializes) a ds:KeyInfo to represent the Credential.
          */
         void initKeyInfo();
-        
+
     public:
         virtual ~BasicX509Credential();
         
@@ -125,6 +134,20 @@ namespace xmltooling {
         XSECCryptoX509CRL* getCRL() const {
             return m_crl;
         }
+
+        const char* getSubjectName() const {
+            return m_subjectName.c_str();
+        }
+
+        const char* getIssuerName() const {
+            return m_issuerName.c_str();
+        }
+
+        int getSerialNumber() const {
+            return m_serial;
+        }
+
+        void extract();
     };
 };
 

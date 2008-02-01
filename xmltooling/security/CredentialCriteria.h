@@ -196,8 +196,7 @@ namespace xmltooling {
          */
         enum keyinfo_extraction_t {
             KEYINFO_EXTRACTION_KEY = 1,
-            KEYINFO_EXTRACTION_KEYNAMES = 2,
-            KEYINFO_EXTRACTION_IMPLICIT_KEYNAMES = 4
+            KEYINFO_EXTRACTION_KEYNAMES = 2
         };
 
         /**
@@ -223,17 +222,16 @@ namespace xmltooling {
                 return;
 
             int types = (extraction & KEYINFO_EXTRACTION_KEY) ? Credential::RESOLVE_KEYS : 0;
-            types |= (extraction & KEYINFO_EXTRACTION_IMPLICIT_KEYNAMES) ? X509Credential::RESOLVE_CERTS : 0;
+            types |= (extraction & KEYINFO_EXTRACTION_KEYNAMES) ? X509Credential::RESOLVE_CERTS : 0;
             m_credential = XMLToolingConfig::getConfig().getKeyInfoResolver()->resolve(keyInfo,types);
 
             if (extraction & KEYINFO_EXTRACTION_KEY)
                 setPublicKey(m_credential->getPublicKey());
-            if (extraction & KEYINFO_EXTRACTION_KEYNAMES)
+            if (extraction & KEYINFO_EXTRACTION_KEYNAMES) {
+                X509Credential* xcred = dynamic_cast<X509Credential*>(m_credential);
+                if (xcred)
+                    xcred->extract();
                 m_keyNames.insert(m_credential->getKeyNames().begin(), m_credential->getKeyNames().end());
-            if (extraction & KEYINFO_EXTRACTION_IMPLICIT_KEYNAMES) {
-                const X509Credential* xcred = dynamic_cast<const X509Credential*>(m_credential);
-                if (xcred && !xcred->getEntityCertificateChain().empty())
-                    X509Credential::extractNames(xcred->getEntityCertificateChain().front(), m_keyNames);
             }
         } 
 
@@ -260,17 +258,16 @@ namespace xmltooling {
                 return;
 
             int types = (extraction & KEYINFO_EXTRACTION_KEY) ? Credential::RESOLVE_KEYS : 0;
-            types |= (extraction & KEYINFO_EXTRACTION_IMPLICIT_KEYNAMES) ? X509Credential::RESOLVE_CERTS : 0;
+            types |= (extraction & KEYINFO_EXTRACTION_KEYNAMES) ? X509Credential::RESOLVE_CERTS : 0;
             m_credential = XMLToolingConfig::getConfig().getKeyInfoResolver()->resolve(keyInfo,types);
 
             if (extraction & KEYINFO_EXTRACTION_KEY)
                 setPublicKey(m_credential->getPublicKey());
-            if (extraction & KEYINFO_EXTRACTION_KEYNAMES)
+            if (extraction & KEYINFO_EXTRACTION_KEYNAMES) {
+                X509Credential* xcred = dynamic_cast<X509Credential*>(m_credential);
+                if (xcred)
+                    xcred->extract();
                 m_keyNames.insert(m_credential->getKeyNames().begin(), m_credential->getKeyNames().end());
-            if (extraction & KEYINFO_EXTRACTION_IMPLICIT_KEYNAMES) {
-                const X509Credential* xcred = dynamic_cast<const X509Credential*>(m_credential);
-                if (xcred && !xcred->getEntityCertificateChain().empty())
-                    X509Credential::extractNames(xcred->getEntityCertificateChain().front(), m_keyNames);
             }
         }
 
@@ -284,10 +281,10 @@ namespace xmltooling {
             setXMLAlgorithm(sig.getSignatureAlgorithm());
             xmlsignature::KeyInfo* k = sig.getKeyInfo();
             if (k)
-                return setKeyInfo(k,extraction);
+                return setKeyInfo(k, extraction);
             DSIGSignature* dsig = sig.getXMLSignature();
             if (dsig)
-                setNativeKeyInfo(dsig->getKeyInfoList(),extraction);
+                setNativeKeyInfo(dsig->getKeyInfoList(), extraction);
         }
 
     private:
