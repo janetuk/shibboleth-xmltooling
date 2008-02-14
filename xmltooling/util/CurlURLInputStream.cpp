@@ -41,6 +41,7 @@
 #include <xercesc/util/TranscodingException.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 
+#include <xmltooling/logging.h>
 #include <xmltooling/util/CurlURLInputStream.hpp>
 
 using namespace xmltooling;
@@ -222,6 +223,9 @@ CurlURLInputStream::readBytes(XMLByte* const          toFill
                 break;
 
             default:
+                logging::Category::getInstance(XMLTOOLING_LOGCAT"libcurl.NetAccessor").error(
+                    "curl NetAccessor encountered error from libcurl (%d)", msg->data.result
+                    );
                 ThrowXMLwithMemMgr1(NetAccessorException, XMLExcepts::NetAcc_InternalError, fURLSource.getURLText(), fMemoryManager);
 				break;
 			}
