@@ -254,7 +254,7 @@ CurlURLInputStream::readBytes(XMLByte* const          toFill
 			timeval tv;
 			tv.tv_sec  = 2;
 			tv.tv_usec = 0;
-			(void) select(fdcnt, &readSet, &writeSet, &exceptSet, &tv);
+			(void) select(fdcnt+1, &readSet, &writeSet, &exceptSet, &tv);
 		}
 	}
 	
