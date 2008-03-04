@@ -80,24 +80,20 @@ namespace xmltooling {
 
 ChainingCredentialResolver::ChainingCredentialResolver(const DOMElement* e)
 {
-#ifdef _DEBUG
-    NDC ndc("ChainingCredentialResolver");
-#endif
-
     XMLToolingConfig& conf = XMLToolingConfig::getConfig();
+    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver."CHAINING_CREDENTIAL_RESOLVER);
 
     // Load up the chain of resolvers.
     e = e ? XMLHelper::getFirstChildElement(e, _CredentialResolver) : NULL;
     while (e) {
         auto_ptr_char type(e->getAttributeNS(NULL,_type));
         if (type.get() && *(type.get())) {
+            log.info("building CredentialResolver of type %s", type.get());
             try {
                 m_resolvers.push_back(conf.CredentialResolverManager.newPlugin(type.get(),e));
             }
             catch (exception& ex) {
-                Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver.Chaining").error(
-                    "caught exception processing embedded CredentialResolver element: %s", ex.what()
-                    );
+                log.error("caught exception processing embedded CredentialResolver element: %s", ex.what());
             }
         }
         e = XMLHelper::getNextSiblingElement(e, _CredentialResolver);
