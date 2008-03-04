@@ -58,7 +58,7 @@ void SOAPClient::send(const Envelope& env, const SOAPTransport::Address& addr)
     
     Category& log = Category::getInstance(XMLTOOLING_LOGCAT".SOAPClient");
     if (log.isDebugEnabled())
-        log.debugStream() << "marshalled envelope:" << logging::eol << env << logging::eol;
+        log.debugStream() << "marshalled envelope:\n" << env << logging::eol;
     
     // Serialize envelope.
     stringstream s;
@@ -90,7 +90,7 @@ Envelope* SOAPClient::receive()
 
     Category& log = Category::getInstance(XMLTOOLING_LOGCAT".SOAPClient");
     if (log.isDebugEnabled())
-        log.debugStream() << "received XML:" << logging::eol << *(doc->getDocumentElement()) << logging::eol;
+        log.debugStream() << "received XML:\n" << *(doc->getDocumentElement()) << logging::eol;
     
     auto_ptr<XMLObject> xmlObject(XMLObjectBuilder::buildOneFromElement(doc->getDocumentElement(), true));
     janitor.release();
