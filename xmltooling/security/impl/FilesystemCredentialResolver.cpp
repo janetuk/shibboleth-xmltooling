@@ -392,6 +392,10 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
                 log.debug("certificate encoding format for (%s) dynamically resolved as (%s)", certpath.c_str(), formatToString(fformat).c_str());
             }
 
+            Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver."FILESYSTEM_CREDENTIAL_RESOLVER).info(
+                "loading certificate from file (%s)", certpath.c_str()
+                );
+
             switch(fformat) {
                 case PEM:
                     while (x=PEM_read_bio_X509(in,NULL,passwd_callback,const_cast<char*>(certpass.get())))
@@ -463,6 +467,10 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
                     log.debug("CA certificate encoding format for (%s) dynamically resolved as (%s)", capath.c_str(), formatToString(fformat).c_str());
                 }
 
+                Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver."FILESYSTEM_CREDENTIAL_RESOLVER).info(
+                    "loading CA certificate from file (%s)", capath.c_str()
+                    );
+
                 switch (fformat) {
                     case PEM:
                         while (x=PEM_read_bio_X509(in,NULL,NULL,NULL))
@@ -504,8 +512,8 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
                 if (in)
                     BIO_free(in);
                 log_openssl();
-                log.error("CA file (%s) can't be opened", capath.c_str());
-                throw XMLSecurityException("FilesystemCredentialResolver can't open CA file ($1)",params(1,capath.c_str()));
+                log.error("CA certificate file (%s) can't be opened", capath.c_str());
+                throw XMLSecurityException("FilesystemCredentialResolver can't open CA certificate file ($1)",params(1,capath.c_str()));
             }
             
             extra = XMLHelper::getNextSiblingElement(extra,CAPath);
@@ -533,6 +541,9 @@ XSECCryptoKey* FilesystemCredentialResolver::loadKey()
 #ifdef _DEBUG
     NDC ndc("loadKey");
 #endif
+    Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver."FILESYSTEM_CREDENTIAL_RESOLVER).info(
+        "loading private key from file (%s)", m_keypath.c_str()
+        );
 
     // Get a EVP_PKEY.
     EVP_PKEY* pkey=NULL;
@@ -588,6 +599,9 @@ XSECCryptoX509CRL* FilesystemCredentialResolver::loadCRL()
 #ifdef _DEBUG
     NDC ndc("loadCRL");
 #endif
+    Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver."FILESYSTEM_CREDENTIAL_RESOLVER).info(
+        "loading CRL from file (%s)", m_crlpath.c_str()
+        );
 
     X509_CRL* crl=NULL;
     BIO* in=BIO_new(BIO_s_file_internal());
