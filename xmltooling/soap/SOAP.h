@@ -23,8 +23,8 @@
 #ifndef __xmltooling_soap_h__
 #define __xmltooling_soap_h__
 
+#include <xmltooling/ConcreteXMLObjectBuilder.h>
 #include <xmltooling/ElementProxy.h>
-#include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/util/XMLConstants.h>
 #include <xercesc/util/XMLUniDefs.hpp>
 

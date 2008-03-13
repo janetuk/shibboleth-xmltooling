@@ -32,6 +32,7 @@ libxmltoolinginclude_HEADERS = \
 	AbstractXMLObject.h \
 	AttributeExtensibleXMLObject.h \
 	base.h \
+	ConcreteXMLObjectBuilder.h \
 	config_pub.h \
 	ElementExtensibleXMLObject.h \
 	ElementProxy.h \
@@ -126,6 +127,8 @@ xmlsec_sources = \
 	encryption/impl/Decrypter.cpp \
 	encryption/impl/EncryptedKeyResolver.cpp \
 	encryption/impl/Encrypter.cpp \
+    encryption/impl/EncryptionImpl.cpp \
+    encryption/impl/EncryptionSchemaValidators.cpp \
 	impl/MemoryStorageService.cpp \
 	security/impl/AbstractPKIXTrustEngine.cpp \
 	security/impl/BasicX509Credential.cpp \
@@ -141,6 +144,8 @@ xmlsec_sources = \
 	security/impl/StaticPKIXTrustEngine.cpp \
 	security/impl/TrustEngine.cpp \
 	security/impl/XSECCryptoX509CRL.cpp \
+    signature/impl/KeyInfoImpl.cpp \
+    signature/impl/KeyInfoSchemaValidators.cpp \
 	signature/impl/SignatureValidator.cpp \
 	signature/impl/XMLSecSignatureImpl.cpp \
 	soap/impl/CURLSOAPTransport.cpp \
@@ -167,15 +172,11 @@ common_sources = \
 	unicode.cpp \
 	XMLObjectBuilder.cpp \
 	XMLToolingConfig.cpp \
-	encryption/impl/EncryptionImpl.cpp \
-	encryption/impl/EncryptionSchemaValidators.cpp \
 	impl/AnyElement.cpp \
 	impl/UnknownElement.cpp \
 	io/AbstractXMLObjectMarshaller.cpp \
 	io/AbstractXMLObjectUnmarshaller.cpp \
 	io/HTTPRequest.cpp \
-	signature/impl/KeyInfoImpl.cpp \
-	signature/impl/KeyInfoSchemaValidators.cpp \
 	soap/impl/SOAPClient.cpp \
 	soap/impl/SOAPImpl.cpp \
 	soap/impl/SOAPSchemaValidators.cpp \

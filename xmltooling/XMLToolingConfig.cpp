@@ -65,8 +65,6 @@
 #endif
 
 using namespace soap11;
-using namespace xmlencryption;
-using namespace xmlsignature;
 using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace std;
@@ -82,6 +80,8 @@ DECL_XMLTOOLING_EXCEPTION_FACTORY(ValidationException,xmltooling);
 DECL_XMLTOOLING_EXCEPTION_FACTORY(IOException,xmltooling);
 
 #ifndef XMLTOOLING_NO_XMLSEC
+using namespace xmlencryption;
+using namespace xmlsignature;
     DECL_XMLTOOLING_EXCEPTION_FACTORY(XMLSecurityException,xmltooling);
     DECL_XMLTOOLING_EXCEPTION_FACTORY(SignatureException,xmlsignature);
     DECL_XMLTOOLING_EXCEPTION_FACTORY(EncryptionException,xmlencryption);
@@ -256,8 +256,6 @@ bool XMLToolingInternalConfig::init()
         // default registrations
         XMLObjectBuilder::registerDefaultBuilder(new UnknownElementBuilder());
 
-        registerKeyInfoClasses();
-        registerEncryptionClasses();
         registerSOAPClasses();
 
         REGISTER_XMLTOOLING_EXCEPTION_FACTORY(XMLParserException,xmltooling);
@@ -274,6 +272,8 @@ bool XMLToolingInternalConfig::init()
         REGISTER_XMLTOOLING_EXCEPTION_FACTORY(XMLSecurityException,xmltooling);
         REGISTER_XMLTOOLING_EXCEPTION_FACTORY(SignatureException,xmlsignature);
         REGISTER_XMLTOOLING_EXCEPTION_FACTORY(EncryptionException,xmlencryption);
+        registerKeyInfoClasses();
+        registerEncryptionClasses();
         registerKeyInfoResolvers();
         registerCredentialResolvers();
         registerTrustEngines();

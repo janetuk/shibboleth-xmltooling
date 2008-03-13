@@ -23,8 +23,8 @@
 #if !defined(__xmltooling_sig_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_sig_h__
 
+#include <xmltooling/ConcreteXMLObjectBuilder.h>
 #include <xmltooling/exceptions.h>
-#include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/signature/ContentReference.h>
 #include <xmltooling/util/XMLConstants.h>
 

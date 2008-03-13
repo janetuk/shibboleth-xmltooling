@@ -17,7 +17,7 @@
 /**
  * @file xmltooling/XMLObjectBuilder.h
  * 
- * Factory interface for XMLObjects 
+ * Factory interface for XMLObjects.
  */
 
 #ifndef __xmltooling_xmlobjbuilder_h__
@@ -47,7 +47,7 @@ namespace xmltooling {
         
         /**
          * Creates an empty XMLObject with a particular element name.
-         * The results are undefined if localName is NULL or empty.
+         * <p>The results are undefined if localName is NULL or empty.
          * 
          * @param nsURI         namespace URI for element
          * @param localName     local name of element

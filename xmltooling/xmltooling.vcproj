@@ -502,6 +502,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ConcreteXMLObjectBuilder.h"
+				>
+			</File>
+			<File
 				RelativePath=".\config_pub_win32.h"
 				>
 			</File>

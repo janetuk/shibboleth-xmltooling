@@ -20,7 +20,7 @@
  * XMLObjects representing XML Encryption content
  */
 
-#ifndef __xmltooling_encryption_h__
+#if !defined(__xmltooling_encryption_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_encryption_h__
 
 #include <xmltooling/signature/KeyInfo.h>

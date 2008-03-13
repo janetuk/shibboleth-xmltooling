@@ -1222,7 +1222,7 @@
  */
 #define BEGIN_XMLOBJECTBUILDER(linkage,cname,namespaceURI,namespacePrefix) \
     XMLTOOLING_DOXYGEN(Builder for cname objects.) \
-    class linkage cname##Builder : public xmltooling::XMLObjectBuilder { \
+    class linkage cname##Builder : public xmltooling::ConcreteXMLObjectBuilder { \
     public: \
         virtual ~cname##Builder() {} \
         XMLTOOLING_DOXYGEN(Default builder.) \
@@ -1287,7 +1287,7 @@
  */
 #define BEGIN_XMLOBJECTBUILDER(linkage,cname,namespaceURI,namespacePrefix) \
     XMLTOOLING_DOXYGEN(Builder for cname objects.) \
-    class linkage cname##Builder : public xmltooling::XMLObjectBuilder { \
+    class linkage cname##Builder : public xmltooling::ConcreteXMLObjectBuilder { \
     public: \
         virtual ~cname##Builder() {} \
         XMLTOOLING_DOXYGEN(Default builder.) \

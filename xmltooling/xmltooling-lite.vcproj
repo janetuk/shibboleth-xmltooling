@@ -309,38 +309,6 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="signature"
-				>
-				<Filter
-					Name="impl"
-					>
-					<File
-						RelativePath=".\signature\impl\KeyInfoImpl.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\signature\impl\KeyInfoSchemaValidators.cpp"
-						>
-					</File>
-				</Filter>
-			</Filter>
-			<Filter
-				Name="encryption"
-				>
-				<Filter
-					Name="impl"
-					>
-					<File
-						RelativePath=".\encryption\impl\EncryptionImpl.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\encryption\impl\EncryptionSchemaValidators.cpp"
-						>
-					</File>
-				</Filter>
-			</Filter>
-			<Filter
 				Name="soap"
 				>
 				<Filter
@@ -392,6 +360,10 @@
 			</File>
 			<File
 				RelativePath=".\base.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ConcreteXMLObjectBuilder.h"
 				>
 			</File>
 			<File
@@ -539,22 +511,6 @@
 				</File>
 				<File
 					RelativePath=".\validation\ValidatorSuite.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="signature"
-				>
-				<File
-					RelativePath=".\signature\KeyInfo.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="encryption"
-				>
-				<File
-					RelativePath=".\encryption\Encryption.h"
 					>
 				</File>
 			</Filter>

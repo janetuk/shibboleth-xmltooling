@@ -21,11 +21,11 @@
  * and related content.
  */
 
-#ifndef __xmltooling_keyinfo_h__
+#if !defined(__xmltooling_keyinfo_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_keyinfo_h__
 
+#include <xmltooling/ConcreteXMLObjectBuilder.h>
 #include <xmltooling/ElementProxy.h>
-#include <xmltooling/XMLObjectBuilder.h>
 #include <xmltooling/util/XMLConstants.h>
 
 /**
