@@ -25,6 +25,7 @@
 
 #include <xmltooling/QName.h>
 #include <xmltooling/Namespace.h>
+#include <xmltooling/util/XMLConstants.h>
 
 #include <set>
 #include <list>
@@ -124,6 +125,53 @@ namespace xmltooling {
          * @return an ID value or NULL 
          */
         virtual const XMLCh* getXMLID() const=0;
+
+        /**
+         * Returns the xsi:nil property of the object, or false if not set.
+         * 
+         * @return	the xsi:nil property
+         */
+        bool nil() const {
+            switch (getNil()) {
+                case xmlconstants::XML_BOOL_TRUE:
+                case xmlconstants::XML_BOOL_ONE:
+                    return true;
+                case xmlconstants::XML_BOOL_FALSE:
+                case xmlconstants::XML_BOOL_ZERO:
+                default:
+                    return false; 
+            }
+        }
+
+        /**
+         * Returns the xsi:nil property as an explicit enumerated value.
+         * 
+         * @return the xsi:nil property
+         */
+        virtual xmlconstants::xmltooling_bool_t getNil() const=0;
+        
+        /**
+         * Sets the xsi:nil property using an enumerated value.
+         * 
+         * @param value	value to set
+         */
+        virtual void nil(xmlconstants::xmltooling_bool_t value)=0;
+        
+        /**
+         * Sets the xsi:nil property.
+         * 
+         * @param value value to set
+         */
+        void nil(bool value) {
+            nil(value ? xmlconstants::XML_BOOL_ONE : xmlconstants::XML_BOOL_ZERO);
+        }
+        
+        /**
+         * Sets the xsi:nil property using a string constant.
+         * 
+         * @param value	value to set
+         */
+        void setNil(const XMLCh* value);
         
         /**
          * Checks to see if this object has a parent.

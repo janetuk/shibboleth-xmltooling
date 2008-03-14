@@ -2,6 +2,7 @@
 <products xmlns:p="http://example.com/product-info">
     <product id="1144" xmlns="http://example.com/product-info">
         <name xml:lang="en">Python Perfect IDE</name>
+        <empty xsi:nil="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
         <description>
             Uses mind-reading technology to anticipate and accommodate
             all user needs in Python development.  Implements all

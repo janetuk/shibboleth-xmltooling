@@ -192,6 +192,27 @@ void AbstractXMLObjectMarshaller::marshallInto(
                 targetElement->setAttributeNS(XSI_NS,noNamespaceSchemaLocation,m_noNamespaceSchemaLocation); 
         }
     }
+    
+    static const XMLCh _nil[] = { chLatin_x, chLatin_s, chLatin_i, chColon, chLatin_n, chLatin_i, chLatin_l, chNull };
+    
+    if (m_nil != xmlconstants::XML_BOOL_NULL) {
+        switch (m_nil) {
+            case xmlconstants::XML_BOOL_TRUE:
+            	targetElement->setAttributeNS(XSI_NS, _nil, xmlconstants::XML_TRUE);
+                break;
+            case xmlconstants::XML_BOOL_ONE:
+            	targetElement->setAttributeNS(XSI_NS, _nil, xmlconstants::XML_ONE);
+                break;
+            case xmlconstants::XML_BOOL_FALSE:
+            	targetElement->setAttributeNS(XSI_NS, _nil, xmlconstants::XML_FALSE);
+                break;
+            case xmlconstants::XML_BOOL_ZERO:
+            	targetElement->setAttributeNS(XSI_NS, _nil, xmlconstants::XML_ZERO);
+                break;
+        }
+        m_log.debug("adding XSI namespace to list of namespaces used by XMLObject");
+        addNamespace(Namespace(XSI_NS, XSI_PREFIX));
+    }
 
     marshallElementType(targetElement);
     marshallNamespaces(targetElement);

@@ -1354,7 +1354,9 @@
         virtual void validate(const xmltooling::XMLObject* xmlObject) const { \
             const cname* ptr=dynamic_cast<const cname*>(xmlObject); \
             if (!ptr) \
-                throw xmltooling::ValidationException(#cname"SchemaValidator: unsupported object type ($1).",xmltooling::params(1,typeid(xmlObject).name()))
+                throw xmltooling::ValidationException(#cname"SchemaValidator: unsupported object type ($1).",xmltooling::params(1,typeid(xmlObject).name())); \
+            if (ptr->nil() && (ptr->hasChildren() || ptr->getTextContent())) \
+            	throw xmltooling::ValidationException("Object has nil property but with children or content.")
 
 /**
  * Begins the declaration of a Schema Validator specialization subclass.
@@ -1371,7 +1373,7 @@
         virtual void validate(const xmltooling::XMLObject* xmlObject) const { \
             const cname* ptr=dynamic_cast<const cname*>(xmlObject); \
             if (!ptr) \
-                throw xmltooling::ValidationException(#cname"SchemaValidator: unsupported object type ($1).",xmltooling::params(1,typeid(xmlObject).name()))
+                throw xmltooling::ValidationException(#cname"SchemaValidator: unsupported object type ($1).",xmltooling::params(1,typeid(xmlObject).name()));
 
 /**
  * Ends the declaration of a Validator specialization.

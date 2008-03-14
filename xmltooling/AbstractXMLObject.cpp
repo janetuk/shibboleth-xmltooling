@@ -29,7 +29,8 @@
 using namespace xmltooling;
 
 AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
-    : m_log(logging::Category::getInstance(XMLTOOLING_LOGCAT".XMLObject")), m_schemaLocation(NULL), m_noNamespaceSchemaLocation(NULL),
+    : m_log(logging::Category::getInstance(XMLTOOLING_LOGCAT".XMLObject")),
+    	m_schemaLocation(NULL), m_noNamespaceSchemaLocation(NULL), m_nil(xmlconstants::XML_BOOL_NULL),
         m_parent(NULL), m_elementQname(nsURI, localName, prefix), m_typeQname(NULL)
 {
     addNamespace(Namespace(nsURI, prefix));
@@ -41,11 +42,35 @@ AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName,
 
 AbstractXMLObject::AbstractXMLObject(const AbstractXMLObject& src)
     : m_namespaces(src.m_namespaces), m_log(src.m_log), m_schemaLocation(XMLString::replicate(src.m_schemaLocation)),
-        m_noNamespaceSchemaLocation(XMLString::replicate(src.m_noNamespaceSchemaLocation)),
+        m_noNamespaceSchemaLocation(XMLString::replicate(src.m_noNamespaceSchemaLocation)), m_nil(src.m_nil),
         m_parent(NULL), m_elementQname(src.m_elementQname), m_typeQname(NULL)
 {
     if (src.m_typeQname)
         m_typeQname=new QName(*src.m_typeQname);
+}
+
+void XMLObject::setNil(const XMLCh* value) {
+    if (value) {
+        switch (*value) {
+            case xercesc::chLatin_t:
+                nil(xmlconstants::XML_BOOL_TRUE);
+                break;
+            case xercesc::chLatin_f:
+                nil(xmlconstants::XML_BOOL_FALSE);
+                break;
+            case xercesc::chDigit_1:
+                nil(xmlconstants::XML_BOOL_ONE);
+                break;
+            case xercesc::chDigit_0:
+                nil(xmlconstants::XML_BOOL_ZERO);
+                break;
+            default:
+                nil(xmlconstants::XML_BOOL_NULL);
+        }
+    }
+    else {
+        nil(xmlconstants::XML_BOOL_NULL);
+    }
 }
 
 XMLCh* AbstractXMLObject::prepareForAssignment(XMLCh* oldValue, const XMLCh* newValue)

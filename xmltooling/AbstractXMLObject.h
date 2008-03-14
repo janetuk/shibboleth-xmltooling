@@ -79,7 +79,18 @@ namespace xmltooling {
         const XMLCh* getXMLID() const {
             return NULL;
         }
-    
+        
+        xmlconstants::xmltooling_bool_t getNil() const {
+        	return m_nil;
+        }
+        
+        void nil(xmlconstants::xmltooling_bool_t value) {
+            if (m_nil != value) {
+            	releaseThisandParentDOM();
+            	m_nil = value;
+            }
+        }
+
         bool hasParent() const {
             return m_parent != NULL;
         }
@@ -205,6 +216,11 @@ namespace xmltooling {
          * Stores off xsi:noNamespaceSchemaLocation attribute.
          */
         XMLCh* m_noNamespaceSchemaLocation;
+        
+        /**
+         * Stores off xsi:nil attribute.
+         */
+        xmlconstants::xmltooling_bool_t m_nil;
 
     private:
         XMLObject* m_parent;
