@@ -22,7 +22,7 @@
 #if !defined(XERCESC_INCLUDE_GUARD_CURLURLINPUTSTREAM_HPP) && !defined(XMLTOOLING_LITE)
 #define XERCESC_INCLUDE_GUARD_CURLURLINPUTSTREAM_HPP
 
-#include <xmltooling/base.h>
+#include <xmltooling/logging.h>
 
 #include <curl/curl.h>
 #include <curl/multi.h>
@@ -107,6 +107,8 @@ private :
     XMLByte				fBuffer[CURL_MAX_WRITE_SIZE];
     XMLByte*			fBufferHeadPtr;
     XMLByte*			fBufferTailPtr;
+
+    logging::Category&  m_log;
     
 }; // CurlURLInputStream
 

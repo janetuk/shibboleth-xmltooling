@@ -41,7 +41,6 @@
 #include <xercesc/util/TranscodingException.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 
-#include <xmltooling/logging.h>
 #include <xmltooling/util/CurlURLInputStream.hpp>
 
 using namespace xmltooling;
@@ -60,6 +59,7 @@ CurlURLInputStream::CurlURLInputStream(const XMLURL& urlSource, const XMLNetHTTP
       , fDataAvailable(false)
       , fBufferHeadPtr(fBuffer)
       , fBufferTailPtr(fBuffer)
+      , m_log(logging::Category::getInstance(XMLTOOLING_LOGCAT".libcurl.NetAccessor"))
 {
 	// Allocate the curl multi handle
 	fMulti = curl_multi_init();
@@ -70,14 +70,14 @@ CurlURLInputStream::CurlURLInputStream(const XMLURL& urlSource, const XMLNetHTTP
 	// Get the text of the URL we're going to use
 	fURL.reset(XMLString::transcode(fURLSource.getURLText(), fMemoryManager), fMemoryManager);
 
-	//printf("Curl trying to fetch %s\n", fURL.get());
+	m_log.debug("libcurl trying to fetch %s", fURL.get());
 
 	// Set URL option
 	curl_easy_setopt(fEasy, CURLOPT_URL, fURL.get());
 	curl_easy_setopt(fEasy, CURLOPT_WRITEDATA, this);						// Pass this pointer to write function
 	curl_easy_setopt(fEasy, CURLOPT_WRITEFUNCTION, staticWriteCallback);	// Our static write function
-    curl_easy_setopt(fEasy, CURLOPT_CONNECTTIMEOUT, 15);
-    curl_easy_setopt(fEasy, CURLOPT_TIMEOUT, 30);
+    curl_easy_setopt(fEasy, CURLOPT_CONNECTTIMEOUT, 30);
+    curl_easy_setopt(fEasy, CURLOPT_TIMEOUT, 60);
     curl_easy_setopt(fEasy, CURLOPT_SSLVERSION, CURL_SSLVERSION_SSLv3);
     curl_easy_setopt(fEasy, CURLOPT_SSL_VERIFYHOST, 0);
     curl_easy_setopt(fEasy, CURLOPT_SSL_VERIFYPEER, 0);
@@ -130,7 +130,7 @@ CurlURLInputStream::writeCallback(char *buffer,
 	fTotalBytesRead	+= consume;
 	fBytesToRead	-= consume;
 
-	//printf("write callback consuming %d bytes\n", consume);
+	//m_log.debug("write callback consuming %d bytes", consume);
 
 	// If bytes remain, rebuffer as many as possible into our holding buffer
 	buffer			+= consume;
@@ -144,7 +144,7 @@ CurlURLInputStream::writeCallback(char *buffer,
 		fBufferHeadPtr	+= consume;
 		buffer			+= consume;
 		totalConsumed	+= consume;
-		//printf("write callback rebuffering %d bytes\n", consume);
+		//m_log.debug("write callback rebuffering %d bytes", consume);
 	}
 	
 	// Return the total amount we've consumed. If we don't consume all the bytes
@@ -180,7 +180,7 @@ CurlURLInputStream::readBytes(XMLByte* const          toFill
 			if (fBufferTailPtr == fBufferHeadPtr)
 				fBufferHeadPtr = fBufferTailPtr = fBuffer;
 				
-			//printf("consuming %d buffered bytes\n", bufCnt);
+			//m_log.debug("consuming %d buffered bytes", bufCnt);
 
 			tryAgain = true;
 			continue;
@@ -189,13 +189,14 @@ CurlURLInputStream::readBytes(XMLByte* const          toFill
 		// Ask the curl to do some work
 		int runningHandles = 0;
 		CURLMcode curlResult = curl_multi_perform(fMulti, &runningHandles);
+        //m_log.debug("curl_multi_perform returned %d", curlResult);
 		tryAgain = (curlResult == CURLM_CALL_MULTI_PERFORM);
 		
 		// Process messages from curl
 		int msgsInQueue = 0;
 		for (CURLMsg* msg = NULL; (msg = curl_multi_info_read(fMulti, &msgsInQueue)) != NULL; )
 		{
-			//printf("msg %d, %d from curl\n", msg->msg, msg->data.result);
+			m_log.debug("msg %d, %d from curl", msg->msg, msg->data.result);
 
 			if (msg->msg != CURLMSG_DONE)
 				continue;
@@ -223,17 +224,17 @@ CurlURLInputStream::readBytes(XMLByte* const          toFill
                 break;
 
             default:
-                logging::Category::getInstance(XMLTOOLING_LOGCAT"libcurl.NetAccessor").error(
-                    "curl NetAccessor encountered error from libcurl (%d)", msg->data.result
-                    );
+                m_log.error("curl NetAccessor encountered error from libcurl (%d)", msg->data.result);
                 ThrowXMLwithMemMgr1(NetAccessorException, XMLExcepts::NetAcc_InternalError, fURLSource.getURLText(), fMemoryManager);
 				break;
 			}
 		}
 		
 		// If nothing is running any longer, bail out
-		if (runningHandles == 0)
+        if (runningHandles == 0) {
+            //m_log.debug("libcurl indicated no running handles");
 			break;
+        }
 		
 		// If there is no further data to read, and we haven't
 		// read any yet on this invocation, call select to wait for data
@@ -258,6 +259,7 @@ CurlURLInputStream::readBytes(XMLByte* const          toFill
 		}
 	}
 	
+    //m_log.debug("returning with %d bytes to parser", fBytesRead);
 	return fBytesRead;
 }
 
