@@ -1,7 +1,6 @@
 PKG=SHIBxmltool
 ARCH=sparc
 VERSION=@-VERSION-@
-BASEDIR=/usr/local
 NAME=xmltooling-c
 CATEGORY=application,textproc,security
 DESC=Library for DOM processing with Signature/Encryption for C++

@@ -5,4 +5,9 @@ sed "s|^  prefix=.*|  prefix=${CLIENT_BASEDIR}|1" log4shib-config > log4shib-con
 mv log4shib-config.tmp log4shib-config
 chmod 755 log4shib-config
 
+cd ${CLIENT_BASEDIR}/lib/pkgconfig
+sed "s|^prefix=.*|prefix=${CLIENT_BASEDIR}|1" log4cpp.pc > log4cpp.pc.tmp
+mv log4cpp.pc.tmp log4cpp.pc
+chmod 644 log4cpp.pc
+
 exit 0

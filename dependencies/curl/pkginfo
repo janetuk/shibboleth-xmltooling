@@ -1,10 +1,9 @@
-ARCH=sparc
 PKG=SHIBcurl
 NAME=curl - Library and tool for common Internet protocols
-VERSION=7.16.2
+VERSION=7.18.0
 CATEGORY=system
 VENDOR=http://curl.haxx.se/ packaged for Shibboleth by Scott Cantor
-HOTLINE=http://bugs.internet2.edu/
+HOTLINE=https://bugs.internet2.edu/
 EMAIL=cantor.2@osu.edu
-PSTAMP=11Jun2007
+PSTAMP=17Mar2008
 CLASSES=none

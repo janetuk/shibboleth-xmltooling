@@ -5,4 +5,9 @@ sed "s|^prefix=.*|prefix=${CLIENT_BASEDIR}|1" curl-config > curl-config.tmp
 mv curl-config.tmp curl-config
 chmod 755 curl-config
 
+cd ${CLIENT_BASEDIR}/lib/pkgconfig
+sed "s|^prefix=.*|prefix=${CLIENT_BASEDIR}|1" libcurl.pc > libcurl.pc.tmp
+mv libcurl.pc.tmp libcurl.pc
+chmod 644 libcurl.pc
+
 exit 0
