@@ -1,10 +1,10 @@
-ARCH=sparc
-PKG=SHIBlog4cpp
-NAME=Logging Library for C++ plus Shib Project patches
-VERSION=0.3.5rc1
+PKG=SHIBlog4shib
+NAME=Logging Library for C++ forked from log4cpp
+VERSION=1.0
+BASEDIR=/usr/local
 CATEGORY=system
-VENDOR=http://log4cpp.sourceforge.net/ packaged for Shibboleth by Scott Cantor
-HOTLINE=http://bugs.internet2.edu/
+VENDOR=Internet2
+HOTLINE=https://bugs.internet2.edu/
 EMAIL=cantor.2@osu.edu
-PSTAMP=11Jun2007
+PSTAMP=17Mar2008
 CLASSES=none
