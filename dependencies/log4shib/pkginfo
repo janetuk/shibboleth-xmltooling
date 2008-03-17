@@ -1,0 +1,10 @@
+PKG=SHIBlog4shib
+NAME=Logging Library for C++ forked from log4cpp
+VERSION=1.0
+BASEDIR=/usr/local
+CATEGORY=system
+VENDOR=Internet2
+HOTLINE=https://bugs.internet2.edu/
+EMAIL=cantor.2@osu.edu
+PSTAMP=17Mar2008
+CLASSES=none

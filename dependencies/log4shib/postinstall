@@ -1,0 +1,8 @@
+#!/bin/sh
+
+cd ${CLIENT_BASEDIR}/bin
+sed "s|^  prefix=.*|  prefix=${CLIENT_BASEDIR}|1" log4shib-config > log4shib-config.tmp
+mv log4shib-config.tmp log4shib-config
+chmod 755 log4shib-config
+
+exit 0
