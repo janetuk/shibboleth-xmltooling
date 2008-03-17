@@ -227,7 +227,7 @@ if test x_$with_xmlsec != x_no; then
         CPPFLAGS="-I${with_xmlsec}/include $CPPFLAGS"
         LDFLAGS="-L${with_xmlsec}/lib $LDFLAGS"
     fi        
-    XMLSEC_LIBS="-lxml-security-c"
+    XMLSEC_LIBS="$XMLSEC_LIBS -lxml-security-c"
     
     # save and append master libs
     save_LIBS="$LIBS"
