@@ -63,7 +63,7 @@ void BasicX509Credential::initKeyInfo()
         }
     }
 
-    if (!m_subjectName.empty() || (!m_issuerName.empty() && m_serial >= 0)) {
+    if (!m_subjectName.empty() || (!m_issuerName.empty() && !m_serial.empty())) {
         if (!m_compactKeyInfo)
             m_compactKeyInfo = KeyInfoBuilder::buildKeyInfo();
         X509Data* x509Data=X509DataBuilder::buildX509Data();
@@ -75,16 +75,14 @@ void BasicX509Credential::initKeyInfo()
             x509Data->getX509SubjectNames().push_back(sn);
         }
         
-        if (!m_issuerName.empty() && m_serial >= 0) {
+        if (!m_issuerName.empty() && !m_serial.empty()) {
             X509IssuerSerial* is = X509IssuerSerialBuilder::buildX509IssuerSerial();
             X509IssuerName* in = X509IssuerNameBuilder::buildX509IssuerName();
             auto_ptr_XMLCh wide(m_issuerName.c_str());
             in->setName(wide.get());
             is->setX509IssuerName(in);
             X509SerialNumber* ser = X509SerialNumberBuilder::buildX509SerialNumber();
-            char buf[64];
-            sprintf(buf,"%d",m_serial);
-            auto_ptr_XMLCh wide2(buf);
+            auto_ptr_XMLCh wide2(m_serial.c_str());
             ser->setSerialNumber(wide2.get());
             is->setX509SerialNumber(ser);
             x509Data->getX509IssuerSerials().push_back(is);
@@ -137,7 +135,7 @@ void BasicX509Credential::extract()
     if (serialBN) {
         char* serial = BN_bn2dec(serialBN);
         if (serial) {
-            m_serial = atoi(serial);
+            m_serial = serial;
             free(serial);
         }
         BN_free(serialBN);

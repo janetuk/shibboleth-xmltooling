@@ -4,3 +4,5 @@ P SHIBxerces xerces-c
 	2.8.0
 P SHIBxmlsec xml-security-c
 	1.4.0
+P SHIBlog4shib log4shib
+    1.0

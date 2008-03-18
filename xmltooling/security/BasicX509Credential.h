@@ -41,7 +41,7 @@ namespace xmltooling {
          * 
          * @param ownCerts  true iff any certificates subsequently stored should be freed by destructor
          */
-        BasicX509Credential(bool ownCerts) : m_key(NULL), m_serial(-1), m_ownCerts(ownCerts), m_crl(NULL), m_keyInfo(NULL), m_compactKeyInfo(NULL) {
+        BasicX509Credential(bool ownCerts) : m_key(NULL), m_ownCerts(ownCerts), m_crl(NULL), m_keyInfo(NULL), m_compactKeyInfo(NULL) {
         }
 
         /**
@@ -52,7 +52,7 @@ namespace xmltooling {
          * @param crl   optional CRL
          */
         BasicX509Credential(XSECCryptoKey* key, const std::vector<XSECCryptoX509*>& certs, XSECCryptoX509CRL* crl=NULL)
-                : m_key(key), m_serial(-1), m_xseccerts(certs), m_ownCerts(true), m_crl(crl), m_keyInfo(NULL), m_compactKeyInfo(NULL) {
+                : m_key(key), m_xseccerts(certs), m_ownCerts(true), m_crl(crl), m_keyInfo(NULL), m_compactKeyInfo(NULL) {
         }
 
         /** The private/secret key/keypair. */
@@ -68,7 +68,7 @@ namespace xmltooling {
         std::string m_issuerName;
 
         /** Serial number. */
-        int m_serial;
+        std::string m_serial;
 
         /** The X.509 certificate chain. */
         std::vector<XSECCryptoX509*> m_xseccerts;
@@ -143,8 +143,8 @@ namespace xmltooling {
             return m_issuerName.c_str();
         }
 
-        int getSerialNumber() const {
-            return m_serial;
+        const char* getSerialNumber() const {
+            return m_serial.c_str();
         }
 
         void extract();

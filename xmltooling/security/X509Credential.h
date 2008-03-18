@@ -83,7 +83,7 @@ namespace xmltooling {
          *
          * @return the serial number
          */
-        virtual int getSerialNumber() const=0;
+        virtual const char* getSerialNumber() const=0;
 
         /**
          * Extracts properties like issuer and subject from the first certificate in the chain.

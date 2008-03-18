@@ -217,8 +217,10 @@ void InlineCredential::resolve(const KeyInfo* keyInfo, int types)
             }
 
             const X509SerialNumber* ser = inames.front()->getX509SerialNumber();
-            if (ser)
-                m_serial = XMLString::parseInt(ser->getSerialNumber());
+            if (ser) {
+                auto_ptr_char sn(ser->getSerialNumber());
+                m_serial = sn.get();
+            }
         }
     }
 }
@@ -433,8 +435,10 @@ void InlineCredential::resolve(DSIGKeyInfoList* keyInfo, int types)
                 delete[] kn;
             }
             n = kix->getX509IssuerSerialNumber();
-            if (n && *n)
-                m_serial = XMLString::parseInt(n);
+            if (n && *n) {
+                auto_ptr_char sn(n);
+                m_serial = sn.get();
+            }
         }
     }
 }

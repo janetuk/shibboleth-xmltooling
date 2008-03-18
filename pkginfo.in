@@ -1,5 +1,4 @@
 PKG=SHIBxmltool
-ARCH=sparc
 VERSION=@-VERSION-@
 NAME=xmltooling-c
 CATEGORY=application,textproc,security
