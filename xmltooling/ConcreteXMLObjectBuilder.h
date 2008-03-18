@@ -36,6 +36,8 @@ namespace xmltooling {
     public:
         virtual ~ConcreteXMLObjectBuilder() {}
 
+        using XMLObjectBuilder::buildObject;
+        
         /**
          * Creates an empty XMLObject with a defaulted element name and/or type.
          * 
