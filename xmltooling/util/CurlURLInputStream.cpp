@@ -78,7 +78,6 @@ CurlURLInputStream::CurlURLInputStream(const XMLURL& urlSource, const XMLNetHTTP
 	curl_easy_setopt(fEasy, CURLOPT_WRITEFUNCTION, staticWriteCallback);	// Our static write function
     curl_easy_setopt(fEasy, CURLOPT_CONNECTTIMEOUT, 30);
     curl_easy_setopt(fEasy, CURLOPT_TIMEOUT, 60);
-    curl_easy_setopt(fEasy, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1);
     curl_easy_setopt(fEasy, CURLOPT_SSL_VERIFYHOST, 0);
     curl_easy_setopt(fEasy, CURLOPT_SSL_VERIFYPEER, 0);
     curl_easy_setopt(fEasy, CURLOPT_NOPROGRESS, 1);
