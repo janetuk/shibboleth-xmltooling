@@ -207,4 +207,11 @@ endif
 install-exec-hook:
 	for la in $(lib_LTLIBRARIES) ; do rm -f $(DESTDIR)$(libdir)/$$la ; done
 
-EXTRA_DIST = xmltooling.vcproj xmltooling-lite.vcproj config_pub.h.in config_pub_win32.h resource.h xmltooling.rc
+EXTRA_DIST = \
+    xmltooling.vcproj \
+    xmltooling-lite.vcproj \
+    config_pub.h.in \
+    config_pub_win32.h\
+    resource.h\
+    xmltooling.rc \
+    util\Win32Threads.cpp
