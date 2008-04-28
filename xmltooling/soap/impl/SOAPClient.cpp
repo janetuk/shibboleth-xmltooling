@@ -89,8 +89,11 @@ Envelope* SOAPClient::receive()
     XercesJanitor<DOMDocument> janitor(doc);
 
     Category& log = Category::getInstance(XMLTOOLING_LOGCAT".SOAPClient");
-    if (log.isDebugEnabled())
-        log.debugStream() << "received XML:\n" << *(doc->getDocumentElement()) << logging::eol;
+    if (log.isDebugEnabled()) {
+	 string serializedXml;
+        XMLHelper::serialize (doc->getDocumentElement(),serializedXml,false);
+        log.debugStream() << "received XML:\n" << serializedXml << logging::eol;
+    }
     
     auto_ptr<XMLObject> xmlObject(XMLObjectBuilder::buildOneFromElement(doc->getDocumentElement(), true));
     janitor.release();
