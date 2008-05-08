@@ -1,0 +1,19 @@
+/* Define if C++ compiler supports covariant virtual methods. */
+#undef HAVE_COVARIANT_RETURNS
+
+/* Define to 1 if you have an STL implementation that supports useful string
+   specialization. */
+#undef HAVE_GOOD_STL
+
+/* Define to 1 if you have an STL implementation that supports
+   std::iterator_traits. */
+#undef HAVE_ITERATOR_TRAITS
+
+/* Define if log4shib library is used. */
+#undef XMLTOOLING_LOG4SHIB
+
+/* Define if log4cpp library is used. */
+#undef XMLTOOLING_LOG4CPP
+
+/* Define to 1 to disable XML-Security-dependent features. */
+#undef XMLTOOLING_NO_XMLSEC

@@ -1,0 +1,9 @@
+#!/bin/sh
+
+cd ${CLIENT_BASEDIR}/share/xml/xmltooling
+
+sed "s|uri=\".*${CLIENT_BASEDIR}|uri=\"${CLIENT_BASEDIR}|1" catalog.xml > catalog.xml.tmp
+mv catalog.xml.tmp catalog.xml
+chmod 644 catalog.xml
+
+exit 0

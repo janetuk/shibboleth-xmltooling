@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <system systemId="http://www.w3.org/XML/1998/namespace" uri="../schemas/xml.xsd"/>
+    <system systemId="http://www.w3.org/2001/04/xmlenc#" uri="../schemas/xenc-schema.xsd"/>
+    <system systemId="http://www.w3.org/2000/09/xmldsig#" uri="../schemas/xmldsig-core-schema.xsd"/>
+</catalog>
