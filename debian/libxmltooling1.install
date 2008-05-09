@@ -1,1 +1,2 @@
 debian/tmp/usr/lib/lib*.so.*
+debian/overrides/libxmltooling1 usr/share/lintian/overrides
