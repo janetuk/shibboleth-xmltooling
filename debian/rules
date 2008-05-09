@@ -75,7 +75,7 @@ install:
 
 	rm $(CURDIR)/debian/tmp/usr/share/doc/xmltooling/{{CURL,LOG4CPP,OPENSSL}.LICENSE,{NOTICE,LICENSE}.txt}
 
-	dh_install -i -s --fail-missing --sourcedir=debian/tmp
+	dh_install -i -s --fail-missing
 
 # Must not depend on anything. This is to be called by
 # binary-arch/binary-indep
