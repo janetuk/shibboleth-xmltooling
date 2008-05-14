@@ -3,9 +3,12 @@ Section: libs
 Priority: optional
 Maintainer: Debian Shib Team <pkg-shibboleth-devel@lists.alioth.debian.org>
 Uploaders: Russ Allbery <rra@debian.org>, Ferenc Wagner <wferi@niif.hu>
-Build-Depends: debhelper (>= 5), autotools-dev, libxerces27-dev | libxerces28-dev, liblog4cpp5-dev,
+Build-Depends: debhelper (>= 5), autotools-dev, libxerces-c2-dev, liblog4cpp5-dev,
  libxml-security-c-dev (>= 1.4), libcurl3-openssl-dev
 Standards-Version: 3.7.2
+Homepage: https://spaces.internet2.edu/display/OpenSAML/XMLTooling-C
+Vcs-Git: git://git.debian.org/git/pkg-shibboleth/xmltooling.git
+Vcs-Browser: http://git.debian.org/?p=pkg-shibboleth/xmltooling.git
 
 Package: libxmltooling1
 Section: libs
