@@ -1,1 +1,1 @@
-debian/tmp/usr/share/doc/xmltooling/api/* usr/share/doc/libxmltooling1-doc
+doc/api/* usr/share/doc/libxmltooling-doc
