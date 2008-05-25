@@ -38,8 +38,8 @@ Description: XML schemas for XMLTooling
 Package: libxmltooling-dev
 Section: libdevel
 Architecture: any
-Depends: libxmltooling1 (= ${Source-Version})
-Suggests: libxmltooling1-doc (= ${Source-Version})
+Depends: libxmltooling1 (= ${binary:Version})
+Suggests: libxmltooling-doc (= ${source:Version})
 Description: C++ XML parsing library with encryption support (development)
  The XMLTooling library contains generic XML parsing and processing
  classes based on the Xerces-C DOM. It adds more powerful facilities
