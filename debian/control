@@ -3,8 +3,9 @@ Section: libs
 Priority: optional
 Maintainer: Debian Shib Team <pkg-shibboleth-devel@lists.alioth.debian.org>
 Uploaders: Russ Allbery <rra@debian.org>, Ferenc Wagner <wferi@niif.hu>
-Build-Depends: debhelper (>= 5), autotools-dev, libcurl3-openssl-dev,
- liblog4cpp5-dev, libxerces-c2-dev, libxml-security-c-dev (>= 1.4)
+Build-Depends: debhelper (>= 5), autotools-dev, doxygen,
+ libcurl3-openssl-dev, liblog4cpp5-dev, libxerces-c2-dev,
+ libxml-security-c-dev (>= 1.4)
 Standards-Version: 3.7.3
 Homepage: https://spaces.internet2.edu/display/OpenSAML/XMLTooling-C
 Vcs-Git: git://git.debian.org/git/pkg-shibboleth/xmltooling.git
@@ -23,23 +24,11 @@ Description: C++ XML parsing library with encryption support (runtime)
  This package contains the files necessary for running applications that
  use the XMLTooling library.
 
-Package: xmltooling-schemas
-Section: text
-Architecture: any
-Description: XML schemas for XMLTooling
- The XMLTooling library contains generic XML parsing and processing
- classes based on the Xerces-C DOM.  It adds more powerful facilities for
- declaring element- and type-specific API and implementation classes, as
- well as signing and encryption support.
- .
- This package contains the XML schema files used by the XMLTooling
- library.
-
 Package: libxmltooling-dev
 Section: libdevel
 Architecture: any
-Depends: libxmltooling1 (= ${Source-Version})
-Suggests: libxmltooling1-doc (= ${Source-Version})
+Depends: libxmltooling1 (= ${binary:Version})
+Suggests: libxmltooling-doc (= ${source:Version})
 Description: C++ XML parsing library with encryption support (development)
  The XMLTooling library contains generic XML parsing and processing
  classes based on the Xerces-C DOM. It adds more powerful facilities
@@ -50,10 +39,22 @@ Description: C++ XML parsing library with encryption support (development)
  This package contains the headers and other necessary files to build
  applications or libraries that use or extend the XMLTooling library.
 
+Package: xmltooling-schemas
+Section: text
+Architecture: all
+Description: XML schemas for XMLTooling
+ The XMLTooling library contains generic XML parsing and processing
+ classes based on the Xerces-C DOM.  It adds more powerful facilities for
+ declaring element- and type-specific API and implementation classes, as
+ well as signing and encryption support.
+ .
+ This package contains the XML schema files used by the XMLTooling
+ library.
+
 Package: libxmltooling-doc
 Section: doc
 Architecture: all
-Description: XMLTooling API Documentation
+Description: C++ XML parsing library with encryption support (API docs)
  The XMLTooling library contains generic XML parsing and processing
  classes based on the Xerces-C DOM. It adds more powerful facilities
  for declaring element- and type-specific API and implementation
