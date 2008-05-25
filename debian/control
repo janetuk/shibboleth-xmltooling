@@ -35,7 +35,7 @@ Description: XML schemas for XMLTooling
  This package contains the XML schema files used by the XMLTooling
  library.
 
-Package: libxmltooling1-dev
+Package: libxmltooling-dev
 Section: libdevel
 Architecture: any
 Depends: libxmltooling1 (= ${Source-Version})
@@ -50,7 +50,7 @@ Description: C++ XML parsing library with encryption support (development)
  This package contains the headers and other necessary files to build
  applications or libraries that use or extend the XMLTooling library.
 
-Package: libxmltooling1-doc
+Package: libxmltooling-doc
 Section: doc
 Architecture: all
 Description: XMLTooling API Documentation
