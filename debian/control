@@ -53,7 +53,7 @@ Description: C++ XML parsing library with encryption support (development)
 Package: libxmltooling-doc
 Section: doc
 Architecture: all
-Description: XMLTooling API Documentation
+Description: C++ XML parsing library with encryption support (API docs)
  The XMLTooling library contains generic XML parsing and processing
  classes based on the Xerces-C DOM. It adds more powerful facilities
  for declaring element- and type-specific API and implementation
