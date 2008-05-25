@@ -3,7 +3,7 @@ Title: XMLTooling-C API documentation
 Author: Scott Cantor
 Abstract: Doxygen generated HTML documentation of the XMLTooling-C
  library version 1.
-Section: Apps/Devel
+Section: Programming/C++
 
 Format: HTML
 Index: /usr/share/doc/libxmltooling1-doc/html/index.html
