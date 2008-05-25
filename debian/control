@@ -23,18 +23,6 @@ Description: C++ XML parsing library with encryption support (runtime)
  This package contains the files necessary for running applications that
  use the XMLTooling library.
 
-Package: xmltooling-schemas
-Section: text
-Architecture: any
-Description: XML schemas for XMLTooling
- The XMLTooling library contains generic XML parsing and processing
- classes based on the Xerces-C DOM.  It adds more powerful facilities for
- declaring element- and type-specific API and implementation classes, as
- well as signing and encryption support.
- .
- This package contains the XML schema files used by the XMLTooling
- library.
-
 Package: libxmltooling-dev
 Section: libdevel
 Architecture: any
@@ -49,6 +37,18 @@ Description: C++ XML parsing library with encryption support (development)
  .
  This package contains the headers and other necessary files to build
  applications or libraries that use or extend the XMLTooling library.
+
+Package: xmltooling-schemas
+Section: text
+Architecture: all
+Description: XML schemas for XMLTooling
+ The XMLTooling library contains generic XML parsing and processing
+ classes based on the Xerces-C DOM.  It adds more powerful facilities for
+ declaring element- and type-specific API and implementation classes, as
+ well as signing and encryption support.
+ .
+ This package contains the XML schema files used by the XMLTooling
+ library.
 
 Package: libxmltooling-doc
 Section: doc
