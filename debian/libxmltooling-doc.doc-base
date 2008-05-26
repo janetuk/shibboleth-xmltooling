@@ -1,4 +1,4 @@
-Document: libxmltooling1-doc
+Document: libxmltooling-doc
 Title: XMLTooling-C API documentation
 Author: Scott Cantor
 Abstract: Doxygen generated HTML documentation of the XMLTooling-C
@@ -6,8 +6,8 @@ Abstract: Doxygen generated HTML documentation of the XMLTooling-C
 Section: Programming/C++
 
 Format: HTML
-Index: /usr/share/doc/libxmltooling1-doc/html/index.html
-Files: /usr/share/doc/libxmltooling1-doc/html/*.html
- /usr/share/doc/libxmltooling1-doc/html/*.png
- /usr/share/doc/libxmltooling1-doc/html/*.gif
- /usr/share/doc/libxmltooling1-doc/html/*.css
+Index: /usr/share/doc/libxmltooling-doc/html/index.html
+Files: /usr/share/doc/libxmltooling-doc/html/*.html
+ /usr/share/doc/libxmltooling-doc/html/*.png
+ /usr/share/doc/libxmltooling-doc/html/*.gif
+ /usr/share/doc/libxmltooling-doc/html/*.css
