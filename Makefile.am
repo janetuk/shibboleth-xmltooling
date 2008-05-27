@@ -26,13 +26,13 @@ install-data-hook:
 
 xmltooling.spec: xmltooling.spec.in Makefile
 	rm -f $@.tmp
-	sed < $< > $@.tmp \
+	sed < $@.in > $@.tmp \
 	    -e 's:@-VERSION-@:${VERSION}:'
 	mv $@.tmp $@
 
 pkginfo: pkginfo.in Makefile
 	rm -f $@.tmp
-	sed < $< > $@.tmp \
+	sed < $@.in > $@.tmp \
 	    -e 's:@-VERSION-@:${VERSION}:'
 	mv $@.tmp $@
 
