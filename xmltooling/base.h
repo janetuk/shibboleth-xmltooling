@@ -24,6 +24,8 @@
 #ifndef __xmltooling_base_h__
 #define __xmltooling_base_h__
 
+#include <typeinfo>
+
 #if defined (_MSC_VER) || defined(__BORLANDC__)
   #include <xmltooling/config_pub_win32.h>
 #else
