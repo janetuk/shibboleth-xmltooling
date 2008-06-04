@@ -1,8 +1,8 @@
 AC_PREREQ([2.50])
-AC_INIT([xmltooling], [1.0], [mace-opensaml-users@internet2.edu], [xmltooling])
+AC_INIT([xmltooling], [1.0.1], [mace-opensaml-users@internet2.edu], [xmltooling])
 AM_CONFIG_HEADER(config.h)
 AM_CONFIG_HEADER(xmltooling/config_pub.h)
-AM_INIT_AUTOMAKE([xmltooling], [1.0])
+AM_INIT_AUTOMAKE([xmltooling], [1.0.1])
 
 sinclude(doxygen.m4)
 sinclude(acx_pthread.m4)
