@@ -63,7 +63,8 @@ void BasicX509Credential::initKeyInfo()
         }
     }
 
-    if (!m_subjectName.empty() || (!m_issuerName.empty() && !m_serial.empty())) {
+//  if (!m_subjectName.empty() || (!m_issuerName.empty() && !m_serial.empty())) {
+    if (!m_subjectName.empty()) {
         if (!m_compactKeyInfo)
             m_compactKeyInfo = KeyInfoBuilder::buildKeyInfo();
         X509Data* x509Data=X509DataBuilder::buildX509Data();
@@ -74,7 +75,7 @@ void BasicX509Credential::initKeyInfo()
             sn->setName(wide.get());
             x509Data->getX509SubjectNames().push_back(sn);
         }
-        
+/*        
         if (!m_issuerName.empty() && !m_serial.empty()) {
             X509IssuerSerial* is = X509IssuerSerialBuilder::buildX509IssuerSerial();
             X509IssuerName* in = X509IssuerNameBuilder::buildX509IssuerName();
@@ -87,6 +88,7 @@ void BasicX509Credential::initKeyInfo()
             is->setX509SerialNumber(ser);
             x509Data->getX509IssuerSerials().push_back(is);
         }
+*/
     }
     
     if (!m_xseccerts.empty()) {
