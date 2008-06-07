@@ -30,6 +30,8 @@
   #include <xmltooling/config_pub.h>
 #endif
 
+#include <typeinfo>
+
 #ifdef XMLTOOLING_LITE
 # define XMLTOOLING_NO_XMLSEC 1
 #endif
