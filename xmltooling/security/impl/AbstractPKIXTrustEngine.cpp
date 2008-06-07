@@ -26,6 +26,7 @@
 #include "security/AbstractPKIXTrustEngine.h"
 #include "signature/KeyInfo.h"
 
+#include <memory>
 #include <openssl/x509_vfy.h>
 #include <openssl/x509v3.h>
 #include <xmltooling/security/CredentialCriteria.h>

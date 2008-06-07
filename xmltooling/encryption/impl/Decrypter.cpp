@@ -28,6 +28,7 @@
 #include "security/CredentialCriteria.h"
 #include "security/CredentialResolver.h"
 
+#include <memory>
 #include <xsec/enc/XSECCryptoException.hpp>
 #include <xsec/framework/XSECException.hpp>
 #include <xsec/framework/XSECAlgorithmMapper.hpp>

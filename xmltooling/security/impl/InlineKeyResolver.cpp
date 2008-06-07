@@ -32,6 +32,7 @@
 #include "util/XMLConstants.h"
 #include "validation/ValidatorSuite.h"
 
+#include <memory>
 #include <xercesc/util/XMLUniDefs.hpp>
 #include <xsec/dsig/DSIGKeyInfoX509.hpp>
 #include <xsec/enc/XSECKeyInfoResolverDefault.hpp>

@@ -26,6 +26,7 @@
 #include "util/NDC.h"
 #include "util/XMLHelper.h"
 
+#include <memory>
 #include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmltooling;
