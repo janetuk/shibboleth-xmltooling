@@ -9,7 +9,8 @@ Files: *
 Copyright: 2001-2007 Internet2
 License: Apache-2.0
 
-Files: xmltooling/util/Curl*
+Files: xmltooling/security/*X509CRL.h xmltooling/security/impl/*X509CRL.cpp
+ xmltooling/util/Curl*
 Copyright: 1999-2004 The Apache Software Foundation
 License: Apache-2.0
 
