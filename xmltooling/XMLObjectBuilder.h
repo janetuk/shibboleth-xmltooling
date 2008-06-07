@@ -24,6 +24,7 @@
 #define __xmltooling_xmlobjbuilder_h__
 
 #include <map>
+#include <memory>
 #include <xmltooling/QName.h>
 #include <xmltooling/XMLObject.h>
 #include <xmltooling/util/XMLHelper.h>

@@ -24,6 +24,7 @@
 #include "encryption/Encrypter.h"
 #include "security/Credential.h"
 
+#include <memory>
 #include <xsec/enc/XSECCryptoException.hpp>
 #include <xsec/framework/XSECException.hpp>
 #include <xsec/framework/XSECAlgorithmMapper.hpp>
