@@ -71,7 +71,7 @@ binary-arch: install-stamp
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs
-	dh_installdocs doc/NOTICE.txt
+	dh_installdocs -A doc/NOTICE.txt
 	dh_link
 	dh_strip
 	dh_compress
@@ -88,7 +88,7 @@ binary-indep: install-stamp
 	dh_testdir
 	dh_testroot
 	dh_installchangelogs
-	dh_installdocs doc/NOTICE.txt
+	dh_installdocs -A doc/NOTICE.txt
 	dh_link
 	dh_compress
 	dh_fixperms
