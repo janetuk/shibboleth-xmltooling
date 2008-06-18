@@ -9,19 +9,19 @@ Files: *
 Copyright: 2001-2007 Internet2
 License: Apache-2.0
 
-Files: xmltooling/security/*X509CRL.h xmltooling/security/impl/*X509CRL.cpp
- xmltooling/util/Curl*
+Files: ./xmltooling/security/*X509CRL.h,
+ ./xmltooling/security/impl/*X509CRL.cpp, ./xmltooling/util/Curl*
 Copyright: 1999-2007 The Apache Software Foundation
 License: Apache-2.0
 
-Files: schemas/soap-envelope.xsd
+Files: ./schemas/soap-envelope.xsd
 Copyright: 2001 Martin Gudgin, Developmentor
  2001 W3C (Massachusetts Institute of Technology, Institut National de
  Recherche en Informatique et en Automatique, Keio University) All Rights
  Reserved. http://www.w3.org/Consortium/Legal/
 License: W3C-Software
 
-Files: schemas/xml.xsd schemas/xmldsig-core-schema.xsd
+Files: ./schemas/xml.xsd, ./schemas/xmldsig-core-schema.xsd
 Copyright: 2001 W3C (Massachusetts Institute of Technology, Institut
  National de Recherche en Informatique et en Automatique, Keio University)
  All Rights Reserved. http://www.w3.org/Consortium/Legal/

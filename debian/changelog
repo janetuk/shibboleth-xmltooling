@@ -9,6 +9,7 @@ xmltooling (1.0-2) UNRELEASED; urgency=low
   * Change package priorities to extra.  Xerces-C is extra, so all of the
     Shibboleth stack needs to be extra, and realistically it's somewhat of
     an edge package in Debian.
+  * Fix copyright file formatting to use the right syntax for Files.
 
  -- Russ Allbery <rra@debian.org>  Wed, 18 Jun 2008 14:20:03 -0700
 
