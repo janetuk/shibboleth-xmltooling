@@ -3,8 +3,6 @@ xmltooling (1.0-2) UNRELEASED; urgency=low
   [ Ferenc Wagner ]
   * Add dependencies to libxmltooling-dev for the packages whose header
     files are included by XMLTooling headers.
-  * Remove build dependency on libxerces-c2-dev since
-    libxml-security-c-dev will depend on it.
   * Include NOTICE.txt in all packages.
 
  -- Russ Allbery <rra@debian.org>  Wed, 18 Jun 2008 14:20:03 -0700
