@@ -6,6 +6,7 @@ xmltooling (1.0-2) unstable; urgency=low
   * Include NOTICE.txt in all packages.
 
   [ Russ Allbery ]
+  * Explicitly link with -lpthread to work around Bug#468555 in libtool.
   * Change package priorities to extra.  Xerces-C is extra, so all of the
     Shibboleth stack needs to be extra, and realistically it's somewhat of
     an edge package in Debian.
@@ -13,7 +14,7 @@ xmltooling (1.0-2) unstable; urgency=low
     files in the tree, including all the Autoconf support files.
   * Fix copyright file formatting to use the right syntax for Files.
 
- -- Russ Allbery <rra@debian.org>  Wed, 18 Jun 2008 19:08:36 -0700
+ -- Russ Allbery <rra@debian.org>  Wed, 18 Jun 2008 20:18:21 -0700
 
 xmltooling (1.0-1) unstable; urgency=low
 
