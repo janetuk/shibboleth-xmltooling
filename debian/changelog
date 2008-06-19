@@ -1,4 +1,4 @@
-xmltooling (1.0-2) UNRELEASED; urgency=low
+xmltooling (1.0-2) unstable; urgency=low
 
   [ Ferenc Wagner ]
   * Add dependencies to libxmltooling-dev for the packages whose header
@@ -13,7 +13,7 @@ xmltooling (1.0-2) UNRELEASED; urgency=low
     files in the tree, including all the Autoconf support files.
   * Fix copyright file formatting to use the right syntax for Files.
 
- -- Russ Allbery <rra@debian.org>  Wed, 18 Jun 2008 14:20:03 -0700
+ -- Russ Allbery <rra@debian.org>  Wed, 18 Jun 2008 19:08:36 -0700
 
 xmltooling (1.0-1) unstable; urgency=low
 
