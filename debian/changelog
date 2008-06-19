@@ -1,3 +1,20 @@
+xmltooling (1.0-2) unstable; urgency=low
+
+  [ Ferenc Wagner ]
+  * Add dependencies to libxmltooling-dev for the packages whose header
+    files are included by XMLTooling headers.
+  * Include NOTICE.txt in all packages.
+
+  [ Russ Allbery ]
+  * Change package priorities to extra.  Xerces-C is extra, so all of the
+    Shibboleth stack needs to be extra, and realistically it's somewhat of
+    an edge package in Debian.
+  * Add in copyright and license information for all of the other random
+    files in the tree, including all the Autoconf support files.
+  * Fix copyright file formatting to use the right syntax for Files.
+
+ -- Russ Allbery <rra@debian.org>  Wed, 18 Jun 2008 19:08:36 -0700
+
 xmltooling (1.0-1) unstable; urgency=low
 
   [ Ferenc Wagner ]
