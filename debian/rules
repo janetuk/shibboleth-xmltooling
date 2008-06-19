@@ -36,7 +36,7 @@ configure-stamp:
 	dh_testdir
 	cp /usr/share/misc/config.guess config.guess
 	cp /usr/share/misc/config.sub config.sub
-	CFLAGS="$(CFLAGS)" ./configure --prefix=/usr \
+	CFLAGS="$(CFLAGS)" LIBS=-lpthread ./configure --prefix=/usr \
 	    --disable-dependency-tracking $(SYSTEM) $(DEBUG)
 	touch $@
 
