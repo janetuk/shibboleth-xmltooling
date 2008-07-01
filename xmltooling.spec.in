@@ -98,6 +98,9 @@ find $RPM_BUILD_ROOT/%{_bindir} -type f |
 %doc %{_datadir}/doc/xmltooling/api
 
 %changelog
+* Tue Jul 1 2008  Scott Cantor  <cantor.2@osu.edu>  - 1.1-1
+- Bumping for minor update.
+
 * Mon Mar 17 2008  Scott Cantor  <cantor.2@osu.edu>  - 1.0-6
 - Official release.
 
