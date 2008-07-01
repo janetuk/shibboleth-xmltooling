@@ -1,6 +1,6 @@
 /*
 *  Copyright 2001-2007 Internet2
- * 
+ *
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 
 /**
  * AbstractXMLObject.cpp
- * 
+ *
  * An abstract implementation of XMLObject.
  */
 
@@ -47,6 +47,13 @@ AbstractXMLObject::AbstractXMLObject(const AbstractXMLObject& src)
 {
     if (src.m_typeQname)
         m_typeQname=new QName(*src.m_typeQname);
+}
+
+AbstractXMLObject::~AbstractXMLObject()
+{
+    delete m_typeQname;
+    xercesc::XMLString::release(&m_schemaLocation);
+    xercesc::XMLString::release(&m_noNamespaceSchemaLocation);
 }
 
 void XMLObject::setNil(const XMLCh* value) {
@@ -121,21 +128,27 @@ DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, const Date
     return newValue ? new DateTime(*newValue) : NULL;
 }
 
-DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, time_t newValue)
+DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, time_t newValue, bool duration)
 {
     delete oldValue;
     releaseThisandParentDOM();
     DateTime* ret = new DateTime(newValue);
-    ret->parseDateTime();
+    if (duration)
+        ret->parseDuration();
+    else
+        ret->parseDateTime();
     return ret;
 }
 
-DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, const XMLCh* newValue)
+DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, const XMLCh* newValue, bool duration)
 {
     delete oldValue;
     releaseThisandParentDOM();
     DateTime* ret = new DateTime(newValue);
-    ret->parseDateTime();
+    if (duration)
+        ret->parseDuration();
+    else
+        ret->parseDateTime();
     return ret;
 }
 
