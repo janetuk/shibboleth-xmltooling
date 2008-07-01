@@ -80,6 +80,7 @@ find $RPM_BUILD_ROOT/%{_bindir} -type f |
 %dir %{_datadir}/xml/xmltooling
 %{_datadir}/xml/xmltooling
 %docdir %{_datadir}/doc/xmltooling
+%{_datadir}/doc/xmltooling/README.txt
 %{_datadir}/doc/xmltooling/LICENSE.txt
 %{_datadir}/doc/xmltooling/NOTICE.txt
 %{_datadir}/doc/xmltooling/CURL.LICENSE
