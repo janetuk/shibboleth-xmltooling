@@ -60,6 +60,7 @@
 <storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
 <storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 <storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+
 <storageModule moduleId="org.eclipse.cdt.core.pathentry">
 <pathentry include="C:/log4shib-1.0/include" kind="inc" path="" system="true"/>
 <pathentry include="C:/xerces-c_2_8_0-x86-windows-vc_8_0/include" kind="inc" path="" system="true"/>
@@ -69,6 +70,7 @@
 <pathentry include="C:/cxxtest" kind="inc" path="" system="true"/>
 <pathentry base-path="cpp-xmltooling" include="" kind="inc" path="" system="true"/>
 <pathentry base-path="cpp-xmltooling" include="xmltooling" kind="inc" path="" system="true"/>
+<pathentry include="C:/Program Files/Microsoft Visual Studio 8/VC/include" kind="inc" path="" system="true"/>
 <pathentry kind="mac" name="_MSC_VER" path="" value=""/>
 <pathentry kind="mac" name="WIN32" path="" value=""/>
 <pathentry kind="out" path="xmltooling/Debug"/>

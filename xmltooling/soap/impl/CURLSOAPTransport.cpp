@@ -1,6 +1,6 @@
 /*
  *  Copyright 2001-2007 Internet2
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 
 /**
  * CURLSOAPTransport.cpp
- * 
+ *
  * libcurl-based SOAPTransport implementation
  */
 
@@ -48,11 +48,11 @@ namespace xmltooling {
         CURLPool() : m_size(0), m_lock(Mutex::create()),
             m_log(Category::getInstance(XMLTOOLING_LOGCAT".SOAPTransport.CURL")) {}
         ~CURLPool();
-        
+
         CURL* get(const SOAPTransport::Address& addr);
         void put(const char* from, const char* to, const char* endpoint, CURL* handle);
-    
-    private:    
+
+    private:
         typedef map<string,vector<CURL*> > poolmap_t;
         poolmap_t m_bindingMap;
         list< vector<CURL*>* > m_pools;
@@ -60,9 +60,9 @@ namespace xmltooling {
         Mutex* m_lock;
         Category& m_log;
     };
-    
+
     static XMLTOOL_DLLLOCAL CURLPool* g_CURLPool = NULL;
-    
+
     class XMLTOOL_DLLLOCAL CURLSOAPTransport : public HTTPSOAPTransport, public OpenSSLSOAPTransport
     {
     public:
@@ -83,7 +83,7 @@ namespace xmltooling {
             curl_easy_setopt(m_handle,CURLOPT_HEADERDATA,this);
             m_headers=curl_slist_append(m_headers,"Content-Type: text/xml");
         }
-        
+
         virtual ~CURLSOAPTransport() {
             curl_slist_free_all(m_headers);
             curl_easy_setopt(m_handle,CURLOPT_ERRORBUFFER,NULL);
@@ -98,17 +98,17 @@ namespace xmltooling {
         bool setConnectTimeout(long timeout) {
             return (curl_easy_setopt(m_handle,CURLOPT_CONNECTTIMEOUT,timeout)==CURLE_OK);
         }
-        
+
         bool setTimeout(long timeout) {
             return (curl_easy_setopt(m_handle,CURLOPT_TIMEOUT,timeout)==CURLE_OK);
         }
-        
+
         bool setAuth(transport_auth_t authType, const char* username=NULL, const char* password=NULL);
-        
+
         bool setVerifyHost(bool verify) {
             return (curl_easy_setopt(m_handle,CURLOPT_SSL_VERIFYHOST,verify ? 2 : 0)==CURLE_OK);
         }
-        
+
 #ifndef XMLTOOLING_NO_XMLSEC
         bool setCredential(const Credential* cred=NULL) {
             const OpenSSLCredential* down = dynamic_cast<const OpenSSLCredential*>(cred);
@@ -119,7 +119,7 @@ namespace xmltooling {
             m_cred = down;
             return true;
         }
-        
+
         bool setTrustEngine(
             const X509TrustEngine* trustEngine=NULL,
             const CredentialResolver* peerResolver=NULL,
@@ -139,9 +139,9 @@ namespace xmltooling {
             m_mandatory = mandatory;
             return true;
         }
-        
+
 #endif
-        
+
         bool useChunkedEncoding(bool chunked=true) {
             m_chunked = chunked;
             return true;
@@ -165,13 +165,13 @@ namespace xmltooling {
                 return (curl_easy_setopt(m_handle, opt, value) == CURLE_OK);
 #endif
         }
-        
+
         void send(istream& in);
-        
+
         istream& receive() {
             return m_stream;
         }
-        
+
         bool isAuthenticated() const {
             return m_authenticated;
         }
@@ -181,23 +181,23 @@ namespace xmltooling {
         }
 
         string getContentType() const;
-        
+
         bool setRequestHeader(const char* name, const char* val) {
             string temp(name);
             temp=temp + ": " + val;
             m_headers=curl_slist_append(m_headers,temp.c_str());
             return true;
         }
-        
+
         const vector<string>& getResponseHeader(const char* val) const;
-        
+
         bool setSSLCallback(ssl_ctx_callback_fn fn, void* userptr=NULL) {
             m_ssl_callback=fn;
             m_ssl_userptr=userptr;
             return true;
         }
 
-    private:        
+    private:
         // per-call state
         string m_sender,m_peerName,m_endpoint,m_simplecreds;
         CURL* m_handle;
@@ -215,7 +215,7 @@ namespace xmltooling {
         void* m_ssl_userptr;
         bool m_chunked;
         bool m_authenticated;
-        
+
         friend size_t XMLTOOL_DLLLOCAL curl_header_hook(void* ptr, size_t size, size_t nmemb, void* stream);
         friend CURLcode XMLTOOL_DLLLOCAL xml_ssl_ctx_callback(CURL* curl, SSL_CTX* ssl_ctx, void* userptr);
         friend int XMLTOOL_DLLLOCAL verify_callback(X509_STORE_CTX* x509_ctx, void* arg);
@@ -277,12 +277,12 @@ CURL* CURLPool::get(const SOAPTransport::Address& addr)
         key = key + '|' + addr.m_to;
     m_lock->lock();
     poolmap_t::iterator i=m_bindingMap.find(key);
-    
+
     if (i!=m_bindingMap.end()) {
         // Move this pool to the front of the list.
         m_pools.remove(&(i->second));
         m_pools.push_front(&(i->second));
-        
+
         // If a free connection exists, return it.
         if (!(i->second.empty())) {
             CURL* handle=i->second.back();
@@ -293,10 +293,10 @@ CURL* CURLPool::get(const SOAPTransport::Address& addr)
             return handle;
         }
     }
-    
+
     m_lock->unlock();
     m_log.debug("nothing free in pool, returning new connection handle");
-    
+
     // Create a new connection and set non-varying options.
     CURL* handle=curl_easy_init();
     if (!handle)
@@ -328,7 +328,7 @@ void CURLPool::put(const char* from, const char* to, const char* endpoint, CURL*
         m_pools.push_front(&(m_bindingMap.insert(poolmap_t::value_type(key,vector<CURL*>(1,handle))).first->second));
     else
         i->second.push_back(handle);
-    
+
     CURL* killit=NULL;
     if (++m_size > 256) {
         // Kick a handle out from the back of the bus.
@@ -340,7 +340,7 @@ void CURLPool::put(const char* from, const char* to, const char* endpoint, CURL*
                 m_size--;
                 break;
             }
-            
+
             // Move an empty pool up to the front so we don't keep hitting it.
             m_pools.pop_back();
             m_pools.push_front(corpse);
@@ -384,7 +384,7 @@ const vector<string>& CURLSOAPTransport::getResponseHeader(const char* name) con
     map<string,vector<string> >::const_iterator i=m_response_headers.find(name);
     if (i!=m_response_headers.end())
         return i->second;
-    
+
     for (map<string,vector<string> >::const_iterator j=m_response_headers.begin(); j!=m_response_headers.end(); j++) {
 #ifdef HAVE_STRCASECMP
         if (!strcasecmp(j->first.c_str(), name))
@@ -393,7 +393,7 @@ const vector<string>& CURLSOAPTransport::getResponseHeader(const char* name) con
 #endif
             return j->second;
     }
-    
+
     return emptyVector;
 }
 
@@ -420,21 +420,25 @@ void CURLSOAPTransport::send(istream& in)
     // Setup standard per-call curl properties.
     curl_easy_setopt(m_handle,CURLOPT_DEBUGDATA,&log_curl);
     curl_easy_setopt(m_handle,CURLOPT_FILE,&m_stream);
-    curl_easy_setopt(m_handle,CURLOPT_POST,1);
-    if (m_chunked) {
+    if (m_chunked && in) {
+        curl_easy_setopt(m_handle,CURLOPT_POST,1);
         m_headers=curl_slist_append(m_headers,"Transfer-Encoding: chunked");
         curl_easy_setopt(m_handle,CURLOPT_READFUNCTION,&curl_read_hook);
         curl_easy_setopt(m_handle,CURLOPT_READDATA,&in);
     }
-    else {
+    else if (in) {
         char buf[1024];
         while (in) {
             in.read(buf,1024);
             msg.append(buf,in.gcount());
         }
+        curl_easy_setopt(m_handle,CURLOPT_POST,1);
         curl_easy_setopt(m_handle,CURLOPT_READFUNCTION,NULL);
         curl_easy_setopt(m_handle,CURLOPT_POSTFIELDS,msg.c_str());
         curl_easy_setopt(m_handle,CURLOPT_POSTFIELDSIZE,msg.length());
+    }
+    else {
+        curl_easy_setopt(m_handle,CURLOPT_HTTPGET,1);
     }
 
     char curl_errorbuf[CURL_ERROR_SIZE];
@@ -465,7 +469,7 @@ void CURLSOAPTransport::send(istream& in)
         curl_easy_setopt(m_handle,CURLOPT_SSL_CTX_FUNCTION,NULL);
         curl_easy_setopt(m_handle,CURLOPT_SSL_CTX_DATA,NULL);
     }
-    
+
     // Make the call.
     log.debug("sending SOAP message to %s", m_endpoint.c_str());
     if (curl_easy_perform(m_handle) != CURLE_OK) {
@@ -562,14 +566,14 @@ int xmltooling::verify_callback(X509_STORE_CTX* x509_ctx, void* arg)
         cc.setUsage(Credential::TLS_CREDENTIAL);
         success = ctx->m_trustEngine->validate(x509_ctx->cert,x509_ctx->untrusted,*(ctx->m_peerResolver),&cc);
     }
-    
+
     if (!success) {
         log.error("supplied TrustEngine failed to validate SSL/TLS server certificate");
         x509_ctx->error=X509_V_ERR_APPLICATION_VERIFICATION;     // generic error, check log for plugin specifics
         ctx->setAuthenticated(false);
         return ctx->m_mandatory ? 0 : 1;
     }
-    
+
     // Signal success. Hopefully it doesn't matter what's actually in the structure now.
     ctx->setAuthenticated(true);
     return 1;
@@ -599,9 +603,9 @@ CURLcode xmltooling::xml_ssl_ctx_callback(CURL* curl, SSL_CTX* ssl_ctx, void* us
 #endif
     }
 #endif
-        
+
     if (conf->m_ssl_callback && !conf->m_ssl_callback(conf, ssl_ctx, conf->m_ssl_userptr))
         return CURLE_SSL_CERTPROBLEM;
-        
+
     return CURLE_OK;
 }
