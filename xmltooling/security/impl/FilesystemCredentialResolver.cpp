@@ -74,7 +74,6 @@ namespace xmltooling {
             FilesystemCredentialResolver* resolver, XSECCryptoKey* key, const std::vector<XSECCryptoX509*>& xseccerts, XSECCryptoX509CRL* crl=NULL
             ) : BasicX509Credential(key, xseccerts, crl), m_resolver(resolver), m_usage(UNSPECIFIED_CREDENTIAL) {
             extract();
-            initKeyInfo();
         }
         virtual ~FilesystemCredential() {
         }
@@ -96,6 +95,10 @@ namespace xmltooling {
         }
 
         void addKeyNames(const DOMElement* e);
+        
+        void initKeyInfo() {
+            BasicX509Credential::initKeyInfo();
+        }
 
         void attach(SSL_CTX* ctx) const;
     
@@ -353,6 +356,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
         m_credential = new FilesystemCredential(this,key,xseccerts,crl);
         m_credential->addKeyNames(keynode);
         m_credential->setUsage(usage);
+        m_credential->initKeyInfo();
         return;
     }
     auto_ptr_char certpass(e->getAttributeNS(NULL,password));
@@ -534,6 +538,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
     m_credential = new FilesystemCredential(this, key, xseccerts, crl);
     m_credential->addKeyNames(keynode);
     m_credential->setUsage(usage);
+    m_credential->initKeyInfo();
 }
 
 XSECCryptoKey* FilesystemCredentialResolver::loadKey()
