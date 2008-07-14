@@ -412,6 +412,10 @@ void CURLSOAPTransport::send(istream& in)
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".SOAPTransport.CURL");
     Category& log_curl=Category::getInstance(XMLTOOLING_LOGCAT".libcurl");
 
+    // For this implementation, it's sufficient to check for https as a sign of transport security.
+    if (m_mandatory && !isConfidential())
+        throw IOException("Blocking unprotected HTTP request, transport authentication by server required.");
+
     string msg;
 
     // By this time, the handle has been prepared with the URL to use and the
