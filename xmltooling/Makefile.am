@@ -214,4 +214,4 @@ EXTRA_DIST = \
     config_pub_win32.h\
     resource.h\
     xmltooling.rc \
-    util\Win32Threads.cpp
+    util/Win32Threads.cpp
