@@ -21,8 +21,8 @@ all-local: xmltooling.spec pkginfo
 endif
 
 install-data-hook:
-	rm -rf $(DESTDIR)/$(datadir)/doc/@PACKAGE@/api
-	cp -r doc/api $(DESTDIR)/$(datadir)/doc/@PACKAGE@
+	rm -rf $(DESTDIR)$(datadir)/doc/@PACKAGE@/api
+	cp -r doc/api $(DESTDIR)$(datadir)/doc/@PACKAGE@
 
 xmltooling.spec: xmltooling.spec.in Makefile
 	rm -f $@.tmp
