@@ -195,10 +195,10 @@ common_sources = \
 libxmltooling_lite_la_SOURCES = \
 	${common_sources}
 libxmltooling_lite_la_CPPFLAGS = -DXMLTOOLING_LITE
-libxmltooling_lite_la_LDFLAGS = -version-info 1:0:0
+libxmltooling_lite_la_LDFLAGS = -version-info 2:0:0
 
 if BUILD_XMLSEC
-libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 1:0:0
+libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 2:0:0
 libxmltooling_la_SOURCES = \
 	${common_sources} \
 	${xmlsec_sources}
@@ -214,4 +214,4 @@ EXTRA_DIST = \
     config_pub_win32.h\
     resource.h\
     xmltooling.rc \
-    util\Win32Threads.cpp
+    util/Win32Threads.cpp

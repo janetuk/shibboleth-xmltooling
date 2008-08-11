@@ -67,7 +67,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wsock32.lib log4shib1D.lib xerces-c_2D.lib"
-				OutputFile="$(OutDir)\$(ProjectName)1_0D.dll"
+				OutputFile="$(OutDir)\$(ProjectName)1_1D.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -145,7 +145,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wsock32.lib log4shib1.lib xerces-c_2.lib"
-				OutputFile="$(OutDir)\$(ProjectName)1_0.dll"
+				OutputFile="$(OutDir)\$(ProjectName)1_1.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -228,7 +228,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wsock32.lib log4shib1D.lib xerces-c_2D.lib"
-				OutputFile="$(OutDir)\$(ProjectName)1_0D.dll"
+				OutputFile="$(OutDir)\$(ProjectName)1_1D.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -307,7 +307,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wsock32.lib log4shib1.lib xerces-c_2.lib"
-				OutputFile="$(OutDir)\$(ProjectName)1_0.dll"
+				OutputFile="$(OutDir)\$(ProjectName)1_1.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
