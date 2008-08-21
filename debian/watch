@@ -1,2 +1,2 @@
 version=3
-http://shibboleth.internet2.edu/downloads/opensaml/cpp/2.0/xmltooling-(.*)\.tar\.gz
+http://shibboleth.internet2.edu/downloads/opensaml/cpp/latest/xmltooling-(.*)\.tar\.gz
