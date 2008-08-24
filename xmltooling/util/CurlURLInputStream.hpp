@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,10 +23,9 @@
 #define XERCESC_INCLUDE_GUARD_CURLURLINPUTSTREAM_HPP
 
 #include <xmltooling/logging.h>
+#include <xmltooling/util/ParserPool.h>
 
-#include <curl/curl.h>
-#include <curl/multi.h>
-#include <curl/easy.h>
+#include <sstream>
 
 #include <xercesc/util/XMLURL.hpp>
 #include <xercesc/util/XMLExceptMsgs.hpp>
@@ -48,12 +47,7 @@ public :
     ~CurlURLInputStream();
 
     unsigned int curPos() const;
-    unsigned int readBytes
-    (
-                XMLByte* const  toFill
-        , const unsigned int       maxToRead
-    );
-
+    unsigned int readBytes(XMLByte* const toFill, const unsigned int maxToRead);
 
 private :
     // -----------------------------------------------------------------------
@@ -61,65 +55,24 @@ private :
     // -----------------------------------------------------------------------
     CurlURLInputStream(const CurlURLInputStream&);
     CurlURLInputStream& operator=(const CurlURLInputStream&);
-    
-    static size_t staticWriteCallback(char *buffer,
-                                      size_t size,
-                                      size_t nitems,
-                                      void *outstream);
-    size_t writeCallback(			  char *buffer,
-                                      size_t size,
-                                      size_t nitems);
 
+    static size_t staticWriteCallback(void* ptr, size_t size, size_t nmemb, void* stream);
 
-    // -----------------------------------------------------------------------
-    //  Private data members
-    //
-    //  fSocket
-    //      The socket representing the connection to the remote file.
-    //  fBytesProcessed
-    //      Its a rolling count of the number of bytes processed off this
-    //      input stream.
-    //  fBuffer
-    //      Holds the http header, plus the first part of the actual
-    //      data.  Filled at the time the stream is opened, data goes
-    //      out to user in response to readBytes().
-    //  fBufferPos, fBufferEnd
-    //      Pointers into fBuffer, showing start and end+1 of content
-    //      that readBytes must return.
-    // -----------------------------------------------------------------------
-	
-    CURLM*				fMulti;
-    CURL*				fEasy;
-    
+    std::stringstream   fUnderlyingStream;
     MemoryManager*      fMemoryManager;
-    
     XMLURL				fURLSource;
     ArrayJanitor<char>	fURL;
-    
-    unsigned long       fTotalBytesRead;
-    XMLByte*			fWritePtr;
-    unsigned long		fBytesRead;
-    unsigned long		fBytesToRead;
-    bool				fDataAvailable;
-    
-    // Overflow buffer for when curl writes more data to us
-    // than we've asked for.
-    XMLByte				fBuffer[CURL_MAX_WRITE_SIZE];
-    XMLByte*			fBufferHeadPtr;
-    XMLByte*			fBufferTailPtr;
-
+    StreamInputSource::StreamBinInputStream* fInputStream;
     logging::Category&  m_log;
-    
+
 }; // CurlURLInputStream
 
 
-inline unsigned int
-CurlURLInputStream::curPos() const
+inline unsigned int CurlURLInputStream::curPos() const
 {
-    return fTotalBytesRead;
+    return fInputStream ? fInputStream->curPos() : 0;
 }
 
 };
 
 #endif // CURLURLINPUTSTREAM_HPP
-

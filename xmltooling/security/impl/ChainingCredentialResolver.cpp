@@ -43,11 +43,11 @@ namespace xmltooling {
         }
 
         Lockable* lock() {
-            for_each(m_resolvers.begin(), m_resolvers.end(), mem_fun(&CredentialResolver::lock));
+            for_each(m_resolvers.begin(), m_resolvers.end(), mem_fun(&Lockable::lock));
             return this;
         }
         void unlock() {
-            for_each(m_resolvers.begin(), m_resolvers.end(), mem_fun(&CredentialResolver::unlock));
+            for_each(m_resolvers.begin(), m_resolvers.end(), mem_fun(&Lockable::unlock));
         }
         
         const Credential* resolve(const CredentialCriteria* criteria=NULL) const {
