@@ -87,8 +87,10 @@ namespace xmltooling {
 
         /**
          * Initializes (or reinitializes) a ds:KeyInfo to represent the Credential.
+         *
+         * @param types the kinds of KeyInfo content to include 
          */
-        void initKeyInfo();
+        void initKeyInfo(unsigned int types=0);
 
     public:
         virtual ~BasicX509Credential();

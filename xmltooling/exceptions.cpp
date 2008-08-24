@@ -28,6 +28,7 @@
 #include "util/XMLHelper.h"
 
 #include <stdarg.h>
+#include <memory>
 #include <sstream>
 #include <xercesc/util/XMLUniDefs.hpp>
 

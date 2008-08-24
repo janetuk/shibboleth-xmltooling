@@ -1,7 +1,7 @@
 Name:		xmltooling
 Summary:	Open source XMLTooling library
-Version:	1.0
-Release:	6
+Version:	1.1
+Release:	1
 Group:		System Environment/Libraries
 Vendor:		Internet2
 License:	Apache 2.0
@@ -80,6 +80,7 @@ find $RPM_BUILD_ROOT/%{_bindir} -type f |
 %dir %{_datadir}/xml/xmltooling
 %{_datadir}/xml/xmltooling
 %docdir %{_datadir}/doc/xmltooling
+%{_datadir}/doc/xmltooling/README.txt
 %{_datadir}/doc/xmltooling/LICENSE.txt
 %{_datadir}/doc/xmltooling/NOTICE.txt
 %{_datadir}/doc/xmltooling/CURL.LICENSE
@@ -97,6 +98,9 @@ find $RPM_BUILD_ROOT/%{_bindir} -type f |
 %doc %{_datadir}/doc/xmltooling/api
 
 %changelog
+* Tue Jul 1 2008  Scott Cantor  <cantor.2@osu.edu>  - 1.1-1
+- Bumping for minor update.
+
 * Mon Mar 17 2008  Scott Cantor  <cantor.2@osu.edu>  - 1.0-6
 - Official release.
 
