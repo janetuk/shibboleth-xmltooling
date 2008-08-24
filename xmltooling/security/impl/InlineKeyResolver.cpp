@@ -173,6 +173,8 @@ void InlineCredential::resolve(const KeyInfo* keyInfo, int types)
             // If we have a cert, just use it.
             if (!m_xseccerts.empty())
                 m_key = m_xseccerts.front()->clonePublicKey();
+            else
+                resolveKey(keyInfo);
         }
         // Otherwise try directly for a key and then go for certs if none is found.
         else if (!resolveKey(keyInfo) && resolveCerts(keyInfo)) {

@@ -26,6 +26,7 @@
 #include <xmltooling/io/GenericRequest.h>
 
 #include <map>
+#include <cstring>
 
 namespace xmltooling {
 

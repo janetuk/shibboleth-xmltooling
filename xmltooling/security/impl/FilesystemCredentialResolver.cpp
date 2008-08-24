@@ -1,6 +1,6 @@
 /*
  *  Copyright 2001-2007 Internet2
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 
 /**
  * FilesystemCredentialResolver.cpp
- * 
+ *
  * Supplies credentials from local files
  */
 
@@ -55,7 +55,7 @@ static int passwd_callback(char* buf, int len, int verify, void* passwd)
             strcpy(buf,reinterpret_cast<char*>(passwd));
             return strlen(buf);
         }
-    }  
+    }
     return 0;
 }
 
@@ -74,7 +74,6 @@ namespace xmltooling {
             FilesystemCredentialResolver* resolver, XSECCryptoKey* key, const std::vector<XSECCryptoX509*>& xseccerts, XSECCryptoX509CRL* crl=NULL
             ) : BasicX509Credential(key, xseccerts, crl), m_resolver(resolver), m_usage(UNSPECIFIED_CREDENTIAL) {
             extract();
-            initKeyInfo();
         }
         virtual ~FilesystemCredential() {
         }
@@ -97,8 +96,12 @@ namespace xmltooling {
 
         void addKeyNames(const DOMElement* e);
 
+        void initKeyInfo(unsigned int types=0) {
+            BasicX509Credential::initKeyInfo(types);
+        }
+
         void attach(SSL_CTX* ctx) const;
-    
+
     private:
         FilesystemCredentialResolver* m_resolver;
         unsigned int m_usage;
@@ -119,7 +122,7 @@ namespace xmltooling {
 
         Lockable* lock() { return this; }
         void unlock() {}
-        
+
         const Credential* resolve(const CredentialCriteria* criteria=NULL) const {
             return (criteria ? (criteria->matches(*m_credential) ? m_credential : NULL) : m_credential);
         }
@@ -139,13 +142,13 @@ namespace xmltooling {
     private:
         XSECCryptoKey* loadKey();
         XSECCryptoX509CRL* loadCRL();
-        
+
         enum format_t { PEM=SSL_FILETYPE_PEM, DER=SSL_FILETYPE_ASN1, _PKCS12, UNKNOWN };
-    
+
         format_t getEncodingFormat(BIO* in) const;
         string formatToString(format_t format) const;
         format_t xmlFormatToFormat(const XMLCh* format_xml) const;
-    
+
         format_t m_keyformat,m_crlformat;
         string m_keypath,m_keypass,m_crlpath;
         vector<X509*> m_certs;
@@ -165,6 +168,7 @@ namespace xmltooling {
     static const XMLCh format[] =           UNICODE_LITERAL_6(f,o,r,m,a,t);
     static const XMLCh Key[] =              UNICODE_LITERAL_3(K,e,y);
     static const XMLCh _key[] =             UNICODE_LITERAL_3(k,e,y);
+    static const XMLCh keyInfoMask[] =      UNICODE_LITERAL_11(k,e,y,I,n,f,o,M,a,s,k);
     static const XMLCh keyName[] =          UNICODE_LITERAL_7(k,e,y,N,a,m,e);
     static const XMLCh Name[] =             UNICODE_LITERAL_4(N,a,m,e);
     static const XMLCh password[] =         UNICODE_LITERAL_8(p,a,s,s,w,o,r,d);
@@ -178,6 +182,15 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
     NDC ndc("FilesystemCredentialResolver");
 #endif
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver."FILESYSTEM_CREDENTIAL_RESOLVER);
+
+    // Default to disable X509IssuerSerial due to schema validation issues.
+    unsigned int mask =
+        Credential::KEYINFO_KEY_NAME |
+        Credential::KEYINFO_KEY_VALUE |
+        X509Credential::KEYINFO_X509_CERTIFICATE |
+        X509Credential::KEYINFO_X509_SUBJECTNAME;
+    if (e && e->hasAttributeNS(NULL,keyInfoMask))
+        mask = XMLString::parseInt(e->getAttributeNS(NULL,keyInfoMask));
 
     if (e && (e->hasAttributeNS(NULL,_certificate) || e->hasAttributeNS(NULL,_key))) {
         // Dummy up a simple file resolver config using these attributes.
@@ -207,7 +220,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
         }
         e = dummy;  // reset "root" to the dummy config element
     }
-    
+
     const DOMElement* root=e;
     const XMLCh* usage = root->getAttributeNS(NULL,_use);
 
@@ -218,20 +231,20 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
     format_t fformat;
     const XMLCh* format_xml=NULL;
     BIO* in = NULL;
-    
+
     // Move to Key
     const DOMElement* keynode=XMLHelper::getFirstChildElement(root,Key);
     if (keynode) {
-        // Get raw format attrib value, but defer processing til later since may need to 
+        // Get raw format attrib value, but defer processing til later since may need to
         // determine format dynamically, and we need the Path for that.
         format_xml=keynode->getAttributeNS(NULL,format);
-            
+
         const XMLCh* password_xml=keynode->getAttributeNS(NULL,password);
         if (password_xml) {
             auto_ptr_char kp(password_xml);
             m_keypass=kp.get();
         }
-        
+
         e=XMLHelper::getFirstChildElement(keynode,Path);
         if (e && e->hasChildNodes()) {
             const XMLCh* s=e->getFirstChild()->getNodeValue();
@@ -279,20 +292,20 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
             }
             if (in)
                 BIO_free(in);
-            in = NULL;    
+            in = NULL;
         }
-        
+
         // Load the key.
         key = loadKey();
     }
-    
+
     // Check for CRL.
     const DOMElement* crlnode=XMLHelper::getFirstChildElement(root,CRL);
     if (crlnode) {
-        // Get raw format attrib value, but defer processing til later since may need to 
+        // Get raw format attrib value, but defer processing til later since may need to
         // determine format dynamically, and we need the Path for that.
         format_xml=crlnode->getAttributeNS(NULL,format);
-            
+
         e=XMLHelper::getFirstChildElement(crlnode,Path);
         if (e && e->hasChildNodes()) {
             const XMLCh* s=e->getFirstChild()->getNodeValue();
@@ -342,7 +355,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
                 BIO_free(in);
             in = NULL;
         }
-        
+
         // Load the key.
         crl = loadCRL();
     }
@@ -353,10 +366,11 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
         m_credential = new FilesystemCredential(this,key,xseccerts,crl);
         m_credential->addKeyNames(keynode);
         m_credential->setUsage(usage);
+        m_credential->initKeyInfo(mask);
         return;
     }
     auto_ptr_char certpass(e->getAttributeNS(NULL,password));
-    
+
     const DOMElement* ep=XMLHelper::getFirstChildElement(e,Path);
     if (!ep || !ep->hasChildNodes()) {
         log.error("Path element missing inside Certificate element or is empty");
@@ -364,7 +378,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
         delete crl;
         throw XMLSecurityException("FilesystemCredentialResolver can't access certificate file, missing or empty Path element.");
     }
-    
+
     auto_ptr_char certpath2(ep->getFirstChild()->getNodeValue());
     string certpath(certpath2.get());
     XMLToolingConfig::getConfig().getPathResolver()->resolve(certpath, PathResolver::XMLTOOLING_CFG_FILE);
@@ -380,7 +394,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
             throw XMLSecurityException("FilesystemCredentialResolver configuration contains unknown certificate encoding format ($1)",params(1,unknown.get()));
         }
     }
-    
+
     try {
         X509* x=NULL;
         PKCS12* p12=NULL;
@@ -401,7 +415,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
                     while (x=PEM_read_bio_X509(in,NULL,passwd_callback,const_cast<char*>(certpass.get())))
                         m_certs.push_back(x);
                     break;
-                                
+
                 case DER:
                     x=d2i_X509_bio(in,NULL);
                     if (x)
@@ -515,7 +529,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
                 log.error("CA certificate file (%s) can't be opened", capath.c_str());
                 throw XMLSecurityException("FilesystemCredentialResolver can't open CA certificate file ($1)",params(1,capath.c_str()));
             }
-            
+
             extra = XMLHelper::getNextSiblingElement(extra,CAPath);
         }
     }
@@ -534,6 +548,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
     m_credential = new FilesystemCredential(this, key, xseccerts, crl);
     m_credential->addKeyNames(keynode);
     m_credential->setUsage(usage);
+    m_credential->initKeyInfo(mask);
 }
 
 XSECCryptoKey* FilesystemCredentialResolver::loadKey()
@@ -553,11 +568,11 @@ XSECCryptoKey* FilesystemCredentialResolver::loadKey()
             case PEM:
                 pkey=PEM_read_bio_PrivateKey(in, NULL, passwd_callback, const_cast<char*>(m_keypass.c_str()));
                 break;
-            
+
             case DER:
                 pkey=d2i_PrivateKey_bio(in, NULL);
                 break;
-                
+
             default: {
                 PKCS12* p12 = d2i_PKCS12_bio(in, NULL);
                 if (p12) {
@@ -569,7 +584,7 @@ XSECCryptoKey* FilesystemCredentialResolver::loadKey()
     }
     if (in)
         BIO_free(in);
-    
+
     // Now map it to an XSEC wrapper.
     if (pkey) {
         XSECCryptoKey* ret=NULL;
@@ -577,11 +592,11 @@ XSECCryptoKey* FilesystemCredentialResolver::loadKey()
             case EVP_PKEY_RSA:
                 ret=new OpenSSLCryptoKeyRSA(pkey);
                 break;
-                
+
             case EVP_PKEY_DSA:
                 ret=new OpenSSLCryptoKeyDSA(pkey);
                 break;
-            
+
             default:
                 Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver."FILESYSTEM_CREDENTIAL_RESOLVER).error("unsupported private key type");
         }
@@ -591,7 +606,7 @@ XSECCryptoKey* FilesystemCredentialResolver::loadKey()
     }
 
     log_openssl();
-    throw XMLSecurityException("FilesystemCredentialResolver unable to load private key from file."); 
+    throw XMLSecurityException("FilesystemCredentialResolver unable to load private key from file.");
 }
 
 XSECCryptoX509CRL* FilesystemCredentialResolver::loadCRL()
@@ -610,7 +625,7 @@ XSECCryptoX509CRL* FilesystemCredentialResolver::loadCRL()
             case PEM:
                 crl=PEM_read_bio_X509_CRL(in, NULL, NULL, NULL);
                 break;
-            
+
             case DER:
                 crl=d2i_X509_CRL_bio(in, NULL);
                 break;
@@ -618,7 +633,7 @@ XSECCryptoX509CRL* FilesystemCredentialResolver::loadCRL()
     }
     if (in)
         BIO_free(in);
-    
+
     // Now map it to an XSEC wrapper.
     if (crl) {
         XSECCryptoX509CRL* ret=new OpenSSLCryptoX509CRL(crl);
@@ -627,7 +642,7 @@ XSECCryptoX509CRL* FilesystemCredentialResolver::loadCRL()
     }
 
     log_openssl();
-    throw XMLSecurityException("FilesystemCredentialResolver unable to load CRL from file."); 
+    throw XMLSecurityException("FilesystemCredentialResolver unable to load CRL from file.");
 }
 
 // Used to determine the encoding format of credentials files
@@ -643,11 +658,11 @@ FilesystemCredentialResolver::format_t FilesystemCredentialResolver::getEncoding
     int mark;
 
     try {
-        if ( (mark = BIO_tell(in)) < 0 ) 
+        if ( (mark = BIO_tell(in)) < 0 )
             throw XMLSecurityException("getEncodingFormat: BIO_tell() can't get the file position");
-        if ( BIO_read(in, buf, READSIZE) <= 0 ) 
+        if ( BIO_read(in, buf, READSIZE) <= 0 )
             throw XMLSecurityException("getEncodingFormat: BIO_read() can't read from the stream");
-        if ( BIO_seek(in, mark) < 0 ) 
+        if ( BIO_seek(in, mark) < 0 )
             throw XMLSecurityException("getEncodingFormat: BIO_seek() can't reset the file position");
     }
     catch (...) {
@@ -674,7 +689,7 @@ FilesystemCredentialResolver::format_t FilesystemCredentialResolver::getEncoding
             format = _PKCS12;
         }
         if (p12)
-            PKCS12_free(p12);    
+            PKCS12_free(p12);
         if ( BIO_seek(in, mark) < 0 ) {
             log_openssl();
             throw XMLSecurityException("getEncodingFormat: BIO_seek() can't reset the file position");
@@ -737,11 +752,11 @@ void FilesystemCredentialResolver::attach(SSL_CTX* ctx) const
         case PEM:
             ret=SSL_CTX_use_PrivateKey_file(ctx, m_keypath.c_str(), m_keyformat);
             break;
-            
+
         case DER:
             ret=SSL_CTX_use_RSAPrivateKey_file(ctx, m_keypath.c_str(), m_keyformat);
             break;
-            
+
         default: {
             BIO* in=BIO_new(BIO_s_file_internal());
             if (in && BIO_read_filename(in,m_keypath.c_str())>0) {
@@ -760,7 +775,7 @@ void FilesystemCredentialResolver::attach(SSL_CTX* ctx) const
                 BIO_free(in);
         }
     }
-    
+
     if (ret!=1) {
         log_openssl();
         throw XMLSecurityException("Unable to attach private key to SSL context.");

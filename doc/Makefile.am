@@ -3,6 +3,7 @@ AUTOMAKE_OPTIONS = foreign
 pkgdocdir = $(datadir)/doc/@PACKAGE@
 
 docfiles = \
+    README.txt \
 	LICENSE.txt \
 	NOTICE.txt \
 	OPENSSL.LICENSE \

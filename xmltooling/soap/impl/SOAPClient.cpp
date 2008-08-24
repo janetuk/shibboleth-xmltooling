@@ -91,9 +91,13 @@ Envelope* SOAPClient::receive()
 
     Category& log = Category::getInstance(XMLTOOLING_LOGCAT".SOAPClient");
     if (log.isDebugEnabled()) {
-	 string serializedXml;
-        XMLHelper::serialize (doc->getDocumentElement(),serializedXml,false);
-        log.debugStream() << "received XML:\n" << serializedXml << logging::eol;
+#ifdef XMLTOOLING_LOG4SHIB
+        log.debugStream() << "received XML:\n" << *(doc->getDocumentElement()) << logging::eol;
+#else
+        string buf;
+        XMLHelper::serialize(doc->getDocumentElement(), buf);
+        log.debugStream() << "received XML:\n" << buf << logging::eol;
+#endif
     }
     
     auto_ptr<XMLObject> xmlObject(XMLObjectBuilder::buildOneFromElement(doc->getDocumentElement(), true));
