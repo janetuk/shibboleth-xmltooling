@@ -1,3 +1,14 @@
+xmltooling (1.1-1) UNRELEASED; urgency=low
+
+  [ Russ Allbery ]
+  * New upstream bug-fix release.
+  * Bump SONAME of libxmltooling following upstream's versioning.
+
+  [ Ferenc Wagner ]
+  * Fix watch file for upstream directory structure.
+
+ -- Ferenc Wagner <wferi@niif.hu>  Fri, 22 Aug 2008 15:03:00 +0200
+
 xmltooling (1.0-2) unstable; urgency=low
 
   [ Ferenc Wagner ]
