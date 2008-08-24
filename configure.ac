@@ -1,8 +1,8 @@
 AC_PREREQ([2.50])
-AC_INIT([xmltooling], [1.0], [mace-opensaml-users@internet2.edu], [xmltooling])
+AC_INIT([xmltooling], [1.1], [mace-opensaml-users@internet2.edu], [xmltooling])
 AM_CONFIG_HEADER(config.h)
 AM_CONFIG_HEADER(xmltooling/config_pub.h)
-AM_INIT_AUTOMAKE([xmltooling], [1.0])
+AM_INIT_AUTOMAKE([xmltooling], [1.1])
 
 sinclude(doxygen.m4)
 sinclude(acx_pthread.m4)
@@ -61,6 +61,7 @@ AC_PROG_LIBTOOL
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_SIZE_T
+AC_CHECK_SIZEOF([long])
 
 # Checks for library functions.
 AC_CHECK_FUNCS([strchr strdup strstr timegm strcasecmp])
