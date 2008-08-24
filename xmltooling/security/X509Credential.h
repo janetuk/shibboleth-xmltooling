@@ -50,6 +50,15 @@ namespace xmltooling {
         };
 
         /**
+         * Bitmask of supported KeyInfo content to generate. 
+         */
+        enum KeyInfoTypes {
+            KEYINFO_X509_CERTIFICATE = 4,
+            KEYINFO_X509_SUBJECTNAME = 8,
+            KEYINFO_X509_ISSUERSERIAL = 16
+        };
+
+        /**
          * Gets an immutable collection of certificates in the entity's trust chain. The entity certificate is contained
          * within this list. No specific ordering of the certificates is guaranteed.
          * 

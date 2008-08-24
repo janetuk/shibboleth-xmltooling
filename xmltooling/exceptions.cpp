@@ -27,8 +27,8 @@
 #include "util/XMLConstants.h"
 #include "util/XMLHelper.h"
 
-#include <memory>
 #include <stdarg.h>
+#include <memory>
 #include <sstream>
 #include <xercesc/util/XMLUniDefs.hpp>
 

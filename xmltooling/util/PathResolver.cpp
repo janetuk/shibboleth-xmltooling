@@ -1,6 +1,6 @@
 /*
  *  Copyright 2001-2007 Internet2
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,8 @@
 
 /**
  * PathResolver.cpp
- * 
- * Resolves local filenames into absolute pathnames. 
+ *
+ * Resolves local filenames into absolute pathnames.
  */
 
 #include "internal.h"
@@ -32,9 +32,15 @@ const string& PathResolver::resolve(string& s, file_type_t filetype, const char*
     if (!isAbsolute(s.c_str())) {
         switch (filetype) {
             case XMLTOOLING_LIB_FILE:
-                s = string(prefix ? prefix : m_defaultPrefix) + "/lib/" + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
+                s = string(prefix ? prefix : m_defaultPrefix) +
+#if (SIZEOF_LONG == 8)
+                    "/lib64/"
+#else
+                    "/lib/"
+#endif
+                    + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
                 break;
-                
+
             case XMLTOOLING_LOG_FILE:
                 if (prefix || m_defaultPrefix != "/usr")
                     s = string(prefix ? prefix : m_defaultPrefix) + "/var/log/" + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
@@ -59,7 +65,7 @@ const string& PathResolver::resolve(string& s, file_type_t filetype, const char*
                 else
                     s = string("/etc/") + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
                 break;
-            
+
             default:
                 throw XMLToolingException("Unknown file type to resolve.");
         }

@@ -1,6 +1,6 @@
 /*
  *  Copyright 2001-2007 Internet2
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,8 @@
 
 /**
  * BasicX509Credential.cpp
- * 
- * Wraps an X.509-based Credential by storing key/cert objects inside. 
+ *
+ * Wraps an X.509-based Credential by storing key/cert objects inside.
  */
 
 #include "internal.h"
@@ -42,54 +42,61 @@ BasicX509Credential::~BasicX509Credential()
     delete m_compactKeyInfo;
 }
 
-void BasicX509Credential::initKeyInfo()
+void BasicX509Credential::initKeyInfo(unsigned int types)
 {
     delete m_keyInfo;
     m_keyInfo = NULL;
     delete m_compactKeyInfo;
     m_compactKeyInfo = NULL;
 
-    const set<string>& names = getKeyNames();
-    if (!names.empty()) {
-        m_compactKeyInfo = KeyInfoBuilder::buildKeyInfo();
-        VectorOf(KeyName) knames = m_compactKeyInfo->getKeyNames();
-        for (set<string>::const_iterator n = names.begin(); n!=names.end(); ++n) {
-            if (*n == m_subjectName)
-                continue;
-            auto_ptr_XMLCh wide(n->c_str());
-            KeyName* kname = KeyNameBuilder::buildKeyName();
-            kname->setName(wide.get());
-            knames.push_back(kname);
+    if (types == 0)
+        types = KEYINFO_KEY_VALUE | KEYINFO_KEY_NAME | KEYINFO_X509_CERTIFICATE | KEYINFO_X509_SUBJECTNAME | KEYINFO_X509_ISSUERSERIAL;
+
+    if (types & KEYINFO_KEY_NAME) {
+        const set<string>& names = getKeyNames();
+        if (!names.empty()) {
+            m_compactKeyInfo = KeyInfoBuilder::buildKeyInfo();
+            VectorOf(KeyName) knames = m_compactKeyInfo->getKeyNames();
+            for (set<string>::const_iterator n = names.begin(); n!=names.end(); ++n) {
+                if (*n == m_subjectName)
+                    continue;
+                auto_ptr_XMLCh wide(n->c_str());
+                KeyName* kname = KeyNameBuilder::buildKeyName();
+                kname->setName(wide.get());
+                knames.push_back(kname);
+            }
         }
     }
 
-    if (!m_subjectName.empty() || (!m_issuerName.empty() && !m_serial.empty())) {
-        if (!m_compactKeyInfo)
-            m_compactKeyInfo = KeyInfoBuilder::buildKeyInfo();
-        X509Data* x509Data=X509DataBuilder::buildX509Data();
-        m_compactKeyInfo->getX509Datas().push_back(x509Data);
-        if (!m_subjectName.empty()) {
-            X509SubjectName* sn = X509SubjectNameBuilder::buildX509SubjectName();
-            auto_ptr_XMLCh wide(m_subjectName.c_str());
-            sn->setName(wide.get());
-            x509Data->getX509SubjectNames().push_back(sn);
-        }
-        
-        if (!m_issuerName.empty() && !m_serial.empty()) {
-            X509IssuerSerial* is = X509IssuerSerialBuilder::buildX509IssuerSerial();
-            X509IssuerName* in = X509IssuerNameBuilder::buildX509IssuerName();
-            auto_ptr_XMLCh wide(m_issuerName.c_str());
-            in->setName(wide.get());
-            is->setX509IssuerName(in);
-            X509SerialNumber* ser = X509SerialNumberBuilder::buildX509SerialNumber();
-            auto_ptr_XMLCh wide2(m_serial.c_str());
-            ser->setSerialNumber(wide2.get());
-            is->setX509SerialNumber(ser);
-            x509Data->getX509IssuerSerials().push_back(is);
+    if (types & KEYINFO_X509_SUBJECTNAME || types & KEYINFO_X509_ISSUERSERIAL) {
+        if (!m_subjectName.empty() || (!m_issuerName.empty() && !m_serial.empty())) {
+            if (!m_compactKeyInfo)
+                m_compactKeyInfo = KeyInfoBuilder::buildKeyInfo();
+            X509Data* x509Data=X509DataBuilder::buildX509Data();
+            m_compactKeyInfo->getX509Datas().push_back(x509Data);
+            if (types & KEYINFO_X509_SUBJECTNAME && !m_subjectName.empty()) {
+                X509SubjectName* sn = X509SubjectNameBuilder::buildX509SubjectName();
+                auto_ptr_XMLCh wide(m_subjectName.c_str());
+                sn->setName(wide.get());
+                x509Data->getX509SubjectNames().push_back(sn);
+            }
+
+            if (types & KEYINFO_X509_ISSUERSERIAL && !m_issuerName.empty() && !m_serial.empty()) {
+                X509IssuerSerial* is = X509IssuerSerialBuilder::buildX509IssuerSerial();
+                X509IssuerName* in = X509IssuerNameBuilder::buildX509IssuerName();
+                auto_ptr_XMLCh wide(m_issuerName.c_str());
+                in->setName(wide.get());
+                is->setX509IssuerName(in);
+                X509SerialNumber* ser = X509SerialNumberBuilder::buildX509SerialNumber();
+                auto_ptr_XMLCh wide2(m_serial.c_str());
+                ser->setSerialNumber(wide2.get());
+                is->setX509SerialNumber(ser);
+                x509Data->getX509IssuerSerials().push_back(is);
+            }
         }
     }
-    
-    if (!m_xseccerts.empty()) {
+
+    if (types & KEYINFO_X509_CERTIFICATE && !m_xseccerts.empty()) {
         m_keyInfo = m_compactKeyInfo ? m_compactKeyInfo->cloneKeyInfo() : KeyInfoBuilder::buildKeyInfo();
         if (m_keyInfo->getX509Datas().empty())
             m_keyInfo->getX509Datas().push_back(X509DataBuilder::buildX509Data());
@@ -140,7 +147,7 @@ void BasicX509Credential::extract()
         }
         BN_free(serialBN);
     }
-    
+
     X509_NAME* subject=X509_get_subject_name(cert);
     if (subject) {
         memset(buf,0,sizeof(buf));
@@ -194,7 +201,7 @@ const char* BasicX509Credential::getAlgorithm() const
             case XSECCryptoKey::KEY_DSA_PUBLIC:
             case XSECCryptoKey::KEY_DSA_PAIR:
                 return "DSA";
-            
+
             case XSECCryptoKey::KEY_HMAC:
                 return "HMAC";
 
