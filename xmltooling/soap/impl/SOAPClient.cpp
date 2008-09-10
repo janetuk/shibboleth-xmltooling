@@ -28,7 +28,6 @@
 #include "util/XMLHelper.h"
 #include "validation/ValidatorSuite.h"
 
-#include <memory>
 #include <sstream>
 
 using namespace soap11;

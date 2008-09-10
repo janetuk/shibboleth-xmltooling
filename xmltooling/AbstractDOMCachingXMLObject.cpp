@@ -28,7 +28,6 @@
 
 #include <algorithm>
 #include <functional>
-#include <memory>
 
 using namespace xmltooling;
 using namespace std;
