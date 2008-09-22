@@ -67,7 +67,7 @@ namespace {
             return false;
         }
     #if (OPENSSL_VERSION_NUMBER >= 0x00907000L)
-        X509_STORE_set_flags(store,X509_V_FLAG_CRL_CHECK_ALL);
+        X509_STORE_set_flags(store, X509_V_FLAG_CRL_CHECK|X509_V_FLAG_CRL_CHECK_ALL);
     #endif
     
         STACK_OF(X509)* CAstack = sk_X509_new_null();
