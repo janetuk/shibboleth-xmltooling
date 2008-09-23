@@ -478,7 +478,7 @@ void CURLSOAPTransport::send(istream& in)
     log.debug("sending SOAP message to %s", m_endpoint.c_str());
     if (curl_easy_perform(m_handle) != CURLE_OK) {
         throw IOException(
-            string("CURLSOAPTransport failed while contacting SOAP responder: ") +
+            string("CURLSOAPTransport failed while contacting SOAP endpoint (") + m_endpoint + "): " +
                 (curl_errorbuf[0] ? curl_errorbuf : "no further information available"));
     }
 }
