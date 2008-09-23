@@ -108,7 +108,7 @@ namespace xmltooling {
     private:
         bool resolveCerts(const KeyInfo* keyInfo);
         bool resolveKey(const KeyInfo* keyInfo);
-        bool resolveCRL(const KeyInfo* keyInfo);
+        bool resolveCRLs(const KeyInfo* keyInfo);
 
         KeyInfoCredentialContext* m_credctx;
     };
@@ -182,7 +182,7 @@ void InlineCredential::resolve(const KeyInfo* keyInfo, int types)
     }
 
     if (types & X509Credential::RESOLVE_CRLS)
-        resolveCRL(keyInfo);
+        resolveCRLs(keyInfo);
 
     const XMLCh* n;
     char* kn;
@@ -319,7 +319,7 @@ bool InlineCredential::resolveCerts(const KeyInfo* keyInfo)
     return !m_xseccerts.empty();
 }
 
-bool InlineCredential::resolveCRL(const KeyInfo* keyInfo)
+bool InlineCredential::resolveCRLs(const KeyInfo* keyInfo)
 {
     Category& log = Category::getInstance(XMLTOOLING_LOGCAT".KeyInfoResolver."INLINE_KEYINFO_RESOLVER);
 
@@ -337,8 +337,7 @@ bool InlineCredential::resolveCRL(const KeyInfo* keyInfo)
                     log.debug("resolving ds:X509CRL");
                     auto_ptr<XSECCryptoX509CRL> crl(XMLToolingConfig::getConfig().X509CRL());
                     crl->loadX509CRLBase64Bin(x.get(), strlen(x.get()));
-                    m_crl = crl.release();
-                    return true;
+                    m_crls.push_back(crl.release());
                 }
             }
             catch(XSECException& e) {
@@ -351,7 +350,8 @@ bool InlineCredential::resolveCRL(const KeyInfo* keyInfo)
         }
     }
 
-    return false;
+    log.debug("resolved %d CRL(s)", m_crls.size());
+    return !m_crls.empty();
 }
 
 void InlineCredential::resolve(DSIGKeyInfoList* keyInfo, int types)
@@ -399,8 +399,7 @@ void InlineCredential::resolve(DSIGKeyInfoList* keyInfo, int types)
                     try {
                         auto_ptr<XSECCryptoX509CRL> crlobj(XMLToolingConfig::getConfig().X509CRL());
                         crlobj->loadX509CRLBase64Bin(buf.get(), strlen(buf.get()));
-                        m_crl = crlobj.release();
-                        break;
+                        m_crls.push_back(crlobj.release());
                     }
                     catch(XSECException& e) {
                         auto_ptr_char temp(e.getMsg());

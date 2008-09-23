@@ -144,8 +144,7 @@ StaticPKIXTrustEngine::StaticPKIXTrustEngine(const DOMElement* e) : AbstractPKIX
             const X509Credential* xcred = dynamic_cast<const X509Credential*>(*i);
             if (xcred) {
                 m_certs.insert(m_certs.end(), xcred->getEntityCertificateChain().begin(), xcred->getEntityCertificateChain().end());
-                if (xcred->getCRL())
-                    m_crls.push_back(xcred->getCRL());
+                m_crls.insert(m_crls.end(), xcred->getCRLs().begin(), xcred->getCRLs().end());
             }
         }
     }

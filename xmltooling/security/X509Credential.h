@@ -67,11 +67,21 @@ namespace xmltooling {
         virtual const std::vector<XSECCryptoX509*>& getEntityCertificateChain() const=0;
 
         /**
+         * @deprecated
+         *
          * Gets a CRL associated with the credential.
          * 
          * @return CRL associated with the credential
          */
         virtual XSECCryptoX509CRL* getCRL() const=0;
+
+        /**
+         * Gets an immutable collection of all CRLs associated with the credential.
+         * 
+         * @return CRLs associated with the credential
+         */
+        virtual const std::vector<XSECCryptoX509CRL*>& getCRLs() const=0;
+
 
         /**
          * Gets the subject name of the first certificate in the chain.

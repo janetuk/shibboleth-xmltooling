@@ -356,7 +356,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e) 
             in = NULL;
         }
 
-        // Load the key.
+        // Load the CRL.
         crl = loadCRL();
     }
 
