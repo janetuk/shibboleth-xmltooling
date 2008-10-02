@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2008 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -681,6 +681,26 @@
                 releaseThisandParentDOM(); \
                 m_##proper = value; \
             } \
+        }
+
+/**
+ * Implements get/set methods and a private member for a typed, qualified XML attribute.
+ *
+ * @param proper    the proper name of the attribute
+ * @param type      the attribute's data type
+ */
+#define IMPL_XMLOBJECT_FOREIGN_ATTRIB(proper,type) \
+    protected: \
+    XMLCh* m_##proper##Prefix; \
+        type* m_##proper; \
+    public: \
+        const type* get##proper() const { \
+            return m_##proper; \
+        } \
+        void set##proper(const type* proper) { \
+            m_##proper = prepareForAssignment(m_##proper,proper); \
+            XMLString::release(&m_##proper##Prefix); \
+            m_##proper##Prefix = NULL; \
         }
 
 /**
