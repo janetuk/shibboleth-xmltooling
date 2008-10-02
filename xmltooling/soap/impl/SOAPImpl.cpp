@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2008 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * SOAPImpl.cpp
  * 
- * Implementation classes for SOAP schema
+ * Implementation classes for SOAP 1.1 schema
  */
 
 #include "internal.h"
@@ -199,17 +199,12 @@ namespace {
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
-        void init() {
-            m_EncodingStyle=NULL;
-        }
     public:
         virtual ~BodyImpl() {
-            XMLString::release(&m_EncodingStyle);
         }
 
         BodyImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
-            init();
         }
             
         BodyImpl(const BodyImpl& src)
@@ -217,31 +212,16 @@ namespace {
                     AbstractAttributeExtensibleXMLObject(src),
                     AbstractComplexElement(src),
                     AbstractDOMCachingXMLObject(src) {
-            init();
-            setEncodingStyle(src.getEncodingStyle());
             VectorOf(XMLObject) v=getUnknownXMLObjects();
             for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i)
                 v.push_back((*i)->clone());
         }
         
         IMPL_XMLOBJECT_CLONE(Body);
-        IMPL_STRING_ATTRIB(EncodingStyle);
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject, m_children.end());
-
-        using AbstractAttributeExtensibleXMLObject::setAttribute;
-        void setAttribute(QName& qualifiedName, const XMLCh* value, bool ID=false) {
-            if (qualifiedName.hasNamespaceURI() && XMLString::equals(qualifiedName.getNamespaceURI(),SOAP11ENV_NS)) {
-                if (XMLString::equals(qualifiedName.getLocalPart(),ENCODINGSTYLE_ATTRIB_NAME)) {
-                    setEncodingStyle(value);
-                    return;
-                }
-            }
-            AbstractAttributeExtensibleXMLObject::setAttribute(qualifiedName, value, ID);
-        }
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_STRING_ATTRIB(EncodingStyle,ENCODINGSTYLE,SOAP11ENV_NS);
             marshallExtensionAttributes(domElement);
         }
 
