@@ -51,10 +51,7 @@ namespace xmltooling {
         StaticPKIXTrustEngine(const DOMElement* e=NULL);
 
         virtual ~StaticPKIXTrustEngine() {
-            if (m_credResolver) {
-                m_credResolver->unlock();
-                delete m_credResolver;
-            }
+            delete m_credResolver;
         }
         
         AbstractPKIXTrustEngine::PKIXValidationInfoIterator* getPKIXValidationInfoIterator(
@@ -66,10 +63,8 @@ namespace xmltooling {
         }
 
     private:
-        CredentialResolver* m_credResolver;
         int m_depth;
-        vector<XSECCryptoX509*> m_certs;
-        vector<XSECCryptoX509CRL*> m_crls;
+        CredentialResolver* m_credResolver;
         friend class XMLTOOL_DLLLOCAL StaticPKIXIterator;
     };
     
@@ -82,9 +77,26 @@ namespace xmltooling {
     {
     public:
         StaticPKIXIterator(const StaticPKIXTrustEngine& engine) : m_engine(engine), m_done(false) {
+            // Merge together all X509Credentials we can resolve.
+            m_engine.m_credResolver->lock();
+            try {
+                vector<const Credential*> creds;
+                m_engine.m_credResolver->resolve(creds);
+                for (vector<const Credential*>::const_iterator i = creds.begin(); i != creds.end(); ++i) {
+                    const X509Credential* xcred = dynamic_cast<const X509Credential*>(*i);
+                    if (xcred) {
+                        m_certs.insert(m_certs.end(), xcred->getEntityCertificateChain().begin(), xcred->getEntityCertificateChain().end());
+                        m_crls.insert(m_crls.end(), xcred->getCRLs().begin(), xcred->getCRLs().end());
+                    }
+                }
+            }
+            catch (exception& ex) {
+                logging::Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine.StaticPKIX").error(ex.what());
+            }
         }
 
         virtual ~StaticPKIXIterator() {
+            m_engine.m_credResolver->unlock();
         }
 
         bool next() {
@@ -99,26 +111,26 @@ namespace xmltooling {
         }
         
         const vector<XSECCryptoX509*>& getTrustAnchors() const {
-            return m_engine.m_certs;
+            return m_certs;
         }
 
         const vector<XSECCryptoX509CRL*>& getCRLs() const {
-            return m_engine.m_crls;
+            return m_crls;
         }
     
     private:
         const StaticPKIXTrustEngine& m_engine;
+        vector<XSECCryptoX509*> m_certs;
+        vector<XSECCryptoX509CRL*> m_crls;
         bool m_done;
     };
 };
 
-StaticPKIXTrustEngine::StaticPKIXTrustEngine(const DOMElement* e) : AbstractPKIXTrustEngine(e)
+StaticPKIXTrustEngine::StaticPKIXTrustEngine(const DOMElement* e) : AbstractPKIXTrustEngine(e), m_depth(1), m_credResolver(NULL)
 {
     const XMLCh* depth = e ? e->getAttributeNS(NULL, verifyDepth) : NULL;
     if (depth && *depth)
         m_depth = XMLString::parseInt(depth);
-    else
-        m_depth = 1;
 
     if (e && e->hasAttributeNS(NULL,certificate)) {
         // Simple File resolver config rooted here.
@@ -132,24 +144,6 @@ StaticPKIXTrustEngine::StaticPKIXTrustEngine(const DOMElement* e) : AbstractPKIX
         }
         else
             throw XMLSecurityException("Missing <CredentialResolver> element, or no type attribute found");
-    }
-
-    m_credResolver->lock();
-
-    // Merge together all X509Credentials we can resolve.
-    try {
-        vector<const Credential*> creds;
-        m_credResolver->resolve(creds);
-        for (vector<const Credential*>::const_iterator i = creds.begin(); i != creds.end(); ++i) {
-            const X509Credential* xcred = dynamic_cast<const X509Credential*>(*i);
-            if (xcred) {
-                m_certs.insert(m_certs.end(), xcred->getEntityCertificateChain().begin(), xcred->getEntityCertificateChain().end());
-                m_crls.insert(m_crls.end(), xcred->getCRLs().begin(), xcred->getCRLs().end());
-            }
-        }
-    }
-    catch (exception& ex) {
-        logging::Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine.StaticPKIX").error(ex.what());
     }
 }
 
