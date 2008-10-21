@@ -170,7 +170,7 @@ bool XMLToolingInternalConfig::log_config(const char* config)
         }
         else {
             string path(config);
-            PropertyConfigurator::configure(m_pathResolver ? m_pathResolver->resolve(path, PathResolver::XMLTOOLING_CFG_FILE).c_str() : config);
+            PropertyConfigurator::configure(m_pathResolver ? m_pathResolver->resolve(path, PathResolver::XMLTOOLING_CFG_FILE) : path);
         }
     }
     catch (const ConfigureFailure& e) {
