@@ -35,6 +35,13 @@ using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace std;
 
+void SOAPTransport::send(istream* in)
+{
+    if (!in)
+        throw IOException("SOAP transport does not support an empty request body.");
+    return send(*in);
+}
+
 SOAPClient::~SOAPClient()
 {
     delete m_transport;

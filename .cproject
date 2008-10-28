@@ -62,6 +62,7 @@
 <storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 
 
+<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
 <storageModule moduleId="org.eclipse.cdt.core.pathentry">
 <pathentry include="C:/log4shib-1.0/include" kind="inc" path="" system="true"/>
 <pathentry include="C:/xerces-c_2_8_0-x86-windows-vc_8_0/include" kind="inc" path="" system="true"/>
@@ -76,6 +77,7 @@
 <pathentry kind="mac" name="WIN32" path="" value=""/>
 <pathentry kind="mac" name="XMLTOOL_API" path="" value=""/>
 <pathentry kind="mac" name="XMLTOOL_DLLLOCAL" path="" value=""/>
+<pathentry kind="mac" name="XMLTOOLING_LOGCAT" path="" value="&quot;XMLTooling&quot;"/>
 <pathentry kind="out" path="xmltooling/Debug"/>
 <pathentry kind="out" path="xmltoolingtest/Debug"/>
 <pathentry kind="out" path="debug"/>

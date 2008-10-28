@@ -344,13 +344,13 @@ vector<XSECCryptoX509CRL*>::size_type SecurityHelper::loadCRLsFromFile(
 XSECCryptoKey* SecurityHelper::loadKeyFromURL(SOAPTransport& transport, const char* backing, const char* format, const char* password)
 {
     // Fetch the data.
-    istringstream dummy;
-    transport.send(dummy);
+    transport.send();
     istream& msg = transport.receive();
 
     // Dump to output file.
     ofstream out(backing, fstream::trunc|fstream::binary);
     out << msg.rdbuf();
+    out.close();
 
     return loadKeyFromFile(backing, format, password);
 }
@@ -359,14 +359,13 @@ vector<XSECCryptoX509*>::size_type SecurityHelper::loadCertificatesFromURL(
     vector<XSECCryptoX509*>& certs, SOAPTransport& transport, const char* backing, const char* format, const char* password
     )
 {
-    // Fetch the data.
-    istringstream dummy;
-    transport.send(dummy);
+    transport.send();
     istream& msg = transport.receive();
 
     // Dump to output file.
     ofstream out(backing, fstream::trunc|fstream::binary);
     out << msg.rdbuf();
+    out.close();
 
     return loadCertificatesFromFile(certs, backing, format, password);
 }
@@ -376,13 +375,13 @@ vector<XSECCryptoX509CRL*>::size_type SecurityHelper::loadCRLsFromURL(
     )
 {
     // Fetch the data.
-    istringstream dummy;
-    transport.send(dummy);
+    transport.send();
     istream& msg = transport.receive();
 
     // Dump to output file.
     ofstream out(backing, fstream::trunc|fstream::binary);
     out << msg.rdbuf();
+    out.close();
 
     return loadCRLsFromFile(crls, backing, format);
 }

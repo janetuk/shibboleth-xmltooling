@@ -166,7 +166,11 @@ namespace xmltooling {
 #endif
         }
 
-        void send(istream& in);
+        void send(istream& in) {
+            send(&in);
+        }
+
+        void send(istream* in=NULL);
 
         istream& receive() {
             return m_stream;
@@ -404,7 +408,7 @@ string CURLSOAPTransport::getContentType() const
     return content_type ? content_type : "";
 }
 
-void CURLSOAPTransport::send(istream& in)
+void CURLSOAPTransport::send(istream* in)
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("send");
@@ -428,13 +432,13 @@ void CURLSOAPTransport::send(istream& in)
         curl_easy_setopt(m_handle,CURLOPT_POST,1);
         m_headers=curl_slist_append(m_headers,"Transfer-Encoding: chunked");
         curl_easy_setopt(m_handle,CURLOPT_READFUNCTION,&curl_read_hook);
-        curl_easy_setopt(m_handle,CURLOPT_READDATA,&in);
+        curl_easy_setopt(m_handle,CURLOPT_READDATA,in);
     }
     else if (in) {
         char buf[1024];
-        while (in) {
-            in.read(buf,1024);
-            msg.append(buf,in.gcount());
+        while (*in) {
+            in->read(buf,1024);
+            msg.append(buf,in->gcount());
         }
         curl_easy_setopt(m_handle,CURLOPT_POST,1);
         curl_easy_setopt(m_handle,CURLOPT_READFUNCTION,NULL);
@@ -513,10 +517,10 @@ size_t xmltooling::curl_header_hook(void* ptr, size_t size, size_t nmemb, void* 
 // callback to send data to server
 size_t xmltooling::curl_read_hook(void* ptr, size_t size, size_t nmemb, void* stream)
 {
-    // *stream is actually an istream object
-    istream& buf=*(reinterpret_cast<istream*>(stream));
-    buf.read(reinterpret_cast<char*>(ptr),size*nmemb);
-    return buf.gcount();
+    // stream is actually an istream pointer
+    istream* buf=reinterpret_cast<istream*>(stream);
+    buf->read(reinterpret_cast<char*>(ptr),size*nmemb);
+    return buf->gcount();
 }
 
 // callback to buffer data from server
