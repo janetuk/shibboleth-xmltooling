@@ -23,6 +23,7 @@ xmlsec_sources = \
     FilesystemCredentialResolverTest.h \
     InlineKeyResolverTest.h \
     MemoryStorageServiceTest.h \
+    SecurityHelperTest.h \
     SignatureTest.h
 else
 xmlsec_sources =
