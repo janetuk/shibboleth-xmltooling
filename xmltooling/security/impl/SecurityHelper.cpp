@@ -51,6 +51,55 @@ static int passwd_callback(char* buf, int len, int verify, void* passwd)
     return 0;
 }
 
+const char* SecurityHelper::guessEncodingFormat(const char* pathname)
+{
+    const char* format=NULL;
+    BIO* in=BIO_new(BIO_s_file_internal());
+    if (in && BIO_read_filename(in, pathname)>0) {
+        const int READSIZE = 1;
+        char buf[READSIZE];
+        int mark;
+
+        // Examine the first byte.
+        try {
+            if ((mark = BIO_tell(in)) < 0)
+                throw XMLSecurityException("Error loading file: BIO_tell() can't get the file position.");
+            if (BIO_read(in, buf, READSIZE) <= 0)
+                throw XMLSecurityException("Error loading file: BIO_read() can't read from the stream.");
+            if (BIO_seek(in, mark) < 0)
+                throw XMLSecurityException("Error loading file: BIO_seek() can't reset the file position.");
+        }
+        catch (exception&) {
+            log_openssl();
+            BIO_free(in);
+            throw;
+        }
+
+        // Check the first byte of the file.  If it's some kind of DER-encoded structure
+        // (including PKCS12), it will begin with ASCII 048. Otherwise, assume it's PEM.
+        if (buf[0] != 48) {
+            format = "PEM";
+        }
+        else {
+            // Here we know it's DER-encoded, now try to parse it as a PKCS12 ASN.1 structure.
+            // If it fails, must be another kind of DER-encoded structure.
+            PKCS12* p12;
+            if ((p12=d2i_PKCS12_bio(in, NULL)) == NULL) {
+                format = "DER";
+            }
+            else {
+                format = "PKCS12";
+                PKCS12_free(p12);
+            }
+        }
+    }
+    if (in)
+        BIO_free(in);
+    if (format)
+        return format;
+    throw XMLSecurityException("Unable to determine encoding for file ($1).", params(1,pathname));
+}
+
 XSECCryptoKey* SecurityHelper::loadKeyFromFile(const char* pathname, const char* format, const char* password)
 {
 #ifdef _DEBUG
@@ -66,7 +115,7 @@ XSECCryptoKey* SecurityHelper::loadKeyFromFile(const char* pathname, const char*
     BIO* in=BIO_new(BIO_s_file_internal());
     if (in && BIO_read_filename(in, pathname)>0) {
         // If the format isn't set, try and guess it.
-        if (!format) {
+        if (!format || !*format) {
             const int READSIZE = 1;
             char buf[READSIZE];
             int mark;
@@ -176,7 +225,7 @@ vector<XSECCryptoX509*>::size_type SecurityHelper::loadCertificatesFromFile(
     BIO* in=BIO_new(BIO_s_file_internal());
     if (in && BIO_read_filename(in, pathname)>0) {
         // If the format isn't set, try and guess it.
-        if (!format) {
+        if (!format || !*format) {
             const int READSIZE = 1;
             char buf[READSIZE];
             int mark;
@@ -281,7 +330,7 @@ vector<XSECCryptoX509CRL*>::size_type SecurityHelper::loadCRLsFromFile(
     BIO* in=BIO_new(BIO_s_file_internal());
     if (in && BIO_read_filename(in, pathname)>0) {
         // If the format isn't set, try and guess it.
-        if (!format) {
+        if (!format || !*format) {
             const int READSIZE = 1;
             char buf[READSIZE];
             int mark;

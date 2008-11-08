@@ -38,6 +38,14 @@ namespace xmltooling {
     {
     public:
         /**
+         * Access a file to try and guess the encoding format used.
+         *
+         * @param pathname  path to file
+         * @return  constant identifying encoding format
+         */
+        static const char* guessEncodingFormat(const char* pathname);
+
+        /**
          * Loads a private key from a local file.
          *
          * @param pathname  path to file containing key
