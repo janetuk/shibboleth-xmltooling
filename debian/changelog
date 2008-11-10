@@ -3,6 +3,9 @@ xmltooling (1.1-1) UNRELEASED; urgency=low
   [ Russ Allbery ]
   * New upstream bug-fix release.
   * Bump SONAME of libxmltooling following upstream's versioning.
+  * Include <cstdio> in base.h since some of its macros use sprintf.
+    Fixes FTBFS for packages using xmltooling with GCC 4.4 that don't
+    already include cstdio.  Thanks, Martin Michlmayr.  (Closes: #505072)
 
   [ Ferenc Wagner ]
   * Fix watch file for upstream directory structure.
