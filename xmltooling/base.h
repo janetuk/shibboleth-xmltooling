@@ -26,6 +26,9 @@
 
 #include <typeinfo>
 
+/* Required for sprintf, used by integer attributes. */
+#include <cstdio>
+
 #if defined (_MSC_VER) || defined(__BORLANDC__)
   #include <xmltooling/config_pub_win32.h>
 #else
