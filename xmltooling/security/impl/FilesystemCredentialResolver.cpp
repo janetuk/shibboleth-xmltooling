@@ -551,6 +551,13 @@ FilesystemCredentialResolver::~FilesystemCredentialResolver()
 
 Credential* FilesystemCredentialResolver::getCredential()
 {
+    // First, verify that the key and certificate match.
+    if (m_key.key && !m_certs.empty()) {
+        auto_ptr<XSECCryptoKey> temp(m_certs.front().certs.front()->clonePublicKey());
+        if (!SecurityHelper::matches(m_key.key, temp.get()))
+            throw XMLSecurityException("FilesystemCredentialResolver given mismatched key/certificate, check for consistency.");
+    }
+
     // We (unfortunately) need to duplicate all the objects and put them in one set of arrays
     // in order to create the credential wrapper.
     FilesystemCredential* credential=NULL;
