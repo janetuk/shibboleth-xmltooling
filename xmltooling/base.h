@@ -642,7 +642,7 @@
         void set##proper(const XMLCh* proper) { \
             m_##proper = prepareForAssignment(m_##proper,proper,duration); \
             if (m_##proper) \
-                m_##proper##Epoch=m_##proper->getEpoch(); \
+                m_##proper##Epoch=m_##proper->getEpoch(duration); \
         }
 
 /**
