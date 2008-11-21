@@ -31,6 +31,7 @@ endif
 
 xmltoolingtest_h = \
     ComplexXMLObjectTest.h \
+    DateTimeTest.h \
     ExceptionTest.h \
     KeyInfoTest.h \
     MarshallingTest.h \
