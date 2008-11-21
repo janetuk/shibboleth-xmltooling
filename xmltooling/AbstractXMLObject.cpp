@@ -132,7 +132,7 @@ DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, time_t new
 {
     delete oldValue;
     releaseThisandParentDOM();
-    DateTime* ret = new DateTime(newValue);
+    DateTime* ret = new DateTime(newValue, duration);
     if (duration)
         ret->parseDuration();
     else

@@ -633,7 +633,7 @@
         void set##proper(const DateTime* proper) { \
             m_##proper = prepareForAssignment(m_##proper,proper); \
             if (m_##proper) \
-                m_##proper##Epoch=m_##proper->getEpoch(); \
+                m_##proper##Epoch=m_##proper->getEpoch(duration); \
         } \
         void set##proper(time_t proper) { \
             m_##proper = prepareForAssignment(m_##proper,proper,duration); \

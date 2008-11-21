@@ -41,15 +41,19 @@ public:
         auto_ptr_XMLCh d1("P1D");
         DateTime dt1(d1.get());
         dt1.parseDuration();
-        TSM_ASSERT_EQUALS("Epoch for 1 day did not match.", dt1.getEpoch(), 86400);
+        TSM_ASSERT_EQUALS("Epoch for 1 day did not match.", dt1.getEpoch(true), 86400);
 
         auto_ptr_XMLCh d2("PT2H");
         DateTime dt2(d2.get());
         dt2.parseDuration();
-        TSM_ASSERT_EQUALS("Epoch for 2 hours did not match.", dt2.getEpoch(), 7200);
+        TSM_ASSERT_EQUALS("Epoch for 2 hours did not match.", dt2.getEpoch(true), 7200);
 
-        DateTime dt3(28800);
+        DateTime dt3(28800, true);
         auto_ptr_char d3(dt3.getRawData());
-        TSM_ASSERT_EQUALS("ISO string for 8 hours did not match.", d3.get(), "PT8H");
+        TSM_ASSERT("ISO string for 8 hours did not match.", !strcmp(d3.get(), "P0DT8H0M0S"));
+
+        DateTime dt4(-29000, true);
+        auto_ptr_char d4(dt4.getRawData());
+        TSM_ASSERT("ISO string for negative 8 hours did not match.", !strcmp(d4.get(), "-P0DT8H3M20S"));
     }
 };
