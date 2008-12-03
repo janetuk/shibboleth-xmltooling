@@ -8,7 +8,11 @@ License:	Apache 2.0
 URL:		http://www.opensaml.org/
 Source0:	%{name}-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root
+%if 0%{?suse_version} > 1030
+BuildRequires:  libXerces-c-devel >= 2.8.0
+%else
 BuildRequires:  xerces%{?xercesver}-c-devel >= 2.8.0
+%endif
 BuildRequires:	xml-security-c-devel >= 1.4.0
 BuildRequires:	openssl-devel, curl-devel >= 7.10.6
 %{?_with_log4cpp:BuildRequires:	log4cpp-devel >= 1.0}
@@ -98,6 +102,10 @@ find $RPM_BUILD_ROOT/%{_bindir} -type f |
 %doc %{_datadir}/doc/xmltooling/api
 
 %changelog
+* Wed Dec 3 2008  Scott Cantor  <cantor.2@osu.edu>  - 1.2-1
+- Bumping for minor update.
+- Fixing SUSE Xerces dependency name.
+
 * Tue Jul 1 2008  Scott Cantor  <cantor.2@osu.edu>  - 1.1-1
 - Bumping for minor update.
 
