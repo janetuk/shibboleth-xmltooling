@@ -169,6 +169,9 @@ AC_TRY_LINK(
         [AC_DEFINE(HAVE_LIBXERCESC,1,[Define if Xerces-C library was found])],
         [AC_MSG_ERROR([unable to link with Xerces])])
 
+# DOM3 API checks.
+AC_CHECK_HEADERS([xercesc/dom/DOMLSParser.hpp xercesc/dom/DOMLSSerializer.hpp xercesc/dom/DOMLSResourceResolver.hpp])
+
 
 # XML-Security settings
 AC_ARG_WITH(xmlsec,
