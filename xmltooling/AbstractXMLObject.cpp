@@ -28,6 +28,8 @@
 
 using namespace xmltooling;
 
+using xercesc::XMLString;
+
 AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
     : m_log(logging::Category::getInstance(XMLTOOLING_LOGCAT".XMLObject")),
     	m_schemaLocation(NULL), m_noNamespaceSchemaLocation(NULL), m_nil(xmlconstants::XML_BOOL_NULL),

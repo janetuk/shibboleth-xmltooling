@@ -38,6 +38,7 @@
 
 using namespace xmltooling::logging;
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 
 static const XMLCh uri[] =              UNICODE_LITERAL_3(u,r,i);

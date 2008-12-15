@@ -40,14 +40,25 @@ namespace xmltooling {
 // parser.
 //
 
-class XMLTOOL_API CurlURLInputStream : public BinInputStream
+class XMLTOOL_API CurlURLInputStream : public xercesc::BinInputStream
 {
 public :
-    CurlURLInputStream(const XMLURL&  urlSource, const XMLNetHTTPInfo* httpInfo=0);
+    CurlURLInputStream(const xercesc::XMLURL&  urlSource, const xercesc::XMLNetHTTPInfo* httpInfo=0);
     ~CurlURLInputStream();
 
-    unsigned int curPos() const;
-    unsigned int readBytes(XMLByte* const toFill, const unsigned int maxToRead);
+#ifdef XMLTOOLING_XERCESC_64BITSAFE
+    XMLFilePos
+#else
+    unsigned int
+#endif
+        curPos() const;
+    xsecsize_t readBytes(XMLByte* const toFill, const xsecsize_t maxToRead);
+
+#ifdef XMLTOOLING_XERCESC_INPUTSTREAM_HAS_CONTENTTYPE
+    const XMLCh* getContentType() const {
+        return NULL;
+    }
+#endif
 
 private :
     // -----------------------------------------------------------------------
@@ -58,17 +69,23 @@ private :
 
     static size_t staticWriteCallback(void* ptr, size_t size, size_t nmemb, void* stream);
 
-    std::stringstream   fUnderlyingStream;
-    MemoryManager*      fMemoryManager;
-    XMLURL				fURLSource;
-    ArrayJanitor<char>	fURL;
+    std::stringstream           fUnderlyingStream;
+    xercesc::MemoryManager*     fMemoryManager;
+    xercesc::XMLURL	            fURLSource;
+    xercesc::ArrayJanitor<char> fURL;
     StreamInputSource::StreamBinInputStream* fInputStream;
     logging::Category&  m_log;
 
 }; // CurlURLInputStream
 
 
-inline unsigned int CurlURLInputStream::curPos() const
+inline
+#ifdef XMLTOOLING_XERCESC_64BITSAFE
+    XMLFilePos
+#else
+    unsigned int
+#endif
+CurlURLInputStream::curPos() const
 {
     return fInputStream ? fInputStream->curPos() : 0;
 }

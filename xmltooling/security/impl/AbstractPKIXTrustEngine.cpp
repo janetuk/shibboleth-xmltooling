@@ -162,11 +162,11 @@ namespace {
     }
 };
 
-AbstractPKIXTrustEngine::AbstractPKIXTrustEngine(const DOMElement* e) : TrustEngine(e), m_fullCRLChain(false)
+AbstractPKIXTrustEngine::AbstractPKIXTrustEngine(const xercesc::DOMElement* e) : TrustEngine(e), m_fullCRLChain(false)
 {
     static XMLCh fullCRLChain[] = UNICODE_LITERAL_12(f,u,l,l,C,R,L,C,h,a,i,n);
     const XMLCh* flag = e ? e->getAttributeNS(NULL, fullCRLChain) : NULL;
-    m_fullCRLChain = (flag && (*flag == chLatin_t || *flag == chDigit_1));
+    m_fullCRLChain = (flag && (*flag == xercesc::chLatin_t || *flag == xercesc::chDigit_1));
 }
 
 bool AbstractPKIXTrustEngine::checkEntityNames(

@@ -29,6 +29,7 @@
 #include <xmltooling/util/CurlNetAccessor.hpp>
 
 using namespace xmltooling;
+using namespace xercesc;
 
 const XMLCh xmltooling::CurlNetAccessor::fgMyName[] =
 {

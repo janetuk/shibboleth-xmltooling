@@ -39,6 +39,7 @@
 using namespace xmlencryption;
 using namespace xmlsignature;
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 
 Decrypter::~Decrypter()
@@ -164,7 +165,7 @@ void Decrypter::decryptData(ostream& out, const EncryptedData& encryptedData, XS
         auto_ptr<XSECBinTXFMInputStream> in(m_cipher->decryptToBinInputStream(encryptedData.getDOM()));
         
         XMLByte buf[8192];
-        unsigned int count = in->readBytes(buf, sizeof(buf));
+        xsecsize_t count = in->readBytes(buf, sizeof(buf));
         while (count > 0)
             out.write(reinterpret_cast<char*>(buf),count);
     }

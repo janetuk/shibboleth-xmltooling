@@ -33,6 +33,7 @@
 #include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 using xmlconstants::XMLTOOLING_NS;
 
@@ -129,13 +130,13 @@ inline const char* get_digit_character()
     return s_mid;
 }
 
-inline const char* unsigned_integer_to_string(char* buf, size_t cchBuf, int i)
+inline const char* unsigned_integer_to_string(char* buf, size_t cchBuf, size_t i)
 {
     char* psz=buf + cchBuf - 1;     // Set psz to last char
     *psz = 0;                       // Set terminating null
 
     do {
-        unsigned int lsd = i % 10;  // Get least significant
+        size_t lsd = i % 10;  // Get least significant
                                     // digit
 
         i /= 10;                    // Prepare for next most
@@ -153,7 +154,7 @@ inline const char* unsigned_integer_to_string(char* buf, size_t cchBuf, int i)
 void XMLToolingException::addProperties(const params& p)
 {
     m_processedmsg.erase();
-    int i=m_params.size()+1;
+    map<string,string>::size_type i=m_params.size()+1;
     char buf[20];
     const vector<const char*>& v=p.get();
     for (vector<const char*>::const_iterator ci=v.begin(); ci!=v.end(); ci++) {

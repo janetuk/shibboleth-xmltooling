@@ -39,6 +39,7 @@
 #include <xercesc/util/Janitor.hpp>
 
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 
 //
@@ -1479,7 +1480,7 @@ void DateTime::fillString(XMLCh*& ptr, valueIndex ind, int expLen) const
     XMLCh strBuffer[16];
     assert(expLen < 16);
     XMLString::binToText(fValue[ind], strBuffer, expLen, 10);
-    int   actualLen = XMLString::stringLen(strBuffer);
+    int   actualLen = (int) XMLString::stringLen(strBuffer);
     int   i;
     //append leading zeros
     for (i = 0; i < expLen - actualLen; i++)
@@ -1499,7 +1500,7 @@ int DateTime::fillYearString(XMLCh*& ptr, valueIndex ind) const
     XMLCh strBuffer[16];
     // let's hope we get no years of 15 digits...
     XMLString::binToText(fValue[ind], strBuffer, 15, 10);
-    int   actualLen = XMLString::stringLen(strBuffer);
+    int   actualLen = (int) XMLString::stringLen(strBuffer);
     // don't forget that years can be negative...
     int negativeYear = 0;
     if(strBuffer[0] == chDash)

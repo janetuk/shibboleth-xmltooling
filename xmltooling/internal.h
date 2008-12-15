@@ -40,8 +40,6 @@
 #include "XMLToolingConfig.h"
 #include "util/ParserPool.h"
 
-using namespace xercesc;
-
 #include <vector>
 #ifndef XMLTOOLING_NO_XMLSEC
     #include <xsec/framework/XSECProvider.hpp>

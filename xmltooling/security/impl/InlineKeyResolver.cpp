@@ -44,6 +44,7 @@
 using namespace xmlsignature;
 using namespace xmltooling::logging;
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 
 namespace xmltooling {

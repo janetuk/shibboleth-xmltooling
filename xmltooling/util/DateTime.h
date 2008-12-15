@@ -161,7 +161,7 @@ namespace xmltooling
     inline void DateTime::setBuffer(const XMLCh* const aString)
     {
         reset();
-        fEnd = xercesc::XMLString::stringLen(aString);
+        fEnd = (int) xercesc::XMLString::stringLen(aString);
         if (fEnd > 0) {
             if (fEnd > fBufferMaxLen) {
                 delete[] fBuffer;

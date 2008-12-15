@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2008 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * @file xmltooling/util/ParserPool.h
  * 
- * A thread-safe pool of DOMBuilders that share characteristics.
+ * A thread-safe pool of parsers that share characteristics.
  */
 
 #ifndef __xmltooling_pool_h__
@@ -34,6 +34,10 @@
 #include <xercesc/util/BinInputStream.hpp>
 #include <xercesc/util/SecurityManager.hpp>
 
+#ifndef XMLTOOLING_NO_XMLSEC
+# include <xsec/framework/XSECDefs.hpp>
+#endif
+
 #if defined (_MSC_VER)
     #pragma warning( push )
     #pragma warning( disable : 4250 4251 )
@@ -44,7 +48,12 @@ namespace xmltooling {
     /**
      * A thread-safe pool of DOMBuilders that share characteristics.
      */
-    class XMLTOOL_API ParserPool : public xercesc::DOMEntityResolver, xercesc::DOMErrorHandler
+    class XMLTOOL_API ParserPool : xercesc::DOMErrorHandler,
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+        public xercesc::DOMLSResourceResolver
+#else
+        public xercesc::DOMEntityResolver
+#endif
     {
         MAKE_NONCOPYABLE(ParserPool);
     public:
@@ -68,11 +77,17 @@ namespace xmltooling {
         /**
          * Parses a document using a pooled parser with the proper settings
          * 
-         * @param domsrc A DOM source containing the content to be parsed
+         * @param domsrc An input source containing the content to be parsed
          * @return The DOM document resulting from the parse
          * @throws XMLParserException thrown if there was a problem reading, parsing, or validating the XML
          */
-        xercesc::DOMDocument* parse(xercesc::DOMInputSource& domsrc);
+        xercesc::DOMDocument* parse(
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+            xercesc::DOMLSInput& domsrc
+#else
+            xercesc::DOMInputSource& domsrc
+#endif
+            );
 
         /**
          * Parses a document using a pooled parser with the proper settings
@@ -109,7 +124,19 @@ namespace xmltooling {
         /**
          * Supplies all external entities (primarily schemas) to the parser
          */
-        xercesc::DOMInputSource* resolveEntity(const XMLCh* const publicId, const XMLCh* const systemId, const XMLCh* const baseURI);
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+        xercesc::DOMLSInput* resolveResource(
+            const XMLCh *const resourceType,
+            const XMLCh *const namespaceUri,
+            const XMLCh *const publicId,
+            const XMLCh *const systemId,
+            const XMLCh *const baseURI
+            );
+#else
+        xercesc::DOMInputSource* resolveEntity(
+            const XMLCh* const publicId, const XMLCh* const systemId, const XMLCh* const baseURI
+            );
+#endif
 
         /**
          * Handles parsing errors
@@ -117,9 +144,15 @@ namespace xmltooling {
         bool handleError(const xercesc::DOMError& e);
 
     private:
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+        xercesc::DOMLSParser* createBuilder();
+        xercesc::DOMLSParser* checkoutBuilder();
+        void checkinBuilder(xercesc::DOMLSParser* builder);
+#else
         xercesc::DOMBuilder* createBuilder();
         xercesc::DOMBuilder* checkoutBuilder();
         void checkinBuilder(xercesc::DOMBuilder* builder);
+#endif
 
 #ifdef HAVE_GOOD_STL
         xstring m_schemaLocations;
@@ -129,7 +162,11 @@ namespace xmltooling {
         std::map<std::string,std::string> m_schemaLocMap;
 #endif
         bool m_namespaceAware,m_schemaAware;
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+        std::stack<xercesc::DOMLSParser*> m_pool;
+#else
         std::stack<xercesc::DOMBuilder*> m_pool;
+#endif
         Mutex* m_lock;
         xercesc::SecurityManager* m_security;
     };
@@ -161,16 +198,24 @@ namespace xmltooling {
             /**
              * Constructs a Xerces input stream around a C++ input stream reference.
              * 
-             * @param is        reference to an input stream
+             * @param is            reference to an input stream
              */
             StreamBinInputStream(std::istream& is) : m_is(is), m_pos(0) {}
             /// @cond off
-            virtual unsigned int curPos() const { return m_pos; }
-            virtual unsigned int readBytes(XMLByte* const toFill, const unsigned int maxToRead);
+#ifdef XMLTOOLING_XERCESC_64BITSAFE
+            XMLFilePos
+#else
+            unsigned int
+#endif
+                curPos() const { return m_pos; }
+            xsecsize_t readBytes(XMLByte* const toFill, const xsecsize_t maxToRead);
+#ifdef XMLTOOLING_XERCESC_64BITSAFE
+            const XMLCh* getContentType() const { return NULL; }
+#endif
             /// @endcond
         private:
             std::istream& m_is;
-            unsigned int m_pos;
+            xsecsize_t m_pos;
         };
 
     private:

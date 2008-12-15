@@ -40,6 +40,7 @@
 
 using namespace xmltooling::logging;
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 
 ParserPool::ParserPool(bool namespaceAware, bool schemaAware)
@@ -60,13 +61,26 @@ DOMDocument* ParserPool::newDocument()
     return DOMImplementationRegistry::getDOMImplementation(NULL)->createDocument();
 }
 
-DOMDocument* ParserPool::parse(DOMInputSource& domsrc)
+DOMDocument* ParserPool::parse(
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+   DOMLSInput& domsrc
+   )
+{
+    DOMLSParser* parser=checkoutBuilder();
+    XercesJanitor<DOMLSParser> janitor(parser);
+    try {
+        DOMDocument* doc=parser->parse(&domsrc);
+        parser->getDomConfig()->setParameter(XMLUni::fgXercesUserAdoptsDOMDocument,true);
+#else
+   DOMInputSource& domsrc
+   )
 {
     DOMBuilder* parser=checkoutBuilder();
     XercesJanitor<DOMBuilder> janitor(parser);
     try {
         DOMDocument* doc=parser->parse(domsrc);
         parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument,true);
+#endif
         checkinBuilder(janitor.release());
         return doc;
     }
@@ -208,7 +222,19 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
     return true;
 }
 
-DOMInputSource* ParserPool::resolveEntity(const XMLCh* const publicId, const XMLCh* const systemId, const XMLCh* const baseURI)
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+DOMLSInput* ParserPool::resolveResource(
+            const XMLCh *const resourceType,
+            const XMLCh *const namespaceUri,
+            const XMLCh *const publicId,
+            const XMLCh *const systemId,
+            const XMLCh *const baseURI
+            )
+#else
+DOMInputSource* ParserPool::resolveEntity(
+    const XMLCh* const publicId, const XMLCh* const systemId, const XMLCh* const baseURI
+    )
+#endif
 {
 #if _DEBUG
     xmltooling::NDC ndc("resolveEntity");
@@ -299,6 +325,10 @@ bool ParserPool::handleError(const DOMError& e)
     throw XMLParserException(string("unclassified error during XML parsing: ") + (temp.get() ? temp.get() : "no message"));
 }
 
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+
+#else
+
 DOMBuilder* ParserPool::createBuilder()
 {
     static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
@@ -356,10 +386,12 @@ void ParserPool::checkinBuilder(DOMBuilder* builder)
     }
 }
 
-unsigned int StreamInputSource::StreamBinInputStream::readBytes(XMLByte* const toFill, const unsigned int maxToRead)
+#endif
+
+xsecsize_t StreamInputSource::StreamBinInputStream::readBytes(XMLByte* const toFill, const xsecsize_t maxToRead)
 {
     XMLByte* target=toFill;
-    unsigned int bytes_read=0,request=maxToRead;
+    xsecsize_t bytes_read=0,request=maxToRead;
 
     // Fulfill the rest by reading from the stream.
     if (request && !m_is.eof() && !m_is.fail()) {

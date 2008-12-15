@@ -43,6 +43,10 @@ using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace std;
 
+using xercesc::DOMElement;
+using xercesc::chLatin_f;
+using xercesc::chDigit_0;
+
 namespace xmltooling {
 
     // The ManagedResource classes handle memory management, loading of the files

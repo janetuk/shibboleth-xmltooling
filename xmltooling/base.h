@@ -39,6 +39,15 @@
 # define XMLTOOLING_NO_XMLSEC 1
 #endif
 
+#ifdef XMLTOOLING_NO_XMLSEC
+# ifdef XMLTOOLING_XERCESC_64BITSAFE
+#   include <xercesc/util/XercesDefs.hpp>
+    typedef XMLSize_t xsecsize_t;
+# else
+    typedef unsigned int xsecsize_t;
+# endif
+#endif
+
 // Windows and GCC4 Symbol Visibility Macros
 #ifdef WIN32
   #define XMLTOOL_IMPORT __declspec(dllimport)
@@ -987,6 +996,7 @@
         domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, qstr.get()); \
     }
 
+#ifdef XMLTOOLING_XERCESC_BOOLSETIDATTRIBUTE
 /**
  * Implements marshalling for an ID attribute
  *
@@ -994,11 +1004,25 @@
  * @param ucase         the upcased name of the attribute
  * @param namespaceURI  the XML namespace of the attribute
  */
-#define MARSHALL_ID_ATTRIB(proper,ucase,namespaceURI) \
+# define MARSHALL_ID_ATTRIB(proper,ucase,namespaceURI) \
+    if (m_##proper && *m_##proper) { \
+        domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, m_##proper); \
+        domElement->setIdAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, true); \
+    }
+#else
+/**
+ * Implements marshalling for an ID attribute
+ *
+ * @param proper        the proper name of the attribute
+ * @param ucase         the upcased name of the attribute
+ * @param namespaceURI  the XML namespace of the attribute
+ */
+# define MARSHALL_ID_ATTRIB(proper,ucase,namespaceURI) \
     if (m_##proper && *m_##proper) { \
         domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, m_##proper); \
         domElement->setIdAttributeNS(namespaceURI, ucase##_ATTRIB_NAME); \
     }
+#endif
 
 /**
  * Implements unmarshalling process branch for a string attribute
@@ -1013,6 +1037,7 @@
         return; \
     }
 
+#ifdef XMLTOOLING_XERCESC_BOOLSETIDATTRIBUTE
 /**
  * Implements unmarshalling process branch for an ID attribute
  *
@@ -1020,12 +1045,27 @@
  * @param ucase         the upcased name of the attribute
  * @param namespaceURI  the XML namespace of the attribute
  */
-#define PROC_ID_ATTRIB(proper,ucase,namespaceURI) \
+# define PROC_ID_ATTRIB(proper,ucase,namespaceURI) \
+    if (xmltooling::XMLHelper::isNodeNamed(attribute, namespaceURI, ucase##_ATTRIB_NAME)) { \
+        set##proper(attribute->getValue()); \
+        attribute->getOwnerElement()->setIdAttributeNode(attribute, true); \
+        return; \
+    }
+#else
+/**
+ * Implements unmarshalling process branch for an ID attribute
+ *
+ * @param proper        the proper name of the attribute
+ * @param ucase         the upcased name of the attribute
+ * @param namespaceURI  the XML namespace of the attribute
+ */
+# define PROC_ID_ATTRIB(proper,ucase,namespaceURI) \
     if (xmltooling::XMLHelper::isNodeNamed(attribute, namespaceURI, ucase##_ATTRIB_NAME)) { \
         set##proper(attribute->getValue()); \
         attribute->getOwnerElement()->setIdAttributeNode(attribute); \
         return; \
     }
+#endif
 
 /**
  * Implements unmarshalling process branch for a DateTime attribute
@@ -1242,7 +1282,7 @@
     { \
     public: \
         virtual ~cname##Impl() {} \
-        cname##Impl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType) \
+        cname##Impl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType) \
             : xmltooling::AbstractXMLObject(nsURI, localName, prefix, schemaType) { \
         } \
         cname##Impl(const cname##Impl& src) \
@@ -1311,7 +1351,7 @@
  */
 #define IMPL_XMLOBJECTBUILDER(cname) \
     cname* cname##Builder::buildObject( \
-        const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType \
+        const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType \
         ) const \
     { \
         return new cname##Impl(nsURI,localName,prefix,schemaType); \
@@ -1376,7 +1416,7 @@
  */
 #define IMPL_XMLOBJECTBUILDER(cname) \
     xmltooling::XMLObject* cname##Builder::buildObject( \
-        const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType \
+        const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::Name* schemaType \
         ) const \
     { \
         return new cname##Impl(nsURI,localName,prefix,schemaType); \

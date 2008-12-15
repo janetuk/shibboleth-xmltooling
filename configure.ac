@@ -169,9 +169,45 @@ AC_TRY_LINK(
         [AC_DEFINE(HAVE_LIBXERCESC,1,[Define if Xerces-C library was found])],
         [AC_MSG_ERROR([unable to link with Xerces])])
 
-# DOM3 API checks.
-AC_CHECK_HEADERS([xercesc/dom/DOMLSParser.hpp xercesc/dom/DOMLSSerializer.hpp xercesc/dom/DOMLSResourceResolver.hpp])
+AC_MSG_CHECKING([whether Xerces is 64-bit clean])
+AC_TRY_COMPILE([#include <xercesc/framework/MemBufInputSource.hpp>],
+    [using namespace XERCES_CPP_NAMESPACE;
+      XMLFilePos testvar;
+    ],
+    [AC_MSG_RESULT([yes])]
+    [AC_DEFINE(XMLTOOLING_XERCESC_64BITSAFE)],
+    [AC_MSG_RESULT([no])])
 
+AC_MSG_CHECKING([whether Xerces BinInputStream requires getContentType])
+AC_TRY_COMPILE([#include <xercesc/framework/MemBufInputSource.hpp>],
+    [using namespace XERCES_CPP_NAMESPACE;
+      char buf[1024];
+      BinMemInputStream in(buf,1024);
+      in.getContentType();
+    ],
+    [AC_MSG_RESULT([yes])]
+    [AC_DEFINE(XMLTOOLING_XERCESC_INPUTSTREAM_HAS_CONTENTTYPE)],
+    [AC_MSG_RESULT([no])])
+
+AC_MSG_CHECKING([whether Xerces DOMLS API is compliant])
+AC_TRY_COMPILE([#include <xercesc/dom/DOM.hpp>],
+    [using namespace XERCES_CPP_NAMESPACE;
+        DOMImplementation *impl = DOMImplementationRegistry::getDOMImplementation(NULL);
+        DOMLSSerializer *ls = ((DOMImplementationLS*)impl)->createLSSerializer();
+    ],
+    [AC_MSG_RESULT([yes])]
+    [AC_DEFINE(XMLTOOLING_XERCESC_COMPLIANT_DOMLS)],
+    [AC_MSG_RESULT([no])])
+
+AC_MSG_CHECKING([whether Xerces has setIdAttribute(XMLCh*, bool)])
+AC_TRY_COMPILE([#include <xercesc/dom/DOM.hpp>],
+      [using namespace XERCES_CPP_NAMESPACE;
+          DOMElement * elt;
+          elt->setIdAttribute(NULL, false);
+      ],
+      [AC_MSG_RESULT([yes])]
+      [AC_DEFINE(XMLTOOLING_XERCESC_BOOLSETIDATTRIBUTE)],
+      [AC_MSG_RESULT([no])])
 
 # XML-Security settings
 AC_ARG_WITH(xmlsec,

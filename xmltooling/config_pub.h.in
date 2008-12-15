@@ -17,3 +17,12 @@
 
 /* Define to 1 to disable XML-Security-dependent features. */
 #undef XMLTOOLING_NO_XMLSEC
+
+/* Define to 1 if Xerces supports a compliant DOMLS API. */
+#undef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+
+/* Define to 1 if Xerces DOM ID methods take extra parameter.  */
+#undef XMLTOOLING_XERCESC_BOOLSETIDATTRIBUTE
+
+/* Define to 1 if Xerces has a 64-bit-safe API. */
+#undef XMLTOOLING_XERCESC_64BITSAFE

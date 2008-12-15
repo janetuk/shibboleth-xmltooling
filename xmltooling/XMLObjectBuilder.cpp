@@ -30,6 +30,8 @@ using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace std;
 
+using xercesc::DOMElement;
+
 map<QName,XMLObjectBuilder*> XMLObjectBuilder::m_map;
 XMLObjectBuilder* XMLObjectBuilder::m_default=NULL;
 

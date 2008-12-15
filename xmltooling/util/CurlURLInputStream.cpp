@@ -36,7 +36,7 @@
 #include <xmltooling/util/CurlURLInputStream.hpp>
 
 using namespace xmltooling;
-
+using namespace xercesc;
 
 CurlURLInputStream::CurlURLInputStream(const XMLURL& urlSource, const XMLNetHTTPInfo* httpInfo/*=0*/)
       : fMemoryManager(urlSource.getMemoryManager())
@@ -64,7 +64,7 @@ size_t CurlURLInputStream::staticWriteCallback(void* ptr, size_t size, size_t nm
 }
 
 
-unsigned int CurlURLInputStream::readBytes(XMLByte* const toFill, const unsigned int maxToRead)
+xsecsize_t CurlURLInputStream::readBytes(XMLByte* const toFill, const xsecsize_t maxToRead)
 {
     if (!fInputStream) {
         // Allocate the curl easy handle.

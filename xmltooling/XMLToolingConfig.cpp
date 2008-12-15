@@ -69,6 +69,8 @@ using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace std;
 
+using xercesc::XMLPlatformUtils;
+
 DECL_XMLTOOLING_EXCEPTION_FACTORY(XMLParserException,xmltooling);
 DECL_XMLTOOLING_EXCEPTION_FACTORY(XMLObjectException,xmltooling);
 DECL_XMLTOOLING_EXCEPTION_FACTORY(MarshallingException,xmltooling);

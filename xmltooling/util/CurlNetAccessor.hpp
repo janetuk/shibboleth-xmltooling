@@ -37,13 +37,13 @@ namespace xmltooling {
 // a HTTP or FTP URL.
 //
 
-class XMLTOOL_API CurlNetAccessor : public XMLNetAccessor
+class XMLTOOL_API CurlNetAccessor : public xercesc::XMLNetAccessor
 {
 public :
     CurlNetAccessor();
     ~CurlNetAccessor();
     
-    virtual BinInputStream* makeNew(const XMLURL&  urlSource, const XMLNetHTTPInfo* httpInfo=0);
+    virtual xercesc::BinInputStream* makeNew(const xercesc::XMLURL&  urlSource, const xercesc::XMLNetHTTPInfo* httpInfo=0);
     virtual const XMLCh* getId() const;
 
 private :

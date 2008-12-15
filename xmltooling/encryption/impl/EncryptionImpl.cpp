@@ -34,6 +34,7 @@
 
 using namespace xmlencryption;
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 using xmlconstants::XMLENC_NS;
 using xmlconstants::XMLSIG_NS;
@@ -71,7 +72,7 @@ namespace xmlencryption {
             XMLString::release(&m_Algorithm);
         }
 
-        EncryptionMethodImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        EncryptionMethodImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
                 : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
             init();
         }
@@ -129,7 +130,7 @@ namespace xmlencryption {
     public:
         virtual ~TransformsImpl() {}
 
-        TransformsImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        TransformsImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
         }
             
@@ -170,7 +171,7 @@ namespace xmlencryption {
             XMLString::release(&m_URI);
         }
 
-        CipherReferenceImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        CipherReferenceImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
                 : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
             init();
         }
@@ -221,7 +222,7 @@ namespace xmlencryption {
     public:
         virtual ~CipherDataImpl() {}
 
-        CipherDataImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        CipherDataImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
                 : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
             init();
         }
@@ -263,7 +264,7 @@ namespace xmlencryption {
             XMLString::release(&m_Target);
         }
 
-        EncryptionPropertyImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        EncryptionPropertyImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
             init();
         }
@@ -286,7 +287,7 @@ namespace xmlencryption {
         IMPL_STRING_ATTRIB(Target);
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject, m_children.end());
 
-        void setAttribute(const QName& qualifiedName, const XMLCh* value, bool ID=false) {
+        void setAttribute(const xmltooling::QName& qualifiedName, const XMLCh* value, bool ID=false) {
             if (!qualifiedName.hasNamespaceURI()) {
                 if (XMLString::equals(qualifiedName.getLocalPart(),ID_ATTRIB_NAME)) {
                     setId(value);
@@ -331,7 +332,7 @@ namespace xmlencryption {
             XMLString::release(&m_Id);
         }
 
-        EncryptionPropertiesImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        EncryptionPropertiesImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
             init();
         }
@@ -388,7 +389,7 @@ namespace xmlencryption {
             XMLString::release(&m_URI);
         }
 
-        ReferenceTypeImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        ReferenceTypeImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
             init();
         }
@@ -426,7 +427,7 @@ namespace xmlencryption {
     public:
         virtual ~DataReferenceImpl() {}
 
-        DataReferenceImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        DataReferenceImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {}
             
         DataReferenceImpl(const DataReferenceImpl& src) : AbstractXMLObject(src), ReferenceTypeImpl(src) {}
@@ -442,7 +443,7 @@ namespace xmlencryption {
     public:
         virtual ~KeyReferenceImpl() {}
 
-        KeyReferenceImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        KeyReferenceImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {}
             
         KeyReferenceImpl(const KeyReferenceImpl& src) : AbstractXMLObject(src), ReferenceTypeImpl(src) {}
@@ -462,7 +463,7 @@ namespace xmlencryption {
     public:
         virtual ~ReferenceListImpl() {}
 
-        ReferenceListImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        ReferenceListImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
         }
             
@@ -534,7 +535,7 @@ namespace xmlencryption {
             XMLString::release(&m_Encoding);
         }
 
-        EncryptedTypeImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        EncryptedTypeImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
                 : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
             init();
         }
@@ -596,7 +597,7 @@ namespace xmlencryption {
     public:
         virtual ~EncryptedDataImpl() {}
 
-        EncryptedDataImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        EncryptedDataImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {}
             
         EncryptedDataImpl(const EncryptedDataImpl& src) : AbstractXMLObject(src), EncryptedTypeImpl(src) {}
@@ -626,7 +627,7 @@ namespace xmlencryption {
             XMLString::release(&m_Recipient);
         }
 
-        EncryptedKeyImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        EncryptedKeyImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
                 : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
             init();
         }
