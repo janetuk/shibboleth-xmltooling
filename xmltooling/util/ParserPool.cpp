@@ -464,6 +464,7 @@ DOMBuilder* ParserPool::createBuilder()
     }
     parser->setProperty(XMLUni::fgXercesSecurityManager, m_security);
     parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
+    parser->setFeature(XMLUni::fgXercesDisableDefaultEntityResolution, true);
     parser->setEntityResolver(this);
     return parser;
 }
