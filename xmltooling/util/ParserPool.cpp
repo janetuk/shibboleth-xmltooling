@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2008 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * ParserPool.cpp
  * 
- * XML parsing
+ * A thread-safe pool of parsers that share characteristics.
  */
 
 #include "internal.h"
@@ -43,6 +43,56 @@ using namespace xmltooling;
 using namespace xercesc;
 using namespace std;
 
+
+namespace {
+    class MyErrorHandler : public DOMErrorHandler {
+    public:
+        unsigned int errors;
+
+        MyErrorHandler() : errors(0) {}
+
+        bool handleError(const DOMError& e)
+        {
+#ifdef _DEBUG
+            xmltooling::NDC ndc("handleError");
+#endif
+            Category& log=Category::getInstance(XMLTOOLING_LOGCAT".ParserPool");
+
+            DOMLocator* locator=e.getLocation();
+            auto_ptr_char temp(e.getMessage());
+
+            switch (e.getSeverity()) {
+                case DOMError::DOM_SEVERITY_WARNING:
+                    log.warnStream() << "warning on line " << locator->getLineNumber()
+                        << ", column " << locator->getColumnNumber()
+                        << ", message: " << temp.get() << logging::eol;
+                    return true;
+
+                case DOMError::DOM_SEVERITY_ERROR:
+                    ++errors;
+                    log.errorStream() << "error on line " << locator->getLineNumber()
+                        << ", column " << locator->getColumnNumber()
+                        << ", message: " << temp.get() << logging::eol;
+                    return true;
+
+                case DOMError::DOM_SEVERITY_FATAL_ERROR:
+                    ++errors;
+                    log.errorStream() << "fatal error on line " << locator->getLineNumber()
+                        << ", column " << locator->getColumnNumber()
+                        << ", message: " << temp.get() << logging::eol;
+                    return true;
+            }
+
+            ++errors;
+            log.errorStream() << "undefined error type on line " << locator->getLineNumber()
+                << ", column " << locator->getColumnNumber()
+                << ", message: " << temp.get() << logging::eol;
+            return false;
+        }
+    };
+}
+
+
 ParserPool::ParserPool(bool namespaceAware, bool schemaAware)
     : m_namespaceAware(namespaceAware), m_schemaAware(schemaAware), m_lock(Mutex::create()), m_security(new SecurityManager()) {}
 
@@ -61,38 +111,75 @@ DOMDocument* ParserPool::newDocument()
     return DOMImplementationRegistry::getDOMImplementation(NULL)->createDocument();
 }
 
-DOMDocument* ParserPool::parse(
 #ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
-   DOMLSInput& domsrc
-   )
+
+DOMDocument* ParserPool::parse(DOMLSInput& domsrc)
 {
     DOMLSParser* parser=checkoutBuilder();
     XercesJanitor<DOMLSParser> janitor(parser);
     try {
+        MyErrorHandler deh;
+        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, dynamic_cast<DOMErrorHandler*>(&deh));
         DOMDocument* doc=parser->parse(&domsrc);
-        parser->getDomConfig()->setParameter(XMLUni::fgXercesUserAdoptsDOMDocument,true);
-#else
-   DOMInputSource& domsrc
-   )
-{
-    DOMBuilder* parser=checkoutBuilder();
-    XercesJanitor<DOMBuilder> janitor(parser);
-    try {
-        DOMDocument* doc=parser->parse(domsrc);
-        parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument,true);
-#endif
+        if (deh.errors) {
+            doc->release();
+            throw XMLParserException("XML error(s) during parsing, check log for specifics");
+        }
+        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, (void*)NULL);
+        parser->getDomConfig()->setParameter(XMLUni::fgXercesUserAdoptsDOMDocument, true);
         checkinBuilder(janitor.release());
         return doc;
     }
-    catch (XMLException&) {
+    catch (XMLException& ex) {
+        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, (void*)NULL);
+        parser->getDomConfig()->setParameter(XMLUni::fgXercesUserAdoptsDOMDocument, true);
         checkinBuilder(janitor.release());
-        throw;
+        auto_ptr_char temp(ex.getMessage());
+        throw XMLParserException(string("Xerces error during parsing: ") + (temp.get() ? temp.get() : "no message"));
     }
     catch (XMLToolingException&) {
+        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, (void*)NULL);
+        parser->getDomConfig()->setParameter(XMLUni::fgXercesUserAdoptsDOMDocument, true);
         checkinBuilder(janitor.release());
         throw;
     }
 }
+
+#else
+
+DOMDocument* ParserPool::parse(DOMInputSource& domsrc)
+{
+    DOMBuilder* parser=checkoutBuilder();
+    XercesJanitor<DOMBuilder> janitor(parser);
+    try {
+        MyErrorHandler deh;
+        parser->setErrorHandler(&deh);
+        DOMDocument* doc=parser->parse(domsrc);
+        if (deh.errors) {
+            doc->release();
+            throw XMLParserException("XML error(s) during parsing, check log for specifics");
+        }
+        parser->setErrorHandler(NULL);
+        parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
+        checkinBuilder(janitor.release());
+        return doc;
+    }
+    catch (XMLException& ex) {
+        parser->setErrorHandler(NULL);
+        parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
+        checkinBuilder(janitor.release());
+        auto_ptr_char temp(ex.getMessage());
+        throw XMLParserException(string("Xerces error during parsing: ") + (temp.get() ? temp.get() : "no message"));
+    }
+    catch (XMLToolingException&) {
+        parser->setErrorHandler(NULL);
+        parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
+        checkinBuilder(janitor.release());
+        throw;
+    }
+}
+
+#endif
 
 DOMDocument* ParserPool::parse(istream& is)
 {
@@ -294,38 +381,63 @@ DOMInputSource* ParserPool::resolveEntity(
     return new Wrapper4InputSource(new MemBufInputSource(nullbuf,0,systemId));
 }
 
-bool ParserPool::handleError(const DOMError& e)
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+
+DOMLSParser* ParserPool::createBuilder()
 {
-#ifdef _DEBUG
-    xmltooling::NDC ndc("handleError");
+    static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
+    DOMImplementation* impl=DOMImplementationRegistry::getDOMImplementation(impltype);
+    DOMLSParser* parser=static_cast<DOMImplementationLS*>(impl)->createLSParser(DOMImplementationLS::MODE_SYNCHRONOUS,NULL);
+    parser->getDomConfig()->setParameter(XMLUni::fgDOMNamespaces, m_namespaceAware);
+    if (m_schemaAware) {
+        parser->getDomConfig()->setParameter(XMLUni::fgDOMNamespaces, true);
+        parser->getDomConfig()->setParameter(XMLUni::fgXercesSchema, true);
+        parser->getDomConfig()->setParameter(XMLUni::fgDOMValidate, true);
+        parser->getDomConfig()->setParameter(XMLUni::fgXercesCacheGrammarFromParse, true);
+        
+        // We build a "fake" schema location hint that binds each namespace to itself.
+        // This ensures the entity resolver will be given the namespace as a systemId it can check. 
+#ifdef HAVE_GOOD_STL
+        parser->getDomConfig()->setParameter(XMLUni::fgXercesSchemaExternalSchemaLocation, const_cast<XMLCh*>(m_schemaLocations.c_str()));
+#else
+        auto_ptr_XMLCh temp(m_schemaLocations.c_str());
+        parser->getDomConfig()->setParameter(XMLUni::fgXercesSchemaExternalSchemaLocation, const_cast<XMLCh*>(temp.get()));
 #endif
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".ParserPool");
-    DOMLocator* locator=e.getLocation();
-    auto_ptr_char temp(e.getMessage());
-
-    switch (e.getSeverity()) {
-        case DOMError::DOM_SEVERITY_WARNING:
-            log.warnStream() << "warning on line " << locator->getLineNumber()
-                << ", column " << locator->getColumnNumber()
-                << ", message: " << temp.get() << logging::eol;
-            return true;
-
-        case DOMError::DOM_SEVERITY_ERROR:
-            log.errorStream() << "error on line " << locator->getLineNumber()
-                << ", column " << locator->getColumnNumber()
-                << ", message: " << temp.get() << logging::eol;
-            throw XMLParserException(string("error during XML parsing: ") + (temp.get() ? temp.get() : "no message"));
-
-        case DOMError::DOM_SEVERITY_FATAL_ERROR:
-            log.errorStream() << "fatal error on line " << locator->getLineNumber()
-                << ", column " << locator->getColumnNumber()
-                << ", message: " << temp.get() << logging::eol;
-            throw XMLParserException(string("fatal error during XML parsing: ") + (temp.get() ? temp.get() : "no message"));
     }
-    throw XMLParserException(string("unclassified error during XML parsing: ") + (temp.get() ? temp.get() : "no message"));
+    parser->getDomConfig()->setParameter(XMLUni::fgXercesUserAdoptsDOMDocument, true);
+    parser->getDomConfig()->setParameter(XMLUni::fgXercesDisableDefaultEntityResolution, true);
+    parser->getDomConfig()->setParameter(XMLUni::fgDOMResourceResolver, dynamic_cast<DOMLSResourceResolver*>(this));
+    parser->getDomConfig()->setParameter(XMLUni::fgXercesSecurityManager, m_security);
+    return parser;
 }
 
-#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+DOMLSParser* ParserPool::checkoutBuilder()
+{
+    Lock lock(m_lock);
+    if (m_pool.empty()) {
+        DOMLSParser* builder=createBuilder();
+        return builder;
+    }
+    DOMLSParser* p=m_pool.top();
+    m_pool.pop();
+    if (m_schemaAware) {
+#ifdef HAVE_GOOD_STL
+        p->getDomConfig()->setParameter(XMLUni::fgXercesSchemaExternalSchemaLocation, const_cast<XMLCh*>(m_schemaLocations.c_str()));
+#else
+        auto_ptr_XMLCh temp2(m_schemaLocations.c_str());
+        p->getDomConfig()->setParameter(XMLUni::fgXercesSchemaExternalSchemaLocation, const_cast<XMLCh*>(temp2.get()));
+#endif
+    }
+    return p;
+}
+
+void ParserPool::checkinBuilder(DOMLSParser* builder)
+{
+    if (builder) {
+        Lock lock(m_lock);
+        m_pool.push(builder);
+    }
+}
 
 #else
 
@@ -334,13 +446,12 @@ DOMBuilder* ParserPool::createBuilder()
     static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
     DOMImplementation* impl=DOMImplementationRegistry::getDOMImplementation(impltype);
     DOMBuilder* parser=static_cast<DOMImplementationLS*>(impl)->createDOMBuilder(DOMImplementationLS::MODE_SYNCHRONOUS,0);
-    if (m_namespaceAware)
-        parser->setFeature(XMLUni::fgDOMNamespaces,true);
+    parser->setFeature(XMLUni::fgDOMNamespaces, m_namespaceAware);
     if (m_schemaAware) {
-        parser->setFeature(XMLUni::fgXercesSchema,true);
-        parser->setFeature(XMLUni::fgDOMValidation,true);
-        parser->setFeature(XMLUni::fgXercesCacheGrammarFromParse,true);
-        parser->setFeature(XMLUni::fgXercesValidationErrorAsFatal,true);
+        parser->setFeature(XMLUni::fgDOMNamespaces, true);
+        parser->setFeature(XMLUni::fgXercesSchema, true);
+        parser->setFeature(XMLUni::fgDOMValidation, true);
+        parser->setFeature(XMLUni::fgXercesCacheGrammarFromParse, true);
         
         // We build a "fake" schema location hint that binds each namespace to itself.
         // This ensures the entity resolver will be given the namespace as a systemId it can check. 
@@ -352,9 +463,8 @@ DOMBuilder* ParserPool::createBuilder()
 #endif
     }
     parser->setProperty(XMLUni::fgXercesSecurityManager, m_security);
-    parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument,true);
+    parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
     parser->setEntityResolver(this);
-    parser->setErrorHandler(this);
     return parser;
 }
 

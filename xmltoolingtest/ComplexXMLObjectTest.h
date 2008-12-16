@@ -56,7 +56,7 @@ public:
         static const XMLCh html[] = {chLatin_h, chLatin_t, chLatin_m, chLatin_l, chNull};
         static const XMLCh div[] = {chLatin_d, chLatin_i, chLatin_v, chNull};
         auto_ptr_XMLCh htmlns("http://www.w3.org/1999/xhtml");
-        QName q(htmlns.get(),div,html);
+        xmltooling::QName q(htmlns.get(),div,html);
         TSM_ASSERT_EQUALS("Element QName unexpected", wc2->getUnknownXMLObjects()[2]->getElementQName(),q);
 
         DOMElement* rebuilt = wcObject->marshall(XMLToolingConfig::getConfig().getParser().newDocument());

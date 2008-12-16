@@ -48,7 +48,7 @@ namespace xmltooling {
     /**
      * A thread-safe pool of DOMBuilders that share characteristics.
      */
-    class XMLTOOL_API ParserPool : xercesc::DOMErrorHandler,
+    class XMLTOOL_API ParserPool :
 #ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
         public xercesc::DOMLSResourceResolver
 #else
@@ -137,11 +137,6 @@ namespace xmltooling {
             const XMLCh* const publicId, const XMLCh* const systemId, const XMLCh* const baseURI
             );
 #endif
-
-        /**
-         * Handles parsing errors
-         */
-        bool handleError(const xercesc::DOMError& e);
 
     private:
 #ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
