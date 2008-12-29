@@ -65,17 +65,6 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 /* #undef HAVE_UNISTD_H */
 
-/* Define to 1 if you have the <xercesc/dom/DOMLSParser.hpp> header file. */
-#undef HAVE_XERCESC_DOM_DOMLSPARSER_HPP
-
-/* Define to 1 if you have the <xercesc/dom/DOMLSResourceResolver.hpp> header
-   file. */
-#undef HAVE_XERCESC_DOM_DOMLSRESOURCERESOLVER_HPP
-
-/* Define to 1 if you have the <xercesc/dom/DOMLSSerializer.hpp> header file.
-   */
-#undef HAVE_XERCESC_DOM_DOMLSSERIALIZER_HPP
-
 #include <xercesc/util/XercesVersion.hpp>
 
 #if (XERCES_VERSION_MAJOR >= 3)
