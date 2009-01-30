@@ -122,7 +122,8 @@ DOMDocument* ParserPool::parse(DOMLSInput& domsrc)
         parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, dynamic_cast<DOMErrorHandler*>(&deh));
         DOMDocument* doc=parser->parse(&domsrc);
         if (deh.errors) {
-            doc->release();
+            if (doc)
+                doc->release();
             throw XMLParserException("XML error(s) during parsing, check log for specifics");
         }
         parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, (void*)NULL);
@@ -156,7 +157,8 @@ DOMDocument* ParserPool::parse(DOMInputSource& domsrc)
         parser->setErrorHandler(&deh);
         DOMDocument* doc=parser->parse(domsrc);
         if (deh.errors) {
-            doc->release();
+            if (doc)
+                doc->release();
             throw XMLParserException("XML error(s) during parsing, check log for specifics");
         }
         parser->setErrorHandler(NULL);
