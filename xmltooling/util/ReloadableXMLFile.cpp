@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@
 
 #include <xercesc/framework/LocalFileInputSource.hpp>
 #include <xercesc/framework/Wrapper4InputSource.hpp>
-#include <xercesc/framework/URLInputSource.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmltooling::logging;
@@ -157,8 +156,8 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
                 m_log.debug("loading configuration from external resource...");
 
             DOMDocument* doc=NULL;
-            auto_ptr_XMLCh widenit(backup ? m_backing.c_str() : m_source.c_str());
             if (m_local || backup) {
+                auto_ptr_XMLCh widenit(backup ? m_backing.c_str() : m_source.c_str());
                 LocalFileInputSource src(widenit.get());
                 Wrapper4InputSource dsrc(&src,false);
                 if (m_validate)
@@ -167,7 +166,7 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
                     doc=XMLToolingConfig::getConfig().getParser().parse(dsrc);
             }
             else {
-                URLInputSource src(widenit.get());
+                URLInputSource src(m_root);
                 Wrapper4InputSource dsrc(&src,false);
                 if (m_validate)
                     doc=XMLToolingConfig::getConfig().getValidatingParser().parse(dsrc);

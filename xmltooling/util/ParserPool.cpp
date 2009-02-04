@@ -23,6 +23,7 @@
 #include "internal.h"
 #include "exceptions.h"
 #include "logging.h"
+#include "util/CurlURLInputStream.h"
 #include "util/NDC.h"
 #include "util/ParserPool.h"
 #include "util/XMLHelper.h"
@@ -523,3 +524,49 @@ xsecsize_t StreamInputSource::StreamBinInputStream::readBytes(XMLByte* const toF
     }
     return bytes_read;
 }
+
+#ifdef XMLTOOLING_LITE
+
+URLInputSource::URLInputSource(const XMLCh* url, const char* systemId) : InputSource(systemId), m_url(url)
+{
+}
+
+URLInputSource::URLInputSource(const DOMElement* e, const char* systemId) : InputSource(systemId)
+{
+    static const XMLCh uri[] = UNICODE_LITERAL_3(u,r,i);
+    static const XMLCh url[] = UNICODE_LITERAL_3(u,r,l);
+
+    const XMLCh* attr = e->getAttributeNS(NULL, url);
+    if (!attr || !*attr) {
+        attr = e->getAttributeNS(NULL, uri);
+        if (!attr || !*attr)
+            throw IOException("No URL supplied via DOM to URLInputSource constructor.");
+    }
+
+    m_url.setURL(attr);
+}
+
+BinInputStream* URLInputSource::makeStream() const
+{
+    // Ask the URL to create us an appropriate input stream
+    return m_url.makeNewStream();
+}
+
+#else
+
+URLInputSource::URLInputSource(const XMLCh* url, const char* systemId)
+    : InputSource(systemId), m_url(url), m_root(NULL)
+{
+}
+
+URLInputSource::URLInputSource(const DOMElement* e, const char* systemId)
+    : InputSource(systemId), m_root(e)
+{
+}
+
+BinInputStream* URLInputSource::makeStream() const
+{
+    return m_root ? new CurlURLInputStream(m_root) : new CurlURLInputStream(m_url.get());
+}
+
+#endif

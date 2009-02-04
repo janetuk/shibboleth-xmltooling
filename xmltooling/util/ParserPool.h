@@ -33,6 +33,7 @@
 #include <xercesc/sax/InputSource.hpp>
 #include <xercesc/util/BinInputStream.hpp>
 #include <xercesc/util/SecurityManager.hpp>
+#include <xercesc/util/XMLURL.hpp>
 
 #ifndef XMLTOOLING_NO_XMLSEC
 # include <xsec/framework/XSECDefs.hpp>
@@ -215,6 +216,51 @@ namespace xmltooling {
 
     private:
         std::istream& m_is;
+    };
+
+    /**
+     * A URL-based parser source that supports a more advanced input stream.
+     */
+    class XMLTOOL_API URLInputSource : public xercesc::InputSource
+    {
+    MAKE_NONCOPYABLE(URLInputSource);
+    public:
+        /**
+         * Constructor.
+         * 
+         * @param url       source of input
+         * @param systemId  optional system identifier to attach to the source
+         */
+        URLInputSource(const XMLCh* url, const char* systemId=NULL);
+
+        /**
+         * Constructor taking a DOM element supporting the following content:
+         * 
+         * <dl>
+         *  <dt>uri | url</dt>
+         *  <dd>identifies the remote resource</dd>
+         *  <dt>verifyHost</dt>
+         *  <dd>true iff name of host should be matched against TLS/SSL certificate</dd>
+         *  <dt>TransportOption elements, like so:</dt>
+         *  <dd>&lt;TransportOption provider="CURL" option="150"&gt;0&lt;/TransportOption&gt;</dd>
+         * </dl>
+         * 
+         * @param e         DOM to supply configuration
+         * @param systemId  optional system identifier to attach to the source
+         */
+        URLInputSource(const xercesc::DOMElement* e, const char* systemId=NULL);
+
+        /// @cond off
+        virtual xercesc::BinInputStream* makeStream() const;
+        /// @endcond
+
+    private:
+#ifdef XMLTOOLING_LITE
+        xercesc::XMLURL m_url;
+#else
+        xmltooling::auto_ptr_char m_url;
+        const xercesc::DOMElement* m_root;
+#endif
     };
 };
 
