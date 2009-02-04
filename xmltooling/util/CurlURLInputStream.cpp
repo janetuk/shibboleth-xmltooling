@@ -166,7 +166,7 @@ void CurlURLInputStream::init(const DOMElement* e)
     if (e) {
         const XMLCh* flag = e->getAttributeNS(NULL, verifyHost);
         if (flag && (*flag == chLatin_f || *flag == chDigit_0))
-            curl_easy_setopt(fEasy, CURLOPT_SSL_VERIFYHOST, 2);
+            curl_easy_setopt(fEasy, CURLOPT_SSL_VERIFYHOST, 0);
 
         // Process TransportOption elements.
         bool success;
