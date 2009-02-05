@@ -26,6 +26,7 @@
 #include <xmltooling/util/CurlURLInputStream.h>
 #include <xmltooling/util/XMLHelper.h>
 
+#include <openssl/ssl.h>
 #include <xercesc/util/XercesDefs.hpp>
 #include <xercesc/util/XMLNetAccessor.hpp>
 #include <xercesc/util/XMLString.hpp>
@@ -47,6 +48,21 @@ namespace {
     static const XMLCh uri[] =              UNICODE_LITERAL_3(u,r,i);
     static const XMLCh url[] =              UNICODE_LITERAL_3(u,r,l);
     static const XMLCh verifyHost[] =       UNICODE_LITERAL_10(v,e,r,i,f,y,H,o,s,t);
+
+    // callback to invoke a caller-defined SSL callback
+    CURLcode ssl_ctx_callback(CURL* curl, SSL_CTX* ssl_ctx, void* userptr)
+    {
+        // Manually disable SSLv2 so we're not dependent on libcurl to do it.
+        // Also disable the ticket option where implemented, since this breaks a variety
+        // of servers. Newer libcurl also does this for us.
+#ifdef SSL_OP_NO_TICKET
+        SSL_CTX_set_options(ssl_ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2|SSL_OP_NO_TICKET);
+#else
+        SSL_CTX_set_options(ssl_ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2);
+#endif
+
+        return CURLE_OK;
+    }
 }
 
 CurlURLInputStream::CurlURLInputStream(const char* url)
@@ -159,6 +175,9 @@ void CurlURLInputStream::init(const DOMElement* e)
     curl_easy_setopt(fEasy, CURLOPT_NOPROGRESS, 1);
     curl_easy_setopt(fEasy, CURLOPT_NOSIGNAL, 1);
     curl_easy_setopt(fEasy, CURLOPT_FAILONERROR, 1);
+
+    // Install SSL callback.
+    curl_easy_setopt(fEasy, CURLOPT_SSL_CTX_FUNCTION, ssl_ctx_callback);
 
     fError[0] = 0;
     curl_easy_setopt(fEasy, CURLOPT_ERRORBUFFER, fError);

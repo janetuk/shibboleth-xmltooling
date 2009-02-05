@@ -308,7 +308,6 @@ CURL* CURLPool::get(const SOAPTransport::Address& addr)
     curl_easy_setopt(handle,CURLOPT_NOPROGRESS,1);
     curl_easy_setopt(handle,CURLOPT_NOSIGNAL,1);
     curl_easy_setopt(handle,CURLOPT_FAILONERROR,1);
-    curl_easy_setopt(handle,CURLOPT_SSLVERSION,CURL_SSLVERSION_SSLv3);
     curl_easy_setopt(handle,CURLOPT_SSL_CIPHER_LIST,"ALL:!aNULL:!LOW:!EXPORT:!SSLv2");
     // Verification of the peer is via TrustEngine only.
     curl_easy_setopt(handle,CURLOPT_SSL_VERIFYPEER,0);
@@ -592,6 +591,15 @@ int xmltooling::verify_callback(X509_STORE_CTX* x509_ctx, void* arg)
 CURLcode xmltooling::xml_ssl_ctx_callback(CURL* curl, SSL_CTX* ssl_ctx, void* userptr)
 {
     CURLSOAPTransport* conf = reinterpret_cast<CURLSOAPTransport*>(userptr);
+
+    // Manually disable SSLv2 so we're not dependent on libcurl to do it.
+    // Also disable the ticket option where implemented, since this breaks a variety
+    // of servers. Newer libcurl also does this for us.
+#ifdef SSL_OP_NO_TICKET
+    SSL_CTX_set_options(ssl_ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2|SSL_OP_NO_TICKET);
+#else
+    SSL_CTX_set_options(ssl_ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2);
+#endif
 
 #ifndef XMLTOOLING_NO_XMLSEC
     if (conf->m_cred)
