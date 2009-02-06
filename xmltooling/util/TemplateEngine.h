@@ -51,7 +51,6 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(TemplateEngine);
     public:
-        
         TemplateEngine() {
             setTagPrefix("mlp"); 
         }
@@ -108,6 +107,12 @@ namespace xmltooling {
             const TemplateParameters& parameters,
             const XMLToolingException* e=NULL
             ) const;
+
+        /**
+         * List of non-built-in characters considered "unsafe" and requiring HTML encoding.
+         * The default set is #%&():[]\\`{}
+         */
+        static std::string unsafe_chars;
 
     private:
         void trimspace(std::string& s) const;

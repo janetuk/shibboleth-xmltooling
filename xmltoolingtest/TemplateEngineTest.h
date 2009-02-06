@@ -34,6 +34,7 @@ public:
         TemplateEngine::TemplateParameters p;
         p.m_map["foo1"] = "bar1";
         p.m_map["foo3"] = "bar3";
+        p.m_map["encoded"] = "http://www.example.org/foo/bar#foobar";
         
         string path = data_path + "template.in";
         ifstream in(path.c_str());

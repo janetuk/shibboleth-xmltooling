@@ -1,6 +1,6 @@
 /*
- *  Copyright 2001-2007 Internet2
- * 
+ *  Copyright 2001-2009 Internet2
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,8 @@
 
 /**
  * TemplateEngine.cpp
- * 
- * Simple template replacement engine. 
+ *
+ * Simple template replacement engine.
  */
 
 #include "internal.h"
@@ -35,6 +35,8 @@ void TemplateEngine::setTagPrefix(const char* tagPrefix)
     ifnotendtag = string("</") + tagPrefix + "ifnot>";
 }
 
+string TemplateEngine::unsafe_chars = "#%&():[]\\`{}";
+
 void TemplateEngine::html_encode(ostream& os, const char* start) const
 {
     while (start && *start) {
@@ -42,10 +44,18 @@ void TemplateEngine::html_encode(ostream& os, const char* start) const
             case '<':   os << "&lt;";       break;
             case '>':   os << "&gt;";       break;
             case '"':   os << "&quot;";     break;
-            case '#':   os << "&#35;";      break;
-            case '%':   os << "&#37;";      break;
             case '&':   os << "&#38;";      break;
             case '\'':  os << "&#39;";      break;
+
+            default:
+                if (unsafe_chars.find_first_of(*start) != string::npos)
+                    os << "&#" << static_cast<short>(*start) << ';';
+                else
+                    os << *start;
+
+            /*
+            case '#':   os << "&#35;";      break;
+            case '%':   os << "&#37;";      break;
             case '(':   os << "&#40;";      break;
             case ')':   os << "&#41;";      break;
             case ':':   os << "&#58;";      break;
@@ -56,6 +66,7 @@ void TemplateEngine::html_encode(ostream& os, const char* start) const
             case '{':   os << "&#123;";     break;
             case '}':   os << "&#125;";     break;
             default:    os << *start;
+            */
         }
         start++;
     }
@@ -91,7 +102,7 @@ void TemplateEngine::process(
         // Output the string up to this token.
         if (visible)
             os << buf.substr(lastpos-line, thispos-lastpos);
-    
+
         // Make sure this token matches our tokens.
 #ifdef HAVE_STRCASECMP
         if (visible && !strncasecmp(thispos, keytag.c_str(), keytag.length()))
@@ -101,12 +112,12 @@ void TemplateEngine::process(
         {
             // Save this position off.
             lastpos = thispos + keytag.length();
-        
+
             // search for the end-tag
             if ((thispos = strstr(lastpos, "/>")) != NULL) {
                 string key = buf.substr(lastpos-line, thispos-lastpos);
                 trimspace(key);
-        
+
                 const char* p = parameters.getParameter(key.c_str());
                 if (!p && e)
                     p = e->getProperty(key.c_str());
@@ -123,7 +134,7 @@ void TemplateEngine::process(
         {
             // Save this position off.
             lastpos = thispos + iftag.length();
-    
+
             // search for the end of this tag
             if ((thispos = strchr(lastpos, '>')) != NULL) {
                 string key = buf.substr(lastpos-line, thispos-lastpos);
@@ -153,7 +164,7 @@ void TemplateEngine::process(
         {
             // Save this position off.
             lastpos = thispos + ifnottag.length();
-    
+
             // search for the end of this tag
             if ((thispos = strchr(lastpos, '>')) != NULL) {
                 string key = buf.substr(lastpos-line, thispos-lastpos);
@@ -191,7 +202,7 @@ void TemplateEngine::run(istream& is, ostream& os, const TemplateParameters& par
     string buf,line;
     while (getline(is, line))
         buf += line + '\n';
-    
+
     const char* pos=buf.c_str();
     process(true, buf, pos, os, parameters, e);
 }
