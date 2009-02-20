@@ -132,21 +132,26 @@ xmltooling::QName* XMLHelper::getNodeQName(const DOMNode* domNode)
 
 xmltooling::QName* XMLHelper::getAttributeValueAsQName(const DOMAttr* attribute)
 {
-    if (!attribute)
+    return getNodeValueAsQName(attribute);
+}
+
+xmltooling::QName* XMLHelper::getNodeValueAsQName(const DOMNode* domNode)
+{
+    if (!domNode)
         return NULL;
     
     int i;
-    const XMLCh* attributeValue=attribute->getTextContent();
-    if (attributeValue && (i=XMLString::indexOf(attributeValue,chColon))>0) {
+    const XMLCh* value=domNode->getTextContent();
+    if (value && (i=XMLString::indexOf(value,chColon))>0) {
         XMLCh* prefix=new XMLCh[i+1];
-        XMLString::subString(prefix,attributeValue,0,i);
+        XMLString::subString(prefix,value,0,i);
         prefix[i]=chNull;
-        xmltooling::QName* ret=new xmltooling::QName(attribute->lookupNamespaceURI(prefix), attributeValue + i + 1, prefix);
+        xmltooling::QName* ret=new xmltooling::QName(domNode->lookupNamespaceURI(prefix), value + i + 1, prefix);
         delete[] prefix;
         return ret;
     }
     
-    return new xmltooling::QName(attribute->lookupNamespaceURI(NULL), attributeValue);
+    return new xmltooling::QName(domNode->lookupNamespaceURI(NULL), value);
 }
 
 DOMElement* XMLHelper::appendChildElement(DOMElement* parentElement, DOMElement* childElement)
