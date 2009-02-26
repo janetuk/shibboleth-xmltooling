@@ -57,7 +57,7 @@ void SOAPClient::reset()
 void SOAPClient::send(const Envelope& env, const SOAPTransport::Address& addr)
 {
     // Prepare a transport object.
-    const char* pch = strchr(addr.m_endpoint,':');
+    const char* pch = addr.m_endpoint ? strchr(addr.m_endpoint,':') : NULL;
     if (!pch)
         throw IOException("SOAP endpoint was not a URL.");
     string scheme(addr.m_endpoint, pch-addr.m_endpoint);
