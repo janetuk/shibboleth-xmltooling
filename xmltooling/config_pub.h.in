@@ -26,3 +26,6 @@
 
 /* Define to 1 if Xerces has a 64-bit-safe API. */
 #undef XMLTOOLING_XERCESC_64BITSAFE
+
+/* Define to 1 if you have the `xsecsize_t' type. */
+#undef HAVE_XSECSIZE_T

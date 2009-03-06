@@ -288,6 +288,8 @@ int i = 0;
             [#include <xsec/utils/XSECPlatformUtils.hpp>],
             [XSECPlatformUtils::Initialise()],,
             [AC_MSG_ERROR([unable to link with XML-Security])])
+    AC_MSG_CHECKING([xsecsize_t])
+    AC_CHECK_TYPE([xsecsize_t],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
 	# restore master libs
 	LIBS="$save_LIBS"

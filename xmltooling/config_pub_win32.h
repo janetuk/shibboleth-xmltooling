@@ -28,3 +28,6 @@
 # define XMLTOOLING_XERCESC_BOOLSETIDATTRIBUTE  1
 # define XMLTOOLING_XERCESC_64BITSAFE           1
 #endif
+
+/* Define to 1 if you have the `xsecsize_t' type. */
+#define HAVE_XSECSIZE_T 1

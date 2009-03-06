@@ -39,7 +39,7 @@
 # define XMLTOOLING_NO_XMLSEC 1
 #endif
 
-#ifdef XMLTOOLING_NO_XMLSEC
+#if defined(XMLTOOLING_NO_XMLSEC) || !defined(HAVE_XSECSIZE_T)
 # ifdef XMLTOOLING_XERCESC_64BITSAFE
 #   include <xercesc/util/XercesDefs.hpp>
     typedef XMLSize_t xsecsize_t;
