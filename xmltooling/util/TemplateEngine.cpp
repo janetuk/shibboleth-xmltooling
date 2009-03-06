@@ -33,6 +33,8 @@ void TemplateEngine::setTagPrefix(const char* tagPrefix)
     ifnottag = string("<") + tagPrefix + "ifnot ";
     ifendtag = string("</") + tagPrefix + "if>";
     ifnotendtag = string("</") + tagPrefix + "ifnot>";
+    fortag = string("<") + tagPrefix + "for ";
+    forendtag = string("</") + tagPrefix + "for>";
 }
 
 string TemplateEngine::unsafe_chars = "#%&():[]\\`{}";
@@ -186,6 +188,53 @@ void TemplateEngine::process(
             lastpos = thispos + ifnotendtag.length();
             return;
         }
+
+#ifdef HAVE_STRCASECMP
+        else if (!strncasecmp(thispos, fortag.c_str(), fortag.length()))
+#else
+        else if (!_strnicmp(thispos, fortag.c_str(), fortag.length()))
+#endif
+        {
+            // Save this position off.
+            lastpos = thispos + iftag.length();
+            string key;
+            bool cond = visible;
+
+            // search for the end of this tag
+            if ((thispos = strchr(lastpos, '>')) != NULL) {
+                key = buf.substr(lastpos-line, thispos-lastpos);
+                trimspace(key);
+                lastpos = thispos + 1; // strlen(">")
+            }
+            const vector<xmltooling::TemplateEngine::TemplateParameters> forParams = parameters.getParameterCollection(key.c_str());
+
+            unsigned int forend = forParams.size();
+            if (forend==0) {  // have to go through at least once to match end tags
+               cond = false;
+               forend = 1;
+            }
+
+            const char *savlastpos = lastpos;
+            for (unsigned int i=0; i<forend; i++ ) {
+                const TemplateParameters nullp;
+                const TemplateParameters* tp = forParams.size()>0? static_cast<const TemplateParameters*>(&forParams[i]): &nullp;
+                lastpos = savlastpos;
+                process(cond, buf, lastpos, os, *tp, e);
+            }
+
+        }
+
+#ifdef HAVE_STRCASECMP
+        else if (!strncasecmp(thispos, forendtag.c_str(), forendtag.length()))
+#else
+        else if (!_strnicmp(thispos, forendtag.c_str(), forendtag.length()))
+#endif
+        {
+            // Save this position off and pop the stack.
+            lastpos = thispos + forendtag.length();
+            return;
+        }
+
         else {
             // Skip it.
             if (visible)

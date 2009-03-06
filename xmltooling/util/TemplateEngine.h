@@ -28,6 +28,7 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include <vector>
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -42,6 +43,7 @@ namespace xmltooling {
      *  <li> &lt;mlp key/&gt; </li>
      *  <li> &lt;mlpif key&gt; stuff &lt;/mlpif&gt;</li>
      *  <li> &lt;mlpifnot key&gt; stuff &lt;/mlpifnot&gt;</li>
+     *  <li> &lt;mlpfor key&gt; stuff &lt;/mlpfor&gt;</li>
      * </ul>
      * 
      * The default tag prefix is "mlp". This can be overridden for
@@ -69,13 +71,14 @@ namespace xmltooling {
          * Allows callers to supply a more dynamic lookup mechanism to supplement a basic map.
          */
         class XMLTOOL_API TemplateParameters {
-            MAKE_NONCOPYABLE(TemplateParameters);
+            // MAKE_NONCOPYABLE(TemplateParameters);
         public:
             TemplateParameters() : m_request(NULL) {}
             virtual ~TemplateParameters() {}
             
             /** Map of known parameters to supply to template. */
             std::map<std::string,std::string> m_map;
+            std::map<std::string,std::vector<TemplateParameters> > m_collectionMap;
             
             /** Request from client that resulted in template being processed. */
             const GenericRequest* m_request;
@@ -89,6 +92,17 @@ namespace xmltooling {
             virtual const char* getParameter(const char* name) const {
                 std::map<std::string,std::string>::const_iterator i=m_map.find(name);
                 return (i!=m_map.end() ? i->second.c_str() : (m_request ? m_request->getParameter(name) : NULL));
+            }
+
+            /**
+             * Returns the collection of parameters to plug into the template.
+             * 
+             * @param name  name of parameter collection
+             * @return vector of parameters
+             */
+            virtual const std::vector<TemplateParameters> getParameterCollection(const char* name) const {
+                std::map<std::string,std::vector<TemplateParameters> >::const_iterator i=m_collectionMap.find(name);
+                return (i->second);
             }
         };
         
@@ -126,7 +140,7 @@ namespace xmltooling {
             const XMLToolingException* e
             ) const;
             
-        std::string keytag,iftag,ifendtag,ifnottag,ifnotendtag;
+        std::string keytag,iftag,ifendtag,ifnottag,ifnotendtag,fortag,forendtag;
     };
 };
 
