@@ -35,6 +35,9 @@ public:
         p.m_map["foo1"] = "bar1";
         p.m_map["foo3"] = "bar3";
         p.m_map["encoded"] = "http://www.example.org/foo/bar#foobar";
+        multimap<string,string>& submap = p.m_collectionMap["sub"];
+        submap.insert(pair<string,string>("subfoo1", "subbar1"));
+        submap.insert(pair<string,string>("subfoo2", "subbar2"));
         
         string path = data_path + "template.in";
         ifstream in(path.c_str());

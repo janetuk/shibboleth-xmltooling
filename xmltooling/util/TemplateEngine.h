@@ -1,6 +1,6 @@
 /*
  *  Copyright 2001-2009 Internet2
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 
 /**
  * @file xmltooling/util/TemplateEngine.h
- * 
+ *
  * Simple template replacement engine.
  */
 
@@ -44,8 +44,10 @@ namespace xmltooling {
      *  <li> &lt;mlpif key&gt; stuff &lt;/mlpif&gt;</li>
      *  <li> &lt;mlpifnot key&gt; stuff &lt;/mlpifnot&gt;</li>
      *  <li> &lt;mlpfor key&gt; stuff &lt;/mlpfor&gt;</li>
+     *  <li> &lt;mlp $name/&gt; (in for loop only) </li>
+     *  <li> &lt;mlp $value/&gt; (in for loop only) </li>
      * </ul>
-     * 
+     *
      * The default tag prefix is "mlp". This can be overridden for
      * compatibility.
      */
@@ -54,18 +56,18 @@ namespace xmltooling {
         MAKE_NONCOPYABLE(TemplateEngine);
     public:
         TemplateEngine() {
-            setTagPrefix("mlp"); 
+            setTagPrefix("mlp");
         }
 
         virtual ~TemplateEngine() {}
-        
+
         /**
          * Sets the tag name to use when locating template replacement tags.
-         * 
+         *
          * @param tagPrefix base prefix for tags
          */
         void setTagPrefix(const char* tagPrefix);
-        
+
         /**
          * Interface to parameters to plug into templates.
          * Allows callers to supply a more dynamic lookup mechanism to supplement a basic map.
@@ -75,17 +77,19 @@ namespace xmltooling {
         public:
             TemplateParameters() : m_request(NULL) {}
             virtual ~TemplateParameters() {}
-            
+
             /** Map of known parameters to supply to template. */
             std::map<std::string,std::string> m_map;
-            std::map<std::string,std::vector<TemplateParameters> > m_collectionMap;
-            
+
+            /** Map of sub-collections used in for loops. */
+            std::map< std::string,std::multimap<std::string,std::string> > m_collectionMap;
+
             /** Request from client that resulted in template being processed. */
             const GenericRequest* m_request;
-            
+
             /**
              * Returns the value of a parameter to plug into the template.
-             * 
+             *
              * @param name  name of parameter
              * @return value of parameter, or NULL
              */
@@ -95,21 +99,21 @@ namespace xmltooling {
             }
 
             /**
-             * Returns the collection of parameters to plug into the template.
-             * 
-             * @param name  name of parameter collection
-             * @return vector of parameters
+             * Returns a named collection of sub-parameters to pass into a loop.
+             *
+             * @param name  name of sub-collection
+             * @return pointer to a multimap of sub-parameters, or NULL
              */
-            virtual const std::vector<TemplateParameters>& getParameterCollection(const char* name) const {
-                std::map<std::string,std::vector<TemplateParameters> >::const_iterator i=m_collectionMap.find(name);
-                return (i->second);
+            virtual const std::multimap<std::string,std::string>* getLoopCollection(const char* name) const {
+                std::map< std::string,std::multimap<std::string,std::string> >::const_iterator i=m_collectionMap.find(name);
+                return (i!=m_collectionMap.end() ? &(i->second) : NULL);
             }
         };
-        
+
         /**
          * Processes template from an input stream and executes replacements and
-         * conditional logic based on parameters. 
-         * 
+         * conditional logic based on parameters.
+         *
          * @param is            input stream providing template
          * @param os            output stream to send results of executing template
          * @param parameters    parameters to plug into template
@@ -137,9 +141,10 @@ namespace xmltooling {
             const char*& lastpos,
             std::ostream& os,
             const TemplateParameters& parameters,
+            const std::pair<std::string,std::string>& loopentry,
             const XMLToolingException* e
             ) const;
-            
+
         std::string keytag,iftag,ifendtag,ifnottag,ifnotendtag,fortag,forendtag;
     };
 };

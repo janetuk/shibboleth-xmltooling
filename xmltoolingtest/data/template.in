@@ -13,3 +13,7 @@ This is a template containing tags for substitution by the template engine.
 </mlpif>
 
 <mlp encoded/>
+
+<mlpfor sub>
+    <mlp $name/> <mlp foo1/> <mlp $value/>
+</mlpfor>

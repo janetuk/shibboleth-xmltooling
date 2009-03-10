@@ -26,6 +26,10 @@
 using namespace xmltooling;
 using namespace std;
 
+namespace {
+    static const pair<string,string> emptyPair;
+}
+
 void TemplateEngine::setTagPrefix(const char* tagPrefix)
 {
     keytag = string("<") + tagPrefix + " ";
@@ -94,6 +98,7 @@ void TemplateEngine::process(
     const char*& lastpos,
     ostream& os,
     const TemplateParameters& parameters,
+    const std::pair<std::string,std::string>& loopentry,
     const XMLToolingException* e
     ) const
 {
@@ -120,11 +125,17 @@ void TemplateEngine::process(
                 string key = buf.substr(lastpos-line, thispos-lastpos);
                 trimspace(key);
 
-                const char* p = parameters.getParameter(key.c_str());
-                if (!p && e)
-                    p = e->getProperty(key.c_str());
-                if (p)
-                    html_encode(os,p);
+                if (key == "$name" && !loopentry.first.empty())
+                    html_encode(os,loopentry.first.c_str());
+                else if (key == "$value" && !loopentry.second.empty())
+                    html_encode(os,loopentry.second.c_str());
+                else {
+                    const char* p = parameters.getParameter(key.c_str());
+                    if (!p && e)
+                        p = e->getProperty(key.c_str());
+                    if (p)
+                        html_encode(os,p);
+                }
                 lastpos = thispos + 2; // strlen("/>")
             }
         }
@@ -145,7 +156,7 @@ void TemplateEngine::process(
                 if (visible)
                     cond = parameters.getParameter(key.c_str()) || (e && e->getProperty(key.c_str()));
                 lastpos = thispos + 1; // strlen(">")
-                process(cond, buf, lastpos, os, parameters, e);
+                process(cond, buf, lastpos, os, parameters, loopentry, e);
             }
         }
 #ifdef HAVE_STRCASECMP
@@ -175,7 +186,7 @@ void TemplateEngine::process(
                 if (visible)
                     cond = !(parameters.getParameter(key.c_str()) || (e && e->getProperty(key.c_str())));
                 lastpos = thispos + 1; // strlen(">")
-                process(cond, buf, lastpos, os, parameters, e);
+                process(cond, buf, lastpos, os, parameters, loopentry, e);
             }
         }
 #ifdef HAVE_STRCASECMP
@@ -207,20 +218,17 @@ void TemplateEngine::process(
                 lastpos = thispos + 1; // strlen(">")
             }
 
-            const vector<TemplateParameters>& forParams = parameters.getParameterCollection(key.c_str());
-            vector<TemplateParameters>::size_type forend = forParams.size();
-            if (forend == 0) {  // have to go through at least once to match end tags
-               cond = false;
-               forend = 1;
+            const multimap<string,string>* forParams = parameters.getLoopCollection(key.c_str());
+            if (!forParams || forParams->size() == 0) {
+                process(false, buf, lastpos, os, parameters, emptyPair, e);
             }
-
-            const char *savlastpos = lastpos;
-            for (vector<TemplateParameters>::size_type i=0; i<forend; ++i) {
-                static TemplateParameters nullp;
-                lastpos = savlastpos;
-                process(cond, buf, lastpos, os, (forParams.size()>0 ? forParams[i] : nullp), e);
+            else {
+                const char* savlastpos = lastpos;
+                for (multimap<string,string>::const_iterator i=forParams->begin(); i!=forParams->end(); ++i) {
+                    lastpos = savlastpos;
+                    process(cond, buf, lastpos, os, parameters, *i, e);
+                }
             }
-
         }
 
 #ifdef HAVE_STRCASECMP
@@ -252,5 +260,5 @@ void TemplateEngine::run(istream& is, ostream& os, const TemplateParameters& par
         buf += line + '\n';
 
     const char* pos=buf.c_str();
-    process(true, buf, pos, os, parameters, e);
+    process(true, buf, pos, os, parameters, emptyPair, e);
 }
