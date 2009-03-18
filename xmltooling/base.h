@@ -1416,7 +1416,7 @@
  */
 #define IMPL_XMLOBJECTBUILDER(cname) \
     xmltooling::XMLObject* cname##Builder::buildObject( \
-        const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::Name* schemaType \
+        const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType \
         ) const \
     { \
         return new cname##Impl(nsURI,localName,prefix,schemaType); \
