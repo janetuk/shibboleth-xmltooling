@@ -88,3 +88,8 @@ std::ostream& xmltooling::operator<<(std::ostream& ostr, const XMLCh* s)
     }
     return ostr;
 }
+
+std::ostream& xmltooling::operator<<(std::ostream& ostr, const xstring& s)
+{
+    return ostr << s.c_str();
+}

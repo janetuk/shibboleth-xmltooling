@@ -33,6 +33,7 @@ libxmltoolinginclude_HEADERS = \
 	AttributeExtensibleXMLObject.h \
 	base.h \
 	ConcreteXMLObjectBuilder.h \
+	char_traits.h \
 	config_pub.h \
 	ElementExtensibleXMLObject.h \
 	ElementProxy.h \

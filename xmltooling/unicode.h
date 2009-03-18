@@ -25,19 +25,27 @@
 
 #include <xmltooling/base.h>
 
+#ifndef HAVE_GOOD_STL
+# include <xmltooling/char_traits.h>
+#endif
+
 #include <string>
 #include <iostream>
 #include <xercesc/util/XMLString.hpp>
 
 namespace xmltooling {
 
-    #ifdef HAVE_GOOD_STL
+#ifdef HAVE_GOOD_STL
         /**
          * An STL string type that supports 16-bit Unicode.
-         * Most compilers support this, but various versions of gcc3 do not.
          */
         typedef std::basic_string<XMLCh> xstring;
-    #endif
+#else
+        /**
+         * An STL string type that supports 16-bit Unicode.
+         */
+        typedef std::basic_string< XMLCh,char_traits<XMLCh> > xstring;
+#endif
 
     /**
      * Transcodes a 16-bit Unicode string into UTF-8.
@@ -65,6 +73,15 @@ namespace xmltooling {
      * @return      reference to output stream
      */
     extern XMLTOOL_API std::ostream& operator<<(std::ostream& ostr, const XMLCh* s);
+
+    /**
+     * Writes a Unicode string to an ASCII stream by transcoding to UTF8.
+     *
+     * @param ostr  stream to write to
+     * @param s     string to write
+     * @return      reference to output stream
+     */
+    extern XMLTOOL_API std::ostream& operator<<(std::ostream& ostr, const xstring& s);
 
     /**
      * A minimal auto_ptr-like class that can copy or transcode a buffer into
