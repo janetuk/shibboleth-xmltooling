@@ -165,8 +165,8 @@ void CurlURLInputStream::init(const DOMElement* e)
     curl_easy_setopt(fEasy, CURLOPT_MAXREDIRS, 6);
 
     // Default settings.
-    curl_easy_setopt(fEasy, CURLOPT_CONNECTTIMEOUT,15);
-    curl_easy_setopt(fEasy, CURLOPT_TIMEOUT,30);
+    curl_easy_setopt(fEasy, CURLOPT_CONNECTTIMEOUT,30);
+    curl_easy_setopt(fEasy, CURLOPT_TIMEOUT,60);
     curl_easy_setopt(fEasy, CURLOPT_HTTPAUTH,0);
     curl_easy_setopt(fEasy, CURLOPT_USERPWD,NULL);
     curl_easy_setopt(fEasy, CURLOPT_SSL_VERIFYHOST, 2);

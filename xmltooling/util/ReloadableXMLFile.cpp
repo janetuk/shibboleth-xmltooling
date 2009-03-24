@@ -1,6 +1,6 @@
 /*
  *  Copyright 2001-2009 Internet2
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 
 /**
  * @file ReloadableXMLFile.cpp
- * 
+ *
  * Base class for file-based XML configuration.
  */
 
@@ -79,14 +79,14 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
     }
     else
         m_local=false;
-    
+
     if (source && *source) {
         const XMLCh* flag=e->getAttributeNS(NULL,validate);
         m_validate=(XMLString::equals(flag,xmlconstants::XML_TRUE) || XMLString::equals(flag,xmlconstants::XML_ONE));
 
         auto_ptr_char temp(source);
         m_source=temp.get();
-        
+
         if (!m_local && !strstr(m_source.c_str(),"://")) {
             log.warn("deprecated usage of uri/url attribute for a local resource, use path instead");
             m_local=true;
@@ -180,7 +180,7 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
                 m_log.debug("backing up remote resource to (%s)", m_backing.c_str());
                 try {
                     ofstream backer(m_backing.c_str());
-                    backer << *(doc->getDocumentElement());
+                    backer << *doc;
                 }
                 catch (exception& ex) {
                     m_log.crit("exception while backing up resource: %s", ex.what());
@@ -211,7 +211,7 @@ Lockable* ReloadableXMLFile::lock()
 {
     if (!m_lock)
         return this;
-        
+
     m_lock->rdlock();
 
     // Check if we need to refresh.
@@ -227,7 +227,7 @@ Lockable* ReloadableXMLFile::lock()
 #endif
         if (m_filestamp>=stat_buf.st_mtime)
             return this;
-        
+
         // Elevate lock and recheck.
         m_log.debug("timestamp of local resource changed, elevating to a write lock");
         m_lock->unlock();
@@ -267,7 +267,7 @@ Lockable* ReloadableXMLFile::lock()
         m_filestamp = now;
         m_log.info("reloading remote resource...");
     }
-    
+
     // Do this once...
     try {
         // At this point we're holding the write lock, so make sure we pop it.
@@ -278,7 +278,7 @@ Lockable* ReloadableXMLFile::lock()
     } catch (exception& ex) {
         m_log.crit("maintaining existing configuration, error reloading resource (%s): %s", m_source.c_str(), ex.what());
     }
-    
+
     // If we made it here, the swap may or may not have worked, but we need to relock.
     m_log.debug("attempt to update resource complete, relocking");
     m_lock->rdlock();
