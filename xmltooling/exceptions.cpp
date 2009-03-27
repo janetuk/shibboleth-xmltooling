@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -249,9 +249,10 @@ string XMLToolingException::toString() const
     const char* msg=getMessage();
     if (msg)
         xml_encode(xml, "<message>", msg, "</message>");
+    const URLEncoder* encoder = XMLToolingConfig::getConfig().getURLEncoder();
     for (map<string,string>::const_iterator i=m_params.begin(); i!=m_params.end(); i++) {
         xml_encode(xml, "<param name='", i->first.c_str(), "'");
-        xml_encode(xml, ">", i->second.c_str(), "</param>");
+        xml_encode(xml, ">", encoder->encode(i->second.c_str()).c_str(), "</param>");
     }
     xml+="</exception>";
     return xml;
@@ -295,13 +296,16 @@ XMLToolingException* XMLToolingException::fromStream(std::istream& in)
         excep->setMessage(m.get());
     }
     
+    const URLEncoder* encoder = XMLToolingConfig::getConfig().getURLEncoder();
     child=XMLHelper::getFirstChildElement(root,XMLTOOLING_NS,param);
     while (child && child->hasChildNodes()) {
         auto_ptr_char n(child->getAttributeNS(NULL,name));
-        char* v=toUTF8(child->getFirstChild()->getNodeValue());
-        if (n.get() && v)
-            excep->addProperty(n.get(), v);
-        delete[] v;
+        char* encoded = XMLString::transcode(child->getFirstChild()->getNodeValue());
+        if (n.get() && encoded) {
+            encoder->decode(encoded);
+            excep->addProperty(n.get(), encoded);
+        }
+        XMLString::release(&encoded);
         child=XMLHelper::getNextSiblingElement(child,XMLTOOLING_NS,param);
     }
 
