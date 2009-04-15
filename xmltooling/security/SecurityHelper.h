@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2008 Internet2
+ *  Copyright 2001-2009 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,6 +124,22 @@ namespace xmltooling {
          * @return  true iff the keys match
          */
         static bool matches(const XSECCryptoKey* key1, const XSECCryptoKey* key2);
+
+        /**
+         * Returns the base64-encoded DER encoding of a public key in SubjectPublicKeyInfo format.
+         *
+         * @param key   the key to encode
+         * @return  the base64 encoded key value
+         */
+        static std::string getDEREncoding(const XSECCryptoKey* key);
+
+        /**
+         * Returns the base64-encoded DER encoding of a certifiate's public key in SubjectPublicKeyInfo format.
+         *
+         * @param cert   the certificate's key to encode
+         * @return  the base64 encoded key value
+         */
+        static std::string getDEREncoding(const XSECCryptoX509* cert);
     };
 };
 

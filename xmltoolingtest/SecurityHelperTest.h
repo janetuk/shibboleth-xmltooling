@@ -76,11 +76,15 @@ public:
         TSM_ASSERT_EQUALS("Wrong certificate count", certs.size(), 3);
 
         auto_ptr<XSECCryptoKey> key1(certs[0]->clonePublicKey());
-        auto_ptr<XSECCryptoKey> key2(certs[0]->clonePublicKey());
-        auto_ptr<XSECCryptoKey> key3(certs[0]->clonePublicKey());
+        auto_ptr<XSECCryptoKey> key2(certs[1]->clonePublicKey());
+        auto_ptr<XSECCryptoKey> key3(certs[2]->clonePublicKey());
 
         TSM_ASSERT("PEM/DER keys did not match", SecurityHelper::matches(key1.get(), key2.get()));
         TSM_ASSERT("DER/PKCS12 keys did not match", SecurityHelper::matches(key2.get(), key3.get()));
+
+        TSM_ASSERT_EQUALS("Certificate and its key produced different DER encodings",
+            SecurityHelper::getDEREncoding(certs[2]), SecurityHelper::getDEREncoding(key1.get())
+            );
 
         for_each(certs.begin(), certs.end(), xmltooling::cleanup<XSECCryptoX509>());
         certs.clear();

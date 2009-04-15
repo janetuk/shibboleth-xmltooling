@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2008 Internet2
+ *  Copyright 2001-2009 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -481,4 +481,74 @@ bool SecurityHelper::matches(const XSECCryptoKey* key1, const XSECCryptoKey* key
 
     Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("unsupported key type for comparison");
     return false;
+}
+
+string SecurityHelper::getDEREncoding(const XSECCryptoKey* key)
+{
+    string ret;
+
+    if (key->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
+        Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("encoding of non-OpenSSL keys not supported");
+        return ret;
+    }
+
+    if (key->getKeyType() == XSECCryptoKey::KEY_RSA_PUBLIC || key->getKeyType() == XSECCryptoKey::KEY_RSA_PAIR) {
+        const RSA* rsa = static_cast<const OpenSSLCryptoKeyRSA*>(key)->getOpenSSLRSA();
+        BIO* base64 = BIO_new(BIO_f_base64());
+        BIO_set_flags(base64, BIO_FLAGS_BASE64_NO_NL);
+        BIO* mem = BIO_new(BIO_s_mem());
+        BIO_push(base64, mem);
+        i2d_RSA_PUBKEY_bio(base64, const_cast<RSA*>(rsa));
+        BIO_flush(base64);
+        BUF_MEM* bptr=NULL;
+        BIO_get_mem_ptr(base64, &bptr);
+        if (bptr && bptr->length > 0)
+            ret.append(bptr->data, bptr->length);
+        BIO_free_all(base64);
+    }
+    else if (key->getKeyType() == XSECCryptoKey::KEY_DSA_PUBLIC || key->getKeyType() == XSECCryptoKey::KEY_DSA_PAIR) {
+        const DSA* dsa = static_cast<const OpenSSLCryptoKeyDSA*>(key)->getOpenSSLDSA();
+        BIO* base64 = BIO_new(BIO_f_base64());
+        BIO_set_flags(base64, BIO_FLAGS_BASE64_NO_NL);
+        BIO* mem = BIO_new(BIO_s_mem());
+        BIO_push(base64, mem);
+        i2d_DSA_PUBKEY_bio(base64, const_cast<DSA*>(dsa));
+        BIO_flush(base64);
+        BUF_MEM* bptr=NULL;
+        BIO_get_mem_ptr(base64, &bptr);
+        if (bptr && bptr->length > 0)
+            ret.append(bptr->data, bptr->length);
+        BIO_free_all(base64);
+    }
+    else {
+        Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("encoding of non-RSA/DSA public keys not supported");
+    }
+    return ret;
+}
+
+string SecurityHelper::getDEREncoding(const XSECCryptoX509* cert)
+{
+    string ret;
+
+    if (cert->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
+        Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("encoding of non-OpenSSL keys not supported");
+        return ret;
+    }
+
+    const X509* x = static_cast<const OpenSSLCryptoX509*>(cert)->getOpenSSLX509();
+    EVP_PKEY* key = X509_get_pubkey(const_cast<X509*>(x));
+
+    BIO* base64 = BIO_new(BIO_f_base64());
+    BIO_set_flags(base64, BIO_FLAGS_BASE64_NO_NL);
+    BIO* mem = BIO_new(BIO_s_mem());
+    BIO_push(base64, mem);
+    i2d_PUBKEY_bio(base64, key);
+    EVP_PKEY_free(key);
+    BIO_flush(base64);
+    BUF_MEM* bptr=NULL;
+    BIO_get_mem_ptr(base64, &bptr);
+    if (bptr && bptr->length > 0)
+        ret.append(bptr->data, bptr->length);
+    BIO_free_all(base64);
+    return ret;
 }
