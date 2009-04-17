@@ -81,5 +81,5 @@ bool CredentialCriteria::matches(const Credential& credential) const
     if (!key2)
         return true;   // no key here, so we can't test it
 
-    return SecurityHelper::matches(key1, key2);
+    return SecurityHelper::matches(*key1, *key2);
 }

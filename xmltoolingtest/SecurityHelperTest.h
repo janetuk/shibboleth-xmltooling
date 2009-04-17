@@ -42,12 +42,12 @@ public:
         pathname = data_path + "test.pfx";
         auto_ptr<XSECCryptoKey> key3(SecurityHelper::loadKeyFromFile(pathname.c_str(), NULL, "password"));
 
-        TSM_ASSERT("PEM/DER keys did not match", SecurityHelper::matches(key1.get(), key2.get()));
-        TSM_ASSERT("DER/PKCS12 keys did not match", SecurityHelper::matches(key2.get(), key3.get()));
+        TSM_ASSERT("PEM/DER keys did not match", SecurityHelper::matches(*key1.get(), *key2.get()));
+        TSM_ASSERT("DER/PKCS12 keys did not match", SecurityHelper::matches(*key2.get(), *key3.get()));
 
         pathname = data_path + "key2.pem";
         auto_ptr<XSECCryptoKey> key4(SecurityHelper::loadKeyFromFile(pathname.c_str()));
-        TSM_ASSERT("Different keys matched", !SecurityHelper::matches(key3.get(), key4.get()));
+        TSM_ASSERT("Different keys matched", !SecurityHelper::matches(*key3.get(), *key4.get()));
     }
 
     void testKeysFromURLs() {
@@ -61,8 +61,8 @@ public:
         auto_ptr<SOAPTransport> t3(getTransport("https://spaces.internet2.edu/download/attachments/5305/test.pfx"));
         auto_ptr<XSECCryptoKey> key3(SecurityHelper::loadKeyFromURL(*t3.get(), pathname.c_str(), NULL, "password"));
 
-        TSM_ASSERT("PEM/DER keys did not match", SecurityHelper::matches(key1.get(), key2.get()));
-        TSM_ASSERT("DER/PKCS12 keys did not match", SecurityHelper::matches(key2.get(), key3.get()));
+        TSM_ASSERT("PEM/DER keys did not match", SecurityHelper::matches(*key1.get(), *key2.get()));
+        TSM_ASSERT("DER/PKCS12 keys did not match", SecurityHelper::matches(*key2.get(), *key3.get()));
     }
 
     void testCertificatesFromFiles() {
@@ -79,14 +79,13 @@ public:
         auto_ptr<XSECCryptoKey> key2(certs[1]->clonePublicKey());
         auto_ptr<XSECCryptoKey> key3(certs[2]->clonePublicKey());
 
-        TSM_ASSERT("PEM/DER keys did not match", SecurityHelper::matches(key1.get(), key2.get()));
-        TSM_ASSERT("DER/PKCS12 keys did not match", SecurityHelper::matches(key2.get(), key3.get()));
+        TSM_ASSERT("PEM/DER keys did not match", SecurityHelper::matches(*key1.get(), *key2.get()));
+        TSM_ASSERT("DER/PKCS12 keys did not match", SecurityHelper::matches(*key2.get(), *key3.get()));
 
-        char* enc1 = SecurityHelper::getDEREncoding(*certs[2]);
-        char* enc2 = SecurityHelper::getDEREncoding(*key1.get());
-        TSM_ASSERT("Certificate and its key produced different DER encodings", !strcmp(enc1, enc2));
-        if (enc1) free(enc1);
-        if (enc2) free(enc2);
+        TSM_ASSERT_EQUALS(
+            "Certificate and its key produced different DER encodings",
+            SecurityHelper::getDEREncoding(*certs[2]), SecurityHelper::getDEREncoding(*key1.get())
+            );
 
         for_each(certs.begin(), certs.end(), xmltooling::cleanup<XSECCryptoX509>());
         certs.clear();
@@ -109,8 +108,8 @@ public:
         auto_ptr<XSECCryptoKey> key2(certs[0]->clonePublicKey());
         auto_ptr<XSECCryptoKey> key3(certs[0]->clonePublicKey());
 
-        TSM_ASSERT("PEM/DER keys did not match", SecurityHelper::matches(key1.get(), key2.get()));
-        TSM_ASSERT("DER/PKCS12 keys did not match", SecurityHelper::matches(key2.get(), key3.get()));
+        TSM_ASSERT("PEM/DER keys did not match", SecurityHelper::matches(*key1.get(), *key2.get()));
+        TSM_ASSERT("DER/PKCS12 keys did not match", SecurityHelper::matches(*key2.get(), *key3.get()));
 
         for_each(certs.begin(), certs.end(), xmltooling::cleanup<XSECCryptoX509>());
         certs.clear();

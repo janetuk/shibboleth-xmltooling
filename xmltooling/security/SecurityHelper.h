@@ -125,31 +125,34 @@ namespace xmltooling {
          * @param key2 second key to compare
          * @return  true iff the keys match
          */
-        static bool matches(const XSECCryptoKey* key1, const XSECCryptoKey* key2);
+        static bool matches(const XSECCryptoKey& key1, const XSECCryptoKey& key2);
 
         /**
          * Returns the base64-encoded DER encoding of a public key in SubjectPublicKeyInfo format.
          *
-         * @param key   the credential containing the key to encode
-         * @return  the base64 encoded key value in a malloc'd string
+         * @param key       the credential containing the key to encode
+         * @param nowrap    if true, any linefeeds will be stripped from the result
+         * @return  the base64 encoded key value
          */
-        static char* getDEREncoding(const Credential& cred);
+        static std::string getDEREncoding(const Credential& cred, bool nowrap=true);
 
         /**
          * Returns the base64-encoded DER encoding of a public key in SubjectPublicKeyInfo format.
          *
          * @param key   the key to encode
-         * @return  the base64 encoded key value in a malloc'd string
+         * @param nowrap    if true, any linefeeds will be stripped from the result
+         * @return  the base64 encoded key value
          */
-        static char* getDEREncoding(const XSECCryptoKey& key);
+        static std::string getDEREncoding(const XSECCryptoKey& key, bool nowrap=true);
 
         /**
          * Returns the base64-encoded DER encoding of a certifiate's public key in SubjectPublicKeyInfo format.
          *
          * @param cert   the certificate's key to encode
-         * @return  the base64 encoded key value in a malloc'd string
+         * @param nowrap    if true, any linefeeds will be stripped from the result
+         * @return  the base64 encoded key value
          */
-        static char* getDEREncoding(const XSECCryptoX509& cert);
+        static std::string getDEREncoding(const XSECCryptoX509& cert, bool nowrap=true);
     };
 };
 

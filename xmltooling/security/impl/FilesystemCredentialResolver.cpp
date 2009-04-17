@@ -558,7 +558,7 @@ Credential* FilesystemCredentialResolver::getCredential()
     // First, verify that the key and certificate match.
     if (m_key.key && !m_certs.empty()) {
         auto_ptr<XSECCryptoKey> temp(m_certs.front().certs.front()->clonePublicKey());
-        if (!SecurityHelper::matches(m_key.key, temp.get()))
+        if (!SecurityHelper::matches(*m_key.key, *temp.get()))
             throw XMLSecurityException("FilesystemCredentialResolver given mismatched key/certificate, check for consistency.");
     }
 
