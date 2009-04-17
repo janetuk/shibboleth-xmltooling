@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,9 +82,11 @@ public:
         TSM_ASSERT("PEM/DER keys did not match", SecurityHelper::matches(key1.get(), key2.get()));
         TSM_ASSERT("DER/PKCS12 keys did not match", SecurityHelper::matches(key2.get(), key3.get()));
 
-        TSM_ASSERT_EQUALS("Certificate and its key produced different DER encodings",
-            SecurityHelper::getDEREncoding(certs[2]), SecurityHelper::getDEREncoding(key1.get())
-            );
+        char* enc1 = SecurityHelper::getDEREncoding(*certs[2]);
+        char* enc2 = SecurityHelper::getDEREncoding(*key1.get());
+        TSM_ASSERT("Certificate and its key produced different DER encodings", !strcmp(enc1, enc2));
+        if (enc1) free(enc1);
+        if (enc2) free(enc2);
 
         for_each(certs.begin(), certs.end(), xmltooling::cleanup<XSECCryptoX509>());
         certs.clear();
