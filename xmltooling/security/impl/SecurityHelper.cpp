@@ -24,6 +24,7 @@
 #include "logging.h"
 #include "security/OpenSSLCryptoX509CRL.h"
 #include "security/SecurityHelper.h"
+#include "security/X509Credential.h"
 #include "util/NDC.h"
 
 #include <fstream>
@@ -483,17 +484,21 @@ bool SecurityHelper::matches(const XSECCryptoKey* key1, const XSECCryptoKey* key
     return false;
 }
 
-string SecurityHelper::getDEREncoding(const XSECCryptoKey* key)
+char* SecurityHelper::getDEREncoding(const XSECCryptoKey& key)
 {
-    string ret;
+    char* ret=NULL;
 
-    if (key->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
+    if (key.getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
         Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("encoding of non-OpenSSL keys not supported");
         return ret;
     }
 
-    if (key->getKeyType() == XSECCryptoKey::KEY_RSA_PUBLIC || key->getKeyType() == XSECCryptoKey::KEY_RSA_PAIR) {
-        const RSA* rsa = static_cast<const OpenSSLCryptoKeyRSA*>(key)->getOpenSSLRSA();
+    if (key.getKeyType() == XSECCryptoKey::KEY_RSA_PUBLIC || key.getKeyType() == XSECCryptoKey::KEY_RSA_PAIR) {
+        const RSA* rsa = static_cast<const OpenSSLCryptoKeyRSA&>(key).getOpenSSLRSA();
+        if (!rsa) {
+            Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("key was not populated");
+            return ret;
+        }
         BIO* base64 = BIO_new(BIO_f_base64());
         BIO_set_flags(base64, BIO_FLAGS_BASE64_NO_NL);
         BIO* mem = BIO_new(BIO_s_mem());
@@ -502,12 +507,21 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey* key)
         BIO_flush(base64);
         BUF_MEM* bptr=NULL;
         BIO_get_mem_ptr(base64, &bptr);
-        if (bptr && bptr->length > 0)
-            ret.append(bptr->data, bptr->length);
+        if (bptr && bptr->length > 0) {
+            ret = (char*)malloc(sizeof(char)*(bptr->length+1));
+            if (ret) {
+                strncpy(ret, bptr->data, bptr->length);
+                ret[bptr->length]=0;
+            }
+        }
         BIO_free_all(base64);
     }
-    else if (key->getKeyType() == XSECCryptoKey::KEY_DSA_PUBLIC || key->getKeyType() == XSECCryptoKey::KEY_DSA_PAIR) {
-        const DSA* dsa = static_cast<const OpenSSLCryptoKeyDSA*>(key)->getOpenSSLDSA();
+    else if (key.getKeyType() == XSECCryptoKey::KEY_DSA_PUBLIC || key.getKeyType() == XSECCryptoKey::KEY_DSA_PAIR) {
+        const DSA* dsa = static_cast<const OpenSSLCryptoKeyDSA&>(key).getOpenSSLDSA();
+        if (!dsa) {
+            Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("key was not populated");
+            return ret;
+        }
         BIO* base64 = BIO_new(BIO_f_base64());
         BIO_set_flags(base64, BIO_FLAGS_BASE64_NO_NL);
         BIO* mem = BIO_new(BIO_s_mem());
@@ -516,8 +530,13 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey* key)
         BIO_flush(base64);
         BUF_MEM* bptr=NULL;
         BIO_get_mem_ptr(base64, &bptr);
-        if (bptr && bptr->length > 0)
-            ret.append(bptr->data, bptr->length);
+        if (bptr && bptr->length > 0) {
+            ret = (char*)malloc(sizeof(char)*(bptr->length+1));
+            if (ret) {
+                strncpy(ret, bptr->data, bptr->length);
+                ret[bptr->length]=0;
+            }
+        }
         BIO_free_all(base64);
     }
     else {
@@ -526,16 +545,16 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey* key)
     return ret;
 }
 
-string SecurityHelper::getDEREncoding(const XSECCryptoX509* cert)
+char* SecurityHelper::getDEREncoding(const XSECCryptoX509& cert)
 {
-    string ret;
+    char* ret=NULL;
 
-    if (cert->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
+    if (cert.getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
         Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("encoding of non-OpenSSL keys not supported");
         return ret;
     }
 
-    const X509* x = static_cast<const OpenSSLCryptoX509*>(cert)->getOpenSSLX509();
+    const X509* x = static_cast<const OpenSSLCryptoX509&>(cert).getOpenSSLX509();
     EVP_PKEY* key = X509_get_pubkey(const_cast<X509*>(x));
 
     BIO* base64 = BIO_new(BIO_f_base64());
@@ -547,8 +566,23 @@ string SecurityHelper::getDEREncoding(const XSECCryptoX509* cert)
     BIO_flush(base64);
     BUF_MEM* bptr=NULL;
     BIO_get_mem_ptr(base64, &bptr);
-    if (bptr && bptr->length > 0)
-        ret.append(bptr->data, bptr->length);
+    if (bptr && bptr->length > 0) {
+        ret = (char*)malloc(sizeof(char)*(bptr->length+1));
+        if (ret) {
+            strncpy(ret, bptr->data, bptr->length);
+            ret[bptr->length]=0;
+        }
+    }
     BIO_free_all(base64);
     return ret;
+}
+
+char* SecurityHelper::getDEREncoding(const Credential& cred)
+{
+    const X509Credential* x509 = dynamic_cast<const X509Credential*>(&cred);
+    if (x509 && !x509->getEntityCertificateChain().empty())
+        return getDEREncoding(*(x509->getEntityCertificateChain().front()));
+    else if (cred.getPublicKey())
+        return getDEREncoding(*(cred.getPublicKey()));
+    return NULL;
 }

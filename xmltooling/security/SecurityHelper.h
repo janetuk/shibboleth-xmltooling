@@ -31,6 +31,8 @@
 #include <xsec/enc/XSECCryptoX509.hpp>
 
 namespace xmltooling {
+    class XMLTOOL_API Credential;
+
     /**
      * A helper class for working with keys, certificates, etc.
      */
@@ -128,18 +130,26 @@ namespace xmltooling {
         /**
          * Returns the base64-encoded DER encoding of a public key in SubjectPublicKeyInfo format.
          *
-         * @param key   the key to encode
-         * @return  the base64 encoded key value
+         * @param key   the credential containing the key to encode
+         * @return  the base64 encoded key value in a malloc'd string
          */
-        static std::string getDEREncoding(const XSECCryptoKey* key);
+        static char* getDEREncoding(const Credential& cred);
+
+        /**
+         * Returns the base64-encoded DER encoding of a public key in SubjectPublicKeyInfo format.
+         *
+         * @param key   the key to encode
+         * @return  the base64 encoded key value in a malloc'd string
+         */
+        static char* getDEREncoding(const XSECCryptoKey& key);
 
         /**
          * Returns the base64-encoded DER encoding of a certifiate's public key in SubjectPublicKeyInfo format.
          *
          * @param cert   the certificate's key to encode
-         * @return  the base64 encoded key value
+         * @return  the base64 encoded key value in a malloc'd string
          */
-        static std::string getDEREncoding(const XSECCryptoX509* cert);
+        static char* getDEREncoding(const XSECCryptoX509& cert);
     };
 };
 
