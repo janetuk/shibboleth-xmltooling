@@ -31,6 +31,15 @@ This package contains the xmltooling runtime library.
 Summary: XMLTooling development Headers
 Group: Development/Libraries
 Requires: %{name} = %{version}
+%if 0%{?suse_version} > 1030
+Requires: libXerces-c-devel >= 2.8.0
+%else
+Requires: xerces%{?xercesver}-c-devel >= 2.8.0
+%endif
+Requires: xml-security-c-devel >= 1.4.0
+Requires: openssl-devel, curl-devel >= 7.10.6
+%{?_with_log4cpp:Requires: log4cpp-devel >= 1.0}
+%{!?_with_log4cpp:Requires: log4shib-devel}
 
 %description devel
 The XMLTooling library contains generic XML parsing and processing
