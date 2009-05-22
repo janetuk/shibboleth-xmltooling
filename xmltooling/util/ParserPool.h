@@ -1,6 +1,6 @@
 /*
  *  Copyright 2001-2008 Internet2
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 
 /**
  * @file xmltooling/util/ParserPool.h
- * 
+ *
  * A thread-safe pool of parsers that share characteristics.
  */
 
@@ -60,7 +60,7 @@ namespace xmltooling {
     public:
         /**
          * Constructs a new pool
-         * 
+         *
          * @param namespaceAware    indicates whether parsers should be namespace-aware or not
          * @param schemaAware       indicates whether parsers should be schema-validating or not
          */
@@ -69,15 +69,15 @@ namespace xmltooling {
 
         /**
          * Creates a new document using a parser from this pool.
-         * 
+         *
          * @return new XML document
-         * 
+         *
          */
         xercesc::DOMDocument* newDocument();
 
         /**
          * Parses a document using a pooled parser with the proper settings
-         * 
+         *
          * @param domsrc An input source containing the content to be parsed
          * @return The DOM document resulting from the parse
          * @throws XMLParserException thrown if there was a problem reading, parsing, or validating the XML
@@ -92,7 +92,7 @@ namespace xmltooling {
 
         /**
          * Parses a document using a pooled parser with the proper settings
-         * 
+         *
          * @param is An input stream containing the content to be parsed
          * @return The DOM document resulting from the parse
          * @throws XMLParserException thrown if there was a problem reading, parsing, or validating the XML
@@ -101,21 +101,21 @@ namespace xmltooling {
 
         /**
          * Load an OASIS catalog file to map schema namespace URIs to filenames.
-         * 
+         *
          * This does not provide real catalog support; only the &lt;uri&gt; element
          * is supported to map from a namespace URI to a relative path or file:// URI.
-         * 
+         *
          * @param pathname  path to a catalog file
          * @return true iff the catalog was successfully processed
          */
         bool loadCatalog(const XMLCh* pathname);
-        
+
         /**
          * Load a schema explicitly from a local file.
-         * 
+         *
          * Note that "successful processing" does not imply that the schema is valid,
          * only that a reference to it was successfully registered with the pool.
-         * 
+         *
          * @param nsURI     XML namespace to load
          * @param pathname  path to schema file
          * @return true iff the schema was successfully processed
@@ -150,13 +150,9 @@ namespace xmltooling {
         void checkinBuilder(xercesc::DOMBuilder* builder);
 #endif
 
-#ifdef HAVE_GOOD_STL
         xstring m_schemaLocations;
         std::map<xstring,xstring> m_schemaLocMap;
-#else
-        std::string m_schemaLocations;
-        std::map<std::string,std::string> m_schemaLocMap;
-#endif
+
         bool m_namespaceAware,m_schemaAware;
 #ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
         std::stack<xercesc::DOMLSParser*> m_pool;
@@ -176,7 +172,7 @@ namespace xmltooling {
     public:
         /**
          * Constructs an input source around an input stream reference.
-         * 
+         *
          * @param is        reference to an input stream
          * @param systemId  optional system identifier to attach to the stream
          */
@@ -193,7 +189,7 @@ namespace xmltooling {
         public:
             /**
              * Constructs a Xerces input stream around a C++ input stream reference.
-             * 
+             *
              * @param is            reference to an input stream
              */
             StreamBinInputStream(std::istream& is) : m_is(is), m_pos(0) {}
@@ -227,7 +223,7 @@ namespace xmltooling {
     public:
         /**
          * Constructor.
-         * 
+         *
          * @param url       source of input
          * @param systemId  optional system identifier to attach to the source
          */
@@ -235,7 +231,7 @@ namespace xmltooling {
 
         /**
          * Constructor taking a DOM element supporting the following content:
-         * 
+         *
          * <dl>
          *  <dt>uri | url</dt>
          *  <dd>identifies the remote resource</dd>
@@ -244,7 +240,7 @@ namespace xmltooling {
          *  <dt>TransportOption elements, like so:</dt>
          *  <dd>&lt;TransportOption provider="CURL" option="150"&gt;0&lt;/TransportOption&gt;</dd>
          * </dl>
-         * 
+         *
          * @param e         DOM to supply configuration
          * @param systemId  optional system identifier to attach to the source
          */
