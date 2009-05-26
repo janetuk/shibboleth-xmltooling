@@ -1,1 +1,0 @@
-If no documentation is present, doxygen can be used to generate it.
