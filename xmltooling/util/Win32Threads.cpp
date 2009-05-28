@@ -1,6 +1,6 @@
 /*
  *  Copyright 2001-2007 Internet2
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 
 /**
  * Win32Threads.cpp
- * 
+ *
  * Thread and locking wrappers for Win32 platforms
  */
 
@@ -55,10 +55,10 @@ namespace xmltooling {
     struct XMLTOOL_DLLLOCAL critical_section_data {
         CRITICAL_SECTION cs;
         critical_section_data(){
-            InitializeCriticalSection(&cs);    
+            InitializeCriticalSection(&cs);
         }
     };
-    
+
     class XMLTOOL_DLLLOCAL critical_section {
     private:
         critical_section_data	cse;
@@ -74,7 +74,7 @@ namespace xmltooling {
             LeaveCriticalSection(&cse.cs);
         }
     };
-    
+
     // hold a critical section over the lifetime of this object
     // used to make a stack variable that unlocks automaticly
     // on return/throw
@@ -89,7 +89,7 @@ namespace xmltooling {
             cs.leave();
         }
     };
-    
+
     class XMLTOOL_DLLLOCAL ThreadImpl : public Thread {
     private:
         HANDLE thread_id;
@@ -111,7 +111,7 @@ namespace xmltooling {
         ~ThreadImpl() {
             (void)detach();
         }
-    
+
         int detach() {
             if (thread_id==0)
                 return THREAD_ERROR;
@@ -135,14 +135,14 @@ namespace xmltooling {
             }
             return 0;
         }
-      
+
         int kill(int signo) {
             if (thread_id==0)
                 return THREAD_ERROR;
             return map_windows_error_status_to_pthreads(TerminateThread(thread_id,signo));
         }
     };
-    
+
     class XMLTOOL_DLLLOCAL MutexImpl : public Mutex {
     private:
         HANDLE mhandle;
@@ -153,12 +153,12 @@ namespace xmltooling {
                 throw ThreadingException("Mutex creation failed.");
             }
         }
-        
+
         ~MutexImpl() {
-            if((mhandle!=0) && (!CloseHandle(mhandle))) 
+            if((mhandle!=0) && (!CloseHandle(mhandle)))
                 map_windows_error_status_to_pthreads();
         }
-        
+
         int lock() {
             int rc=WaitForSingleObject(mhandle,INFINITE);
             switch(rc) {
@@ -169,16 +169,16 @@ namespace xmltooling {
                     return map_windows_error_status_to_pthreads();
             }
         }
-        
+
         int unlock() {
             return map_windows_error_status_to_pthreads(ReleaseMutex(mhandle));
         }
     };
-    
+
     class XMLTOOL_DLLLOCAL CondWaitImpl : public CondWait {
     private:
         HANDLE cond;
-    
+
     public:
         CondWaitImpl() : cond(CreateEvent(0,false,false,0)) {
             if(cond==0) {
@@ -186,32 +186,32 @@ namespace xmltooling {
     	        throw ThreadingException("Event creation failed.");
             }
         };
-    
+
         ~CondWaitImpl() {
-            if((cond!=0) && (!CloseHandle(cond))) 
+            if((cond!=0) && (!CloseHandle(cond)))
                 map_windows_error_status_to_pthreads();
         }
-    
+
         int wait(Mutex* mutex) {
             return timedwait(mutex,INFINITE);
         }
-    
+
         int signal() {
             if(!SetEvent(cond))
                 return map_windows_error_status_to_pthreads();
             return 0;
         }
-      
+
         int broadcast() {
             throw ThreadingException("Broadcast not implemented on Win32 platforms.");
         }
-    
+
         // wait for myself to signal and this mutex or the timeout
         int timedwait(Mutex* mutex, int delay_seconds) {
             int rc=mutex->unlock();
             if(rc!=0)
                 return rc;
-        
+
             int delay_ms=delay_seconds;
             if(delay_seconds!=INFINITE)
                 delay_ms*=1000;
@@ -230,7 +230,7 @@ namespace xmltooling {
             return 0;
         }
     };
-    
+
     class XMLTOOL_DLLLOCAL RWLockImpl : public RWLock {
     private:
         // used to protect read or write to the data below
@@ -244,7 +244,7 @@ namespace xmltooling {
         int num_readers;
         // true iff there a writer has our lock
         bool have_writer;
-    
+
     public:
         RWLockImpl() : wake_waiters(0), num_readers(0), have_writer(true) {
             with_crit_section acs(cs);
@@ -255,20 +255,20 @@ namespace xmltooling {
                 throw ThreadingException("Event creation for shared lock failed.");
             }
         }
-        
-        ~RWLockImpl() { 
+
+        ~RWLockImpl() {
             with_crit_section acs(cs);
-            if ((wake_waiters!=0) && (!CloseHandle(wake_waiters))) 
+            if ((wake_waiters!=0) && (!CloseHandle(wake_waiters)))
                 map_windows_error_status_to_pthreads();
         }
-    
+
         int rdlock() {
             while(1) {
                 // wait for the lock maybe being availible
                 // we will find out for sure inside the critical section
-                if (WaitForSingleObject(wake_waiters,INFINITE)!=WAIT_OBJECT_0) 
+                if (WaitForSingleObject(wake_waiters,INFINITE)!=WAIT_OBJECT_0)
                     return map_windows_error_status_to_pthreads();
-         
+
                 with_crit_section alock(cs);
                 // invariant not locked for reading and writing
                 if ((num_readers!=0) && (have_writer))
@@ -278,7 +278,7 @@ namespace xmltooling {
                     num_readers++;
                     return 0;
                 }
-           
+
                 // have a writer, mark the synchronization object
                 // so everyone waits, when the writer unlocks it will wake us
                 if (!ResetEvent(wake_waiters))
@@ -286,12 +286,12 @@ namespace xmltooling {
             }
             return THREAD_ERROR;
         }
-    
+
         int wrlock() {
             while(1) {
                 // wait for the lock maybe being availible
                 // we will find out for sure inside the critical section
-                if (WaitForSingleObject(wake_waiters,INFINITE)!=WAIT_OBJECT_0) 
+                if (WaitForSingleObject(wake_waiters,INFINITE)!=WAIT_OBJECT_0)
                     return map_windows_error_status_to_pthreads();
 
                 with_crit_section bla(cs);
@@ -304,31 +304,31 @@ namespace xmltooling {
                     have_writer=true;
                     return 0;
                 }
-             
+
                 // lock is busy, the unlocker will wake us
                 if (!ResetEvent(wake_waiters))
                     return map_windows_error_status_to_pthreads();
             }
             return THREAD_ERROR;
         }
-    
+
         int unlock() {
             with_crit_section mumble(cs);
             // invariant not locked for reading and writing
             if ((num_readers!=0) && (have_writer))
                 return THREAD_ERROR;
-            
+
             // error if nothing locked
             if ((num_readers==0) && (!have_writer))
                 return THREAD_ERROR;
-            
-            // if there was a writer it has to be us so unlock write lock 
+
+            // if there was a writer it has to be us so unlock write lock
             have_writer=false;
-            
+
             // if there where any reades there is one less now
             if(num_readers>0)
                 num_readers--;
-            
+
             // if no readers left wake up any readers/writers waiting
             // to have a go at it
             if (num_readers==0)
@@ -337,30 +337,32 @@ namespace xmltooling {
             return 0;
         }
     };
-    
+
     typedef void (*destroy_hook_type)(void*);
-    
+
     class XMLTOOL_DLLLOCAL ThreadKeyImpl : public ThreadKey {
     private:
-        destroy_hook_type destroy_hook;
+        //destroy_hook_type destroy_hook;
         DWORD key;
-    
+
     public:
-        ThreadKeyImpl(void (*destroy_fcn)(void*)) : destroy_hook(destroy_fcn) {
+        ThreadKeyImpl(void (*destroy_fcn)(void*)) { // : destroy_hook(destroy_fcn) {
+            if (destroy_fcn)
+                throw ThreadingException("TLS destructor function not supported.");
             key=TlsAlloc();
         };
-        
+
         virtual ~ThreadKeyImpl() {
-            if (destroy_hook)
-                destroy_hook(TlsGetValue(key));
+            //if (destroy_hook)
+            //    destroy_hook(TlsGetValue(key));
             TlsFree(key);
         }
-    
+
         int setData(void* data) {
             TlsSetValue(key,data);
             return 0;
         }
-        
+
         void* getData() const {
             return TlsGetValue(key);
         }
