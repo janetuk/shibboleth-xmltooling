@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@
 #include "internal.h"
 #include "logging.h"
 #include "util/Threads.h"
+
+#include <algorithm>
 
 #ifndef WIN32
 # error "This implementation is for WIN32 platforms."
@@ -145,33 +147,24 @@ namespace xmltooling {
 
     class XMLTOOL_DLLLOCAL MutexImpl : public Mutex {
     private:
-        HANDLE mhandle;
+        CRITICAL_SECTION mhandle;
     public:
-        MutexImpl() : mhandle(CreateMutex(0,false,0)) {
-            if (mhandle==0) {
-                map_windows_error_status_to_pthreads();
-                throw ThreadingException("Mutex creation failed.");
-            }
+        MutexImpl() {
+            InitializeCriticalSection(&mhandle);
         }
 
         ~MutexImpl() {
-            if((mhandle!=0) && (!CloseHandle(mhandle)))
-                map_windows_error_status_to_pthreads();
+            DeleteCriticalSection(&mhandle);
         }
 
         int lock() {
-            int rc=WaitForSingleObject(mhandle,INFINITE);
-            switch(rc) {
-                case WAIT_ABANDONED:
-                case WAIT_OBJECT_0:
-                    return 0;
-                default:
-                    return map_windows_error_status_to_pthreads();
-            }
+            EnterCriticalSection(&mhandle);
+            return 0;
         }
 
         int unlock() {
-            return map_windows_error_status_to_pthreads(ReleaseMutex(mhandle));
+            LeaveCriticalSection(&mhandle);
+            return 0;
         }
     };
 
@@ -342,29 +335,43 @@ namespace xmltooling {
 
     class XMLTOOL_DLLLOCAL ThreadKeyImpl : public ThreadKey {
     private:
-        //destroy_hook_type destroy_hook;
+        destroy_hook_type destroy_hook;
         DWORD key;
-
+        static critical_section cs;
+        static set<ThreadKeyImpl*> m_keys;
+        friend class ThreadKey;
     public:
-        ThreadKeyImpl(void (*destroy_fcn)(void*)) { // : destroy_hook(destroy_fcn) {
-            if (destroy_fcn)
-                throw ThreadingException("TLS destructor function not supported.");
+        ThreadKeyImpl(void (*destroy_fcn)(void*)) : destroy_hook(destroy_fcn) {
             key=TlsAlloc();
+            if (destroy_fcn) {
+                with_crit_section wcs(cs);
+                m_keys.insert(this);
+            }
         };
 
         virtual ~ThreadKeyImpl() {
-            //if (destroy_hook)
-            //    destroy_hook(TlsGetValue(key));
+            if (destroy_hook) {
+                destroy_hook(TlsGetValue(key));
+                with_crit_section wcs(cs);
+                m_keys.erase(this);
+            }
             TlsFree(key);
         }
 
         int setData(void* data) {
-            TlsSetValue(key,data);
+            TlsSetValue(key, data);
             return 0;
         }
 
         void* getData() const {
             return TlsGetValue(key);
+        }
+
+        void onDetach() const {
+            if (destroy_hook) {
+                destroy_hook(TlsGetValue(key));
+                TlsSetValue(key, NULL);
+            }
         }
     };
 
@@ -404,7 +411,16 @@ RWLock * RWLock::create()
     return new RWLockImpl();
 }
 
+critical_section ThreadKeyImpl::cs;
+set<ThreadKeyImpl*> ThreadKeyImpl::m_keys;
+
 ThreadKey* ThreadKey::create (void (*destroy_fcn)(void*))
 {
     return new ThreadKeyImpl(destroy_fcn);
+}
+
+void ThreadKey::onDetach()
+{
+    with_crit_section wcs(ThreadKeyImpl::cs);
+    for_each(ThreadKeyImpl::m_keys.begin(), ThreadKeyImpl::m_keys.end(), mem_fun<void,ThreadKeyImpl>(&ThreadKeyImpl::onDetach));
 }

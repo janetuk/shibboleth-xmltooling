@@ -529,3 +529,14 @@ void XMLToolingInternalConfig::registerXMLAlgorithms()
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES256, "AES", 256);
 }
 #endif
+
+#ifdef WIN32
+
+extern "C" __declspec(dllexport) BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID)
+{
+    if (fdwReason == DLL_THREAD_DETACH)
+        ThreadKey::onDetach();
+    return TRUE;
+}
+
+#endif
