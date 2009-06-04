@@ -32,6 +32,7 @@ public:
 
     void tearDown() {
         for_each(certs.begin(), certs.end(), xmltooling::cleanup<XSECCryptoX509>());
+        certs.clear();
     }
 
     void testKeysFromFiles() {
@@ -85,6 +86,11 @@ public:
         TSM_ASSERT_EQUALS(
             "Certificate and its key produced different DER encodings",
             SecurityHelper::getDEREncoding(*certs[2]), SecurityHelper::getDEREncoding(*key1.get())
+            );
+
+        TSM_ASSERT_EQUALS(
+            "Certificate and its key produced different hashed encodings",
+            SecurityHelper::getDEREncoding(*certs[2], true), SecurityHelper::getDEREncoding(*key1.get(), true)
             );
 
         for_each(certs.begin(), certs.end(), xmltooling::cleanup<XSECCryptoX509>());

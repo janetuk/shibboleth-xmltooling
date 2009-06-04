@@ -484,7 +484,7 @@ bool SecurityHelper::matches(const XSECCryptoKey& key1, const XSECCryptoKey& key
     return false;
 }
 
-string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, bool nowrap)
+string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, bool hash, bool nowrap)
 {
     string ret;
 
@@ -499,18 +499,37 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, bool nowrap)
             Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("key was not populated");
             return ret;
         }
-        BIO* base64 = BIO_new(BIO_f_base64());
+        BIO* chain = BIO_new(BIO_s_mem());
+        BIO* b = BIO_new(BIO_f_base64());
         if (nowrap)
-            BIO_set_flags(base64, BIO_FLAGS_BASE64_NO_NL);
-        BIO* mem = BIO_new(BIO_s_mem());
-        BIO_push(base64, mem);
-        i2d_RSA_PUBKEY_bio(base64, const_cast<RSA*>(rsa));
-        BIO_flush(base64);
+            BIO_set_flags(b, BIO_FLAGS_BASE64_NO_NL);
+        chain = BIO_push(b, chain);
+        if (hash) {
+            b = BIO_new(BIO_f_md());
+            BIO_set_md(b, EVP_sha1());
+            chain = BIO_push(b, chain);
+        }
+        i2d_RSA_PUBKEY_bio(chain, const_cast<RSA*>(rsa));
+        BIO_flush(chain);
+        if (hash) {
+            char digest[20];
+            int len = BIO_gets(chain, digest, sizeof(digest));
+            if (len != sizeof(digest)) {
+                BIO_free_all(chain);
+                return ret;
+            }
+            b = BIO_pop(chain);
+            BIO_free(chain);
+            chain = b;
+            BIO_reset(chain);
+            BIO_write(chain, digest, len);
+            BIO_flush(chain);
+        }
         BUF_MEM* bptr=NULL;
-        BIO_get_mem_ptr(base64, &bptr);
+        BIO_get_mem_ptr(chain, &bptr);
         if (bptr && bptr->length > 0)
             ret.append(bptr->data, bptr->length);
-        BIO_free_all(base64);
+        BIO_free_all(chain);
     }
     else if (key.getKeyType() == XSECCryptoKey::KEY_DSA_PUBLIC || key.getKeyType() == XSECCryptoKey::KEY_DSA_PAIR) {
         const DSA* dsa = static_cast<const OpenSSLCryptoKeyDSA&>(key).getOpenSSLDSA();
@@ -518,18 +537,37 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, bool nowrap)
             Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("key was not populated");
             return ret;
         }
-        BIO* base64 = BIO_new(BIO_f_base64());
+        BIO* chain = BIO_new(BIO_s_mem());
+        BIO* b = BIO_new(BIO_f_base64());
         if (nowrap)
-            BIO_set_flags(base64, BIO_FLAGS_BASE64_NO_NL);
-        BIO* mem = BIO_new(BIO_s_mem());
-        BIO_push(base64, mem);
-        i2d_DSA_PUBKEY_bio(base64, const_cast<DSA*>(dsa));
-        BIO_flush(base64);
+            BIO_set_flags(b, BIO_FLAGS_BASE64_NO_NL);
+        chain = BIO_push(b, chain);
+        if (hash) {
+            b = BIO_new(BIO_f_md());
+            BIO_set_md(b, EVP_sha1());
+            chain = BIO_push(b, chain);
+        }
+        i2d_DSA_PUBKEY_bio(chain, const_cast<DSA*>(dsa));
+        BIO_flush(chain);
+        if (hash) {
+            char digest[20];
+            int len = BIO_gets(chain, digest, sizeof(digest));
+            if (len != sizeof(digest)) {
+                BIO_free_all(chain);
+                return ret;
+            }
+            b = BIO_pop(chain);
+            BIO_free(chain);
+            chain = b;
+            BIO_reset(chain);
+            BIO_write(chain, digest, len);
+            BIO_flush(chain);
+        }
         BUF_MEM* bptr=NULL;
-        BIO_get_mem_ptr(base64, &bptr);
+        BIO_get_mem_ptr(chain, &bptr);
         if (bptr && bptr->length > 0)
             ret.append(bptr->data, bptr->length);
-        BIO_free_all(base64);
+        BIO_free_all(chain);
     }
     else {
         Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("encoding of non-RSA/DSA public keys not supported");
@@ -537,7 +575,7 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, bool nowrap)
     return ret;
 }
 
-string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, bool nowrap)
+string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, bool hash, bool nowrap)
 {
     string ret;
 
@@ -549,28 +587,47 @@ string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, bool nowrap)
     const X509* x = static_cast<const OpenSSLCryptoX509&>(cert).getOpenSSLX509();
     EVP_PKEY* key = X509_get_pubkey(const_cast<X509*>(x));
 
-    BIO* base64 = BIO_new(BIO_f_base64());
+    BIO* chain = BIO_new(BIO_s_mem());
+    BIO* b = BIO_new(BIO_f_base64());
     if (nowrap)
-        BIO_set_flags(base64, BIO_FLAGS_BASE64_NO_NL);
-    BIO* mem = BIO_new(BIO_s_mem());
-    BIO_push(base64, mem);
-    i2d_PUBKEY_bio(base64, key);
+        BIO_set_flags(b, BIO_FLAGS_BASE64_NO_NL);
+    chain = BIO_push(b, chain);
+    if (hash) {
+        b = BIO_new(BIO_f_md());
+        BIO_set_md(b, EVP_sha1());
+        chain = BIO_push(b, chain);
+    }
+    i2d_PUBKEY_bio(chain, key);
     EVP_PKEY_free(key);
-    BIO_flush(base64);
+    BIO_flush(chain);
+    if (hash) {
+        char digest[20];
+        int len = BIO_gets(chain, digest, sizeof(digest));
+        if (len != sizeof(digest)) {
+            BIO_free_all(chain);
+            return ret;
+        }
+        b = BIO_pop(chain);
+        BIO_free(chain);
+        chain = b;
+        BIO_reset(chain);
+        BIO_write(chain, digest, len);
+        BIO_flush(chain);
+    }
     BUF_MEM* bptr=NULL;
-    BIO_get_mem_ptr(base64, &bptr);
+    BIO_get_mem_ptr(chain, &bptr);
     if (bptr && bptr->length > 0)
         ret.append(bptr->data, bptr->length);
-    BIO_free_all(base64);
+    BIO_free_all(chain);
     return ret;
 }
 
-string SecurityHelper::getDEREncoding(const Credential& cred, bool nowrap)
+string SecurityHelper::getDEREncoding(const Credential& cred, bool hash, bool nowrap)
 {
     const X509Credential* x509 = dynamic_cast<const X509Credential*>(&cred);
     if (x509 && !x509->getEntityCertificateChain().empty())
-        return getDEREncoding(*(x509->getEntityCertificateChain().front()), nowrap);
+        return getDEREncoding(*(x509->getEntityCertificateChain().front()), hash, nowrap);
     else if (cred.getPublicKey())
-        return getDEREncoding(*(cred.getPublicKey()), nowrap);
+        return getDEREncoding(*(cred.getPublicKey()), hash, nowrap);
     return "";
 }

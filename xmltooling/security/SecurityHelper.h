@@ -130,29 +130,32 @@ namespace xmltooling {
         /**
          * Returns the base64-encoded DER encoding of a public key in SubjectPublicKeyInfo format.
          *
-         * @param key       the credential containing the key to encode
+         * @param cred      the credential containing the key to encode
+         * @param hash      if true, the DER encoded data is hashed with SHA-1 before base64 encoding
          * @param nowrap    if true, any linefeeds will be stripped from the result
          * @return  the base64 encoded key value
          */
-        static std::string getDEREncoding(const Credential& cred, bool nowrap=true);
+        static std::string getDEREncoding(const Credential& cred, bool hash=false, bool nowrap=true);
 
         /**
          * Returns the base64-encoded DER encoding of a public key in SubjectPublicKeyInfo format.
          *
-         * @param key   the key to encode
+         * @param key       the key to encode
+         * @param hash      if true, the DER encoded data is hashed with SHA-1 before base64 encoding
          * @param nowrap    if true, any linefeeds will be stripped from the result
          * @return  the base64 encoded key value
          */
-        static std::string getDEREncoding(const XSECCryptoKey& key, bool nowrap=true);
+        static std::string getDEREncoding(const XSECCryptoKey& key, bool hash=false, bool nowrap=true);
 
         /**
          * Returns the base64-encoded DER encoding of a certifiate's public key in SubjectPublicKeyInfo format.
          *
-         * @param cert   the certificate's key to encode
+         * @param cert      the certificate's key to encode
+         * @param hash      if true, the DER encoded data is hashed with SHA-1 before base64 encoding
          * @param nowrap    if true, any linefeeds will be stripped from the result
          * @return  the base64 encoded key value
          */
-        static std::string getDEREncoding(const XSECCryptoX509& cert, bool nowrap=true);
+        static std::string getDEREncoding(const XSECCryptoX509& cert, bool hash=false, bool nowrap=true);
     };
 };
 
