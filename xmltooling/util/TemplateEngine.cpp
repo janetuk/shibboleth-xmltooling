@@ -98,7 +98,7 @@ void TemplateEngine::process(
     const char*& lastpos,
     ostream& os,
     const TemplateParameters& parameters,
-    const std::pair<std::string,std::string>& loopentry,
+    const std::pair<const std::string,std::string>& loopentry,
     const XMLToolingException* e
     ) const
 {
