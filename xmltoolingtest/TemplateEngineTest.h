@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,8 @@ public:
         p.m_map["foo3"] = "bar3";
         p.m_map["encoded"] = "http://www.example.org/foo/bar#foobar";
         multimap<string,string>& submap = p.m_collectionMap["sub"];
-        submap.insert(pair<string,string>("subfoo1", "subbar1"));
-        submap.insert(pair<string,string>("subfoo2", "subbar2"));
+        submap.insert(pair<const string,string>("subfoo1", "subbar1"));
+        submap.insert(pair<const string,string>("subfoo2", "subbar2"));
         
         string path = data_path + "template.in";
         ifstream in(path.c_str());
