@@ -27,7 +27,7 @@ using namespace xmltooling;
 using namespace std;
 
 namespace {
-    static const pair<string,string> emptyPair;
+    static const pair<const string,string> emptyPair;
 }
 
 void TemplateEngine::setTagPrefix(const char* tagPrefix)
