@@ -311,6 +311,7 @@ CURL* CURLPool::get(const SOAPTransport::Address& addr)
     curl_easy_setopt(handle,CURLOPT_SSL_CIPHER_LIST,"ALL:!aNULL:!LOW:!EXPORT:!SSLv2");
     // Verification of the peer is via TrustEngine only.
     curl_easy_setopt(handle,CURLOPT_SSL_VERIFYPEER,0);
+    curl_easy_setopt(handle,CURLOPT_CAINFO,NULL);
     curl_easy_setopt(handle,CURLOPT_HEADERFUNCTION,&curl_header_hook);
     curl_easy_setopt(handle,CURLOPT_WRITEFUNCTION,&curl_write_hook);
     curl_easy_setopt(handle,CURLOPT_DEBUGFUNCTION,&curl_debug_hook);
