@@ -1,0 +1,38 @@
+PortSystem 1.0
+
+name               xercesc
+version            3.0.1
+revision           1
+categories         shibboleth
+maintainers        cantor.2@osu.edu
+description         an XML parser
+long_description    Xerces-C++ is a validating XML parser written in \
+                    a portable subset of C++.  Xerces-C++ makes it \
+                    easy to give your application the ability to read \
+                    and write XML data.  A shared library is provided \
+                    for parsing, generating, manipulating, and \
+                    validating XML documents.
+homepage        http://xerces.apache.org/xerces-c/
+master_sites    apache:xerces/c/3/sources/
+distname        xerces-c-${version}
+configure.args  --disable-static \
+                --enable-netaccessor-socket \
+                --enable-transcoder-icu \
+                --enable-msgloader-icu \
+                --with-icu=${prefix}
+checksums       sha1 71e4efee5397dd45d6bafad34bf3bc766bc2a085
+platforms       darwin
+
+depends_lib     port:icu
+
+platform darwin 8 {
+    configure.env-append MACOSX_DEPLOYMENT_TARGET=10.4
+    build.env-append MACOSX_DEPLOYMENT_TARGET=10.4
+    destroot.env-append MACOSX_DEPLOYMENT_TARGET=10.4
+}
+
+platform darwin 9 {
+    configure.env-append MACOSX_DEPLOYMENT_TARGET=10.4
+    build.env-append MACOSX_DEPLOYMENT_TARGET=10.4
+    destroot.env-append MACOSX_DEPLOYMENT_TARGET=10.4
+}
