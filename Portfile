@@ -1,8 +1,7 @@
 PortSystem 1.0
 
 name               xmltooling
-version            1.2
-revision           1
+version            1.2.1
 categories         shibboleth
 maintainers        cantor.2@osu.edu
 description        XMLTooling library for C++
@@ -23,16 +22,3 @@ depends_lib        port:curl \
                    port:xercesc \
                    port:xml-security-c \
                    port:log4shib
-
-platform darwin 8 {
-	configure.env-append MACOSX_DEPLOYMENT_TARGET=10.4
-	build.env-append MACOSX_DEPLOYMENT_TARGET=10.4
-	destroot.env-append MACOSX_DEPLOYMENT_TARGET=10.4
-}
-
-platform darwin 9 {
-	configure.env-append MACOSX_DEPLOYMENT_TARGET=10.4
-	build.env-append MACOSX_DEPLOYMENT_TARGET=10.4
-	destroot.env-append MACOSX_DEPLOYMENT_TARGET=10.4
-}
-

@@ -18,21 +18,8 @@ distname        xerces-c-${version}
 configure.args  --disable-static \
                 --enable-netaccessor-socket \
                 --enable-transcoder-icu \
-                --enable-msgloader-icu \
                 --with-icu=${prefix}
 checksums       sha1 71e4efee5397dd45d6bafad34bf3bc766bc2a085
 platforms       darwin
 
 depends_lib     port:icu
-
-platform darwin 8 {
-    configure.env-append MACOSX_DEPLOYMENT_TARGET=10.4
-    build.env-append MACOSX_DEPLOYMENT_TARGET=10.4
-    destroot.env-append MACOSX_DEPLOYMENT_TARGET=10.4
-}
-
-platform darwin 9 {
-    configure.env-append MACOSX_DEPLOYMENT_TARGET=10.4
-    build.env-append MACOSX_DEPLOYMENT_TARGET=10.4
-    destroot.env-append MACOSX_DEPLOYMENT_TARGET=10.4
-}
