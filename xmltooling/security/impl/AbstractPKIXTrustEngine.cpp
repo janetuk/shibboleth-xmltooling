@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -185,38 +185,37 @@ bool AbstractPKIXTrustEngine::checkEntityNames(
     for (vector<const Credential*>::const_iterator cred = creds.begin(); cred!=creds.end(); ++cred)
         trustednames.insert((*cred)->getKeyNames().begin(), (*cred)->getKeyNames().end());
 
-    char buf[256];
     X509_NAME* subject=X509_get_subject_name(certEE);
     if (subject) {
         // One way is a direct match to the subject DN.
         // Seems that the way to do the compare is to write the X509_NAME into a BIO.
         BIO* b = BIO_new(BIO_s_mem());
         BIO* b2 = BIO_new(BIO_s_mem());
-        BIO_set_mem_eof_return(b, 0);
-        BIO_set_mem_eof_return(b2, 0);
         // The flags give us LDAP order instead of X.500, with a comma separator.
-        int len=X509_NAME_print_ex(b,subject,0,XN_FLAG_RFC2253);
-        string subjectstr,subjectstr2;
+        X509_NAME_print_ex(b,subject,0,XN_FLAG_RFC2253);
         BIO_flush(b);
-        while ((len = BIO_read(b, buf, 255)) > 0) {
-            buf[len] = '\0';
-            subjectstr+=buf;
-        }
-        log.debugStream() << "certificate subject: " << subjectstr << logging::eol;
         // The flags give us LDAP order instead of X.500, with a comma plus space separator.
-        len=X509_NAME_print_ex(b2,subject,0,XN_FLAG_RFC2253 + XN_FLAG_SEP_CPLUS_SPC - XN_FLAG_SEP_COMMA_PLUS);
+        X509_NAME_print_ex(b2,subject,0,XN_FLAG_RFC2253 + XN_FLAG_SEP_CPLUS_SPC - XN_FLAG_SEP_COMMA_PLUS);
         BIO_flush(b2);
-        while ((len = BIO_read(b2, buf, 255)) > 0) {
-            buf[len] = '\0';
-            subjectstr2+=buf;
+
+        BUF_MEM* bptr=NULL;
+        BUF_MEM* bptr2=NULL;
+        BIO_get_mem_ptr(b, &bptr);
+        BIO_get_mem_ptr(b2, &bptr2);
+
+        if (bptr && bptr->length > 0 && log.isDebugEnabled()) {
+            string subjectstr(bptr->data, bptr->length);
+            log.debug("certificate subject: %s", subjectstr.c_str());
         }
         
         // Check each keyname.
-        for (set<string>::const_iterator n=trustednames.begin(); n!=trustednames.end(); n++) {
+        for (set<string>::const_iterator n=trustednames.begin(); bptr && bptr2 && n!=trustednames.end(); n++) {
 #ifdef HAVE_STRCASECMP
-            if (!strcasecmp(n->c_str(),subjectstr.c_str()) || !strcasecmp(n->c_str(),subjectstr2.c_str())) {
+            if ((n->length() == bptr->length && !strncasecmp(n->c_str(), bptr->data, bptr->length)) ||
+                (n->length() == bptr2->length && !strncasecmp(n->c_str(), bptr2->data, bptr2->length))) {
 #else
-            if (!stricmp(n->c_str(),subjectstr.c_str()) || !stricmp(n->c_str(),subjectstr2.c_str())) {
+            if ((n->length() == bptr->length && !strnicmp(n->c_str(), bptr->data, bptr->length)) ||
+                (n->length() == bptr2->length && !strnicmp(n->c_str(), bptr2->data, bptr2->length))) {
 #endif
                 log.debug("matched full subject DN to a key name (%s)", n->c_str());
                 BIO_free(b);
@@ -238,11 +237,11 @@ bool AbstractPKIXTrustEngine::checkEntityNames(
                     const int altlen = ASN1_STRING_length(check->d.ia5);
                     for (set<string>::const_iterator n=trustednames.begin(); n!=trustednames.end(); n++) {
 #ifdef HAVE_STRCASECMP
-                        if ((check->type==GEN_DNS && !strncasecmp(altptr,n->c_str(),altlen))
+                        if ((check->type==GEN_DNS && n->length()==altlen && !strncasecmp(altptr,n->c_str(),altlen))
 #else
-                        if ((check->type==GEN_DNS && !strnicmp(altptr,n->c_str(),altlen))
+                        if ((check->type==GEN_DNS && n->length()==altlen && !strnicmp(altptr,n->c_str(),altlen))
 #endif
-                                || (check->type==GEN_URI && !strncmp(altptr,n->c_str(),altlen))) {
+                                || (check->type==GEN_URI && n->length()==altlen && !strncmp(altptr,n->c_str(),altlen))) {
                             log.debug("matched DNS/URI subjectAltName to a key name (%s)", n->c_str());
                             GENERAL_NAMES_free(altnames);
                             return true;
@@ -254,24 +253,52 @@ bool AbstractPKIXTrustEngine::checkEntityNames(
         GENERAL_NAMES_free(altnames);
             
         log.debug("unable to match subjectAltName, trying TLS CN match");
-        memset(buf,0,sizeof(buf));
-        if (X509_NAME_get_text_by_NID(subject,NID_commonName,buf,255)>0) {
+
+        // Fetch the last CN RDN.
+        char* peer_CN = NULL;
+        int j,i = -1;
+        while ((j=X509_NAME_get_index_by_NID(subject, NID_commonName, i)) >= 0)
+            i = j;
+        if (i >= 0) {
+            ASN1_STRING* tmp = X509_NAME_ENTRY_get_data(X509_NAME_get_entry(subject, i));
+            // Copied in from libcurl.
+            /* In OpenSSL 0.9.7d and earlier, ASN1_STRING_to_UTF8 fails if the input
+               is already UTF-8 encoded. We check for this case and copy the raw
+               string manually to avoid the problem. */
+            if(tmp && ASN1_STRING_type(tmp) == V_ASN1_UTF8STRING) {
+                j = ASN1_STRING_length(tmp);
+                if(j >= 0) {
+                    peer_CN = (char*)OPENSSL_malloc(j + 1);
+                    memcpy(peer_CN, ASN1_STRING_data(tmp), j);
+                    peer_CN[j] = '\0';
+                }
+            }
+            else /* not a UTF8 name */ {
+                j = ASN1_STRING_to_UTF8(reinterpret_cast<unsigned char**>(&peer_CN), tmp);
+            }
+
             for (set<string>::const_iterator n=trustednames.begin(); n!=trustednames.end(); n++) {
 #ifdef HAVE_STRCASECMP
-                if (!strcasecmp(buf,n->c_str())) {
+                if (n->length() == j && !strncasecmp(peer_CN, n->c_str(), j)) {
 #else
-                if (!stricmp(buf,n->c_str())) {
+                if (n->length() == j && !strnicmp(peer_CN, n->c_str(), j)) {
 #endif
                     log.debug("matched subject CN to a key name (%s)", n->c_str());
+                    if(peer_CN)
+                        OPENSSL_free(peer_CN);
                     return true;
                 }
             }
+            if(peer_CN)
+                OPENSSL_free(peer_CN);
         }
-        else
+        else {
             log.warn("no common name in certificate subject");
+        }
     }
-    else
+    else {
         log.error("certificate has no subject?!");
+    }
     
     return false;
 }
