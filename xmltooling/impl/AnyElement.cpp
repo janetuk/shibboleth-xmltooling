@@ -29,6 +29,7 @@
 #include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 
 XMLObject* AnyElementImpl::clone() const {
@@ -62,7 +63,7 @@ void AnyElementImpl::processAttribute(const DOMAttr* attribute) {
 }
 
 XMLObject* AnyElementBuilder::buildObject(
-    const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType
+    const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType
     ) const {
     return new AnyElementImpl(nsURI, localName, prefix, schemaType);
 }

@@ -41,7 +41,7 @@ namespace xmltooling {
          * 
          * @param ownCerts  true iff any certificates subsequently stored should be freed by destructor
          */
-        BasicX509Credential(bool ownCerts) : m_key(NULL), m_ownCerts(ownCerts), m_crl(NULL), m_keyInfo(NULL), m_compactKeyInfo(NULL) {
+        BasicX509Credential(bool ownCerts) : m_key(NULL), m_ownCerts(ownCerts), m_keyInfo(NULL), m_compactKeyInfo(NULL) {
         }
 
         /**
@@ -52,7 +52,20 @@ namespace xmltooling {
          * @param crl   optional CRL
          */
         BasicX509Credential(XSECCryptoKey* key, const std::vector<XSECCryptoX509*>& certs, XSECCryptoX509CRL* crl=NULL)
-                : m_key(key), m_xseccerts(certs), m_ownCerts(true), m_crl(crl), m_keyInfo(NULL), m_compactKeyInfo(NULL) {
+                : m_key(key), m_xseccerts(certs), m_ownCerts(true), m_keyInfo(NULL), m_compactKeyInfo(NULL) {
+            if (crl)
+                m_crls.push_back(crl);
+        }
+
+        /**
+         * Constructor.
+         * 
+         * @param key   key pair or secret key
+         * @param certs array of X.509 certificates, the first entry being the entity certificate
+         * @param crls  array of X.509 CRLs
+         */
+        BasicX509Credential(XSECCryptoKey* key, const std::vector<XSECCryptoX509*>& certs, const std::vector<XSECCryptoX509CRL*>& crls)
+                : m_key(key), m_xseccerts(certs), m_ownCerts(true), m_crls(crls), m_keyInfo(NULL), m_compactKeyInfo(NULL) {
         }
 
         /** The private/secret key/keypair. */
@@ -76,8 +89,8 @@ namespace xmltooling {
         /** Indicates whether to destroy certificates. */
         bool m_ownCerts;
 
-        /** The X.509 CRL. */
-        XSECCryptoX509CRL* m_crl;
+        /** The X.509 CRLs. */
+        std::vector<XSECCryptoX509CRL*> m_crls;
 
         /** The KeyInfo object representing the information. */
         xmlsignature::KeyInfo* m_keyInfo;
@@ -134,7 +147,11 @@ namespace xmltooling {
         }
 
         XSECCryptoX509CRL* getCRL() const {
-            return m_crl;
+            return m_crls.empty() ? NULL : m_crls.front();
+        }
+
+        const std::vector<XSECCryptoX509CRL*>& getCRLs() const {
+            return m_crls;
         }
 
         const char* getSubjectName() const {

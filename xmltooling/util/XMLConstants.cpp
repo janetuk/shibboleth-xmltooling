@@ -25,6 +25,8 @@
 #include "util/XMLConstants.h"
 #include <xercesc/util/XMLUniDefs.hpp>
 
+using namespace xercesc;
+
 const XMLCh xmlconstants::XML_NS[] = // http://www.w3.org/XML/1998/namespace
 { chLatin_h, chLatin_t, chLatin_t, chLatin_p, chColon, chForwardSlash, chForwardSlash,
   chLatin_w, chLatin_w, chLatin_w, chPeriod, chLatin_w, chDigit_3, chPeriod, chLatin_o, chLatin_r, chLatin_g, chForwardSlash,

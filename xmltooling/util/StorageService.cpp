@@ -27,7 +27,7 @@ using namespace xmltooling;
 using namespace std;
 
 namespace xmltooling {
-    XMLTOOL_DLLLOCAL PluginManager<StorageService,string,const DOMElement*>::Factory MemoryStorageServiceFactory; 
+    XMLTOOL_DLLLOCAL PluginManager<StorageService,string,const xercesc::DOMElement*>::Factory MemoryStorageServiceFactory; 
 };
 
 void XMLTOOL_API xmltooling::registerStorageServices()

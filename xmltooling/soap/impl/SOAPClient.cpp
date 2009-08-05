@@ -33,7 +33,15 @@
 using namespace soap11;
 using namespace xmltooling::logging;
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
+
+void SOAPTransport::send(istream* in)
+{
+    if (!in)
+        throw IOException("SOAP transport does not support an empty request body.");
+    return send(*in);
+}
 
 SOAPClient::~SOAPClient()
 {
@@ -49,7 +57,7 @@ void SOAPClient::reset()
 void SOAPClient::send(const Envelope& env, const SOAPTransport::Address& addr)
 {
     // Prepare a transport object.
-    const char* pch = strchr(addr.m_endpoint,':');
+    const char* pch = addr.m_endpoint ? strchr(addr.m_endpoint,':') : NULL;
     if (!pch)
         throw IOException("SOAP endpoint was not a URL.");
     string scheme(addr.m_endpoint, pch-addr.m_endpoint);
@@ -122,7 +130,7 @@ Envelope* SOAPClient::receive()
 
 bool SOAPClient::handleFault(const Fault& fault)
 {
-    const QName* code = (fault.getFaultcode() ? fault.getFaultcode()->getCode() : NULL);
+    const xmltooling::QName* code = (fault.getFaultcode() ? fault.getFaultcode()->getCode() : NULL);
     auto_ptr_char str((fault.getFaultstring() ? fault.getFaultstring()->getString() : NULL));
     Category::getInstance(XMLTOOLING_LOGCAT".SOAPClient").error(
         "SOAP client detected a Fault: (%s) (%s)",

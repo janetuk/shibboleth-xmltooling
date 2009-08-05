@@ -44,6 +44,7 @@
 using namespace xmlsignature;
 using namespace xmltooling::logging;
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 
 namespace xmltooling {
@@ -108,7 +109,7 @@ namespace xmltooling {
     private:
         bool resolveCerts(const KeyInfo* keyInfo);
         bool resolveKey(const KeyInfo* keyInfo);
-        bool resolveCRL(const KeyInfo* keyInfo);
+        bool resolveCRLs(const KeyInfo* keyInfo);
 
         KeyInfoCredentialContext* m_credctx;
     };
@@ -182,7 +183,7 @@ void InlineCredential::resolve(const KeyInfo* keyInfo, int types)
     }
 
     if (types & X509Credential::RESOLVE_CRLS)
-        resolveCRL(keyInfo);
+        resolveCRLs(keyInfo);
 
     const XMLCh* n;
     char* kn;
@@ -319,7 +320,7 @@ bool InlineCredential::resolveCerts(const KeyInfo* keyInfo)
     return !m_xseccerts.empty();
 }
 
-bool InlineCredential::resolveCRL(const KeyInfo* keyInfo)
+bool InlineCredential::resolveCRLs(const KeyInfo* keyInfo)
 {
     Category& log = Category::getInstance(XMLTOOLING_LOGCAT".KeyInfoResolver."INLINE_KEYINFO_RESOLVER);
 
@@ -337,8 +338,7 @@ bool InlineCredential::resolveCRL(const KeyInfo* keyInfo)
                     log.debug("resolving ds:X509CRL");
                     auto_ptr<XSECCryptoX509CRL> crl(XMLToolingConfig::getConfig().X509CRL());
                     crl->loadX509CRLBase64Bin(x.get(), strlen(x.get()));
-                    m_crl = crl.release();
-                    return true;
+                    m_crls.push_back(crl.release());
                 }
             }
             catch(XSECException& e) {
@@ -351,7 +351,8 @@ bool InlineCredential::resolveCRL(const KeyInfo* keyInfo)
         }
     }
 
-    return false;
+    log.debug("resolved %d CRL(s)", m_crls.size());
+    return !m_crls.empty();
 }
 
 void InlineCredential::resolve(DSIGKeyInfoList* keyInfo, int types)
@@ -392,23 +393,33 @@ void InlineCredential::resolve(DSIGKeyInfoList* keyInfo, int types)
     }
 
     if (types & X509Credential::RESOLVE_CRLS) {
+        DOMNode* x509Node;
+        DOMElement* crlElement;
         for (DSIGKeyInfoList::size_type i=0; i<sz; ++i) {
             if (keyInfo->item(i)->getKeyInfoType()==DSIGKeyInfo::KEYINFO_X509) {
-                auto_ptr_char buf(static_cast<DSIGKeyInfoX509*>(keyInfo->item(i))->getX509CRL());
-                if (buf.get()) {
-                    try {
-                        auto_ptr<XSECCryptoX509CRL> crlobj(XMLToolingConfig::getConfig().X509CRL());
-                        crlobj->loadX509CRLBase64Bin(buf.get(), strlen(buf.get()));
-                        m_crl = crlobj.release();
-                        break;
+                // The current xmlsec API is limited to one CRL per KeyInfo.
+                // For now, I'm going to process the DOM directly.
+                x509Node = keyInfo->item(i)->getKeyInfoDOMNode();
+                crlElement = x509Node ? XMLHelper::getFirstChildElement(x509Node, xmlconstants::XMLSIG_NS, X509CRL::LOCAL_NAME) : NULL;
+                while (crlElement) {
+                    if (crlElement->hasChildNodes()) {
+                        auto_ptr_char buf(crlElement->getFirstChild()->getNodeValue());
+                        if (buf.get()) {
+                            try {
+                                auto_ptr<XSECCryptoX509CRL> crlobj(XMLToolingConfig::getConfig().X509CRL());
+                                crlobj->loadX509CRLBase64Bin(buf.get(), strlen(buf.get()));
+                                m_crls.push_back(crlobj.release());
+                            }
+                            catch(XSECException& e) {
+                                auto_ptr_char temp(e.getMsg());
+                                Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver."INLINE_KEYINFO_RESOLVER).error("caught XML-Security exception loading CRL: %s", temp.get());
+                            }
+                            catch(XSECCryptoException& e) {
+                                Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver."INLINE_KEYINFO_RESOLVER).error("caught XML-Security exception loading CRL: %s", e.getMsg());
+                            }
+                        }
                     }
-                    catch(XSECException& e) {
-                        auto_ptr_char temp(e.getMsg());
-                        Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver."INLINE_KEYINFO_RESOLVER).error("caught XML-Security exception loading CRL: %s", temp.get());
-                    }
-                    catch(XSECCryptoException& e) {
-                        Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver."INLINE_KEYINFO_RESOLVER).error("caught XML-Security exception loading CRL: %s", e.getMsg());
-                    }
+                    crlElement = XMLHelper::getNextSiblingElement(crlElement, xmlconstants::XMLSIG_NS, X509CRL::LOCAL_NAME);
                 }
             }
         }

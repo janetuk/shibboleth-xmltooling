@@ -35,6 +35,7 @@
 #include <xmltooling/security/X509Credential.h>
 #include <xmltooling/signature/SignatureValidator.h>
 #include <xmltooling/util/NDC.h>
+#include <xercesc/util/XMLUniDefs.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
 
 using namespace xmlsignature;
@@ -52,13 +53,17 @@ namespace {
     }
 
     static bool XMLTOOL_DLLLOCAL validate(
-        X509* EE, STACK_OF(X509)* untrusted, AbstractPKIXTrustEngine::PKIXValidationInfoIterator* pkixInfo
+        X509* EE,
+        STACK_OF(X509)* untrusted,
+        AbstractPKIXTrustEngine::PKIXValidationInfoIterator* pkixInfo,
+        bool fullCRLChain,
+        const vector<XSECCryptoX509CRL*>* inlineCRLs=NULL
         )
     {
         Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine");
     
         // First we build a stack of CA certs. These objects are all referenced in place.
-        log.debug("building CA list from PKIX Validation information");
+        log.debug("supplying PKIX Validation information");
     
         // We need this for CRL support.
         X509_STORE* store=X509_STORE_new();
@@ -66,32 +71,53 @@ namespace {
             log_openssl();
             return false;
         }
-    #if (OPENSSL_VERSION_NUMBER >= 0x00907000L)
-        X509_STORE_set_flags(store,X509_V_FLAG_CRL_CHECK_ALL);
-    #endif
     
         STACK_OF(X509)* CAstack = sk_X509_new_null();
         
         // This contains the state of the validate operation.
+        int count=0;
         X509_STORE_CTX ctx;
         
         const vector<XSECCryptoX509*>& CAcerts = pkixInfo->getTrustAnchors();
         for (vector<XSECCryptoX509*>::const_iterator i=CAcerts.begin(); i!=CAcerts.end(); ++i) {
             if ((*i)->getProviderName()==DSIGConstants::s_unicodeStrPROVOpenSSL) {
                 sk_X509_push(CAstack,static_cast<OpenSSLCryptoX509*>(*i)->getOpenSSLX509());
+                ++count;
             }
         }
 
+        log.debug("supplied (%d) CA certificate(s)", count);
+
+#if (OPENSSL_VERSION_NUMBER >= 0x00907000L)
+        count=0;
+        if (inlineCRLs) {
+            for (vector<XSECCryptoX509CRL*>::const_iterator j=inlineCRLs->begin(); j!=inlineCRLs->end(); ++j) {
+                if ((*j)->getProviderName()==DSIGConstants::s_unicodeStrPROVOpenSSL) {
+                    // owned by store
+                    X509_STORE_add_crl(store, X509_CRL_dup(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL()));
+                    ++count;
+                }
+            }
+        }
         const vector<XSECCryptoX509CRL*>& crls = pkixInfo->getCRLs();
         for (vector<XSECCryptoX509CRL*>::const_iterator j=crls.begin(); j!=crls.end(); ++j) {
             if ((*j)->getProviderName()==DSIGConstants::s_unicodeStrPROVOpenSSL) {
                 // owned by store
                 X509_STORE_add_crl(store, X509_CRL_dup(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL()));
+                ++count;
             }
         }
-     
+        log.debug("supplied (%d) CRL(s)", count);
+        if (count > 0)
+            X509_STORE_set_flags(store, fullCRLChain ? (X509_V_FLAG_CRL_CHECK|X509_V_FLAG_CRL_CHECK_ALL) : (X509_V_FLAG_CRL_CHECK));
+#else
+        if ((inlineCRLs && !inlineCRLs->empty()) || !pkixInfo->getCRLs().empty()) {
+            log.warn("OpenSSL versions < 0.9.7 do not support CRL checking");
+        }
+#endif
+
         // AFAICT, EE and untrusted are passed in but not owned by the ctx.
-    #if (OPENSSL_VERSION_NUMBER >= 0x00907000L)
+#if (OPENSSL_VERSION_NUMBER >= 0x00907000L)
         if (X509_STORE_CTX_init(&ctx,store,EE,untrusted)!=1) {
             log_openssl();
             log.error("unable to initialize X509_STORE_CTX");
@@ -99,9 +125,9 @@ namespace {
             X509_STORE_free(store);
             return false;
         }
-    #else
+#else
         X509_STORE_CTX_init(&ctx,store,EE,untrusted);
-    #endif
+#endif
     
         // Seems to be most efficient to just pass in the CA stack.
         X509_STORE_CTX_trusted_stack(&ctx,CAstack);
@@ -135,6 +161,13 @@ namespace {
         return false;
     }
 };
+
+AbstractPKIXTrustEngine::AbstractPKIXTrustEngine(const xercesc::DOMElement* e) : TrustEngine(e), m_fullCRLChain(false)
+{
+    static XMLCh fullCRLChain[] = UNICODE_LITERAL_12(f,u,l,l,C,R,L,C,h,a,i,n);
+    const XMLCh* flag = e ? e->getAttributeNS(NULL, fullCRLChain) : NULL;
+    m_fullCRLChain = (flag && (*flag == xercesc::chLatin_t || *flag == xercesc::chDigit_1));
+}
 
 bool AbstractPKIXTrustEngine::checkEntityNames(
     X509* certEE, const CredentialResolver& credResolver, const CredentialCriteria& criteria
@@ -243,15 +276,16 @@ bool AbstractPKIXTrustEngine::checkEntityNames(
     return false;
 }
 
-bool AbstractPKIXTrustEngine::validate(
+bool AbstractPKIXTrustEngine::validateWithCRLs(
     X509* certEE,
     STACK_OF(X509)* certChain,
     const CredentialResolver& credResolver,
-    CredentialCriteria* criteria
+    CredentialCriteria* criteria,
+    const std::vector<XSECCryptoX509CRL*>* inlineCRLs
     ) const
 {
 #ifdef _DEBUG
-    NDC ndc("validate");
+    NDC ndc("validateWithCRLs");
 #endif
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine.PKIX");
 
@@ -274,13 +308,23 @@ bool AbstractPKIXTrustEngine::validate(
 
     auto_ptr<PKIXValidationInfoIterator> pkix(getPKIXValidationInfoIterator(credResolver, criteria));
     while (pkix->next()) {
-        if (::validate(certEE,certChain,pkix.get())) {
+        if (::validate(certEE,certChain,pkix.get(),m_fullCRLChain,inlineCRLs)) {
             return true;
         }
     }
 
     log.debug("failed to validate certificate chain using supplied PKIX information");
     return false;
+}
+
+bool AbstractPKIXTrustEngine::validate(
+    X509* certEE,
+    STACK_OF(X509)* certChain,
+    const CredentialResolver& credResolver,
+    CredentialCriteria* criteria
+    ) const
+{
+    return validateWithCRLs(certEE,certChain,credResolver,criteria);
 }
 
 bool AbstractPKIXTrustEngine::validate(
@@ -332,7 +376,7 @@ bool AbstractPKIXTrustEngine::validate(
 
     // Pull the certificate chain out of the signature.
     X509Credential* x509cred;
-    auto_ptr<Credential> cred(inlineResolver->resolve(&sig,X509Credential::RESOLVE_CERTS));
+    auto_ptr<Credential> cred(inlineResolver->resolve(&sig,X509Credential::RESOLVE_CERTS|X509Credential::RESOLVE_CRLS));
     if (!cred.get() || !(x509cred=dynamic_cast<X509Credential*>(cred.get()))) {
         log.error("unable to perform PKIX validation, signature does not contain any certificates");
         return false;
@@ -362,11 +406,22 @@ bool AbstractPKIXTrustEngine::validate(
         }
     }
     
-    if (certEE)
-        return validate(certEE,certs,credResolver,criteria);
-        
-    log.debug("failed to verify signature with embedded certificates");
-    return false;
+    if (!certEE) {
+        log.debug("failed to verify signature with embedded certificates");
+        return false;
+    }
+    else if (certEE->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
+        log.error("only the OpenSSL XSEC provider is supported");
+        return false;
+    }
+
+    STACK_OF(X509)* untrusted=sk_X509_new_null();
+    for (vector<XSECCryptoX509*>::const_iterator i=certs.begin(); i!=certs.end(); ++i)
+        sk_X509_push(untrusted,static_cast<OpenSSLCryptoX509*>(*i)->getOpenSSLX509());
+    const vector<XSECCryptoX509CRL*>& crls = x509cred->getCRLs();
+    bool ret = validateWithCRLs(static_cast<OpenSSLCryptoX509*>(certEE)->getOpenSSLX509(), untrusted, credResolver, criteria, &crls);
+    sk_X509_free(untrusted);
+    return ret;
 }
 
 bool AbstractPKIXTrustEngine::validate(

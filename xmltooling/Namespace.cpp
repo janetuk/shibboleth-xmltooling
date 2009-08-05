@@ -25,6 +25,8 @@
 
 using namespace xmltooling;
 
+using xercesc::XMLString;
+
 Namespace::Namespace(const XMLCh* uri, const XMLCh* prefix, bool alwaysDeclare) : m_pinned(alwaysDeclare)
 {
 #ifndef HAVE_GOOD_STL

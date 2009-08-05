@@ -30,6 +30,8 @@
 using namespace xmltooling;
 using namespace std;
 
+using xercesc::DOMElement;
+
 namespace xmltooling {
     XMLTOOL_DLLLOCAL PluginManager<TrustEngine,string,const DOMElement*>::Factory ExplicitKeyTrustEngineFactory;
     XMLTOOL_DLLLOCAL PluginManager<TrustEngine,string,const DOMElement*>::Factory StaticPKIXTrustEngineFactory;

@@ -299,9 +299,7 @@ ACLOCAL_AMFLAGS = -I .
 
 MOSTLYCLEANFILES = $(DX_CLEANFILES)
 SUBDIRS = doc schemas xmltooling xmltoolingtest
-@DX_COND_doc_TRUE@APIDOCS = doc/api
 EXTRA_DIST = $(DX_CONFIG) \
-        $(APIDOCS) \
         cpp-xmltooling.sln \
         acx_pthread.m4 \
         acinclude.m4 \
@@ -517,7 +515,6 @@ distclean-tags:
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/doc
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
