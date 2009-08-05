@@ -1,6 +1,6 @@
 /*
  *  Copyright 2001-2007 Internet2
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,8 @@
 
 /**
  * DateTime.cpp
- * 
- * Manipulation of XML date/time data. 
+ *
+ * Manipulation of XML date/time data.
  */
 
 /*
@@ -34,10 +34,12 @@
 #endif
 
 #include <ctime>
+#include <sstream>
 #include <assert.h>
 #include <xercesc/util/Janitor.hpp>
 
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 
 //
@@ -245,7 +247,7 @@ void DateTime::addDuration(DateTime*             fNewDate
     temp = DATETIMES[index][Second] + fDuration->fValue[Second];
     carry = fQuotient (temp, 60);
     fNewDate->fValue[Second] =  mod(temp, 60, carry);
-		
+
     //add minutes
     temp = DATETIMES[index][Minute] + fDuration->fValue[Minute] + carry;
     carry = fQuotient(temp, 60);
@@ -255,7 +257,7 @@ void DateTime::addDuration(DateTime*             fNewDate
     temp = DATETIMES[index][Hour] + fDuration->fValue[Hour] + carry;
     carry = fQuotient(temp, 24);
     fNewDate->fValue[Hour] = mod(temp, 24, carry);
-		
+
     fNewDate->fValue[Day] =
         DATETIMES[index][Day] + fDuration->fValue[Day] + carry;
 
@@ -316,7 +318,7 @@ int DateTime::compareResult(int resultA
     }
 
     return resultA;
-	
+
 }
 
 // ---------------------------------------------------------------------------
@@ -346,7 +348,7 @@ int DateTime::compare(const DateTime* const pDate1
         return getRetVal(c1, c2);
     }
 
-    return XMLDateTime::INDETERMINATE;	
+    return XMLDateTime::INDETERMINATE;
 }
 
 int DateTime::compareResult(const DateTime* const pDate1
@@ -436,7 +438,7 @@ DateTime::DateTime(const XMLCh* const aString)
     setBuffer(aString);
 }
 
-DateTime::DateTime(time_t epoch)
+DateTime::DateTime(time_t epoch, bool duration)
 : fStart(0)
 , fEnd(0)
 , fBufferMaxLen(0)
@@ -444,16 +446,34 @@ DateTime::DateTime(time_t epoch)
 , fMiliSecond(0)
 , fHasTime(false)
 {
+    if (duration) {
+        ostringstream s;
+        if (epoch < 0) {
+            s << "-";
+            epoch = -epoch;
+        }
+        time_t days = epoch / 86400;
+        epoch %= 86400;
+        time_t hours = epoch / 3600;
+        epoch %= 3600;
+        time_t minutes = epoch / 60;
+        epoch %= 60;
+        s << "P" << days << "DT" << hours << "H" << minutes << "M" << epoch << "S";
+        auto_ptr_XMLCh timeptr(s.str().c_str());
+        setBuffer(timeptr.get());
+    }
+    else {
 #ifndef HAVE_GMTIME_R
-    struct tm* ptime=gmtime(&epoch);
+        struct tm* ptime=gmtime(&epoch);
 #else
-    struct tm res;
-    struct tm* ptime=gmtime_r(&epoch,&res);
+        struct tm res;
+        struct tm* ptime=gmtime_r(&epoch,&res);
 #endif
-    char timebuf[32];
-    strftime(timebuf,32,"%Y-%m-%dT%H:%M:%SZ",ptime);
-    auto_ptr_XMLCh timeptr(timebuf);
-    setBuffer(timeptr.get());
+        char timebuf[32];
+        strftime(timebuf,32,"%Y-%m-%dT%H:%M:%SZ",ptime);
+        auto_ptr_XMLCh timeptr(timebuf);
+        setBuffer(timeptr.get());
+    }
 }
 
 // -----------------------------------------------------------------------
@@ -497,25 +517,35 @@ const XMLCh*  DateTime::getFormattedString() const
 
 int DateTime::getSign() const
 {
-    return 0;
+    return fValue[utc];
 }
 
-time_t DateTime::getEpoch() const
+time_t DateTime::getEpoch(bool duration) const
 {
-    struct tm t;
-    t.tm_sec=getSecond();
-    t.tm_min=getMinute();
-    t.tm_hour=getHour();
-    t.tm_mday=getDay();
-    t.tm_mon=getMonth()-1;
-    t.tm_year=getYear()-1900;
-    t.tm_isdst=0;
+    if (duration) {
+        time_t epoch = getSecond() + (60 * getMinute()) + (3600 * getHour()) + (86400 * getDay());
+        if (getMonth())
+            epoch += (((365 * 4) + 1)/48 * 86400);
+        if (getYear())
+            epoch += 365.25 * 86400;
+        return getSign()!=UTC_NEG ? epoch : -epoch;
+    }
+    else {
+        struct tm t;
+        t.tm_sec=getSecond();
+        t.tm_min=getMinute();
+        t.tm_hour=getHour();
+        t.tm_mday=getDay();
+        t.tm_mon=getMonth()-1;
+        t.tm_year=getYear()-1900;
+        t.tm_isdst=0;
 #if defined(HAVE_TIMEGM)
-    return timegm(&t);
+        return timegm(&t);
 #else
-    // Windows, and hopefully most others...?
-    return mktime(&t) - timezone;
+        // Windows, and hopefully most others...?
+        return mktime(&t) - timezone;
 #endif
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -625,14 +655,14 @@ void DateTime::parseMonth()
     fValue[Day]      = DAY_DEFAULT;
     fValue[Month]    = parseInt(2, 4);
 
-    // REVISIT: allow both --MM and --MM-- now. 
-    // need to remove the following lines to disallow --MM-- 
-    // when the errata is officially in the rec. 
+    // REVISIT: allow both --MM and --MM-- now.
+    // need to remove the following lines to disallow --MM--
+    // when the errata is officially in the rec.
     fStart = 4;
-    if ( fEnd >= fStart+2 && fBuffer[fStart] == DATE_SEPARATOR && fBuffer[fStart+1] == DATE_SEPARATOR ) 
-    { 
-        fStart += 2; 
-    } 
+    if ( fEnd >= fStart+2 && fBuffer[fStart] == DATE_SEPARATOR && fBuffer[fStart+1] == DATE_SEPARATOR )
+    {
+        fStart += 2;
+    }
 
     //
     // parse TimeZone if any
@@ -702,7 +732,7 @@ void DateTime::parseMonthDay()
 
     //initialize
     fValue[CentYear] = YEAR_DEFAULT;
-    fValue[Month]    = parseInt(2, 4);	
+    fValue[Month]    = parseInt(2, 4);
     fValue[Day]      = parseInt(5, 7);
 
     if ( MONTHDAY_SIZE < fEnd )
@@ -855,9 +885,9 @@ void DateTime::parseDuration()
 
             /***
              * Schema Errata: E2-23
-             * at least one digit must follow the decimal point if it appears. 
-             * That is, the value of the seconds component must conform 
-             * to the following pattern: [0-9]+(.[0-9]+)? 
+             * at least one digit must follow the decimal point if it appears.
+             * That is, the value of the seconds component must conform
+             * to the following pattern: [0-9]+(.[0-9]+)?
              */
             if ( mlsec != NOT_FOUND )
             {
@@ -1072,9 +1102,9 @@ void DateTime::getTimeZone(const int sign)
         if ((sign + 1) != fEnd )
         {
             throw XMLParserException("Error in parsing time zone.");
-        }		
+        }
 
-        return;	
+        return;
     }
 
     //
@@ -1089,9 +1119,9 @@ void DateTime::getTimeZone(const int sign)
         throw XMLParserException("Error in parsing time zone.");
     }
 
-    fTimeZone[hh] = parseInt(sign+1, sign+3);		
+    fTimeZone[hh] = parseInt(sign+1, sign+3);
     fTimeZone[mm] = parseInt(sign+4, fEnd);
-        		
+
     return;
 }
 
@@ -1214,7 +1244,7 @@ void DateTime::validateDateTime() const
     {
         throw XMLParserException("Minute must have values 0-59");
     }
-	
+
     return;
 }
 
@@ -1332,15 +1362,15 @@ int DateTime::parseIntYear(const int end) const
  * E2-41
  *
  *  3.2.7.2 Canonical representation
- * 
- *  Except for trailing fractional zero digits in the seconds representation, 
- *  '24:00:00' time representations, and timezone (for timezoned values), 
- *  the mapping from literals to values is one-to-one. Where there is more 
- *  than one possible representation, the canonical representation is as follows: 
- *  redundant trailing zero digits in fractional-second literals are prohibited. 
+ *
+ *  Except for trailing fractional zero digits in the seconds representation,
+ *  '24:00:00' time representations, and timezone (for timezoned values),
+ *  the mapping from literals to values is one-to-one. Where there is more
+ *  than one possible representation, the canonical representation is as follows:
+ *  redundant trailing zero digits in fractional-second literals are prohibited.
  *  An hour representation of '24' is prohibited. Timezoned values are canonically
- *  represented by appending 'Z' to the nontimezoned representation. (All 
- *  timezoned dateTime values are UTC.) 
+ *  represented by appending 'Z' to the nontimezoned representation. (All
+ *  timezoned dateTime values are UTC.)
  *
  *  .'24:00:00' -> '00:00:00'
  *  .milisecond: trailing zeros removed
@@ -1402,8 +1432,8 @@ XMLCh* DateTime::getDateTimeCanonicalRepresentation() const
 /***
  * 3.2.8 time
  *
- *  . either the time zone must be omitted or, 
- *    if present, the time zone must be Coordinated Universal Time (UTC) indicated by a "Z".   
+ *  . either the time zone must be omitted or,
+ *    if present, the time zone must be Coordinated Universal Time (UTC) indicated by a "Z".
  *
  *  . Additionally, the canonical representation for midnight is 00:00:00.
  *
@@ -1450,7 +1480,7 @@ void DateTime::fillString(XMLCh*& ptr, valueIndex ind, int expLen) const
     XMLCh strBuffer[16];
     assert(expLen < 16);
     XMLString::binToText(fValue[ind], strBuffer, expLen, 10);
-    int   actualLen = XMLString::stringLen(strBuffer);
+    int   actualLen = (int) XMLString::stringLen(strBuffer);
     int   i;
     //append leading zeros
     for (i = 0; i < expLen - actualLen; i++)
@@ -1470,7 +1500,7 @@ int DateTime::fillYearString(XMLCh*& ptr, valueIndex ind) const
     XMLCh strBuffer[16];
     // let's hope we get no years of 15 digits...
     XMLString::binToText(fValue[ind], strBuffer, 15, 10);
-    int   actualLen = XMLString::stringLen(strBuffer);
+    int   actualLen = (int) XMLString::stringLen(strBuffer);
     // don't forget that years can be negative...
     int negativeYear = 0;
     if(strBuffer[0] == chDash)

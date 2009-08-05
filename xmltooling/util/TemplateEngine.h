@@ -1,6 +1,6 @@
 /*
- *  Copyright 2001-2007 Internet2
- * 
+ *  Copyright 2001-2009 Internet2
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 
 /**
  * @file xmltooling/util/TemplateEngine.h
- * 
+ *
  * Simple template replacement engine.
  */
 
@@ -28,6 +28,7 @@
 #include <map>
 #include <string>
 #include <iostream>
+#include <vector>
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -42,8 +43,11 @@ namespace xmltooling {
      *  <li> &lt;mlp key/&gt; </li>
      *  <li> &lt;mlpif key&gt; stuff &lt;/mlpif&gt;</li>
      *  <li> &lt;mlpifnot key&gt; stuff &lt;/mlpifnot&gt;</li>
+     *  <li> &lt;mlpfor key&gt; stuff &lt;/mlpfor&gt;</li>
+     *  <li> &lt;mlp $name/&gt; (in for loop only) </li>
+     *  <li> &lt;mlp $value/&gt; (in for loop only) </li>
      * </ul>
-     * 
+     *
      * The default tag prefix is "mlp". This can be overridden for
      * compatibility.
      */
@@ -51,39 +55,41 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(TemplateEngine);
     public:
-        
         TemplateEngine() {
-            setTagPrefix("mlp"); 
+            setTagPrefix("mlp");
         }
 
         virtual ~TemplateEngine() {}
-        
+
         /**
          * Sets the tag name to use when locating template replacement tags.
-         * 
+         *
          * @param tagPrefix base prefix for tags
          */
         void setTagPrefix(const char* tagPrefix);
-        
+
         /**
          * Interface to parameters to plug into templates.
          * Allows callers to supply a more dynamic lookup mechanism to supplement a basic map.
          */
         class XMLTOOL_API TemplateParameters {
-            MAKE_NONCOPYABLE(TemplateParameters);
+            // MAKE_NONCOPYABLE(TemplateParameters);
         public:
             TemplateParameters() : m_request(NULL) {}
             virtual ~TemplateParameters() {}
-            
+
             /** Map of known parameters to supply to template. */
             std::map<std::string,std::string> m_map;
-            
+
+            /** Map of sub-collections used in for loops. */
+            std::map< std::string,std::multimap<std::string,std::string> > m_collectionMap;
+
             /** Request from client that resulted in template being processed. */
             const GenericRequest* m_request;
-            
+
             /**
              * Returns the value of a parameter to plug into the template.
-             * 
+             *
              * @param name  name of parameter
              * @return value of parameter, or NULL
              */
@@ -91,12 +97,23 @@ namespace xmltooling {
                 std::map<std::string,std::string>::const_iterator i=m_map.find(name);
                 return (i!=m_map.end() ? i->second.c_str() : (m_request ? m_request->getParameter(name) : NULL));
             }
+
+            /**
+             * Returns a named collection of sub-parameters to pass into a loop.
+             *
+             * @param name  name of sub-collection
+             * @return pointer to a multimap of sub-parameters, or NULL
+             */
+            virtual const std::multimap<std::string,std::string>* getLoopCollection(const char* name) const {
+                std::map< std::string,std::multimap<std::string,std::string> >::const_iterator i=m_collectionMap.find(name);
+                return (i!=m_collectionMap.end() ? &(i->second) : NULL);
+            }
         };
-        
+
         /**
          * Processes template from an input stream and executes replacements and
-         * conditional logic based on parameters. 
-         * 
+         * conditional logic based on parameters.
+         *
          * @param is            input stream providing template
          * @param os            output stream to send results of executing template
          * @param parameters    parameters to plug into template
@@ -109,6 +126,12 @@ namespace xmltooling {
             const XMLToolingException* e=NULL
             ) const;
 
+        /**
+         * List of non-built-in characters considered "unsafe" and requiring HTML encoding.
+         * The default set is #%&():[]\\`{}
+         */
+        static std::string unsafe_chars;
+
     private:
         void trimspace(std::string& s) const;
         void html_encode(std::ostream& os, const char* start) const;
@@ -118,10 +141,11 @@ namespace xmltooling {
             const char*& lastpos,
             std::ostream& os,
             const TemplateParameters& parameters,
+            const std::pair<const std::string,std::string>& loopentry,
             const XMLToolingException* e
             ) const;
-            
-        std::string keytag,iftag,ifendtag,ifnottag,ifnotendtag;
+
+        std::string keytag,iftag,ifendtag,ifnottag,ifnotendtag,fortag,forendtag;
     };
 };
 

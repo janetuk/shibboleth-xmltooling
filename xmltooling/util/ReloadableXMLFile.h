@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,6 +53,10 @@ namespace xmltooling {
          *  <dd>use a validating parser</dd>
          *  <dt>reloadChanges</dt>
          *  <dd>enables monitoring of local file for changes</dd>
+         *  <dt>reloadInterval</dt>
+         *  <dd>enables periodic refresh of remote file</dd>
+         *  <dt>backingFilePath</dt>
+         *  <dd>location for backup of remote resource</dd>
          * </dl>
          * 
          * @param e     DOM to supply configuration

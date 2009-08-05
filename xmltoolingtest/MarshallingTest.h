@@ -21,21 +21,20 @@
 class MarshallingTest : public CxxTest::TestSuite {
 public:
     void setUp() {
-        QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
-        QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
+        xmltooling::QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
+        xmltooling::QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
         XMLObjectBuilder::registerBuilder(qname, new SimpleXMLObjectBuilder());
         XMLObjectBuilder::registerBuilder(qtype, new SimpleXMLObjectBuilder());
     }
 
     void tearDown() {
-        QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
-        QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
+        xmltooling::QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
+        xmltooling::QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
         XMLObjectBuilder::deregisterBuilder(qname);
         XMLObjectBuilder::deregisterBuilder(qtype);
     }
 
     void testMarshallingWithAttributes() {
-        QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
         auto_ptr<SimpleXMLObject> sxObject(SimpleXMLObjectBuilder::buildSimpleXMLObject());
         TS_ASSERT(sxObject.get()!=NULL);
         auto_ptr_XMLCh expected("Firefly");
@@ -53,7 +52,6 @@ public:
     }
 
     void testMarshallingWithElementContent() {
-        QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
         auto_ptr<SimpleXMLObject> sxObject(SimpleXMLObjectBuilder::buildSimpleXMLObject());
         TS_ASSERT(sxObject.get()!=NULL);
         auto_ptr_XMLCh expected("Sample Content");
@@ -71,7 +69,7 @@ public:
     }
 
     void testMarshallingWithChildElements() {
-        QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
+        xmltooling::QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
         const SimpleXMLObjectBuilder* b=dynamic_cast<const SimpleXMLObjectBuilder*>(XMLObjectBuilder::getBuilder(qname));
         TS_ASSERT(b!=NULL);
         
@@ -91,7 +89,7 @@ public:
         kids.erase(kids.begin()+1);
         TS_ASSERT(XMLString::equals(kids.back()->getValue(), bar.get()));
         
-        QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME,SimpleXMLObject::NAMESPACE_PREFIX);
+        xmltooling::QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME,SimpleXMLObject::NAMESPACE_PREFIX);
         kids.push_back(
             dynamic_cast<SimpleXMLObject*>(
                 b->buildObject(SimpleXMLObject::NAMESPACE,SimpleXMLObject::DERIVED_NAME,SimpleXMLObject::NAMESPACE_PREFIX,&qtype)

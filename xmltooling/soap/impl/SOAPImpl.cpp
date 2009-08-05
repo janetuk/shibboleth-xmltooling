@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2008 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * SOAPImpl.cpp
  * 
- * Implementation classes for SOAP schema
+ * Implementation classes for SOAP 1.1 schema
  */
 
 #include "internal.h"
@@ -34,6 +34,7 @@
 
 using namespace soap11;
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 using xmlconstants::SOAP11ENV_NS;
 using xmlconstants::SOAP11ENV_PREFIX;
@@ -54,13 +55,13 @@ namespace {
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
-        QName* m_qname;
+        xmltooling::QName* m_qname;
     public:
         virtual ~FaultcodeImpl() {
             delete m_qname;
         }
 
-        FaultcodeImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        FaultcodeImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_qname(NULL) {
         }
             
@@ -69,11 +70,11 @@ namespace {
             setCode(src.getCode());
         }
         
-        const QName* getCode() const {
+        const xmltooling::QName* getCode() const {
             return m_qname;
         }
         
-        void setCode(const QName* qname) {
+        void setCode(const xmltooling::QName* qname) {
             m_qname=prepareForAssignment(m_qname,qname);
             if (m_qname) {
                 auto_ptr_XMLCh temp(m_qname->toString().c_str());
@@ -96,7 +97,7 @@ namespace {
     public:
         virtual ~DetailImpl() {}
 
-        DetailImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        DetailImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
         }
             
@@ -158,7 +159,7 @@ namespace {
     public:
         virtual ~FaultImpl() {}
 
-        FaultImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        FaultImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
                 : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
             init();
         }
@@ -199,17 +200,12 @@ namespace {
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
-        void init() {
-            m_EncodingStyle=NULL;
-        }
     public:
         virtual ~BodyImpl() {
-            XMLString::release(&m_EncodingStyle);
         }
 
-        BodyImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        BodyImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
-            init();
         }
             
         BodyImpl(const BodyImpl& src)
@@ -217,31 +213,16 @@ namespace {
                     AbstractAttributeExtensibleXMLObject(src),
                     AbstractComplexElement(src),
                     AbstractDOMCachingXMLObject(src) {
-            init();
-            setEncodingStyle(src.getEncodingStyle());
             VectorOf(XMLObject) v=getUnknownXMLObjects();
             for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i)
                 v.push_back((*i)->clone());
         }
         
         IMPL_XMLOBJECT_CLONE(Body);
-        IMPL_STRING_ATTRIB(EncodingStyle);
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject, m_children.end());
-
-        using AbstractAttributeExtensibleXMLObject::setAttribute;
-        void setAttribute(QName& qualifiedName, const XMLCh* value, bool ID=false) {
-            if (qualifiedName.hasNamespaceURI() && XMLString::equals(qualifiedName.getNamespaceURI(),SOAP11ENV_NS)) {
-                if (XMLString::equals(qualifiedName.getLocalPart(),ENCODINGSTYLE_ATTRIB_NAME)) {
-                    setEncodingStyle(value);
-                    return;
-                }
-            }
-            AbstractAttributeExtensibleXMLObject::setAttribute(qualifiedName, value, ID);
-        }
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_STRING_ATTRIB(EncodingStyle,ENCODINGSTYLE,SOAP11ENV_NS);
             marshallExtensionAttributes(domElement);
         }
 
@@ -265,7 +246,7 @@ namespace {
         virtual ~HeaderImpl() {
         }
 
-        HeaderImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        HeaderImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
         }
             
@@ -315,7 +296,7 @@ namespace {
     public:
         virtual ~EnvelopeImpl() {}
 
-        EnvelopeImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        EnvelopeImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
             init();
         }
@@ -390,7 +371,7 @@ static const XMLCh _SERVER[] =                          UNICODE_LITERAL_6(S,e,r,
 static const XMLCh _MUSTUNDERSTAND[] =                  UNICODE_LITERAL_14(M,u,s,t,U,n,d,e,r,s,t,a,n,d);
 static const XMLCh _VERSIONMISMATCH[] =                 UNICODE_LITERAL_15(V,e,r,s,i,o,n,M,i,s,m,a,t,c,h);
  
-QName Faultcode::CLIENT(SOAP11ENV_NS,_CLIENT,SOAP11ENV_PREFIX);
-QName Faultcode::SERVER(SOAP11ENV_NS,_SERVER,SOAP11ENV_PREFIX);
-QName Faultcode::MUSTUNDERSTAND(SOAP11ENV_NS,_MUSTUNDERSTAND,SOAP11ENV_PREFIX);
-QName Faultcode::VERSIONMISMATCH(SOAP11ENV_NS,_VERSIONMISMATCH,SOAP11ENV_PREFIX);
+xmltooling::QName Faultcode::CLIENT(SOAP11ENV_NS,_CLIENT,SOAP11ENV_PREFIX);
+xmltooling::QName Faultcode::SERVER(SOAP11ENV_NS,_SERVER,SOAP11ENV_PREFIX);
+xmltooling::QName Faultcode::MUSTUNDERSTAND(SOAP11ENV_NS,_MUSTUNDERSTAND,SOAP11ENV_PREFIX);
+xmltooling::QName Faultcode::VERSIONMISMATCH(SOAP11ENV_NS,_VERSIONMISMATCH,SOAP11ENV_PREFIX);

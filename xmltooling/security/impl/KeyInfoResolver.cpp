@@ -30,7 +30,7 @@ using namespace xmltooling;
 using namespace std;
 
 namespace xmltooling {
-    XMLTOOL_DLLLOCAL PluginManager<KeyInfoResolver,string,const DOMElement*>::Factory InlineKeyInfoResolverFactory;
+    XMLTOOL_DLLLOCAL PluginManager<KeyInfoResolver,string,const xercesc::DOMElement*>::Factory InlineKeyInfoResolverFactory;
 };
 
 void XMLTOOL_API xmltooling::registerKeyInfoResolvers()

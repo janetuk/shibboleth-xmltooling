@@ -26,8 +26,8 @@
 using namespace xmltooling;
 
 namespace xmltooling {
-    XMLTOOL_DLLLOCAL PluginManager<CredentialResolver,std::string,const DOMElement*>::Factory FilesystemCredentialResolverFactory; 
-    XMLTOOL_DLLLOCAL PluginManager<CredentialResolver,std::string,const DOMElement*>::Factory ChainingCredentialResolverFactory; 
+    XMLTOOL_DLLLOCAL PluginManager<CredentialResolver,std::string,const xercesc::DOMElement*>::Factory FilesystemCredentialResolverFactory; 
+    XMLTOOL_DLLLOCAL PluginManager<CredentialResolver,std::string,const xercesc::DOMElement*>::Factory ChainingCredentialResolverFactory; 
 };
 
 void XMLTOOL_API xmltooling::registerCredentialResolvers()

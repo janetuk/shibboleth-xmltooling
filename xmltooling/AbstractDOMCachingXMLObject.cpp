@@ -30,6 +30,7 @@
 #include <functional>
 
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 
 AbstractDOMCachingXMLObject::~AbstractDOMCachingXMLObject()

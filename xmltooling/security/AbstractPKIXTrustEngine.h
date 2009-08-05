@@ -43,6 +43,7 @@ namespace xmltooling {
          * If a DOM is supplied, the following XML content is supported:
          * 
          * <ul>
+         *  <li>fullCRLChain boolean attribute
          *  <li>&lt;KeyInfoResolver&gt; elements with a type attribute
          * </ul>
          * 
@@ -50,7 +51,9 @@ namespace xmltooling {
          * 
          * @param e DOM to supply configuration for provider
          */
-        AbstractPKIXTrustEngine(const xercesc::DOMElement* e=NULL) : TrustEngine(e) {}
+        AbstractPKIXTrustEngine(const xercesc::DOMElement* e=NULL);
+
+        bool m_fullCRLChain;
         
         /**
          * Checks that either the name of the peer with the given credentials or the names
@@ -63,7 +66,7 @@ namespace xmltooling {
          * @return true the name check succeeds, false if not
          */
         bool checkEntityNames(X509* certEE, const CredentialResolver& credResolver, const CredentialCriteria& criteria) const;
-        
+
     public:
         virtual ~AbstractPKIXTrustEngine() {}
 
@@ -160,6 +163,15 @@ namespace xmltooling {
         virtual PKIXValidationInfoIterator* getPKIXValidationInfoIterator(
             const CredentialResolver& pkixSource, CredentialCriteria* criteria=NULL
             ) const=0;
+
+    private:
+        bool validateWithCRLs(
+            X509* certEE,
+            STACK_OF(X509)* certChain,
+            const CredentialResolver& credResolver,
+            CredentialCriteria* criteria=NULL,
+            const std::vector<XSECCryptoX509CRL*>* inlineCRLs=NULL
+            ) const;
     };
 };
 

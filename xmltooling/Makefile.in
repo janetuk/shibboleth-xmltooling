@@ -148,6 +148,7 @@ am__libxmltooling_la_SOURCES_DIST =  \
 	security/impl/InlineKeyResolver.cpp \
 	security/impl/KeyInfoResolver.cpp \
 	security/impl/OpenSSLCryptoX509CRL.cpp \
+	security/impl/SecurityHelper.cpp \
 	security/impl/StaticPKIXTrustEngine.cpp \
 	security/impl/TrustEngine.cpp \
 	security/impl/XSECCryptoX509CRL.cpp \
@@ -155,9 +156,8 @@ am__libxmltooling_la_SOURCES_DIST =  \
 	signature/impl/KeyInfoSchemaValidators.cpp \
 	signature/impl/SignatureValidator.cpp \
 	signature/impl/XMLSecSignatureImpl.cpp \
-	soap/impl/CURLSOAPTransport.cpp util/CurlNetAccessor.cpp \
-	util/CurlURLInputStream.cpp util/ReplayCache.cpp \
-	util/StorageService.cpp
+	soap/impl/CURLSOAPTransport.cpp util/CurlURLInputStream.cpp \
+	util/ReplayCache.cpp util/StorageService.cpp
 @BUILD_PTHREAD_TRUE@am__objects_3 = PThreads.lo
 am__objects_4 = AbstractAttributeExtensibleXMLObject.lo \
 	AbstractComplexElement.lo AbstractDOMCachingXMLObject.lo \
@@ -177,12 +177,12 @@ am__objects_5 = Decrypter.lo EncryptedKeyResolver.lo Encrypter.lo \
 	ChainingTrustEngine.lo CredentialCriteria.lo \
 	CredentialResolver.lo ExplicitKeyTrustEngine.lo \
 	FilesystemCredentialResolver.lo InlineKeyResolver.lo \
-	KeyInfoResolver.lo OpenSSLCryptoX509CRL.lo \
+	KeyInfoResolver.lo OpenSSLCryptoX509CRL.lo SecurityHelper.lo \
 	StaticPKIXTrustEngine.lo TrustEngine.lo XSECCryptoX509CRL.lo \
 	KeyInfoImpl.lo KeyInfoSchemaValidators.lo \
 	SignatureValidator.lo XMLSecSignatureImpl.lo \
-	CURLSOAPTransport.lo CurlNetAccessor.lo CurlURLInputStream.lo \
-	ReplayCache.lo StorageService.lo
+	CURLSOAPTransport.lo CurlURLInputStream.lo ReplayCache.lo \
+	StorageService.lo
 @BUILD_XMLSEC_TRUE@am_libxmltooling_la_OBJECTS = $(am__objects_4) \
 @BUILD_XMLSEC_TRUE@	$(am__objects_5)
 libxmltooling_la_OBJECTS = $(am_libxmltooling_la_OBJECTS)
@@ -407,6 +407,7 @@ libxmltoolinginclude_HEADERS = \
 	AttributeExtensibleXMLObject.h \
 	base.h \
 	ConcreteXMLObjectBuilder.h \
+	char_traits.h \
 	config_pub.h \
 	ElementExtensibleXMLObject.h \
 	ElementProxy.h \
@@ -451,6 +452,7 @@ secinclude_HEADERS = \
 	security/KeyInfoCredentialContext.h \
 	security/KeyInfoResolver.h \
 	security/OpenSSLCredential.h \
+	security/SecurityHelper.h \
 	security/SignatureTrustEngine.h \
 	security/TrustEngine.h \
 	security/X509Credential.h \
@@ -473,8 +475,7 @@ soapinclude_HEADERS = \
 	soap/OpenSSLSOAPTransport.h
 
 utilinclude_HEADERS = \
-    util/CurlNetAccessor.hpp \
-    util/CurlURLInputStream.hpp \
+    util/CurlURLInputStream.h \
 	util/DateTime.h \
 	util/NDC.h \
 	util/ParserPool.h \
@@ -515,6 +516,7 @@ xmlsec_sources = \
 	security/impl/InlineKeyResolver.cpp \
 	security/impl/KeyInfoResolver.cpp \
 	security/impl/OpenSSLCryptoX509CRL.cpp \
+	security/impl/SecurityHelper.cpp \
 	security/impl/StaticPKIXTrustEngine.cpp \
 	security/impl/TrustEngine.cpp \
 	security/impl/XSECCryptoX509CRL.cpp \
@@ -523,7 +525,6 @@ xmlsec_sources = \
 	signature/impl/SignatureValidator.cpp \
 	signature/impl/XMLSecSignatureImpl.cpp \
 	soap/impl/CURLSOAPTransport.cpp \
-	util/CurlNetAccessor.cpp \
 	util/CurlURLInputStream.cpp \
 	util/ReplayCache.cpp \
 	util/StorageService.cpp
@@ -566,8 +567,8 @@ libxmltooling_lite_la_SOURCES = \
 	${common_sources}
 
 libxmltooling_lite_la_CPPFLAGS = -DXMLTOOLING_LITE
-libxmltooling_lite_la_LDFLAGS = -version-info 2:0:0
-@BUILD_XMLSEC_TRUE@libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 2:0:0
+libxmltooling_lite_la_LDFLAGS = -version-info 3:0:0
+@BUILD_XMLSEC_TRUE@libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 3:0:0
 @BUILD_XMLSEC_TRUE@libxmltooling_la_SOURCES = \
 @BUILD_XMLSEC_TRUE@	${common_sources} \
 @BUILD_XMLSEC_TRUE@	${xmlsec_sources}
@@ -685,7 +686,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ChainingTrustEngine.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CredentialCriteria.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CredentialResolver.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CurlNetAccessor.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CurlURLInputStream.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DateTime.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Decrypter.Plo@am__quote@
@@ -713,6 +713,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SOAPClient.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SOAPImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SOAPSchemaValidators.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SecurityHelper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SignatureValidator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/StaticPKIXTrustEngine.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/StorageService.Plo@am__quote@
@@ -1243,6 +1244,13 @@ OpenSSLCryptoX509CRL.lo: security/impl/OpenSSLCryptoX509CRL.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o OpenSSLCryptoX509CRL.lo `test -f 'security/impl/OpenSSLCryptoX509CRL.cpp' || echo '$(srcdir)/'`security/impl/OpenSSLCryptoX509CRL.cpp
 
+SecurityHelper.lo: security/impl/SecurityHelper.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT SecurityHelper.lo -MD -MP -MF "$(DEPDIR)/SecurityHelper.Tpo" -c -o SecurityHelper.lo `test -f 'security/impl/SecurityHelper.cpp' || echo '$(srcdir)/'`security/impl/SecurityHelper.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/SecurityHelper.Tpo" "$(DEPDIR)/SecurityHelper.Plo"; else rm -f "$(DEPDIR)/SecurityHelper.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='security/impl/SecurityHelper.cpp' object='SecurityHelper.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o SecurityHelper.lo `test -f 'security/impl/SecurityHelper.cpp' || echo '$(srcdir)/'`security/impl/SecurityHelper.cpp
+
 StaticPKIXTrustEngine.lo: security/impl/StaticPKIXTrustEngine.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT StaticPKIXTrustEngine.lo -MD -MP -MF "$(DEPDIR)/StaticPKIXTrustEngine.Tpo" -c -o StaticPKIXTrustEngine.lo `test -f 'security/impl/StaticPKIXTrustEngine.cpp' || echo '$(srcdir)/'`security/impl/StaticPKIXTrustEngine.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/StaticPKIXTrustEngine.Tpo" "$(DEPDIR)/StaticPKIXTrustEngine.Plo"; else rm -f "$(DEPDIR)/StaticPKIXTrustEngine.Tpo"; exit 1; fi
@@ -1298,13 +1306,6 @@ CURLSOAPTransport.lo: soap/impl/CURLSOAPTransport.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='soap/impl/CURLSOAPTransport.cpp' object='CURLSOAPTransport.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o CURLSOAPTransport.lo `test -f 'soap/impl/CURLSOAPTransport.cpp' || echo '$(srcdir)/'`soap/impl/CURLSOAPTransport.cpp
-
-CurlNetAccessor.lo: util/CurlNetAccessor.cpp
-@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT CurlNetAccessor.lo -MD -MP -MF "$(DEPDIR)/CurlNetAccessor.Tpo" -c -o CurlNetAccessor.lo `test -f 'util/CurlNetAccessor.cpp' || echo '$(srcdir)/'`util/CurlNetAccessor.cpp; \
-@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/CurlNetAccessor.Tpo" "$(DEPDIR)/CurlNetAccessor.Plo"; else rm -f "$(DEPDIR)/CurlNetAccessor.Tpo"; exit 1; fi
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='util/CurlNetAccessor.cpp' object='CurlNetAccessor.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o CurlNetAccessor.lo `test -f 'util/CurlNetAccessor.cpp' || echo '$(srcdir)/'`util/CurlNetAccessor.cpp
 
 CurlURLInputStream.lo: util/CurlURLInputStream.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT CurlURLInputStream.lo -MD -MP -MF "$(DEPDIR)/CurlURLInputStream.Tpo" -c -o CurlURLInputStream.lo `test -f 'util/CurlURLInputStream.cpp' || echo '$(srcdir)/'`util/CurlURLInputStream.cpp; \

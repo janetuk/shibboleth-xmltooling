@@ -74,8 +74,8 @@ class SignatureTest : public CxxTest::TestSuite {
 public:
     void setUp() {
         m_resolver=NULL;
-        QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
-        QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
+        xmltooling::QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
+        xmltooling::QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
         XMLObjectBuilder::registerBuilder(qname, new SimpleXMLObjectBuilder());
         XMLObjectBuilder::registerBuilder(qtype, new SimpleXMLObjectBuilder());
 
@@ -89,15 +89,15 @@ public:
     }
 
     void tearDown() {
-        QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
-        QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
+        xmltooling::QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
+        xmltooling::QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
         XMLObjectBuilder::deregisterBuilder(qname);
         XMLObjectBuilder::deregisterBuilder(qtype);
         delete m_resolver;
     }
 
     void testSignature() {
-        QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
+        xmltooling::QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
         const SimpleXMLObjectBuilder* b=dynamic_cast<const SimpleXMLObjectBuilder*>(XMLObjectBuilder::getBuilder(qname));
         TS_ASSERT(b!=NULL);
         

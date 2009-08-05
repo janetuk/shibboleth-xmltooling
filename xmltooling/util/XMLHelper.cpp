@@ -29,6 +29,7 @@
 #include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 
 static const XMLCh type[]={chLatin_t, chLatin_y, chLatin_p, chLatin_e, chNull };
@@ -44,7 +45,7 @@ bool XMLHelper::hasXSIType(const DOMElement* e)
     return false;
 }
 
-QName* XMLHelper::getXSIType(const DOMElement* e)
+xmltooling::QName* XMLHelper::getXSIType(const DOMElement* e)
 {
     DOMAttr* attribute = e->getAttributeNodeNS(xmlconstants::XSI_NS, type);
     if (attribute) {
@@ -55,12 +56,12 @@ QName* XMLHelper::getXSIType(const DOMElement* e)
                 XMLCh* prefix=new XMLCh[i+1];
                 XMLString::subString(prefix,attributeValue,0,i);
                 prefix[i]=chNull;
-                QName* ret=new QName(e->lookupNamespaceURI(prefix), attributeValue + i + 1, prefix);
+                xmltooling::QName* ret=new xmltooling::QName(e->lookupNamespaceURI(prefix), attributeValue + i + 1, prefix);
                 delete[] prefix;
                 return ret;
             }
             else {
-                return new QName(e->lookupNamespaceURI(NULL), attributeValue);
+                return new xmltooling::QName(e->lookupNamespaceURI(NULL), attributeValue);
             }
         }
     }
@@ -122,30 +123,35 @@ XMLObject* XMLHelper::getXMLObjectById(XMLObject& tree, const XMLCh* id)
     return NULL;
 }
 
-QName* XMLHelper::getNodeQName(const DOMNode* domNode)
+xmltooling::QName* XMLHelper::getNodeQName(const DOMNode* domNode)
 {
     if (domNode)
-        return new QName(domNode->getNamespaceURI(), domNode->getLocalName(), domNode->getPrefix());
+        return new xmltooling::QName(domNode->getNamespaceURI(), domNode->getLocalName(), domNode->getPrefix());
     return NULL; 
 }
 
-QName* XMLHelper::getAttributeValueAsQName(const DOMAttr* attribute)
+xmltooling::QName* XMLHelper::getAttributeValueAsQName(const DOMAttr* attribute)
 {
-    if (!attribute)
+    return getNodeValueAsQName(attribute);
+}
+
+xmltooling::QName* XMLHelper::getNodeValueAsQName(const DOMNode* domNode)
+{
+    if (!domNode)
         return NULL;
     
     int i;
-    const XMLCh* attributeValue=attribute->getTextContent();
-    if (attributeValue && (i=XMLString::indexOf(attributeValue,chColon))>0) {
+    const XMLCh* value=domNode->getTextContent();
+    if (value && (i=XMLString::indexOf(value,chColon))>0) {
         XMLCh* prefix=new XMLCh[i+1];
-        XMLString::subString(prefix,attributeValue,0,i);
+        XMLString::subString(prefix,value,0,i);
         prefix[i]=chNull;
-        QName* ret=new QName(attribute->lookupNamespaceURI(prefix), attributeValue + i + 1, prefix);
+        xmltooling::QName* ret=new xmltooling::QName(domNode->lookupNamespaceURI(prefix), value + i + 1, prefix);
         delete[] prefix;
         return ret;
     }
     
-    return new QName(attribute->lookupNamespaceURI(NULL), attributeValue);
+    return new xmltooling::QName(domNode->lookupNamespaceURI(NULL), value);
 }
 
 DOMElement* XMLHelper::appendChildElement(DOMElement* parentElement, DOMElement* childElement)
@@ -254,15 +260,31 @@ void XMLHelper::serialize(const DOMNode* n, std::string& buf, bool pretty)
 {
     static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
     static const XMLCh UTF8[]={ chLatin_U, chLatin_T, chLatin_F, chDigit_8, chNull };
+
+    MemBufFormatTarget target;
     DOMImplementation* impl=DOMImplementationRegistry::getDOMImplementation(impltype);
-    DOMWriter* serializer=(static_cast<DOMImplementationLS*>(impl))->createDOMWriter();
+
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+    DOMLSSerializer* serializer = static_cast<DOMImplementationLS*>(impl)->createLSSerializer();
+    XercesJanitor<DOMLSSerializer> janitor(serializer);
+    if (pretty && serializer->getDomConfig()->canSetParameter(XMLUni::fgDOMWRTFormatPrettyPrint, pretty))
+        serializer->getDomConfig()->setParameter(XMLUni::fgDOMWRTFormatPrettyPrint, pretty);
+    DOMLSOutput *theOutput = static_cast<DOMImplementationLS*>(impl)->createLSOutput();
+    XercesJanitor<DOMLSOutput> j_theOutput(theOutput);
+    theOutput->setEncoding(UTF8);
+    theOutput->setByteStream(&target);
+    if (!serializer->write(n, theOutput))
+        throw XMLParserException("unable to serialize XML");
+#else
+    DOMWriter* serializer = static_cast<DOMImplementationLS*>(impl)->createDOMWriter();
     XercesJanitor<DOMWriter> janitor(serializer);
     serializer->setEncoding(UTF8);
     if (pretty && serializer->canSetFeature(XMLUni::fgDOMWRTFormatPrettyPrint, pretty))
         serializer->setFeature(XMLUni::fgDOMWRTFormatPrettyPrint, pretty);
-    MemBufFormatTarget target;
-    if (!serializer->writeNode(&target,*n))
+    if (!serializer->writeNode(&target, *n))
         throw XMLParserException("unable to serialize XML");
+#endif
+
     buf.erase();
     buf.append(reinterpret_cast<const char*>(target.getRawBuffer()),target.getLen());
 }
@@ -274,7 +296,7 @@ namespace {
         StreamFormatTarget(std::ostream& out) : m_out(out) {}
         ~StreamFormatTarget() {}
 
-        void writeChars(const XMLByte *const toWrite, const unsigned int count, XMLFormatter *const formatter) {
+        void writeChars(const XMLByte *const toWrite, const xsecsize_t count, XMLFormatter *const formatter) {
             m_out.write(reinterpret_cast<const char*>(toWrite),count);
         }
 
@@ -291,15 +313,31 @@ ostream& XMLHelper::serialize(const DOMNode* n, ostream& out, bool pretty)
 {
     static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
     static const XMLCh UTF8[]={ chLatin_U, chLatin_T, chLatin_F, chDigit_8, chNull };
+
+    StreamFormatTarget target(out);
     DOMImplementation* impl=DOMImplementationRegistry::getDOMImplementation(impltype);
+
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+    DOMLSSerializer* serializer = static_cast<DOMImplementationLS*>(impl)->createLSSerializer();
+    XercesJanitor<DOMLSSerializer> janitor(serializer);
+    if (pretty && serializer->getDomConfig()->canSetParameter(XMLUni::fgDOMWRTFormatPrettyPrint, pretty))
+        serializer->getDomConfig()->setParameter(XMLUni::fgDOMWRTFormatPrettyPrint, pretty);
+    DOMLSOutput *theOutput = static_cast<DOMImplementationLS*>(impl)->createLSOutput();
+    XercesJanitor<DOMLSOutput> j_theOutput(theOutput);
+    theOutput->setEncoding(UTF8);
+    theOutput->setByteStream(&target);
+    if (!serializer->write(n, theOutput))
+        throw XMLParserException("unable to serialize XML");
+#else
     DOMWriter* serializer=(static_cast<DOMImplementationLS*>(impl))->createDOMWriter();
     XercesJanitor<DOMWriter> janitor(serializer);
     serializer->setEncoding(UTF8);
     if (pretty && serializer->canSetFeature(XMLUni::fgDOMWRTFormatPrettyPrint, pretty))
         serializer->setFeature(XMLUni::fgDOMWRTFormatPrettyPrint, pretty);
-    StreamFormatTarget target(out);
     if (!serializer->writeNode(&target,*n))
         throw XMLParserException("unable to serialize XML");
+#endif
+
     return out;
 }
 

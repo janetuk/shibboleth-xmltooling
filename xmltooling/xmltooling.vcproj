@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="xmltooling"
 	ProjectGUID="{06B55A46-D3B3-41AE-B5A5-B57830BA010D}"
 	RootNamespace="xmltooling"
 	Keyword="Win32Proj"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -66,11 +67,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wsock32.lib log4shib1D.lib xerces-c_2D.lib xsec_1D.lib libeay32D.lib ssleay32D.lib libcurld_imp.lib"
-				OutputFile="$(OutDir)\$(ProjectName)1_1D.dll"
+				AdditionalDependencies="wsock32.lib log4shib1D.lib xerces-c_3D.lib xsec_1D.lib libeay32D.lib ssleay32D.lib libcurld_imp.lib"
+				OutputFile="$(OutDir)\$(ProjectName)1_2D.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(TargetDir)$(ProjectName)1D.lib"
 				TargetMachine="1"
 			/>
@@ -91,87 +94,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
-			CharacterSet="2"
-			WholeProgramOptimization="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)&quot;;&quot;$(ProjectDir)&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL"
-				RuntimeLibrary="2"
-				PrecompiledHeaderThrough=""
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="wsock32.lib log4shib1.lib xerces-c_2.lib xsec_1.lib libeay32.lib ssleay32.lib libcurl_imp.lib"
-				OutputFile="$(OutDir)\$(ProjectName)1_1.dll"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				ImportLibrary="$(TargetDir)$(ProjectName)1.lib"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -226,11 +148,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wsock32.lib log4shib1D.lib xerces-c_2D.lib xsec_1D.lib libeay32D.lib ssleay32D.lib libcurld_imp.lib"
-				OutputFile="$(OutDir)\$(ProjectName)1_1D.dll"
+				AdditionalDependencies="wsock32.lib log4shib1D.lib xerces-c_3D.lib xsec_1D.lib libeay32D.lib ssleay32D.lib libcurld_imp.lib"
+				OutputFile="$(OutDir)\$(ProjectName)1_2D.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(TargetDir)$(ProjectName)1D.lib"
 				TargetMachine="17"
 			/>
@@ -253,7 +177,81 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="2"
+			CharacterSet="2"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)&quot;;&quot;$(ProjectDir)&quot;"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL"
+				RuntimeLibrary="2"
+				PrecompiledHeaderThrough=""
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="true"
+				DebugInformationFormat="3"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="wsock32.lib log4shib1.lib xerces-c_3.lib xsec_1.lib libeay32.lib ssleay32.lib libcurl_imp.lib"
+				OutputFile="$(OutDir)\$(ProjectName)1_2.dll"
+				GenerateDebugInformation="true"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				ImportLibrary="$(TargetDir)$(ProjectName)1.lib"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -304,12 +302,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="wsock32.lib log4shib1.lib xerces-c_2.lib xsec_1.lib libeay32.lib ssleay32.lib libcurl_imp.lib"
-				OutputFile="$(OutDir)\$(ProjectName)1_1.dll"
+				AdditionalDependencies="wsock32.lib log4shib1.lib xerces-c_3.lib xsec_1.lib libeay32.lib ssleay32.lib libcurl_imp.lib"
+				OutputFile="$(OutDir)\$(ProjectName)1_2.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				ImportLibrary="$(TargetDir)$(ProjectName)1.lib"
 				TargetMachine="17"
 			/>
@@ -330,9 +330,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -394,10 +391,6 @@
 			<Filter
 				Name="util"
 				>
-				<File
-					RelativePath=".\util\CurlNetAccessor.cpp"
-					>
-				</File>
 				<File
 					RelativePath=".\util\CurlURLInputStream.cpp"
 					>
@@ -594,6 +587,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\security\impl\SecurityHelper.cpp"
+						>
+					</File>
+					<File
 						RelativePath=".\security\impl\StaticPKIXTrustEngine.cpp"
 						>
 					</File>
@@ -733,11 +730,7 @@
 				Name="util"
 				>
 				<File
-					RelativePath=".\util\CurlNetAccessor.hpp"
-					>
-				</File>
-				<File
-					RelativePath=".\util\CurlURLInputStream.hpp"
+					RelativePath=".\util\CurlURLInputStream.h"
 					>
 				</File>
 				<File
@@ -938,6 +931,10 @@
 				</File>
 				<File
 					RelativePath=".\security\OpenSSLTrustEngine.h"
+					>
+				</File>
+				<File
+					RelativePath=".\security\SecurityHelper.h"
 					>
 				</File>
 				<File

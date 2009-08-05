@@ -15,7 +15,6 @@ SUBDIRS = doc schemas xmltooling xmltoolingtest
 
 if DX_COND_doc
 all-local: doxygen-doc xmltooling.spec pkginfo
-APIDOCS = doc/api
 else
 all-local: xmltooling.spec pkginfo
 endif
@@ -37,7 +36,6 @@ pkginfo: pkginfo.in Makefile
 	mv $@.tmp $@
 
 EXTRA_DIST = $(DX_CONFIG) \
-        $(APIDOCS) \
         cpp-xmltooling.sln \
         acx_pthread.m4 \
         acinclude.m4 \

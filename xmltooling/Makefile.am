@@ -33,6 +33,7 @@ libxmltoolinginclude_HEADERS = \
 	AttributeExtensibleXMLObject.h \
 	base.h \
 	ConcreteXMLObjectBuilder.h \
+	char_traits.h \
 	config_pub.h \
 	ElementExtensibleXMLObject.h \
 	ElementProxy.h \
@@ -77,6 +78,7 @@ secinclude_HEADERS = \
 	security/KeyInfoCredentialContext.h \
 	security/KeyInfoResolver.h \
 	security/OpenSSLCredential.h \
+	security/SecurityHelper.h \
 	security/SignatureTrustEngine.h \
 	security/TrustEngine.h \
 	security/X509Credential.h \
@@ -99,8 +101,7 @@ soapinclude_HEADERS = \
 	soap/OpenSSLSOAPTransport.h
 
 utilinclude_HEADERS = \
-    util/CurlNetAccessor.hpp \
-    util/CurlURLInputStream.hpp \
+    util/CurlURLInputStream.h \
 	util/DateTime.h \
 	util/NDC.h \
 	util/ParserPool.h \
@@ -141,6 +142,7 @@ xmlsec_sources = \
 	security/impl/InlineKeyResolver.cpp \
 	security/impl/KeyInfoResolver.cpp \
 	security/impl/OpenSSLCryptoX509CRL.cpp \
+	security/impl/SecurityHelper.cpp \
 	security/impl/StaticPKIXTrustEngine.cpp \
 	security/impl/TrustEngine.cpp \
 	security/impl/XSECCryptoX509CRL.cpp \
@@ -149,7 +151,6 @@ xmlsec_sources = \
 	signature/impl/SignatureValidator.cpp \
 	signature/impl/XMLSecSignatureImpl.cpp \
 	soap/impl/CURLSOAPTransport.cpp \
-	util/CurlNetAccessor.cpp \
 	util/CurlURLInputStream.cpp \
 	util/ReplayCache.cpp \
 	util/StorageService.cpp
@@ -195,10 +196,10 @@ common_sources = \
 libxmltooling_lite_la_SOURCES = \
 	${common_sources}
 libxmltooling_lite_la_CPPFLAGS = -DXMLTOOLING_LITE
-libxmltooling_lite_la_LDFLAGS = -version-info 2:0:0
+libxmltooling_lite_la_LDFLAGS = -version-info 3:0:0
 
 if BUILD_XMLSEC
-libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 2:0:0
+libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 3:0:0
 libxmltooling_la_SOURCES = \
 	${common_sources} \
 	${xmlsec_sources}

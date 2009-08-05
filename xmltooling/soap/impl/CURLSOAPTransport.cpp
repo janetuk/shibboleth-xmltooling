@@ -166,7 +166,11 @@ namespace xmltooling {
 #endif
         }
 
-        void send(istream& in);
+        void send(istream& in) {
+            send(&in);
+        }
+
+        void send(istream* in=NULL);
 
         istream& receive() {
             return m_stream;
@@ -304,10 +308,10 @@ CURL* CURLPool::get(const SOAPTransport::Address& addr)
     curl_easy_setopt(handle,CURLOPT_NOPROGRESS,1);
     curl_easy_setopt(handle,CURLOPT_NOSIGNAL,1);
     curl_easy_setopt(handle,CURLOPT_FAILONERROR,1);
-    curl_easy_setopt(handle,CURLOPT_SSLVERSION,CURL_SSLVERSION_SSLv3);
     curl_easy_setopt(handle,CURLOPT_SSL_CIPHER_LIST,"ALL:!aNULL:!LOW:!EXPORT:!SSLv2");
     // Verification of the peer is via TrustEngine only.
     curl_easy_setopt(handle,CURLOPT_SSL_VERIFYPEER,0);
+    curl_easy_setopt(handle,CURLOPT_CAINFO,NULL);
     curl_easy_setopt(handle,CURLOPT_HEADERFUNCTION,&curl_header_hook);
     curl_easy_setopt(handle,CURLOPT_WRITEFUNCTION,&curl_write_hook);
     curl_easy_setopt(handle,CURLOPT_DEBUGFUNCTION,&curl_debug_hook);
@@ -404,7 +408,7 @@ string CURLSOAPTransport::getContentType() const
     return content_type ? content_type : "";
 }
 
-void CURLSOAPTransport::send(istream& in)
+void CURLSOAPTransport::send(istream* in)
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("send");
@@ -428,13 +432,13 @@ void CURLSOAPTransport::send(istream& in)
         curl_easy_setopt(m_handle,CURLOPT_POST,1);
         m_headers=curl_slist_append(m_headers,"Transfer-Encoding: chunked");
         curl_easy_setopt(m_handle,CURLOPT_READFUNCTION,&curl_read_hook);
-        curl_easy_setopt(m_handle,CURLOPT_READDATA,&in);
+        curl_easy_setopt(m_handle,CURLOPT_READDATA,in);
     }
     else if (in) {
         char buf[1024];
-        while (in) {
-            in.read(buf,1024);
-            msg.append(buf,in.gcount());
+        while (*in) {
+            in->read(buf,1024);
+            msg.append(buf,in->gcount());
         }
         curl_easy_setopt(m_handle,CURLOPT_POST,1);
         curl_easy_setopt(m_handle,CURLOPT_READFUNCTION,NULL);
@@ -478,7 +482,7 @@ void CURLSOAPTransport::send(istream& in)
     log.debug("sending SOAP message to %s", m_endpoint.c_str());
     if (curl_easy_perform(m_handle) != CURLE_OK) {
         throw IOException(
-            string("CURLSOAPTransport failed while contacting SOAP responder: ") +
+            string("CURLSOAPTransport failed while contacting SOAP endpoint (") + m_endpoint + "): " +
                 (curl_errorbuf[0] ? curl_errorbuf : "no further information available"));
     }
 }
@@ -513,10 +517,10 @@ size_t xmltooling::curl_header_hook(void* ptr, size_t size, size_t nmemb, void* 
 // callback to send data to server
 size_t xmltooling::curl_read_hook(void* ptr, size_t size, size_t nmemb, void* stream)
 {
-    // *stream is actually an istream object
-    istream& buf=*(reinterpret_cast<istream*>(stream));
-    buf.read(reinterpret_cast<char*>(ptr),size*nmemb);
-    return buf.gcount();
+    // stream is actually an istream pointer
+    istream* buf=reinterpret_cast<istream*>(stream);
+    buf->read(reinterpret_cast<char*>(ptr),size*nmemb);
+    return buf->gcount();
 }
 
 // callback to buffer data from server
@@ -588,6 +592,15 @@ int xmltooling::verify_callback(X509_STORE_CTX* x509_ctx, void* arg)
 CURLcode xmltooling::xml_ssl_ctx_callback(CURL* curl, SSL_CTX* ssl_ctx, void* userptr)
 {
     CURLSOAPTransport* conf = reinterpret_cast<CURLSOAPTransport*>(userptr);
+
+    // Manually disable SSLv2 so we're not dependent on libcurl to do it.
+    // Also disable the ticket option where implemented, since this breaks a variety
+    // of servers. Newer libcurl also does this for us.
+#ifdef SSL_OP_NO_TICKET
+    SSL_CTX_set_options(ssl_ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2|SSL_OP_NO_TICKET);
+#else
+    SSL_CTX_set_options(ssl_ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2);
+#endif
 
 #ifndef XMLTOOLING_NO_XMLSEC
     if (conf->m_cred)

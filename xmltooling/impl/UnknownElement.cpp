@@ -33,6 +33,7 @@
 
 using namespace xmltooling::logging;
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 #ifndef XMLTOOLING_NO_XMLSEC
 using xmlsignature::Signature;
@@ -204,7 +205,7 @@ XMLObject* UnknownElementImpl::unmarshall(DOMElement* element, bool bindDocument
 }
 
 XMLObject* UnknownElementBuilder::buildObject(
-    const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType
+    const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType
     ) const {
     return new UnknownElementImpl(nsURI,localName,prefix);
 }

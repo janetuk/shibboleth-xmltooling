@@ -1,6 +1,6 @@
 /*
- *  Copyright 2001-2007 Internet2
- * 
+ *  Copyright 2001-2008 Internet2
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,8 @@
 
 /**
  * @file xmltooling/util/ParserPool.h
- * 
- * A thread-safe pool of DOMBuilders that share characteristics.
+ *
+ * A thread-safe pool of parsers that share characteristics.
  */
 
 #ifndef __xmltooling_pool_h__
@@ -33,6 +33,11 @@
 #include <xercesc/sax/InputSource.hpp>
 #include <xercesc/util/BinInputStream.hpp>
 #include <xercesc/util/SecurityManager.hpp>
+#include <xercesc/util/XMLURL.hpp>
+
+#ifndef XMLTOOLING_NO_XMLSEC
+# include <xsec/framework/XSECDefs.hpp>
+#endif
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -44,13 +49,18 @@ namespace xmltooling {
     /**
      * A thread-safe pool of DOMBuilders that share characteristics.
      */
-    class XMLTOOL_API ParserPool : public xercesc::DOMEntityResolver, xercesc::DOMErrorHandler
+    class XMLTOOL_API ParserPool :
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+        public xercesc::DOMLSResourceResolver
+#else
+        public xercesc::DOMEntityResolver
+#endif
     {
         MAKE_NONCOPYABLE(ParserPool);
     public:
         /**
          * Constructs a new pool
-         * 
+         *
          * @param namespaceAware    indicates whether parsers should be namespace-aware or not
          * @param schemaAware       indicates whether parsers should be schema-validating or not
          */
@@ -59,24 +69,30 @@ namespace xmltooling {
 
         /**
          * Creates a new document using a parser from this pool.
-         * 
+         *
          * @return new XML document
-         * 
+         *
          */
         xercesc::DOMDocument* newDocument();
 
         /**
          * Parses a document using a pooled parser with the proper settings
-         * 
-         * @param domsrc A DOM source containing the content to be parsed
+         *
+         * @param domsrc An input source containing the content to be parsed
          * @return The DOM document resulting from the parse
          * @throws XMLParserException thrown if there was a problem reading, parsing, or validating the XML
          */
-        xercesc::DOMDocument* parse(xercesc::DOMInputSource& domsrc);
+        xercesc::DOMDocument* parse(
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+            xercesc::DOMLSInput& domsrc
+#else
+            xercesc::DOMInputSource& domsrc
+#endif
+            );
 
         /**
          * Parses a document using a pooled parser with the proper settings
-         * 
+         *
          * @param is An input stream containing the content to be parsed
          * @return The DOM document resulting from the parse
          * @throws XMLParserException thrown if there was a problem reading, parsing, or validating the XML
@@ -85,21 +101,21 @@ namespace xmltooling {
 
         /**
          * Load an OASIS catalog file to map schema namespace URIs to filenames.
-         * 
+         *
          * This does not provide real catalog support; only the &lt;uri&gt; element
          * is supported to map from a namespace URI to a relative path or file:// URI.
-         * 
+         *
          * @param pathname  path to a catalog file
          * @return true iff the catalog was successfully processed
          */
         bool loadCatalog(const XMLCh* pathname);
-        
+
         /**
          * Load a schema explicitly from a local file.
-         * 
+         *
          * Note that "successful processing" does not imply that the schema is valid,
          * only that a reference to it was successfully registered with the pool.
-         * 
+         *
          * @param nsURI     XML namespace to load
          * @param pathname  path to schema file
          * @return true iff the schema was successfully processed
@@ -109,27 +125,40 @@ namespace xmltooling {
         /**
          * Supplies all external entities (primarily schemas) to the parser
          */
-        xercesc::DOMInputSource* resolveEntity(const XMLCh* const publicId, const XMLCh* const systemId, const XMLCh* const baseURI);
-
-        /**
-         * Handles parsing errors
-         */
-        bool handleError(const xercesc::DOMError& e);
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+        xercesc::DOMLSInput* resolveResource(
+            const XMLCh *const resourceType,
+            const XMLCh *const namespaceUri,
+            const XMLCh *const publicId,
+            const XMLCh *const systemId,
+            const XMLCh *const baseURI
+            );
+#else
+        xercesc::DOMInputSource* resolveEntity(
+            const XMLCh* const publicId, const XMLCh* const systemId, const XMLCh* const baseURI
+            );
+#endif
 
     private:
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+        xercesc::DOMLSParser* createBuilder();
+        xercesc::DOMLSParser* checkoutBuilder();
+        void checkinBuilder(xercesc::DOMLSParser* builder);
+#else
         xercesc::DOMBuilder* createBuilder();
         xercesc::DOMBuilder* checkoutBuilder();
         void checkinBuilder(xercesc::DOMBuilder* builder);
+#endif
 
-#ifdef HAVE_GOOD_STL
         xstring m_schemaLocations;
         std::map<xstring,xstring> m_schemaLocMap;
-#else
-        std::string m_schemaLocations;
-        std::map<std::string,std::string> m_schemaLocMap;
-#endif
+
         bool m_namespaceAware,m_schemaAware;
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+        std::stack<xercesc::DOMLSParser*> m_pool;
+#else
         std::stack<xercesc::DOMBuilder*> m_pool;
+#endif
         Mutex* m_lock;
         xercesc::SecurityManager* m_security;
     };
@@ -143,7 +172,7 @@ namespace xmltooling {
     public:
         /**
          * Constructs an input source around an input stream reference.
-         * 
+         *
          * @param is        reference to an input stream
          * @param systemId  optional system identifier to attach to the stream
          */
@@ -160,21 +189,74 @@ namespace xmltooling {
         public:
             /**
              * Constructs a Xerces input stream around a C++ input stream reference.
-             * 
-             * @param is        reference to an input stream
+             *
+             * @param is            reference to an input stream
              */
             StreamBinInputStream(std::istream& is) : m_is(is), m_pos(0) {}
             /// @cond off
-            virtual unsigned int curPos() const { return m_pos; }
-            virtual unsigned int readBytes(XMLByte* const toFill, const unsigned int maxToRead);
+#ifdef XMLTOOLING_XERCESC_64BITSAFE
+            XMLFilePos
+#else
+            unsigned int
+#endif
+                curPos() const { return m_pos; }
+            xsecsize_t readBytes(XMLByte* const toFill, const xsecsize_t maxToRead);
+#ifdef XMLTOOLING_XERCESC_64BITSAFE
+            const XMLCh* getContentType() const { return NULL; }
+#endif
             /// @endcond
         private:
             std::istream& m_is;
-            unsigned int m_pos;
+            xsecsize_t m_pos;
         };
 
     private:
         std::istream& m_is;
+    };
+
+    /**
+     * A URL-based parser source that supports a more advanced input stream.
+     */
+    class XMLTOOL_API URLInputSource : public xercesc::InputSource
+    {
+    MAKE_NONCOPYABLE(URLInputSource);
+    public:
+        /**
+         * Constructor.
+         *
+         * @param url       source of input
+         * @param systemId  optional system identifier to attach to the source
+         */
+        URLInputSource(const XMLCh* url, const char* systemId=NULL);
+
+        /**
+         * Constructor taking a DOM element supporting the following content:
+         *
+         * <dl>
+         *  <dt>uri | url</dt>
+         *  <dd>identifies the remote resource</dd>
+         *  <dt>verifyHost</dt>
+         *  <dd>true iff name of host should be matched against TLS/SSL certificate</dd>
+         *  <dt>TransportOption elements, like so:</dt>
+         *  <dd>&lt;TransportOption provider="CURL" option="150"&gt;0&lt;/TransportOption&gt;</dd>
+         * </dl>
+         *
+         * @param e         DOM to supply configuration
+         * @param systemId  optional system identifier to attach to the source
+         */
+        URLInputSource(const xercesc::DOMElement* e, const char* systemId=NULL);
+
+        /// @cond off
+        virtual xercesc::BinInputStream* makeStream() const;
+        /// @endcond
+
+    private:
+#ifdef XMLTOOLING_LITE
+        xercesc::XMLURL m_url;
+#else
+        xmltooling::auto_ptr_char m_url;
+        const xercesc::DOMElement* m_root;
+#endif
     };
 };
 

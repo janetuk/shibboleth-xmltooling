@@ -34,6 +34,7 @@
 using namespace xmlencryption;
 using namespace xmlsignature;
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 
 Encrypter::~Encrypter()
