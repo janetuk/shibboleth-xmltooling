@@ -6,7 +6,7 @@ Original-Source-Location:
  http://shibboleth.internet2.edu/downloads/opensaml/cpp/2.0/
 
 Files: *
-Copyright: 2001-2007 Internet2
+Copyright: 2001-2009 Internet2
 License: Apache-2.0
 
 Files: */Makefile.in
@@ -97,7 +97,7 @@ License: other
 
 Files: ./debian/*
 Copyright: 2008 Ferenc Wágner <wferi@niif.hu>
-           2008 Russ Allbery <rra@debian.org>
+           2008, 2009 Russ Allbery <rra@debian.org>
 License: Expat
 
 Files: ./doxygen.{am,m4}
