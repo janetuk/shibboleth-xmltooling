@@ -28,6 +28,8 @@
 using namespace xmltooling;
 using namespace std;
 
+using xercesc::XMLString;
+
 AbstractComplexElement::~AbstractComplexElement() {
     for_each(m_children.begin(), m_children.end(), cleanup<XMLObject>());
     for (vector<XMLCh*>::iterator i=m_text.begin(); i!=m_text.end(); ++i)

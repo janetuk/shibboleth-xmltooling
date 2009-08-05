@@ -37,7 +37,7 @@ BasicX509Credential::~BasicX509Credential()
     delete m_key;
     if (m_ownCerts)
         for_each(m_xseccerts.begin(), m_xseccerts.end(), xmltooling::cleanup<XSECCryptoX509>());
-    delete m_crl;
+    for_each(m_crls.begin(), m_crls.end(), xmltooling::cleanup<XSECCryptoX509CRL>());
     delete m_keyInfo;
     delete m_compactKeyInfo;
 }

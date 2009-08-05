@@ -1,0 +1,125 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/**
+ * @file xmltooling/util/CurlURLInputStream.h
+ *
+ * Asynchronous use of curl to fetch data from a URL.
+ */
+
+#if !defined(__xmltooling_curlinstr_h__) && !defined(XMLTOOLING_LITE)
+#define __xmltooling_curlinstr_h__
+
+#include <xmltooling/logging.h>
+
+#include <curl/curl.h>
+#include <xercesc/util/BinInputStream.hpp>
+
+namespace xmltooling {
+
+    /**
+     * Adapted from Xerces-C as a more advanced input stream implementation
+     * for subsequent use in parsing remote documents.
+     */
+    class XMLTOOL_API CurlURLInputStream : public xercesc::BinInputStream
+    {
+    public :
+        /**
+         * Constructor.
+         *
+         * @param url   the URL of the resource to fetch
+         */
+        CurlURLInputStream(const char* url);
+
+        /**
+         * Constructor.
+         *
+         * @param url   the URL of the resource to fetch
+         */
+        CurlURLInputStream(const XMLCh* url);
+
+        /**
+         * Constructor taking a DOM element supporting the following content:
+         * 
+         * <dl>
+         *  <dt>uri | url</dt>
+         *  <dd>identifies the remote resource</dd>
+         *  <dt>verifyHost</dt>
+         *  <dd>true iff name of host should be matched against TLS/SSL certificate</dd>
+         *  <dt>TransportOption elements, like so:</dt>
+         *  <dd>&lt;TransportOption provider="CURL" option="150"&gt;0&lt;/TransportOption&gt;</dd>
+         * </dl>
+         * 
+         * @param e     DOM to supply configuration
+         */
+        CurlURLInputStream(const xercesc::DOMElement* e);
+
+        ~CurlURLInputStream();
+
+#ifdef XMLTOOLING_XERCESC_64BITSAFE
+        XMLFilePos
+#else
+        unsigned int
+#endif
+        curPos() const {
+            return fTotalBytesRead;
+        }
+
+#ifdef XMLTOOLING_XERCESC_INPUTSTREAM_HAS_CONTENTTYPE
+        const XMLCh* getContentType() const {
+            return fContentType;
+        }
+#endif
+
+        xsecsize_t readBytes(XMLByte* const toFill, const xsecsize_t maxToRead);
+
+    private :
+        CurlURLInputStream(const CurlURLInputStream&);
+        CurlURLInputStream& operator=(const CurlURLInputStream&);
+
+        // libcurl callbacks for data read/write
+        static size_t staticWriteCallback(char *buffer, size_t size, size_t nitems, void *outstream);
+        size_t writeCallback(char *buffer, size_t size, size_t nitems);
+
+        void init(const xercesc::DOMElement* e=NULL);
+        bool readMore(int *runningHandles);
+
+        logging::Category&  fLog;
+        std::string         fURL;
+
+        CURLM*              fMulti;
+        CURL*               fEasy;
+
+        unsigned long       fTotalBytesRead;
+        XMLByte*            fWritePtr;
+        xsecsize_t          fBytesRead;
+        xsecsize_t          fBytesToRead;
+        bool                fDataAvailable;
+
+        // Overflow buffer for when curl writes more data to us
+        // than we've asked for.
+        XMLByte             fBuffer[CURL_MAX_WRITE_SIZE];
+        XMLByte*            fBufferHeadPtr;
+        XMLByte*            fBufferTailPtr;
+
+        XMLCh*              fContentType;
+
+        char                fError[CURL_ERROR_SIZE];
+    };
+};
+
+#endif // __xmltooling_curlinstr_h__

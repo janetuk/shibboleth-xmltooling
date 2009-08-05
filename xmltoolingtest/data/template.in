@@ -11,3 +11,9 @@ This is a template containing tags for substitution by the template engine.
 		<mlp foo3/>
 	</mlpifnot>
 </mlpif>
+
+<mlp encoded/>
+
+<mlpfor sub>
+    <mlp $name/> <mlp foo1/> <mlp $value/>
+</mlpfor>

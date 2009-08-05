@@ -1,6 +1,6 @@
 /*
- *  Copyright 2001-2007 Internet2
- * 
+ *  Copyright 2001-2009 Internet2
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,8 @@
 
 /**
  * XMLToolingConfig.cpp
- * 
- * Library configuration 
+ *
+ * Library configuration
  */
 
 #include "internal.h"
@@ -69,6 +69,8 @@ using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace std;
 
+using xercesc::XMLPlatformUtils;
+
 DECL_XMLTOOLING_EXCEPTION_FACTORY(XMLParserException,xmltooling);
 DECL_XMLTOOLING_EXCEPTION_FACTORY(XMLObjectException,xmltooling);
 DECL_XMLTOOLING_EXCEPTION_FACTORY(MarshallingException,xmltooling);
@@ -99,7 +101,7 @@ namespace xmltooling {
         else
             g_openssl_locks[n]->unlock();
     }
-    
+
 # ifndef WIN32
     extern "C" unsigned long openssl_thread_id(void)
     {
@@ -126,7 +128,7 @@ bool XMLToolingInternalConfig::log_config(const char* config)
             config=getenv("XMLTOOLING_LOG_CONFIG");
         if (!config || !*config)
             config="WARN";
-        
+
         bool level=false;
         Category& root = Category::getRoot();
         if (!strcmp(config,"DEBUG")) {
@@ -170,14 +172,14 @@ bool XMLToolingInternalConfig::log_config(const char* config)
         }
         else {
             string path(config);
-            PropertyConfigurator::configure(m_pathResolver ? m_pathResolver->resolve(path, PathResolver::XMLTOOLING_CFG_FILE).c_str() : config);
+            PropertyConfigurator::configure(m_pathResolver ? m_pathResolver->resolve(path, PathResolver::XMLTOOLING_CFG_FILE) : path);
         }
     }
     catch (const ConfigureFailure& e) {
         Category::getInstance(XMLTOOLING_LOGCAT".Logging").crit("failed to initialize log4cpp: %s", e.what());
         return false;
     }
-    
+
     return true;
 }
 
@@ -236,7 +238,7 @@ bool XMLToolingInternalConfig::init()
         m_parserPool=new ParserPool();
         m_validatingPool=new ParserPool(true,true);
         m_lock=XMLPlatformUtils::makeMutex();
-        
+
         // Load catalogs from path.
         if (!catalog_path.empty()) {
             char* catpath=strdup(catalog_path.c_str());
@@ -266,7 +268,7 @@ bool XMLToolingInternalConfig::init()
         REGISTER_XMLTOOLING_EXCEPTION_FACTORY(UnknownAttributeException,xmltooling);
         REGISTER_XMLTOOLING_EXCEPTION_FACTORY(ValidationException,xmltooling);
         REGISTER_XMLTOOLING_EXCEPTION_FACTORY(IOException,xmltooling);
-        
+
 #ifndef XMLTOOLING_NO_XMLSEC
         XMLObjectBuilder::registerBuilder(QName(xmlconstants::XMLSIG_NS,Signature::LOCAL_NAME),new SignatureBuilder());
         REGISTER_XMLTOOLING_EXCEPTION_FACTORY(XMLSecurityException,xmltooling);
@@ -286,10 +288,10 @@ bool XMLToolingInternalConfig::init()
 
         m_pathResolver = new PathResolver();
         m_urlEncoder = new URLEncoder();
-        
-        // Register xml:id as an ID attribute.        
+
+        // Register xml:id as an ID attribute.
         static const XMLCh xmlid[] = UNICODE_LITERAL_2(i,d);
-        AttributeExtensibleXMLObject::registerIDAttribute(QName(xmlconstants::XML_NS, xmlid)); 
+        AttributeExtensibleXMLObject::registerIDAttribute(QName(xmlconstants::XML_NS, xmlid));
     }
     catch (const xercesc::XMLException&) {
         log.fatal("caught exception while initializing Xerces");
@@ -344,7 +346,7 @@ void XMLToolingInternalConfig::term()
 
     delete m_pathResolver;
     m_pathResolver = NULL;
-    
+
     delete m_templateEngine;
     m_templateEngine = NULL;
 
@@ -367,7 +369,7 @@ void XMLToolingInternalConfig::term()
 #endif
     }
     m_libhandles.clear();
-    
+
     delete m_parserPool;
     m_parserPool=NULL;
     delete m_validatingPool;
@@ -385,7 +387,7 @@ void XMLToolingInternalConfig::term()
 
 #ifndef XMLTOOLING_NO_XMLSEC
     curl_global_cleanup();
-#endif   
+#endif
 #ifdef _DEBUG
     xmltooling::NDC ndc("term");
 #endif
@@ -415,13 +417,13 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
 
     string resolved(path);
     m_pathResolver->resolve(resolved, PathResolver::XMLTOOLING_LIB_FILE);
-    
+
 #if defined(WIN32)
     HMODULE handle=NULL;
     for (string::iterator i = resolved.begin(); i != resolved.end(); ++i)
         if (*i == '/')
             *i = '\\';
-    
+
     UINT em=SetErrorMode(SEM_FAILCRITICALERRORS);
     try {
         handle=LoadLibraryEx(resolved.c_str(),NULL,LOAD_WITH_ALTERED_SEARCH_PATH);
@@ -436,12 +438,11 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
             throw runtime_error(string("detected error in xmltooling_extension_init: ") + resolved);
         SetErrorMode(em);
     }
-    catch(runtime_error& e) {
-        log.error(e.what());
+    catch(exception&) {
         if (handle)
             FreeLibrary(handle);
         SetErrorMode(em);
-        return false;
+        throw;
     }
 
 #elif defined(HAVE_DLFCN_H)
@@ -460,11 +461,10 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
         if (fn(context)!=0)
             throw runtime_error(string("detected error in xmltooling_extension_init in ") + resolved);
     }
-    catch(runtime_error& e) {
-        log.error(e.what());
+    catch(exception&) {
         if (handle)
             dlclose(handle);
-        return false;
+        throw;
     }
 #else
 # error "Don't know about dynamic loading on this platform!"
@@ -528,4 +528,15 @@ void XMLToolingInternalConfig::registerXMLAlgorithms()
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES256_CBC, "AES", 256);
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES256, "AES", 256);
 }
+#endif
+
+#ifdef WIN32
+
+extern "C" __declspec(dllexport) BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID)
+{
+    if (fdwReason == DLL_THREAD_DETACH || fdwReason == DLL_PROCESS_DETACH)
+        ThreadKey::onDetach();
+    return TRUE;
+}
+
 #endif

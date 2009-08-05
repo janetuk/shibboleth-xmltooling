@@ -29,6 +29,10 @@
 using namespace xmltooling;
 using namespace std;
 
+using xercesc::DOMAttr;
+using xercesc::DOMElement;
+using xercesc::XMLString;
+
 set<QName> AttributeExtensibleXMLObject::m_idAttributeSet;
 
 AbstractAttributeExtensibleXMLObject::~AbstractAttributeExtensibleXMLObject()
@@ -80,7 +84,11 @@ void AbstractAttributeExtensibleXMLObject::unmarshallExtensionAttribute(const DO
     bool ID = attribute->isId() || isRegisteredIDAttribute(q);
     setAttribute(q,attribute->getNodeValue(),ID);
     if (ID) {
+#ifdef XMLTOOLING_XERCESC_BOOLSETIDATTRIBUTE
+        attribute->getOwnerElement()->setIdAttributeNode(attribute, true);
+#else
         attribute->getOwnerElement()->setIdAttributeNode(attribute);
+#endif
     }
 }
 
@@ -92,7 +100,12 @@ void AbstractAttributeExtensibleXMLObject::marshallExtensionAttributes(DOMElemen
             attr->setPrefix(i->first.getPrefix());
         attr->setNodeValue(i->second);
         domElement->setAttributeNodeNS(attr);
-        if (m_idAttribute==i)
+        if (m_idAttribute==i) {
+#ifdef XMLTOOLING_XERCESC_BOOLSETIDATTRIBUTE
+            domElement->setIdAttributeNode(attr, true);
+#else
             domElement->setIdAttributeNode(attr);
+#endif
+        }
     }
 }

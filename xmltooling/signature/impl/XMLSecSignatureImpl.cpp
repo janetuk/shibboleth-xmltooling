@@ -47,6 +47,7 @@
 using namespace xmlsignature;
 using namespace xmltooling::logging;
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 using xmlconstants::XMLSIG_NS;
 using xmlconstants::XMLSIG_PREFIX;
@@ -432,7 +433,7 @@ Signature*
 XMLObject*
 #endif
 SignatureBuilder::buildObject(
-    const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType
+    const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType
     ) const
 {
     if (!XMLString::equals(nsURI,XMLSIG_NS) || !XMLString::equals(localName,Signature::LOCAL_NAME))

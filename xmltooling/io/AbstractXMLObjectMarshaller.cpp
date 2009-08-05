@@ -40,6 +40,7 @@
 #endif
 using namespace xmlconstants;
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 
 DOMElement* AbstractXMLObjectMarshaller::marshall(

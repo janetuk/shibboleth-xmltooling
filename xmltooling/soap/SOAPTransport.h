@@ -182,6 +182,17 @@ namespace xmltooling {
         virtual void send(std::istream& in)=0;
 
         /**
+         * Sends an optional stream of data over the transport. The function may return without
+         * having received any data, depending on the nature of the transport.
+         *
+         * <p>If the parameter is omitted, a request may be issued with no body if the transport
+         * supports that feature.
+         *
+         * @param in    input stream to send
+         */
+        virtual void send(std::istream* in=NULL);
+
+        /**
          * Returns reference to response stream.  The resulting stream must be
          * checked directly to determine whether data is available.
          *

@@ -23,6 +23,7 @@ xmlsec_sources = \
     FilesystemCredentialResolverTest.h \
     InlineKeyResolverTest.h \
     MemoryStorageServiceTest.h \
+    SecurityHelperTest.h \
     SignatureTest.h
 else
 xmlsec_sources =
@@ -30,6 +31,7 @@ endif
 
 xmltoolingtest_h = \
     ComplexXMLObjectTest.h \
+    DateTimeTest.h \
     ExceptionTest.h \
     KeyInfoTest.h \
     MarshallingTest.h \

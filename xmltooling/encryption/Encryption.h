@@ -24,6 +24,7 @@
 #define __xmltooling_encryption_h__
 
 #include <xmltooling/signature/KeyInfo.h>
+#include <cstdio>
 
 /**
  * Macro for declaring encryption builders.

@@ -1,6 +1,6 @@
 /*
  *  Copyright 2001-2007 Internet2
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 
 /**
  * MemoryStorageService.cpp
- * 
+ *
  * In-memory "persistent" storage, suitable for simple applications.
  */
 
@@ -34,18 +34,20 @@ using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace std;
 
+using xercesc::DOMElement;
+
 namespace xmltooling {
     class XMLTOOL_DLLLOCAL MemoryStorageService : public StorageService
     {
     public:
         MemoryStorageService(const DOMElement* e);
         virtual ~MemoryStorageService();
-        
+
         bool createString(const char* context, const char* key, const char* value, time_t expiration);
         int readString(const char* context, const char* key, string* pvalue=NULL, time_t* pexpiration=NULL, int version=0);
         int updateString(const char* context, const char* key, const char* value=NULL, time_t expiration=0, int version=0);
         bool deleteString(const char* context, const char* key);
-        
+
         bool createText(const char* context, const char* key, const char* value, time_t expiration) {
             return createString(context, key, value, expiration);
         }
@@ -58,7 +60,7 @@ namespace xmltooling {
         bool deleteText(const char* context, const char* key) {
             return deleteString(context, key);
         }
-        
+
         void reap(const char* context);
         void updateContext(const char* context, time_t expiration);
         void deleteContext(const char* context) {
@@ -69,7 +71,7 @@ namespace xmltooling {
 
     private:
         void cleanup();
-    
+
         struct XMLTOOL_DLLLOCAL Record {
             Record() : expiration(0), version(1) {}
             Record(const string& s, time_t t) : data(s), expiration(t), version(1) {}
@@ -77,7 +79,7 @@ namespace xmltooling {
             time_t expiration;
             int version;
         };
-        
+
         struct XMLTOOL_DLLLOCAL Context {
             Context() {}
             Context(const Context& src) {
@@ -143,6 +145,7 @@ MemoryStorageService::~MemoryStorageService()
     shutdown_wait->signal();
     cleanup_thread->join(NULL);
 
+    delete cleanup_thread;
     delete shutdown_wait;
     delete m_lock;
 }
@@ -152,7 +155,7 @@ void* MemoryStorageService::cleanup_fn(void* cache_p)
     MemoryStorageService* cache = reinterpret_cast<MemoryStorageService*>(cache_p);
 
 #ifndef WIN32
-    // First, let's block all signals 
+    // First, let's block all signals
     Thread::mask_all_signals();
 #endif
 
@@ -176,14 +179,14 @@ void MemoryStorageService::cleanup()
         shutdown_wait->timedwait(mutex.get(), m_cleanupInterval);
         if (shutdown)
             break;
-        
+
         unsigned long count=0;
         time_t now = time(NULL);
         m_lock->wrlock();
         SharedLock locker(m_lock, false);
         for (map<string,Context>::iterator i=m_contextMap.begin(); i!=m_contextMap.end(); ++i)
             count += i->second.reap(now);
-        
+
         if (count)
             m_log.info("purged %d expired record(s) from storage", count);
     }
@@ -234,9 +237,9 @@ bool MemoryStorageService::createString(const char* context, const char* key, co
         // It's dead, so we can just remove it now and create the new record.
         ctx.m_dataMap.erase(i);
     }
-    
+
     ctx.m_dataMap[key]=Record(value,expiration);
-    
+
     m_log.debug("inserted record (%s) in context (%s)", key, context);
     return true;
 }
@@ -270,7 +273,7 @@ int MemoryStorageService::updateString(const char* context, const char* key, con
         return 0;
     else if (time(NULL) >= i->second.expiration)
         return 0;
-    
+
     if (version > 0 && version != i->second.version)
         return -1;  // caller's out of sync
 
@@ -278,7 +281,7 @@ int MemoryStorageService::updateString(const char* context, const char* key, con
         i->second.data = value;
         ++(i->second.version);
     }
-        
+
     if (expiration && expiration != i->second.expiration)
         i->second.expiration = expiration;
 
@@ -290,7 +293,7 @@ bool MemoryStorageService::deleteString(const char* context, const char* key)
 {
     Context& ctx = writeContext(context);
     SharedLock locker(m_lock, false);
-    
+
     // Find the record.
     map<string,Record>::iterator i=ctx.m_dataMap.find(key);
     if (i!=ctx.m_dataMap.end()) {
