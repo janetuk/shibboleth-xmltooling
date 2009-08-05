@@ -33,6 +33,8 @@ using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace std;
 
+using xercesc::DOMElement;
+
 namespace xmltooling {
     class XMLTOOL_DLLLOCAL ChainingCredentialResolver : public CredentialResolver
     {

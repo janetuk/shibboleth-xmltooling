@@ -1,6 +1,6 @@
 /*
- *  Copyright 2001-2007 Internet2
- * 
+ *  Copyright 2001-2008 Internet2
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 
 /**
  * CredentialCriteria.cpp
- * 
+ *
  * Class for specifying criteria by which a CredentialResolver should resolve credentials.
  */
 
@@ -25,6 +25,7 @@
 #include "security/Credential.h"
 #include "security/CredentialCriteria.h"
 #include "security/KeyInfoResolver.h"
+#include "security/SecurityHelper.h"
 
 #include <openssl/dsa.h>
 #include <openssl/rsa.h>
@@ -80,28 +81,5 @@ bool CredentialCriteria::matches(const Credential& credential) const
     if (!key2)
         return true;   // no key here, so we can't test it
 
-    if (key1->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL ||
-        key2->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
-        logging::Category::getInstance(XMLTOOLING_LOGCAT".Credential").warn("comparison of non-OpenSSL credentials are not supported");
-        return false;
-    }
-
-    if (key1->getKeyType()==XSECCryptoKey::KEY_RSA_PUBLIC || key1->getKeyType()==XSECCryptoKey::KEY_RSA_PAIR) {
-        if (key2->getKeyType()!=XSECCryptoKey::KEY_RSA_PUBLIC && key2->getKeyType()!=XSECCryptoKey::KEY_RSA_PAIR)
-            return false;
-        const RSA* rsa1 = static_cast<const OpenSSLCryptoKeyRSA*>(key1)->getOpenSSLRSA();
-        const RSA* rsa2 = static_cast<const OpenSSLCryptoKeyRSA*>(key2)->getOpenSSLRSA();
-        return (BN_cmp(rsa1->n,rsa2->n) == 0 && BN_cmp(rsa1->e,rsa2->e) == 0);
-    }
-
-    if (key1->getKeyType()==XSECCryptoKey::KEY_DSA_PUBLIC || key1->getKeyType()==XSECCryptoKey::KEY_DSA_PAIR) {
-        if (key2->getKeyType()!=XSECCryptoKey::KEY_DSA_PUBLIC && key2->getKeyType()!=XSECCryptoKey::KEY_DSA_PAIR)
-            return false;
-        const DSA* dsa1 = static_cast<const OpenSSLCryptoKeyDSA*>(key1)->getOpenSSLDSA();
-        const DSA* dsa2 = static_cast<const OpenSSLCryptoKeyDSA*>(key2)->getOpenSSLDSA();
-        return (BN_cmp(dsa1->pub_key,dsa2->pub_key) == 0);
-    }
-    
-    logging::Category::getInstance(XMLTOOLING_LOGCAT".CredentialCriteria").warn("unsupported key type for comparison");
-    return false;
+    return SecurityHelper::matches(*key1, *key2);
 }

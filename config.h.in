@@ -1,12 +1,12 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define if C++ compiler supports covariant virtual methods. */
+/* Define to 1 if C++ compiler supports covariant virtual methods. */
 #undef HAVE_COVARIANT_RETURNS
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
-/* Define if you have an STL implementation that supports useful string
+/* Define to 1 if you have an STL implementation that supports useful string
    specialization. */
 #undef HAVE_GOOD_STL
 
@@ -23,7 +23,7 @@
 /* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL
 
-/* Define if Xerces-C library was found */
+/* Define to 1 if Xerces-C library was found */
 #undef HAVE_LIBXERCESC
 
 /* Define to 1 if you have the <memory.h> header file. */
@@ -74,6 +74,9 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
+/* Define to 1 if you have the 'xsecsize_t' type. */
+#undef HAVE_XSECSIZE_T
+
 /* Name of package */
 #undef PACKAGE
 
@@ -105,14 +108,26 @@
 /* Version number of package */
 #undef VERSION
 
-/* Define if log4cpp library is used. */
+/* Define to 1 if log4cpp library is used. */
 #undef XMLTOOLING_LOG4CPP
 
-/* Define if log4shib library is used. */
+/* Define to 1 if log4shib library is used. */
 #undef XMLTOOLING_LOG4SHIB
 
-/* Define if you wish to disable XML-Security-dependent features. */
+/* Define to 1 if you wish to disable XML-Security-dependent features. */
 #undef XMLTOOLING_NO_XMLSEC
+
+/* Define to 1 if Xerces has a 64-bit-safe API. */
+#undef XMLTOOLING_XERCESC_64BITSAFE
+
+/* Define to 1 if Xerces DOM ID methods take extra parameter. */
+#undef XMLTOOLING_XERCESC_BOOLSETIDATTRIBUTE
+
+/* Define to 1 if Xerces supports a compliant DOMLS API. */
+#undef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+
+/* Define to 1 if Xerces InputStream class requires getContentType. */
+#undef XMLTOOLING_XERCESC_INPUTSTREAM_HAS_CONTENTTYPE
 
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const

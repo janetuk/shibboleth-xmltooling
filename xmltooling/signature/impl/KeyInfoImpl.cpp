@@ -33,6 +33,7 @@
 
 using namespace xmlsignature;
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 using xmlconstants::XMLSIG_NS;
 
@@ -52,7 +53,7 @@ namespace xmlsignature {
     public:
         virtual ~DSAKeyValueImpl() {}
 
-        DSAKeyValueImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        DSAKeyValueImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
             init();
         }
@@ -137,7 +138,7 @@ namespace xmlsignature {
     public:
         virtual ~RSAKeyValueImpl() {}
 
-        RSAKeyValueImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        RSAKeyValueImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
                 : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
             init();
         }
@@ -182,7 +183,7 @@ namespace xmlsignature {
     public:
         virtual ~KeyValueImpl() {}
 
-        KeyValueImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        KeyValueImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
                 : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
             init();
         }
@@ -244,7 +245,7 @@ namespace xmlsignature {
             XMLString::release(&m_Algorithm);
         }
 
-        TransformImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        TransformImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Algorithm(NULL) {
         }
             
@@ -301,7 +302,7 @@ namespace xmlsignature {
     public:
         virtual ~TransformsImpl() {}
 
-        TransformsImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        TransformsImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
         }
             
@@ -337,7 +338,7 @@ namespace xmlsignature {
             XMLString::release(&m_Type);
         }
 
-        RetrievalMethodImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        RetrievalMethodImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
             init();
         }
@@ -390,7 +391,7 @@ namespace xmlsignature {
     public:
         virtual ~X509IssuerSerialImpl() {}
 
-        X509IssuerSerialImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        X509IssuerSerialImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
                 : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
             init();
         }
@@ -435,7 +436,7 @@ namespace xmlsignature {
     public:
         virtual ~X509DataImpl() {}
 
-        X509DataImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        X509DataImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
         }
             
@@ -514,7 +515,7 @@ namespace xmlsignature {
     public:
         virtual ~SPKIDataImpl() {}
 
-        SPKIDataImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        SPKIDataImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
         }
             
@@ -578,7 +579,7 @@ namespace xmlsignature {
     public:
         virtual ~PGPDataImpl() {}
 
-        PGPDataImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        PGPDataImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
                 : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
             init();
         }
@@ -637,7 +638,7 @@ namespace xmlsignature {
             XMLString::release(&m_Id);
         }
 
-        KeyInfoImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
+        KeyInfoImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
             : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Id(NULL) {
         }
             

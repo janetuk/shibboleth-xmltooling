@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2008 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,8 @@ namespace soap11 {
     END_XMLOBJECT;
 
     BEGIN_XMLOBJECT(XMLTOOL_API,Body,xmltooling::ElementProxy,SOAP 1.1 Body element);
-        DECL_STRING_ATTRIB(EncodingStyle,ENCODINGSTYLE);
+        /** encodingStyle attribute name */
+        static const XMLCh ENCODINGSTYLE_ATTRIB_NAME[];
         /** Body (type) local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;

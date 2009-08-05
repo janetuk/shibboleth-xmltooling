@@ -33,6 +33,8 @@ using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace std;
 
+using xercesc::DOMElement;
+
 namespace xmltooling {
     TrustEngine* XMLTOOL_DLLLOCAL ChainingTrustEngineFactory(const DOMElement* const & e)
     {

@@ -65,6 +65,18 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 /* #undef HAVE_UNISTD_H */
 
+#include <xercesc/util/XercesVersion.hpp>
+
+#if (XERCES_VERSION_MAJOR >= 3)
+# define XMLTOOLING_XERCESC_COMPLIANT_DOMLS     1
+# define XMLTOOLING_XERCESC_BOOLSETIDATTRIBUTE  1
+# define XMLTOOLING_XERCESC_64BITSAFE           1
+# define XMLTOOLING_XERCESC_INPUTSTREAM_HAS_CONTENTTYPE 1
+#endif
+
+/* Define to 1 if you have the `xsecsize_t' type. */
+#define HAVE_XSECSIZE_T 1
+
 /* Name of package */
 #define PACKAGE "xmltooling"
 
@@ -75,13 +87,13 @@
 #define PACKAGE_NAME "xmltooling"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "xmltooling 1.0"
+#define PACKAGE_STRING "xmltooling 1.2"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "xmltooling"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.0"
+#define PACKAGE_VERSION "1.2"
 
 /* Define to the necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -94,7 +106,7 @@
 /* #undef TM_IN_SYS_TIME */
 
 /* Version number of package */
-#define VERSION "1.0"
+#define VERSION "1.2"
 
 /* Define if you wish to disable XML-Security-dependent features. */
 /* #undef XMLTOOLING_NO_XMLSEC */

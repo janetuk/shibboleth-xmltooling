@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,43 +27,59 @@
 using namespace xmltooling;
 using namespace std;
 
+PathResolver::PathResolver() : m_defaultPackage(PACKAGE_NAME), m_defaultPrefix("/usr")
+{
+    setLibDir("/usr/lib");
+    setLogDir("/var/log");
+    setXMLDir("/usr/share/xml");
+    setRunDir("/var/run");
+    setCfgDir("/etc");
+}
+
 const string& PathResolver::resolve(string& s, file_type_t filetype, const char* pkgname, const char* prefix) const
 {
     if (!isAbsolute(s.c_str())) {
         switch (filetype) {
             case XMLTOOLING_LIB_FILE:
-                s = string(prefix ? prefix : m_defaultPrefix) +
-#if (SIZEOF_LONG == 8)
-                    "/lib64/"
-#else
-                    "/lib/"
-#endif
-                    + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
+                s = m_lib + '/' + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
+                if (!isAbsolute(m_lib.c_str()))
+                    s = string(prefix ? prefix : m_defaultPrefix) + '/' + s;
                 break;
 
             case XMLTOOLING_LOG_FILE:
-                if (prefix || m_defaultPrefix != "/usr")
-                    s = string(prefix ? prefix : m_defaultPrefix) + "/var/log/" + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
-                else
-                    s = string("/var/log/") + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
+                s = m_log + '/' + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
+                if (!isAbsolute(m_log.c_str())) {
+                    if (prefix || m_defaultPrefix != "/usr")
+                        s = string(prefix ? prefix : m_defaultPrefix) + '/' + s;
+                    else
+                        s = string("/") + s;
+                }
                 break;
 
             case XMLTOOLING_XML_FILE:
-                s = string(prefix ? prefix : m_defaultPrefix) + "/share/xml/" + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
+                s = m_xml + '/' + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
+                if (!isAbsolute(m_xml.c_str()))
+                    s = string(prefix ? prefix : m_defaultPrefix) + '/' + s;
                 break;
 
             case XMLTOOLING_RUN_FILE:
-                if (prefix || m_defaultPrefix != "/usr")
-                    s = string(prefix ? prefix : m_defaultPrefix) + "/var/run/" + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
-                else
-                    s = string("/var/run/") + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
+                s = m_run + '/' + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
+                if (!isAbsolute(m_run.c_str())) {
+                    if (prefix || m_defaultPrefix != "/usr")
+                        s = string(prefix ? prefix : m_defaultPrefix) + '/' + s;
+                    else
+                        s = string("/") + s;
+                }
                 break;
 
             case XMLTOOLING_CFG_FILE:
-                if (prefix || m_defaultPrefix != "/usr")
-                    s = string(prefix ? prefix : m_defaultPrefix) + "/etc/" + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
-                else
-                    s = string("/etc/") + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
+                s = m_cfg + '/' + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
+                if (!isAbsolute(m_cfg.c_str())) {
+                    if (prefix || m_defaultPrefix != "/usr")
+                        s = string(prefix ? prefix : m_defaultPrefix) + '/' + s;
+                    else
+                        s = string("/") + s;
+                }
                 break;
 
             default:

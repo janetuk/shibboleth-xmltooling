@@ -1,6 +1,6 @@
 /*
- *  Copyright 2001-2007 Internet2
- * 
+ *  Copyright 2001-2008 Internet2
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,13 +16,14 @@
 
 /**
  * ParserPool.cpp
- * 
- * XML parsing
+ *
+ * A thread-safe pool of parsers that share characteristics.
  */
 
 #include "internal.h"
 #include "exceptions.h"
 #include "logging.h"
+#include "util/CurlURLInputStream.h"
 #include "util/NDC.h"
 #include "util/ParserPool.h"
 #include "util/XMLHelper.h"
@@ -40,7 +41,58 @@
 
 using namespace xmltooling::logging;
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
+
+
+namespace {
+    class MyErrorHandler : public DOMErrorHandler {
+    public:
+        unsigned int errors;
+
+        MyErrorHandler() : errors(0) {}
+
+        bool handleError(const DOMError& e)
+        {
+#ifdef _DEBUG
+            xmltooling::NDC ndc("handleError");
+#endif
+            Category& log=Category::getInstance(XMLTOOLING_LOGCAT".ParserPool");
+
+            DOMLocator* locator=e.getLocation();
+            auto_ptr_char temp(e.getMessage());
+
+            switch (e.getSeverity()) {
+                case DOMError::DOM_SEVERITY_WARNING:
+                    log.warnStream() << "warning on line " << locator->getLineNumber()
+                        << ", column " << locator->getColumnNumber()
+                        << ", message: " << temp.get() << logging::eol;
+                    return true;
+
+                case DOMError::DOM_SEVERITY_ERROR:
+                    ++errors;
+                    log.errorStream() << "error on line " << locator->getLineNumber()
+                        << ", column " << locator->getColumnNumber()
+                        << ", message: " << temp.get() << logging::eol;
+                    return true;
+
+                case DOMError::DOM_SEVERITY_FATAL_ERROR:
+                    ++errors;
+                    log.errorStream() << "fatal error on line " << locator->getLineNumber()
+                        << ", column " << locator->getColumnNumber()
+                        << ", message: " << temp.get() << logging::eol;
+                    return true;
+            }
+
+            ++errors;
+            log.errorStream() << "undefined error type on line " << locator->getLineNumber()
+                << ", column " << locator->getColumnNumber()
+                << ", message: " << temp.get() << logging::eol;
+            return false;
+        }
+    };
+}
+
 
 ParserPool::ParserPool(bool namespaceAware, bool schemaAware)
     : m_namespaceAware(namespaceAware), m_schemaAware(schemaAware), m_lock(Mutex::create()), m_security(new SecurityManager()) {}
@@ -60,25 +112,77 @@ DOMDocument* ParserPool::newDocument()
     return DOMImplementationRegistry::getDOMImplementation(NULL)->createDocument();
 }
 
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+
+DOMDocument* ParserPool::parse(DOMLSInput& domsrc)
+{
+    DOMLSParser* parser=checkoutBuilder();
+    XercesJanitor<DOMLSParser> janitor(parser);
+    try {
+        MyErrorHandler deh;
+        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, dynamic_cast<DOMErrorHandler*>(&deh));
+        DOMDocument* doc=parser->parse(&domsrc);
+        if (deh.errors) {
+            if (doc)
+                doc->release();
+            throw XMLParserException("XML error(s) during parsing, check log for specifics");
+        }
+        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, (void*)NULL);
+        parser->getDomConfig()->setParameter(XMLUni::fgXercesUserAdoptsDOMDocument, true);
+        checkinBuilder(janitor.release());
+        return doc;
+    }
+    catch (XMLException& ex) {
+        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, (void*)NULL);
+        parser->getDomConfig()->setParameter(XMLUni::fgXercesUserAdoptsDOMDocument, true);
+        checkinBuilder(janitor.release());
+        auto_ptr_char temp(ex.getMessage());
+        throw XMLParserException(string("Xerces error during parsing: ") + (temp.get() ? temp.get() : "no message"));
+    }
+    catch (XMLToolingException&) {
+        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, (void*)NULL);
+        parser->getDomConfig()->setParameter(XMLUni::fgXercesUserAdoptsDOMDocument, true);
+        checkinBuilder(janitor.release());
+        throw;
+    }
+}
+
+#else
+
 DOMDocument* ParserPool::parse(DOMInputSource& domsrc)
 {
     DOMBuilder* parser=checkoutBuilder();
     XercesJanitor<DOMBuilder> janitor(parser);
     try {
+        MyErrorHandler deh;
+        parser->setErrorHandler(&deh);
         DOMDocument* doc=parser->parse(domsrc);
-        parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument,true);
+        if (deh.errors) {
+            if (doc)
+                doc->release();
+            throw XMLParserException("XML error(s) during parsing, check log for specifics");
+        }
+        parser->setErrorHandler(NULL);
+        parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
         checkinBuilder(janitor.release());
         return doc;
     }
-    catch (XMLException&) {
+    catch (XMLException& ex) {
+        parser->setErrorHandler(NULL);
+        parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
         checkinBuilder(janitor.release());
-        throw;
+        auto_ptr_char temp(ex.getMessage());
+        throw XMLParserException(string("Xerces error during parsing: ") + (temp.get() ? temp.get() : "no message"));
     }
     catch (XMLToolingException&) {
+        parser->setErrorHandler(NULL);
+        parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
         checkinBuilder(janitor.release());
         throw;
     }
 }
+
+#endif
 
 DOMDocument* ParserPool::parse(istream& is)
 {
@@ -100,7 +204,7 @@ public:
 bool ParserPool::loadSchema(const XMLCh* nsURI, const XMLCh* pathname)
 {
     // Just check the pathname and then directly register the pair into the map.
-    
+
     auto_ptr_char p(pathname);
 #ifdef WIN32
     struct _stat stat_buf;
@@ -120,16 +224,9 @@ bool ParserPool::loadSchema(const XMLCh* nsURI, const XMLCh* pathname)
     }
 
     Lock lock(m_lock);
-#ifdef HAVE_GOOD_STL
     m_schemaLocMap[nsURI]=pathname;
     m_schemaLocations.erase();
     for_each(m_schemaLocMap.begin(),m_schemaLocMap.end(),doubleit<xstring>(m_schemaLocations,chSpace));
-#else
-    auto_ptr_char n(nsURI);
-    m_schemaLocMap[n.get()]=p.get();
-    m_schemaLocations.erase();
-    for_each(m_schemaLocMap.begin(),m_schemaLocMap.end(),doubleit<string>(m_schemaLocations,' '));
-#endif
 
     return true;
 }
@@ -169,7 +266,7 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
     try {
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(domsrc);
         XercesJanitor<DOMDocument> janitor(doc);
-        
+
         // Check root element.
         const DOMElement* root=doc->getDocumentElement();
         if (!XMLHelper::isNodeNamed(root,CATALOG_NS,catalog)) {
@@ -177,7 +274,7 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
             log.error("unknown root element, failed to load XML catalog from %s", temp.get());
             return false;
         }
-        
+
         // Fetch all the <system> elements.
         DOMNodeList* mappings=root->getElementsByTagNameNS(CATALOG_NS,system);
         Lock lock(m_lock);
@@ -185,20 +282,10 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
             root=static_cast<DOMElement*>(mappings->item(i));
             const XMLCh* from=root->getAttributeNS(NULL,systemId);
             const XMLCh* to=root->getAttributeNS(NULL,uri);
-#ifdef HAVE_GOOD_STL
             m_schemaLocMap[from]=to;
-#else
-            auto_ptr_char f(from);
-            auto_ptr_char t(to);
-            m_schemaLocMap[f.get()]=t.get();
-#endif
         }
         m_schemaLocations.erase();
-#ifdef HAVE_GOOD_STL
         for_each(m_schemaLocMap.begin(),m_schemaLocMap.end(),doubleit<xstring>(m_schemaLocations,chSpace));
-#else
-        for_each(m_schemaLocMap.begin(),m_schemaLocMap.end(),doubleit<string>(m_schemaLocations,' '));
-#endif
     }
     catch (exception& e) {
         log.error("catalog loader caught exception: %s", e.what());
@@ -208,7 +295,19 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
     return true;
 }
 
-DOMInputSource* ParserPool::resolveEntity(const XMLCh* const publicId, const XMLCh* const systemId, const XMLCh* const baseURI)
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+DOMLSInput* ParserPool::resolveResource(
+            const XMLCh *const resourceType,
+            const XMLCh *const namespaceUri,
+            const XMLCh *const publicId,
+            const XMLCh *const systemId,
+            const XMLCh *const baseURI
+            )
+#else
+DOMInputSource* ParserPool::resolveEntity(
+    const XMLCh* const publicId, const XMLCh* const systemId, const XMLCh* const baseURI
+    )
+#endif
 {
 #if _DEBUG
     xmltooling::NDC ndc("resolveEntity");
@@ -223,7 +322,6 @@ DOMInputSource* ParserPool::resolveEntity(const XMLCh* const publicId, const XML
         log.debug("asked to resolve %s with baseURI %s",sysId.get(),base.get() ? base.get() : "(null)");
     }
 
-#ifdef HAVE_GOOD_STL
     // Find well-known schemas in the specified location.
     map<xstring,xstring>::const_iterator i=m_schemaLocMap.find(systemId);
     if (i!=m_schemaLocMap.end())
@@ -238,93 +336,83 @@ DOMInputSource* ParserPool::resolveEntity(const XMLCh* const publicId, const XML
     // We'll allow anything without embedded slashes.
     if (XMLString::indexOf(systemId, chForwardSlash)==-1)
         return new Wrapper4InputSource(new LocalFileInputSource(baseURI,systemId));
-#else
-    // Find well-known schemas in the specified location.
-    auto_ptr_char temp(systemId);
-    map<string,string>::const_iterator i=m_schemaLocMap.find(temp.get());
-    if (i!=m_schemaLocMap.end()) {
-        auto_ptr_XMLCh temp2(i->second.c_str());
-        return new Wrapper4InputSource(new LocalFileInputSource(baseURI,temp2.get()));
-    }
-
-    // Check for entity as a value in the map.
-    for (i=m_schemaLocMap.begin(); i!=m_schemaLocMap.end(); ++i) {
-        auto_ptr_XMLCh temp2(i->second.c_str());
-        if (XMLString::endsWith(temp2.get(), systemId))
-            return new Wrapper4InputSource(new LocalFileInputSource(baseURI,temp2.get()));
-    }
-
-    // We'll allow anything without embedded slashes.
-    if (XMLString::indexOf(systemId, chForwardSlash)==-1)
-        return new Wrapper4InputSource(new LocalFileInputSource(baseURI,systemId));
-#endif    
 
     // Shortcircuit the request.
-#ifdef HAVE_GOOD_STL
     auto_ptr_char temp(systemId);
-#endif
     log.debug("unauthorized entity request (%s), blocking it", temp.get());
     static const XMLByte nullbuf[] = {0};
     return new Wrapper4InputSource(new MemBufInputSource(nullbuf,0,systemId));
 }
 
-bool ParserPool::handleError(const DOMError& e)
+#ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
+
+DOMLSParser* ParserPool::createBuilder()
 {
-#ifdef _DEBUG
-    xmltooling::NDC ndc("handleError");
-#endif
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".ParserPool");
-    DOMLocator* locator=e.getLocation();
-    auto_ptr_char temp(e.getMessage());
+    static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
+    DOMImplementation* impl=DOMImplementationRegistry::getDOMImplementation(impltype);
+    DOMLSParser* parser=static_cast<DOMImplementationLS*>(impl)->createLSParser(DOMImplementationLS::MODE_SYNCHRONOUS,NULL);
+    parser->getDomConfig()->setParameter(XMLUni::fgDOMNamespaces, m_namespaceAware);
+    if (m_schemaAware) {
+        parser->getDomConfig()->setParameter(XMLUni::fgDOMNamespaces, true);
+        parser->getDomConfig()->setParameter(XMLUni::fgXercesSchema, true);
+        parser->getDomConfig()->setParameter(XMLUni::fgDOMValidate, true);
+        parser->getDomConfig()->setParameter(XMLUni::fgXercesCacheGrammarFromParse, true);
 
-    switch (e.getSeverity()) {
-        case DOMError::DOM_SEVERITY_WARNING:
-            log.warnStream() << "warning on line " << locator->getLineNumber()
-                << ", column " << locator->getColumnNumber()
-                << ", message: " << temp.get() << logging::eol;
-            return true;
-
-        case DOMError::DOM_SEVERITY_ERROR:
-            log.errorStream() << "error on line " << locator->getLineNumber()
-                << ", column " << locator->getColumnNumber()
-                << ", message: " << temp.get() << logging::eol;
-            throw XMLParserException(string("error during XML parsing: ") + (temp.get() ? temp.get() : "no message"));
-
-        case DOMError::DOM_SEVERITY_FATAL_ERROR:
-            log.errorStream() << "fatal error on line " << locator->getLineNumber()
-                << ", column " << locator->getColumnNumber()
-                << ", message: " << temp.get() << logging::eol;
-            throw XMLParserException(string("fatal error during XML parsing: ") + (temp.get() ? temp.get() : "no message"));
+        // We build a "fake" schema location hint that binds each namespace to itself.
+        // This ensures the entity resolver will be given the namespace as a systemId it can check.
+        parser->getDomConfig()->setParameter(XMLUni::fgXercesSchemaExternalSchemaLocation, const_cast<XMLCh*>(m_schemaLocations.c_str()));
     }
-    throw XMLParserException(string("unclassified error during XML parsing: ") + (temp.get() ? temp.get() : "no message"));
+    parser->getDomConfig()->setParameter(XMLUni::fgXercesUserAdoptsDOMDocument, true);
+    parser->getDomConfig()->setParameter(XMLUni::fgXercesDisableDefaultEntityResolution, true);
+    parser->getDomConfig()->setParameter(XMLUni::fgDOMResourceResolver, dynamic_cast<DOMLSResourceResolver*>(this));
+    parser->getDomConfig()->setParameter(XMLUni::fgXercesSecurityManager, m_security);
+    return parser;
 }
+
+DOMLSParser* ParserPool::checkoutBuilder()
+{
+    Lock lock(m_lock);
+    if (m_pool.empty()) {
+        DOMLSParser* builder=createBuilder();
+        return builder;
+    }
+    DOMLSParser* p=m_pool.top();
+    m_pool.pop();
+    if (m_schemaAware)
+        p->getDomConfig()->setParameter(XMLUni::fgXercesSchemaExternalSchemaLocation, const_cast<XMLCh*>(m_schemaLocations.c_str()));
+    return p;
+}
+
+void ParserPool::checkinBuilder(DOMLSParser* builder)
+{
+    if (builder) {
+        Lock lock(m_lock);
+        m_pool.push(builder);
+    }
+}
+
+#else
 
 DOMBuilder* ParserPool::createBuilder()
 {
     static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
     DOMImplementation* impl=DOMImplementationRegistry::getDOMImplementation(impltype);
     DOMBuilder* parser=static_cast<DOMImplementationLS*>(impl)->createDOMBuilder(DOMImplementationLS::MODE_SYNCHRONOUS,0);
-    if (m_namespaceAware)
-        parser->setFeature(XMLUni::fgDOMNamespaces,true);
+    parser->setFeature(XMLUni::fgDOMNamespaces, m_namespaceAware);
     if (m_schemaAware) {
-        parser->setFeature(XMLUni::fgXercesSchema,true);
-        parser->setFeature(XMLUni::fgDOMValidation,true);
-        parser->setFeature(XMLUni::fgXercesCacheGrammarFromParse,true);
-        parser->setFeature(XMLUni::fgXercesValidationErrorAsFatal,true);
-        
+        parser->setFeature(XMLUni::fgDOMNamespaces, true);
+        parser->setFeature(XMLUni::fgXercesSchema, true);
+        parser->setFeature(XMLUni::fgDOMValidation, true);
+        parser->setFeature(XMLUni::fgXercesCacheGrammarFromParse, true);
+
         // We build a "fake" schema location hint that binds each namespace to itself.
-        // This ensures the entity resolver will be given the namespace as a systemId it can check. 
-#ifdef HAVE_GOOD_STL
+        // This ensures the entity resolver will be given the namespace as a systemId it can check.
         parser->setProperty(XMLUni::fgXercesSchemaExternalSchemaLocation,const_cast<XMLCh*>(m_schemaLocations.c_str()));
-#else
-        auto_ptr_XMLCh temp(m_schemaLocations.c_str());
-        parser->setProperty(XMLUni::fgXercesSchemaExternalSchemaLocation,const_cast<XMLCh*>(temp.get()));
-#endif
     }
     parser->setProperty(XMLUni::fgXercesSecurityManager, m_security);
-    parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument,true);
+    parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
+    parser->setFeature(XMLUni::fgXercesDisableDefaultEntityResolution, true);
     parser->setEntityResolver(this);
-    parser->setErrorHandler(this);
     return parser;
 }
 
@@ -337,14 +425,8 @@ DOMBuilder* ParserPool::checkoutBuilder()
     }
     DOMBuilder* p=m_pool.top();
     m_pool.pop();
-    if (m_schemaAware) {
-#ifdef HAVE_GOOD_STL
+    if (m_schemaAware)
         p->setProperty(XMLUni::fgXercesSchemaExternalSchemaLocation,const_cast<XMLCh*>(m_schemaLocations.c_str()));
-#else
-        auto_ptr_XMLCh temp2(m_schemaLocations.c_str());
-        p->setProperty(XMLUni::fgXercesSchemaExternalSchemaLocation,const_cast<XMLCh*>(temp2.get()));
-#endif
-    }
     return p;
 }
 
@@ -356,10 +438,12 @@ void ParserPool::checkinBuilder(DOMBuilder* builder)
     }
 }
 
-unsigned int StreamInputSource::StreamBinInputStream::readBytes(XMLByte* const toFill, const unsigned int maxToRead)
+#endif
+
+xsecsize_t StreamInputSource::StreamBinInputStream::readBytes(XMLByte* const toFill, const xsecsize_t maxToRead)
 {
     XMLByte* target=toFill;
-    unsigned int bytes_read=0,request=maxToRead;
+    xsecsize_t bytes_read=0,request=maxToRead;
 
     // Fulfill the rest by reading from the stream.
     if (request && !m_is.eof() && !m_is.fail()) {
@@ -378,3 +462,49 @@ unsigned int StreamInputSource::StreamBinInputStream::readBytes(XMLByte* const t
     }
     return bytes_read;
 }
+
+#ifdef XMLTOOLING_LITE
+
+URLInputSource::URLInputSource(const XMLCh* url, const char* systemId) : InputSource(systemId), m_url(url)
+{
+}
+
+URLInputSource::URLInputSource(const DOMElement* e, const char* systemId) : InputSource(systemId)
+{
+    static const XMLCh uri[] = UNICODE_LITERAL_3(u,r,i);
+    static const XMLCh url[] = UNICODE_LITERAL_3(u,r,l);
+
+    const XMLCh* attr = e->getAttributeNS(NULL, url);
+    if (!attr || !*attr) {
+        attr = e->getAttributeNS(NULL, uri);
+        if (!attr || !*attr)
+            throw IOException("No URL supplied via DOM to URLInputSource constructor.");
+    }
+
+    m_url.setURL(attr);
+}
+
+BinInputStream* URLInputSource::makeStream() const
+{
+    // Ask the URL to create us an appropriate input stream
+    return m_url.makeNewStream();
+}
+
+#else
+
+URLInputSource::URLInputSource(const XMLCh* url, const char* systemId)
+    : InputSource(systemId), m_url(url), m_root(NULL)
+{
+}
+
+URLInputSource::URLInputSource(const DOMElement* e, const char* systemId)
+    : InputSource(systemId), m_root(e)
+{
+}
+
+BinInputStream* URLInputSource::makeStream() const
+{
+    return m_root ? new CurlURLInputStream(m_root) : new CurlURLInputStream(m_url.get());
+}
+
+#endif

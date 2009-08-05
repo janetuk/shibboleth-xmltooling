@@ -74,7 +74,7 @@ public:
     static const XMLCh ID_ATTRIB_NAME[];
 
     SimpleXMLObject(
-        const XMLCh* nsURI=NULL, const XMLCh* localName=NULL, const XMLCh* prefix=NULL, const QName* schemaType=NULL
+        const XMLCh* nsURI=NULL, const XMLCh* localName=NULL, const XMLCh* prefix=NULL, const xmltooling::QName* schemaType=NULL
         ) : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_id(NULL) {
 #ifndef XMLTOOLING_NO_XMLSEC
         m_children.push_back(NULL);
@@ -126,7 +126,11 @@ protected:
     void marshallAttributes(xercesc::DOMElement* domElement) const {
         if(getId()) {
             domElement->setAttributeNS(NULL, SimpleXMLObject::ID_ATTRIB_NAME, getId());
+#ifdef XMLTOOLING_XERCESC_BOOLSETIDATTRIBUTE
+            domElement->setIdAttributeNS(NULL, SimpleXMLObject::ID_ATTRIB_NAME, true);
+#else
             domElement->setIdAttributeNS(NULL, SimpleXMLObject::ID_ATTRIB_NAME);
+#endif
         }
     }
 
@@ -171,14 +175,14 @@ public:
     }
 
     XMLObject* buildObject(
-        const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL
+        const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const xmltooling::QName* schemaType=NULL
         ) const {
         return new SimpleXMLObject(nsURI, localName, prefix, schemaType);
     }
 
     static SimpleXMLObject* buildSimpleXMLObject() {
         const SimpleXMLObjectBuilder* b = dynamic_cast<const SimpleXMLObjectBuilder*>(
-            XMLObjectBuilder::getBuilder(QName(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME))
+            XMLObjectBuilder::getBuilder(xmltooling::QName(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME))
             );
         if (b)
             return dynamic_cast<SimpleXMLObject*>(b->buildObject());

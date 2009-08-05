@@ -26,6 +26,8 @@
 using namespace xmltooling;
 using namespace std;
 
+using xercesc::XMLString;
+
 QName::QName(const XMLCh* uri, const XMLCh* localPart, const XMLCh* prefix)
 {
 #ifndef HAVE_GOOD_STL
