@@ -7,6 +7,7 @@ xmltooling (1.2-1) UNRELEASED; urgency=low
       API, allowing separate revocation lists for intermediate certs.
     - Provide the hostname in artifact resolution errors.
     - Sanity-check provided credentials for consistency.
+  * Build against Xerces-C 3.0.
 
  -- Russ Allbery <rra@debian.org>  Wed, 05 Aug 2009 15:45:06 -0700
 
