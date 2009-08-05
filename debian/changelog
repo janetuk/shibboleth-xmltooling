@@ -7,6 +7,7 @@ xmltooling (1.2-1) UNRELEASED; urgency=low
       API, allowing separate revocation lists for intermediate certs.
     - Provide the hostname in artifact resolution errors.
     - Sanity-check provided credentials for consistency.
+  * Rename library package for upstream SONAME bump.
   * Build against Xerces-C 3.0.
   * Update standards version to 3.8.2 (no changes required).
 
