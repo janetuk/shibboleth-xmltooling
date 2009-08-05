@@ -8,6 +8,7 @@ xmltooling (1.2-1) UNRELEASED; urgency=low
     - Provide the hostname in artifact resolution errors.
     - Sanity-check provided credentials for consistency.
   * Build against Xerces-C 3.0.
+  * Update standards version to 3.8.2 (no changes required).
 
  -- Russ Allbery <rra@debian.org>  Wed, 05 Aug 2009 15:45:06 -0700
 
