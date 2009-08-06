@@ -86,7 +86,7 @@ This package includes files needed for development with xmltooling.
 %install
 %{__make} install DESTDIR=$RPM_BUILD_ROOT
 # Don't package unit tester if present.
-{__rm} $RPM_BUILD_ROOT/%{_bindir}/xmltoolingtest
+%{__rm} $RPM_BUILD_ROOT/%{_bindir}/xmltoolingtest
 
 %check
 %{__make} check
