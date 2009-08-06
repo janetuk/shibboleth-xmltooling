@@ -9,16 +9,17 @@ URL:		http://www.opensaml.org/
 Source:	    %{name}-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root
 %if 0%{?suse_version} > 1030
-%define libpkgprefix lib
 BuildRequires:  libXerces-c-devel >= 2.8.0
+BuildRequires:  libxml-security-c-devel >= 1.4.0
+%{?_with_log4cpp:BuildRequires: liblog4cpp-devel >= 1.0}
+%{!?_with_log4cpp:BuildRequires: liblog4shib-devel}
 %else
-%define libpkgprefix
 BuildRequires:  xerces%{?xercesver}-c-devel >= 2.8.0
+BuildRequires:  xml-security-c-devel >= 1.4.0
+%{?_with_log4cpp:BuildRequires: log4cpp-devel >= 1.0}
+%{!?_with_log4cpp:BuildRequires: log4shib-devel}
 %endif
-BuildRequires:	%{libpkgprefix}xml-security-c-devel >= 1.4.0
 BuildRequires:	gcc-c++, openssl-devel, curl-devel >= 7.10.6
-%{?_with_log4cpp:BuildRequires:	%{libpkgprefix}log4cpp-devel >= 1.0}
-%{!?_with_log4cpp:BuildRequires: %{libpkgprefix}log4shib-devel}
 
 %if "%{_vendor}" == "suse"
 %define pkgdocdir %{_docdir}/%{name}
@@ -60,13 +61,16 @@ Summary: XMLTooling development Headers
 Group: Development/Libraries
 %if 0%{?suse_version} > 1030
 Requires: libXerces-c-devel >= 2.8.0
+Requires: libxml-security-c-devel >= 1.4.0
+%{?_with_log4cpp:Requires: liblog4cpp-devel >= 1.0}
+%{!?_with_log4cpp:Requires: liblog4shib-devel}
 %else
 Requires: xerces%{?xercesver}-c-devel >= 2.8.0
+Requires: xml-security-c-devel >= 1.4.0
+%{?_with_log4cpp:Requires: log4cpp-devel >= 1.0}
+%{!?_with_log4cpp:Requires: log4shib-devel}
 %endif
-Requires: %{libpkgprefix}xml-security-c-devel >= 1.4.0
 Requires: openssl-devel, curl-devel >= 7.10.6
-%{?_with_log4cpp:Requires: %{libpkgprefix}log4cpp-devel >= 1.0}
-%{!?_with_log4cpp:Requires: %{libpkgprefix}log4shib-devel}
 
 %if 0%{?suse_version} > 1030
 %description -n libxmltooling-devel
