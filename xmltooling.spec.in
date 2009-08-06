@@ -20,6 +20,12 @@ BuildRequires:	gcc-c++, openssl-devel, curl-devel >= 7.10.6
 %{?_with_log4cpp:BuildRequires:	%{libpkgprefix}log4cpp-devel >= 1.0}
 %{!?_with_log4cpp:BuildRequires: %{libpkgprefix}log4shib-devel}
 
+%if "%{_vendor}" == "suse"
+%define pkgdocdir %{_docdir}/%{name}
+%else
+%define pkgdocdir %{_docdir}/%{name}-%{version}
+%endif
+
 %description
 The XMLTooling library contains generic XML parsing and processing
 classes based on the Xerces-C DOM. It adds more powerful facilities
@@ -84,7 +90,7 @@ This package includes files needed for development with xmltooling.
 %{__make}
 
 %install
-%{__make} install DESTDIR=$RPM_BUILD_ROOT
+%{__make} install DESTDIR=$RPM_BUILD_ROOT pkgdocdir=%{pkgdocdir}
 # Don't package unit tester if present.
 %{__rm} -f $RPM_BUILD_ROOT/%{_bindir}/xmltoolingtest
 
