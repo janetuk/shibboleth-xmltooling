@@ -9,14 +9,16 @@ URL:		http://www.opensaml.org/
 Source:	    %{name}-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root
 %if 0%{?suse_version} > 1030
+%define libpkgprefix lib
 BuildRequires:  libXerces-c-devel >= 2.8.0
 %else
+%define libpkgprefix
 BuildRequires:  xerces%{?xercesver}-c-devel >= 2.8.0
 %endif
-BuildRequires:	xml-security-c-devel >= 1.4.0
+BuildRequires:	%{libpkgprefix}xml-security-c-devel >= 1.4.0
 BuildRequires:	gcc-c++, openssl-devel, curl-devel >= 7.10.6
-%{?_with_log4cpp:BuildRequires:	log4cpp-devel >= 1.0}
-%{!?_with_log4cpp:BuildRequires: log4shib-devel}
+%{?_with_log4cpp:BuildRequires:	%{libpkgprefix}log4cpp-devel >= 1.0}
+%{!?_with_log4cpp:BuildRequires: %{libpkgprefix}log4shib-devel}
 
 %description
 The XMLTooling library contains generic XML parsing and processing
@@ -55,10 +57,10 @@ Requires: libXerces-c-devel >= 2.8.0
 %else
 Requires: xerces%{?xercesver}-c-devel >= 2.8.0
 %endif
-Requires: xml-security-c-devel >= 1.4.0
+Requires: %{libpkgprefix}xml-security-c-devel >= 1.4.0
 Requires: openssl-devel, curl-devel >= 7.10.6
-%{?_with_log4cpp:Requires: log4cpp-devel >= 1.0}
-%{!?_with_log4cpp:Requires: log4shib-devel}
+%{?_with_log4cpp:Requires: %{libpkgprefix}log4cpp-devel >= 1.0}
+%{!?_with_log4cpp:Requires: %{libpkgprefix}log4shib-devel}
 
 %if 0%{?suse_version} > 1030
 %description -n libxmltooling-devel
