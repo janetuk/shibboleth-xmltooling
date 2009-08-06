@@ -76,7 +76,7 @@ Requires: openssl-devel, curl-devel >= 7.10.6
 %description -n libxmltooling-devel
 Requires: libxmltooling12 = %version
 %else
-%description
+%description devel
 %endif
 The XMLTooling library contains generic XML parsing and processing
 classes based on the Xerces-C DOM. It adds more powerful facilities
