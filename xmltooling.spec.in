@@ -135,14 +135,7 @@ This package includes files needed for development with xmltooling.
 %defattr(-,root,root,-)
 %{_includedir}/*
 %{_libdir}/*.so
-%docdir %{_datadir}/doc/xmltooling
-%{_datadir}/doc/xmltooling/README.txt
-%{_datadir}/doc/xmltooling/LICENSE.txt
-%{_datadir}/doc/xmltooling/NOTICE.txt
-%{_datadir}/doc/xmltooling/CURL.LICENSE
-%{_datadir}/doc/xmltooling/LOG4CPP.LICENSE
-%{_datadir}/doc/xmltooling/OPENSSL.LICENSE
-%doc %{_datadir}/doc/xmltooling/api
+%doc %{pkgdocdir}
 
 %changelog
 * Thu Aug 6 2009  Scott Cantor  <cantor.2@osu.edu>  - 1.2.1-1
