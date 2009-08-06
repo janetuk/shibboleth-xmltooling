@@ -7,7 +7,7 @@ maintainers        cantor.2@osu.edu
 description        XMLTooling library for C++
 long_description   Toolkit for security-aware XML processing
 homepage           http://www.opensaml.org/
-master_sites       http://shibboleth.internet2.edu/downloads/opensaml/cpp/@-VERSION-@/
+master_sites       http://shibboleth.internet2.edu/downloads/opensaml/cpp/${version}/
 checksums          sha1 @CHECKSUM@
 
 configure.args     --disable-static \
