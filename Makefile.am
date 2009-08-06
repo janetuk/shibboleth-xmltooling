@@ -10,13 +10,6 @@ dist-hook:
 	rm -rf `find $(distdir)/xmltoolingtest/data -name .svn`
 	rm -rf `find $(distdir)/doc/api -name .svn`
 
-checksum: Portfile $(PACKAGE)-$(VERSION).tar.gz
-	rm -f Portfile.tmp
-	set HASH = `$(SHA1) $(PACKAGE)-$(VERSION).tar.gz`
-	sed < Portfile > Portfile.tmp \
-	   -e 's:@CHECKSUM@:${HASH}:'
-	mv Portfile.tmp Portfile
-
 
 SUBDIRS = doc schemas xmltooling xmltoolingtest
 
