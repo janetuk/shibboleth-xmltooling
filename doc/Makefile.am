@@ -3,8 +3,7 @@ AUTOMAKE_OPTIONS = foreign
 pkgdocdir = $(datadir)/doc/@PACKAGE@-@PACKAGE_VERSION@
 
 install-data-hook:
-	rm -rf $(DESTDIR)$(pkgdocdir)/api
-	cp -r doc/api $(DESTDIR)$(pkgdocdir)
+	cp -r api $(DESTDIR)$(pkgdocdir)
 	rm -rf `find $(DESTDIR)$(pkgdocdir)/api -name .svn`
 
 docfiles = \
