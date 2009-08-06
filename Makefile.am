@@ -21,10 +21,6 @@ else
 all-local: $(GENFILES)
 endif
 
-install-data-hook:
-	rm -rf $(DESTDIR)$(datadir)/doc/@PACKAGE@/api
-	cp -r doc/api $(DESTDIR)$(datadir)/doc/@PACKAGE@
-
 $(GENFILES): %: %.in Makefile
 	rm -f $@.tmp
 	sed < $@.in > $@.tmp \
