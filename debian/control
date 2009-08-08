@@ -12,7 +12,6 @@ Vcs-Git: git://git.debian.org/git/pkg-shibboleth/xmltooling.git
 Vcs-Browser: http://git.debian.org/?p=pkg-shibboleth/xmltooling.git
 
 Package: libxmltooling3
-Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: C++ XML parsing library with encryption support (runtime)
