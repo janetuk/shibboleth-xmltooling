@@ -1,4 +1,4 @@
-xmltooling (1.2-1) UNRELEASED; urgency=low
+xmltooling (1.2-1) unstable; urgency=low
 
   * New upstream release.
     - Stop dropping the namespace of qualified attributes that aren't
@@ -10,6 +10,7 @@ xmltooling (1.2-1) UNRELEASED; urgency=low
   * Rename library package for upstream SONAME bump.
   * Build against Xerces-C 3.0.
   * Update standards version to 3.8.2 (no changes required).
+  * Remove duplicate section setting for the library package.
 
  -- Russ Allbery <rra@debian.org>  Wed, 05 Aug 2009 15:45:06 -0700
 
