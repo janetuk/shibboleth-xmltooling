@@ -1,4 +1,4 @@
-xmltooling (1.2-1) UNRELEASED; urgency=low
+xmltooling (1.2-1) unstable; urgency=low
 
   * New upstream release.
     - Stop dropping the namespace of qualified attributes that aren't
