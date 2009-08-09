@@ -36,12 +36,12 @@ classes to add value around the DOM, as well as signing and encryption
 support.
 
 %if 0%{?suse_version} > 1030
-%package -n libxmltooling12
+%package -n libxmltooling3
 Summary:    OpenSAML XMLTooling library
 Group:      Development/Libraries
 Provides:   xmltooling = %{version}
 
-%description -n libxmltooling12
+%description -n libxmltooling3
 The XMLTooling library contains generic XML parsing and processing
 classes based on the Xerces-C DOM. It adds more powerful facilities
 for declaring element- and type-specific API and implementation
@@ -53,7 +53,7 @@ This package contains just the shared library.
 
 %if 0%{?suse_version} > 1030
 %package -n libxmltooling-devel
-Requires: libxmltooling12 = %version
+Requires: libxmltooling3 = %version
 %else
 %package devel
 Requires: %name = %version
@@ -106,7 +106,7 @@ This package includes files needed for development with xmltooling.
 
 %ifnos solaris2.8 solaris2.9 solaris2.10
 %if 0%{?suse_version} > 1030
-%post -n libxmltooling12 -p /sbin/ldconfig
+%post -n libxmltooling3 -p /sbin/ldconfig
 %else
 %post -p /sbin/ldconfig
 %endif
@@ -114,14 +114,14 @@ This package includes files needed for development with xmltooling.
 
 %ifnos solaris2.8 solaris2.9 solaris2.10
 %if 0%{?suse_version} > 1030
-%postun -n libxmltooling12 -p /sbin/ldconfig
+%postun -n libxmltooling3 -p /sbin/ldconfig
 %else
 %postun -p /sbin/ldconfig
 %endif
 %endif
 
 %if 0%{?suse_version} > 1030
-%files -n libxmltooling12
+%files -n libxmltooling3
 %else
 %files
 %endif
@@ -129,7 +129,7 @@ This package includes files needed for development with xmltooling.
 %{_libdir}/libxmltooling.so.*
 %{_libdir}/libxmltooling-lite.so.*
 %dir %{_datadir}/xml/xmltooling
-%{_datadir}/xml/xmltooling
+%{_datadir}/xml/xmltooling/*
 
 %if 0%{?suse_version} > 1030
 %files -n libxmltooling-devel
