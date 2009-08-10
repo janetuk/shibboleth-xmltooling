@@ -13,19 +13,13 @@ dist-hook:
 
 SUBDIRS = doc schemas xmltooling xmltoolingtest
 
-GENFILES = xmltooling.spec pkginfo Portfile
-
 if DX_COND_doc
-all-local: doxygen-doc $(GENFILES)
+all-local: doxygen-doc
 else
-all-local: $(GENFILES)
+all-local:
 endif
 
-$(GENFILES): %: %.in Makefile
-	rm -f $@.tmp
-	sed < $@.in > $@.tmp \
-	    -e 's:@-VERSION-@:${VERSION}:'
-	mv $@.tmp $@
+GENFILES = xmltooling.spec pkginfo Portfile
 
 EXTRA_DIST = $(DX_CONFIG) \
         cpp-xmltooling.sln \
@@ -39,5 +33,3 @@ EXTRA_DIST = $(DX_CONFIG) \
         $(GENFILES:%=%.in) \
         depend \
         postinstall
-
-DISTCLEANFILES = $(GENFILES)
