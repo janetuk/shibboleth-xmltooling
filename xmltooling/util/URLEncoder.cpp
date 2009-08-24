@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ void URLEncoder::decode(char* s) const
 
     for(x=0,y=0;s[y];++x,++y)
     {
-        if((s[x] = s[y]) == '%')
+        if((s[x] = s[y]) == '%' && s[y+1] && s[y+2])
         {
             s[x] = x2c(&s[y+1]);
             y+=2;
