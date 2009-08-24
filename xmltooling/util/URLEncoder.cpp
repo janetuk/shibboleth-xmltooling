@@ -43,7 +43,7 @@ void URLEncoder::decode(char* s) const
 
     for(x=0,y=0;s[y];++x,++y)
     {
-        if((s[x] = s[y]) == '%' && s[y+1] && s[y+2])
+        if((s[x] = s[y]) == '%' && isxdigit(s[y+1]) && isxdigit(s[y+2]))
         {
             s[x] = x2c(&s[y+1]);
             y+=2;
