@@ -68,7 +68,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wsock32.lib log4shib1D.lib xerces-c_3D.lib xsec_1D.lib libeay32D.lib ssleay32D.lib libcurld_imp.lib"
-				OutputFile="$(OutDir)\$(ProjectName)1_2D.dll"
+				OutputFile="$(OutDir)\$(ProjectName)1_3D.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -149,7 +149,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wsock32.lib log4shib1D.lib xerces-c_3D.lib xsec_1D.lib libeay32D.lib ssleay32D.lib libcurld_imp.lib"
-				OutputFile="$(OutDir)\$(ProjectName)1_2D.dll"
+				OutputFile="$(OutDir)\$(ProjectName)1_3D.dll"
 				LinkIncremental="2"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -225,7 +225,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wsock32.lib log4shib1.lib xerces-c_3.lib xsec_1.lib libeay32.lib ssleay32.lib libcurl_imp.lib"
-				OutputFile="$(OutDir)\$(ProjectName)1_2.dll"
+				OutputFile="$(OutDir)\$(ProjectName)1_3.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -303,7 +303,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="wsock32.lib log4shib1.lib xerces-c_3.lib xsec_1.lib libeay32.lib ssleay32.lib libcurl_imp.lib"
-				OutputFile="$(OutDir)\$(ProjectName)1_2.dll"
+				OutputFile="$(OutDir)\$(ProjectName)1_3.dll"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"

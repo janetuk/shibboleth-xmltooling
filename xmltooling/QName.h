@@ -59,19 +59,7 @@ namespace xmltooling {
         QName(const char* uri, const char* localPart, const char* prefix=NULL);
         
         ~QName();
-#ifndef HAVE_GOOD_STL
-        /**
-         * Deep copy constructor
-         */
-        QName(const QName& src);
-
-        /**
-         * Deep assignment operator
-         */
-        QName& operator=(const QName& src);
-#endif
         
-#ifdef HAVE_GOOD_STL
         /**
          * Indicates whether the QName has a prefix.
          * @return  true iff the prefix is non-empty
@@ -107,43 +95,6 @@ namespace xmltooling {
          * @return  Null-terminated Unicode string containing the local name
          */
         const XMLCh* getLocalPart() const { return m_local.c_str(); }
-#else
-        /**
-         * Indicates whether the QName has a prefix.
-         * @return  true iff the prefix is non-empty
-         */
-        bool hasPrefix() const { return m_prefix && *m_prefix; }
-
-        /**
-         * Indicates whether the QName has a non-empty namespace.
-         * @return  true iff the namespace is non-empty
-         */
-        bool hasNamespaceURI() const { return m_uri && *m_uri; }
-
-        /**
-         * Indicates whether the QName has a non-empty local name.
-         * @return  true iff the local name is non-empty
-         */
-        bool hasLocalPart() const { return m_local && *m_local; }
-
-        /**
-         * Returns the namespace prefix
-         * @return  Null-terminated Unicode string containing the prefix, without the colon
-         */
-        const XMLCh* getPrefix() const { return m_prefix; }
-
-        /**
-         * Returns the namespace URI
-         * @return  Null-terminated Unicode string containing the URI
-         */
-        const XMLCh* getNamespaceURI() const { return m_uri; }
-
-        /**
-         * Returns the local part of the name
-         * @return  Null-terminated Unicode string containing the local name
-         */
-        const XMLCh* getLocalPart() const { return m_local; }
-#endif
 
         /**
          * Sets the namespace prefix
@@ -190,15 +141,9 @@ namespace xmltooling {
         std::string toString() const;
         
     private:
-#ifdef HAVE_GOOD_STL
         xstring m_uri;
         xstring m_local;
         xstring m_prefix;
-#else
-        XMLCh* m_uri;
-        XMLCh* m_local;
-        XMLCh* m_prefix;
-#endif
     };
 
 #if defined (_MSC_VER)

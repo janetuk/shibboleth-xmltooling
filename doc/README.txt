@@ -1,3 +1,7 @@
+VERSION 1.3
+
+Unreleased
+
 VERSION 1.2.2
 
 Issues addressed by this release:
