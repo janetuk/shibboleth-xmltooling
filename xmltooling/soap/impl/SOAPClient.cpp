@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,8 +109,8 @@ Envelope* SOAPClient::receive()
     
     auto_ptr<XMLObject> xmlObject(XMLObjectBuilder::buildOneFromElement(doc->getDocumentElement(), true));
     janitor.release();
-    if (!m_validate)
-        SchemaValidators.validate(xmlObject.get());
+
+    SchemaValidators.validate(xmlObject.get());
 
     Envelope* env = dynamic_cast<Envelope*>(xmlObject.get());
     if (!env)

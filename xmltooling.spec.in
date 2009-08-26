@@ -1,5 +1,5 @@
-Name:		xmltooling
-Version:	@-VERSION-@
+Name:		@PACKAGE@
+Version:	@PACKAGE_VERSION@
 Release:	1
 Summary:    OpenSAML XMLTooling library
 Group:		System Environment/Libraries
@@ -9,16 +9,18 @@ URL:		http://www.opensaml.org/
 Source:	    %{name}-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root
 %if 0%{?suse_version} > 1030
-%define libpkgprefix lib
 BuildRequires:  libXerces-c-devel >= 2.8.0
+BuildRequires:  libxml-security-c-devel >= 1.4.0
+%{?_with_log4cpp:BuildRequires: liblog4cpp-devel >= 1.0}
+%{!?_with_log4cpp:BuildRequires: liblog4shib-devel}
 %else
-%define libpkgprefix
 BuildRequires:  xerces%{?xercesver}-c-devel >= 2.8.0
+BuildRequires:  xml-security-c-devel >= 1.4.0
+%{?_with_log4cpp:BuildRequires: log4cpp-devel >= 1.0}
+%{!?_with_log4cpp:BuildRequires: log4shib-devel}
 %endif
-BuildRequires:	%{libpkgprefix}xml-security-c-devel >= 1.4.0
 BuildRequires:	gcc-c++, openssl-devel, curl-devel >= 7.10.6
-%{?_with_log4cpp:BuildRequires:	%{libpkgprefix}log4cpp-devel >= 1.0}
-%{!?_with_log4cpp:BuildRequires: %{libpkgprefix}log4shib-devel}
+%{!?_without_doxygen:BuildRequires: doxygen}
 
 %if "%{_vendor}" == "suse"
 %define pkgdocdir %{_docdir}/%{name}
@@ -34,12 +36,12 @@ classes to add value around the DOM, as well as signing and encryption
 support.
 
 %if 0%{?suse_version} > 1030
-%package -n libxmltooling12
+%package -n lib@PACKAGE@3
 Summary:    OpenSAML XMLTooling library
 Group:      Development/Libraries
-Provides:   xmltooling = %{version}
+Provides:   @PACKAGE@ = %{version}
 
-%description -n libxmltooling12
+%description -n lib@PACKAGE@3
 The XMLTooling library contains generic XML parsing and processing
 classes based on the Xerces-C DOM. It adds more powerful facilities
 for declaring element- and type-specific API and implementation
@@ -50,8 +52,8 @@ This package contains just the shared library.
 %endif
 
 %if 0%{?suse_version} > 1030
-%package -n libxmltooling-devel
-Requires: libxmltooling12 = %version
+%package -n lib@PACKAGE@-devel
+Requires: lib@PACKAGE@3 = %version
 %else
 %package devel
 Requires: %name = %version
@@ -60,19 +62,21 @@ Summary: XMLTooling development Headers
 Group: Development/Libraries
 %if 0%{?suse_version} > 1030
 Requires: libXerces-c-devel >= 2.8.0
+Requires: libxml-security-c-devel >= 1.4.0
+%{?_with_log4cpp:Requires: liblog4cpp-devel >= 1.0}
+%{!?_with_log4cpp:Requires: liblog4shib-devel}
 %else
 Requires: xerces%{?xercesver}-c-devel >= 2.8.0
+Requires: xml-security-c-devel >= 1.4.0
+%{?_with_log4cpp:Requires: log4cpp-devel >= 1.0}
+%{!?_with_log4cpp:Requires: log4shib-devel}
 %endif
-Requires: %{libpkgprefix}xml-security-c-devel >= 1.4.0
 Requires: openssl-devel, curl-devel >= 7.10.6
-%{?_with_log4cpp:Requires: %{libpkgprefix}log4cpp-devel >= 1.0}
-%{!?_with_log4cpp:Requires: %{libpkgprefix}log4shib-devel}
 
 %if 0%{?suse_version} > 1030
-%description -n libxmltooling-devel
-Requires: libxmltooling12 = %version
+%description -n lib@PACKAGE@-devel
 %else
-%description
+%description devel
 %endif
 The XMLTooling library contains generic XML parsing and processing
 classes based on the Xerces-C DOM. It adds more powerful facilities
@@ -80,19 +84,19 @@ for declaring element- and type-specific API and implementation
 classes to add value around the DOM, as well as signing and encryption
 support.
 
-This package includes files needed for development with xmltooling.
+This package includes files needed for development with XMLTooling.
 
 %prep
 %setup -q
 
 %build
-%configure %{?xmltooling_options}
+%configure %{?@PACKAGE@_options}
 %{__make}
 
 %install
 %{__make} install DESTDIR=$RPM_BUILD_ROOT pkgdocdir=%{pkgdocdir}
 # Don't package unit tester if present.
-%{__rm} -f $RPM_BUILD_ROOT/%{_bindir}/xmltoolingtest
+%{__rm} -f $RPM_BUILD_ROOT/%{_bindir}/@PACKAGE@test
 
 %check
 %{__make} check
@@ -102,7 +106,7 @@ This package includes files needed for development with xmltooling.
 
 %ifnos solaris2.8 solaris2.9 solaris2.10
 %if 0%{?suse_version} > 1030
-%post -n libxmltooling12 -p /sbin/ldconfig
+%post -n lib@PACKAGE@3 -p /sbin/ldconfig
 %else
 %post -p /sbin/ldconfig
 %endif
@@ -110,39 +114,31 @@ This package includes files needed for development with xmltooling.
 
 %ifnos solaris2.8 solaris2.9 solaris2.10
 %if 0%{?suse_version} > 1030
-%postun -n libxmltooling12 -p /sbin/ldconfig
+%postun -n lib@PACKAGE@3 -p /sbin/ldconfig
 %else
 %postun -p /sbin/ldconfig
 %endif
 %endif
 
 %if 0%{?suse_version} > 1030
-%files -n libxmltooling12
+%files -n lib@PACKAGE@3
 %else
 %files
 %endif
 %defattr(-,root,root,-)
-%{_libdir}/libxmltooling.so.*
-%{_libdir}/libxmltooling-lite.so.*
-%dir %{_datadir}/xml/xmltooling
-%{_datadir}/xml/xmltooling
+%{_libdir}/*.so.*
+%dir %{_datadir}/xml/@PACKAGE@
+%{_datadir}/xml/@PACKAGE@/*
 
 %if 0%{?suse_version} > 1030
-%files -n libxmltooling-devel
+%files -n lib@PACKAGE@-devel
 %else
 %files devel
 %endif
 %defattr(-,root,root,-)
 %{_includedir}/*
 %{_libdir}/*.so
-%docdir %{_datadir}/doc/xmltooling
-%{_datadir}/doc/xmltooling/README.txt
-%{_datadir}/doc/xmltooling/LICENSE.txt
-%{_datadir}/doc/xmltooling/NOTICE.txt
-%{_datadir}/doc/xmltooling/CURL.LICENSE
-%{_datadir}/doc/xmltooling/LOG4CPP.LICENSE
-%{_datadir}/doc/xmltooling/OPENSSL.LICENSE
-%doc %{_datadir}/doc/xmltooling/api
+%doc %{pkgdocdir}
 
 %changelog
 * Thu Aug 6 2009  Scott Cantor  <cantor.2@osu.edu>  - 1.2.1-1

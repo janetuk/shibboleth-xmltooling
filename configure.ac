@@ -1,8 +1,8 @@
 AC_PREREQ([2.50])
-AC_INIT([xmltooling], [1.2.1], [mace-opensaml-users@internet2.edu], [xmltooling])
+AC_INIT([xmltooling], [1.2.2], [mace-opensaml-users@internet2.edu], [xmltooling])
 AM_CONFIG_HEADER(config.h)
 AM_CONFIG_HEADER(xmltooling/config_pub.h)
-AM_INIT_AUTOMAKE([xmltooling], [1.2.1])
+AM_INIT_AUTOMAKE([xmltooling], [1.2.2])
 
 sinclude(doxygen.m4)
 sinclude(acx_pthread.m4)
@@ -364,5 +364,7 @@ AM_CONDITIONAL(BUILD_UNITTEST,test -f ${CXXTEST})
 
 LIBTOOL="$LIBTOOL --silent"
 
-# output makefiles
-AC_OUTPUT(Makefile xmltooling/Makefile xmltoolingtest/Makefile schemas/Makefile doc/Makefile)
+# output packaging and makefiles
+AC_CONFIG_FILES([xmltooling.spec pkginfo Portfile])
+AC_CONFIG_FILES([Makefile xmltooling/Makefile xmltoolingtest/Makefile schemas/Makefile doc/Makefile])
+AC_OUTPUT
