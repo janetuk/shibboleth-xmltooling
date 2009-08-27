@@ -1,5 +1,6 @@
-xmltooling (1.2.2-1) UNRELEASED; urgency=low
+xmltooling (1.2.2-1) unstable; urgency=high
 
+  * Urgency set to high for security fix.
   * New upstream release.
     - SECURITY: Fix potential buffer overflows and reuses of freed objects
       in error handling code paths with invalid XML or with malformed
@@ -13,7 +14,7 @@ xmltooling (1.2.2-1) UNRELEASED; urgency=low
     - Use dh_prep instead of dh_clean -k.
   * Update standards version to 3.8.3 (no changes required).
 
- -- Russ Allbery <rra@debian.org>  Thu, 27 Aug 2009 11:01:35 -0700
+ -- Russ Allbery <rra@debian.org>  Thu, 27 Aug 2009 11:31:37 -0700
 
 xmltooling (1.2-1) unstable; urgency=low
 
