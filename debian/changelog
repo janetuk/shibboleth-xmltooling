@@ -1,3 +1,19 @@
+xmltooling (1.2.2-1) UNRELEASED; urgency=low
+
+  * New upstream release.
+    - SECURITY: Fix potential buffer overflows and reuses of freed objects
+      in error handling code paths with invalid XML.  See
+      http://shibboleth.internet2.edu/secadv/secadv_20090826.txt
+    - Fix other validation issues with malformed objects.
+    - Fix for accessing the resolution context, which affects the ability
+      of callers to restrict keys based on use attributes.
+    - Fix encoding of backup metadata.
+  * Update debhelper compatibility level to V7.
+    - Use dh_prep instead of dh_clean -k.
+  * Update standards version to 3.8.3 (no changes required).
+
+ -- Russ Allbery <rra@debian.org>  Thu, 27 Aug 2009 11:01:35 -0700
+
 xmltooling (1.2-1) unstable; urgency=low
 
   * New upstream release.
