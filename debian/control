@@ -6,7 +6,7 @@ Uploaders: Russ Allbery <rra@debian.org>, Ferenc Wagner <wferi@niif.hu>
 Build-Depends: debhelper (>= 5), autotools-dev, doxygen,
  libcurl4-openssl-dev, liblog4cpp5-dev, libxerces-c-dev,
  libxml-security-c-dev (>= 1.4)
-Standards-Version: 3.8.2
+Standards-Version: 3.8.3
 Homepage: https://spaces.internet2.edu/display/OpenSAML/XMLTooling-C
 Vcs-Git: git://git.debian.org/git/pkg-shibboleth/xmltooling.git
 Vcs-Browser: http://git.debian.org/?p=pkg-shibboleth/xmltooling.git
