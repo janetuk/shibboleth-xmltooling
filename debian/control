@@ -3,7 +3,7 @@ Section: libs
 Priority: extra
 Maintainer: Debian Shib Team <pkg-shibboleth-devel@lists.alioth.debian.org>
 Uploaders: Russ Allbery <rra@debian.org>, Ferenc Wagner <wferi@niif.hu>
-Build-Depends: debhelper (>= 5), autotools-dev, doxygen,
+Build-Depends: debhelper (>= 7), autotools-dev, doxygen,
  libcurl4-openssl-dev, liblog4cpp5-dev, libxerces-c-dev,
  libxml-security-c-dev (>= 1.4)
 Standards-Version: 3.8.3
