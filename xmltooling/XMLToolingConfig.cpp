@@ -109,6 +109,22 @@ namespace xmltooling {
     }
 # endif
 #endif
+
+#ifdef WIN32
+    BOOL LogEvent(
+        LPCSTR  lpUNCServerName,
+        WORD  wType,
+        DWORD  dwEventID,
+        PSID  lpUserSid,
+        LPCSTR  message)
+    {
+        LPCSTR  messages[] = {message, NULL};
+
+        HANDLE hElog = RegisterEventSource(lpUNCServerName, "OpenSAML XMLTooling Library");
+        BOOL res = ReportEvent(hElog, wType, 0, dwEventID, lpUserSid, 1, 0, messages, NULL);
+        return (DeregisterEventSource(hElog) && res);
+    }
+#endif
 }
 
 XMLToolingConfig& XMLToolingConfig::getConfig()
@@ -176,7 +192,11 @@ bool XMLToolingInternalConfig::log_config(const char* config)
         }
     }
     catch (const ConfigureFailure& e) {
-        Category::getInstance(XMLTOOLING_LOGCAT".Logging").crit("failed to initialize log4cpp: %s", e.what());
+        string msg = string("failed to configure logging: ") + e.what();
+        Category::getInstance(XMLTOOLING_LOGCAT".Logging").crit(msg);
+#ifdef WIN32
+        LogEvent(NULL, EVENTLOG_ERROR_TYPE, 2100, NULL, msg.c_str());
+#endif
         return false;
     }
 

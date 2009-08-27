@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007 The Apache Software Foundation.
+ * Copyright 2001-2009 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,14 +46,6 @@ namespace xmltooling {
          * @return  the crypto provider name
     	 */
     	virtual const XMLCh* getProviderName() const=0;
-    
-    	/**
-    	 * Load a CRL into the object.
-    	 * Takes a base64 DER-encoded CRL and loads it.
-    	 *
-    	 * @param buf buffer containing the Base64 encoded CRL
-    	 * @param len number of bytes of data in the CRL buffer
-    	 */
     
         /**
          * Returns a duplicate of the original object.
