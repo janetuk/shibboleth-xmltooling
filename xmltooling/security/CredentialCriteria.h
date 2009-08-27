@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 
 #include <xmltooling/XMLToolingConfig.h>
 #include <xmltooling/security/KeyInfoResolver.h>
-#include <xmltooling/security/X509Credential.h>
+#include <xmltooling/security/Credential.h>
 #include <xmltooling/signature/KeyInfo.h>
 #include <xmltooling/signature/Signature.h>
 
@@ -214,26 +214,7 @@ namespace xmltooling {
          * @param keyInfo       the KeyInfo criteria
          * @param extraction    bitmask of criteria to auto-extract from KeyInfo
          */
-        virtual void setKeyInfo(const xmlsignature::KeyInfo* keyInfo, int extraction=0) {
-            delete m_credential;
-            m_credential = NULL;
-            m_keyInfo = keyInfo;
-            if (!keyInfo || !extraction)
-                return;
-
-            int types = (extraction & KEYINFO_EXTRACTION_KEY) ? Credential::RESOLVE_KEYS : 0;
-            types |= (extraction & KEYINFO_EXTRACTION_KEYNAMES) ? X509Credential::RESOLVE_CERTS : 0;
-            m_credential = XMLToolingConfig::getConfig().getKeyInfoResolver()->resolve(keyInfo,types);
-
-            if (extraction & KEYINFO_EXTRACTION_KEY)
-                setPublicKey(m_credential->getPublicKey());
-            if (extraction & KEYINFO_EXTRACTION_KEYNAMES) {
-                X509Credential* xcred = dynamic_cast<X509Credential*>(m_credential);
-                if (xcred)
-                    xcred->extract();
-                m_keyNames.insert(m_credential->getKeyNames().begin(), m_credential->getKeyNames().end());
-            }
-        } 
+        virtual void setKeyInfo(const xmlsignature::KeyInfo* keyInfo, int extraction=0);
 
         /**
          * Gets the native KeyInfo criteria.
@@ -250,26 +231,7 @@ namespace xmltooling {
          * @param keyInfo       the KeyInfo criteria
          * @param extraction    bitmask of criteria to auto-extract from KeyInfo
          */
-        virtual void setNativeKeyInfo(DSIGKeyInfoList* keyInfo, int extraction=0) {
-            delete m_credential;
-            m_credential = NULL;
-            m_nativeKeyInfo = keyInfo;
-            if (!keyInfo || !extraction)
-                return;
-
-            int types = (extraction & KEYINFO_EXTRACTION_KEY) ? Credential::RESOLVE_KEYS : 0;
-            types |= (extraction & KEYINFO_EXTRACTION_KEYNAMES) ? X509Credential::RESOLVE_CERTS : 0;
-            m_credential = XMLToolingConfig::getConfig().getKeyInfoResolver()->resolve(keyInfo,types);
-
-            if (extraction & KEYINFO_EXTRACTION_KEY)
-                setPublicKey(m_credential->getPublicKey());
-            if (extraction & KEYINFO_EXTRACTION_KEYNAMES) {
-                X509Credential* xcred = dynamic_cast<X509Credential*>(m_credential);
-                if (xcred)
-                    xcred->extract();
-                m_keyNames.insert(m_credential->getKeyNames().begin(), m_credential->getKeyNames().end());
-            }
-        }
+        virtual void setNativeKeyInfo(DSIGKeyInfoList* keyInfo, int extraction=0);
 
         /**
          * Sets the KeyInfo criteria from an XML Signature.
@@ -277,15 +239,7 @@ namespace xmltooling {
          * @param sig           the Signature containing KeyInfo criteria
          * @param extraction    bitmask of criteria to auto-extract from KeyInfo
          */
-        void setSignature(const xmlsignature::Signature& sig, int extraction=0) {
-            setXMLAlgorithm(sig.getSignatureAlgorithm());
-            xmlsignature::KeyInfo* k = sig.getKeyInfo();
-            if (k)
-                return setKeyInfo(k, extraction);
-            DSIGSignature* dsig = sig.getXMLSignature();
-            if (dsig)
-                setNativeKeyInfo(dsig->getKeyInfoList(), extraction);
-        }
+        void setSignature(const xmlsignature::Signature& sig, int extraction=0);
 
     private:
         unsigned int m_keyUsage;

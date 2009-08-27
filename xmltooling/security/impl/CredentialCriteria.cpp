@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2008 Internet2
+ *  Copyright 2001-2009 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 
 #include "internal.h"
 #include "logging.h"
-#include "security/Credential.h"
+#include "security/X509Credential.h"
 #include "security/CredentialCriteria.h"
 #include "security/KeyInfoResolver.h"
 #include "security/SecurityHelper.h"
@@ -34,6 +34,57 @@
 
 using namespace xmltooling;
 using namespace std;
+
+void CredentialCriteria::setKeyInfo(const xmlsignature::KeyInfo* keyInfo, int extraction)
+{
+    delete m_credential;
+    m_credential = NULL;
+    m_keyInfo = keyInfo;
+    if (!keyInfo || !extraction)
+        return;
+
+    int types = (extraction & KEYINFO_EXTRACTION_KEY) ? Credential::RESOLVE_KEYS : 0;
+    types |= (extraction & KEYINFO_EXTRACTION_KEYNAMES) ? X509Credential::RESOLVE_CERTS : 0;
+    m_credential = XMLToolingConfig::getConfig().getKeyInfoResolver()->resolve(keyInfo,types);
+
+    // Ensure any key names have been sucked out for later if desired.
+    if (extraction & KEYINFO_EXTRACTION_KEYNAMES) {
+        X509Credential* xcred = dynamic_cast<X509Credential*>(m_credential);
+        if (xcred)
+            xcred->extract();
+    }
+} 
+
+void CredentialCriteria::setNativeKeyInfo(DSIGKeyInfoList* keyInfo, int extraction)
+{
+    delete m_credential;
+    m_credential = NULL;
+    m_nativeKeyInfo = keyInfo;
+    if (!keyInfo || !extraction)
+        return;
+
+    int types = (extraction & KEYINFO_EXTRACTION_KEY) ? Credential::RESOLVE_KEYS : 0;
+    types |= (extraction & KEYINFO_EXTRACTION_KEYNAMES) ? X509Credential::RESOLVE_CERTS : 0;
+    m_credential = XMLToolingConfig::getConfig().getKeyInfoResolver()->resolve(keyInfo,types);
+
+    // Ensure any key names have been sucked out for later if desired.
+    if (extraction & KEYINFO_EXTRACTION_KEYNAMES) {
+        X509Credential* xcred = dynamic_cast<X509Credential*>(m_credential);
+        if (xcred)
+            xcred->extract();
+    }
+}
+
+void CredentialCriteria::setSignature(const xmlsignature::Signature& sig, int extraction)
+{
+    setXMLAlgorithm(sig.getSignatureAlgorithm());
+    xmlsignature::KeyInfo* k = sig.getKeyInfo();
+    if (k)
+        return setKeyInfo(k, extraction);
+    DSIGSignature* dsig = sig.getXMLSignature();
+    if (dsig)
+        setNativeKeyInfo(dsig->getKeyInfoList(), extraction);
+}
 
 bool CredentialCriteria::matches(const Credential& credential) const
 {
@@ -58,7 +109,9 @@ bool CredentialCriteria::matches(const Credential& credential) const
         return false;
 
     // See if we can test key names.
-    const set<string>& critnames = getKeyNames();
+    set<string> critnames = getKeyNames();
+    if (m_credential)
+        critnames.insert(m_credential->getKeyNames().begin(), m_credential->getKeyNames().end());
     const set<string>& crednames = credential.getKeyNames();
     if (!critnames.empty() && !crednames.empty()) {
         bool found = false;
@@ -74,6 +127,8 @@ bool CredentialCriteria::matches(const Credential& credential) const
 
     // See if we have to match a specific key.
     const XSECCryptoKey* key1 = getPublicKey();
+    if (!key1 && m_credential)
+        key1 = m_credential->getPublicKey();
     if (!key1)
         return true;    // no key to compare against, so we're done
 

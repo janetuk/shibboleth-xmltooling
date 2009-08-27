@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2007 Internet2
+*  Copyright 2001-2009 Internet2
  * 
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,23 @@ using namespace std;
 
 using xercesc::XMLString;
 
+namespace {
+    bool _nonnull(const XMLObject* ptr) {
+        return (ptr!=NULL);
+    }
+}
+
 AbstractComplexElement::~AbstractComplexElement() {
     for_each(m_children.begin(), m_children.end(), cleanup<XMLObject>());
     for (vector<XMLCh*>::iterator i=m_text.begin(); i!=m_text.end(); ++i)
         XMLString::release(&(*i));
+}
+
+bool AbstractComplexElement::hasChildren() const
+{
+    if (m_children.empty())
+        return false;
+    return (find_if(m_children.begin(), m_children.end(), _nonnull) != m_children.end());
 }
 
 void AbstractComplexElement::removeChild(XMLObject* child)
