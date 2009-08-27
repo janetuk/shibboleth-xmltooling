@@ -65,7 +65,7 @@ namespace xmltooling {
          * @return  true iff the character should be encoded
          */
         virtual bool isBad(char ch) const {
-            static char badchars[]="=&/?:\"\\+<>#%{}|^~[]`;@";
+            static char badchars[]="=&/?:\"\\+<>#%{}|^~[],`;@";
             return (ch<=0x20 || ch>=0x7F || strchr(badchars,ch));
         }
     };

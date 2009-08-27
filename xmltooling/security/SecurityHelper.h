@@ -63,6 +63,7 @@ namespace xmltooling {
          * @param certs     array to populate with certificate(s)
          * @param pathname  path to file containing certificate(s)
          * @param format    optional constant identifying certificate encoding format
+         * @param password  optional password to decrypt certificate(s)
          * @return  size of the resulting array
          */
         static std::vector<XSECCryptoX509*>::size_type loadCertificatesFromFile(
@@ -99,6 +100,7 @@ namespace xmltooling {
          * @param transport object to use to acquire certificate(s)
          * @param backing   backing file for certificate(s) (written to or read from if download fails)
          * @param format    optional constant identifying certificate encoding format
+         * @param password  optional password to decrypt certificate(s)
          * @return  size of the resulting array
          */
         static std::vector<XSECCryptoX509*>::size_type loadCertificatesFromURL(

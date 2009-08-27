@@ -259,7 +259,7 @@ DOMElement* XMLHelper::getPreviousSiblingElement(const DOMNode* n, const XMLCh* 
 void XMLHelper::serialize(const DOMNode* n, std::string& buf, bool pretty)
 {
     static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
-    static const XMLCh UTF8[]={ chLatin_U, chLatin_T, chLatin_F, chDigit_8, chNull };
+    static const XMLCh UTF8[]={ chLatin_U, chLatin_T, chLatin_F, chDash, chDigit_8, chNull };
 
     MemBufFormatTarget target;
     DOMImplementation* impl=DOMImplementationRegistry::getDOMImplementation(impltype);
@@ -312,7 +312,7 @@ namespace {
 ostream& XMLHelper::serialize(const DOMNode* n, ostream& out, bool pretty)
 {
     static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
-    static const XMLCh UTF8[]={ chLatin_U, chLatin_T, chLatin_F, chDigit_8, chNull };
+    static const XMLCh UTF8[]={ chLatin_U, chLatin_T, chLatin_F, chDash, chDigit_8, chNull };
 
     StreamFormatTarget target(out);
     DOMImplementation* impl=DOMImplementationRegistry::getDOMImplementation(impltype);

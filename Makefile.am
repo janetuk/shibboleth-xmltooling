@@ -14,26 +14,12 @@ dist-hook:
 SUBDIRS = doc schemas xmltooling xmltoolingtest
 
 if DX_COND_doc
-all-local: doxygen-doc xmltooling.spec pkginfo
+all-local: doxygen-doc
 else
-all-local: xmltooling.spec pkginfo
+all-local:
 endif
 
-install-data-hook:
-	rm -rf $(DESTDIR)$(datadir)/doc/@PACKAGE@/api
-	cp -r doc/api $(DESTDIR)$(datadir)/doc/@PACKAGE@
-
-xmltooling.spec: xmltooling.spec.in Makefile
-	rm -f $@.tmp
-	sed < $@.in > $@.tmp \
-	    -e 's:@-VERSION-@:${VERSION}:'
-	mv $@.tmp $@
-
-pkginfo: pkginfo.in Makefile
-	rm -f $@.tmp
-	sed < $@.in > $@.tmp \
-	    -e 's:@-VERSION-@:${VERSION}:'
-	mv $@.tmp $@
+GENFILES = xmltooling.spec pkginfo Portfile
 
 EXTRA_DIST = $(DX_CONFIG) \
         cpp-xmltooling.sln \
@@ -43,11 +29,7 @@ EXTRA_DIST = $(DX_CONFIG) \
         doxygen.m4 \
         depcomp \
         config_win32.h \
-        xmltooling.spec.in \
-        xmltooling.spec \
-        pkginfo.in \
-        pkginfo \
+        $(GENFILES) \
+        $(GENFILES:%=%.in) \
         depend \
         postinstall
-
-DISTCLEANFILES = xmltooling.spec pkginfo
