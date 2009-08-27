@@ -2,7 +2,8 @@ xmltooling (1.2.2-1) UNRELEASED; urgency=low
 
   * New upstream release.
     - SECURITY: Fix potential buffer overflows and reuses of freed objects
-      in error handling code paths with invalid XML.  See
+      in error handling code paths with invalid XML or with malformed
+      URLs.  See the upstream security advisory at
       http://shibboleth.internet2.edu/secadv/secadv_20090826.txt
     - Fix other validation issues with malformed objects.
     - Fix for accessing the resolution context, which affects the ability
