@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2007 Internet2
+*  Copyright 2001-2009 Internet2
  * 
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,13 +100,15 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
             if (XMLString::equals(attribute->getLocalName(),XMLNS_PREFIX)) {
                 m_log.debug("found default namespace declaration, adding it to the list of namespaces on the XMLObject");
                 addNamespace(Namespace(attribute->getValue(), NULL, true));
-                continue;
+            }
+            else if (XMLString::equals(attribute->getLocalName(),XML_PREFIX) && XMLString::equals(attribute->getNodeValue(),XML_NS)) {
+                m_log.debug("found standard xml prefix declaration, ignoring as superfluous");
             }
             else {
                 m_log.debug("found namespace declaration, adding it to the list of namespaces on the XMLObject");
                 addNamespace(Namespace(attribute->getValue(), attribute->getLocalName(), true));
-                continue;
             }
+            continue;
         }
         else if (XMLString::equals(nsuri,XSI_NS)) {
             static const XMLCh type[]= UNICODE_LITERAL_4(t,y,p,e);

@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2007 Internet2
+*  Copyright 2001-2009 Internet2
  *
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,13 +56,7 @@ namespace xmltooling {
             return m_namespaces;
         }
 
-        void addNamespace(const Namespace& ns) const {
-            std::set<Namespace>::iterator i = m_namespaces.find(ns);
-            if (i == m_namespaces.end())
-                m_namespaces.insert(ns);
-            else if (ns.alwaysDeclare())
-                const_cast<Namespace&>(*i).setAlwaysDeclare(true);
-        }
+        void addNamespace(const Namespace& ns) const;
 
         void removeNamespace(const Namespace& ns) {
             m_namespaces.erase(ns);

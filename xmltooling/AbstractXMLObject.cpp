@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2007 Internet2
+*  Copyright 2001-2009 Internet2
  *
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,8 @@ AbstractXMLObject::~AbstractXMLObject()
     xercesc::XMLString::release(&m_noNamespaceSchemaLocation);
 }
 
-void XMLObject::setNil(const XMLCh* value) {
+void XMLObject::setNil(const XMLCh* value)
+{
     if (value) {
         switch (*value) {
             case xercesc::chLatin_t:
@@ -80,6 +81,15 @@ void XMLObject::setNil(const XMLCh* value) {
     else {
         nil(xmlconstants::XML_BOOL_NULL);
     }
+}
+
+void AbstractXMLObject::addNamespace(const Namespace& ns) const
+{
+    std::set<Namespace>::iterator i = m_namespaces.find(ns);
+    if (i == m_namespaces.end())
+        m_namespaces.insert(ns);
+    else if (ns.alwaysDeclare())
+        const_cast<Namespace&>(*i).setAlwaysDeclare(true);
 }
 
 XMLCh* AbstractXMLObject::prepareForAssignment(XMLCh* oldValue, const XMLCh* newValue)
