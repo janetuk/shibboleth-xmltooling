@@ -11,7 +11,9 @@ Prefix:     /usr
 BuildRequires: gcc-c++
 %{?_with_curl:BuildRequires: curl-devel}
 %{?_with_icu:BuildRequires: libicu-devel}
-
+%if "%{_vendor}" == "redhat"
+BuildRequires: redhat-rpm-config
+%endif
 
 %description
 Xerces-C++ is a validating XML parser written in a portable subset of C++.

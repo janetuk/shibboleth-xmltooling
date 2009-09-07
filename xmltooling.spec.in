@@ -21,6 +21,9 @@ BuildRequires:  xml-security-c-devel >= 1.4.0
 %endif
 BuildRequires:	gcc-c++, openssl-devel, curl-devel >= 7.10.6
 %{!?_without_doxygen:BuildRequires: doxygen}
+%if "%{_vendor}" == "redhat"
+BuildRequires: redhat-rpm-config
+%endif
 
 %if "%{_vendor}" == "suse"
 %define pkgdocdir %{_docdir}/%{name}
