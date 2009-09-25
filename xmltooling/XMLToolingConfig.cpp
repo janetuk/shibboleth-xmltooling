@@ -209,6 +209,12 @@ void XMLToolingConfig::setReplayCache(ReplayCache* replayCache)
     delete m_replayCache;
     m_replayCache = replayCache;
 }
+
+void XMLToolingConfig::setKeyInfoResolver(xmltooling::KeyInfoResolver *keyInfoResolver)
+{
+    delete m_keyInfoResolver;
+    m_keyInfoResolver = keyInfoResolver;
+}
 #endif
 
 void XMLToolingConfig::setPathResolver(PathResolver* pathResolver)
