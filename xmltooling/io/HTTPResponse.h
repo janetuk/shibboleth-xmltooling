@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * @file xmltooling/io/HTTPResponse.h
  * 
- * Interface to HTTP response.
+ * Interface to HTTP responses.
  */
 
 #ifndef __xmltooling_httpres_h__
@@ -60,11 +60,7 @@ namespace xmltooling {
          * @param name  cookie name
          * @param value value to set, or NULL to clear
          */
-        virtual void setCookie(const char* name, const char* value) {
-            std::string cookie(name);
-            cookie = cookie + '=' + value;
-            setResponseHeader("Set-Cookie", cookie.c_str());
-        }
+        virtual void setCookie(const char* name, const char* value);
         
         /**
          * Redirect the client to the specified URL and complete the response.

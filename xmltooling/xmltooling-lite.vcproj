@@ -449,6 +449,10 @@
 					RelativePath=".\io\HTTPRequest.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\io\HTTPResponse.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="impl"

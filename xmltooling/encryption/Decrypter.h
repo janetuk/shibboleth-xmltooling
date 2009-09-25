@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ namespace xmlencryption {
             ) : m_cipher(NULL), m_credResolver(credResolver), m_criteria(criteria), m_EKResolver(EKResolver) {
         }
 
-        ~Decrypter();
+        virtual ~Decrypter();
         
         /**
          * Replace the current EncryptedKeyResolver interface, if any, with a new one.

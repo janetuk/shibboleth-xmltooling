@@ -178,6 +178,7 @@ common_sources = \
 	io/AbstractXMLObjectMarshaller.cpp \
 	io/AbstractXMLObjectUnmarshaller.cpp \
 	io/HTTPRequest.cpp \
+	io/HTTPResponse.cpp \
 	soap/impl/SOAPClient.cpp \
 	soap/impl/SOAPImpl.cpp \
 	soap/impl/SOAPSchemaValidators.cpp \
