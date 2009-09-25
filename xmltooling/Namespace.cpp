@@ -63,3 +63,9 @@ bool xmltooling::operator<(const Namespace& op1, const Namespace& op2)
     else
         return false;
 }
+
+bool xmltooling::operator==(const Namespace& op1, const Namespace& op2)
+{
+    return (XMLString::equals(op1.getNamespacePrefix(), op2.getNamespacePrefix()) &&
+            XMLString::equals(op1.getNamespaceURI(), op2.getNamespaceURI()));
+}

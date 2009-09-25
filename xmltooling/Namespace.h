@@ -105,14 +105,12 @@ namespace xmltooling {
      */
     extern XMLTOOL_API bool operator<(const Namespace& op1, const Namespace& op2);
 
-#ifndef HAVE_GOOD_STL
     /**
      * Returns true iff op1's namespace and prefix are equal to op2's namespace and prefix.
      * @param op1   First namspace to compare
      * @param op2   Second namespace to compare
      */
     extern XMLTOOL_API bool operator==(const Namespace& op1, const Namespace& op2);
-#endif
 
 };
 
