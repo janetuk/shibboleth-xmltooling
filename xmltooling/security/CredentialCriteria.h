@@ -28,6 +28,7 @@
 #include <set>
 
 class DSIGKeyInfoList;
+class XSECCryptoKey;
 
 namespace xmlsignature {
     class XMLTOOL_API KeyInfo;
