@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,9 @@
 
 #include <xmltooling/ConcreteXMLObjectBuilder.h>
 #include <xmltooling/exceptions.h>
-#include <xmltooling/signature/ContentReference.h>
-#include <xmltooling/util/XMLConstants.h>
 
-#include <xsec/dsig/DSIGSignature.hpp>
+class DSIGSignature;
+class XSECCryptoKey;
 
 /**
  * @namespace xmlsignature
@@ -36,6 +35,7 @@
  */
 namespace xmlsignature {
 
+    class XMLTOOL_API ContentReference;
     class XMLTOOL_API KeyInfo;
 
     /**
@@ -194,13 +194,14 @@ namespace xmlsignature {
             );
 
     protected:
+        /** Default constructor. */
         Signature() {}
     };
 
     /**
      * Builder for Signature objects.
      */
-    class XMLTOOL_API SignatureBuilder : public xmltooling::XMLObjectBuilder
+    class XMLTOOL_API SignatureBuilder : public xmltooling::ConcreteXMLObjectBuilder
     {
     public:
 #ifdef HAVE_COVARIANT_RETURNS
@@ -222,21 +223,7 @@ namespace xmlsignature {
         virtual xmltooling::XMLObject* buildObject() const;
 #endif
         /** Singleton builder. */
-        static Signature* buildSignature() {
-            const SignatureBuilder* b = dynamic_cast<const SignatureBuilder*>(
-                xmltooling::XMLObjectBuilder::getBuilder(
-                    xmltooling::QName(xmlconstants::XMLSIG_NS,Signature::LOCAL_NAME)
-                    )
-                );
-            if (b) {
-#ifdef HAVE_COVARIANT_RETURNS
-                return b->buildObject();
-#else
-                return dynamic_cast<Signature*>(b->buildObject());
-#endif
-            }
-            throw xmltooling::XMLObjectException("Unable to obtain typed builder for Signature.");
-        }
+        static Signature* buildSignature();
     };
 
     DECL_XMLTOOLING_EXCEPTION(SignatureException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmlsignature,xmltooling::XMLSecurityException,Exceptions in signature processing);

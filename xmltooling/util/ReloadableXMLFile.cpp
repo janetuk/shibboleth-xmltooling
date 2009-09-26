@@ -51,6 +51,12 @@ static const XMLCh reloadChanges[] =    UNICODE_LITERAL_13(r,e,l,o,a,d,C,h,a,n,g
 static const XMLCh reloadInterval[] =   UNICODE_LITERAL_14(r,e,l,o,a,d,I,n,t,e,r,v,a,l);
 static const XMLCh backingFilePath[] =  UNICODE_LITERAL_15(b,a,c,k,i,n,g,F,i,l,e,P,a,t,h);
 
+
+ReloadableXMLFile::~ReloadableXMLFile()
+{
+    delete m_lock;
+}
+
 ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
     : m_root(e), m_local(true), m_validate(false), m_filestamp(0), m_reloadInterval(0), m_lock(NULL), m_log(log)
 {
@@ -283,4 +289,15 @@ Lockable* ReloadableXMLFile::lock()
     m_log.debug("attempt to update resource complete, relocking");
     m_lock->rdlock();
     return this;
+}
+
+void ReloadableXMLFile::unlock()
+{
+    if (m_lock)
+        m_lock->unlock();
+}
+
+pair<bool,DOMElement*> ReloadableXMLFile::load()
+{
+    return load(false);
 }

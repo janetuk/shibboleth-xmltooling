@@ -36,6 +36,18 @@ PathResolver::PathResolver() : m_defaultPackage(PACKAGE_NAME), m_defaultPrefix("
     setCfgDir("/etc");
 }
 
+bool PathResolver::isAbsolute(const char* s) const
+{
+    switch (*s) {
+        case '/':
+        case '\\':
+            return true;
+        case '.':
+            return (*(s+1) == '.' || *(s+1) == '/' || *(s+1) == '\\');
+    }
+    return *(s+1) == ':';
+}
+
 const string& PathResolver::resolve(string& s, file_type_t filetype, const char* pkgname, const char* prefix) const
 {
     if (!isAbsolute(s.c_str())) {

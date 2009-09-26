@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007 The Apache Software Foundation.
+ * Copyright 2001-2009 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * OpenSSLCryptoX509CRL.cpp
  * 
- * OpenSSL-based class for handling X.509 CRLs
+ * OpenSSL-based class for handling X.509 CRLs.
  */
 
 #include "internal.h"
@@ -109,4 +109,12 @@ void OpenSSLCryptoX509CRL::loadX509CRLBase64Bin(const char* buf, unsigned int le
 
 	m_DERX509CRL.sbStrcpyIn(buf);
 
+}
+
+XSECCryptoX509CRL* OpenSSLCryptoX509CRL::clone() const
+{
+    OpenSSLCryptoX509CRL* copy = new OpenSSLCryptoX509CRL();
+    copy->mp_X509CRL = X509_CRL_dup(mp_X509CRL);
+    copy->m_DERX509CRL = m_DERX509CRL;
+    return copy;
 }

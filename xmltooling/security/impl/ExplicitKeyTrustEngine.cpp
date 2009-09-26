@@ -27,6 +27,7 @@
 #include "security/CredentialResolver.h"
 #include "security/OpenSSLTrustEngine.h"
 #include "security/SignatureTrustEngine.h"
+#include "signature/Signature.h"
 #include "signature/SignatureValidator.h"
 #include "util/NDC.h"
 

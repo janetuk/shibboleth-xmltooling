@@ -75,3 +75,9 @@ string URLEncoder::encode(const char* s) const
     }
     return ret;
 }
+
+bool URLEncoder::isBad(char ch) const
+{
+    static char badchars[]="=&/?:\"\\+<>#%{}|^~[],`;@";
+    return (ch<=0x20 || ch>=0x7F || strchr(badchars,ch));
+}

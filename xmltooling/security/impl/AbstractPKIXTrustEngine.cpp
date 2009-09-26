@@ -25,6 +25,7 @@
 #include "logging.h"
 #include "security/AbstractPKIXTrustEngine.h"
 #include "signature/KeyInfo.h"
+#include "signature/Signature.h"
 
 #include <openssl/x509_vfy.h>
 #include <openssl/x509v3.h>

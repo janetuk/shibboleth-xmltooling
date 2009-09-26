@@ -21,6 +21,7 @@
  */
 
 #include "internal.h"
+#include "io/GenericRequest.h"
 #include "util/TemplateEngine.h"
 
 using namespace xmltooling;
@@ -28,6 +29,18 @@ using namespace std;
 
 namespace {
     static const pair<const string,string> emptyPair;
+}
+
+const char* TemplateEngine::TemplateParameters::getParameter(const char* name) const
+{
+    map<string,string>::const_iterator i=m_map.find(name);
+    return (i!=m_map.end() ? i->second.c_str() : (m_request ? m_request->getParameter(name) : NULL));
+}
+
+const multimap<string,string>* TemplateEngine::TemplateParameters::getLoopCollection(const char* name) const
+{
+    map< string,multimap<string,string> >::const_iterator i=m_collectionMap.find(name);
+    return (i!=m_collectionMap.end() ? &(i->second) : NULL);
 }
 
 void TemplateEngine::setTagPrefix(const char* tagPrefix)

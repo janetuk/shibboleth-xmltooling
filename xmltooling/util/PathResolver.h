@@ -128,16 +128,7 @@ namespace xmltooling {
         virtual const std::string& resolve(std::string& s, file_type_t filetype, const char* pkgname=NULL, const char* prefix=NULL) const;
 
     private:
-        bool isAbsolute(const char* s) const {
-            switch (*s) {
-                case '/':
-                case '\\':
-                    return true;
-                case '.':
-                    return (*(s+1) == '.' || *(s+1) == '/' || *(s+1) == '\\');
-            }
-            return *(s+1) == ':';
-        }
+        bool isAbsolute(const char* s) const;
 
         std::string m_defaultPackage,m_defaultPrefix,m_lib,m_log,m_xml,m_run,m_cfg;
     };

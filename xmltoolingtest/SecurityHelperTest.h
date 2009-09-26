@@ -18,6 +18,9 @@
 
 #include <xmltooling/security/SecurityHelper.h>
 
+#include <xsec/enc/XSECCryptoKey.hpp>
+#include <xsec/enc/XSECCryptoX509.hpp>
+
 class SecurityHelperTest : public CxxTest::TestSuite {
     vector<XSECCryptoX509*> certs;
 

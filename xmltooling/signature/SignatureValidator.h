@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,17 @@
 #if !defined(__xmltooling_sigval_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_sigval_h__
 
-#include <xmltooling/security/Credential.h>
-#include <xmltooling/signature/Signature.h>
 #include <xmltooling/validation/Validator.h>
 
+class XSECCryptoKey;
+
+namespace xmltooling {
+    class XMLTOOL_API Credential;
+};
+
 namespace xmlsignature {
+
+    class XMLTOOL_API Signature;
 
     /**
      * Validator for signatures based on a Credential
@@ -40,18 +46,18 @@ namespace xmlsignature {
          * 
          * @param key the key to use
          */
-        SignatureValidator(XSECCryptoKey* key=NULL) : m_key(key), m_credential(NULL) {}
+        SignatureValidator(XSECCryptoKey* key=NULL);
 
         /**
          * Constructor using a Credential
          * 
          * @param credential the credential to use
          */
-        SignatureValidator(const xmltooling::Credential* credential) : m_key(NULL), m_credential(credential) {}
+        SignatureValidator(const xmltooling::Credential* credential);
 
         virtual ~SignatureValidator() {}
 
-        virtual void validate(const xmltooling::XMLObject* xmlObject) const;
+        void validate(const xmltooling::XMLObject* xmlObject) const;
 
         /**
          * Type-safe validator.
@@ -65,20 +71,14 @@ namespace xmlsignature {
          * 
          * @param key  the key to attach 
          */
-        void setKey(XSECCryptoKey* key) {
-            m_key = key;
-            m_credential = NULL;
-        }
+        void setKey(XSECCryptoKey* key);
 
         /**
          * Replace the current Credential, if any, with a new one.
          * 
          * @param credential  the Credential to attach 
          */
-        void setCredential(const xmltooling::Credential* credential) {
-            m_key = NULL;
-            m_credential = credential;
-        }
+        void setCredential(const xmltooling::Credential* credential);
     
     protected:
         /** Verification key. */

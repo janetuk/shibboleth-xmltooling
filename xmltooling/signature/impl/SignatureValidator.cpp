@@ -21,6 +21,8 @@
  */
  
 #include "internal.h"
+#include "security/Credential.h"
+#include "signature/Signature.h"
 #include "signature/SignatureValidator.h"
 
 #include <xsec/enc/XSECCryptoException.hpp>
@@ -29,6 +31,26 @@
 using namespace xmlsignature;
 using namespace xmltooling;
 using namespace std;
+
+SignatureValidator::SignatureValidator(XSECCryptoKey* key) : m_key(key), m_credential(NULL)
+{
+}
+
+SignatureValidator::SignatureValidator(const Credential* credential) : m_key(NULL), m_credential(credential)
+{
+}
+
+void SignatureValidator::setKey(XSECCryptoKey* key)
+{
+    m_key = key;
+    m_credential = NULL;
+}
+
+void SignatureValidator::setCredential(const Credential* credential)
+{
+    m_key = NULL;
+    m_credential = credential;
+}
 
 void SignatureValidator::validate(const XMLObject* xmlObject) const
 {

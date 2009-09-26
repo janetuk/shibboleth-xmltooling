@@ -22,18 +22,45 @@
 
 #include "internal.h"
 #include "logging.h"
+#include "XMLToolingConfig.h"
 #include "security/X509Credential.h"
 #include "security/CredentialCriteria.h"
 #include "security/KeyInfoResolver.h"
 #include "security/SecurityHelper.h"
+#include "signature/Signature.h"
 
 #include <openssl/dsa.h>
 #include <openssl/rsa.h>
+#include <xsec/dsig/DSIGKeyInfoList.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyDSA.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyRSA.hpp>
 
 using namespace xmltooling;
 using namespace std;
+
+CredentialCriteria::CredentialCriteria()
+    : m_keyUsage(Credential::UNSPECIFIED_CREDENTIAL), m_keySize(0), m_key(NULL),
+        m_keyInfo(NULL), m_nativeKeyInfo(NULL), m_credential(NULL)
+{
+}
+
+CredentialCriteria::~CredentialCriteria()
+{
+    delete m_credential;
+}
+
+void CredentialCriteria::setXMLAlgorithm(const XMLCh* algorithm)
+{
+    if (algorithm) {
+        pair<const char*,unsigned int> mapped = XMLToolingConfig::getConfig().mapXMLAlgorithmToKeyAlgorithm(algorithm);
+        setKeyAlgorithm(mapped.first);
+        setKeySize(mapped.second);
+    }
+    else {
+        setKeyAlgorithm(NULL);
+        setKeySize(0);
+    }
+}
 
 void CredentialCriteria::setKeyInfo(const xmlsignature::KeyInfo* keyInfo, int extraction)
 {

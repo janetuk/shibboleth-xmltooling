@@ -23,15 +23,17 @@
 #if !defined(__xmltooling_sechelper_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_sechelper_h__
 
-#include <xmltooling/security/XSECCryptoX509CRL.h>
-#include <xmltooling/soap/SOAPTransport.h>
+#include <xmltooling/base.h>
 
 #include <vector>
-#include <xsec/enc/XSECCryptoKey.hpp>
-#include <xsec/enc/XSECCryptoX509.hpp>
+
+class XSECCryptoKey;
+class XSECCryptoX509;
 
 namespace xmltooling {
     class XMLTOOL_API Credential;
+    class XMLTOOL_API SOAPTransport;
+    class XMLTOOL_API XSECCryptoX509CRL;
 
     /**
      * A helper class for working with keys, certificates, etc.

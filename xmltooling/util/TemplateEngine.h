@@ -23,7 +23,7 @@
 #ifndef __xmltooling_template_h__
 #define __xmltooling_template_h__
 
-#include <xmltooling/io/GenericRequest.h>
+#include <xmltooling/base.h>
 
 #include <map>
 #include <string>
@@ -36,6 +36,8 @@
 #endif
 
 namespace xmltooling {
+
+    class XMLTOOL_API GenericRequest;
 
     /**
      * Simple template replacement engine. Supports the following:
@@ -53,8 +55,9 @@ namespace xmltooling {
      */
     class XMLTOOL_API TemplateEngine
     {
-        MAKE_NONCOPYABLE(TemplateEngine);
+    MAKE_NONCOPYABLE(TemplateEngine);
     public:
+        /** Default constructor. */
         TemplateEngine() {
             setTagPrefix("mlp");
         }
@@ -73,7 +76,6 @@ namespace xmltooling {
          * Allows callers to supply a more dynamic lookup mechanism to supplement a basic map.
          */
         class XMLTOOL_API TemplateParameters {
-            // MAKE_NONCOPYABLE(TemplateParameters);
         public:
             TemplateParameters() : m_request(NULL) {}
             virtual ~TemplateParameters() {}
@@ -93,10 +95,7 @@ namespace xmltooling {
              * @param name  name of parameter
              * @return value of parameter, or NULL
              */
-            virtual const char* getParameter(const char* name) const {
-                std::map<std::string,std::string>::const_iterator i=m_map.find(name);
-                return (i!=m_map.end() ? i->second.c_str() : (m_request ? m_request->getParameter(name) : NULL));
-            }
+            virtual const char* getParameter(const char* name) const;
 
             /**
              * Returns a named collection of sub-parameters to pass into a loop.
@@ -104,10 +103,7 @@ namespace xmltooling {
              * @param name  name of sub-collection
              * @return pointer to a multimap of sub-parameters, or NULL
              */
-            virtual const std::multimap<std::string,std::string>* getLoopCollection(const char* name) const {
-                std::map< std::string,std::multimap<std::string,std::string> >::const_iterator i=m_collectionMap.find(name);
-                return (i!=m_collectionMap.end() ? &(i->second) : NULL);
-            }
+            virtual const std::multimap<std::string,std::string>* getLoopCollection(const char* name) const;
         };
 
         /**

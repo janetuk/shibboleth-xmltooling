@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,9 +58,7 @@ namespace xmltooling {
          * 
          * @param newEngine trust engine to add
          */
-        void addTrustEngine(TrustEngine* newEngine) {
-            m_engines.push_back(newEngine);
-        }
+        void addTrustEngine(TrustEngine* newEngine);
 
         /**
          * Removes a trust engine. The caller must delete the engine if necessary.
@@ -68,15 +66,7 @@ namespace xmltooling {
          * @param oldEngine trust engine to remove
          * @return  the old engine
          */
-        TrustEngine* removeTrustEngine(TrustEngine* oldEngine) {
-            for (std::vector<TrustEngine*>::iterator i=m_engines.begin(); i!=m_engines.end(); i++) {
-                if (oldEngine==(*i)) {
-                    m_engines.erase(i);
-                    return oldEngine;
-                }
-            }
-            return NULL;
-        }
+        TrustEngine* removeTrustEngine(TrustEngine* oldEngine);
 
         bool validate(
             xmlsignature::Signature& sig,

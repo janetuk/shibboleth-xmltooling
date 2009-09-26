@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@
 #define __xmltooling_keyinfocredctx_h__
 
 #include <xmltooling/security/CredentialContext.h>
-#include <xmltooling/signature/Signature.h>
-#include <xsec/dsig/DSIGKeyInfoList.hpp>
+
+class DSIGKeyInfoList;
 
 namespace xmlsignature {
     class XMLTOOL_API KeyInfo;
@@ -41,12 +41,16 @@ namespace xmltooling {
     public:
         /**
          * Constructor
+         *
+         * @param keyInfo   surrounding KeyInfo context object
          */
         KeyInfoCredentialContext(const xmlsignature::KeyInfo* keyInfo=NULL) : m_keyInfo(keyInfo), m_nativeKeyInfo(NULL) {
         }
 
         /**
          * Constructor
+         *
+         * @param keyInfo   surrounding native KeyInfo context object
          */
         KeyInfoCredentialContext(DSIGKeyInfoList* keyInfo) : m_keyInfo(NULL), m_nativeKeyInfo(keyInfo) {
         }

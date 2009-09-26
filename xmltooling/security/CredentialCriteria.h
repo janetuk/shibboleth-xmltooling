@@ -23,15 +23,16 @@
 #if !defined(__xmltooling_credcrit_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_credcrit_h__
 
-#include <xmltooling/XMLToolingConfig.h>
-#include <xmltooling/security/KeyInfoResolver.h>
-#include <xmltooling/security/Credential.h>
-#include <xmltooling/signature/KeyInfo.h>
-#include <xmltooling/signature/Signature.h>
+#include <xmltooling/base.h>
 
 #include <set>
-#include <xsec/dsig/DSIGKeyInfoList.hpp>
-#include <xsec/dsig/DSIGKeyInfoName.hpp>
+
+class DSIGKeyInfoList;
+
+namespace xmlsignature {
+    class XMLTOOL_API KeyInfo;
+    class XMLTOOL_API Signature;
+};
 
 namespace xmltooling {
 
@@ -42,12 +43,10 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(CredentialCriteria);
     public:
-        CredentialCriteria() : m_keyUsage(Credential::UNSPECIFIED_CREDENTIAL), m_keySize(0), m_key(NULL),
-            m_keyInfo(NULL), m_nativeKeyInfo(NULL), m_credential(NULL) {
-        }
-        virtual ~CredentialCriteria() {
-            delete m_credential;
-        }
+        /** Default constructor. */
+        CredentialCriteria();
+
+        virtual ~CredentialCriteria();
 
         /**
          * Determines whether the supplied Credential matches this CredentialCriteria.
@@ -138,18 +137,7 @@ namespace xmltooling {
          *
          * @param algorithm XML algorithm specifier
          */
-        void setXMLAlgorithm(const XMLCh* algorithm) {
-            if (algorithm) {
-                std::pair<const char*,unsigned int> mapped =
-                    XMLToolingConfig::getConfig().mapXMLAlgorithmToKeyAlgorithm(algorithm);
-                setKeyAlgorithm(mapped.first);
-                setKeySize(mapped.second);
-            }
-            else {
-                setKeyAlgorithm(NULL);
-                setKeySize(0);
-            }
-        }
+        void setXMLAlgorithm(const XMLCh* algorithm);
 
         /**
          * Gets key name criteria.
