@@ -31,12 +31,13 @@ class DSIGKeyInfoList;
 class XSECCryptoKey;
 
 namespace xmlsignature {
-    class XMLTOOL_API Credential;
     class XMLTOOL_API KeyInfo;
     class XMLTOOL_API Signature;
 };
 
 namespace xmltooling {
+
+    class XMLTOOL_API Credential;
 
 #if defined (_MSC_VER)
     #pragma warning( push )
