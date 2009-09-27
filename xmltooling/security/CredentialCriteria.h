@@ -31,6 +31,7 @@ class DSIGKeyInfoList;
 class XSECCryptoKey;
 
 namespace xmlsignature {
+    class XMLTOOL_API Credential;
     class XMLTOOL_API KeyInfo;
     class XMLTOOL_API Signature;
 };
