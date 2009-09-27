@@ -37,6 +37,11 @@ namespace xmlsignature {
 
 namespace xmltooling {
 
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4251 )
+#endif
+
     /**
      * Class for specifying criteria by which a CredentialResolver should resolve credentials.
      */
@@ -240,6 +245,10 @@ namespace xmltooling {
         DSIGKeyInfoList* m_nativeKeyInfo;
         Credential* m_credential;
     };
+
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
 };
 
 #endif /* __xmltooling_credcrit_h__ */
