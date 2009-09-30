@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -157,8 +157,13 @@ namespace xmltooling {
 #ifdef CURLOPTTYPE_OFF_T
             else if (opt < CURLOPTTYPE_OFF_T)
                 return (curl_easy_setopt(m_handle, opt, value) == CURLE_OK);
+# ifdef HAVE_CURL_OFF_T
             else if (sizeof(curl_off_t) == sizeof(long))
                 return (curl_easy_setopt(m_handle, opt, strtol(value, NULL, 10)) == CURLE_OK);
+# else
+            else if (sizeof(off_t) == sizeof(long))
+                return (curl_easy_setopt(m_handle, opt, strtol(value, NULL, 10)) == CURLE_OK);
+# endif
             return false;
 #else
             else

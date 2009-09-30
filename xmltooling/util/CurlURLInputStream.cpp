@@ -202,8 +202,13 @@ void CurlURLInputStream::init(const DOMElement* e)
 #ifdef CURLOPTTYPE_OFF_T
                     else if (opt < CURLOPTTYPE_OFF_T)
                         success = (curl_easy_setopt(fEasy, opt, value.get()) == CURLE_OK);
+# ifdef HAVE_CURL_OFF_T
                     else if (sizeof(curl_off_t) == sizeof(long))
                         success = (curl_easy_setopt(fEasy, opt, strtol(value.get(), NULL, 10)) == CURLE_OK);
+# else
+                    else if (sizeof(off_t) == sizeof(long))
+                        success = (curl_easy_setopt(fEasy, opt, strtol(value.get(), NULL, 10)) == CURLE_OK);
+# endif
                     else
                         success = false;
 #else
