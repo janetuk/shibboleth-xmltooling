@@ -77,6 +77,9 @@
 /* Define to 1 if you have the `xsecsize_t' type. */
 #define HAVE_XSECSIZE_T 1
 
+/* Define to 1 if you have the `curl_off_t' type. */
+#define HAVE_CURL_OFF_T 1
+
 /* Name of package */
 #define PACKAGE "xmltooling"
 
