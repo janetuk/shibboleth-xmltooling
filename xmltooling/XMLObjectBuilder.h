@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,12 @@
 #ifndef __xmltooling_xmlobjbuilder_h__
 #define __xmltooling_xmlobjbuilder_h__
 
-#include <map>
-#include <memory>
 #include <xmltooling/QName.h>
 #include <xmltooling/XMLObject.h>
 #include <xmltooling/util/XMLHelper.h>
+
+#include <map>
+#include <memory>
 
 #if defined (_MSC_VER)
     #pragma warning( push )
