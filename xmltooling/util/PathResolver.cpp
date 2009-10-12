@@ -36,6 +36,45 @@ PathResolver::PathResolver() : m_defaultPackage(PACKAGE_NAME), m_defaultPrefix("
     setCfgDir("/etc");
 }
 
+PathResolver::~PathResolver()
+{
+}
+
+void PathResolver::setDefaultPackageName(const char* pkgname)
+{
+    m_defaultPackage = pkgname;
+}
+
+void PathResolver::setDefaultPrefix(const char* prefix)
+{
+    m_defaultPrefix = prefix;
+}
+
+void PathResolver::setLibDir(const char* dir)
+{
+    m_lib = dir;
+}
+
+void PathResolver::setLogDir(const char* dir)
+{
+    m_log = dir;
+}
+
+void PathResolver::setXMLDir(const char* dir)
+{
+    m_xml = dir;
+}
+
+void PathResolver::setRunDir(const char* dir)
+{
+    m_run = dir;
+}
+
+void PathResolver::setCfgDir(const char* dir)
+{
+    m_cfg = dir;
+}
+
 bool PathResolver::isAbsolute(const char* s) const
 {
     switch (*s) {

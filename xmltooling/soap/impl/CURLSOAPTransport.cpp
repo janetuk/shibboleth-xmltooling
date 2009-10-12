@@ -264,6 +264,35 @@ void xmltooling::termSOAPTransports()
     g_CURLPool = NULL;
 }
 
+SOAPTransport::SOAPTransport()
+{
+}
+
+SOAPTransport::~SOAPTransport()
+{
+}
+
+bool SOAPTransport::setProviderOption(const char* provider, const char* option, const char* value)
+{
+    return false;
+}
+
+HTTPSOAPTransport::HTTPSOAPTransport()
+{
+}
+
+HTTPSOAPTransport::~HTTPSOAPTransport()
+{
+}
+
+OpenSSLSOAPTransport::OpenSSLSOAPTransport()
+{
+}
+
+OpenSSLSOAPTransport::~OpenSSLSOAPTransport()
+{
+}
+
 CURLPool::~CURLPool()
 {
     for (poolmap_t::iterator i=m_bindingMap.begin(); i!=m_bindingMap.end(); i++) {

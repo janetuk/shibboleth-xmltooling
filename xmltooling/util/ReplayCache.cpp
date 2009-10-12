@@ -47,3 +47,9 @@ bool ReplayCache::check(const char* context, const char* s, time_t expires)
     m_storage->createString(context, s, "x", expires);
     return true;
 }
+
+bool ReplayCache::check(const char* context, const XMLCh* s, time_t expires)
+{
+    auto_ptr_char temp(s);
+    return check(context, temp.get(), expires);
+}

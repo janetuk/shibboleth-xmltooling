@@ -35,6 +35,13 @@ using namespace xmltooling;
 using namespace xercesc;
 using namespace std;
 
+AbstractXMLObjectUnmarshaller::AbstractXMLObjectUnmarshaller()
+{
+}
+
+AbstractXMLObjectUnmarshaller::~AbstractXMLObjectUnmarshaller()
+{
+}
 
 XMLObject* AbstractXMLObjectUnmarshaller::unmarshall(DOMElement* element, bool bindDocument)
 {

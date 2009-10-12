@@ -34,6 +34,10 @@ XSEC_USING_XERCES(Janitor);
 
 using namespace xmltooling;
 
+OpenSSLCryptoX509CRL::OpenSSLCryptoX509CRL() : mp_X509CRL(NULL), m_DERX509CRL("")
+{
+}
+
 OpenSSLCryptoX509CRL::~OpenSSLCryptoX509CRL()
 {
 	if (mp_X509CRL)
@@ -73,7 +77,13 @@ OpenSSLCryptoX509CRL::OpenSSLCryptoX509CRL(X509_CRL* x) {
 	BIO_free_all(b64);
 }
 
-void OpenSSLCryptoX509CRL::loadX509CRLBase64Bin(const char* buf, unsigned int len) {
+const XMLCh* OpenSSLCryptoX509CRL::getProviderName() const
+{
+    return DSIGConstants::s_unicodeStrPROVOpenSSL;
+}
+
+void OpenSSLCryptoX509CRL::loadX509CRLBase64Bin(const char* buf, unsigned int len)
+{
 
 	// Free anything currently held.
 	
@@ -109,6 +119,16 @@ void OpenSSLCryptoX509CRL::loadX509CRLBase64Bin(const char* buf, unsigned int le
 
 	m_DERX509CRL.sbStrcpyIn(buf);
 
+}
+
+safeBuffer& OpenSSLCryptoX509CRL::getDEREncodingSB()
+{
+    return m_DERX509CRL;
+}
+
+X509_CRL* OpenSSLCryptoX509CRL::getOpenSSLX509CRL()
+{
+    return mp_X509CRL;
 }
 
 XSECCryptoX509CRL* OpenSSLCryptoX509CRL::clone() const

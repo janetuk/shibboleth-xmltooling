@@ -69,76 +69,56 @@ namespace xmltooling {
          * 
          * @return the usage mask
          */
-        unsigned int getUsage() const {
-            return m_keyUsage;
-        }
+        unsigned int getUsage() const;
     
         /**
          * Set key usage criteria.
          * 
          * @param usage the usage mask to set
          */
-        void setUsage(unsigned int usage) {
-            m_keyUsage = usage;
-        }
+        void setUsage(unsigned int usage);
 
         /**
          * Get the peer name criteria.
          * 
          * @return the peer name
          */
-        const char* getPeerName() const {
-            return m_peerName.c_str();
-        }
+        const char* getPeerName() const;
     
         /**
          * Set the peer name criteria.
          * 
          * @param peerName peer name to set
          */
-        void setPeerName(const char* peerName) {
-            m_peerName.erase();
-            if (peerName)
-                m_peerName = peerName;
-        }
+        void setPeerName(const char* peerName);
     
         /**
          * Get the key algorithm criteria.
          * 
          * @return the key algorithm
          */
-        const char* getKeyAlgorithm() const {
-            return m_keyAlgorithm.c_str();
-        }
+        const char* getKeyAlgorithm() const;
     
         /**
          * Set the key algorithm criteria.
          * 
          * @param keyAlgorithm The key algorithm to set
          */
-        void setKeyAlgorithm(const char* keyAlgorithm) {
-            m_keyAlgorithm.erase();
-            if (keyAlgorithm)
-                m_keyAlgorithm = keyAlgorithm;
-        }
+        void setKeyAlgorithm(const char* keyAlgorithm);
 
         /**
          * Get the key size criteria.
          *
          * @return  the key size, or 0
          */
-        unsigned int getKeySize() const {
-            return m_keySize;
-        }
+        unsigned int getKeySize() const;
 
         /**
          * Set the key size criteria.
          *
          * @param keySize Key size to set
          */
-        void setKeySize(unsigned int keySize) {
-            m_keySize = keySize;
-        }
+        void setKeySize(unsigned int keySize);
     
         /**
          * Set the key algorithm and size criteria based on an XML algorithm specifier.
@@ -152,27 +132,21 @@ namespace xmltooling {
          * 
          * @return an immutable set of key names
          */
-        const std::set<std::string>& getKeyNames() const {
-            return m_keyNames;
-        }
+        const std::set<std::string>& getKeyNames() const;
 
         /**
          * Gets key name criteria.
          * 
          * @return a mutable set of key names
          */
-        std::set<std::string>& getKeyNames() {
-            return m_keyNames;
-        }
+        std::set<std::string>& getKeyNames();
 
         /**
          * Returns the public key criteria.
          * 
          * @return  a public key
          */
-        virtual XSECCryptoKey* getPublicKey() const {
-            return m_key;
-        }
+        virtual XSECCryptoKey* getPublicKey() const;
 
         /**
          * Sets the public key criteria.
@@ -182,9 +156,7 @@ namespace xmltooling {
          * 
          * @param key a public key
          */
-        void setPublicKey(XSECCryptoKey* key) {
-            m_key = key;
-        }
+        void setPublicKey(XSECCryptoKey* key);
 
         /**
          * Bitmask constants controlling the kinds of criteria set automatically
@@ -200,9 +172,7 @@ namespace xmltooling {
          * 
          * @return the KeyInfo criteria
          */
-        const xmlsignature::KeyInfo* getKeyInfo() const {
-            return m_keyInfo;
-        }
+        const xmlsignature::KeyInfo* getKeyInfo() const;
     
         /**
          * Sets the KeyInfo criteria.
@@ -217,9 +187,7 @@ namespace xmltooling {
          * 
          * @return the native KeyInfo criteria
          */
-        DSIGKeyInfoList* getNativeKeyInfo() const {
-            return m_nativeKeyInfo;
-        }
+        DSIGKeyInfoList* getNativeKeyInfo() const;
 
         /**
          * Sets the KeyInfo criteria.

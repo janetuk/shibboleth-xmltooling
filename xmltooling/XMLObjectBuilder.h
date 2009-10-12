@@ -45,7 +45,7 @@ namespace xmltooling {
     {
     MAKE_NONCOPYABLE(XMLObjectBuilder);
     public:
-        virtual ~XMLObjectBuilder() {}
+        virtual ~XMLObjectBuilder();
         
         /**
          * Creates an empty XMLObject with a particular element name.
@@ -67,9 +67,7 @@ namespace xmltooling {
          * @param q     QName of element for object
          * @return the empty XMLObject
          */
-        XMLObject* buildFromQName(const QName& q) const {
-            return buildObject(q.getNamespaceURI(),q.getLocalPart(),q.getPrefix());
-        }
+        XMLObject* buildFromQName(const QName& q) const;
 
         /**
          * Creates an unmarshalled XMLObject from a DOM Element.
@@ -78,13 +76,7 @@ namespace xmltooling {
          * @param bindDocument  true iff the XMLObject should take ownership of the DOM Document
          * @return the unmarshalled XMLObject
          */
-        XMLObject* buildFromElement(xercesc::DOMElement* element, bool bindDocument=false) const {
-            std::auto_ptr<XMLObject> ret(
-                buildObject(element->getNamespaceURI(),element->getLocalName(),element->getPrefix(),XMLHelper::getXSIType(element))
-                );
-            ret->unmarshall(element,bindDocument);
-            return ret.release();
-        }
+        XMLObject* buildFromElement(xercesc::DOMElement* element, bool bindDocument=false) const;
 
         /**
          * Creates an unmarshalled XMLObject from the root of a DOM Document.
@@ -93,9 +85,7 @@ namespace xmltooling {
          * @param bindDocument  true iff the XMLObject should take ownership of the DOM Document
          * @return the unmarshalled XMLObject
          */
-        XMLObject* buildFromDocument(xercesc::DOMDocument* doc, bool bindDocument=true) const {
-            return buildFromElement(doc->getDocumentElement(),bindDocument);
-        }
+        XMLObject* buildFromDocument(xercesc::DOMDocument* doc, bool bindDocument=true) const;
 
         /**
          * Creates an unmarshalled XMLObject using the default build method, if a builder can be found.
@@ -104,10 +94,7 @@ namespace xmltooling {
          * @param bindDocument  true iff the new XMLObject should take ownership of the DOM Document
          * @return  the unmarshalled object or NULL if no builder is available 
          */
-        static XMLObject* buildOneFromElement(xercesc::DOMElement* element, bool bindDocument=false) {
-            const XMLObjectBuilder* b=getBuilder(element);
-            return b ? b->buildFromElement(element,bindDocument) : NULL;
-        }
+        static XMLObject* buildOneFromElement(xercesc::DOMElement* element, bool bindDocument=false);
 
         /**
          * Retrieves an XMLObjectBuilder using the key it was registered with.
@@ -115,10 +102,7 @@ namespace xmltooling {
          * @param key the key used to register the builder
          * @return the builder or NULL
          */
-        static const XMLObjectBuilder* getBuilder(const QName& key) {
-            std::map<QName,XMLObjectBuilder*>::const_iterator i=m_map.find(key);
-            return (i==m_map.end()) ? NULL : i->second;
-        }
+        static const XMLObjectBuilder* getBuilder(const QName& key);
 
         /**
          * Retrieves an XMLObjectBuilder for a given DOM element.
@@ -134,18 +118,14 @@ namespace xmltooling {
          * 
          * @return the default builder or NULL
          */
-        static const XMLObjectBuilder* getDefaultBuilder() {
-            return m_default;
-        }
+        static const XMLObjectBuilder* getDefaultBuilder();
 
         /**
          * Gets an immutable list of all the builders currently registered.
          * 
          * @return list of all the builders currently registered
          */
-        static const std::map<QName,XMLObjectBuilder*>& getBuilders() {
-            return m_map;
-        }
+        static const std::map<QName,XMLObjectBuilder*>& getBuilders();
     
         /**
          * Registers a new builder for the given key.
@@ -153,38 +133,26 @@ namespace xmltooling {
          * @param builderKey the key used to retrieve this builder later
          * @param builder the builder
          */
-        static void registerBuilder(const QName& builderKey, XMLObjectBuilder* builder) {
-            deregisterBuilder(builderKey);
-            m_map[builderKey]=builder;
-        }
+        static void registerBuilder(const QName& builderKey, XMLObjectBuilder* builder);
 
         /**
          * Registers a default builder
          * 
          * @param builder the default builder
          */
-        static void registerDefaultBuilder(XMLObjectBuilder* builder) {
-            deregisterDefaultBuilder();
-            m_default=builder;
-        }
+        static void registerDefaultBuilder(XMLObjectBuilder* builder);
 
         /**
          * Deregisters a builder.
          * 
          * @param builderKey the key for the builder to be deregistered
          */
-        static void deregisterBuilder(const QName& builderKey) {
-            delete getBuilder(builderKey);
-            m_map.erase(builderKey);
-        }
+        static void deregisterBuilder(const QName& builderKey);
 
         /**
          * Deregisters default builder.
          */
-        static void deregisterDefaultBuilder() {
-            delete m_default;
-            m_default=NULL;
-        }
+        static void deregisterDefaultBuilder();
 
         /**
          * Unregisters and destroys all registered builders. 
@@ -192,7 +160,7 @@ namespace xmltooling {
         static void destroyBuilders();
 
     protected:
-        XMLObjectBuilder() {}
+        XMLObjectBuilder();
     
     private:
         static std::map<QName,XMLObjectBuilder*> m_map;

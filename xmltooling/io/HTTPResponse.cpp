@@ -24,10 +24,42 @@
 #include "HTTPResponse.h"
 
 using namespace xmltooling;
+using std::istream;
+
+GenericResponse::GenericResponse()
+{
+}
+
+GenericResponse::~GenericResponse()
+{
+}
+
+HTTPResponse::HTTPResponse()
+{
+}
+
+HTTPResponse::~HTTPResponse()
+{
+}
+
+void HTTPResponse::setContentType(const char* type)
+{
+    setResponseHeader("Content-Type", type);
+}
 
 void HTTPResponse::setCookie(const char* name, const char* value)
 {
     std::string cookie(name);
     cookie = cookie + '=' + value;
     setResponseHeader("Set-Cookie", cookie.c_str());
+}
+
+long HTTPResponse::sendError(istream& inputStream)
+{
+    return sendResponse(inputStream, XMLTOOLING_HTTP_STATUS_ERROR);
+}
+
+long HTTPResponse::sendResponse(istream& inputStream)
+{
+    return sendResponse(inputStream, XMLTOOLING_HTTP_STATUS_OK);
 }

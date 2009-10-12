@@ -167,6 +167,11 @@ DOMElement* XMLHelper::appendChildElement(DOMElement* parentElement, DOMElement*
     return childElement;
 }
 
+bool XMLHelper::isNodeNamed(const xercesc::DOMNode* n, const XMLCh* ns, const XMLCh* local)
+{
+    return (n && XMLString::equals(local,n->getLocalName()) && XMLString::equals(ns,n->getNamespaceURI()));
+}
+
 const XMLCh* XMLHelper::getTextContent(const DOMElement* e)
 {
     DOMNode* child=e->getFirstChild();

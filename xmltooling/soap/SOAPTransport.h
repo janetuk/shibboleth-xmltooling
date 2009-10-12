@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,9 +43,9 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(SOAPTransport);
     protected:
-        SOAPTransport() {}
+        SOAPTransport();
     public:
-        virtual ~SOAPTransport() {}
+        virtual ~SOAPTransport();
 
         /**
          * A simple structure to capture SOAP addressing information.
@@ -166,9 +166,7 @@ namespace xmltooling {
          * @param value     implementation- and option-specific string to use
          * @return  true iff the transport supports the option and value supplied
          */
-        virtual bool setProviderOption(const char* provider, const char* option, const char* value) {
-            return false;
-        }
+        virtual bool setProviderOption(const char* provider, const char* option, const char* value);
 
         /**
          * Sends a stream of data over the transport. The function may return without

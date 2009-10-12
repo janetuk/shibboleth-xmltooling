@@ -22,7 +22,8 @@
 
 #include "internal.h"
 #include "security/KeyInfoResolver.h"
-#include "security/TrustEngine.h"
+#include "security/SignatureTrustEngine.h"
+#include "security/OpenSSLTrustEngine.h"
 #include "util/XMLHelper.h"
 
 #include <xercesc/util/XMLUniDefs.hpp>
@@ -64,4 +65,28 @@ TrustEngine::TrustEngine(const DOMElement* e) : m_keyInfoResolver(NULL)
 TrustEngine::~TrustEngine()
 {
     delete m_keyInfoResolver;
+}
+
+SignatureTrustEngine::SignatureTrustEngine(const DOMElement* e) : TrustEngine(e)
+{
+}
+
+SignatureTrustEngine::~SignatureTrustEngine()
+{
+}
+
+X509TrustEngine::X509TrustEngine(const DOMElement* e) : TrustEngine(e)
+{
+}
+
+X509TrustEngine::~X509TrustEngine()
+{
+}
+
+OpenSSLTrustEngine::OpenSSLTrustEngine(const DOMElement* e) : X509TrustEngine(e)
+{
+}
+
+OpenSSLTrustEngine::~OpenSSLTrustEngine()
+{
 }

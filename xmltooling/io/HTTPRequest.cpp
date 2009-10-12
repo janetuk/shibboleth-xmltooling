@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * HTTPRequest.cpp
  * 
- * Interface to HTTP requests  
+ * Interface to HTTP requests.
  */
 
 #include "internal.h"
@@ -25,6 +25,27 @@
 
 using namespace xmltooling;
 using namespace std;
+
+GenericRequest::GenericRequest()
+{
+}
+
+GenericRequest::~GenericRequest()
+{
+}
+
+HTTPRequest::HTTPRequest()
+{
+}
+
+HTTPRequest::~HTTPRequest()
+{
+}
+
+bool HTTPRequest::isSecure() const
+{
+    return strcmp(getScheme(),"https")==0;
+}
 
 const char* HTTPRequest::getCookie(const char* name) const
 {

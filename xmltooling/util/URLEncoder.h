@@ -37,10 +37,9 @@ namespace xmltooling {
     class XMLTOOL_API URLEncoder {
         MAKE_NONCOPYABLE(URLEncoder);
     public:
-        /** Default constructor. */
-        URLEncoder() {}
+        URLEncoder();
 
-        virtual ~URLEncoder() {}
+        virtual ~URLEncoder();
 
         /**
          * Produce a URL-safe but equivalent version of the input string.

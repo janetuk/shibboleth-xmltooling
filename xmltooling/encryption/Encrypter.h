@@ -23,16 +23,20 @@
 #if !defined(__xmltooling_encrypter_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_encrypter_h__
 
-#include <xmltooling/encryption/Encryption.h>
+#include <xmltooling/exceptions.h>
 
-#include <xsec/enc/XSECCryptoKey.hpp>
-#include <xsec/xenc/XENCCipher.hpp>
+#include <xsec/dsig/DSIGConstants.hpp>
+
+class XENCCipher;
 
 namespace xmltooling {
     class XMLTOOL_API Credential;
 };
 
 namespace xmlencryption {
+
+    class XMLTOOL_API EncryptedData;
+    class XMLTOOL_API EncryptedKey;
 
     /**
      * Wrapper API for XML Encryption functionality.
@@ -82,11 +86,9 @@ namespace xmlencryption {
                 unsigned int keyBufferSize=0,
                 const xmltooling::Credential* credential=NULL,
                 bool compact=false
-                ) :  m_algorithm(algorithm), m_keyBuffer(keyBuffer), m_keyBufferSize(keyBufferSize),
-                    m_credential(credential), m_compact(compact) {
-            }
+                );
 
-            ~EncryptionParams() {}
+            ~EncryptionParams();
 
             /** Data encryption algorithm. */
             const XMLCh* m_algorithm;
@@ -116,13 +118,10 @@ namespace xmlencryption {
              * @param recipient     optional name of recipient of encrypted key
              */
             KeyEncryptionParams(
-                const xmltooling::Credential& credential,
-                const XMLCh* algorithm=NULL,
-                const XMLCh* recipient=NULL
-                ) : m_credential(credential), m_algorithm(algorithm), m_recipient(recipient) {
-            }
+                const xmltooling::Credential& credential, const XMLCh* algorithm=NULL, const XMLCh* recipient=NULL
+                );
         
-            ~KeyEncryptionParams() {}
+            ~KeyEncryptionParams();
 
             /** Credential containing key encryption key. */
             const xmltooling::Credential& m_credential;
@@ -134,7 +133,7 @@ namespace xmlencryption {
             const XMLCh* m_recipient;
         };
     
-        Encrypter() : m_cipher(NULL) {}
+        Encrypter();
 
         virtual ~Encrypter();
         

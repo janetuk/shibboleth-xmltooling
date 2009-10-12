@@ -44,36 +44,30 @@ namespace xmltooling {
          *
          * @param keyInfo   surrounding KeyInfo context object
          */
-        KeyInfoCredentialContext(const xmlsignature::KeyInfo* keyInfo=NULL) : m_keyInfo(keyInfo), m_nativeKeyInfo(NULL) {
-        }
+        KeyInfoCredentialContext(const xmlsignature::KeyInfo* keyInfo=NULL);
 
         /**
          * Constructor
          *
          * @param keyInfo   surrounding native KeyInfo context object
          */
-        KeyInfoCredentialContext(DSIGKeyInfoList* keyInfo) : m_keyInfo(NULL), m_nativeKeyInfo(keyInfo) {
-        }
+        KeyInfoCredentialContext(DSIGKeyInfoList* keyInfo);
 
-        virtual ~KeyInfoCredentialContext() {}
+        virtual ~KeyInfoCredentialContext();
 
         /**
          * Gets the KeyInfo context.
          * 
          * @return the KeyInfo context
          */
-        const xmlsignature::KeyInfo* getKeyInfo() const {
-            return m_keyInfo;
-        }
+        const xmlsignature::KeyInfo* getKeyInfo() const;
 
         /**
          * Gets the native KeyInfo context.
          * 
          * @return the native KeyInfo context
          */
-        DSIGKeyInfoList* getNativeKeyInfo() const {
-            return m_nativeKeyInfo;
-        }
+        DSIGKeyInfoList* getNativeKeyInfo() const;
 
     private:
         const xmlsignature::KeyInfo* m_keyInfo;

@@ -40,6 +40,10 @@ SignatureValidator::SignatureValidator(const Credential* credential) : m_key(NUL
 {
 }
 
+SignatureValidator::~SignatureValidator()
+{
+}
+
 void SignatureValidator::setKey(XSECCryptoKey* key)
 {
     m_key = key;

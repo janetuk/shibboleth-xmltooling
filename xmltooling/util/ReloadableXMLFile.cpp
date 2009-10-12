@@ -24,6 +24,7 @@
 #include "util/NDC.h"
 #include "util/PathResolver.h"
 #include "util/ReloadableXMLFile.h"
+#include "util/Threads.h"
 #include "util/XMLConstants.h"
 #include "util/XMLHelper.h"
 

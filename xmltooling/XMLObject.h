@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 #ifndef __xmltooling_xmlobj_h__
 #define __xmltooling_xmlobj_h__
 
-#include <xmltooling/QName.h>
 #include <xmltooling/Namespace.h>
 #include <xmltooling/util/XMLConstants.h>
 
@@ -48,6 +47,7 @@ namespace xmltooling {
 #ifndef XMLTOOLING_NO_XMLSEC
     class XMLTOOL_API Credential;
 #endif
+    class XMLTOOL_API QName;
 
     /**
      * Object that represents an XML Element that has been unmarshalled into this C++ object.
@@ -55,7 +55,7 @@ namespace xmltooling {
     class XMLTOOL_API XMLObject
     {
     public:
-        virtual ~XMLObject() {}
+        virtual ~XMLObject();
         
         /**
          * Creates a copy of the object, along with all of its children.
@@ -284,22 +284,12 @@ namespace xmltooling {
         /**
          * A convenience method that is equal to calling releaseDOM() then releaseParentDOM(true).
          */
-        void releaseThisandParentDOM() const {
-            if (getDOM()) {
-                releaseDOM();
-                releaseParentDOM(true);
-            }
-        }
+        void releaseThisandParentDOM() const;
     
         /**
          * A convenience method that is equal to calling releaseChildrenDOM(true) then releaseDOM().
          */
-        void releaseThisAndChildrenDOM() const {
-            if (getDOM()) {
-                releaseChildrenDOM(true);
-                releaseDOM();
-            }
-        }
+        void releaseThisAndChildrenDOM() const;
 
         /**
          * Marshalls the XMLObject, and its children, into a DOM element.
@@ -362,7 +352,7 @@ namespace xmltooling {
         virtual XMLObject* unmarshall(xercesc::DOMElement* element, bool bindDocument=false)=0;
 
     protected:
-        XMLObject() {}
+        XMLObject();
     private:
         XMLObject& operator=(const XMLObject& src);
     };

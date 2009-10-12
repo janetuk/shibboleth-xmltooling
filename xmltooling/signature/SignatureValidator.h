@@ -17,7 +17,7 @@
 /**
  * @file xmltooling/signature/SignatureValidator.h
  * 
- * Validator for signatures based on an externally-supplied key 
+ * Validator for signatures based on an externally-supplied key.
  */
 
 #if !defined(__xmltooling_sigval_h__) && !defined(XMLTOOLING_NO_XMLSEC)
@@ -55,7 +55,7 @@ namespace xmlsignature {
          */
         SignatureValidator(const xmltooling::Credential* credential);
 
-        virtual ~SignatureValidator() {}
+        virtual ~SignatureValidator();
 
         void validate(const xmltooling::XMLObject* xmlObject) const;
 

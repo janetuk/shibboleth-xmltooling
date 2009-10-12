@@ -50,9 +50,9 @@ namespace xmltooling {
     class XMLTOOL_API KeyInfoResolver {
         MAKE_NONCOPYABLE(KeyInfoResolver);
     protected:
-        KeyInfoResolver() {}
+        KeyInfoResolver();
     public:
-        virtual ~KeyInfoResolver() {}
+        virtual ~KeyInfoResolver();
         
         /**
          * Returns a credential based on the supplied KeyInfo information.

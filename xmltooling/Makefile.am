@@ -168,6 +168,7 @@ common_sources = \
 	AbstractSimpleElement.cpp \
 	AbstractXMLObject.cpp \
 	exceptions.cpp \
+	Lockable.cpp \
 	Namespace.cpp \
 	QName.cpp \
 	unicode.cpp \

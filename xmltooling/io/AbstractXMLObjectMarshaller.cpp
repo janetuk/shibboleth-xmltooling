@@ -43,6 +43,23 @@ using namespace xmltooling;
 using namespace xercesc;
 using namespace std;
 
+AbstractXMLObjectMarshaller::AbstractXMLObjectMarshaller()
+{
+}
+
+AbstractXMLObjectMarshaller::~AbstractXMLObjectMarshaller()
+{
+}
+
+void AbstractXMLObjectMarshaller::setDocumentElement(DOMDocument* document, DOMElement* element) const
+{
+    DOMElement* documentRoot = document->getDocumentElement();
+    if (documentRoot)
+        document->replaceChild(element, documentRoot);
+    else
+        document->appendChild(element);
+}
+
 DOMElement* AbstractXMLObjectMarshaller::marshall(
     DOMDocument* document
 #ifndef XMLTOOLING_NO_XMLSEC
@@ -360,4 +377,8 @@ void AbstractXMLObjectMarshaller::marshallContent(
                 domElement->appendChild(domElement->getOwnerDocument()->createTextNode(val));
         }
     }
+}
+
+void AbstractXMLObjectMarshaller::marshallAttributes(DOMElement* domElement) const
+{
 }

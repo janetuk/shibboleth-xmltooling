@@ -43,7 +43,7 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(StorageService);
     public:
-        virtual ~StorageService() {}
+        virtual ~StorageService();
         
         /**
          * Creates a new "short" record in the storage service.
@@ -189,7 +189,7 @@ namespace xmltooling {
         virtual void deleteContext(const char* context)=0;
 
     protected:
-        StorageService() {}
+        StorageService();
     };
 
     /**

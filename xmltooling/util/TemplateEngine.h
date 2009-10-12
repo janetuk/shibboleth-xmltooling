@@ -58,11 +58,9 @@ namespace xmltooling {
     MAKE_NONCOPYABLE(TemplateEngine);
     public:
         /** Default constructor. */
-        TemplateEngine() {
-            setTagPrefix("mlp");
-        }
+        TemplateEngine();
 
-        virtual ~TemplateEngine() {}
+        virtual ~TemplateEngine();
 
         /**
          * Sets the tag name to use when locating template replacement tags.
@@ -77,8 +75,8 @@ namespace xmltooling {
          */
         class XMLTOOL_API TemplateParameters {
         public:
-            TemplateParameters() : m_request(NULL) {}
-            virtual ~TemplateParameters() {}
+            TemplateParameters();
+            virtual ~TemplateParameters();
 
             /** Map of known parameters to supply to template. */
             std::map<std::string,std::string> m_map;

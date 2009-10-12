@@ -37,6 +37,14 @@ static char x2c(char *what)
     return(digit);
 }
 
+URLEncoder::URLEncoder()
+{
+}
+
+URLEncoder::~URLEncoder()
+{
+}
+
 void URLEncoder::decode(char* s) const
 {
     register int x,y;

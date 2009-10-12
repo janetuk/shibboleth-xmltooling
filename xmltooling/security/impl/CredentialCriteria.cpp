@@ -35,6 +35,8 @@
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyDSA.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyRSA.hpp>
 
+using xmlsignature::KeyInfo;
+using xmlsignature::Signature;
 using namespace xmltooling;
 using namespace std;
 
@@ -47,6 +49,50 @@ CredentialCriteria::CredentialCriteria()
 CredentialCriteria::~CredentialCriteria()
 {
     delete m_credential;
+}
+
+unsigned int CredentialCriteria::getUsage() const
+{
+    return m_keyUsage;
+}
+
+void CredentialCriteria::setUsage(unsigned int usage)
+{
+    m_keyUsage = usage;
+}
+
+const char* CredentialCriteria::getPeerName() const
+{
+    return m_peerName.c_str();
+}
+
+void CredentialCriteria::setPeerName(const char* peerName)
+{
+    m_peerName.erase();
+    if (peerName)
+        m_peerName = peerName;
+}
+
+const char* CredentialCriteria::getKeyAlgorithm() const
+{
+    return m_keyAlgorithm.c_str();
+}
+
+void CredentialCriteria::setKeyAlgorithm(const char* keyAlgorithm)
+{
+    m_keyAlgorithm.erase();
+    if (keyAlgorithm)
+        m_keyAlgorithm = keyAlgorithm;
+}
+
+unsigned int CredentialCriteria::getKeySize() const
+{
+    return m_keySize;
+}
+
+void CredentialCriteria::setKeySize(unsigned int keySize)
+{
+    m_keySize = keySize;
 }
 
 void CredentialCriteria::setXMLAlgorithm(const XMLCh* algorithm)
@@ -62,7 +108,32 @@ void CredentialCriteria::setXMLAlgorithm(const XMLCh* algorithm)
     }
 }
 
-void CredentialCriteria::setKeyInfo(const xmlsignature::KeyInfo* keyInfo, int extraction)
+const set<string>& CredentialCriteria::getKeyNames() const
+{
+    return m_keyNames;
+}
+
+set<string>& CredentialCriteria::getKeyNames()
+{
+    return m_keyNames;
+}
+
+XSECCryptoKey* CredentialCriteria::getPublicKey() const
+{
+    return m_key;
+}
+
+void CredentialCriteria::setPublicKey(XSECCryptoKey* key)
+{
+    m_key = key;
+}
+
+const KeyInfo* CredentialCriteria::getKeyInfo() const
+{
+    return m_keyInfo;
+}
+
+void CredentialCriteria::setKeyInfo(const KeyInfo* keyInfo, int extraction)
 {
     delete m_credential;
     m_credential = NULL;
@@ -80,7 +151,12 @@ void CredentialCriteria::setKeyInfo(const xmlsignature::KeyInfo* keyInfo, int ex
         if (xcred)
             xcred->extract();
     }
-} 
+}
+
+DSIGKeyInfoList* CredentialCriteria::getNativeKeyInfo() const
+{
+    return m_nativeKeyInfo;
+}
 
 void CredentialCriteria::setNativeKeyInfo(DSIGKeyInfoList* keyInfo, int extraction)
 {
@@ -102,10 +178,10 @@ void CredentialCriteria::setNativeKeyInfo(DSIGKeyInfoList* keyInfo, int extracti
     }
 }
 
-void CredentialCriteria::setSignature(const xmlsignature::Signature& sig, int extraction)
+void CredentialCriteria::setSignature(const Signature& sig, int extraction)
 {
     setXMLAlgorithm(sig.getSignatureAlgorithm());
-    xmlsignature::KeyInfo* k = sig.getKeyInfo();
+    KeyInfo* k = sig.getKeyInfo();
     if (k)
         return setKeyInfo(k, extraction);
     DSIGSignature* dsig = sig.getXMLSignature();

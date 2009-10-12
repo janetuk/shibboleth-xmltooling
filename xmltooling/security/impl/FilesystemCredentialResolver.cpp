@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2008 Internet2
+ *  Copyright 2001-2009 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * FilesystemCredentialResolver.cpp
  *
- * Supplies credentials from local files
+ * Supplies credentials from local files.
  */
 
 #include "internal.h"
@@ -28,10 +28,13 @@
 #include "security/KeyInfoResolver.h"
 #include "security/OpenSSLCredential.h"
 #include "security/SecurityHelper.h"
+#include "security/XSECCryptoX509CRL.h"
 #include "util/NDC.h"
 #include "util/PathResolver.h"
+#include "util/Threads.h"
 #include "util/XMLHelper.h"
 
+#include <algorithm>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <openssl/pkcs12.h>

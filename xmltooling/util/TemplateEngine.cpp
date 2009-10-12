@@ -31,6 +31,23 @@ namespace {
     static const pair<const string,string> emptyPair;
 }
 
+TemplateEngine::TemplateEngine()
+{
+    setTagPrefix("mlp");
+}
+
+TemplateEngine::~TemplateEngine()
+{
+}
+
+TemplateEngine::TemplateParameters::TemplateParameters() : m_request(NULL)
+{
+}
+
+TemplateEngine::TemplateParameters::~TemplateParameters()
+{
+}
+
 const char* TemplateEngine::TemplateParameters::getParameter(const char* name) const
 {
     map<string,string>::const_iterator i=m_map.find(name);

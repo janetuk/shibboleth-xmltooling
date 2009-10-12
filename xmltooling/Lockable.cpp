@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,31 +15,45 @@
  */
 
 /**
- * StorageService.cpp
+ * Lockable.cpp
  * 
- * Generic data storage interface.
+ * Locking abstraction.
  */
 
 #include "internal.h"
-#include "util/StorageService.h"
+#include "Lockable.h"
 
 using namespace xmltooling;
-using namespace std;
 
-namespace xmltooling {
-    XMLTOOL_DLLLOCAL PluginManager<StorageService,string,const xercesc::DOMElement*>::Factory MemoryStorageServiceFactory; 
-};
-
-void XMLTOOL_API xmltooling::registerStorageServices()
-{
-    XMLToolingConfig& conf=XMLToolingConfig::getConfig();
-    conf.StorageServiceManager.registerFactory(MEMORY_STORAGE_SERVICE, MemoryStorageServiceFactory);
-}
-
-StorageService::StorageService()
+Lockable::Lockable()
 {
 }
 
-StorageService::~StorageService()
+Lockable::~Lockable()
 {
+}
+        
+Locker::Locker(Lockable* lockee, bool lock)
+{
+    if (lockee && lock)
+        m_lockee=lockee->lock();
+    else
+        m_lockee=lockee;
+}
+
+void Locker::assign(Lockable* lockee, bool lock)
+{
+    if (m_lockee)
+        m_lockee->unlock();
+    m_lockee=NULL;
+    if (lockee && lock)
+        m_lockee=lockee->lock();
+    else
+        m_lockee=lockee;
+}
+
+Locker::~Locker()
+{
+    if (m_lockee)
+        m_lockee->unlock();
 }

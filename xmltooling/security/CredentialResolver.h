@@ -37,10 +37,10 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(CredentialResolver);
     protected:
-        CredentialResolver() {}
+        CredentialResolver();
         
     public:
-        virtual ~CredentialResolver() {}
+        virtual ~CredentialResolver();
         
         /**
          * Returns a single Credential according to the supplied criteria.

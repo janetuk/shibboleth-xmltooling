@@ -35,7 +35,7 @@ namespace xmlsignature {
     {
         MAKE_NONCOPYABLE(ContentReference);
     public:
-        virtual ~ContentReference() {}
+        virtual ~ContentReference();
 
         /**
          * Given a native signature, asks the object to create the reference(s).
@@ -46,7 +46,7 @@ namespace xmlsignature {
         
     protected:
         /** Default constructor. */
-        ContentReference() {}
+        ContentReference();
     };
 };
 

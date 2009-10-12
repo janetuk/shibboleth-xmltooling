@@ -176,9 +176,7 @@ namespace xmltooling {
          * @param local local name to compare with
          * @return  true iff the node's qualified name matches the other parameters
          */
-        static bool isNodeNamed(const xercesc::DOMNode* n, const XMLCh* ns, const XMLCh* local) {
-            return (n && xercesc::XMLString::equals(local,n->getLocalName()) && xercesc::XMLString::equals(ns,n->getNamespaceURI()));
-        }
+        static bool isNodeNamed(const xercesc::DOMNode* n, const XMLCh* ns, const XMLCh* local);
 
         /**
          * Returns the first matching child element of the node if any.

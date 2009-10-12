@@ -369,6 +369,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Lockable.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Namespace.cpp"
 				>
 			</File>

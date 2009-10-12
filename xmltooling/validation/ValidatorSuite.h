@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@
 #define __xmltooling_valsuite_h__
 
 #include <xmltooling/QName.h>
-#include <xmltooling/validation/Validator.h>
 
 #include <map>
+#include <string>
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -34,6 +34,8 @@
 #endif
 
 namespace xmltooling {
+
+    class XMLTOOL_API Validator;
 
     /**
      * A collection of validators that can be applied to an XMLObject and its children. These collections can represent
@@ -51,20 +53,16 @@ namespace xmltooling {
          * 
          * @param id    an identifier for the suite
          */
-        ValidatorSuite(const char* id) : m_id(id) {}
+        ValidatorSuite(const char* id);
         
-        ~ValidatorSuite() {
-            destroyValidators();
-        }
+        ~ValidatorSuite();
 
         /**
          * Gets a unique ID for this suite.
          * 
          * @return a unique ID for this suite
          */
-        const char* getId() {
-            return m_id.c_str();
-        }
+        const char* getId();
 
         /**
          * Evaluates the registered validators against the given XMLObject and it's children.
@@ -81,9 +79,7 @@ namespace xmltooling {
          * @param key       the key used to retrieve the validator
          * @param validator the validator
          */
-        void registerValidator(const QName& key, Validator* validator) {
-            m_map.insert(std::pair<const QName,Validator*>(key, validator));
-        }
+        void registerValidator(const QName& key, Validator* validator);
 
         /**
          * Deregisters validators.

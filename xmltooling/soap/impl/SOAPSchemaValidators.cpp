@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2007 Internet2
+*  Copyright 2001-2009 Internet2
  * 
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,13 @@
 /**
  * SOAPSchemaValidators.cpp
  * 
- * Schema validators for SOAP schema
+ * Schema validators for SOAP schema.
  */
 
 #include "internal.h"
 #include "exceptions.h"
 #include "soap/SOAP.h"
+#include "validation/Validator.h"
 #include "validation/ValidatorSuite.h"
 
 using namespace soap11;

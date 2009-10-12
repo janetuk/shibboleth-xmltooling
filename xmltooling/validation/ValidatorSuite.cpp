@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,40 @@
  */
 
 #include "internal.h"
+#include "validation/Validator.h"
 #include "validation/ValidatorSuite.h"
-#include "util/XMLHelper.h"
 
 using namespace xmltooling;
 using namespace std;
 
+Validator::Validator()
+{
+}
+
+Validator::~Validator()
+{
+}
+
 ValidatorSuite xmltooling::SchemaValidators("SchemaValidators");
+
+ValidatorSuite::ValidatorSuite(const char* id) : m_id(id)
+{
+}
+
+ValidatorSuite::~ValidatorSuite()
+{
+    destroyValidators();
+}
+
+const char* ValidatorSuite::getId()
+{
+    return m_id.c_str();
+}
+
+void ValidatorSuite::registerValidator(const QName& key, Validator* validator)
+{
+    m_map.insert(pair<const QName,Validator*>(key, validator));
+}
 
 void ValidatorSuite::deregisterValidators(const QName& key)
 {

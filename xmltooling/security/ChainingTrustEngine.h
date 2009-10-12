@@ -26,6 +26,8 @@
 #include <xmltooling/security/OpenSSLTrustEngine.h>
 #include <xmltooling/security/SignatureTrustEngine.h>
 
+#include <vector>
+
 namespace xmltooling {
 
     /**

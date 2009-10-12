@@ -38,13 +38,11 @@ namespace xmltooling {
      */
     class XMLTOOL_API HTTPResponse : public GenericResponse {
     protected:
-        HTTPResponse() {}
+        HTTPResponse();
     public:
-        virtual ~HTTPResponse() {}
+        virtual ~HTTPResponse();
         
-        void setContentType(const char* type) {
-            setResponseHeader("Content-Type", type);
-        }
+        void setContentType(const char* type);
         
         /**
          * Sets or clears a response header.
@@ -81,15 +79,10 @@ namespace xmltooling {
             XMLTOOLING_HTTP_STATUS_ERROR = 500
         };
         
+        long sendError(std::istream& inputStream);
+
         using GenericResponse::sendResponse;
-
-        long sendError(std::istream& inputStream) {
-            return sendResponse(inputStream, XMLTOOLING_HTTP_STATUS_ERROR);
-        }
-
-        long sendResponse(std::istream& inputStream) {
-            return sendResponse(inputStream, XMLTOOLING_HTTP_STATUS_OK);
-        }
+        long sendResponse(std::istream& inputStream);
     };
 };
 

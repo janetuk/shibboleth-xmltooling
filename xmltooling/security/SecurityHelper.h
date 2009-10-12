@@ -25,6 +25,7 @@
 
 #include <xmltooling/base.h>
 
+#include <string>
 #include <vector>
 
 class XSECCryptoKey;

@@ -65,10 +65,7 @@ namespace xmltooling {
          * @param s         value to check
          * @param expires   time for disposal of value from cache
          */
-        bool check(const char* context, const XMLCh* s, time_t expires) {
-            auto_ptr_char temp(s);
-            return check(context, temp.get(), expires);
-        }
+        bool check(const char* context, const XMLCh* s, time_t expires);
         
     private:
         bool m_owned;

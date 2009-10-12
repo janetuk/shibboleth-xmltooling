@@ -24,9 +24,14 @@
 #define __xmltooling_basicx509cred_h__
 
 #include <xmltooling/security/X509Credential.h>
-#include <xmltooling/signature/KeyInfo.h>
 
-#include <algorithm>
+#include <set>
+#include <vector>
+#include <string>
+
+namespace xmlsignature {
+    class XMLTOOL_API KeyInfo;
+};
 
 namespace xmltooling {
 
@@ -101,7 +106,7 @@ namespace xmltooling {
     public:
         virtual ~BasicX509Credential();
         
-        // Virtual overrides.
+        // Virtual function overrides.
         unsigned int getUsage() const;
         const char* getAlgorithm() const;
         unsigned int getKeySize() const;

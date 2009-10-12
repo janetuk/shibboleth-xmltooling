@@ -23,9 +23,9 @@
 #if !defined(__xmltooling_decrypter_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_decrypter_h__
 
-#include <xmltooling/encryption/Encryption.h>
+#include <xmltooling/exceptions.h>
 
-#include <xsec/xenc/XENCCipher.hpp>
+class XENCCipher;
 
 namespace xmltooling {
     class XMLTOOL_API CredentialCriteria;
@@ -34,6 +34,8 @@ namespace xmltooling {
 
 namespace xmlencryption {
 
+    class XMLTOOL_API EncryptedData;
+    class XMLTOOL_API EncryptedKey;
     class XMLTOOL_API EncryptedKeyResolver;
 
     /**
@@ -53,8 +55,7 @@ namespace xmlencryption {
             const xmltooling::CredentialResolver* credResolver=NULL,
             xmltooling::CredentialCriteria* criteria=NULL,
             const EncryptedKeyResolver* EKResolver=NULL
-            ) : m_cipher(NULL), m_credResolver(credResolver), m_criteria(criteria), m_EKResolver(EKResolver) {
-        }
+            );
 
         virtual ~Decrypter();
         
@@ -63,9 +64,7 @@ namespace xmlencryption {
          * 
          * @param EKResolver  the EncryptedKeyResolver to attach 
          */
-        void setEncryptedKeyResolver(const EncryptedKeyResolver* EKResolver) {
-            m_EKResolver=EKResolver;
-        }
+        void setEncryptedKeyResolver(const EncryptedKeyResolver* EKResolver);
 
         /**
          * Replace the current CredentialResolver interface, if any, with a new one.
@@ -73,10 +72,7 @@ namespace xmlencryption {
          * @param resolver  the locked CredentialResolver to attach, or NULL to clear
          * @param criteria  optional external criteria to use with resolver
          */
-        void setKEKResolver(const xmltooling::CredentialResolver* resolver, xmltooling::CredentialCriteria* criteria) {
-            m_credResolver=resolver;
-            m_criteria=criteria;
-        }
+        void setKEKResolver(const xmltooling::CredentialResolver* resolver, xmltooling::CredentialCriteria* criteria);
 
         /**
          * Decrypts the supplied information using the supplied key, and returns

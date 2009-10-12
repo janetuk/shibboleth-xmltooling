@@ -35,16 +35,12 @@ namespace xmltooling {
     class XMLTOOL_API OpenSSLCryptoX509CRL : public XSECCryptoX509CRL {
     public:
         /** Default constructor. */
-    	OpenSSLCryptoX509CRL() : mp_X509CRL(NULL), m_DERX509CRL("") {}
+    	OpenSSLCryptoX509CRL();
     	virtual ~OpenSSLCryptoX509CRL();
 
-    	const XMLCh* getProviderName() const {
-            return DSIGConstants::s_unicodeStrPROVOpenSSL;
-        }
+    	const XMLCh* getProviderName() const;
     	void loadX509CRLBase64Bin(const char* buf, unsigned int len);
-    	safeBuffer& getDEREncodingSB(void) {
-            return m_DERX509CRL;
-        }
+    	safeBuffer& getDEREncodingSB();
     
         /**
          * Constructor
@@ -58,9 +54,7 @@ namespace xmltooling {
          * 
          * @return  native CRL object, or NULL
          */
-    	X509_CRL* getOpenSSLX509CRL() {
-            return mp_X509CRL;
-        }
+    	X509_CRL* getOpenSSLX509CRL();
 
         XSECCryptoX509CRL* clone() const;
     

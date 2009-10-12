@@ -163,18 +163,14 @@ namespace xmltooling {
          * 
          * @return  global KeyInfoResolver or NULL
          */
-        const KeyInfoResolver* getKeyInfoResolver() const {
-            return m_keyInfoResolver;
-        }
+        const KeyInfoResolver* getKeyInfoResolver() const;
 
         /**
          * Returns the global ReplayCache instance.
          * 
          * @return  global ReplayCache or NULL
          */
-        ReplayCache* getReplayCache() const {
-            return m_replayCache;
-        }
+        ReplayCache* getReplayCache() const;
 
         /**
          * Sets the global KeyInfoResolver instance.
@@ -200,27 +196,21 @@ namespace xmltooling {
          * 
          * @return  global PathResolver or NULL
          */
-        PathResolver* getPathResolver() const {
-            return m_pathResolver;
-        }
+        PathResolver* getPathResolver() const;
         
         /**
          * Returns the global TemplateEngine instance.
          * 
          * @return  global TemplateEngine or NULL
          */
-        TemplateEngine* getTemplateEngine() const {
-            return m_templateEngine;
-        }
+        TemplateEngine* getTemplateEngine() const;
 
         /**
          * Returns the global URLEncoder instance.
          * 
          * @return  global URLEncoder or NULL
          */
-        const URLEncoder* getURLEncoder() const {
-            return m_urlEncoder;
-        }
+        const URLEncoder* getURLEncoder() const;
 
         /**
          * Sets the global PathResolver instance.

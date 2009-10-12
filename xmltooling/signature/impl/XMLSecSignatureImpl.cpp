@@ -53,12 +53,12 @@ using namespace std;
 using xmlconstants::XMLSIG_NS;
 using xmlconstants::XMLSIG_PREFIX;
 
+namespace xmlsignature {
+
 #if defined (_MSC_VER)
     #pragma warning( push )
     #pragma warning( disable : 4250 4251 )
 #endif
-
-namespace xmlsignature {
     
     class XMLTOOL_DLLLOCAL XMLSecSignatureImpl : public UnknownElementImpl, public virtual Signature
     {
@@ -129,12 +129,27 @@ namespace xmlsignature {
         mutable KeyInfo* m_keyInfo;
         ContentReference* m_reference;
     };
-    
-};
 
 #if defined (_MSC_VER)
     #pragma warning( pop )
 #endif
+};
+
+ContentReference::ContentReference()
+{
+}
+
+ContentReference::~ContentReference()
+{
+}
+
+Signature::Signature()
+{
+}
+
+Signature::~Signature()
+{
+}
 
 XMLSecSignatureImpl::~XMLSecSignatureImpl()
 {

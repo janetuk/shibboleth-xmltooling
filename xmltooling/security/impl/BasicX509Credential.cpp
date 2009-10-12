@@ -22,6 +22,9 @@
 
 #include "internal.h"
 #include "security/BasicX509Credential.h"
+#include "security/KeyInfoCredentialContext.h"
+#include "security/OpenSSLCredential.h"
+#include "security/XSECCryptoX509CRL.h"
 #include "signature/KeyInfo.h"
 
 #include <algorithm>
@@ -31,6 +34,65 @@
 using namespace xmlsignature;
 using namespace xmltooling;
 using namespace std;
+
+Credential::Credential()
+{
+}
+
+Credential::~Credential()
+{
+}
+
+const CredentialContext* Credential::getCredentalContext() const
+{
+    return NULL;
+}
+
+X509Credential::X509Credential()
+{
+}
+
+X509Credential::~X509Credential()
+{
+}
+
+OpenSSLCredential::OpenSSLCredential()
+{
+}
+
+OpenSSLCredential::~OpenSSLCredential()
+{
+}
+
+CredentialContext::CredentialContext()
+{
+}
+
+CredentialContext::~CredentialContext()
+{
+}
+
+KeyInfoCredentialContext::KeyInfoCredentialContext(const KeyInfo* keyInfo) : m_keyInfo(keyInfo), m_nativeKeyInfo(NULL)
+{
+}
+
+KeyInfoCredentialContext::KeyInfoCredentialContext(DSIGKeyInfoList* keyInfo) : m_keyInfo(NULL), m_nativeKeyInfo(keyInfo)
+{
+}
+
+KeyInfoCredentialContext::~KeyInfoCredentialContext()
+{
+}
+
+const KeyInfo* KeyInfoCredentialContext::getKeyInfo() const
+{
+    return m_keyInfo;
+}
+
+DSIGKeyInfoList* KeyInfoCredentialContext::getNativeKeyInfo() const
+{
+    return m_nativeKeyInfo;
+}
 
 BasicX509Credential::BasicX509Credential(bool ownCerts) : m_key(NULL), m_ownCerts(ownCerts), m_keyInfo(NULL), m_compactKeyInfo(NULL)
 {

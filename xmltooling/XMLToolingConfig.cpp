@@ -33,6 +33,7 @@
 #include "security/OpenSSLCryptoX509CRL.h"
 #include "security/CredentialResolver.h"
 #include "security/KeyInfoResolver.h"
+#include "signature/KeyInfo.h"
 #include "signature/Signature.h"
 #include "soap/SOAP.h"
 #include "soap/SOAPTransport.h"
@@ -41,6 +42,7 @@
 #include "util/ReplayCache.h"
 #include "util/StorageService.h"
 #include "util/TemplateEngine.h"
+#include "util/Threads.h"
 #include "util/URLEncoder.h"
 #include "util/XMLConstants.h"
 #include "validation/ValidatorSuite.h"
@@ -204,10 +206,14 @@ bool XMLToolingInternalConfig::log_config(const char* config)
 }
 
 #ifndef XMLTOOLING_LITE
-void XMLToolingConfig::setReplayCache(ReplayCache* replayCache)
+const KeyInfoResolver* XMLToolingConfig::getKeyInfoResolver() const
 {
-    delete m_replayCache;
-    m_replayCache = replayCache;
+    return m_keyInfoResolver;
+}
+
+ReplayCache* XMLToolingConfig::getReplayCache() const
+{
+    return m_replayCache;
 }
 
 void XMLToolingConfig::setKeyInfoResolver(xmltooling::KeyInfoResolver *keyInfoResolver)
@@ -215,7 +221,28 @@ void XMLToolingConfig::setKeyInfoResolver(xmltooling::KeyInfoResolver *keyInfoRe
     delete m_keyInfoResolver;
     m_keyInfoResolver = keyInfoResolver;
 }
+
+void XMLToolingConfig::setReplayCache(ReplayCache* replayCache)
+{
+    delete m_replayCache;
+    m_replayCache = replayCache;
+}
 #endif
+
+PathResolver* XMLToolingConfig::getPathResolver() const
+{
+    return m_pathResolver;
+}
+
+TemplateEngine* XMLToolingConfig::getTemplateEngine() const
+{
+    return m_templateEngine;
+}
+
+const URLEncoder* XMLToolingConfig::getURLEncoder() const
+{
+    return m_urlEncoder;
+}
 
 void XMLToolingConfig::setPathResolver(PathResolver* pathResolver)
 {

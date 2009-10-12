@@ -23,8 +23,8 @@
 #if !defined(__xmltooling_sig_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_sig_h__
 
-#include <xmltooling/ConcreteXMLObjectBuilder.h>
 #include <xmltooling/exceptions.h>
+#include <xmltooling/ConcreteXMLObjectBuilder.h>
 
 class DSIGSignature;
 class XSECCryptoKey;
@@ -46,7 +46,7 @@ namespace xmlsignature {
     class XMLTOOL_API Signature : public virtual xmltooling::XMLObject
     {
     public:
-        virtual ~Signature() {}
+        virtual ~Signature();
 
         /** Element local name */
         static const XMLCh LOCAL_NAME[];
@@ -195,7 +195,7 @@ namespace xmlsignature {
 
     protected:
         /** Default constructor. */
-        Signature() {}
+        Signature();
     };
 
     /**

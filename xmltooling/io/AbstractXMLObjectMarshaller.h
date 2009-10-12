@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2007 Internet2
+*  Copyright 2001-2009 Internet2
  * 
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ namespace xmltooling {
     class XMLTOOL_API AbstractXMLObjectMarshaller : public virtual AbstractXMLObject
     {
     public:
-        virtual ~AbstractXMLObjectMarshaller() {}
+        virtual ~AbstractXMLObjectMarshaller();
 
         xercesc::DOMElement* marshall(
             xercesc::DOMDocument* document=NULL
@@ -57,7 +57,7 @@ namespace xmltooling {
             ) const;
         
     protected:
-        AbstractXMLObjectMarshaller() {}
+        AbstractXMLObjectMarshaller();
 
         /**
          * Sets the given element as the Document Element of the given Document.
@@ -66,13 +66,7 @@ namespace xmltooling {
          * @param document the document
          * @param element the Element that will serve as the Document Element
          */
-        void setDocumentElement(xercesc::DOMDocument* document, xercesc::DOMElement* element) const {
-            xercesc::DOMElement* documentRoot = document->getDocumentElement();
-            if (documentRoot)
-                document->replaceChild(element, documentRoot);
-            else
-                document->appendChild(element);
-        }
+        void setDocumentElement(xercesc::DOMDocument* document, xercesc::DOMElement* element) const;
     
 #ifndef XMLTOOLING_NO_XMLSEC
         /**
@@ -146,7 +140,7 @@ namespace xmltooling {
          * 
          * @throws MarshallingException thrown if there is a problem marshalling an attribute
          */
-        virtual void marshallAttributes(xercesc::DOMElement* domElement) const {}
+        virtual void marshallAttributes(xercesc::DOMElement* domElement) const;
     };
     
 };

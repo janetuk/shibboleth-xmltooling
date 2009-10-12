@@ -45,25 +45,14 @@ namespace xmltooling {
     public:
         virtual ~AbstractAttributeExtensibleXMLObject();
         
-        const XMLCh* getAttribute(const QName& qualifiedName) const {
-            std::map<QName,XMLCh*>::const_iterator i=m_attributeMap.find(qualifiedName);
-            return (i==m_attributeMap.end()) ? NULL : i->second;
-        }
-        
+        // Virtual function overrides.
+        const XMLCh* getAttribute(const QName& qualifiedName) const;
         void setAttribute(const QName& qualifiedName, const XMLCh* value, bool ID=false);
-    
-        const std::map<QName,XMLCh*>& getExtensionAttributes() const {
-            return m_attributeMap;
-        }
-        
-        const XMLCh* getXMLID() const {
-            return (m_idAttribute == m_attributeMap.end()) ? NULL : m_idAttribute->second;
-        }
+        const std::map<QName,XMLCh*>& getExtensionAttributes() const;
+        const XMLCh* getXMLID() const;
     
      protected:
-        AbstractAttributeExtensibleXMLObject() {
-            m_idAttribute = m_attributeMap.end();
-        }
+        AbstractAttributeExtensibleXMLObject();
 
         /** Copy constructor. */
         AbstractAttributeExtensibleXMLObject(const AbstractAttributeExtensibleXMLObject& src);
