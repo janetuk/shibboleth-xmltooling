@@ -17,7 +17,7 @@
 /**
  * XMLToolingConfig.cpp
  *
- * Library configuration
+ * Library configuration.
  */
 
 #include "internal.h"
@@ -26,8 +26,6 @@
 #include "XMLToolingConfig.h"
 #include "encryption/Encryption.h"
 #include "encryption/Encrypter.h"
-#include "io/HTTPRequest.h"
-#include "io/HTTPResponse.h"
 #include "impl/UnknownElement.h"
 #include "security/TrustEngine.h"
 #include "security/OpenSSLCryptoX509CRL.h"
@@ -36,7 +34,6 @@
 #include "signature/KeyInfo.h"
 #include "signature/Signature.h"
 #include "soap/SOAP.h"
-#include "soap/SOAPTransport.h"
 #include "util/NDC.h"
 #include "util/PathResolver.h"
 #include "util/ReplayCache.h"
@@ -44,7 +41,6 @@
 #include "util/TemplateEngine.h"
 #include "util/Threads.h"
 #include "util/URLEncoder.h"
-#include "util/XMLConstants.h"
 #include "validation/ValidatorSuite.h"
 
 #ifdef HAVE_DLFCN_H
@@ -137,6 +133,20 @@ XMLToolingConfig& XMLToolingConfig::getConfig()
 XMLToolingInternalConfig& XMLToolingInternalConfig::getInternalConfig()
 {
     return g_config;
+}
+
+#ifndef XMLTOOLING_NO_XMLSEC
+XMLToolingConfig::XMLToolingConfig()
+    : m_keyInfoResolver(NULL), m_replayCache(NULL), m_pathResolver(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180)
+#else
+XMLToolingConfig::XMLToolingConfig()
+    : m_pathResolver(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180)
+#endif
+{
+}
+
+XMLToolingConfig::~XMLToolingConfig()
+{
 }
 
 bool XMLToolingInternalConfig::log_config(const char* config)

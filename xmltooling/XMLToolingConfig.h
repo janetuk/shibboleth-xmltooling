@@ -17,7 +17,7 @@
 /**
  * @file xmltooling/XMLToolingConfig.h
  * 
- * Library configuration 
+ * Library configuration.
  */
 
 #ifndef __xmltooling_config_h__
@@ -26,16 +26,9 @@
 #include <xmltooling/Lockable.h>
 #include <xmltooling/PluginManager.h>
 #include <xmltooling/soap/SOAPTransport.h>
-#include <xmltooling/util/ParserPool.h>
 
-#ifndef XMLTOOLING_NO_XMLSEC
-namespace xmltooling {
-    class XMLTOOL_API CredentialResolver;
-    class XMLTOOL_API KeyInfoResolver;
-    class XMLTOOL_API TrustEngine;
-    class XMLTOOL_API XSECCryptoX509CRL;
-};
-#endif
+#include <string>
+#include <xercesc/dom/DOM.hpp>
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -44,12 +37,19 @@ namespace xmltooling {
 
 namespace xmltooling {
     
+    class XMLTOOL_API ParserPool;
     class XMLTOOL_API PathResolver;
     class XMLTOOL_API TemplateEngine;
     class XMLTOOL_API URLEncoder;
 #ifndef XMLTOOLING_LITE
     class XMLTOOL_API ReplayCache;
     class XMLTOOL_API StorageService;
+#endif
+#ifndef XMLTOOLING_NO_XMLSEC
+    class XMLTOOL_API CredentialResolver;
+    class XMLTOOL_API KeyInfoResolver;
+    class XMLTOOL_API TrustEngine;
+    class XMLTOOL_API XSECCryptoX509CRL;
 #endif
 
     /**
@@ -59,21 +59,18 @@ namespace xmltooling {
      * obtain a global system lock, but the actual configuration itself is not
      * synchronized.
      */
-    class XMLTOOL_API XMLToolingConfig : public Lockable
+    class XMLTOOL_API XMLToolingConfig : public virtual Lockable
     {
         MAKE_NONCOPYABLE(XMLToolingConfig);
     protected:
-#ifndef XMLTOOLING_NO_XMLSEC
-        XMLToolingConfig() : m_keyInfoResolver(NULL), m_replayCache(NULL),
-            m_pathResolver(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180) {}
+        XMLToolingConfig();
 
+#ifndef XMLTOOLING_NO_XMLSEC
         /** Global KeyInfoResolver instance. */
         KeyInfoResolver* m_keyInfoResolver;
 
         /** Global ReplayCache instance. */
         ReplayCache* m_replayCache;
-#else
-        XMLToolingConfig() : m_pathResolver(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180) {}
 #endif
 
         /** Global PathResolver instance. */
@@ -86,7 +83,7 @@ namespace xmltooling {
         URLEncoder* m_urlEncoder;
 
     public:
-        virtual ~XMLToolingConfig() {}
+        virtual ~XMLToolingConfig();
 
         /**
          * Returns the global configuration object for the library.
