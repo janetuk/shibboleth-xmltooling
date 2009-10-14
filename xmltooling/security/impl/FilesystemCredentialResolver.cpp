@@ -34,6 +34,7 @@
 #include "util/Threads.h"
 #include "util/XMLHelper.h"
 
+#include <memory>
 #include <algorithm>
 #include <sys/types.h>
 #include <sys/stat.h>
