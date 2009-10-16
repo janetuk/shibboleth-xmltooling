@@ -604,6 +604,25 @@
     }
 
 /**
+ * Implements get/set methods and a private member for a string XML attribute,
+ * plus a getXMLID override and attribute node clearance when DOM is dropped.
+ *
+ * @param proper    the proper name of the attribute
+ * @param ucase         the upcased name of the attribute
+ * @param namespaceURI  the XML namespace of the attribute
+ */
+#define IMPL_ID_ATTRIB_EX(proper, ucase, namespaceURI) \
+    IMPL_XMLOBJECT_ATTRIB(proper,XMLCh) \
+    const XMLCh* getXMLID() const { \
+        return m_##proper; \
+    } \
+    void releaseDOM() const { \
+        if (getDOM()) \
+            getDOM()->removeAttributeNS(namespaceURI, ucase##_ATTRIB_NAME); \
+        AbstractDOMCachingXMLObject::releaseDOM(); \
+    }
+
+/**
  * Implements get/set methods and a private member for a DateTime XML attribute.
  *
  * @param proper    the proper name of the attribute

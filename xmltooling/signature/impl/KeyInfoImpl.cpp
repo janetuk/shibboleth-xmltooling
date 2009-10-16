@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * KeyInfoImpl.cpp
  * 
- * Implementation classes for KeyInfo schema
+ * Implementation classes for KeyInfo schema.
  */
 
 #include "internal.h"
@@ -696,7 +696,7 @@ namespace xmlsignature {
         }
         
         IMPL_XMLOBJECT_CLONE(KeyInfo);
-        IMPL_ID_ATTRIB(Id);
+        IMPL_ID_ATTRIB_EX(Id,ID,NULL);
         IMPL_TYPED_CHILDREN(KeyName,m_children.end());
         IMPL_TYPED_CHILDREN(KeyValue,m_children.end());
         IMPL_TYPED_CHILDREN(RetrievalMethod,m_children.end());

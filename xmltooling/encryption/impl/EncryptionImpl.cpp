@@ -17,7 +17,7 @@
 /**
  * EncryptionImpl.cpp
  * 
- * Implementation classes for XML Encryption schema
+ * Implementation classes for XML Encryption schema.
  */
 
 #include "internal.h"
@@ -284,7 +284,7 @@ namespace xmlencryption {
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptionProperty);
-        IMPL_ID_ATTRIB(Id);
+        IMPL_ID_ATTRIB_EX(Id,ID,NULL);
         IMPL_STRING_ATTRIB(Target);
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject, m_children.end());
 
@@ -351,7 +351,7 @@ namespace xmlencryption {
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptionProperties);
-        IMPL_ID_ATTRIB(Id);
+        IMPL_ID_ATTRIB_EX(Id,ID,NULL);
         IMPL_TYPED_CHILDREN(EncryptionProperty,m_children.end());
 
     protected:
@@ -559,7 +559,7 @@ namespace xmlencryption {
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptedType);
-        IMPL_ID_ATTRIB(Id);
+        IMPL_ID_ATTRIB_EX(Id,ID,NULL);
         IMPL_STRING_ATTRIB(Type);
         IMPL_STRING_ATTRIB(MimeType);
         IMPL_STRING_ATTRIB(Encoding);
