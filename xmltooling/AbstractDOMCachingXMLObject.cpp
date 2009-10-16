@@ -65,9 +65,11 @@ void AbstractDOMCachingXMLObject::setDOM(DOMElement* dom, bool bindDocument) con
 
 void AbstractDOMCachingXMLObject::setDocument(DOMDocument* doc) const
 {
-    if (m_document)
-        m_document->release();
-    m_document=doc;
+    if (m_document != doc) {
+        if (m_document)
+            m_document->release();
+        m_document=doc;
+    }
 }
 
 void AbstractDOMCachingXMLObject::releaseDOM() const
@@ -94,15 +96,17 @@ void AbstractDOMCachingXMLObject::releaseParentDOM(bool propagateRelease) const
     }
 }
 
-class _release : public binary_function<XMLObject*,bool,void> {
-public:
-    void operator()(XMLObject* obj, bool propagate) const {
-        if (obj) {
-            obj->releaseDOM();
-            if (propagate)
-                obj->releaseChildrenDOM(propagate);
+namespace {
+    class _release : public binary_function<XMLObject*,bool,void> {
+    public:
+        void operator()(XMLObject* obj, bool propagate) const {
+            if (obj) {
+                obj->releaseDOM();
+                if (propagate)
+                    obj->releaseChildrenDOM(propagate);
+            }
         }
-    }
+    };
 };
 
 void AbstractDOMCachingXMLObject::releaseChildrenDOM(bool propagateRelease) const
