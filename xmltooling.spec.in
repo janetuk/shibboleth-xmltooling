@@ -43,6 +43,7 @@ support.
 Summary:    OpenSAML XMLTooling library
 Group:      Development/Libraries
 Provides:   @PACKAGE@ = %{version}
+Obsoletes:  @PACKAGE@
 
 %description -n lib@PACKAGE@4
 The XMLTooling library contains generic XML parsing and processing
@@ -56,10 +57,11 @@ This package contains just the shared library.
 
 %if 0%{?suse_version} > 1030
 %package -n lib@PACKAGE@-devel
-Requires: lib@PACKAGE@4 = %version
+Requires:   lib@PACKAGE@4 = %version
+Obsoletes:  @PACKAGE@-devel
 %else
 %package devel
-Requires: %name = %version
+Requires:   %name = %version
 %endif
 Summary: XMLTooling development Headers
 Group: Development/Libraries
