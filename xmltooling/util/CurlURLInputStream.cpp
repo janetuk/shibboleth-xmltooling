@@ -200,8 +200,10 @@ void CurlURLInputStream::init(const DOMElement* e)
                     if (opt < CURLOPTTYPE_OBJECTPOINT)
                         success = (curl_easy_setopt(fEasy, opt, strtol(value.get(), NULL, 10)) == CURLE_OK);
 #ifdef CURLOPTTYPE_OFF_T
-                    else if (opt < CURLOPTTYPE_OFF_T)
-                        success = (curl_easy_setopt(fEasy, opt, value.get()) == CURLE_OK);
+                    else if (opt < CURLOPTTYPE_OFF_T) {
+                        fSavedOptions.push_back(value.get());
+                        success = (curl_easy_setopt(fEasy, opt, fSavedOptions.back().c_str()) == CURLE_OK);
+                    }
 # ifdef HAVE_CURL_OFF_T
                     else if (sizeof(curl_off_t) == sizeof(long))
                         success = (curl_easy_setopt(fEasy, opt, strtol(value.get(), NULL, 10)) == CURLE_OK);
@@ -212,8 +214,10 @@ void CurlURLInputStream::init(const DOMElement* e)
                     else
                         success = false;
 #else
-                    else
-                        success = (curl_easy_setopt(fEasy, opt, value.get()) == CURLE_OK);
+                    else {
+                        fSavedOptions.push_back(value.get());
+                        success = (curl_easy_setopt(fEasy, opt, fSavedOptions.back().c_str()) == CURLE_OK);
+                    }
 #endif
                     if (!success)
                         fLog.error("failed to set transport option (%s)", option.get());
