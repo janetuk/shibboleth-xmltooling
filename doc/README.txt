@@ -1,12 +1,8 @@
 VERSION 1.3
 
-Unreleased
-
-VERSION 1.2.2
-
 Issues addressed by this release:
 ---------------------------------
-https://bugs.internet2.edu/jira/secure/IssueNavigator.jspa?reset=true&&pid=10009&fixfor=10243&status=5&status=6&sorter/field=issuekey&sorter/order=ASC
+https://bugs.internet2.edu/jira/browse/CPPXT/fixforversion/10253
 
 Documentation:
 --------------
