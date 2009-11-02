@@ -133,6 +133,16 @@ namespace xmltooling {
         static bool matches(const XSECCryptoKey& key1, const XSECCryptoKey& key2);
 
         /**
+         * Performs a hash operation over the supplied data and returns a hex-encoded string.
+         *
+         * @param hashAlg   name of hash algorithm, syntax specific to crypto provider
+         * @param buf       input data to hash
+         * @param buflen    length of input data
+         * @return  hex-encoded result of hash operation, or an empty string
+         */
+        static std::string doHash(const char* hashAlg, const char* buf, unsigned long buflen);
+
+        /**
          * Returns the base64-encoded DER encoding of a public key in SubjectPublicKeyInfo format.
          * <p>If a hash algorithm is provided, the data is digested before being base64-encoded.
          *

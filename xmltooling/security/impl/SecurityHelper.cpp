@@ -484,6 +484,40 @@ bool SecurityHelper::matches(const XSECCryptoKey& key1, const XSECCryptoKey& key
     return false;
 }
 
+string SecurityHelper::doHash(const char* hashAlg, const char* buf, unsigned long buflen)
+{
+    static char DIGITS[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    string ret;
+
+    const EVP_MD* md = EVP_get_digestbyname(hashAlg);
+    if (!md) {
+        Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("hash algorithm (%s) not available", hashAlg);
+        return ret;
+    }
+
+    BIO* chain = BIO_new(BIO_s_mem());
+    BIO* b = BIO_new(BIO_f_md());
+    BIO_set_md(b, md);
+    chain = BIO_push(b, chain);
+    BIO_write(chain, buf, buflen);
+    BIO_flush(chain);
+
+    char digest[EVP_MAX_MD_SIZE];
+    int len = BIO_gets(chain, digest, EVP_MD_size(md));
+    BIO_free_all(chain);
+    if (len != EVP_MD_size(md)) {
+        Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error(
+            "hash result length (%d) did not match expected value (%d)", len, EVP_MD_size(md)
+            );
+        return ret;
+    }
+    for (unsigned int i=0; i < len; ++i) {
+        ret+=(DIGITS[((unsigned char)(0xF0 & digest[i])) >> 4 ]);
+        ret+=(DIGITS[0x0F & digest[i]]);
+    }
+    return ret;
+}
+
 string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, const char* hash, bool nowrap)
 {
     string ret;
