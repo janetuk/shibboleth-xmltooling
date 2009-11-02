@@ -484,7 +484,7 @@ bool SecurityHelper::matches(const XSECCryptoKey& key1, const XSECCryptoKey& key
     return false;
 }
 
-string SecurityHelper::doHash(const char* hashAlg, const char* buf, unsigned long buflen)
+string SecurityHelper::doHash(const char* hashAlg, const char* buf, unsigned long buflen, bool toHex)
 {
     static char DIGITS[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
     string ret;
@@ -511,9 +511,16 @@ string SecurityHelper::doHash(const char* hashAlg, const char* buf, unsigned lon
             );
         return ret;
     }
-    for (unsigned int i=0; i < len; ++i) {
-        ret+=(DIGITS[((unsigned char)(0xF0 & digest[i])) >> 4 ]);
-        ret+=(DIGITS[0x0F & digest[i]]);
+    if (toHex) {
+        for (int i=0; i < len; ++i) {
+            ret += (DIGITS[((unsigned char)(0xF0 & digest[i])) >> 4 ]);
+            ret += (DIGITS[0x0F & digest[i]]);
+        }
+    }
+    else {
+        for (int i=0; i < len; ++i) {
+            ret += digest[i];
+        }
     }
     return ret;
 }
