@@ -484,7 +484,7 @@ bool SecurityHelper::matches(const XSECCryptoKey& key1, const XSECCryptoKey& key
     return false;
 }
 
-string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, bool hash, bool nowrap, const char* hashAlg)
+string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, const char* hash, bool nowrap)
 {
     string ret;
 
@@ -500,10 +500,10 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, bool hash, bool 
             return ret;
         }
         const EVP_MD* md=NULL;
-        if (hash && hashAlg) {
-            md = EVP_get_digestbyname(hashAlg);
+        if (hash) {
+            md = EVP_get_digestbyname(hash);
             if (!md) {
-                Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("hash algorithm (%s) not available", hashAlg);
+                Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("hash algorithm (%s) not available", hash);
                 return ret;
             }
         }
@@ -546,10 +546,10 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, bool hash, bool 
             return ret;
         }
         const EVP_MD* md=NULL;
-        if (hash && hashAlg) {
-            md = EVP_get_digestbyname(hashAlg);
+        if (hash) {
+            md = EVP_get_digestbyname(hash);
             if (!md) {
-                Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("hash algorithm (%s) not available", hashAlg);
+                Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("hash algorithm (%s) not available", hash);
                 return ret;
             }
         }
@@ -591,7 +591,7 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, bool hash, bool 
     return ret;
 }
 
-string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, bool hash, bool nowrap, const char* hashAlg)
+string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, const char* hash, bool nowrap)
 {
     string ret;
 
@@ -601,10 +601,10 @@ string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, bool hash, boo
     }
 
     const EVP_MD* md=NULL;
-    if (hash && hashAlg) {
-        md = EVP_get_digestbyname(hashAlg);
+    if (hash) {
+        md = EVP_get_digestbyname(hash);
         if (!md) {
-            Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("hash algorithm (%s) not available", hashAlg);
+            Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("hash algorithm (%s) not available", hash);
             return ret;
         }
     }
@@ -647,12 +647,27 @@ string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, bool hash, boo
     return ret;
 }
 
-string SecurityHelper::getDEREncoding(const Credential& cred, bool hash, bool nowrap, const char* hashAlg)
+string SecurityHelper::getDEREncoding(const Credential& cred, const char* hash, bool nowrap)
 {
     const X509Credential* x509 = dynamic_cast<const X509Credential*>(&cred);
     if (x509 && !x509->getEntityCertificateChain().empty())
-        return getDEREncoding(*(x509->getEntityCertificateChain().front()), hash, nowrap, hashAlg);
+        return getDEREncoding(*(x509->getEntityCertificateChain().front()), hash, nowrap);
     else if (cred.getPublicKey())
-        return getDEREncoding(*(cred.getPublicKey()), hash, nowrap, hashAlg);
+        return getDEREncoding(*(cred.getPublicKey()), hash, nowrap);
     return "";
+}
+
+string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, bool hash, bool nowrap)
+{
+    return getDEREncoding(key, hash ? "SHA1" : NULL, nowrap);
+}
+
+string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, bool hash, bool nowrap)
+{
+    return getDEREncoding(cert, hash ? "SHA1" : NULL, nowrap);
+}
+
+string SecurityHelper::getDEREncoding(const Credential& cred, bool hash, bool nowrap)
+{
+    return getDEREncoding(cred, hash ? "SHA1" : NULL, nowrap);
 }

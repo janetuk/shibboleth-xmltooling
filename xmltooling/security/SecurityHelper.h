@@ -134,36 +134,71 @@ namespace xmltooling {
 
         /**
          * Returns the base64-encoded DER encoding of a public key in SubjectPublicKeyInfo format.
+         * <p>If a hash algorithm is provided, the data is digested before being base64-encoded.
          *
          * @param cred      the credential containing the key to encode
-         * @param hash      if true, the DER encoded data is hashed with SHA-1 before base64 encoding
+         * @param hash      optional name of hash algorithm, syntax specific to crypto provider
+         * @param nowrap    if true, any linefeeds will be stripped from the result
+         * @return  the base64 encoded key value
+         */
+        static std::string getDEREncoding(const Credential& cred, const char* hash, bool nowrap=true);
+
+        /**
+         * Returns the base64-encoded DER encoding of a public key in SubjectPublicKeyInfo format.
+         * <p>If a hash algorithm is provided, the data is digested before being base64-encoded.
+         *
+         * @param key       the key to encode
+         * @param hash      optional name of hash algorithm, syntax specific to crypto provider
          * @param nowrap    if true, any linefeeds will be stripped from the result
          * @param hashAlg   name of hash algorithm, syntax specific to crypto provider
          * @return  the base64 encoded key value
          */
-        static std::string getDEREncoding(const Credential& cred, bool hash=false, bool nowrap=true, const char* hashAlg="SHA1");
+        static std::string getDEREncoding(const XSECCryptoKey& key, const char* hash, bool nowrap=true);
 
         /**
+         * Returns the base64-encoded DER encoding of a certifiate's public key in SubjectPublicKeyInfo format.
+         * <p>If a hash algorithm is provided, the data is digested before being base64-encoded.
+         *
+         * @param cert      the certificate's key to encode
+         * @param hash      optional name of hash algorithm, syntax specific to crypto provider
+         * @param nowrap    if true, any linefeeds will be stripped from the result
+         * @param hashAlg   name of hash algorithm, syntax specific to crypto provider
+         * @return  the base64 encoded key value
+         */
+        static std::string getDEREncoding(const XSECCryptoX509& cert, const char* hash, bool nowrap=true);
+
+        /**
+         * @deprecated
+         * Returns the base64-encoded DER encoding of a public key in SubjectPublicKeyInfo format.
+         *
+         * @param cred      the credential containing the key to encode
+         * @param hash      if true, the DER encoded data is hashed with SHA-1 before base64 encoding
+         * @param nowrap    if true, any linefeeds will be stripped from the result
+         * @return  the base64 encoded key value
+         */
+        static std::string getDEREncoding(const Credential& cred, bool hash=false, bool nowrap=true);
+
+        /**
+         * @deprecated
          * Returns the base64-encoded DER encoding of a public key in SubjectPublicKeyInfo format.
          *
          * @param key       the key to encode
          * @param hash      if true, the DER encoded data is hashed with SHA-1 before base64 encoding
          * @param nowrap    if true, any linefeeds will be stripped from the result
-         * @param hashAlg   name of hash algorithm, syntax specific to crypto provider
          * @return  the base64 encoded key value
          */
-        static std::string getDEREncoding(const XSECCryptoKey& key, bool hash=false, bool nowrap=true, const char* hashAlg="SHA1");
+        static std::string getDEREncoding(const XSECCryptoKey& key, bool hash=false, bool nowrap=true);
 
         /**
+         * @deprecated
          * Returns the base64-encoded DER encoding of a certifiate's public key in SubjectPublicKeyInfo format.
          *
          * @param cert      the certificate's key to encode
          * @param hash      if true, the DER encoded data is hashed with SHA-1 before base64 encoding
          * @param nowrap    if true, any linefeeds will be stripped from the result
-         * @param hashAlg   name of hash algorithm, syntax specific to crypto provider
          * @return  the base64 encoded key value
          */
-        static std::string getDEREncoding(const XSECCryptoX509& cert, bool hash=false, bool nowrap=true, const char* hashAlg="SHA1");
+        static std::string getDEREncoding(const XSECCryptoX509& cert, bool hash=false, bool nowrap=true);
     };
 };
 
