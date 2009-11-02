@@ -53,14 +53,23 @@
 <folderInfo id="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814." name="/" resourcePath="">
 <toolChain id="org.eclipse.linuxtools.cdt.autotools.toolChain.434260605" name="GNU Autotools Toolchain" superClass="org.eclipse.linuxtools.cdt.autotools.toolChain">
 <targetPlatform id="org.eclipse.linuxtools.cdt.autotools.toolchain.targetPlatform.2031187350" isAbstract="false" name="GNU Autotools Target Platform" superClass="org.eclipse.linuxtools.cdt.autotools.toolchain.targetPlatform"/>
-<builder buildPath="${workspace_loc:/cpp-xmltooling/build}" id="org.eclipse.linuxtools.cdt.autotools.toolchain.builder.929959114" name="Autotools Makefile Generator.Build (GNU)" superClass="org.eclipse.linuxtools.cdt.autotools.toolchain.builder"/>
+<builder buildPath="${workspace_loc:/cpp-xmltooling/build}" id="org.eclipse.linuxtools.cdt.autotools.toolchain.builder.929959114" keepEnvironmentInBuildfile="false" name="Autotools Makefile Generator" superClass="org.eclipse.linuxtools.cdt.autotools.toolchain.builder"/>
 <tool id="org.eclipse.linuxtools.cdt.autotools.gnu.toolchain.tool.configure.837026680" name="configure" superClass="org.eclipse.linuxtools.cdt.autotools.gnu.toolchain.tool.configure">
+<option id="org.eclipse.linuxtools.cdt.autotools.option.configure.symbols.461255076" name="symbols" superClass="org.eclipse.linuxtools.cdt.autotools.option.configure.symbols" valueType="definedSymbols">
+<listOptionValue builtIn="false" value="XMLTOOL_API"/>
+<listOptionValue builtIn="false" value="XMLTOOL_DLLLOCAL"/>
+</option>
 <inputType id="org.eclipse.linuxtools.cdt.autotools.inputType.configure.387715961" superClass="org.eclipse.linuxtools.cdt.autotools.inputType.configure"/>
 <inputType id="org.eclipse.linuxtools.cdt.autotools.inputType.configure1.2086982536" superClass="org.eclipse.linuxtools.cdt.autotools.inputType.configure1"/>
 </tool>
 <tool id="org.eclipse.linuxtools.cdt.autotools.toolchain.tool.autogen.414704866" name="autogen.sh" superClass="org.eclipse.linuxtools.cdt.autotools.toolchain.tool.autogen"/>
 </toolChain>
 </folderInfo>
+<sourceEntries>
+<entry excluding="xmltooling|xmltoolingtest|debug/|release/|x64/" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
+<entry excluding="Debug/|Release/|x64/|xmltooling-lite-Debug/|xmltooling-lite-Release/" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="xmltooling"/>
+<entry excluding="Debug/|Release/|x64/" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="xmltoolingtest"/>
+</sourceEntries>
 </configuration>
 </storageModule>
 <storageModule moduleId="scannerConfiguration">
@@ -230,6 +239,8 @@
 </scannerConfigBuildInfo>
 </storageModule>
 <storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+<storageModule moduleId="org.eclipse.cdt.core.language.mapping"/>
+<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cconfiguration>
 </storageModule>
 <storageModule moduleId="cdtBuildSystem" version="4.0.0">
