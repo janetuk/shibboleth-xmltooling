@@ -25,8 +25,16 @@
 
 #include <xmltooling/io/GenericResponse.h>
 
+#include <string>
+#include <vector>
+
 namespace xmltooling {
-    
+
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4251 )
+#endif
+
     /**
      * Interface to HTTP response.
      * 
@@ -50,7 +58,7 @@ namespace xmltooling {
          * @param name  header name
          * @param value value to set, or NULL to clear
          */
-        virtual void setResponseHeader(const char* name, const char* value)=0;
+        virtual void setResponseHeader(const char* name, const char* value);
 
         /**
          * Sets a client cookie.
@@ -62,12 +70,15 @@ namespace xmltooling {
         
         /**
          * Redirect the client to the specified URL and complete the response.
-         * Any headers previously set will be sent ahead of the redirect.
          * 
+         * <p>Any headers previously set will be sent ahead of the redirect.
+         *
+         * <p>The URL will be validated with the sanitizeURL method below.
+         *
          * @param url   location to redirect client
          * @return a result code to return from the calling MessageEncoder
          */
-        virtual long sendRedirect(const char* url)=0;
+        virtual long sendRedirect(const char* url);
         
         /** Some common HTTP status codes. */
         enum status_t {
@@ -83,7 +94,31 @@ namespace xmltooling {
 
         using GenericResponse::sendResponse;
         long sendResponse(std::istream& inputStream);
+
+        /**
+         * Returns a modifiable array of schemes to permit in sanitized URLs.
+         *
+         * <p>Updates to this array must be externally synchronized with any use
+         * of this class or its subclasses.
+         *
+         * @return  a mutable array of strings containing the schemes to permit
+         */
+        static std::vector<std::string>& getAllowedSchemes();
+
+        /**
+         * Manually check for unsafe URLs vulnerable to injection attacks.
+         *
+         * @param url   location to check
+         */
+        static void sanitizeURL(const char* url);
+
+    private:
+        static std::vector<std::string> m_allowedSchemes;
     };
+
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
 };
 
 #endif /* __xmltooling_httpres_h__ */
