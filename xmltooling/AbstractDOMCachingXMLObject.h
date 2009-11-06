@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,35 +40,22 @@ namespace xmltooling {
     {
     public:
         virtual ~AbstractDOMCachingXMLObject();
-        
-        xercesc::DOMElement* getDOM() const {
-            return m_dom;
-        }
-        
-        void setDOM(xercesc::DOMElement* dom, bool bindDocument=false) const;
-        
-        void setDocument(xercesc::DOMDocument* doc) const {
-            if (m_document)
-                m_document->release();
-            m_document=doc;
-        }
-    
-        virtual void releaseDOM() const;
-        
-        virtual void releaseParentDOM(bool propagateRelease=true) const;
-        
-        virtual void releaseChildrenDOM(bool propagateRelease=true) const;
-    
-        XMLObject* clone() const;
 
+        // Virtual function overrides.
+        xercesc::DOMElement* getDOM() const;
+        void setDOM(xercesc::DOMElement* dom, bool bindDocument=false) const;
+        void setDocument(xercesc::DOMDocument* doc) const;
+        void releaseDOM() const;
+        void releaseParentDOM(bool propagateRelease=true) const;
+        void releaseChildrenDOM(bool propagateRelease=true) const;
+        XMLObject* clone() const;
         void detach();
 
      protected:
-        AbstractDOMCachingXMLObject() : m_dom(NULL), m_document(NULL) {}
+        AbstractDOMCachingXMLObject();
 
         /** Copy constructor. */
-        AbstractDOMCachingXMLObject(const AbstractDOMCachingXMLObject& src)
-            : AbstractXMLObject(src), m_dom(NULL), m_document(NULL) {}
+        AbstractDOMCachingXMLObject(const AbstractDOMCachingXMLObject& src);
 
         /**
          * If a DOM representation exists, this clones it into a new document.

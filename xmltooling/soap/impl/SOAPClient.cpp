@@ -36,11 +36,8 @@ using namespace xmltooling;
 using namespace xercesc;
 using namespace std;
 
-void SOAPTransport::send(istream* in)
+SOAPClient::SOAPClient(bool validate) : m_validate(validate), m_transport(NULL)
 {
-    if (!in)
-        throw IOException("SOAP transport does not support an empty request body.");
-    return send(*in);
 }
 
 SOAPClient::~SOAPClient()
@@ -48,10 +45,22 @@ SOAPClient::~SOAPClient()
     delete m_transport;
 }
 
+void SOAPClient::setValidating(bool validate)
+{
+    m_validate = validate;
+}
+
 void SOAPClient::reset()
 {
     delete m_transport;
     m_transport=NULL;
+}
+
+void SOAPTransport::send(istream* in)
+{
+    if (!in)
+        throw IOException("SOAP transport does not support an empty request body.");
+    return send(*in);
 }
 
 void SOAPClient::send(const Envelope& env, const SOAPTransport::Address& addr)
@@ -126,6 +135,10 @@ Envelope* SOAPClient::receive()
 
     xmlObject.release();
     return env;
+}
+
+void SOAPClient::prepareTransport(SOAPTransport& transport)
+{
 }
 
 bool SOAPClient::handleFault(const Fault& fault)

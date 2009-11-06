@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -155,14 +155,25 @@ namespace xmltooling {
             if (opt < CURLOPTTYPE_OBJECTPOINT)
                 return (curl_easy_setopt(m_handle, opt, strtol(value, NULL, 10)) == CURLE_OK);
 #ifdef CURLOPTTYPE_OFF_T
-            else if (opt < CURLOPTTYPE_OFF_T)
-                return (curl_easy_setopt(m_handle, opt, value) == CURLE_OK);
+            else if (opt < CURLOPTTYPE_OFF_T) {
+                if (value)
+                    m_saved_options.push_back(value);
+                return (curl_easy_setopt(m_handle, opt, value ? m_saved_options.back().c_str() : NULL) == CURLE_OK);
+            }
+# ifdef HAVE_CURL_OFF_T
             else if (sizeof(curl_off_t) == sizeof(long))
                 return (curl_easy_setopt(m_handle, opt, strtol(value, NULL, 10)) == CURLE_OK);
+# else
+            else if (sizeof(off_t) == sizeof(long))
+                return (curl_easy_setopt(m_handle, opt, strtol(value, NULL, 10)) == CURLE_OK);
+# endif
             return false;
 #else
-            else
-                return (curl_easy_setopt(m_handle, opt, value) == CURLE_OK);
+            else {
+                if (value)
+                    m_saved_options.push_back(value);
+                return (curl_easy_setopt(m_handle, opt, value ? m_saved_options.back().c_str() : NULL) == CURLE_OK);
+            }
 #endif
         }
 
@@ -208,6 +219,7 @@ namespace xmltooling {
         stringstream m_stream;
         struct curl_slist* m_headers;
         map<string,vector<string> > m_response_headers;
+        vector<string> m_saved_options;
 #ifndef XMLTOOLING_NO_XMLSEC
         const OpenSSLCredential* m_cred;
         const OpenSSLTrustEngine* m_trustEngine;
@@ -257,6 +269,35 @@ void xmltooling::termSOAPTransports()
 {
     delete g_CURLPool;
     g_CURLPool = NULL;
+}
+
+SOAPTransport::SOAPTransport()
+{
+}
+
+SOAPTransport::~SOAPTransport()
+{
+}
+
+bool SOAPTransport::setProviderOption(const char* provider, const char* option, const char* value)
+{
+    return false;
+}
+
+HTTPSOAPTransport::HTTPSOAPTransport()
+{
+}
+
+HTTPSOAPTransport::~HTTPSOAPTransport()
+{
+}
+
+OpenSSLSOAPTransport::OpenSSLSOAPTransport()
+{
+}
+
+OpenSSLSOAPTransport::~OpenSSLSOAPTransport()
+{
 }
 
 CURLPool::~CURLPool()

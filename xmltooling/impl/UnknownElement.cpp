@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2007 Internet2
+*  Copyright 2001-2009 Internet2
  * 
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * UnknownElement.cpp
  * 
- * Basic implementation suitable for use as default for unrecognized content
+ * Basic implementation suitable for use as default for unrecognized content.
  */
 
 #include "internal.h"
@@ -38,6 +38,15 @@ using namespace std;
 #ifndef XMLTOOLING_NO_XMLSEC
 using xmlsignature::Signature;
 #endif
+
+UnknownElementImpl::UnknownElementImpl(const XMLCh* namespaceURI, const XMLCh* elementLocalName, const XMLCh* namespacePrefix)
+    : AbstractXMLObject(namespaceURI, elementLocalName, namespacePrefix)
+{
+}
+
+UnknownElementImpl::~UnknownElementImpl()
+{
+}
 
 void UnknownElementImpl::releaseDOM() const
 {
@@ -66,6 +75,25 @@ XMLObject* UnknownElementImpl::clone() const
         ret->m_xml=m_xml;
 
     return ret;
+}
+
+const XMLCh* UnknownElementImpl::getTextContent(unsigned int position) const
+{
+    throw XMLObjectException("Direct access to content is not permitted.");
+}
+
+void UnknownElementImpl::setTextContent(const XMLCh*, unsigned int position)
+{
+    throw XMLObjectException("Direct access to content is not permitted.");
+}
+
+void UnknownElementImpl::setDocumentElement(DOMDocument* document, DOMElement* element) const
+{
+    DOMElement* documentRoot = document->getDocumentElement();
+    if (documentRoot)
+        document->replaceChild(element, documentRoot);
+    else
+        document->appendChild(element);
 }
 
 void UnknownElementImpl::serialize(string& s) const
@@ -206,7 +234,8 @@ XMLObject* UnknownElementImpl::unmarshall(DOMElement* element, bool bindDocument
 
 XMLObject* UnknownElementBuilder::buildObject(
     const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType
-    ) const {
+    ) const
+{
     return new UnknownElementImpl(nsURI,localName,prefix);
 }
 

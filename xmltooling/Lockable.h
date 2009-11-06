@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * @file xmltooling/Lockable.h
  * 
- * Locking abstraction 
+ * Locking abstraction.
  */
 
 #ifndef __xmltooling_lockable_h__
@@ -30,9 +30,12 @@ namespace xmltooling {
     /**
      * Abstract mixin interface for interfaces that support locking
      */
-    struct XMLTOOL_API Lockable
+    class XMLTOOL_API Lockable
     {
-        virtual ~Lockable() {}
+    protected:
+        Lockable();
+    public:
+        virtual ~Lockable();
         
         /**
          * Lock the associated object for exclusive access.
@@ -60,12 +63,7 @@ namespace xmltooling {
          * @param lockee    pointer to an object to hold, and optionally lock
          * @param lock      true iff object is not yet locked
          */
-        Locker(Lockable* lockee=NULL, bool lock=true) {
-            if (lockee && lock)
-                m_lockee=lockee->lock();
-            else
-                m_lockee=lockee;
-        }
+        Locker(Lockable* lockee=NULL, bool lock=true);
 
         /**
          * Optionally locks an object and stores it for later release.
@@ -74,23 +72,12 @@ namespace xmltooling {
          * @param lockee    pointer to an object to hold, and optionally lock
          * @param lock      true iff object is not yet locked
          */
-        void assign(Lockable* lockee=NULL, bool lock=true) {
-            if (m_lockee)
-                m_lockee->unlock();
-            m_lockee=NULL;
-            if (lockee && lock)
-                m_lockee=lockee->lock();
-            else
-                m_lockee=lockee;
-        }
+        void assign(Lockable* lockee=NULL, bool lock=true);
         
         /**
          * Destructor releases lock on held pointer, if any.
          */
-        ~Locker() {
-            if (m_lockee)
-                m_lockee->unlock();
-         }
+        ~Locker();
         
     private:
         Lockable* m_lockee;

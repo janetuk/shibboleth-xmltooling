@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,10 +39,10 @@ namespace xmltooling {
     class XMLTOOL_API ElementExtensibleXMLObject : public virtual XMLObject
     {
     protected:
-        ElementExtensibleXMLObject() {}
+        ElementExtensibleXMLObject();
     
     public:
-        virtual ~ElementExtensibleXMLObject() {}
+        virtual ~ElementExtensibleXMLObject();
         
         /**
          * Gets a mutable list of child objects

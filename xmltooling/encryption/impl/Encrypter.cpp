@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,15 @@
 
 #include "internal.h"
 #include "encryption/Encrypter.h"
+#include "encryption/Encryption.h"
 #include "security/Credential.h"
+#include "signature/KeyInfo.h"
 
 #include <xsec/enc/XSECCryptoException.hpp>
 #include <xsec/framework/XSECException.hpp>
 #include <xsec/framework/XSECAlgorithmMapper.hpp>
 #include <xsec/framework/XSECAlgorithmHandler.hpp>
+#include <xsec/xenc/XENCCipher.hpp>
 #include <xsec/xenc/XENCEncryptedData.hpp>
 #include <xsec/xenc/XENCEncryptedKey.hpp>
 
@@ -36,6 +39,29 @@ using namespace xmlsignature;
 using namespace xmltooling;
 using namespace xercesc;
 using namespace std;
+
+Encrypter::EncryptionParams::EncryptionParams(
+    const XMLCh* algorithm, const unsigned char* keyBuffer, unsigned int keyBufferSize, const Credential* credential, bool compact
+    ) : m_algorithm(algorithm), m_keyBuffer(keyBuffer), m_keyBufferSize(keyBufferSize), m_credential(credential), m_compact(compact)
+{
+}
+
+Encrypter::EncryptionParams::~EncryptionParams()
+{
+}
+
+Encrypter::KeyEncryptionParams::KeyEncryptionParams(const Credential& credential, const XMLCh* algorithm, const XMLCh* recipient)
+    : m_credential(credential), m_algorithm(algorithm), m_recipient(recipient)
+{
+}
+
+Encrypter::KeyEncryptionParams::~KeyEncryptionParams()
+{
+}
+
+Encrypter::Encrypter() : m_cipher(NULL)
+{
+}
 
 Encrypter::~Encrypter()
 {

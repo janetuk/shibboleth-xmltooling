@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007 The Apache Software Foundation.
+ * Copyright 2001-2009 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * OpenSSLCryptoX509CRL.cpp
  * 
- * OpenSSL-based class for handling X.509 CRLs
+ * OpenSSL-based class for handling X.509 CRLs.
  */
 
 #include "internal.h"
@@ -33,6 +33,10 @@ XSEC_USING_XERCES(ArrayJanitor);
 XSEC_USING_XERCES(Janitor);
 
 using namespace xmltooling;
+
+OpenSSLCryptoX509CRL::OpenSSLCryptoX509CRL() : mp_X509CRL(NULL), m_DERX509CRL("")
+{
+}
 
 OpenSSLCryptoX509CRL::~OpenSSLCryptoX509CRL()
 {
@@ -73,7 +77,13 @@ OpenSSLCryptoX509CRL::OpenSSLCryptoX509CRL(X509_CRL* x) {
 	BIO_free_all(b64);
 }
 
-void OpenSSLCryptoX509CRL::loadX509CRLBase64Bin(const char* buf, unsigned int len) {
+const XMLCh* OpenSSLCryptoX509CRL::getProviderName() const
+{
+    return DSIGConstants::s_unicodeStrPROVOpenSSL;
+}
+
+void OpenSSLCryptoX509CRL::loadX509CRLBase64Bin(const char* buf, unsigned int len)
+{
 
 	// Free anything currently held.
 	
@@ -109,4 +119,22 @@ void OpenSSLCryptoX509CRL::loadX509CRLBase64Bin(const char* buf, unsigned int le
 
 	m_DERX509CRL.sbStrcpyIn(buf);
 
+}
+
+safeBuffer& OpenSSLCryptoX509CRL::getDEREncodingSB()
+{
+    return m_DERX509CRL;
+}
+
+X509_CRL* OpenSSLCryptoX509CRL::getOpenSSLX509CRL()
+{
+    return mp_X509CRL;
+}
+
+XSECCryptoX509CRL* OpenSSLCryptoX509CRL::clone() const
+{
+    OpenSSLCryptoX509CRL* copy = new OpenSSLCryptoX509CRL();
+    copy->mp_X509CRL = X509_CRL_dup(mp_X509CRL);
+    copy->m_DERX509CRL = m_DERX509CRL;
+    return copy;
 }

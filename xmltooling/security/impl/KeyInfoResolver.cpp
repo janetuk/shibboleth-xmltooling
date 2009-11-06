@@ -17,7 +17,7 @@
 /**
  * KeyInfoResolver.cpp
  * 
- * Registration of factories for built-in resolvers
+ * Resolves credentials from KeyInfo information.
  */
 
 #include "internal.h"
@@ -37,6 +37,14 @@ void XMLTOOL_API xmltooling::registerKeyInfoResolvers()
 {
     XMLToolingConfig& conf=XMLToolingConfig::getConfig();
     conf.KeyInfoResolverManager.registerFactory(INLINE_KEYINFO_RESOLVER, InlineKeyInfoResolverFactory);
+}
+
+KeyInfoResolver::KeyInfoResolver()
+{
+}
+
+KeyInfoResolver::~KeyInfoResolver()
+{
 }
 
 Credential* KeyInfoResolver::resolve(const Signature* sig, int types) const

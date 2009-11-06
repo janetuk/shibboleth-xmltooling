@@ -37,6 +37,14 @@ static char x2c(char *what)
     return(digit);
 }
 
+URLEncoder::URLEncoder()
+{
+}
+
+URLEncoder::~URLEncoder()
+{
+}
+
 void URLEncoder::decode(char* s) const
 {
     register int x,y;
@@ -74,4 +82,10 @@ string URLEncoder::encode(const char* s) const
             ret+=*s;
     }
     return ret;
+}
+
+bool URLEncoder::isBad(char ch) const
+{
+    static char badchars[]="=&/?:\"\\+<>#%{}|^~[],`;@";
+    return (ch<=0x20 || ch>=0x7F || strchr(badchars,ch));
 }

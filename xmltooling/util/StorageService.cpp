@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * StorageService.cpp
  * 
- * Registration of factories for built-in storage services
+ * Generic data storage interface.
  */
 
 #include "internal.h"
@@ -34,4 +34,12 @@ void XMLTOOL_API xmltooling::registerStorageServices()
 {
     XMLToolingConfig& conf=XMLToolingConfig::getConfig();
     conf.StorageServiceManager.registerFactory(MEMORY_STORAGE_SERVICE, MemoryStorageServiceFactory);
+}
+
+StorageService::StorageService()
+{
+}
+
+StorageService::~StorageService()
+{
 }

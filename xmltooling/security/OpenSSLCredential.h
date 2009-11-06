@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,10 +35,10 @@ namespace xmltooling {
     class XMLTOOL_API OpenSSLCredential : public virtual X509Credential
     {
     protected:
-        OpenSSLCredential() {}
+        OpenSSLCredential();
         
     public:
-        virtual ~OpenSSLCredential() {}
+        virtual ~OpenSSLCredential();
         
         /**
          * Attaches credential to an OpenSSL SSL context object.

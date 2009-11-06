@@ -18,6 +18,9 @@
 
 #include <xmltooling/security/SecurityHelper.h>
 
+#include <xsec/enc/XSECCryptoKey.hpp>
+#include <xsec/enc/XSECCryptoX509.hpp>
+
 class SecurityHelperTest : public CxxTest::TestSuite {
     vector<XSECCryptoX509*> certs;
 
@@ -90,7 +93,12 @@ public:
 
         TSM_ASSERT_EQUALS(
             "Certificate and its key produced different hashed encodings",
-            SecurityHelper::getDEREncoding(*certs[2], true), SecurityHelper::getDEREncoding(*key1.get(), true)
+            SecurityHelper::getDEREncoding(*certs[2], "SHA1"), SecurityHelper::getDEREncoding(*key1.get(), "SHA1")
+            );
+
+        TSM_ASSERT_EQUALS(
+            "Certificate and its key produced different hashed encodings",
+            SecurityHelper::getDEREncoding(*certs[2], "SHA256"), SecurityHelper::getDEREncoding(*key1.get(), "SHA256")
             );
 
         for_each(certs.begin(), certs.end(), xmltooling::cleanup<XSECCryptoX509>());

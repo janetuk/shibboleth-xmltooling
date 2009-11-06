@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,36 +39,20 @@ namespace xmltooling {
     class XMLTOOL_API AbstractSimpleElement : public virtual AbstractXMLObject
     {
     public:
-        virtual ~AbstractSimpleElement() {
-            xercesc::XMLString::release(&m_value);
-        }
+        virtual ~AbstractSimpleElement();
         
-        bool hasChildren() const {
-            return false;
-        }
-
-        const std::list<XMLObject*>& getOrderedChildren() const {
-            return m_no_children;
-        }
-
+        // Virtual function overrides.
+        bool hasChildren() const;
+        const std::list<XMLObject*>& getOrderedChildren() const;
         void removeChild(XMLObject* child);
-
-        virtual const XMLCh* getTextContent(unsigned int position=0) const {
-            return (position==0) ? m_value : NULL;
-        }
-        
-        virtual void setTextContent(const XMLCh* value, unsigned int position=0) {
-            if (position > 0)
-                throw XMLObjectException("Cannot set text content in simple element at position > 0.");
-            m_value=prepareForAssignment(m_value,value);
-        }
+        const XMLCh* getTextContent(unsigned int position=0) const;
+        void setTextContent(const XMLCh* value, unsigned int position=0);
         
     protected:
-        AbstractSimpleElement() : m_value(NULL) {}
+        AbstractSimpleElement();
         
         /** Copy constructor. */
-        AbstractSimpleElement(const AbstractSimpleElement& src)
-            : AbstractXMLObject(src), m_value(xercesc::XMLString::replicate(src.m_value)) {}
+        AbstractSimpleElement(const AbstractSimpleElement& src);
 
     private:
         XMLCh* m_value;

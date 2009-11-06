@@ -23,17 +23,26 @@
 #if !defined(__xmltooling_credcrit_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_credcrit_h__
 
-#include <xmltooling/XMLToolingConfig.h>
-#include <xmltooling/security/KeyInfoResolver.h>
-#include <xmltooling/security/Credential.h>
-#include <xmltooling/signature/KeyInfo.h>
-#include <xmltooling/signature/Signature.h>
+#include <xmltooling/base.h>
 
 #include <set>
-#include <xsec/dsig/DSIGKeyInfoList.hpp>
-#include <xsec/dsig/DSIGKeyInfoName.hpp>
+
+class DSIGKeyInfoList;
+class XSECCryptoKey;
+
+namespace xmlsignature {
+    class XMLTOOL_API KeyInfo;
+    class XMLTOOL_API Signature;
+};
 
 namespace xmltooling {
+
+    class XMLTOOL_API Credential;
+
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4251 )
+#endif
 
     /**
      * Class for specifying criteria by which a CredentialResolver should resolve credentials.
@@ -42,12 +51,10 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(CredentialCriteria);
     public:
-        CredentialCriteria() : m_keyUsage(Credential::UNSPECIFIED_CREDENTIAL), m_keySize(0), m_key(NULL),
-            m_keyInfo(NULL), m_nativeKeyInfo(NULL), m_credential(NULL) {
-        }
-        virtual ~CredentialCriteria() {
-            delete m_credential;
-        }
+        /** Default constructor. */
+        CredentialCriteria();
+
+        virtual ~CredentialCriteria();
 
         /**
          * Determines whether the supplied Credential matches this CredentialCriteria.
@@ -62,121 +69,84 @@ namespace xmltooling {
          * 
          * @return the usage mask
          */
-        unsigned int getUsage() const {
-            return m_keyUsage;
-        }
+        unsigned int getUsage() const;
     
         /**
          * Set key usage criteria.
          * 
          * @param usage the usage mask to set
          */
-        void setUsage(unsigned int usage) {
-            m_keyUsage = usage;
-        }
+        void setUsage(unsigned int usage);
 
         /**
          * Get the peer name criteria.
          * 
          * @return the peer name
          */
-        const char* getPeerName() const {
-            return m_peerName.c_str();
-        }
+        const char* getPeerName() const;
     
         /**
          * Set the peer name criteria.
          * 
          * @param peerName peer name to set
          */
-        void setPeerName(const char* peerName) {
-            m_peerName.erase();
-            if (peerName)
-                m_peerName = peerName;
-        }
+        void setPeerName(const char* peerName);
     
         /**
          * Get the key algorithm criteria.
          * 
          * @return the key algorithm
          */
-        const char* getKeyAlgorithm() const {
-            return m_keyAlgorithm.c_str();
-        }
+        const char* getKeyAlgorithm() const;
     
         /**
          * Set the key algorithm criteria.
          * 
          * @param keyAlgorithm The key algorithm to set
          */
-        void setKeyAlgorithm(const char* keyAlgorithm) {
-            m_keyAlgorithm.erase();
-            if (keyAlgorithm)
-                m_keyAlgorithm = keyAlgorithm;
-        }
+        void setKeyAlgorithm(const char* keyAlgorithm);
 
         /**
          * Get the key size criteria.
          *
          * @return  the key size, or 0
          */
-        unsigned int getKeySize() const {
-            return m_keySize;
-        }
+        unsigned int getKeySize() const;
 
         /**
          * Set the key size criteria.
          *
          * @param keySize Key size to set
          */
-        void setKeySize(unsigned int keySize) {
-            m_keySize = keySize;
-        }
+        void setKeySize(unsigned int keySize);
     
         /**
          * Set the key algorithm and size criteria based on an XML algorithm specifier.
          *
          * @param algorithm XML algorithm specifier
          */
-        void setXMLAlgorithm(const XMLCh* algorithm) {
-            if (algorithm) {
-                std::pair<const char*,unsigned int> mapped =
-                    XMLToolingConfig::getConfig().mapXMLAlgorithmToKeyAlgorithm(algorithm);
-                setKeyAlgorithm(mapped.first);
-                setKeySize(mapped.second);
-            }
-            else {
-                setKeyAlgorithm(NULL);
-                setKeySize(0);
-            }
-        }
+        void setXMLAlgorithm(const XMLCh* algorithm);
 
         /**
          * Gets key name criteria.
          * 
          * @return an immutable set of key names
          */
-        const std::set<std::string>& getKeyNames() const {
-            return m_keyNames;
-        }
+        const std::set<std::string>& getKeyNames() const;
 
         /**
          * Gets key name criteria.
          * 
          * @return a mutable set of key names
          */
-        std::set<std::string>& getKeyNames() {
-            return m_keyNames;
-        }
+        std::set<std::string>& getKeyNames();
 
         /**
          * Returns the public key criteria.
          * 
          * @return  a public key
          */
-        virtual XSECCryptoKey* getPublicKey() const {
-            return m_key;
-        }
+        virtual XSECCryptoKey* getPublicKey() const;
 
         /**
          * Sets the public key criteria.
@@ -186,9 +156,7 @@ namespace xmltooling {
          * 
          * @param key a public key
          */
-        void setPublicKey(XSECCryptoKey* key) {
-            m_key = key;
-        }
+        void setPublicKey(XSECCryptoKey* key);
 
         /**
          * Bitmask constants controlling the kinds of criteria set automatically
@@ -204,9 +172,7 @@ namespace xmltooling {
          * 
          * @return the KeyInfo criteria
          */
-        const xmlsignature::KeyInfo* getKeyInfo() const {
-            return m_keyInfo;
-        }
+        const xmlsignature::KeyInfo* getKeyInfo() const;
     
         /**
          * Sets the KeyInfo criteria.
@@ -221,9 +187,7 @@ namespace xmltooling {
          * 
          * @return the native KeyInfo criteria
          */
-        DSIGKeyInfoList* getNativeKeyInfo() const {
-            return m_nativeKeyInfo;
-        }
+        DSIGKeyInfoList* getNativeKeyInfo() const;
 
         /**
          * Sets the KeyInfo criteria.
@@ -251,6 +215,10 @@ namespace xmltooling {
         DSIGKeyInfoList* m_nativeKeyInfo;
         Credential* m_credential;
     };
+
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
 };
 
 #endif /* __xmltooling_credcrit_h__ */

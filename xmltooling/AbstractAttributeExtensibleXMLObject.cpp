@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@
 
 #include "internal.h"
 #include "AbstractAttributeExtensibleXMLObject.h"
+#include "ElementExtensibleXMLObject.h"
+#include "ElementProxy.h"
 
 #include <algorithm>
 #include <functional>
@@ -33,12 +35,60 @@ using xercesc::DOMAttr;
 using xercesc::DOMElement;
 using xercesc::XMLString;
 
+ElementExtensibleXMLObject::ElementExtensibleXMLObject()
+{
+}
+
+ElementExtensibleXMLObject::~ElementExtensibleXMLObject()
+{
+}
+
+ElementProxy::ElementProxy()
+{
+}
+
+ElementProxy::~ElementProxy()
+{
+}
+
 set<QName> AttributeExtensibleXMLObject::m_idAttributeSet;
 
-AbstractAttributeExtensibleXMLObject::~AbstractAttributeExtensibleXMLObject()
+AttributeExtensibleXMLObject::AttributeExtensibleXMLObject()
 {
-    for (map<QName,XMLCh*>::iterator i=m_attributeMap.begin(); i!=m_attributeMap.end(); i++)
-        XMLString::release(&(i->second));
+}
+
+AttributeExtensibleXMLObject::~AttributeExtensibleXMLObject()
+{
+}
+
+const set<QName>& AttributeExtensibleXMLObject::getRegisteredIDAttributes()
+{
+    return m_idAttributeSet;
+}
+
+bool AttributeExtensibleXMLObject::isRegisteredIDAttribute(const QName& name)
+{
+    return m_idAttributeSet.find(name)!=m_idAttributeSet.end();
+}
+
+void AttributeExtensibleXMLObject::registerIDAttribute(const QName& name)
+{
+    m_idAttributeSet.insert(name);
+}
+
+void AttributeExtensibleXMLObject::deregisterIDAttribute(const QName& name)
+{
+    m_idAttributeSet.erase(name);
+}
+
+void AttributeExtensibleXMLObject::deregisterIDAttributes()
+{
+    m_idAttributeSet.clear();
+}
+
+AbstractAttributeExtensibleXMLObject::AbstractAttributeExtensibleXMLObject()
+{
+    m_idAttribute = m_attributeMap.end();
 }
 
 AbstractAttributeExtensibleXMLObject::AbstractAttributeExtensibleXMLObject(const AbstractAttributeExtensibleXMLObject& src)
@@ -51,6 +101,18 @@ AbstractAttributeExtensibleXMLObject::AbstractAttributeExtensibleXMLObject(const
     if (src.m_idAttribute != src.m_attributeMap.end()) {
         m_idAttribute = m_attributeMap.find(src.m_idAttribute->first);
     }
+}
+
+AbstractAttributeExtensibleXMLObject::~AbstractAttributeExtensibleXMLObject()
+{
+    for (map<QName,XMLCh*>::iterator i=m_attributeMap.begin(); i!=m_attributeMap.end(); i++)
+        XMLString::release(&(i->second));
+}
+
+const XMLCh* AbstractAttributeExtensibleXMLObject::getAttribute(const QName& qualifiedName) const
+{
+    map<QName,XMLCh*>::const_iterator i=m_attributeMap.find(qualifiedName);
+    return (i==m_attributeMap.end()) ? NULL : i->second;
 }
 
 void AbstractAttributeExtensibleXMLObject::setAttribute(const QName& qualifiedName, const XMLCh* value, bool ID)
@@ -76,6 +138,15 @@ void AbstractAttributeExtensibleXMLObject::setAttribute(const QName& qualifiedNa
         if (ID)
             m_idAttribute = m_attributeMap.find(qualifiedName);
     }
+}
+
+const map<QName,XMLCh*>& AbstractAttributeExtensibleXMLObject::getExtensionAttributes() const
+{
+    return m_attributeMap;
+}
+const XMLCh* AbstractAttributeExtensibleXMLObject::getXMLID() const
+{
+    return (m_idAttribute == m_attributeMap.end()) ? NULL : m_idAttribute->second;
 }
 
 void AbstractAttributeExtensibleXMLObject::unmarshallExtensionAttribute(const DOMAttr* attribute)

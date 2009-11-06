@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,20 @@
 
 #include "internal.h"
 #include "encryption/EncryptedKeyResolver.h"
+#include "signature/KeyInfo.h"
 
 using namespace xmlencryption;
 using namespace xmlsignature;
 using namespace xmltooling;
 using namespace std;
+
+EncryptedKeyResolver::EncryptedKeyResolver()
+{
+}
+
+EncryptedKeyResolver::~EncryptedKeyResolver()
+{
+}
 
 const EncryptedKey* EncryptedKeyResolver::resolveKey(const EncryptedData& encryptedData, const XMLCh* recipient) const
 {

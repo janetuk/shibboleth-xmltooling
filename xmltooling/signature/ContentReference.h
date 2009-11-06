@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,22 +17,17 @@
 /**
  * @file xmltooling/signature/ContentReference.h
  * 
- * Interface for creating signature references 
+ * Interface for creating signature references.
  */
 
 #if !defined(__xmltooling_sigref_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_sigref_h__
 
-#include <vector>
-#include <xsec/dsig/DSIGSignature.hpp>
+#include <xmltooling/base.h>
 
-#if defined (_MSC_VER)
-    #pragma warning( push )
-    #pragma warning( disable : 4250 4251 )
-#endif
+class DSIGSignature;
 
 namespace xmlsignature {
-
     /**
      * Interface for creating signature references based on application requirements.
      */
@@ -40,7 +35,7 @@ namespace xmlsignature {
     {
         MAKE_NONCOPYABLE(ContentReference);
     public:
-        virtual ~ContentReference() {}
+        virtual ~ContentReference();
 
         /**
          * Given a native signature, asks the object to create the reference(s).
@@ -50,13 +45,9 @@ namespace xmlsignature {
         virtual void createReferences(DSIGSignature* sig)=0;
         
     protected:
-        ContentReference() {}
+        /** Default constructor. */
+        ContentReference();
     };
-
 };
-
-#if defined (_MSC_VER)
-    #pragma warning( pop )
-#endif
 
 #endif /* __xmltooling_sigref_h__ */

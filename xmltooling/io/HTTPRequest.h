@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * @file xmltooling/io/HTTPRequest.h
  * 
- * Interface to HTTP requests 
+ * Interface to HTTP requests.
  */
 
 #ifndef __xmltooling_httpreq_h__
@@ -46,13 +46,11 @@ namespace xmltooling {
      */
     class XMLTOOL_API HTTPRequest : public GenericRequest {
     protected:
-        HTTPRequest() {}
+        HTTPRequest();
     public:
-        virtual ~HTTPRequest() {}
+        virtual ~HTTPRequest();
 
-        bool isSecure() const {
-            return strcmp(getScheme(),"https")==0;
-        }
+        bool isSecure() const;
           
         /**
          * Returns the HTTP method of the request (GET, POST, etc.)

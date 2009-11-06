@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ namespace xmltooling {
     class XMLTOOL_API ConcreteXMLObjectBuilder : public XMLObjectBuilder
     {
     public:
-        virtual ~ConcreteXMLObjectBuilder() {}
+        virtual ~ConcreteXMLObjectBuilder();
 
         using XMLObjectBuilder::buildObject;
         
@@ -46,7 +46,7 @@ namespace xmltooling {
         virtual XMLObject* buildObject() const=0;
 
     protected:
-        ConcreteXMLObjectBuilder() {}
+        ConcreteXMLObjectBuilder();
     };
 
 };

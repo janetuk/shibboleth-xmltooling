@@ -36,6 +36,16 @@ namespace {
     }
 }
 
+AbstractComplexElement::AbstractComplexElement()
+{
+}
+
+AbstractComplexElement::AbstractComplexElement(const AbstractComplexElement& src)
+{
+    for (vector<XMLCh*>::const_iterator i=src.m_text.begin(); i!=src.m_text.end(); ++i)
+        m_text.push_back(XMLString::replicate(*i));
+}
+
 AbstractComplexElement::~AbstractComplexElement() {
     for_each(m_children.begin(), m_children.end(), cleanup<XMLObject>());
     for (vector<XMLCh*>::iterator i=m_text.begin(); i!=m_text.end(); ++i)
@@ -49,15 +59,19 @@ bool AbstractComplexElement::hasChildren() const
     return (find_if(m_children.begin(), m_children.end(), _nonnull) != m_children.end());
 }
 
+const list<XMLObject*>& AbstractComplexElement::getOrderedChildren() const
+{
+    return m_children;
+}
+
 void AbstractComplexElement::removeChild(XMLObject* child)
 {
     m_children.erase(remove(m_children.begin(), m_children.end(), child), m_children.end());
 }
 
-AbstractComplexElement::AbstractComplexElement(const AbstractComplexElement& src)
+const XMLCh* AbstractComplexElement::getTextContent(unsigned int position) const
 {
-    for (vector<XMLCh*>::const_iterator i=src.m_text.begin(); i!=src.m_text.end(); ++i)
-        m_text.push_back(XMLString::replicate(*i));
+    return (m_text.size() > position) ? m_text[position] : NULL;
 }
 
 void AbstractComplexElement::setTextContent(const XMLCh* value, unsigned int position)

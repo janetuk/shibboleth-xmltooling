@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2007 Internet2
+*  Copyright 2001-2009 Internet2
  * 
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * @file xmltooling/impl/UnknownElement.h
  * 
- * Basic implementation suitable for use as default for unrecognized content
+ * Basic implementation suitable for use as default for unrecognized content.
  */
 
 #ifndef __xmltooling_unkelement_h__
@@ -42,20 +42,14 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL UnknownElementImpl : public AbstractSimpleElement, public AbstractDOMCachingXMLObject
     {
     public:
-        UnknownElementImpl(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL)
-            : AbstractXMLObject(namespaceURI, elementLocalName, namespacePrefix) {}
+        UnknownElementImpl(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL);
     
+        virtual ~UnknownElementImpl();
+
         void releaseDOM() const;
-
         XMLObject* clone() const;
-
-        const XMLCh* getTextContent(unsigned int position=0) const {
-            throw XMLObjectException("Direct access to content is not permitted.");
-        }
-
-        void setTextContent(const XMLCh*, unsigned int position=0) {
-            throw XMLObjectException("Direct access to content is not permitted.");
-        }
+        const XMLCh* getTextContent(unsigned int position=0) const;
+        void setTextContent(const XMLCh*, unsigned int position=0);
 
         xercesc::DOMElement* marshall(
             xercesc::DOMDocument* document=NULL
@@ -75,13 +69,7 @@ namespace xmltooling {
         XMLObject* unmarshall(xercesc::DOMElement* element, bool bindDocument=false);
         
     protected:
-        void setDocumentElement(xercesc::DOMDocument* document, xercesc::DOMElement* element) const {
-            xercesc::DOMElement* documentRoot = document->getDocumentElement();
-            if (documentRoot)
-                document->replaceChild(element, documentRoot);
-            else
-                document->appendChild(element);
-        }
+        void setDocumentElement(xercesc::DOMDocument* document, xercesc::DOMElement* element) const;
 
         mutable std::string m_xml;
 

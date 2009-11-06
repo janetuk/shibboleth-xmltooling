@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,9 @@
 #ifndef __xmltooling_ndc_h__
 #define __xmltooling_ndc_h__
 
-#include <string>
 #include <xmltooling/base.h>
+
+#include <string>
 
 namespace xmltooling {
     
@@ -33,6 +34,7 @@ namespace xmltooling {
      */
     class XMLTOOL_API NDC
     {
+    MAKE_NONCOPYABLE(NDC);
     public:
         /**
          * Constructor pushes logging context onto diagnostic stack
@@ -50,8 +52,6 @@ namespace xmltooling {
          * Destructor pops context off of diagnostic stack
          */
         ~NDC();
-        
-    MAKE_NONCOPYABLE(NDC);
     };
 
 };

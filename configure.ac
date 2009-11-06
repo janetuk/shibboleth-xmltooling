@@ -1,8 +1,8 @@
 AC_PREREQ([2.50])
-AC_INIT([xmltooling], [1.2.2], [mace-opensaml-users@internet2.edu], [xmltooling])
+AC_INIT([xmltooling], [1.3], [mace-opensaml-users@internet2.edu], [xmltooling])
 AM_CONFIG_HEADER(config.h)
 AM_CONFIG_HEADER(xmltooling/config_pub.h)
-AM_INIT_AUTOMAKE([xmltooling], [1.2.2])
+AM_INIT_AUTOMAKE([xmltooling], [1.3])
 
 sinclude(doxygen.m4)
 sinclude(acx_pthread.m4)
@@ -320,6 +320,7 @@ int i = 0;
 	AC_EGREP_HEADER([CURLOPT_SSL_CTX_FUNCTION], [curl/curl.h],
 			[AC_MSG_RESULT(yes)],
 			[AC_MSG_ERROR([need libcurl that supports CURLOPT_SSL_CTX_FUNCTION])])
+    AC_CHECK_TYPE([curl_off_t],[AC_DEFINE([HAVE_CURL_OFF_T], [1], [Define to 1 if you have the 'curl_off_t' type.])])
 
 	# restore master libs
 	LIBS="$save_LIBS"
