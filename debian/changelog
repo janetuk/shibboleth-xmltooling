@@ -1,4 +1,4 @@
-xmltooling (1.3-1) UNRELEASED; urgency=high
+xmltooling (1.3-1) unstable; urgency=high
 
   * Urgency set to high for security fix.
   * New upstream release.
@@ -18,7 +18,7 @@ xmltooling (1.3-1) UNRELEASED; urgency=high
     ensure that all builds are consistent.  Although this package will
     build with 1.4, the other packages built on xmltooling require 1.5.
 
- -- Russ Allbery <rra@debian.org>  Fri, 06 Nov 2009 11:16:43 -0800
+ -- Russ Allbery <rra@debian.org>  Fri, 06 Nov 2009 11:30:41 -0800
 
 xmltooling (1.2.2-1) unstable; urgency=high
 
