@@ -27,7 +27,7 @@ Package: libxmltooling-dev
 Section: libdevel
 Architecture: any
 Depends: libxmltooling4 (= ${binary:Version}), libcurl4-openssl-dev,
- liblog4cpp5-dev, libxerces-c-dev, libxml-security-c-dev (>= 1.4)
+ liblog4cpp5-dev, libxerces-c-dev, libxml-security-c-dev (>= 1.5)
 Suggests: libxmltooling-doc (= ${source:Version})
 Description: C++ XML parsing library with encryption support (development)
  The XMLTooling library contains generic XML parsing and processing

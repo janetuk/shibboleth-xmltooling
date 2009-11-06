@@ -13,8 +13,10 @@ xmltooling (1.3-1) UNRELEASED; urgency=high
     - Remove xmlns:xml namespace declaration when marshalling and
       unmarshalling to avoid canonicalization bugs.
   * Rename library package for upstream SONAME bump.
-  * Build-depend on libxml-security-c-dev 1.5 or later to ensure that all
-    builds are consistent.
+  * Build-depend on libxml-security-c-dev 1.5 or later and make
+    libxmltooling-dev depend on libxml-security-c-dev 1.5 or later to
+    ensure that all builds are consistent.  Although this package will
+    build with 1.4, the other packages built on xmltooling require 1.5.
 
  -- Russ Allbery <rra@debian.org>  Fri, 06 Nov 2009 11:16:43 -0800
 
