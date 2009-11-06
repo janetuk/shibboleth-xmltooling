@@ -17,7 +17,7 @@
 /**
  * XMLToolingConfig.cpp
  *
- * Library configuration
+ * Library configuration.
  */
 
 #include "internal.h"
@@ -26,23 +26,22 @@
 #include "XMLToolingConfig.h"
 #include "encryption/Encryption.h"
 #include "encryption/Encrypter.h"
-#include "io/HTTPRequest.h"
-#include "io/HTTPResponse.h"
 #include "impl/UnknownElement.h"
+#include "io/HTTPResponse.h"
 #include "security/TrustEngine.h"
 #include "security/OpenSSLCryptoX509CRL.h"
 #include "security/CredentialResolver.h"
 #include "security/KeyInfoResolver.h"
+#include "signature/KeyInfo.h"
 #include "signature/Signature.h"
 #include "soap/SOAP.h"
-#include "soap/SOAPTransport.h"
 #include "util/NDC.h"
 #include "util/PathResolver.h"
 #include "util/ReplayCache.h"
 #include "util/StorageService.h"
 #include "util/TemplateEngine.h"
+#include "util/Threads.h"
 #include "util/URLEncoder.h"
-#include "util/XMLConstants.h"
 #include "validation/ValidatorSuite.h"
 
 #ifdef HAVE_DLFCN_H
@@ -58,6 +57,7 @@
 # include <log4cpp/OstreamAppender.hh>
 #endif
 #include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/util/XMLUniDefs.hpp>
 #ifndef XMLTOOLING_NO_XMLSEC
 # include <curl/curl.h>
 # include <openssl/err.h>
@@ -137,6 +137,20 @@ XMLToolingInternalConfig& XMLToolingInternalConfig::getInternalConfig()
     return g_config;
 }
 
+#ifndef XMLTOOLING_NO_XMLSEC
+XMLToolingConfig::XMLToolingConfig()
+    : m_keyInfoResolver(NULL), m_replayCache(NULL), m_pathResolver(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180)
+#else
+XMLToolingConfig::XMLToolingConfig()
+    : m_pathResolver(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180)
+#endif
+{
+}
+
+XMLToolingConfig::~XMLToolingConfig()
+{
+}
+
 bool XMLToolingInternalConfig::log_config(const char* config)
 {
     try {
@@ -204,12 +218,43 @@ bool XMLToolingInternalConfig::log_config(const char* config)
 }
 
 #ifndef XMLTOOLING_LITE
+const KeyInfoResolver* XMLToolingConfig::getKeyInfoResolver() const
+{
+    return m_keyInfoResolver;
+}
+
+ReplayCache* XMLToolingConfig::getReplayCache() const
+{
+    return m_replayCache;
+}
+
+void XMLToolingConfig::setKeyInfoResolver(xmltooling::KeyInfoResolver *keyInfoResolver)
+{
+    delete m_keyInfoResolver;
+    m_keyInfoResolver = keyInfoResolver;
+}
+
 void XMLToolingConfig::setReplayCache(ReplayCache* replayCache)
 {
     delete m_replayCache;
     m_replayCache = replayCache;
 }
 #endif
+
+PathResolver* XMLToolingConfig::getPathResolver() const
+{
+    return m_pathResolver;
+}
+
+TemplateEngine* XMLToolingConfig::getTemplateEngine() const
+{
+    return m_templateEngine;
+}
+
+const URLEncoder* XMLToolingConfig::getURLEncoder() const
+{
+    return m_urlEncoder;
+}
 
 void XMLToolingConfig::setPathResolver(PathResolver* pathResolver)
 {
@@ -308,6 +353,9 @@ bool XMLToolingInternalConfig::init()
 
         m_pathResolver = new PathResolver();
         m_urlEncoder = new URLEncoder();
+
+        HTTPResponse::getAllowedSchemes().push_back("https");
+        HTTPResponse::getAllowedSchemes().push_back("http");
 
         // Register xml:id as an ID attribute.
         static const XMLCh xmlid[] = UNICODE_LITERAL_2(i,d);

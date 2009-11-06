@@ -484,7 +484,48 @@ bool SecurityHelper::matches(const XSECCryptoKey& key1, const XSECCryptoKey& key
     return false;
 }
 
-string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, bool hash, bool nowrap)
+string SecurityHelper::doHash(const char* hashAlg, const char* buf, unsigned long buflen, bool toHex)
+{
+    static char DIGITS[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+    string ret;
+
+    const EVP_MD* md = EVP_get_digestbyname(hashAlg);
+    if (!md) {
+        Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("hash algorithm (%s) not available", hashAlg);
+        return ret;
+    }
+
+    BIO* chain = BIO_new(BIO_s_mem());
+    BIO* b = BIO_new(BIO_f_md());
+    BIO_set_md(b, md);
+    chain = BIO_push(b, chain);
+    BIO_write(chain, buf, buflen);
+    BIO_flush(chain);
+
+    char digest[EVP_MAX_MD_SIZE];
+    int len = BIO_gets(chain, digest, EVP_MD_size(md));
+    BIO_free_all(chain);
+    if (len != EVP_MD_size(md)) {
+        Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error(
+            "hash result length (%d) did not match expected value (%d)", len, EVP_MD_size(md)
+            );
+        return ret;
+    }
+    if (toHex) {
+        for (int i=0; i < len; ++i) {
+            ret += (DIGITS[((unsigned char)(0xF0 & digest[i])) >> 4 ]);
+            ret += (DIGITS[0x0F & digest[i]]);
+        }
+    }
+    else {
+        for (int i=0; i < len; ++i) {
+            ret += digest[i];
+        }
+    }
+    return ret;
+}
+
+string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, const char* hash, bool nowrap)
 {
     string ret;
 
@@ -499,22 +540,30 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, bool hash, bool 
             Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("key was not populated");
             return ret;
         }
+        const EVP_MD* md=NULL;
+        if (hash) {
+            md = EVP_get_digestbyname(hash);
+            if (!md) {
+                Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("hash algorithm (%s) not available", hash);
+                return ret;
+            }
+        }
         BIO* chain = BIO_new(BIO_s_mem());
         BIO* b = BIO_new(BIO_f_base64());
         if (nowrap)
             BIO_set_flags(b, BIO_FLAGS_BASE64_NO_NL);
         chain = BIO_push(b, chain);
-        if (hash) {
+        if (md) {
             b = BIO_new(BIO_f_md());
-            BIO_set_md(b, EVP_sha1());
+            BIO_set_md(b, md);
             chain = BIO_push(b, chain);
         }
         i2d_RSA_PUBKEY_bio(chain, const_cast<RSA*>(rsa));
         BIO_flush(chain);
-        if (hash) {
-            char digest[20];
-            int len = BIO_gets(chain, digest, sizeof(digest));
-            if (len != sizeof(digest)) {
+        if (md) {
+            char digest[EVP_MAX_MD_SIZE];
+            int len = BIO_gets(chain, digest, EVP_MD_size(md));
+            if (len != EVP_MD_size(md)) {
                 BIO_free_all(chain);
                 return ret;
             }
@@ -537,22 +586,30 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, bool hash, bool 
             Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("key was not populated");
             return ret;
         }
+        const EVP_MD* md=NULL;
+        if (hash) {
+            md = EVP_get_digestbyname(hash);
+            if (!md) {
+                Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("hash algorithm (%s) not available", hash);
+                return ret;
+            }
+        }
         BIO* chain = BIO_new(BIO_s_mem());
         BIO* b = BIO_new(BIO_f_base64());
         if (nowrap)
             BIO_set_flags(b, BIO_FLAGS_BASE64_NO_NL);
         chain = BIO_push(b, chain);
-        if (hash) {
+        if (md) {
             b = BIO_new(BIO_f_md());
-            BIO_set_md(b, EVP_sha1());
+            BIO_set_md(b, md);
             chain = BIO_push(b, chain);
         }
         i2d_DSA_PUBKEY_bio(chain, const_cast<DSA*>(dsa));
         BIO_flush(chain);
-        if (hash) {
-            char digest[20];
-            int len = BIO_gets(chain, digest, sizeof(digest));
-            if (len != sizeof(digest)) {
+        if (md) {
+            char digest[EVP_MAX_MD_SIZE];
+            int len = BIO_gets(chain, digest, EVP_MD_size(md));
+            if (len != EVP_MD_size(md)) {
                 BIO_free_all(chain);
                 return ret;
             }
@@ -575,13 +632,22 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, bool hash, bool 
     return ret;
 }
 
-string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, bool hash, bool nowrap)
+string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, const char* hash, bool nowrap)
 {
     string ret;
 
     if (cert.getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
         Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("encoding of non-OpenSSL keys not supported");
         return ret;
+    }
+
+    const EVP_MD* md=NULL;
+    if (hash) {
+        md = EVP_get_digestbyname(hash);
+        if (!md) {
+            Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("hash algorithm (%s) not available", hash);
+            return ret;
+        }
     }
 
     const X509* x = static_cast<const OpenSSLCryptoX509&>(cert).getOpenSSLX509();
@@ -592,18 +658,18 @@ string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, bool hash, boo
     if (nowrap)
         BIO_set_flags(b, BIO_FLAGS_BASE64_NO_NL);
     chain = BIO_push(b, chain);
-    if (hash) {
+    if (md) {
         b = BIO_new(BIO_f_md());
-        BIO_set_md(b, EVP_sha1());
+        BIO_set_md(b, md);
         chain = BIO_push(b, chain);
     }
     i2d_PUBKEY_bio(chain, key);
     EVP_PKEY_free(key);
     BIO_flush(chain);
-    if (hash) {
-        char digest[20];
-        int len = BIO_gets(chain, digest, sizeof(digest));
-        if (len != sizeof(digest)) {
+    if (md) {
+        char digest[EVP_MAX_MD_SIZE];
+        int len = BIO_gets(chain, digest, EVP_MD_size(md));
+        if (len != EVP_MD_size(md)) {
             BIO_free_all(chain);
             return ret;
         }
@@ -622,7 +688,7 @@ string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, bool hash, boo
     return ret;
 }
 
-string SecurityHelper::getDEREncoding(const Credential& cred, bool hash, bool nowrap)
+string SecurityHelper::getDEREncoding(const Credential& cred, const char* hash, bool nowrap)
 {
     const X509Credential* x509 = dynamic_cast<const X509Credential*>(&cred);
     if (x509 && !x509->getEntityCertificateChain().empty())
@@ -630,4 +696,19 @@ string SecurityHelper::getDEREncoding(const Credential& cred, bool hash, bool no
     else if (cred.getPublicKey())
         return getDEREncoding(*(cred.getPublicKey()), hash, nowrap);
     return "";
+}
+
+string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, bool hash, bool nowrap)
+{
+    return getDEREncoding(key, hash ? "SHA1" : NULL, nowrap);
+}
+
+string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, bool hash, bool nowrap)
+{
+    return getDEREncoding(cert, hash ? "SHA1" : NULL, nowrap);
+}
+
+string SecurityHelper::getDEREncoding(const Credential& cred, bool hash, bool nowrap)
+{
+    return getDEREncoding(cred, hash ? "SHA1" : NULL, nowrap);
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,10 +33,24 @@ using namespace xmltooling;
 using namespace xercesc;
 using namespace std;
 
+AbstractDOMCachingXMLObject::AbstractDOMCachingXMLObject() : m_dom(NULL), m_document(NULL)
+{
+}
+
+AbstractDOMCachingXMLObject::AbstractDOMCachingXMLObject(const AbstractDOMCachingXMLObject& src)
+    : AbstractXMLObject(src), m_dom(NULL), m_document(NULL)
+{
+}
+
 AbstractDOMCachingXMLObject::~AbstractDOMCachingXMLObject()
 {
     if (m_document)
         m_document->release();
+}
+
+DOMElement* AbstractDOMCachingXMLObject::getDOM() const
+{
+    return m_dom;
 }
 
 void AbstractDOMCachingXMLObject::setDOM(DOMElement* dom, bool bindDocument) const
@@ -46,6 +60,15 @@ void AbstractDOMCachingXMLObject::setDOM(DOMElement* dom, bool bindDocument) con
         if (bindDocument) {
             setDocument(dom->getOwnerDocument());
         }
+    }
+}
+
+void AbstractDOMCachingXMLObject::setDocument(DOMDocument* doc) const
+{
+    if (m_document != doc) {
+        if (m_document)
+            m_document->release();
+        m_document=doc;
     }
 }
 
@@ -73,15 +96,17 @@ void AbstractDOMCachingXMLObject::releaseParentDOM(bool propagateRelease) const
     }
 }
 
-class _release : public binary_function<XMLObject*,bool,void> {
-public:
-    void operator()(XMLObject* obj, bool propagate) const {
-        if (obj) {
-            obj->releaseDOM();
-            if (propagate)
-                obj->releaseChildrenDOM(propagate);
+namespace {
+    class _release : public binary_function<XMLObject*,bool,void> {
+    public:
+        void operator()(XMLObject* obj, bool propagate) const {
+            if (obj) {
+                obj->releaseDOM();
+                if (propagate)
+                    obj->releaseChildrenDOM(propagate);
+            }
         }
-    }
+    };
 };
 
 void AbstractDOMCachingXMLObject::releaseChildrenDOM(bool propagateRelease) const

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,20 @@
 #if !defined(__xmltooling_keyres_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_keyres_h__
 
-#include <xmltooling/security/Credential.h>
-#include <xmltooling/security/KeyInfoCredentialContext.h>
+#include <xmltooling/base.h>
 
-#include <xsec/dsig/DSIGKeyInfoList.hpp>
+class DSIGKeyInfoList;
+
+namespace xmlsignature {
+    class XMLTOOL_API KeyInfo;
+    class XMLTOOL_API Signature;
+};
 
 namespace xmltooling {
 
+    class XMLTOOL_API Credential;
     class XMLTOOL_API CredentialCriteria;
+    class XMLTOOL_API KeyInfoCredentialContext;
 
     /**
      * Resolves credentials from KeyInfo information.
@@ -44,9 +50,9 @@ namespace xmltooling {
     class XMLTOOL_API KeyInfoResolver {
         MAKE_NONCOPYABLE(KeyInfoResolver);
     protected:
-        KeyInfoResolver() {}
+        KeyInfoResolver();
     public:
-        virtual ~KeyInfoResolver() {}
+        virtual ~KeyInfoResolver();
         
         /**
          * Returns a credential based on the supplied KeyInfo information.

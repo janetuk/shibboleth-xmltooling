@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include "logging.h"
 #include "encryption/Decrypter.h"
 #include "encryption/EncryptedKeyResolver.h"
+#include "encryption/Encryption.h"
 #include "security/Credential.h"
 #include "security/CredentialCriteria.h"
 #include "security/CredentialResolver.h"
@@ -33,6 +34,7 @@
 #include <xsec/framework/XSECAlgorithmMapper.hpp>
 #include <xsec/framework/XSECAlgorithmHandler.hpp>
 #include <xsec/utils/XSECBinTXFMInputStream.hpp>
+#include <xsec/xenc/XENCCipher.hpp>
 #include <xsec/xenc/XENCEncryptedData.hpp>
 #include <xsec/xenc/XENCEncryptedKey.hpp>
 
@@ -42,10 +44,26 @@ using namespace xmltooling;
 using namespace xercesc;
 using namespace std;
 
+Decrypter::Decrypter(const CredentialResolver* credResolver, CredentialCriteria* criteria, const EncryptedKeyResolver* EKResolver)
+    : m_cipher(NULL), m_credResolver(credResolver), m_criteria(criteria), m_EKResolver(EKResolver)
+{
+}
+
 Decrypter::~Decrypter()
 {
     if (m_cipher)
         XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
+}
+
+void Decrypter::setEncryptedKeyResolver(const EncryptedKeyResolver* EKResolver)
+{
+    m_EKResolver=EKResolver;
+}
+
+void Decrypter::setKEKResolver(const CredentialResolver* resolver, CredentialCriteria* criteria)
+{
+    m_credResolver=resolver;
+    m_criteria=criteria;
 }
 
 DOMDocumentFragment* Decrypter::decryptData(const EncryptedData& encryptedData, XSECCryptoKey* key)

@@ -36,9 +36,9 @@ namespace xmltooling {
     class XMLTOOL_API XSECCryptoX509CRL {
         MAKE_NONCOPYABLE(XSECCryptoX509CRL);
     protected:
-        XSECCryptoX509CRL() {}
+        XSECCryptoX509CRL();
     public:
-    	virtual ~XSECCryptoX509CRL() {}
+    	virtual ~XSECCryptoX509CRL();
     
     	/**
     	 * Returns a string that identifies the crypto owner of this library.

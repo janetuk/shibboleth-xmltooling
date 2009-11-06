@@ -26,6 +26,8 @@
 
 #include <xmltooling/logging.h>
 
+#include <string>
+#include <vector>
 #include <curl/curl.h>
 #include <xercesc/util/BinInputStream.hpp>
 
@@ -100,6 +102,7 @@ namespace xmltooling {
 
         logging::Category&  fLog;
         std::string         fURL;
+        std::vector<std::string>    fSavedOptions;
 
         CURLM*              fMulti;
         CURL*               fEasy;

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,8 @@ namespace xmlencryption {
     class XMLTOOL_API EncryptedKeyResolver {
         MAKE_NONCOPYABLE(EncryptedKeyResolver);
     public:
-        EncryptedKeyResolver() {}
-        virtual ~EncryptedKeyResolver() {}
+        EncryptedKeyResolver();
+        virtual ~EncryptedKeyResolver();
         
         /**
          * Returns an encrypted key based on the supplied object's KeyInfo information.

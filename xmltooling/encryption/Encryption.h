@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,16 @@
 #if !defined(__xmltooling_encryption_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_encryption_h__
 
-#include <xmltooling/signature/KeyInfo.h>
+#include <xmltooling/ConcreteXMLObjectBuilder.h>
+#include <xmltooling/ElementProxy.h>
+#include <xmltooling/util/XMLConstants.h>
+
 #include <cstdio>
+
+namespace xmlsignature {
+    class XMLTOOL_API KeyInfo;
+    class XMLTOOL_API Transform;
+};
 
 /**
  * Macro for declaring encryption builders.

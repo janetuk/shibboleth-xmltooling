@@ -72,15 +72,16 @@ am__libxmltooling_lite_la_SOURCES_DIST =  \
 	AbstractAttributeExtensibleXMLObject.cpp \
 	AbstractComplexElement.cpp AbstractDOMCachingXMLObject.cpp \
 	AbstractSimpleElement.cpp AbstractXMLObject.cpp exceptions.cpp \
-	Namespace.cpp QName.cpp unicode.cpp XMLObjectBuilder.cpp \
-	XMLToolingConfig.cpp impl/AnyElement.cpp \
+	Lockable.cpp Namespace.cpp QName.cpp unicode.cpp \
+	XMLObjectBuilder.cpp XMLToolingConfig.cpp impl/AnyElement.cpp \
 	impl/UnknownElement.cpp io/AbstractXMLObjectMarshaller.cpp \
 	io/AbstractXMLObjectUnmarshaller.cpp io/HTTPRequest.cpp \
-	soap/impl/SOAPClient.cpp soap/impl/SOAPImpl.cpp \
-	soap/impl/SOAPSchemaValidators.cpp util/DateTime.cpp \
-	util/NDC.cpp util/ParserPool.cpp util/PathResolver.cpp \
-	util/ReloadableXMLFile.cpp util/TemplateEngine.cpp \
-	util/URLEncoder.cpp util/XMLConstants.cpp util/XMLHelper.cpp \
+	io/HTTPResponse.cpp soap/impl/SOAPClient.cpp \
+	soap/impl/SOAPImpl.cpp soap/impl/SOAPSchemaValidators.cpp \
+	util/DateTime.cpp util/NDC.cpp util/ParserPool.cpp \
+	util/PathResolver.cpp util/ReloadableXMLFile.cpp \
+	util/TemplateEngine.cpp util/URLEncoder.cpp \
+	util/XMLConstants.cpp util/XMLHelper.cpp \
 	validation/ValidatorSuite.cpp util/PThreads.cpp
 @BUILD_PTHREAD_TRUE@am__objects_1 = libxmltooling_lite_la-PThreads.lo
 am__objects_2 =  \
@@ -90,6 +91,7 @@ am__objects_2 =  \
 	libxmltooling_lite_la-AbstractSimpleElement.lo \
 	libxmltooling_lite_la-AbstractXMLObject.lo \
 	libxmltooling_lite_la-exceptions.lo \
+	libxmltooling_lite_la-Lockable.lo \
 	libxmltooling_lite_la-Namespace.lo \
 	libxmltooling_lite_la-QName.lo \
 	libxmltooling_lite_la-unicode.lo \
@@ -100,6 +102,7 @@ am__objects_2 =  \
 	libxmltooling_lite_la-AbstractXMLObjectMarshaller.lo \
 	libxmltooling_lite_la-AbstractXMLObjectUnmarshaller.lo \
 	libxmltooling_lite_la-HTTPRequest.lo \
+	libxmltooling_lite_la-HTTPResponse.lo \
 	libxmltooling_lite_la-SOAPClient.lo \
 	libxmltooling_lite_la-SOAPImpl.lo \
 	libxmltooling_lite_la-SOAPSchemaValidators.lo \
@@ -121,15 +124,16 @@ am__libxmltooling_la_SOURCES_DIST =  \
 	AbstractAttributeExtensibleXMLObject.cpp \
 	AbstractComplexElement.cpp AbstractDOMCachingXMLObject.cpp \
 	AbstractSimpleElement.cpp AbstractXMLObject.cpp exceptions.cpp \
-	Namespace.cpp QName.cpp unicode.cpp XMLObjectBuilder.cpp \
-	XMLToolingConfig.cpp impl/AnyElement.cpp \
+	Lockable.cpp Namespace.cpp QName.cpp unicode.cpp \
+	XMLObjectBuilder.cpp XMLToolingConfig.cpp impl/AnyElement.cpp \
 	impl/UnknownElement.cpp io/AbstractXMLObjectMarshaller.cpp \
 	io/AbstractXMLObjectUnmarshaller.cpp io/HTTPRequest.cpp \
-	soap/impl/SOAPClient.cpp soap/impl/SOAPImpl.cpp \
-	soap/impl/SOAPSchemaValidators.cpp util/DateTime.cpp \
-	util/NDC.cpp util/ParserPool.cpp util/PathResolver.cpp \
-	util/ReloadableXMLFile.cpp util/TemplateEngine.cpp \
-	util/URLEncoder.cpp util/XMLConstants.cpp util/XMLHelper.cpp \
+	io/HTTPResponse.cpp soap/impl/SOAPClient.cpp \
+	soap/impl/SOAPImpl.cpp soap/impl/SOAPSchemaValidators.cpp \
+	util/DateTime.cpp util/NDC.cpp util/ParserPool.cpp \
+	util/PathResolver.cpp util/ReloadableXMLFile.cpp \
+	util/TemplateEngine.cpp util/URLEncoder.cpp \
+	util/XMLConstants.cpp util/XMLHelper.cpp \
 	validation/ValidatorSuite.cpp util/PThreads.cpp \
 	encryption/impl/Decrypter.cpp \
 	encryption/impl/EncryptedKeyResolver.cpp \
@@ -162,14 +166,15 @@ am__libxmltooling_la_SOURCES_DIST =  \
 am__objects_4 = AbstractAttributeExtensibleXMLObject.lo \
 	AbstractComplexElement.lo AbstractDOMCachingXMLObject.lo \
 	AbstractSimpleElement.lo AbstractXMLObject.lo exceptions.lo \
-	Namespace.lo QName.lo unicode.lo XMLObjectBuilder.lo \
-	XMLToolingConfig.lo AnyElement.lo UnknownElement.lo \
-	AbstractXMLObjectMarshaller.lo \
-	AbstractXMLObjectUnmarshaller.lo HTTPRequest.lo SOAPClient.lo \
-	SOAPImpl.lo SOAPSchemaValidators.lo DateTime.lo NDC.lo \
-	ParserPool.lo PathResolver.lo ReloadableXMLFile.lo \
-	TemplateEngine.lo URLEncoder.lo XMLConstants.lo XMLHelper.lo \
-	ValidatorSuite.lo $(am__objects_3)
+	Lockable.lo Namespace.lo QName.lo unicode.lo \
+	XMLObjectBuilder.lo XMLToolingConfig.lo AnyElement.lo \
+	UnknownElement.lo AbstractXMLObjectMarshaller.lo \
+	AbstractXMLObjectUnmarshaller.lo HTTPRequest.lo \
+	HTTPResponse.lo SOAPClient.lo SOAPImpl.lo \
+	SOAPSchemaValidators.lo DateTime.lo NDC.lo ParserPool.lo \
+	PathResolver.lo ReloadableXMLFile.lo TemplateEngine.lo \
+	URLEncoder.lo XMLConstants.lo XMLHelper.lo ValidatorSuite.lo \
+	$(am__objects_3)
 am__objects_5 = Decrypter.lo EncryptedKeyResolver.lo Encrypter.lo \
 	EncryptionImpl.lo EncryptionSchemaValidators.lo \
 	MemoryStorageService.lo AbstractPKIXTrustEngine.lo \
@@ -538,6 +543,7 @@ common_sources = \
 	AbstractSimpleElement.cpp \
 	AbstractXMLObject.cpp \
 	exceptions.cpp \
+	Lockable.cpp \
 	Namespace.cpp \
 	QName.cpp \
 	unicode.cpp \
@@ -548,6 +554,7 @@ common_sources = \
 	io/AbstractXMLObjectMarshaller.cpp \
 	io/AbstractXMLObjectUnmarshaller.cpp \
 	io/HTTPRequest.cpp \
+	io/HTTPResponse.cpp \
 	soap/impl/SOAPClient.cpp \
 	soap/impl/SOAPImpl.cpp \
 	soap/impl/SOAPSchemaValidators.cpp \
@@ -567,8 +574,8 @@ libxmltooling_lite_la_SOURCES = \
 	${common_sources}
 
 libxmltooling_lite_la_CPPFLAGS = -DXMLTOOLING_LITE
-libxmltooling_lite_la_LDFLAGS = -version-info 3:2:0
-@BUILD_XMLSEC_TRUE@libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 3:2:0
+libxmltooling_lite_la_LDFLAGS = -version-info 4:0:0
+@BUILD_XMLSEC_TRUE@libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 4:0:0
 @BUILD_XMLSEC_TRUE@libxmltooling_la_SOURCES = \
 @BUILD_XMLSEC_TRUE@	${common_sources} \
 @BUILD_XMLSEC_TRUE@	${xmlsec_sources}
@@ -696,10 +703,12 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ExplicitKeyTrustEngine.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FilesystemCredentialResolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HTTPRequest.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HTTPResponse.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InlineKeyResolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyInfoImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyInfoResolver.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeyInfoSchemaValidators.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Lockable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MemoryStorageService.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NDC.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Namespace.Plo@am__quote@
@@ -739,6 +748,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmltooling_lite_la-AnyElement.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmltooling_lite_la-DateTime.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmltooling_lite_la-HTTPRequest.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmltooling_lite_la-HTTPResponse.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmltooling_lite_la-Lockable.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmltooling_lite_la-NDC.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmltooling_lite_la-Namespace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmltooling_lite_la-PThreads.Plo@am__quote@
@@ -824,6 +835,13 @@ libxmltooling_lite_la-exceptions.lo: exceptions.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libxmltooling_lite_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libxmltooling_lite_la-exceptions.lo `test -f 'exceptions.cpp' || echo '$(srcdir)/'`exceptions.cpp
 
+libxmltooling_lite_la-Lockable.lo: Lockable.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libxmltooling_lite_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libxmltooling_lite_la-Lockable.lo -MD -MP -MF "$(DEPDIR)/libxmltooling_lite_la-Lockable.Tpo" -c -o libxmltooling_lite_la-Lockable.lo `test -f 'Lockable.cpp' || echo '$(srcdir)/'`Lockable.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libxmltooling_lite_la-Lockable.Tpo" "$(DEPDIR)/libxmltooling_lite_la-Lockable.Plo"; else rm -f "$(DEPDIR)/libxmltooling_lite_la-Lockable.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='Lockable.cpp' object='libxmltooling_lite_la-Lockable.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libxmltooling_lite_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libxmltooling_lite_la-Lockable.lo `test -f 'Lockable.cpp' || echo '$(srcdir)/'`Lockable.cpp
+
 libxmltooling_lite_la-Namespace.lo: Namespace.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libxmltooling_lite_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libxmltooling_lite_la-Namespace.lo -MD -MP -MF "$(DEPDIR)/libxmltooling_lite_la-Namespace.Tpo" -c -o libxmltooling_lite_la-Namespace.lo `test -f 'Namespace.cpp' || echo '$(srcdir)/'`Namespace.cpp; \
 @am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libxmltooling_lite_la-Namespace.Tpo" "$(DEPDIR)/libxmltooling_lite_la-Namespace.Plo"; else rm -f "$(DEPDIR)/libxmltooling_lite_la-Namespace.Tpo"; exit 1; fi
@@ -893,6 +911,13 @@ libxmltooling_lite_la-HTTPRequest.lo: io/HTTPRequest.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='io/HTTPRequest.cpp' object='libxmltooling_lite_la-HTTPRequest.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libxmltooling_lite_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libxmltooling_lite_la-HTTPRequest.lo `test -f 'io/HTTPRequest.cpp' || echo '$(srcdir)/'`io/HTTPRequest.cpp
+
+libxmltooling_lite_la-HTTPResponse.lo: io/HTTPResponse.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libxmltooling_lite_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libxmltooling_lite_la-HTTPResponse.lo -MD -MP -MF "$(DEPDIR)/libxmltooling_lite_la-HTTPResponse.Tpo" -c -o libxmltooling_lite_la-HTTPResponse.lo `test -f 'io/HTTPResponse.cpp' || echo '$(srcdir)/'`io/HTTPResponse.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/libxmltooling_lite_la-HTTPResponse.Tpo" "$(DEPDIR)/libxmltooling_lite_la-HTTPResponse.Plo"; else rm -f "$(DEPDIR)/libxmltooling_lite_la-HTTPResponse.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='io/HTTPResponse.cpp' object='libxmltooling_lite_la-HTTPResponse.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libxmltooling_lite_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libxmltooling_lite_la-HTTPResponse.lo `test -f 'io/HTTPResponse.cpp' || echo '$(srcdir)/'`io/HTTPResponse.cpp
 
 libxmltooling_lite_la-SOAPClient.lo: soap/impl/SOAPClient.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libxmltooling_lite_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libxmltooling_lite_la-SOAPClient.lo -MD -MP -MF "$(DEPDIR)/libxmltooling_lite_la-SOAPClient.Tpo" -c -o libxmltooling_lite_la-SOAPClient.lo `test -f 'soap/impl/SOAPClient.cpp' || echo '$(srcdir)/'`soap/impl/SOAPClient.cpp; \
@@ -1026,6 +1051,13 @@ HTTPRequest.lo: io/HTTPRequest.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='io/HTTPRequest.cpp' object='HTTPRequest.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o HTTPRequest.lo `test -f 'io/HTTPRequest.cpp' || echo '$(srcdir)/'`io/HTTPRequest.cpp
+
+HTTPResponse.lo: io/HTTPResponse.cpp
+@am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT HTTPResponse.lo -MD -MP -MF "$(DEPDIR)/HTTPResponse.Tpo" -c -o HTTPResponse.lo `test -f 'io/HTTPResponse.cpp' || echo '$(srcdir)/'`io/HTTPResponse.cpp; \
+@am__fastdepCXX_TRUE@	then mv -f "$(DEPDIR)/HTTPResponse.Tpo" "$(DEPDIR)/HTTPResponse.Plo"; else rm -f "$(DEPDIR)/HTTPResponse.Tpo"; exit 1; fi
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='io/HTTPResponse.cpp' object='HTTPResponse.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o HTTPResponse.lo `test -f 'io/HTTPResponse.cpp' || echo '$(srcdir)/'`io/HTTPResponse.cpp
 
 SOAPClient.lo: soap/impl/SOAPClient.cpp
 @am__fastdepCXX_TRUE@	if $(LIBTOOL) --tag=CXX --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT SOAPClient.lo -MD -MP -MF "$(DEPDIR)/SOAPClient.Tpo" -c -o SOAPClient.lo `test -f 'soap/impl/SOAPClient.cpp' || echo '$(srcdir)/'`soap/impl/SOAPClient.cpp; \

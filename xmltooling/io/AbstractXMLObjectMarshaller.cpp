@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2007 Internet2
+*  Copyright 2001-2009 Internet2
  * 
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,23 @@ using namespace xmlconstants;
 using namespace xmltooling;
 using namespace xercesc;
 using namespace std;
+
+AbstractXMLObjectMarshaller::AbstractXMLObjectMarshaller()
+{
+}
+
+AbstractXMLObjectMarshaller::~AbstractXMLObjectMarshaller()
+{
+}
+
+void AbstractXMLObjectMarshaller::setDocumentElement(DOMDocument* document, DOMElement* element) const
+{
+    DOMElement* documentRoot = document->getDocumentElement();
+    if (documentRoot)
+        document->replaceChild(element, documentRoot);
+    else
+        document->appendChild(element);
+}
 
 DOMElement* AbstractXMLObjectMarshaller::marshall(
     DOMDocument* document
@@ -269,6 +286,10 @@ public:
         const XMLCh* prefix=ns.getNamespacePrefix();
         const XMLCh* uri=ns.getNamespaceURI();
         
+        // Check for xmlns:xml.
+        if (XMLString::equals(prefix, XML_PREFIX) && XMLString::equals(uri, XML_NS))
+            return;
+
         // Check to see if the prefix is already declared properly above this node.
         if (!ns.alwaysDeclare()) {
             const XMLCh* declared=lookupNamespaceURI(domElement->getParentNode(),prefix);
@@ -284,7 +305,7 @@ public:
             XMLString::catString(xmlns,colon);
             XMLString::catString(xmlns,prefix);
             domElement->setAttributeNS(XMLNS_NS, xmlns, uri);
-            XMLString::release(&xmlns);
+            delete[] xmlns;
         }
         else {
             domElement->setAttributeNS(XMLNS_NS, XMLNS_PREFIX, uri);
@@ -356,4 +377,8 @@ void AbstractXMLObjectMarshaller::marshallContent(
                 domElement->appendChild(domElement->getOwnerDocument()->createTextNode(val));
         }
     }
+}
+
+void AbstractXMLObjectMarshaller::marshallAttributes(DOMElement* domElement) const
+{
 }

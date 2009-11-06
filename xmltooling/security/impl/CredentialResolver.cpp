@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * CredentialResolver.cpp
  * 
- * Registration of factories for built-in resolvers
+ * An API for resolving keys and certificates based on application criteria.
  */
 
 #include "internal.h"
@@ -35,4 +35,12 @@ void XMLTOOL_API xmltooling::registerCredentialResolvers()
     XMLToolingConfig& conf=XMLToolingConfig::getConfig();
     conf.CredentialResolverManager.registerFactory(FILESYSTEM_CREDENTIAL_RESOLVER, FilesystemCredentialResolverFactory);
     conf.CredentialResolverManager.registerFactory(CHAINING_CREDENTIAL_RESOLVER, ChainingCredentialResolverFactory);
+}
+
+CredentialResolver::CredentialResolver()
+{
+}
+
+CredentialResolver::~CredentialResolver()
+{
 }

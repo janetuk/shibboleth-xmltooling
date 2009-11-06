@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * EncryptionImpl.cpp
  * 
- * Implementation classes for XML Encryption schema
+ * Implementation classes for XML Encryption schema.
  */
 
 #include "internal.h"
@@ -28,6 +28,7 @@
 #include "encryption/Encryption.h"
 #include "io/AbstractXMLObjectMarshaller.h"
 #include "io/AbstractXMLObjectUnmarshaller.h"
+#include "signature/KeyInfo.h"
 #include "util/XMLHelper.h"
 
 #include <xercesc/util/XMLUniDefs.hpp>
@@ -283,7 +284,7 @@ namespace xmlencryption {
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptionProperty);
-        IMPL_ID_ATTRIB(Id);
+        IMPL_ID_ATTRIB_EX(Id,ID,NULL);
         IMPL_STRING_ATTRIB(Target);
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject, m_children.end());
 
@@ -350,7 +351,7 @@ namespace xmlencryption {
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptionProperties);
-        IMPL_ID_ATTRIB(Id);
+        IMPL_ID_ATTRIB_EX(Id,ID,NULL);
         IMPL_TYPED_CHILDREN(EncryptionProperty,m_children.end());
 
     protected:
@@ -558,7 +559,7 @@ namespace xmlencryption {
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptedType);
-        IMPL_ID_ATTRIB(Id);
+        IMPL_ID_ATTRIB_EX(Id,ID,NULL);
         IMPL_STRING_ATTRIB(Type);
         IMPL_STRING_ATTRIB(MimeType);
         IMPL_STRING_ATTRIB(Encoding);

@@ -24,10 +24,11 @@
 #define __xmltooling_cred_h__
 
 #include <xmltooling/base.h>
-#include <xsec/enc/XSECCryptoKey.hpp>
 
 #include <set>
 #include <string>
+
+class XSECCryptoKey;
 
 namespace xmlsignature {
     class XMLTOOL_API KeyInfo;
@@ -48,10 +49,10 @@ namespace xmltooling {
     {
         MAKE_NONCOPYABLE(Credential);
     protected:
-        Credential() {}
+        Credential();
 
     public:
-        virtual ~Credential() {}
+        virtual ~Credential();
 
         /**
          * Bitmask constants for limiting resolution process inside a CredentialResolver.
@@ -139,9 +140,7 @@ namespace xmltooling {
          *
          * @return resolution context of the credential
          */
-        virtual const CredentialContext* getCredentalContext() const {
-            return NULL;
-        }
+        virtual const CredentialContext* getCredentalContext() const;
     };
 };
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,18 @@
 #if !defined(__xmltooling_replay_h__) && !defined(XMLTOOLING_LITE)
 #define __xmltooling_replay_h__
 
-#include <xmltooling/util/StorageService.h>
+#include <xmltooling/base.h>
 
 namespace xmltooling {
+
+    class XMLTOOL_API StorageService;
 
     /**
      * Helper class on top of StorageService for detecting message replay.
      */
     class XMLTOOL_API ReplayCache
     {
-        MAKE_NONCOPYABLE(ReplayCache);
+    MAKE_NONCOPYABLE(ReplayCache);
     public:
         
         /**
@@ -63,10 +65,7 @@ namespace xmltooling {
          * @param s         value to check
          * @param expires   time for disposal of value from cache
          */
-        bool check(const char* context, const XMLCh* s, time_t expires) {
-            auto_ptr_char temp(s);
-            return check(context, temp.get(), expires);
-        }
+        bool check(const char* context, const XMLCh* s, time_t expires);
         
     private:
         bool m_owned;
