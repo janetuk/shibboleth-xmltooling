@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2008 Internet2
+ *  Copyright 2001-2009 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@
 #define __xmltooling_pool_h__
 
 #include <xmltooling/unicode.h>
-#include <xmltooling/util/Threads.h>
 
 #include <map>
 #include <stack>
@@ -45,6 +44,8 @@
 #endif
 
 namespace xmltooling {
+
+    class XMLTOOL_API Mutex;
 
     /**
      * A thread-safe pool of DOMBuilders that share characteristics.
@@ -176,9 +177,9 @@ namespace xmltooling {
          * @param is        reference to an input stream
          * @param systemId  optional system identifier to attach to the stream
          */
-        StreamInputSource(std::istream& is, const char* systemId=NULL) : xercesc::InputSource(systemId), m_is(is) {}
+        StreamInputSource(std::istream& is, const char* systemId=NULL);
         /// @cond off
-        virtual xercesc::BinInputStream* makeStream() const { return new StreamBinInputStream(m_is); }
+        xercesc::BinInputStream* makeStream() const;
         /// @endcond
 
         /**
@@ -192,18 +193,15 @@ namespace xmltooling {
              *
              * @param is            reference to an input stream
              */
-            StreamBinInputStream(std::istream& is) : m_is(is), m_pos(0) {}
+            StreamBinInputStream(std::istream& is);
             /// @cond off
 #ifdef XMLTOOLING_XERCESC_64BITSAFE
-            XMLFilePos
+            XMLFilePos curPos() const;
+            const XMLCh* getContentType() const;
 #else
-            unsigned int
+            unsigned int curPos() const;
 #endif
-                curPos() const { return m_pos; }
             xsecsize_t readBytes(XMLByte* const toFill, const xsecsize_t maxToRead);
-#ifdef XMLTOOLING_XERCESC_64BITSAFE
-            const XMLCh* getContentType() const { return NULL; }
-#endif
             /// @endcond
         private:
             std::istream& m_is;

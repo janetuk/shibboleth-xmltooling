@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2008 Internet2
+ *  Copyright 2001-2009 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@
 #include "util/CurlURLInputStream.h"
 #include "util/NDC.h"
 #include "util/ParserPool.h"
+#include "util/Threads.h"
 #include "util/XMLHelper.h"
 
 #include <algorithm>
@@ -438,6 +439,36 @@ void ParserPool::checkinBuilder(DOMBuilder* builder)
     }
 }
 
+#endif
+
+StreamInputSource::StreamInputSource(istream& is, const char* systemId) : InputSource(systemId), m_is(is)
+{
+}
+
+BinInputStream* StreamInputSource::makeStream() const
+{
+    return new StreamBinInputStream(m_is);
+}
+
+StreamInputSource::StreamBinInputStream::StreamBinInputStream(istream& is) : m_is(is), m_pos(0)
+{
+}
+
+#ifdef XMLTOOLING_XERCESC_64BITSAFE
+XMLFilePos
+#else
+unsigned int
+#endif
+StreamInputSource::StreamBinInputStream::curPos() const
+{
+    return m_pos;
+}
+
+#ifdef XMLTOOLING_XERCESC_64BITSAFE
+const XMLCh* StreamInputSource::StreamBinInputStream::getContentType() const
+{
+    return NULL;
+}
 #endif
 
 xsecsize_t StreamInputSource::StreamBinInputStream::readBytes(XMLByte* const toFill, const xsecsize_t maxToRead)

@@ -36,7 +36,7 @@ namespace xmltooling {
         MAKE_NONCOPYABLE(PathResolver);
     public:
         PathResolver();
-        virtual ~PathResolver() {}
+        virtual ~PathResolver();
 
         /** Types of file resources to resolve. */
         enum file_type_t {
@@ -52,18 +52,14 @@ namespace xmltooling {
          *
          * @param pkgname name of default package to use
          */
-        virtual void setDefaultPackageName(const char* pkgname) {
-            m_defaultPackage = pkgname;
-        }
+        virtual void setDefaultPackageName(const char* pkgname);
 
         /**
          * Set the default installation prefix to use when resolving files.
          *
          * @param prefix name of default prefix to use
          */
-        virtual void setDefaultPrefix(const char* prefix) {
-            m_defaultPrefix = prefix;
-        }
+        virtual void setDefaultPrefix(const char* prefix);
 
         /**
          * Set the lib directory to use when resolving files.
@@ -71,9 +67,7 @@ namespace xmltooling {
          *
          * @param dir    the library directory to use
          */
-        virtual void setLibDir(const char* dir) {
-            m_lib = dir;
-        }
+        virtual void setLibDir(const char* dir);
 
         /**
          * Set the log directory to use when resolving files.
@@ -81,9 +75,7 @@ namespace xmltooling {
          *
          * @param dir    the log directory to use
          */
-        virtual void setLogDir(const char* dir) {
-            m_log = dir;
-        }
+        virtual void setLogDir(const char* dir);
 
         /**
          * Set the XML directory to use when resolving files.
@@ -91,9 +83,7 @@ namespace xmltooling {
          *
          * @param dir    the XML directory to use
          */
-        virtual void setXMLDir(const char* dir) {
-            m_xml = dir;
-        }
+        virtual void setXMLDir(const char* dir);
 
         /**
          * Set the run directory to use when resolving files.
@@ -101,9 +91,7 @@ namespace xmltooling {
          *
          * @param dir    the run directory to use
          */
-        virtual void setRunDir(const char* dir) {
-            m_run = dir;
-        }
+        virtual void setRunDir(const char* dir);
 
         /**
          * Set the config directory to use when resolving files.
@@ -111,9 +99,7 @@ namespace xmltooling {
          *
          * @param dir    the config directory to use
          */
-        virtual void setCfgDir(const char* dir) {
-            m_cfg = dir;
-        }
+        virtual void setCfgDir(const char* dir);
 
         /**
          * Changes the input filename into an absolute pathname to the same file.
@@ -128,16 +114,7 @@ namespace xmltooling {
         virtual const std::string& resolve(std::string& s, file_type_t filetype, const char* pkgname=NULL, const char* prefix=NULL) const;
 
     private:
-        bool isAbsolute(const char* s) const {
-            switch (*s) {
-                case '/':
-                case '\\':
-                    return true;
-                case '.':
-                    return (*(s+1) == '.' || *(s+1) == '/' || *(s+1) == '\\');
-            }
-            return *(s+1) == ':';
-        }
+        bool isAbsolute(const char* s) const;
 
         std::string m_defaultPackage,m_defaultPrefix,m_lib,m_log,m_xml,m_run,m_cfg;
     };

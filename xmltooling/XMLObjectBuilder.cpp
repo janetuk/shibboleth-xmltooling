@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 
 #include "internal.h"
 #include "logging.h"
-#include "XMLObjectBuilder.h"
+#include "ConcreteXMLObjectBuilder.h"
 #include "util/NDC.h"
 #include "util/XMLHelper.h"
 
@@ -30,10 +30,50 @@ using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace std;
 
+using xercesc::DOMDocument;
 using xercesc::DOMElement;
 
 map<QName,XMLObjectBuilder*> XMLObjectBuilder::m_map;
 XMLObjectBuilder* XMLObjectBuilder::m_default=NULL;
+
+XMLObjectBuilder::XMLObjectBuilder()
+{
+}
+
+XMLObjectBuilder::~XMLObjectBuilder()
+{
+}
+
+XMLObject* XMLObjectBuilder::buildFromQName(const QName& q) const
+{
+    return buildObject(q.getNamespaceURI(),q.getLocalPart(),q.getPrefix());
+}
+
+XMLObject* XMLObjectBuilder::buildFromElement(DOMElement* element, bool bindDocument) const
+{
+    auto_ptr<XMLObject> ret(
+        buildObject(element->getNamespaceURI(),element->getLocalName(),element->getPrefix(),XMLHelper::getXSIType(element))
+        );
+    ret->unmarshall(element,bindDocument);
+    return ret.release();
+}
+
+XMLObject* XMLObjectBuilder::buildFromDocument(DOMDocument* doc, bool bindDocument) const
+{
+    return buildFromElement(doc->getDocumentElement(),bindDocument);
+}
+
+XMLObject* XMLObjectBuilder::buildOneFromElement(xercesc::DOMElement* element, bool bindDocument)
+{
+    const XMLObjectBuilder* b=getBuilder(element);
+    return b ? b->buildFromElement(element,bindDocument) : NULL;
+}
+
+const XMLObjectBuilder* XMLObjectBuilder::getBuilder(const QName& key)
+{
+    map<QName,XMLObjectBuilder*>::const_iterator i=m_map.find(key);
+    return (i==m_map.end()) ? NULL : i->second;
+}
 
 const XMLObjectBuilder* XMLObjectBuilder::getBuilder(const DOMElement* domElement)
 {
@@ -66,9 +106,51 @@ const XMLObjectBuilder* XMLObjectBuilder::getBuilder(const DOMElement* domElemen
     return m_default;
 }
 
+const XMLObjectBuilder* XMLObjectBuilder::getDefaultBuilder()
+{
+    return m_default;
+}
+
+const map<QName,XMLObjectBuilder*>& XMLObjectBuilder::getBuilders()
+{
+    return m_map;
+}
+
+void XMLObjectBuilder::registerBuilder(const QName& builderKey, XMLObjectBuilder* builder)
+{
+    deregisterBuilder(builderKey);
+    m_map[builderKey]=builder;
+}
+
+void XMLObjectBuilder::registerDefaultBuilder(XMLObjectBuilder* builder)
+{
+    deregisterDefaultBuilder();
+    m_default=builder;
+}
+
+void XMLObjectBuilder::deregisterBuilder(const QName& builderKey)
+{
+    delete getBuilder(builderKey);
+    m_map.erase(builderKey);
+}
+
+void XMLObjectBuilder::deregisterDefaultBuilder()
+{
+    delete m_default;
+    m_default=NULL;
+}
+
 void XMLObjectBuilder::destroyBuilders()
 {
     for_each(m_map.begin(),m_map.end(),cleanup_pair<QName,XMLObjectBuilder>());
     m_map.clear();
     deregisterDefaultBuilder();
+}
+
+ConcreteXMLObjectBuilder::ConcreteXMLObjectBuilder()
+{
+}
+
+ConcreteXMLObjectBuilder::~ConcreteXMLObjectBuilder()
+{
 }

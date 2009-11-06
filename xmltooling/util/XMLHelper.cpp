@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@
 
 #include "internal.h"
 #include "exceptions.h"
+#include "QName.h"
+#include "XMLObject.h"
 #include "util/XMLHelper.h"
 #include "util/XMLConstants.h"
 
@@ -163,6 +165,11 @@ DOMElement* XMLHelper::appendChildElement(DOMElement* parentElement, DOMElement*
 
     parentElement->appendChild(childElement);
     return childElement;
+}
+
+bool XMLHelper::isNodeNamed(const xercesc::DOMNode* n, const XMLCh* ns, const XMLCh* local)
+{
+    return (n && XMLString::equals(local,n->getLocalName()) && XMLString::equals(ns,n->getNamespaceURI()));
 }
 
 const XMLCh* XMLHelper::getTextContent(const DOMElement* e)

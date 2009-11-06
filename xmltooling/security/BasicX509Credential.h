@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,14 @@
 #define __xmltooling_basicx509cred_h__
 
 #include <xmltooling/security/X509Credential.h>
-#include <xmltooling/signature/KeyInfo.h>
 
-#include <algorithm>
+#include <set>
+#include <vector>
+#include <string>
+
+namespace xmlsignature {
+    class XMLTOOL_API KeyInfo;
+};
 
 namespace xmltooling {
 
@@ -41,8 +46,7 @@ namespace xmltooling {
          * 
          * @param ownCerts  true iff any certificates subsequently stored should be freed by destructor
          */
-        BasicX509Credential(bool ownCerts) : m_key(NULL), m_ownCerts(ownCerts), m_keyInfo(NULL), m_compactKeyInfo(NULL) {
-        }
+        BasicX509Credential(bool ownCerts);
 
         /**
          * Constructor.
@@ -51,11 +55,7 @@ namespace xmltooling {
          * @param certs array of X.509 certificates, the first entry being the entity certificate
          * @param crl   optional CRL
          */
-        BasicX509Credential(XSECCryptoKey* key, const std::vector<XSECCryptoX509*>& certs, XSECCryptoX509CRL* crl=NULL)
-                : m_key(key), m_xseccerts(certs), m_ownCerts(true), m_keyInfo(NULL), m_compactKeyInfo(NULL) {
-            if (crl)
-                m_crls.push_back(crl);
-        }
+        BasicX509Credential(XSECCryptoKey* key, const std::vector<XSECCryptoX509*>& certs, XSECCryptoX509CRL* crl=NULL);
 
         /**
          * Constructor.
@@ -64,9 +64,7 @@ namespace xmltooling {
          * @param certs array of X.509 certificates, the first entry being the entity certificate
          * @param crls  array of X.509 CRLs
          */
-        BasicX509Credential(XSECCryptoKey* key, const std::vector<XSECCryptoX509*>& certs, const std::vector<XSECCryptoX509CRL*>& crls)
-                : m_key(key), m_xseccerts(certs), m_ownCerts(true), m_crls(crls), m_keyInfo(NULL), m_compactKeyInfo(NULL) {
-        }
+        BasicX509Credential(XSECCryptoKey* key, const std::vector<XSECCryptoX509*>& certs, const std::vector<XSECCryptoX509CRL*>& crls);
 
         /** The private/secret key/keypair. */
         XSECCryptoKey* m_key;
@@ -108,64 +106,20 @@ namespace xmltooling {
     public:
         virtual ~BasicX509Credential();
         
-        unsigned int getUsage() const {
-            return UNSPECIFIED_CREDENTIAL;
-        }
+        // Virtual function overrides.
+        unsigned int getUsage() const;
         const char* getAlgorithm() const;
         unsigned int getKeySize() const;
-
-        XSECCryptoKey* getPrivateKey() const {
-            if (m_key) {
-                XSECCryptoKey::KeyType type = m_key->getKeyType();
-                if (type!=XSECCryptoKey::KEY_RSA_PUBLIC && type!=XSECCryptoKey::KEY_DSA_PUBLIC)
-                    return m_key;
-            }
-            return NULL;
-        }
-
-        XSECCryptoKey* getPublicKey() const {
-            if (m_key) {
-                XSECCryptoKey::KeyType type = m_key->getKeyType();
-                if (type!=XSECCryptoKey::KEY_RSA_PRIVATE && type!=XSECCryptoKey::KEY_DSA_PRIVATE)
-                    return m_key;
-            }
-            return NULL;
-        }
-        
-        const std::set<std::string>& getKeyNames() const {
-            return m_keyNames;
-        }
-
-        xmlsignature::KeyInfo* getKeyInfo(bool compact=false) const {
-            if (compact || !m_keyInfo)
-                return m_compactKeyInfo ? m_compactKeyInfo->cloneKeyInfo() : NULL;
-            return m_keyInfo->cloneKeyInfo();
-        }
-        
-        const std::vector<XSECCryptoX509*>& getEntityCertificateChain() const {
-            return m_xseccerts;
-        }
-
-        XSECCryptoX509CRL* getCRL() const {
-            return m_crls.empty() ? NULL : m_crls.front();
-        }
-
-        const std::vector<XSECCryptoX509CRL*>& getCRLs() const {
-            return m_crls;
-        }
-
-        const char* getSubjectName() const {
-            return m_subjectName.c_str();
-        }
-
-        const char* getIssuerName() const {
-            return m_issuerName.c_str();
-        }
-
-        const char* getSerialNumber() const {
-            return m_serial.c_str();
-        }
-
+        XSECCryptoKey* getPrivateKey() const;
+        XSECCryptoKey* getPublicKey() const;
+        const std::set<std::string>& getKeyNames() const;
+        xmlsignature::KeyInfo* getKeyInfo(bool compact=false) const;
+        const std::vector<XSECCryptoX509*>& getEntityCertificateChain() const;
+        XSECCryptoX509CRL* getCRL() const;
+        const std::vector<XSECCryptoX509CRL*>& getCRLs() const;
+        const char* getSubjectName() const;
+        const char* getIssuerName() const;
+        const char* getSerialNumber() const;
         void extract();
     };
 };

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,9 @@ namespace xmltooling {
     class XMLTOOL_API OpenSSLSOAPTransport : public virtual SOAPTransport 
     {
     protected:
-        OpenSSLSOAPTransport() {}
+        OpenSSLSOAPTransport();
     public:
-        virtual ~OpenSSLSOAPTransport() {}
+        virtual ~OpenSSLSOAPTransport();
         
         /** OpenSSL context callback for manipulating credentials and validation behavior. */
         typedef bool (*ssl_ctx_callback_fn)(OpenSSLSOAPTransport* transport, SSL_CTX* ssl_ctx, void* userptr);

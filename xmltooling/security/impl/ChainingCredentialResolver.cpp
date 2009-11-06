@@ -27,6 +27,7 @@
 #include "util/NDC.h"
 #include "util/XMLHelper.h"
 
+#include <algorithm>
 #include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmltooling::logging;

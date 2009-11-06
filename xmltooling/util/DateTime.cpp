@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1555,3 +1555,72 @@ void DateTime::searchMiliSeconds(XMLCh*& miliStartPtr, XMLCh*& miliEndPtr) const
     return;
 }
 
+void DateTime::setBuffer(const XMLCh* const aString)
+{
+    reset();
+    fEnd = (int) xercesc::XMLString::stringLen(aString);
+    if (fEnd > 0) {
+        if (fEnd > fBufferMaxLen) {
+            delete[] fBuffer;
+            fBufferMaxLen = fEnd + 8;
+            fBuffer = new XMLCh[fBufferMaxLen+1];
+        }
+        memcpy(fBuffer, aString, (fEnd+1) * sizeof(XMLCh));
+    }
+}
+
+void DateTime::reset()
+{
+    for ( int i=0; i < xercesc::XMLDateTime::TOTAL_SIZE; i++ )
+        fValue[i] = 0;
+
+    fMiliSecond   = 0;
+    fHasTime      = false;
+    fTimeZone[hh] = fTimeZone[mm] = 0;
+    fStart = fEnd = 0;
+
+    if (fBuffer)
+        *fBuffer = 0;
+}
+
+void DateTime::copy(const DateTime& rhs)
+{
+    for ( int i = 0; i < xercesc::XMLDateTime::TOTAL_SIZE; i++ )
+        fValue[i] = rhs.fValue[i];
+
+    fMiliSecond   = rhs.fMiliSecond;
+    fHasTime      = rhs.fHasTime;
+    fTimeZone[hh] = rhs.fTimeZone[hh];
+    fTimeZone[mm] = rhs.fTimeZone[mm];
+    fStart = rhs.fStart;
+    fEnd   = rhs.fEnd;
+
+    if (fEnd > 0) {
+        if (fEnd > fBufferMaxLen) {
+            delete[] fBuffer;
+            fBufferMaxLen = rhs.fBufferMaxLen;
+            fBuffer = new XMLCh[fBufferMaxLen+1];
+        }
+        memcpy(fBuffer, rhs.fBuffer, (fEnd+1) * sizeof(XMLCh));
+    }
+}
+
+void DateTime::initParser()
+{
+    fStart = 0;   // to ensure scan from the very first beginning
+                  // in case the pointer is updated accidentally by someone else.
+}
+
+bool DateTime::isNormalized() const
+{
+    return (fValue[xercesc::XMLDateTime::utc] == xercesc::XMLDateTime::UTC_STD ? true : false);
+}
+
+int DateTime::getRetVal(int c1, int c2)
+{
+    if ((c1 == xercesc::XMLDateTime::LESS_THAN && c2 == xercesc::XMLDateTime::GREATER_THAN) ||
+        (c1 == xercesc::XMLDateTime::GREATER_THAN && c2 == xercesc::XMLDateTime::LESS_THAN))
+        return xercesc::XMLDateTime::INDETERMINATE;
+
+    return (c1 != xercesc::XMLDateTime::INDETERMINATE) ? c1 : c2;
+}

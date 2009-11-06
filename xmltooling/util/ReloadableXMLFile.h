@@ -25,7 +25,6 @@
 
 #include <xmltooling/logging.h>
 #include <xmltooling/Lockable.h>
-#include <xmltooling/util/Threads.h>
 
 #include <ctime>
 #include <string>
@@ -33,13 +32,14 @@
 
 namespace xmltooling {
 
+    class XMLTOOL_API RWLock;
+
     /**
      * Base class for file-based XML configuration.
      */
     class XMLTOOL_API ReloadableXMLFile : protected virtual Lockable
     {
-        MAKE_NONCOPYABLE(ReloadableXMLFile);
-        
+    MAKE_NONCOPYABLE(ReloadableXMLFile);
     protected:
         /**
          * Constructor taking a DOM element supporting the following content:
@@ -64,9 +64,7 @@ namespace xmltooling {
          */
         ReloadableXMLFile(const xercesc::DOMElement* e, logging::Category& log);
     
-        virtual ~ReloadableXMLFile() {
-            delete m_lock;
-        }
+        virtual ~ReloadableXMLFile();
 
         /**
          * Loads configuration material.
@@ -78,9 +76,7 @@ namespace xmltooling {
          * @return a pair consisting of a flag indicating whether to take ownership of
          *      the document, and the root element of the tree to load
          */
-        virtual std::pair<bool,xercesc::DOMElement*> load() {
-            return load(false);
-        }
+        virtual std::pair<bool,xercesc::DOMElement*> load();
         
         /** Root of the original DOM element passed into constructor. */
         const xercesc::DOMElement* m_root;
@@ -111,11 +107,7 @@ namespace xmltooling {
 
     public:
         Lockable* lock();
-
-        void unlock() {
-            if (m_lock)
-                m_lock->unlock();
-        }
+        void unlock();
 
     private:
         std::pair<bool,xercesc::DOMElement*> load(bool backup);

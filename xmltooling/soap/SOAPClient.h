@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 #ifndef __xmltooling_soap11client_h__
 #define __xmltooling_soap11client_h__
 
-#include <xmltooling/security/CredentialResolver.h>
 #include <xmltooling/soap/SOAPTransport.h>
 
 namespace soap11 {
@@ -46,7 +45,7 @@ namespace soap11 {
          * 
          * @param validate  true iff schema validation should be used 
          */
-        SOAPClient(bool validate=false) : m_validate(validate), m_transport(NULL) {}
+        SOAPClient(bool validate=false);
         
         virtual ~SOAPClient();
         
@@ -57,9 +56,7 @@ namespace soap11 {
          * 
          * @param validate  true iff the client should use a validating XML parser
          */
-        void setValidating(bool validate=true) {
-            m_validate = validate;
-        }
+        void setValidating(bool validate=true);
         
         /**
          * Sends the supplied envelope to the identified recipient/endpoint.
@@ -97,7 +94,7 @@ namespace soap11 {
          * 
          * @param transport reference to transport layer
          */
-        virtual void prepareTransport(xmltooling::SOAPTransport& transport) {}
+        virtual void prepareTransport(xmltooling::SOAPTransport& transport);
 
         /**
          * Handling of SOAP faults.

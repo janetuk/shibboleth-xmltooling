@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2007 Internet2
+*  Copyright 2001-2009 Internet2
  *
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,40 @@
  */
 
 #include "internal.h"
-#include "AbstractXMLObject.h"
 #include "exceptions.h"
+#include "AbstractXMLObject.h"
+#include "util/DateTime.h"
 
 #include <algorithm>
 
 using namespace xmltooling;
+using std::set;
 
 using xercesc::XMLString;
+
+XMLObject::XMLObject()
+{
+}
+
+XMLObject::~XMLObject()
+{
+}
+
+void XMLObject::releaseThisandParentDOM() const
+{
+    if (getDOM()) {
+        releaseDOM();
+        releaseParentDOM(true);
+    }
+}
+
+void XMLObject::releaseThisAndChildrenDOM() const
+{
+    if (getDOM()) {
+        releaseChildrenDOM(true);
+        releaseDOM();
+    }
+}
 
 AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
     : m_log(logging::Category::getInstance(XMLTOOLING_LOGCAT".XMLObject")),
@@ -58,7 +84,31 @@ AbstractXMLObject::~AbstractXMLObject()
     xercesc::XMLString::release(&m_noNamespaceSchemaLocation);
 }
 
-void XMLObject::setNil(const XMLCh* value) {
+void AbstractXMLObject::detach()
+{
+    if (!getParent())
+        return;
+    else if (getParent()->hasParent())
+        throw XMLObjectException("Cannot detach an object whose parent is itself a child.");
+
+    // Pull ourselves out of the parent and then blast him.
+    getParent()->removeChild(this);
+    delete m_parent;
+    m_parent = NULL;
+}
+
+const QName& AbstractXMLObject::getElementQName() const
+{
+    return m_elementQname;
+}
+
+const set<Namespace>& AbstractXMLObject::getNamespaces() const
+{
+    return m_namespaces;
+}
+
+void XMLObject::setNil(const XMLCh* value)
+{
     if (value) {
         switch (*value) {
             case xercesc::chLatin_t:
@@ -80,6 +130,58 @@ void XMLObject::setNil(const XMLCh* value) {
     else {
         nil(xmlconstants::XML_BOOL_NULL);
     }
+}
+
+void AbstractXMLObject::addNamespace(const Namespace& ns) const
+{
+    std::set<Namespace>::iterator i = m_namespaces.find(ns);
+    if (i == m_namespaces.end())
+        m_namespaces.insert(ns);
+    else if (ns.alwaysDeclare())
+        const_cast<Namespace&>(*i).setAlwaysDeclare(true);
+}
+
+void AbstractXMLObject::removeNamespace(const Namespace& ns)
+{
+    m_namespaces.erase(ns);
+}
+
+const QName* AbstractXMLObject::getSchemaType() const
+{
+    return m_typeQname;
+}
+
+const XMLCh* AbstractXMLObject::getXMLID() const
+{
+    return NULL;
+}
+
+xmlconstants::xmltooling_bool_t AbstractXMLObject::getNil() const
+{
+    return m_nil;
+}
+
+void AbstractXMLObject::nil(xmlconstants::xmltooling_bool_t value)
+{
+    if (m_nil != value) {
+        releaseThisandParentDOM();
+        m_nil = value;
+    }
+}
+
+bool AbstractXMLObject::hasParent() const
+{
+    return m_parent != NULL;
+}
+
+XMLObject* AbstractXMLObject::getParent() const
+{
+    return m_parent;
+}
+
+void AbstractXMLObject::setParent(XMLObject* parent)
+{
+    m_parent = parent;
 }
 
 XMLCh* AbstractXMLObject::prepareForAssignment(XMLCh* oldValue, const XMLCh* newValue)
@@ -175,17 +277,4 @@ XMLObject* AbstractXMLObject::prepareForAssignment(XMLObject* oldValue, XMLObjec
     }
 
     return newValue;
-}
-
-void AbstractXMLObject::detach()
-{
-    if (!getParent())
-        return;
-    else if (getParent()->hasParent())
-        throw XMLObjectException("Cannot detach an object whose parent is itself a child.");
-
-    // Pull ourselves out of the parent and then blast him.
-    getParent()->removeChild(this);
-    delete m_parent;
-    m_parent = NULL;
 }

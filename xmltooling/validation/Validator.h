@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * @file xmltooling/validation/Validator.h
  * 
- * Rules checking of XMLObjects 
+ * Rules checking of XMLObjects.
  */
 
 #ifndef __xmltooling_validator_h__
@@ -35,7 +35,7 @@ namespace xmltooling {
     {
     MAKE_NONCOPYABLE(Validator);
     public:
-        virtual ~Validator() {}
+        virtual ~Validator();
         
         /**
          * Checks to see if an XMLObject is valid.
@@ -47,7 +47,7 @@ namespace xmltooling {
         virtual void validate(const XMLObject* xmlObject) const=0;
 
     protected:
-        Validator() {}
+        Validator();
     };
 
 };

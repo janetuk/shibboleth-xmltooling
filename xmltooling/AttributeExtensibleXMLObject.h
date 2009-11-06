@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,10 +38,10 @@ namespace xmltooling {
     class XMLTOOL_API AttributeExtensibleXMLObject : public virtual XMLObject
     {
     protected:
-        AttributeExtensibleXMLObject() {}
+        AttributeExtensibleXMLObject();
         
     public:
-        virtual ~AttributeExtensibleXMLObject() {}
+        virtual ~AttributeExtensibleXMLObject();
         
         /**
          * Gets the value of an XML attribute of the object.
@@ -73,43 +73,33 @@ namespace xmltooling {
          * 
          * @return list of all the ID attributes currently registered
          */
-        static const std::set<QName>& getRegisteredIDAttributes() {
-            return m_idAttributeSet;
-        }
+        static const std::set<QName>& getRegisteredIDAttributes();
         
         /**
          * Tests whether an XML attribute is registered as an XML ID.
          * 
          * @return true iff the attribute name matches a registered XML ID attribute 
          */
-        static bool isRegisteredIDAttribute(const QName& name) {
-            return m_idAttributeSet.find(name)!=m_idAttributeSet.end();
-        }
+        static bool isRegisteredIDAttribute(const QName& name);
     
         /**
          * Registers a new attribute as being of XML ID type.
          * 
          * @param name the qualified attribute name
          */
-        static void registerIDAttribute(const QName& name) {
-            m_idAttributeSet.insert(name);
-        }
+        static void registerIDAttribute(const QName& name);
 
         /**
          * Deregisters an ID attribute.
          * 
          * @param name the qualified attribute name
          */
-        static void deregisterIDAttribute(const QName& name) {
-            m_idAttributeSet.erase(name);
-        }
+        static void deregisterIDAttribute(const QName& name);
         
         /**
          * Deregisters all ID attributes.
          */
-        static void deregisterIDAttributes() {
-            m_idAttributeSet.clear();
-        }
+        static void deregisterIDAttributes();
 
     private:
         /** Set of attributes to treat as XML IDs. */

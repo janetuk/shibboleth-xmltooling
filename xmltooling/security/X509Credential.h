@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,12 @@
 #define __xmltooling_x509cred_h__
 
 #include <xmltooling/security/Credential.h>
-#include <xmltooling/security/XSECCryptoX509CRL.h>
 
-#include <xsec/enc/XSECCryptoX509.hpp>
+class XSECCryptoX509;
 
 namespace xmltooling {
+
+    class XMLTOOL_API XSECCryptoX509CRL;
 
     /**
      * Wraps an X.509-based Credential.
@@ -36,10 +37,10 @@ namespace xmltooling {
     class XMLTOOL_API X509Credential : public virtual Credential
     {
     protected:
-        X509Credential() {}
+        X509Credential();
         
     public:
-        virtual ~X509Credential() {}
+        virtual ~X509Credential();
 
         /**
          * Bitmask constants for limiting resolution process inside a CredentialResolver. 

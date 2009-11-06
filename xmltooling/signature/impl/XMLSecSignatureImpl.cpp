@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2007 Internet2
+*  Copyright 2001-2009 Internet2
  * 
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include "logging.h"
 #include "impl/UnknownElement.h"
 #include "security/Credential.h"
+#include "signature/ContentReference.h"
 #include "signature/KeyInfo.h"
 #include "signature/Signature.h"
 #include "util/NDC.h"
@@ -52,12 +53,12 @@ using namespace std;
 using xmlconstants::XMLSIG_NS;
 using xmlconstants::XMLSIG_PREFIX;
 
+namespace xmlsignature {
+
 #if defined (_MSC_VER)
     #pragma warning( push )
     #pragma warning( disable : 4250 4251 )
 #endif
-
-namespace xmlsignature {
     
     class XMLTOOL_DLLLOCAL XMLSecSignatureImpl : public UnknownElementImpl, public virtual Signature
     {
@@ -128,12 +129,27 @@ namespace xmlsignature {
         mutable KeyInfo* m_keyInfo;
         ContentReference* m_reference;
     };
-    
-};
 
 #if defined (_MSC_VER)
     #pragma warning( pop )
 #endif
+};
+
+ContentReference::ContentReference()
+{
+}
+
+ContentReference::~ContentReference()
+{
+}
+
+Signature::Signature()
+{
+}
+
+Signature::~Signature()
+{
+}
 
 XMLSecSignatureImpl::~XMLSecSignatureImpl()
 {
@@ -449,6 +465,20 @@ XMLObject*
 SignatureBuilder::buildObject() const
 {
     return new XMLSecSignatureImpl();
+}
+
+Signature* SignatureBuilder::buildSignature() {
+    const SignatureBuilder* b = dynamic_cast<const SignatureBuilder*>(
+        XMLObjectBuilder::getBuilder(xmltooling::QName(xmlconstants::XMLSIG_NS,Signature::LOCAL_NAME))
+        );
+    if (b) {
+#ifdef HAVE_COVARIANT_RETURNS
+        return b->buildObject();
+#else
+        return dynamic_cast<Signature*>(b->buildObject());
+#endif
+    }
+    throw XMLObjectException("Unable to obtain typed builder for Signature.");
 }
 
 const XMLCh Signature::LOCAL_NAME[] = UNICODE_LITERAL_9(S,i,g,n,a,t,u,r,e);

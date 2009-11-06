@@ -42,9 +42,9 @@ namespace xmltooling {
     class XMLTOOL_API GenericRequest {
         MAKE_NONCOPYABLE(GenericRequest);
     protected:
-        GenericRequest() {}
+        GenericRequest();
     public:
-        virtual ~GenericRequest() {}
+        virtual ~GenericRequest();
 
         /**
          * Returns the URL scheme of the request (http, https, ftp, ldap, etc.)

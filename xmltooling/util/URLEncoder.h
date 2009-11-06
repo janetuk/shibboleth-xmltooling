@@ -17,8 +17,7 @@
 /**
  * @file xmltooling/util/URLEncoder.h
  *
- * Interface to a URL-encoding mechanism along with a
- * default implementation.
+ * Interface to a URL-encoding mechanism along with a default implementation.
  */
 
 #ifndef __xmltool_urlenc_h__
@@ -38,8 +37,9 @@ namespace xmltooling {
     class XMLTOOL_API URLEncoder {
         MAKE_NONCOPYABLE(URLEncoder);
     public:
-        URLEncoder() {}
-        virtual ~URLEncoder() {}
+        URLEncoder();
+
+        virtual ~URLEncoder();
 
         /**
          * Produce a URL-safe but equivalent version of the input string.
@@ -64,10 +64,7 @@ namespace xmltooling {
          * @param ch    the character to check
          * @return  true iff the character should be encoded
          */
-        virtual bool isBad(char ch) const {
-            static char badchars[]="=&/?:\"\\+<>#%{}|^~[],`;@";
-            return (ch<=0x20 || ch>=0x7F || strchr(badchars,ch));
-        }
+        virtual bool isBad(char ch) const;
     };
 };
 

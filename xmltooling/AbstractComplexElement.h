@@ -40,23 +40,16 @@ namespace xmltooling {
     {
     public:
         virtual ~AbstractComplexElement();
-        
+
+        // Virtual function overrides.
         bool hasChildren() const;
-
-        const std::list<XMLObject*>& getOrderedChildren() const {
-            return m_children;
-        }
-
+        const std::list<XMLObject*>& getOrderedChildren() const;
         void removeChild(XMLObject* child);
-
-        const XMLCh* getTextContent(unsigned int position=0) const {
-            return (m_text.size() > position) ? m_text[position] : NULL; 
-        }
-        
+        const XMLCh* getTextContent(unsigned int position=0) const;
         void setTextContent(const XMLCh* value, unsigned int position=0);
 
     protected:
-        AbstractComplexElement() {}
+        AbstractComplexElement();
         
         /** Copy constructor. */
         AbstractComplexElement(const AbstractComplexElement& src);

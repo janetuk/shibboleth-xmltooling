@@ -3,6 +3,9 @@
 /* Define to 1 if C++ compiler supports covariant virtual methods. */
 #undef HAVE_COVARIANT_RETURNS
 
+/* Define to 1 if you have the 'curl_off_t' type. */
+#undef HAVE_CURL_OFF_T
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 

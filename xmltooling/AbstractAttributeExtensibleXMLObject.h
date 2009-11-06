@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,10 @@
 #ifndef __xmltooling_absattrextxmlobj_h__
 #define __xmltooling_absattrextxmlobj_h__
 
-#include <map>
 #include <xmltooling/AbstractXMLObject.h>
 #include <xmltooling/AttributeExtensibleXMLObject.h>
+
+#include <map>
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -44,25 +45,14 @@ namespace xmltooling {
     public:
         virtual ~AbstractAttributeExtensibleXMLObject();
         
-        const XMLCh* getAttribute(const QName& qualifiedName) const {
-            std::map<QName,XMLCh*>::const_iterator i=m_attributeMap.find(qualifiedName);
-            return (i==m_attributeMap.end()) ? NULL : i->second;
-        }
-        
+        // Virtual function overrides.
+        const XMLCh* getAttribute(const QName& qualifiedName) const;
         void setAttribute(const QName& qualifiedName, const XMLCh* value, bool ID=false);
-    
-        const std::map<QName,XMLCh*>& getExtensionAttributes() const {
-            return m_attributeMap;
-        }
-        
-        const XMLCh* getXMLID() const {
-            return (m_idAttribute == m_attributeMap.end()) ? NULL : m_idAttribute->second;
-        }
+        const std::map<QName,XMLCh*>& getExtensionAttributes() const;
+        const XMLCh* getXMLID() const;
     
      protected:
-        AbstractAttributeExtensibleXMLObject() {
-            m_idAttribute = m_attributeMap.end();
-        }
+        AbstractAttributeExtensibleXMLObject();
 
         /** Copy constructor. */
         AbstractAttributeExtensibleXMLObject(const AbstractAttributeExtensibleXMLObject& src);

@@ -168,6 +168,7 @@ common_sources = \
 	AbstractSimpleElement.cpp \
 	AbstractXMLObject.cpp \
 	exceptions.cpp \
+	Lockable.cpp \
 	Namespace.cpp \
 	QName.cpp \
 	unicode.cpp \
@@ -178,6 +179,7 @@ common_sources = \
 	io/AbstractXMLObjectMarshaller.cpp \
 	io/AbstractXMLObjectUnmarshaller.cpp \
 	io/HTTPRequest.cpp \
+	io/HTTPResponse.cpp \
 	soap/impl/SOAPClient.cpp \
 	soap/impl/SOAPImpl.cpp \
 	soap/impl/SOAPSchemaValidators.cpp \
@@ -196,10 +198,10 @@ common_sources = \
 libxmltooling_lite_la_SOURCES = \
 	${common_sources}
 libxmltooling_lite_la_CPPFLAGS = -DXMLTOOLING_LITE
-libxmltooling_lite_la_LDFLAGS = -version-info 3:2:0
+libxmltooling_lite_la_LDFLAGS = -version-info 4:0:0
 
 if BUILD_XMLSEC
-libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 3:2:0
+libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 4:0:0
 libxmltooling_la_SOURCES = \
 	${common_sources} \
 	${xmlsec_sources}

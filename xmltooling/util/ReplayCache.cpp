@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 
 #include "internal.h"
 #include "util/ReplayCache.h"
+#include "util/StorageService.h"
 
 using namespace xmltooling;
 using namespace std;
@@ -45,4 +46,10 @@ bool ReplayCache::check(const char* context, const char* s, time_t expires)
         return false;
     m_storage->createString(context, s, "x", expires);
     return true;
+}
+
+bool ReplayCache::check(const char* context, const XMLCh* s, time_t expires)
+{
+    auto_ptr_char temp(s);
+    return check(context, temp.get(), expires);
 }

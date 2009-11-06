@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2007 Internet2
+*  Copyright 2001-2009 Internet2
  *
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@
 #define __xmltooling_abstractxmlobj_h__
 
 #include <xmltooling/logging.h>
+#include <xmltooling/QName.h>
 #include <xmltooling/XMLObject.h>
-#include <xmltooling/util/DateTime.h>
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -33,6 +33,8 @@
 #endif
 
 namespace xmltooling {
+
+    class XMLTOOL_API DateTime;
 
     /**
      * An abstract implementation of XMLObject.
@@ -46,58 +48,19 @@ namespace xmltooling {
     public:
         virtual ~AbstractXMLObject();
 
+        // Virtual function overrides.
         void detach();
-
-        const QName& getElementQName() const {
-            return m_elementQname;
-        }
-
-        const std::set<Namespace>& getNamespaces() const {
-            return m_namespaces;
-        }
-
-        void addNamespace(const Namespace& ns) const {
-            std::set<Namespace>::iterator i = m_namespaces.find(ns);
-            if (i == m_namespaces.end())
-                m_namespaces.insert(ns);
-            else if (ns.alwaysDeclare())
-                const_cast<Namespace&>(*i).setAlwaysDeclare(true);
-        }
-
-        void removeNamespace(const Namespace& ns) {
-            m_namespaces.erase(ns);
-        }
-
-        const QName* getSchemaType() const {
-            return m_typeQname;
-        }
-
-        const XMLCh* getXMLID() const {
-            return NULL;
-        }
-
-        xmlconstants::xmltooling_bool_t getNil() const {
-        	return m_nil;
-        }
-
-        void nil(xmlconstants::xmltooling_bool_t value) {
-            if (m_nil != value) {
-            	releaseThisandParentDOM();
-            	m_nil = value;
-            }
-        }
-
-        bool hasParent() const {
-            return m_parent != NULL;
-        }
-
-        XMLObject* getParent() const {
-            return m_parent;
-        }
-
-        void setParent(XMLObject* parent) {
-            m_parent = parent;
-        }
+        const QName& getElementQName() const;
+        const std::set<Namespace>& getNamespaces() const;
+        void addNamespace(const Namespace& ns) const;
+        void removeNamespace(const Namespace& ns);
+        const QName* getSchemaType() const;
+        const XMLCh* getXMLID() const;
+        xmlconstants::xmltooling_bool_t getNil() const;
+        void nil(xmlconstants::xmltooling_bool_t value);
+        bool hasParent() const;
+        XMLObject* getParent() const;
+        void setParent(XMLObject* parent);
 
      protected:
         /**

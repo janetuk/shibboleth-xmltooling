@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include "security/BasicX509Credential.h"
 #include "security/KeyInfoCredentialContext.h"
 #include "security/KeyInfoResolver.h"
+#include "security/XSECCryptoX509CRL.h"
 #include "signature/KeyInfo.h"
 #include "signature/Signature.h"
 #include "util/NDC.h"

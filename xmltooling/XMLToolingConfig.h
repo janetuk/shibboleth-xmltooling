@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * @file xmltooling/XMLToolingConfig.h
  * 
- * Library configuration 
+ * Library configuration.
  */
 
 #ifndef __xmltooling_config_h__
@@ -26,16 +26,9 @@
 #include <xmltooling/Lockable.h>
 #include <xmltooling/PluginManager.h>
 #include <xmltooling/soap/SOAPTransport.h>
-#include <xmltooling/util/ParserPool.h>
 
-#ifndef XMLTOOLING_NO_XMLSEC
-namespace xmltooling {
-    class XMLTOOL_API CredentialResolver;
-    class XMLTOOL_API KeyInfoResolver;
-    class XMLTOOL_API TrustEngine;
-    class XMLTOOL_API XSECCryptoX509CRL;
-};
-#endif
+#include <string>
+#include <xercesc/dom/DOM.hpp>
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -44,12 +37,19 @@ namespace xmltooling {
 
 namespace xmltooling {
     
+    class XMLTOOL_API ParserPool;
     class XMLTOOL_API PathResolver;
     class XMLTOOL_API TemplateEngine;
     class XMLTOOL_API URLEncoder;
 #ifndef XMLTOOLING_LITE
     class XMLTOOL_API ReplayCache;
     class XMLTOOL_API StorageService;
+#endif
+#ifndef XMLTOOLING_NO_XMLSEC
+    class XMLTOOL_API CredentialResolver;
+    class XMLTOOL_API KeyInfoResolver;
+    class XMLTOOL_API TrustEngine;
+    class XMLTOOL_API XSECCryptoX509CRL;
 #endif
 
     /**
@@ -59,21 +59,18 @@ namespace xmltooling {
      * obtain a global system lock, but the actual configuration itself is not
      * synchronized.
      */
-    class XMLTOOL_API XMLToolingConfig : public Lockable
+    class XMLTOOL_API XMLToolingConfig : public virtual Lockable
     {
         MAKE_NONCOPYABLE(XMLToolingConfig);
     protected:
-#ifndef XMLTOOLING_NO_XMLSEC
-        XMLToolingConfig() : m_keyInfoResolver(NULL), m_replayCache(NULL),
-            m_pathResolver(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180) {}
+        XMLToolingConfig();
 
+#ifndef XMLTOOLING_NO_XMLSEC
         /** Global KeyInfoResolver instance. */
         KeyInfoResolver* m_keyInfoResolver;
 
         /** Global ReplayCache instance. */
         ReplayCache* m_replayCache;
-#else
-        XMLToolingConfig() : m_pathResolver(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180) {}
 #endif
 
         /** Global PathResolver instance. */
@@ -86,7 +83,7 @@ namespace xmltooling {
         URLEncoder* m_urlEncoder;
 
     public:
-        virtual ~XMLToolingConfig() {}
+        virtual ~XMLToolingConfig();
 
         /**
          * Returns the global configuration object for the library.
@@ -159,6 +156,20 @@ namespace xmltooling {
 
 #ifndef XMLTOOLING_NO_XMLSEC
         /**
+         * Returns the global KeyInfoResolver instance.
+         * 
+         * @return  global KeyInfoResolver or NULL
+         */
+        const KeyInfoResolver* getKeyInfoResolver() const;
+
+        /**
+         * Returns the global ReplayCache instance.
+         * 
+         * @return  global ReplayCache or NULL
+         */
+        ReplayCache* getReplayCache() const;
+
+        /**
          * Sets the global KeyInfoResolver instance.
          * This method must be externally synchronized with any code that uses the object.
          * Any previously set object is destroyed.
@@ -168,15 +179,6 @@ namespace xmltooling {
         void setKeyInfoResolver(KeyInfoResolver* keyInfoResolver);
 
         /**
-         * Returns the global KeyInfoResolver instance.
-         * 
-         * @return  global KeyInfoResolver or NULL
-         */
-        const KeyInfoResolver* getKeyInfoResolver() const {
-            return m_keyInfoResolver;
-        }
-
-        /**
          * Sets the global ReplayCache instance.
          * This method must be externally synchronized with any code that uses the object.
          * Any previously set object is destroyed.
@@ -184,34 +186,37 @@ namespace xmltooling {
          * @param replayCache   new ReplayCache instance to store
          */
         void setReplayCache(ReplayCache* replayCache);
-
-        /**
-         * Returns the global ReplayCache instance.
-         * 
-         * @return  global ReplayCache or NULL
-         */
-        ReplayCache* getReplayCache() const {
-            return m_replayCache;
-        }
 #endif
 
         /**
-         * Sets the global URLEncoder instance.
-         * This method must be externally synchronized with any code that uses the object.
-         * Any previously set object is destroyed.
+         * Returns the global PathResolver instance.
          * 
-         * @param urlEncoder   new URLEncoder instance to store
+         * @return  global PathResolver or NULL
          */
-        void setURLEncoder(URLEncoder* urlEncoder);
+        PathResolver* getPathResolver() const;
         
+        /**
+         * Returns the global TemplateEngine instance.
+         * 
+         * @return  global TemplateEngine or NULL
+         */
+        TemplateEngine* getTemplateEngine() const;
+
         /**
          * Returns the global URLEncoder instance.
          * 
          * @return  global URLEncoder or NULL
          */
-        const URLEncoder* getURLEncoder() const {
-            return m_urlEncoder;
-        }
+        const URLEncoder* getURLEncoder() const;
+
+        /**
+         * Sets the global PathResolver instance.
+         * This method must be externally synchronized with any code that uses the object.
+         * Any previously set object is destroyed.
+         * 
+         * @param pathResolver   new PathResolver instance to store
+         */
+        void setPathResolver(PathResolver* pathResolver);
         
         /**
          * Sets the global TemplateEngine instance.
@@ -223,31 +228,13 @@ namespace xmltooling {
         void setTemplateEngine(TemplateEngine* templateEngine);
 
         /**
-         * Returns the global TemplateEngine instance.
-         * 
-         * @return  global TemplateEngine or NULL
-         */
-        TemplateEngine* getTemplateEngine() const {
-            return m_templateEngine;
-        }
-
-        /**
-         * Sets the global PathResolver instance.
+         * Sets the global URLEncoder instance.
          * This method must be externally synchronized with any code that uses the object.
          * Any previously set object is destroyed.
          * 
-         * @param pathResolver   new PathResolver instance to store
+         * @param urlEncoder   new URLEncoder instance to store
          */
-        void setPathResolver(PathResolver* pathResolver);
-
-        /**
-         * Returns the global PathResolver instance.
-         * 
-         * @return  global PathResolver or NULL
-         */
-        PathResolver* getPathResolver() const {
-            return m_pathResolver;
-        }
+        void setURLEncoder(URLEncoder* urlEncoder);
         
         /**
          * List of catalog files to load into validating parser pool at initialization time.

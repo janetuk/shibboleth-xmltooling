@@ -26,9 +26,10 @@
 
 #include <xmltooling/security/OpenSSLTrustEngine.h>
 #include <xmltooling/security/SignatureTrustEngine.h>
-#include <xmltooling/security/XSECCryptoX509CRL.h>
 
 namespace xmltooling {
+
+    class XMLTOOL_API XSECCryptoX509CRL;
 
     /**
      * A trust engine that uses X.509 trust anchors and CRLs associated with a peer
@@ -69,7 +70,7 @@ namespace xmltooling {
         bool checkEntityNames(X509* certEE, const CredentialResolver& credResolver, const CredentialCriteria& criteria) const;
 
     public:
-        virtual ~AbstractPKIXTrustEngine() {}
+        virtual ~AbstractPKIXTrustEngine();
 
         bool validate(
             xmlsignature::Signature& sig,
@@ -110,10 +111,10 @@ namespace xmltooling {
         class XMLTOOL_API PKIXValidationInfoIterator {
             MAKE_NONCOPYABLE(PKIXValidationInfoIterator);
         protected:
-            PKIXValidationInfoIterator() {}
+            PKIXValidationInfoIterator();
             
         public:
-            virtual ~PKIXValidationInfoIterator() {}
+            virtual ~PKIXValidationInfoIterator();
             
             /**
              * Advances to the next set of information, if any.

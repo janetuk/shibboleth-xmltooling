@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * ChainingTrustEngine.cpp
  * 
- * TrustEngine that uses multiple engines in sequence.
+ * OpenSSLTrustEngine that uses multiple engines in sequence.
  */
 
 #include "internal.h"
@@ -26,6 +26,7 @@
 #include "security/ChainingTrustEngine.h"
 #include "util/XMLHelper.h"
 
+#include <algorithm>
 #include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmlsignature;
@@ -75,6 +76,22 @@ ChainingTrustEngine::ChainingTrustEngine(const DOMElement* e) : TrustEngine(e) {
 
 ChainingTrustEngine::~ChainingTrustEngine() {
     for_each(m_engines.begin(), m_engines.end(), xmltooling::cleanup<TrustEngine>());
+}
+
+void ChainingTrustEngine::addTrustEngine(TrustEngine* newEngine)
+{
+    m_engines.push_back(newEngine);
+}
+
+TrustEngine* ChainingTrustEngine::removeTrustEngine(TrustEngine* oldEngine)
+{
+    for (vector<TrustEngine*>::iterator i=m_engines.begin(); i!=m_engines.end(); i++) {
+        if (oldEngine==(*i)) {
+            m_engines.erase(i);
+            return oldEngine;
+        }
+    }
+    return NULL;
 }
 
 bool ChainingTrustEngine::validate(Signature& sig, const CredentialResolver& credResolver, CredentialCriteria* criteria) const

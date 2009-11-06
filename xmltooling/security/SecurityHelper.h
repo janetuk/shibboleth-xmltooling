@@ -23,15 +23,18 @@
 #if !defined(__xmltooling_sechelper_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_sechelper_h__
 
-#include <xmltooling/security/XSECCryptoX509CRL.h>
-#include <xmltooling/soap/SOAPTransport.h>
+#include <xmltooling/base.h>
 
+#include <string>
 #include <vector>
-#include <xsec/enc/XSECCryptoKey.hpp>
-#include <xsec/enc/XSECCryptoX509.hpp>
+
+class XSECCryptoKey;
+class XSECCryptoX509;
 
 namespace xmltooling {
     class XMLTOOL_API Credential;
+    class XMLTOOL_API SOAPTransport;
+    class XMLTOOL_API XSECCryptoX509CRL;
 
     /**
      * A helper class for working with keys, certificates, etc.
@@ -130,6 +133,53 @@ namespace xmltooling {
         static bool matches(const XSECCryptoKey& key1, const XSECCryptoKey& key2);
 
         /**
+         * Performs a hash operation over the supplied data.
+         *
+         * @param hashAlg   name of hash algorithm, syntax specific to crypto provider
+         * @param buf       input data to hash
+         * @param buflen    length of input data
+         * @param toHex     if true, hex-encodes the resulting raw bytes
+         * @return  result of hash operation, or an empty string
+         */
+        static std::string doHash(const char* hashAlg, const char* buf, unsigned long buflen, bool toHex=true);
+
+        /**
+         * Returns the base64-encoded DER encoding of a public key in SubjectPublicKeyInfo format.
+         * <p>If a hash algorithm is provided, the data is digested before being base64-encoded.
+         *
+         * @param cred      the credential containing the key to encode
+         * @param hash      optional name of hash algorithm, syntax specific to crypto provider
+         * @param nowrap    if true, any linefeeds will be stripped from the result
+         * @return  the base64 encoded key value
+         */
+        static std::string getDEREncoding(const Credential& cred, const char* hash, bool nowrap=true);
+
+        /**
+         * Returns the base64-encoded DER encoding of a public key in SubjectPublicKeyInfo format.
+         * <p>If a hash algorithm is provided, the data is digested before being base64-encoded.
+         *
+         * @param key       the key to encode
+         * @param hash      optional name of hash algorithm, syntax specific to crypto provider
+         * @param nowrap    if true, any linefeeds will be stripped from the result
+         * @param hashAlg   name of hash algorithm, syntax specific to crypto provider
+         * @return  the base64 encoded key value
+         */
+        static std::string getDEREncoding(const XSECCryptoKey& key, const char* hash, bool nowrap=true);
+
+        /**
+         * Returns the base64-encoded DER encoding of a certifiate's public key in SubjectPublicKeyInfo format.
+         * <p>If a hash algorithm is provided, the data is digested before being base64-encoded.
+         *
+         * @param cert      the certificate's key to encode
+         * @param hash      optional name of hash algorithm, syntax specific to crypto provider
+         * @param nowrap    if true, any linefeeds will be stripped from the result
+         * @param hashAlg   name of hash algorithm, syntax specific to crypto provider
+         * @return  the base64 encoded key value
+         */
+        static std::string getDEREncoding(const XSECCryptoX509& cert, const char* hash, bool nowrap=true);
+
+        /**
+         * @deprecated
          * Returns the base64-encoded DER encoding of a public key in SubjectPublicKeyInfo format.
          *
          * @param cred      the credential containing the key to encode
@@ -140,6 +190,7 @@ namespace xmltooling {
         static std::string getDEREncoding(const Credential& cred, bool hash=false, bool nowrap=true);
 
         /**
+         * @deprecated
          * Returns the base64-encoded DER encoding of a public key in SubjectPublicKeyInfo format.
          *
          * @param key       the key to encode
@@ -150,6 +201,7 @@ namespace xmltooling {
         static std::string getDEREncoding(const XSECCryptoKey& key, bool hash=false, bool nowrap=true);
 
         /**
+         * @deprecated
          * Returns the base64-encoded DER encoding of a certifiate's public key in SubjectPublicKeyInfo format.
          *
          * @param cert      the certificate's key to encode

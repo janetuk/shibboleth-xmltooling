@@ -25,6 +25,7 @@
 #include "logging.h"
 #include "security/AbstractPKIXTrustEngine.h"
 #include "signature/KeyInfo.h"
+#include "signature/Signature.h"
 
 #include <openssl/x509_vfy.h>
 #include <openssl/x509v3.h>
@@ -162,11 +163,23 @@ namespace {
     }
 };
 
+AbstractPKIXTrustEngine::PKIXValidationInfoIterator::PKIXValidationInfoIterator()
+{
+}
+
+AbstractPKIXTrustEngine::PKIXValidationInfoIterator::~PKIXValidationInfoIterator()
+{
+}
+
 AbstractPKIXTrustEngine::AbstractPKIXTrustEngine(const xercesc::DOMElement* e) : TrustEngine(e), m_fullCRLChain(false)
 {
     static XMLCh fullCRLChain[] = UNICODE_LITERAL_12(f,u,l,l,C,R,L,C,h,a,i,n);
     const XMLCh* flag = e ? e->getAttributeNS(NULL, fullCRLChain) : NULL;
     m_fullCRLChain = (flag && (*flag == xercesc::chLatin_t || *flag == xercesc::chDigit_1));
+}
+
+AbstractPKIXTrustEngine::~AbstractPKIXTrustEngine()
+{
 }
 
 bool AbstractPKIXTrustEngine::checkEntityNames(

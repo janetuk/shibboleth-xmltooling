@@ -23,7 +23,6 @@
 #ifndef _xmltooling_threads_h
 #define _xmltooling_threads_h
 
-#include <xmltooling/base.h>
 #include <xmltooling/exceptions.h>
 
 #include <signal.h>

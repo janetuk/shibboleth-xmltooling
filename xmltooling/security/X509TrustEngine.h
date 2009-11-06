@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,8 @@
 #include <xmltooling/security/TrustEngine.h>
 
 #include <vector>
-#include <xsec/enc/XSECCryptoX509.hpp>
+
+class XSECCryptoX509;
 
 namespace xmltooling {
 
@@ -51,10 +52,10 @@ namespace xmltooling {
          * 
          * @param e DOM to supply configuration for provider
          */
-        X509TrustEngine(const xercesc::DOMElement* e=NULL) : TrustEngine(e) {}
+        X509TrustEngine(const xercesc::DOMElement* e=NULL);
         
     public:
-        virtual ~X509TrustEngine() {}
+        virtual ~X509TrustEngine();
 
         /**
          * Determines whether an X.509 credential is valid with respect to the

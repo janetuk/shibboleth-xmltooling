@@ -1,5 +1,5 @@
 Name:		xmltooling
-Version:	1.2.2
+Version:	1.3
 Release:	1
 Summary:    OpenSAML XMLTooling library
 Group:		System Environment/Libraries
@@ -21,6 +21,9 @@ BuildRequires:  xml-security-c-devel >= 1.4.0
 %endif
 BuildRequires:	gcc-c++, openssl-devel, curl-devel >= 7.10.6
 %{!?_without_doxygen:BuildRequires: doxygen}
+%if "%{_vendor}" == "redhat"
+BuildRequires: redhat-rpm-config
+%endif
 
 %if "%{_vendor}" == "suse"
 %define pkgdocdir %{_docdir}/%{name}
@@ -36,12 +39,13 @@ classes to add value around the DOM, as well as signing and encryption
 support.
 
 %if 0%{?suse_version} > 1030
-%package -n libxmltooling3
+%package -n libxmltooling4
 Summary:    OpenSAML XMLTooling library
 Group:      Development/Libraries
 Provides:   xmltooling = %{version}
+Obsoletes:  xmltooling
 
-%description -n libxmltooling3
+%description -n libxmltooling4
 The XMLTooling library contains generic XML parsing and processing
 classes based on the Xerces-C DOM. It adds more powerful facilities
 for declaring element- and type-specific API and implementation
@@ -53,10 +57,11 @@ This package contains just the shared library.
 
 %if 0%{?suse_version} > 1030
 %package -n libxmltooling-devel
-Requires: libxmltooling3 = %version
+Requires:   libxmltooling4 = %version
+Obsoletes:  xmltooling-devel
 %else
 %package devel
-Requires: %name = %version
+Requires:   %name = %version
 %endif
 Summary: XMLTooling development Headers
 Group: Development/Libraries
@@ -106,7 +111,7 @@ This package includes files needed for development with XMLTooling.
 
 %ifnos solaris2.8 solaris2.9 solaris2.10
 %if 0%{?suse_version} > 1030
-%post -n libxmltooling3 -p /sbin/ldconfig
+%post -n libxmltooling4 -p /sbin/ldconfig
 %else
 %post -p /sbin/ldconfig
 %endif
@@ -114,14 +119,14 @@ This package includes files needed for development with XMLTooling.
 
 %ifnos solaris2.8 solaris2.9 solaris2.10
 %if 0%{?suse_version} > 1030
-%postun -n libxmltooling3 -p /sbin/ldconfig
+%postun -n libxmltooling4 -p /sbin/ldconfig
 %else
 %postun -p /sbin/ldconfig
 %endif
 %endif
 
 %if 0%{?suse_version} > 1030
-%files -n libxmltooling3
+%files -n libxmltooling4
 %else
 %files
 %endif
@@ -141,6 +146,9 @@ This package includes files needed for development with XMLTooling.
 %doc %{pkgdocdir}
 
 %changelog
+* Mon Aug 31 2009  Scott Cantor  <cantor.2@osu.edu>  - 1.3-1
+- Bump soname for SUSE packaging.
+
 * Thu Aug 6 2009  Scott Cantor  <cantor.2@osu.edu>  - 1.2.1-1
 - SuSE conventions
 - Stop packaging unit tester

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2009 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,15 +49,14 @@ namespace xmltooling {
     {
     /// @cond OFF
     public:
-        virtual ~AnyElementImpl() {}
+        virtual ~AnyElementImpl();
 
-        AnyElementImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL)
-            : AbstractXMLObject(nsURI, localName, prefix, schemaType) {}
+        AnyElementImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL);
         
         XMLObject* clone() const;
         
     protected:
-        AnyElementImpl() {}
+        AnyElementImpl();
         AnyElementImpl(const AnyElementImpl& src);
         
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject,m_children.end());
