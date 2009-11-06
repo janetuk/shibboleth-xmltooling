@@ -23,6 +23,7 @@
 #include "internal.h"
 #include "exceptions.h"
 #include "logging.h"
+#include "soap/HTTPSOAPTransport.h"
 #include "soap/SOAP.h"
 #include "soap/SOAPClient.h"
 #include "util/XMLHelper.h"
@@ -35,6 +36,27 @@ using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace xercesc;
 using namespace std;
+
+SOAPTransport::SOAPTransport()
+{
+}
+
+SOAPTransport::~SOAPTransport()
+{
+}
+
+bool SOAPTransport::setProviderOption(const char* provider, const char* option, const char* value)
+{
+    return false;
+}
+
+HTTPSOAPTransport::HTTPSOAPTransport()
+{
+}
+
+HTTPSOAPTransport::~HTTPSOAPTransport()
+{
+}
 
 SOAPClient::SOAPClient(bool validate) : m_validate(validate), m_transport(NULL)
 {

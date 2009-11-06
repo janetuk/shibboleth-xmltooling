@@ -27,6 +27,7 @@
 #include "encryption/Encryption.h"
 #include "encryption/Encrypter.h"
 #include "impl/UnknownElement.h"
+#include "io/HTTPResponse.h"
 #include "security/TrustEngine.h"
 #include "security/OpenSSLCryptoX509CRL.h"
 #include "security/CredentialResolver.h"
@@ -56,6 +57,7 @@
 # include <log4cpp/OstreamAppender.hh>
 #endif
 #include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/util/XMLUniDefs.hpp>
 #ifndef XMLTOOLING_NO_XMLSEC
 # include <curl/curl.h>
 # include <openssl/err.h>
@@ -351,6 +353,9 @@ bool XMLToolingInternalConfig::init()
 
         m_pathResolver = new PathResolver();
         m_urlEncoder = new URLEncoder();
+
+        HTTPResponse::getAllowedSchemes().push_back("https");
+        HTTPResponse::getAllowedSchemes().push_back("http");
 
         // Register xml:id as an ID attribute.
         static const XMLCh xmlid[] = UNICODE_LITERAL_2(i,d);
