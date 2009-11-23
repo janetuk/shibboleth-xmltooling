@@ -60,6 +60,13 @@
 <listOptionValue builtIn="false" value="XMLTOOL_DLLLOCAL"/>
 <listOptionValue builtIn="false" value="XMLTOOLING_LOGCAT=&quot;XMLTooling&quot;"/>
 </option>
+<option id="org.eclipse.linuxtools.cdt.autotools.option.configure.includes.959417153" name="includes" superClass="org.eclipse.linuxtools.cdt.autotools.option.configure.includes" valueType="includePath">
+<listOptionValue builtIn="false" value="&quot;C:\openssl-0.9.8k\inc32&quot;"/>
+<listOptionValue builtIn="false" value="&quot;C:\curl-7.19.6\include&quot;"/>
+<listOptionValue builtIn="false" value="&quot;C:\log4shib-1.0.3\include&quot;"/>
+<listOptionValue builtIn="false" value="&quot;C:\xerces-c-3.0.1-x86-windows-vc-9.0\include&quot;"/>
+<listOptionValue builtIn="false" value="&quot;C:\xml-security-c-1.5.1\include&quot;"/>
+</option>
 <inputType id="org.eclipse.linuxtools.cdt.autotools.inputType.configure.387715961" superClass="org.eclipse.linuxtools.cdt.autotools.inputType.configure"/>
 <inputType id="org.eclipse.linuxtools.cdt.autotools.inputType.configure1.2086982536" superClass="org.eclipse.linuxtools.cdt.autotools.inputType.configure1"/>
 </tool>
