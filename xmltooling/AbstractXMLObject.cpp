@@ -244,6 +244,8 @@ DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, const XMLC
 {
     delete oldValue;
     releaseThisandParentDOM();
+    if (!newValue || !*newValue)
+        return NULL;
     DateTime* ret = new DateTime(newValue);
     if (duration)
         ret->parseDuration();
