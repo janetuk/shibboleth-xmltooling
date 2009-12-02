@@ -42,18 +42,14 @@ XMLObject::~XMLObject()
 
 void XMLObject::releaseThisandParentDOM() const
 {
-    if (getDOM()) {
-        releaseDOM();
-        releaseParentDOM(true);
-    }
+    releaseDOM();
+    releaseParentDOM(true);
 }
 
 void XMLObject::releaseThisAndChildrenDOM() const
 {
-    if (getDOM()) {
-        releaseChildrenDOM(true);
-        releaseDOM();
-    }
+    releaseChildrenDOM(true);
+    releaseDOM();
 }
 
 AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
@@ -248,6 +244,8 @@ DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, const XMLC
 {
     delete oldValue;
     releaseThisandParentDOM();
+    if (!newValue || !*newValue)
+        return NULL;
     DateTime* ret = new DateTime(newValue);
     if (duration)
         ret->parseDuration();

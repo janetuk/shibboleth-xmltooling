@@ -250,7 +250,7 @@ namespace xmltooling {
         FilesystemCredential(
             FilesystemCredentialResolver* resolver, XSECCryptoKey* key, const vector<XSECCryptoX509*>& xseccerts, const vector<XSECCryptoX509CRL*>& crls
             ) : BasicX509Credential(key ? key : (xseccerts.empty() ? NULL : xseccerts.front()->clonePublicKey()), xseccerts, crls), m_resolver(resolver) {
-            extract();
+            //extract();
             m_keyNames.insert(m_resolver->m_keynames.begin(), m_resolver->m_keynames.end());
         }
 

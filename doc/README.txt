@@ -1,8 +1,8 @@
-VERSION 1.3
+VERSION 1.3.2
 
 Issues addressed by this release:
 ---------------------------------
-https://bugs.internet2.edu/jira/browse/CPPXT/fixforversion/10253
+https://bugs.internet2.edu/jira/browse/CPPXT/fixforversion/10272
 
 Documentation:
 --------------

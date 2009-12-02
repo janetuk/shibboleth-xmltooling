@@ -271,27 +271,6 @@ void xmltooling::termSOAPTransports()
     g_CURLPool = NULL;
 }
 
-SOAPTransport::SOAPTransport()
-{
-}
-
-SOAPTransport::~SOAPTransport()
-{
-}
-
-bool SOAPTransport::setProviderOption(const char* provider, const char* option, const char* value)
-{
-    return false;
-}
-
-HTTPSOAPTransport::HTTPSOAPTransport()
-{
-}
-
-HTTPSOAPTransport::~HTTPSOAPTransport()
-{
-}
-
 OpenSSLSOAPTransport::OpenSSLSOAPTransport()
 {
 }
