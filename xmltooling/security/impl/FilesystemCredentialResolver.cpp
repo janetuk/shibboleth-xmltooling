@@ -209,7 +209,6 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL FilesystemCredential;
     class XMLTOOL_DLLLOCAL FilesystemCredentialResolver : public CredentialResolver
     {
-        friend class XMLTOOL_DLLLOCAL FilesystemCredential;
     public:
         FilesystemCredentialResolver(const DOMElement* e);
         virtual ~FilesystemCredentialResolver();
@@ -232,11 +231,14 @@ namespace xmltooling {
         Credential* m_credential;
         string m_keypass,m_certpass;
         unsigned int m_keyinfomask,m_usage;
+        bool m_extractNames;
         vector<string> m_keynames;
 
         ManagedKey m_key;
         vector<ManagedCert> m_certs;
         vector<ManagedCRL> m_crls;
+
+        friend class XMLTOOL_DLLLOCAL FilesystemCredential;
     };
 
 #if defined (_MSC_VER)
@@ -248,9 +250,13 @@ namespace xmltooling {
     {
     public:
         FilesystemCredential(
-            FilesystemCredentialResolver* resolver, XSECCryptoKey* key, const vector<XSECCryptoX509*>& xseccerts, const vector<XSECCryptoX509CRL*>& crls
+            FilesystemCredentialResolver* resolver,
+            XSECCryptoKey* key,
+            const vector<XSECCryptoX509*>& xseccerts,
+            const vector<XSECCryptoX509CRL*>& crls
             ) : BasicX509Credential(key ? key : (xseccerts.empty() ? NULL : xseccerts.front()->clonePublicKey()), xseccerts, crls), m_resolver(resolver) {
-            //extract();
+            if (m_resolver->m_extractNames)
+                extract();
             m_keyNames.insert(m_resolver->m_keynames.begin(), m_resolver->m_keynames.end());
         }
 
@@ -286,6 +292,7 @@ namespace xmltooling {
     static const XMLCh Certificate[] =      UNICODE_LITERAL_11(C,e,r,t,i,f,i,c,a,t,e);
     static const XMLCh _certificate[] =     UNICODE_LITERAL_11(c,e,r,t,i,f,i,c,a,t,e);
     static const XMLCh CRL[] =              UNICODE_LITERAL_3(C,R,L);
+    static const XMLCh extractNames[] =     UNICODE_LITERAL_12(e,x,t,r,a,c,t,N,a,m,e,s);
     static const XMLCh _format[] =          UNICODE_LITERAL_6(f,o,r,m,a,t);
     static const XMLCh Key[] =              UNICODE_LITERAL_3(K,e,y);
     static const XMLCh _key[] =             UNICODE_LITERAL_3(k,e,y);
@@ -301,7 +308,7 @@ namespace xmltooling {
 };
 
 FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
-    : m_lock(NULL), m_credential(NULL), m_usage(Credential::UNSPECIFIED_CREDENTIAL)
+    : m_lock(NULL), m_credential(NULL), m_usage(Credential::UNSPECIFIED_CREDENTIAL), m_extractNames(true)
 {
 #ifdef _DEBUG
     NDC ndc("FilesystemCredentialResolver");
@@ -342,6 +349,8 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
             path = e->getOwnerDocument()->createElementNS(NULL,Path);
             child->appendChild(path);
             path->appendChild(e->getOwnerDocument()->createTextNode(e->getAttributeNS(NULL,_certificate)));
+            if (e->hasAttributeNS(NULL, extractNames))
+                child->setAttributeNS(NULL, extractNames, e->getAttributeNS(NULL, extractNames));
         }
         e = dummy;  // reset "root" to the dummy config element
     }
@@ -349,7 +358,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
     const XMLCh* prop;
     const DOMElement* root = e;
 
-    // Save off usage flags.
+    // Save off usage bits.
     const XMLCh* usage = root->getAttributeNS(NULL,_use);
     if (usage && *usage) {
         auto_ptr_char u(usage);
@@ -483,6 +492,10 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
         }
 
         const XMLCh* certformat = certnode->getAttributeNS(NULL,_format);
+
+        const XMLCh* extractFlag = certnode->getAttributeNS(NULL, extractNames);
+        if (extractFlag && (*extractFlag == chLatin_f || *extractFlag == chDigit_0))
+            m_extractNames = false;
 
         e = XMLHelper::getFirstChildElement(certnode);
         while (e) {
