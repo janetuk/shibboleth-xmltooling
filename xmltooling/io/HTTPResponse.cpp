@@ -24,7 +24,7 @@
 #include "HTTPResponse.h"
 
 using namespace xmltooling;
-using std::istream;
+using namespace std;
 
 GenericResponse::GenericResponse()
 {
@@ -32,6 +32,37 @@ GenericResponse::GenericResponse()
 
 GenericResponse::~GenericResponse()
 {
+}
+
+vector<string> HTTPResponse::m_allowedSchemes;
+
+vector<string>& HTTPResponse::getAllowedSchemes()
+{
+    return m_allowedSchemes;
+}
+
+void HTTPResponse::sanitizeURL(const char* url)
+{
+    const char* ch;
+    for (ch=url; *ch; ++ch) {
+        if (iscntrl(*ch))
+            throw IOException("URL contained a control character.");
+    }
+
+    ch = strchr(url, ':');
+    if (!ch)
+        throw IOException("URL is malformed.");
+    string s(url, ch - url);
+    for (vector<string>::const_iterator i = m_allowedSchemes.begin(); i != m_allowedSchemes.end(); ++i) {
+#ifdef HAVE_STRCASECMP
+        if (!strcasecmp(s.c_str(), i->c_str()))
+#else
+        if (!stricmp(s.c_str(), i->c_str()))
+#endif
+            return;
+    }
+
+    throw IOException("URL contains invalid scheme ($1).", params(1, s.c_str()));
 }
 
 HTTPResponse::HTTPResponse()
@@ -49,9 +80,28 @@ void HTTPResponse::setContentType(const char* type)
 
 void HTTPResponse::setCookie(const char* name, const char* value)
 {
-    std::string cookie(name);
+    string cookie(name);
     cookie = cookie + '=' + value;
     setResponseHeader("Set-Cookie", cookie.c_str());
+}
+
+void HTTPResponse::setResponseHeader(const char* name, const char* value)
+{
+    for (const char* ch=name; *ch; ++ch) {
+        if (iscntrl(*ch))
+            throw IOException("Response header name contained a control character.");
+    }
+
+    for (const char* ch=value; *ch; ++ch) {
+        if (iscntrl(*ch))
+            throw IOException("Value for response header ($1) contained a control character.", params(1,name));
+    }
+}
+
+long HTTPResponse::sendRedirect(const char* url)
+{
+    sanitizeURL(url);
+    return XMLTOOLING_HTTP_STATUS_MOVED;
 }
 
 long HTTPResponse::sendError(istream& inputStream)

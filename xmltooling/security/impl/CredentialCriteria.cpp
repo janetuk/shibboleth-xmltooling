@@ -37,6 +37,7 @@
 
 using xmlsignature::KeyInfo;
 using xmlsignature::Signature;
+using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace std;
 
@@ -191,25 +192,37 @@ void CredentialCriteria::setSignature(const Signature& sig, int extraction)
 
 bool CredentialCriteria::matches(const Credential& credential) const
 {
+    Category& log = Category::getInstance(XMLTOOLING_LOGCAT".CredentialCriteria");
+
     // Usage check, if specified and we have one, compare masks.
     if (getUsage() != Credential::UNSPECIFIED_CREDENTIAL) {
         if (credential.getUsage() != Credential::UNSPECIFIED_CREDENTIAL)
-            if ((getUsage() & credential.getUsage()) == 0)
+            if ((getUsage() & credential.getUsage()) == 0) {
+                if (log.isDebugEnabled())
+                    log.debug("usage didn't match (%u != %u)", getUsage(), credential.getUsage());
                 return false;
+            }
     }
 
     // Algorithm check, if specified and we have one.
     const char* alg = getKeyAlgorithm();
     if (alg && *alg) {
         const char* alg2 = credential.getAlgorithm();
-        if (alg2 && *alg2)
-            if (strcmp(alg,alg2))
+        if (alg2 && *alg2) {
+            if (strcmp(alg,alg2)) {
+                if (log.isDebugEnabled())
+                    log.debug("key algorithm didn't match ('%s' != '%s')", getKeyAlgorithm(), credential.getAlgorithm());
                 return false;
+            }
+        }
     }
 
     // KeySize check, if specified and we have one.
-    if (credential.getKeySize()>0 && getKeySize()>0 && credential.getKeySize() != getKeySize())
+    if (credential.getKeySize()>0 && getKeySize()>0 && credential.getKeySize() != getKeySize()) {
+        if (log.isDebugEnabled())
+            log.debug("key size didn't match (%u != %u)", getKeySize(), credential.getKeySize());
         return false;
+    }
 
     // See if we can test key names.
     set<string> critnames = getKeyNames();
@@ -224,8 +237,10 @@ bool CredentialCriteria::matches(const Credential& credential) const
                 break;
             }
         }
-        if (!found)
+        if (!found) {
+            log.debug("credential name(s) didn't overlap");
             return false;
+        }
     }
 
     // See if we have to match a specific key.
@@ -239,5 +254,9 @@ bool CredentialCriteria::matches(const Credential& credential) const
     if (!key2)
         return true;   // no key here, so we can't test it
 
-    return SecurityHelper::matches(*key1, *key2);
+    if (SecurityHelper::matches(*key1, *key2))
+        return true;
+    
+    log.debug("keys didn't match");
+    return false;
 }

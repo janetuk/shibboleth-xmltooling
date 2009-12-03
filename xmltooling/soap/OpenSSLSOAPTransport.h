@@ -20,7 +20,7 @@
  * Encapsulates OpenSSL-capable SOAP transport layer.
  */
 
-#ifndef __xmltooling_opensslsoaptrans_h__
+#if !defined(__xmltooling_opensslsoaptrans_h__) && !defined(XMLTOOLING_NO_XMLSEC)
 #define __xmltooling_opensslsoaptrans_h__
 
 #include <xmltooling/soap/SOAPTransport.h>

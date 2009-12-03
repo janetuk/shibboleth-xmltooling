@@ -692,10 +692,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\soap\OpenSSLSOAPTransport.h"
-					>
-				</File>
-				<File
 					RelativePath=".\soap\SOAP.h"
 					>
 				</File>
