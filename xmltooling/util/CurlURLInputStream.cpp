@@ -171,6 +171,7 @@ void CurlURLInputStream::init(const DOMElement* e)
     curl_easy_setopt(fEasy, CURLOPT_USERPWD,NULL);
     curl_easy_setopt(fEasy, CURLOPT_SSL_VERIFYHOST, 2);
     curl_easy_setopt(fEasy, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_easy_setopt(fEasy, CURLOPT_CAINFO, NULL);
     curl_easy_setopt(fEasy, CURLOPT_SSL_CIPHER_LIST, "ALL:!aNULL:!LOW:!EXPORT:!SSLv2");
     curl_easy_setopt(fEasy, CURLOPT_NOPROGRESS, 1);
     curl_easy_setopt(fEasy, CURLOPT_NOSIGNAL, 1);
