@@ -233,7 +233,7 @@ if test x_$with_xmlsec != x_no; then
                 SSLLIBS="`$PKG_CONFIG --libs openssl`"
                 SSLFLAGS="`$PKG_CONFIG --cflags openssl`"
             else
-                AC_MSG_ERROR([OpenSSL not supported by pkg-config, try --with-openssl instead])
+                AC_MSG_WARN([OpenSSL not supported by pkg-config, try --with-openssl instead])
             fi
         fi
     fi
