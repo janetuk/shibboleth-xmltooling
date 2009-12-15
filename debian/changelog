@@ -1,3 +1,12 @@
+xmltooling (1.3.3-1) UNRELEASED; urgency=low
+
+  * New upstream release.
+    - Allow the empty string in assignment to DateTime members.
+    - Allow configuration to not extract local credential names for
+      matching purposes.
+
+ -- Russ Allbery <rra@debian.org>  Mon, 14 Dec 2009 19:27:12 -0800
+
 xmltooling (1.3.1-1) unstable; urgency=high
 
   * Urgency set to high for security fix.
