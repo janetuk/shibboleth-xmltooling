@@ -26,6 +26,7 @@
 #include <xmltooling/exceptions.h>
 
 class XENCCipher;
+class XSECCryptoKey;
 
 namespace xmltooling {
     class XMLTOOL_API CredentialCriteria;
