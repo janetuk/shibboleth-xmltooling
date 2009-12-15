@@ -574,8 +574,8 @@ libxmltooling_lite_la_SOURCES = \
 	${common_sources}
 
 libxmltooling_lite_la_CPPFLAGS = -DXMLTOOLING_LITE
-libxmltooling_lite_la_LDFLAGS = -version-info 4:1:0
-@BUILD_XMLSEC_TRUE@libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 4:1:0
+libxmltooling_lite_la_LDFLAGS = -version-info 4:3:0
+@BUILD_XMLSEC_TRUE@libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 4:3:0
 @BUILD_XMLSEC_TRUE@libxmltooling_la_SOURCES = \
 @BUILD_XMLSEC_TRUE@	${common_sources} \
 @BUILD_XMLSEC_TRUE@	${xmlsec_sources}
