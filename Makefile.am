@@ -22,7 +22,7 @@ endif
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = @PACKAGE_NAME@.pc
 
-GENFILES = @PACKAGE_NAME@.spec @PACKAGE_NAME@.pc pkginfo Portfile
+GENFILES = @PACKAGE_NAME@.spec pkginfo Portfile
 
 EXTRA_DIST = $(DX_CONFIG) \
         cpp-@PACKAGE_NAME@.sln \
