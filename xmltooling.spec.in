@@ -132,8 +132,8 @@ This package includes files needed for development with XMLTooling.
 %endif
 %defattr(-,root,root,-)
 %{_libdir}/*.so.*
-%dir %{_datadir}/xml/@PACKAGE@
-%{_datadir}/xml/@PACKAGE@/*
+%dir %{_datadir}/xml/@PACKAGE@-@PACKAGE_VERSION@
+%{_datadir}/xml/@PACKAGE@-@PACKAGE_VERSION@/*
 
 %if 0%{?suse_version} > 1030
 %files -n lib@PACKAGE@-devel
