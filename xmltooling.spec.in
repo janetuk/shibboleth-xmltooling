@@ -1,4 +1,4 @@
-Name:		@PACKAGE@
+Name:		@PACKAGE_NAME@
 Version:	@PACKAGE_VERSION@
 Release:	1
 Summary:    OpenSAML XMLTooling library
@@ -39,13 +39,13 @@ classes to add value around the DOM, as well as signing and encryption
 support.
 
 %if 0%{?suse_version} > 1030
-%package -n lib@PACKAGE@4
+%package -n lib@PACKAGE_NAME@5
 Summary:    OpenSAML XMLTooling library
 Group:      Development/Libraries
-Provides:   @PACKAGE@ = %{version}
-Obsoletes:  @PACKAGE@
+Provides:   @PACKAGE_NAME@ = %{version}
+Obsoletes:  @PACKAGE_NAME@
 
-%description -n lib@PACKAGE@4
+%description -n lib@PACKAGE_NAME@5
 The XMLTooling library contains generic XML parsing and processing
 classes based on the Xerces-C DOM. It adds more powerful facilities
 for declaring element- and type-specific API and implementation
@@ -56,9 +56,9 @@ This package contains just the shared library.
 %endif
 
 %if 0%{?suse_version} > 1030
-%package -n lib@PACKAGE@-devel
-Requires:   lib@PACKAGE@4 = %version
-Obsoletes:  @PACKAGE@-devel
+%package -n lib@PACKAGE_NAME@-devel
+Requires:   lib@PACKAGE_NAME@5 = %version
+Obsoletes:  @PACKAGE_NAME@-devel
 %else
 %package devel
 Requires:   %name = %version
@@ -79,7 +79,7 @@ Requires: xml-security-c-devel >= 1.4.0
 Requires: openssl-devel, curl-devel >= 7.10.6
 
 %if 0%{?suse_version} > 1030
-%description -n lib@PACKAGE@-devel
+%description -n lib@PACKAGE_NAME@-devel
 %else
 %description devel
 %endif
@@ -95,13 +95,13 @@ This package includes files needed for development with XMLTooling.
 %setup -q
 
 %build
-%configure %{?@PACKAGE@_options}
+%configure %{?@PACKAGE_NAME@_options}
 %{__make}
 
 %install
 %{__make} install DESTDIR=$RPM_BUILD_ROOT pkgdocdir=%{pkgdocdir}
 # Don't package unit tester if present.
-%{__rm} -f $RPM_BUILD_ROOT/%{_bindir}/@PACKAGE@test
+%{__rm} -f $RPM_BUILD_ROOT/%{_bindir}/@PACKAGE_NAME@test
 
 %check
 %{__make} check
@@ -111,7 +111,7 @@ This package includes files needed for development with XMLTooling.
 
 %ifnos solaris2.8 solaris2.9 solaris2.10
 %if 0%{?suse_version} > 1030
-%post -n lib@PACKAGE@4 -p /sbin/ldconfig
+%post -n lib@PACKAGE_NAME@5 -p /sbin/ldconfig
 %else
 %post -p /sbin/ldconfig
 %endif
@@ -119,31 +119,31 @@ This package includes files needed for development with XMLTooling.
 
 %ifnos solaris2.8 solaris2.9 solaris2.10
 %if 0%{?suse_version} > 1030
-%postun -n lib@PACKAGE@4 -p /sbin/ldconfig
+%postun -n lib@PACKAGE_NAME@5 -p /sbin/ldconfig
 %else
 %postun -p /sbin/ldconfig
 %endif
 %endif
 
 %if 0%{?suse_version} > 1030
-%files -n lib@PACKAGE@4
+%files -n lib@PACKAGE@5
 %else
 %files
 %endif
 %defattr(-,root,root,-)
 %{_libdir}/*.so.*
-%dir %{_datadir}/xml/@PACKAGE@-@PACKAGE_VERSION@
-%{_datadir}/xml/@PACKAGE@-@PACKAGE_VERSION@/*
+%dir %{_datadir}/xml/@PACKAGE_NAME@-@PACKAGE_VERSION@
+%{_datadir}/xml/@PACKAGE_NAME@-@PACKAGE_VERSION@/*
 
 %if 0%{?suse_version} > 1030
-%files -n lib@PACKAGE@-devel
+%files -n lib@PACKAGE_NAME@-devel
 %else
 %files devel
 %endif
 %defattr(-,root,root,-)
 %{_includedir}/*
 %{_libdir}/*.so
-%{_libdir}/pkgconfig/@PACKAGE@.pc
+%{_libdir}/pkgconfig/@PACKAGE_NAME@.pc
 %doc %{pkgdocdir}
 
 %changelog
