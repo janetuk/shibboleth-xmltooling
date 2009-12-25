@@ -19,12 +19,16 @@ else
 all-local:
 endif
 
-GENFILES = xmltooling.spec pkginfo Portfile
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = xmltooling.pc
+
+GENFILES = xmltooling.spec xmltooling.pc pkginfo Portfile
 
 EXTRA_DIST = $(DX_CONFIG) \
         cpp-xmltooling.sln \
         acx_pthread.m4 \
         acinclude.m4 \
+        ax_create_pkgconfig_info.m4 \
         libtool.m4 \
         doxygen.m4 \
         depcomp \

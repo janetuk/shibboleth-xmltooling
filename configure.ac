@@ -1,11 +1,12 @@
 AC_PREREQ([2.50])
-AC_INIT([xmltooling], [1.3.3], [mace-opensaml-users@internet2.edu], [xmltooling])
+AC_INIT([xmltooling], [1.4], [mace-opensaml-users@internet2.edu], [xmltooling])
 AM_CONFIG_HEADER(config.h)
 AM_CONFIG_HEADER(xmltooling/config_pub.h)
-AM_INIT_AUTOMAKE([xmltooling], [1.3.3])
+AM_INIT_AUTOMAKE([xmltooling], [1.4])
 
 sinclude(doxygen.m4)
 sinclude(acx_pthread.m4)
+sinclude(ax_create_pkgconfig_info.m4)
 
 # Docygen features
 DX_HTML_FEATURE(ON)
@@ -362,6 +363,8 @@ fi
 AC_SUBST(CXXTEST)
 AC_SUBST(CXXTESTFLAGS)
 AM_CONDITIONAL(BUILD_UNITTEST,test -f ${CXXTEST})
+
+AX_CREATE_PKGCONFIG_INFO(,,[$XMLSEC_LIBS -lxmltooling],[OpenSAML XMLTooling-C library])
 
 LIBTOOL="$LIBTOOL --silent"
 

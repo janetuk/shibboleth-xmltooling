@@ -143,9 +143,13 @@ This package includes files needed for development with XMLTooling.
 %defattr(-,root,root,-)
 %{_includedir}/*
 %{_libdir}/*.so
+%{_libdir}/pkgconfig/@PACKAGE@.pc
 %doc %{pkgdocdir}
 
 %changelog
+* Thu Dec 24 2009  Scott Cantor  <cantor.2@osu.edu>  - 1.4-1
+- Add pkg-config support
+
 * Mon Aug 31 2009  Scott Cantor  <cantor.2@osu.edu>  - 1.3-1
 - Bump soname for SUSE packaging.
 

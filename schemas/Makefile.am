@@ -9,7 +9,7 @@ schemafiles = \
         xml.xsd \
         xmltooling.xsd
 
-pkgxmldir = $(datadir)/xml/@PACKAGE@
+pkgxmldir = $(datadir)/xml/@PACKAGE_NAME@-@PACKAGE_VERSION@
 
 pkgxml_DATA = \
 	catalog.xml \
