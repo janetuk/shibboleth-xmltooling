@@ -10,15 +10,12 @@ Source:	    %{name}-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root
 %if 0%{?suse_version} > 1030
 BuildRequires:  libXerces-c-devel >= 2.8.0
+%else
+BuildRequires:  libxerces-c-devel >= 2.8.0
+%endif
 BuildRequires:  libxml-security-c-devel >= 1.4.0
 %{?_with_log4cpp:BuildRequires: liblog4cpp-devel >= 1.0}
 %{!?_with_log4cpp:BuildRequires: liblog4shib-devel}
-%else
-BuildRequires:  xerces%{?xercesver}-c-devel >= 2.8.0
-BuildRequires:  xml-security-c-devel >= 1.4.0
-%{?_with_log4cpp:BuildRequires: log4cpp-devel >= 1.0}
-%{!?_with_log4cpp:BuildRequires: log4shib-devel}
-%endif
 BuildRequires:	gcc-c++, openssl-devel, curl-devel >= 7.10.6
 %{!?_without_doxygen:BuildRequires: doxygen}
 %if "%{_vendor}" == "redhat"
@@ -38,7 +35,6 @@ for declaring element- and type-specific API and implementation
 classes to add value around the DOM, as well as signing and encryption
 support.
 
-%if 0%{?suse_version} > 1030
 %package -n lib@PACKAGE_NAME@5
 Summary:    OpenSAML XMLTooling library
 Group:      Development/Libraries
@@ -53,36 +49,24 @@ classes to add value around the DOM, as well as signing and encryption
 support.
 
 This package contains just the shared library.
-%endif
 
-%if 0%{?suse_version} > 1030
 %package -n lib@PACKAGE_NAME@-devel
-Requires:   lib@PACKAGE_NAME@5 = %version
-Obsoletes:  @PACKAGE_NAME@-devel
-%else
-%package devel
-Requires:   %name = %version
-%endif
-Summary: XMLTooling development Headers
-Group: Development/Libraries
+Summary:	XMLTooling development Headers
+Group:		Development/Libraries
+Requires:	lib@PACKAGE_NAME@5 = %{version}
+Provides:	@PACKAGE_NAME@-devel = %{version}
+Obsoletes:	@PACKAGE_NAME@-devel
 %if 0%{?suse_version} > 1030
-Requires: libXerces-c-devel >= 2.8.0
+Requires:  libXerces-c-devel >= 2.8.0
+%else
+Requires:  libxerces-c-devel >= 2.8.0
+%endif
 Requires: libxml-security-c-devel >= 1.4.0
 %{?_with_log4cpp:Requires: liblog4cpp-devel >= 1.0}
 %{!?_with_log4cpp:Requires: liblog4shib-devel}
-%else
-Requires: xerces%{?xercesver}-c-devel >= 2.8.0
-Requires: xml-security-c-devel >= 1.4.0
-%{?_with_log4cpp:Requires: log4cpp-devel >= 1.0}
-%{!?_with_log4cpp:Requires: log4shib-devel}
-%endif
 Requires: openssl-devel, curl-devel >= 7.10.6
 
-%if 0%{?suse_version} > 1030
 %description -n lib@PACKAGE_NAME@-devel
-%else
-%description devel
-%endif
 The XMLTooling library contains generic XML parsing and processing
 classes based on the Xerces-C DOM. It adds more powerful facilities
 for declaring element- and type-specific API and implementation
@@ -90,6 +74,19 @@ classes to add value around the DOM, as well as signing and encryption
 support.
 
 This package includes files needed for development with XMLTooling.
+
+%package -n @PACKAGE_NAME@-schemas
+Summary:	XMLTooling schemas and catalog
+Group:		Development/Libraries
+
+%description -n @PACKAGE_NAME@-schemas
+The XMLTooling library contains generic XML parsing and processing
+classes based on the Xerces-C DOM. It adds more powerful facilities
+for declaring element- and type-specific API and implementation
+classes to add value around the DOM, as well as signing and encryption
+support.
+
+This package includes XML schemas and related files.
 
 %prep
 %setup -q
@@ -110,36 +107,22 @@ This package includes files needed for development with XMLTooling.
 [ "$RPM_BUILD_ROOT" != "/" ] && %{__rm} -rf $RPM_BUILD_ROOT
 
 %ifnos solaris2.8 solaris2.9 solaris2.10
-%if 0%{?suse_version} > 1030
 %post -n lib@PACKAGE_NAME@5 -p /sbin/ldconfig
-%else
-%post -p /sbin/ldconfig
-%endif
 %endif
 
 %ifnos solaris2.8 solaris2.9 solaris2.10
-%if 0%{?suse_version} > 1030
 %postun -n lib@PACKAGE_NAME@5 -p /sbin/ldconfig
-%else
-%postun -p /sbin/ldconfig
-%endif
 %endif
 
-%if 0%{?suse_version} > 1030
 %files -n lib@PACKAGE@5
-%else
-%files
-%endif
 %defattr(-,root,root,-)
 %{_libdir}/*.so.*
+
+%files -n @PACKAGE_NAME@-schemas
 %dir %{_datadir}/xml/@PACKAGE_NAME@
 %{_datadir}/xml/@PACKAGE_NAME@/*
 
-%if 0%{?suse_version} > 1030
 %files -n lib@PACKAGE_NAME@-devel
-%else
-%files devel
-%endif
 %defattr(-,root,root,-)
 %{_includedir}/*
 %{_libdir}/*.so
@@ -148,7 +131,8 @@ This package includes files needed for development with XMLTooling.
 
 %changelog
 * Thu Dec 24 2009  Scott Cantor  <cantor.2@osu.edu>  - 1.4-1
-- Add pkg-config support
+- Add pkg-config support.
+- Sync package names for side by side install.
 
 * Mon Aug 31 2009  Scott Cantor  <cantor.2@osu.edu>  - 1.3-1
 - Bump soname for SUSE packaging.
