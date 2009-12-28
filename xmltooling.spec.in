@@ -119,6 +119,7 @@ This package includes XML schemas and related files.
 %{_libdir}/*.so.*
 
 %files -n @PACKAGE_NAME@-schemas
+%defattr(-,root,root,-)
 %dir %{_datadir}/xml/@PACKAGE_NAME@
 %{_datadir}/xml/@PACKAGE_NAME@/*
 
