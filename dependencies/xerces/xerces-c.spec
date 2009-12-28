@@ -1,10 +1,10 @@
 Summary:    Xerces-C++ validating XML parser
 Name:       xerces-c
 Version:    3.0.1
-Release:    1
+Release:    2
 URL:        http://xerces.apache.org/xerces-c/
 Source0:    %{name}-%{version}.tar.gz
-License:        Apache
+License:    Apache
 Group:      Libraries
 BuildRoot:  %{_tmppath}/%{name}-root
 Prefix:     /usr
@@ -21,23 +21,34 @@ Xerces-C++ makes it easy to give your application the ability to read and
 write XML data. A shared library is provided for parsing, generating,
 manipulating, and validating XML documents.
 
-The parser provides high performance, modularity, and scalability. Source
-code, samples and API documentation are provided with the parser. For
-portability, care has been taken to make minimal use of templates, no RTTI,
-and minimal use of #ifdefs.
-
-%package devel
-Requires:   %{name} = %{version}
+%package -n libxerces-c-3_0
+Summary:    Log for C++, Shibboleth Edition
 Group:      Development/Libraries
-Summary:    Header files for Xerces-C++ validating XML parser
+Provides:   xerces-c = %{version}
+Obsoletes:  xerces-c
 
-%description devel
-Header files you can use to develop XML applications with Xerces-C++.
-
+%description -n libxerces-c-3_0
 Xerces-C++ is a validating XML parser written in a portable subset of C++.
 Xerces-C++ makes it easy to give your application the ability to read and
 write XML data. A shared library is provided for parsing, generating,
 manipulating, and validating XML documents.
+
+This package contains just the shared library.
+
+%package -n libxerces-c-devel
+Group:      Development/Libraries
+Summary:    Header files for Xerces-C++ validating XML parser
+Requires:   libxerces-c-3_0 = %{version}
+Provides:   xerces-c-devel = %{version}
+Obsoletes:  xerces-c-devel
+
+%description -n libxerces-c-devel
+Xerces-C++ is a validating XML parser written in a portable subset of C++.
+Xerces-C++ makes it easy to give your application the ability to read and
+write XML data. A shared library is provided for parsing, generating,
+manipulating, and validating XML documents.
+
+The static libraries and header files needed for development with Xerces-C++.
 
 %prep
 %setup -q
@@ -53,27 +64,33 @@ manipulating, and validating XML documents.
 [ "$RPM_BUILD_ROOT" != "/" ] && %{__rm} -rf $RPM_BUILD_ROOT
 
 %ifnos solaris2.8 solaris2.9 solaris2.10
-%post -p /sbin/ldconfig
+%post -n libxerces-c-3_0 -p /sbin/ldconfig
 %endif
 
 %ifnos solaris2.8 solaris2.9 solaris2.10
-%postun -p /sbin/ldconfig
+%postun -n libxerces-c-3_0 -p /sbin/ldconfig
 %endif
 
 %files
 %defattr(755,root,root)
 %{_bindir}/*
-%{_libdir}/lib%{name}-*.so
 
-%files devel
+%files -n libxerces-c-3_0
+%defattr(755,root,root)
+%{_libdir}/libxerces-c-*.so
+
+%files -n libxerces-c-devel
 %defattr(-,root,root)
 %{_includedir}
-%{_libdir}/lib%{name}.so
-%{_libdir}/lib%{name}.a
-%{_libdir}/pkgconfig/%{name}.pc
-%exclude %{_libdir}/lib%{name}.la
+%{_libdir}/libxerces-c.so
+%{_libdir}/libxerces-c.a
+%{_libdir}/pkgconfig/xerces-c.pc
+%exclude %{_libdir}/libxerces-c.la
 
 %changelog
+* Mon Dec 28 2009 Scott Cantor <cantor.2@osu.edu> 3.0.1-2
+- Sync package names for side by side installation
+
 * Wed Aug  5 2009 Scott Cantor <cantor.2@osu.edu> 3.0.1-1
 - Disabled curl thanks to Red Hat
 
