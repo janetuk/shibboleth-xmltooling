@@ -43,16 +43,18 @@ namespace xmltooling {
         /**
          * Constructor.
          *
-         * @param url   the URL of the resource to fetch
+         * @param url       the URL of the resource to fetch
+         * @param cacheTag  optional pointer to string used for cache management
          */
-        CurlURLInputStream(const char* url);
+        CurlURLInputStream(const char* url, std::string* cacheTag=NULL);
 
         /**
          * Constructor.
          *
-         * @param url   the URL of the resource to fetch
+         * @param url       the URL of the resource to fetch
+         * @param cacheTag  optional pointer to string used for cache management
          */
-        CurlURLInputStream(const XMLCh* url);
+        CurlURLInputStream(const XMLCh* url, std::string* cacheTag=NULL);
 
         /**
          * Constructor taking a DOM element supporting the following content:
@@ -66,9 +68,10 @@ namespace xmltooling {
          *  <dd>&lt;TransportOption provider="CURL" option="150"&gt;0&lt;/TransportOption&gt;</dd>
          * </dl>
          * 
-         * @param e     DOM to supply configuration
+         * @param e         DOM to supply configuration
+         * @param cacheTag  optional pointer to string used for cache management
          */
-        CurlURLInputStream(const xercesc::DOMElement* e);
+        CurlURLInputStream(const xercesc::DOMElement* e, std::string* cacheTag=NULL);
 
         ~CurlURLInputStream();
 
@@ -101,11 +104,13 @@ namespace xmltooling {
         bool readMore(int *runningHandles);
 
         logging::Category&  fLog;
+        std::string*        fCacheTag;
         std::string         fURL;
         std::vector<std::string>    fSavedOptions;
 
         CURLM*              fMulti;
         CURL*               fEasy;
+        struct curl_slist*  fHeaders;
 
         unsigned long       fTotalBytesRead;
         XMLByte*            fWritePtr;
@@ -120,6 +125,7 @@ namespace xmltooling {
         XMLByte*            fBufferTailPtr;
 
         XMLCh*              fContentType;
+        long                fStatusCode;
 
         char                fError[CURL_ERROR_SIZE];
     };

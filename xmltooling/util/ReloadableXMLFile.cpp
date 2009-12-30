@@ -21,6 +21,7 @@
  */
 
 #include "internal.h"
+#include "io/HTTPResponse.h"
 #include "util/NDC.h"
 #include "util/PathResolver.h"
 #include "util/ReloadableXMLFile.h"
@@ -173,12 +174,25 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
                     doc=XMLToolingConfig::getConfig().getParser().parse(dsrc);
             }
             else {
-                URLInputSource src(m_root);
+                URLInputSource src(m_root, NULL, &m_cacheTag);
                 Wrapper4InputSource dsrc(&src,false);
                 if (m_validate)
                     doc=XMLToolingConfig::getConfig().getValidatingParser().parse(dsrc);
                 else
                     doc=XMLToolingConfig::getConfig().getParser().parse(dsrc);
+
+                // Check for a response code signal.
+                if (XMLHelper::isNodeNamed(doc->getDocumentElement(), xmlconstants::XMLTOOLING_NS, URLInputSource::utf16StatusCodeElementName)) {
+                    int responseCode = XMLString::parseInt(doc->getDocumentElement()->getFirstChild()->getNodeValue());
+                    doc->release();
+                    if (responseCode == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED) {
+                        throw responseCode; // toss out as a "known" case to handle gracefully
+                    }
+                    else {
+                        m_log.warn("remote resource fetch returned atypical status code (%d)", responseCode);
+                        throw IOException("remote resource fetch failed, check log for status code of response");
+                    }
+                }
             }
 
             m_log.infoStream() << "loaded XML resource (" << (backup ? m_backing : m_source) << ")" << logging::eol;
@@ -206,7 +220,7 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
         throw XMLParserException(msg.get());
     }
     catch (exception& e) {
-        m_log.errorStream() << "error while loading configuration from ("
+        m_log.errorStream() << "error while loading resource ("
             << (m_source.empty() ? "inline" : (backup ? m_backing : m_source)) << "): " << e.what() << logging::eol;
         if (!backup && !m_backing.empty())
             return load(true);
@@ -282,7 +296,17 @@ Lockable* ReloadableXMLFile::lock()
         pair<bool,DOMElement*> ret=load();
         if (ret.first)
             ret.second->getOwnerDocument()->release();
-    } catch (exception& ex) {
+    }
+    catch (int& ex) {
+        if (ex == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED) {
+            m_log.info("remote resource (%s) unchanged from cached version", m_source.c_str());
+        }
+        else {
+            // Shouldn't happen, we should only get codes intended to be gracefully handled.
+            m_log.crit("maintaining existing configuration, remote resource fetch returned atypical status code (%d)", ex);
+        }
+    }
+    catch (exception& ex) {
         m_log.crit("maintaining existing configuration, error reloading resource (%s): %s", m_source.c_str(), ex.what());
     }
 

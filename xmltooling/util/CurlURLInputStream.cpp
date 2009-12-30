@@ -24,6 +24,7 @@
 #include "internal.h"
 
 #include <xmltooling/util/CurlURLInputStream.h>
+#include <xmltooling/util/ParserPool.h>
 #include <xmltooling/util/XMLHelper.h>
 
 #include <openssl/ssl.h>
@@ -39,6 +40,7 @@
 
 using namespace xmltooling;
 using namespace xercesc;
+using namespace std;
 
 namespace {
     static const XMLCh  _CURL[] =           UNICODE_LITERAL_4(C,U,R,L);
@@ -63,13 +65,48 @@ namespace {
 
         return CURLE_OK;
     }
+
+    size_t curl_header_hook(void* ptr, size_t size, size_t nmemb, void* stream)
+    {
+        // only handle single-byte data
+        if (size!=1 || nmemb<5 || !stream)
+            return nmemb;
+        string* cacheTag = reinterpret_cast<string*>(stream);
+        const char* hdr = reinterpret_cast<char*>(ptr);
+        if (strncmp(hdr, "ETag:", 5) == 0) {
+            hdr += 5;
+            size_t remaining = nmemb - 5;
+            // skip leading spaces
+            while (remaining > 0) {
+                if (*hdr == ' ') {
+                    ++hdr;
+                    --remaining;
+                    continue;
+                }
+                break;
+            }
+            // append until whitespace
+            while (remaining > 0) {
+                if (!isspace(*hdr)) {
+                    (*cacheTag) += *hdr++;
+                    --remaining;
+                    continue;
+                }
+                break;
+            }
+        }
+
+        return nmemb;
+    }
 }
 
-CurlURLInputStream::CurlURLInputStream(const char* url)
+CurlURLInputStream::CurlURLInputStream(const char* url, string* cacheTag)
     : fLog(logging::Category::getInstance(XMLTOOLING_LOGCAT".libcurl.InputStream"))
-    , fURL(url)
+    , fCacheTag(cacheTag)
+    , fURL(url ? url : "")
     , fMulti(0)
     , fEasy(0)
+    , fHeaders(0)
     , fTotalBytesRead(0)
     , fWritePtr(0)
     , fBytesRead(0)
@@ -78,14 +115,19 @@ CurlURLInputStream::CurlURLInputStream(const char* url)
     , fBufferHeadPtr(fBuffer)
     , fBufferTailPtr(fBuffer)
     , fContentType(0)
+    , fStatusCode(200)
 {
+    if (fURL.empty())
+        throw IOException("No URL supplied to CurlURLInputStream constructor.");
     init();
 }
 
-CurlURLInputStream::CurlURLInputStream(const XMLCh* url)
+CurlURLInputStream::CurlURLInputStream(const XMLCh* url, string* cacheTag)
     : fLog(logging::Category::getInstance(XMLTOOLING_LOGCAT".libcurl.InputStream"))
+    , fCacheTag(cacheTag)
     , fMulti(0)
     , fEasy(0)
+    , fHeaders(0)
     , fTotalBytesRead(0)
     , fWritePtr(0)
     , fBytesRead(0)
@@ -94,16 +136,23 @@ CurlURLInputStream::CurlURLInputStream(const XMLCh* url)
     , fBufferHeadPtr(fBuffer)
     , fBufferTailPtr(fBuffer)
     , fContentType(0)
+    , fStatusCode(200)
 {
-    auto_ptr_char temp(url);
-    fURL = temp.get();
+    if (url) {
+        auto_ptr_char temp(url);
+        fURL = temp.get();
+    }
+    if (fURL.empty())
+        throw IOException("No URL supplied to CurlURLInputStream constructor.");
     init();
 }
 
-CurlURLInputStream::CurlURLInputStream(const DOMElement* e)
+CurlURLInputStream::CurlURLInputStream(const DOMElement* e, string* cacheTag)
     : fLog(logging::Category::getInstance(XMLTOOLING_LOGCAT".libcurl.InputStream"))
+    , fCacheTag(cacheTag)
     , fMulti(0)
     , fEasy(0)
+    , fHeaders(0)
     , fTotalBytesRead(0)
     , fWritePtr(0)
     , fBytesRead(0)
@@ -112,6 +161,7 @@ CurlURLInputStream::CurlURLInputStream(const DOMElement* e)
     , fBufferHeadPtr(fBuffer)
     , fBufferTailPtr(fBuffer)
     , fContentType(0)
+    , fStatusCode(200)
 {
     const XMLCh* attr = e->getAttributeNS(NULL, url);
     if (!attr || !*attr) {
@@ -138,6 +188,10 @@ CurlURLInputStream::~CurlURLInputStream()
     if (fMulti) {
         // Cleanup the multi handle
         curl_multi_cleanup(fMulti);
+    }
+
+    if (fHeaders) {
+        curl_slist_free_all(fHeaders);
     }
 
     XMLString::release(&fContentType);
@@ -182,6 +236,20 @@ void CurlURLInputStream::init(const DOMElement* e)
 
     fError[0] = 0;
     curl_easy_setopt(fEasy, CURLOPT_ERRORBUFFER, fError);
+
+    // Check for cache tag.
+    if (fCacheTag) {
+        // Outgoing tag.
+        if (!fCacheTag->empty()) {
+            string hdr("If-None-Match: ");
+            hdr += *fCacheTag;
+            fHeaders = curl_slist_append(fHeaders, hdr.c_str());
+            curl_easy_setopt(fEasy, CURLOPT_HTTPHEADER, fHeaders);
+        }
+        // Incoming tag.
+        curl_easy_setopt(fEasy, CURLOPT_HEADERFUNCTION, curl_header_hook);
+        curl_easy_setopt(fEasy, CURLOPT_HEADERDATA, fCacheTag);
+    }
 
     if (e) {
         const XMLCh* flag = e->getAttributeNS(NULL, verifyHost);
@@ -239,22 +307,37 @@ void CurlURLInputStream::init(const DOMElement* e)
         try {
             readMore(&runningHandles);
         }
-        catch (XMLException& ex) {
+        catch (XMLException&) {
             curl_multi_remove_handle(fMulti, fEasy);
             curl_easy_cleanup(fEasy);
             fEasy = NULL;
             curl_multi_cleanup(fMulti);
             fMulti = NULL;
-            auto_ptr_char msg(ex.getMessage());
-            throw IOException(msg.get());
+            throw;
         }
         if(runningHandles == 0) break;
     }
 
+    // Check for a response code.
+    if (curl_easy_getinfo(fEasy, CURLINFO_RESPONSE_CODE, &fStatusCode) == CURLE_OK) {
+        if (fStatusCode >= 300 ) {
+            // Short-circuit usual processing by storing a special XML document in the buffer.
+            ostringstream specialdoc;
+            specialdoc << '<' << URLInputSource::asciiStatusCodeElementName << " xmlns=\"http://www.opensaml.org/xmltooling\">"
+                << fStatusCode
+                << "</" << URLInputSource::asciiStatusCodeElementName << '>';
+            string specialxml = specialdoc.str();
+            memcpy(fBuffer, specialxml.c_str(), specialxml.length());
+            fBufferHeadPtr += specialxml.length();
+        }
+    }
+    else {
+        fStatusCode = 200;  // reset to 200 to ensure no special processing occurs
+    }
+
     // Find the content type
     char* contentType8 = NULL;
-    curl_easy_getinfo(fEasy, CURLINFO_CONTENT_TYPE, &contentType8);
-    if(contentType8)
+    if(curl_easy_getinfo(fEasy, CURLINFO_CONTENT_TYPE, &contentType8) == CURLE_OK && contentType8)
         fContentType = XMLString::transcode(contentType8);
 }
 
@@ -334,6 +417,10 @@ bool CurlURLInputStream::readMore(int* runningHandles)
             ThrowXML1(NetAccessorException, XMLExcepts::NetAcc_ConnSocket, fURL.c_str());
             break;
 
+        case CURLE_OPERATION_TIMEDOUT:
+            ThrowXML1(NetAccessorException, XMLExcepts::NetAcc_ConnSocket, fURL.c_str());
+            break;
+
         case CURLE_RECV_ERROR:
             ThrowXML1(NetAccessorException, XMLExcepts::NetAcc_ReadSocket, fURL.c_str());
             break;
@@ -403,6 +490,10 @@ xsecsize_t CurlURLInputStream::readBytes(XMLByte* const toFill, const xsecsize_t
             tryAgain = true;
             continue;
         }
+
+        // Check for a non-2xx status that means to ignore the curl response.
+        if (fStatusCode >= 300)
+            break;
 
         // Ask the curl to do some work
         int runningHandles = 0;

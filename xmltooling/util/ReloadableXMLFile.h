@@ -90,7 +90,7 @@ namespace xmltooling {
         /** Resource location, may be a local path or a URI. */
         std::string m_source;
 
-        /** Path to backup copy for remote resources. */
+        /** Path to backup copy for remote resource. */
         std::string m_backing;
         
         /** Last modification of local resource or reload of remote resource. */
@@ -98,6 +98,9 @@ namespace xmltooling {
 
         /** Time in seconds to wait before trying for new copy of remote resource. */
         time_t m_reloadInterval;
+
+        /** Caching tag associated with remote resource. */
+        std::string m_cacheTag;
 
         /** Shared lock for guarding reloads. */
         RWLock* m_lock;

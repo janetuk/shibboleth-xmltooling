@@ -496,11 +496,11 @@ xsecsize_t StreamInputSource::StreamBinInputStream::readBytes(XMLByte* const toF
 
 #ifdef XMLTOOLING_LITE
 
-URLInputSource::URLInputSource(const XMLCh* url, const char* systemId) : InputSource(systemId), m_url(url)
+URLInputSource::URLInputSource(const XMLCh* url, const char* systemId, string* cacheTag) : InputSource(systemId), m_url(url)
 {
 }
 
-URLInputSource::URLInputSource(const DOMElement* e, const char* systemId) : InputSource(systemId)
+URLInputSource::URLInputSource(const DOMElement* e, const char* systemId, string* cacheTag) : InputSource(systemId)
 {
     static const XMLCh uri[] = UNICODE_LITERAL_3(u,r,i);
     static const XMLCh url[] = UNICODE_LITERAL_3(u,r,l);
@@ -523,19 +523,23 @@ BinInputStream* URLInputSource::makeStream() const
 
 #else
 
-URLInputSource::URLInputSource(const XMLCh* url, const char* systemId)
-    : InputSource(systemId), m_url(url), m_root(NULL)
+URLInputSource::URLInputSource(const XMLCh* url, const char* systemId, string* cacheTag)
+    : InputSource(systemId), m_cacheTag(cacheTag), m_url(url), m_root(NULL)
 {
 }
 
-URLInputSource::URLInputSource(const DOMElement* e, const char* systemId)
-    : InputSource(systemId), m_root(e)
+URLInputSource::URLInputSource(const DOMElement* e, const char* systemId, string* cacheTag)
+    : InputSource(systemId), m_cacheTag(cacheTag), m_root(e)
 {
 }
 
 BinInputStream* URLInputSource::makeStream() const
 {
-    return m_root ? new CurlURLInputStream(m_root) : new CurlURLInputStream(m_url.get());
+    return m_root ? new CurlURLInputStream(m_root, m_cacheTag) : new CurlURLInputStream(m_url.get(), m_cacheTag);
 }
 
 #endif
+
+const char URLInputSource::asciiStatusCodeElementName[] = "URLInputSourceStatus";
+
+const XMLCh URLInputSource::utf16StatusCodeElementName[] = UNICODE_LITERAL_20(U,R,L,I,n,p,u,t,S,o,u,r,c,e,S,t,a,t,u,s);

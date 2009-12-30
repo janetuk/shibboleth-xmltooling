@@ -1,4 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><?fileVersion 4.0.0?><cproject>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?>
+
+<cproject>
 <storageModule moduleId="org.eclipse.cdt.core.settings">
 <cconfiguration id="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814">
 <storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814" moduleId="org.eclipse.cdt.core.settings" name="Build (GNU)">
@@ -34,19 +37,6 @@
 <pathentry kind="out" path="debug"/>
 <pathentry kind="con" path="org.eclipse.cdt.make.core.DISCOVERED_SCANNER_INFO"/>
 <pathentry excluding="util/|io/|impl/|validation/|signature/|signature/impl/|encryption/|encryption/impl/|security/|security/impl/|soap/|soap/impl/" kind="src" path="xmltooling"/>
-<pathentry kind="src" path="xmltooling/impl"/>
-<pathentry kind="src" path="xmltooling/io"/>
-<pathentry excluding="impl/" kind="src" path="xmltooling/encryption"/>
-<pathentry kind="src" path="xmltooling/encryption/impl"/>
-<pathentry excluding="impl/" kind="src" path="xmltooling/signature"/>
-<pathentry kind="src" path="xmltooling/signature/impl"/>
-<pathentry excluding="impl/" kind="src" path="xmltooling/security"/>
-<pathentry kind="src" path="xmltooling/security/impl"/>
-<pathentry excluding="impl/" kind="src" path="xmltooling/soap"/>
-<pathentry kind="src" path="xmltooling/soap/impl"/>
-<pathentry kind="src" path="xmltooling/util"/>
-<pathentry kind="src" path="xmltooling/validation"/>
-<pathentry kind="src" path="xmltoolingtest"/>
 </storageModule>
 <storageModule moduleId="cdtBuildSystem" version="4.0.0">
 <configuration artifactName="cpp-xmltooling" buildArtefactType="org.eclipse.linuxtools.cdt.autotools.buildArtefactType.autotools" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.linuxtools.cdt.autotools.buildArtefactType.autotools" cleanCommand="rm -rf" description="" errorParsers="org.eclipse.cdt.core.MakeErrorParser;org.eclipse.cdt.core.GCCErrorParser;org.eclipse.cdt.core.GLDErrorParser;org.eclipse.cdt.core.GASErrorParser" id="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814" name="Build (GNU)" parent="org.eclipse.linuxtools.cdt.autotools.configuration.build">
@@ -76,7 +66,19 @@
 </folderInfo>
 <sourceEntries>
 <entry excluding="xmltooling|xmltoolingtest|debug/|release/|x64/" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
-<entry excluding="Debug/|Release/|x64/|xmltooling-lite-Debug/|xmltooling-lite-Release/" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="xmltooling"/>
+<entry excluding="encryption|security|signature|soap|io|util|impl|validation|Debug/|Release/|x64/|xmltooling-lite-Debug/|xmltooling-lite-Release/" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="xmltooling"/>
+<entry excluding="impl" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="xmltooling/encryption"/>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="xmltooling/encryption/impl"/>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="xmltooling/impl"/>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="xmltooling/io"/>
+<entry excluding="impl" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="xmltooling/security"/>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="xmltooling/security/impl"/>
+<entry excluding="impl" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="xmltooling/signature"/>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="xmltooling/signature/impl"/>
+<entry excluding="impl" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="xmltooling/soap"/>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="xmltooling/soap/impl"/>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="xmltooling/validation"/>
+<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="xmltooling/util"/>
 <entry excluding="Debug/|Release/|x64/" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="xmltoolingtest"/>
 </sourceEntries>
 </configuration>
