@@ -186,7 +186,7 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
                     int responseCode = XMLString::parseInt(doc->getDocumentElement()->getFirstChild()->getNodeValue());
                     doc->release();
                     if (responseCode == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED) {
-                        throw responseCode; // toss out as a "known" case to handle gracefully
+                        throw (long)responseCode; // toss out as a "known" case to handle gracefully
                     }
                     else {
                         m_log.warn("remote resource fetch returned atypical status code (%d)", responseCode);
@@ -297,7 +297,7 @@ Lockable* ReloadableXMLFile::lock()
         if (ret.first)
             ret.second->getOwnerDocument()->release();
     }
-    catch (int& ex) {
+    catch (long& ex) {
         if (ex == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED) {
             m_log.info("remote resource (%s) unchanged from cached version", m_source.c_str());
         }
