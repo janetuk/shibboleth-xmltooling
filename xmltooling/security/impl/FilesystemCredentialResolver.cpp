@@ -22,6 +22,7 @@
 
 #include "internal.h"
 #include "logging.h"
+#include "io/HTTPResponse.h"
 #include "security/BasicX509Credential.h"
 #include "security/CredentialCriteria.h"
 #include "security/CredentialResolver.h"
@@ -65,7 +66,10 @@ namespace xmltooling {
         SOAPTransport* getTransport() {
             SOAPTransport::Address addr("FilesystemCredentialResolver", source.c_str(), source.c_str());
             string scheme(addr.m_endpoint, strchr(addr.m_endpoint,':') - addr.m_endpoint);
-            return XMLToolingConfig::getConfig().SOAPTransportManager.newPlugin(scheme.c_str(), addr);
+            SOAPTransport* ret = XMLToolingConfig::getConfig().SOAPTransportManager.newPlugin(scheme.c_str(), addr);
+            if (ret)
+                ret->setCacheTag(&cacheTag);
+            return ret;
         }
 
     public:
@@ -129,7 +133,7 @@ namespace xmltooling {
         }
 
         bool local,reloadChanges;
-        string format,source,backing;
+        string format,source,backing,cacheTag;
         time_t filestamp,reloadInterval;
     };
 
@@ -638,6 +642,15 @@ Lockable* FilesystemCredentialResolver::lock()
             m_key.load(log, m_keypass.c_str());
             updated = true;
         }
+        catch (long& ex) {
+            if (ex == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED) {
+                log.info("remote key (%s) unchanged from cached version", m_key.source.c_str());
+            }
+            else {
+                // Shouldn't happen, we should only get codes intended to be gracefully handled.
+                log.crit("maintaining existing key, remote fetch returned atypical status code (%d)", ex);
+            }
+        }
         catch (exception& ex) {
             log.crit("maintaining existing key: %s", ex.what());
         }
@@ -649,6 +662,15 @@ Lockable* FilesystemCredentialResolver::lock()
             try {
                 i->load(log, (i==m_certs.begin()) ? m_certpass.c_str() : NULL);
                 updated = true;
+            }
+            catch (long& ex) {
+                if (ex == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED) {
+                    log.info("remote certificate(s) (%s) unchanged from cached version", i->source.c_str());
+                }
+                else {
+                    // Shouldn't happen, we should only get codes intended to be gracefully handled.
+                    log.crit("maintaining existing certificate(s), remote fetch returned atypical status code (%d)", ex);
+                }
             }
             catch (exception& ex) {
                 log.crit("maintaining existing certificate(s): %s", ex.what());
@@ -662,6 +684,15 @@ Lockable* FilesystemCredentialResolver::lock()
             try {
                 j->load(log);
                 updated = true;
+            }
+            catch (long& ex) {
+                if (ex == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED) {
+                    log.info("remote CRL(s) (%s) unchanged from cached version", j->source.c_str());
+                }
+                else {
+                    // Shouldn't happen, we should only get codes intended to be gracefully handled.
+                    log.crit("maintaining existing CRL(s), remote fetch returned atypical status code (%d)", ex);
+                }
             }
             catch (exception& ex) {
                 log.crit("maintaining existing CRL(s): %s", ex.what());

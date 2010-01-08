@@ -22,9 +22,11 @@
 
 #include "internal.h"
 #include "logging.h"
+#include "io/HTTPResponse.h"
 #include "security/OpenSSLCryptoX509CRL.h"
 #include "security/SecurityHelper.h"
 #include "security/X509Credential.h"
+#include "soap/HTTPSOAPTransport.h"
 #include "util/NDC.h"
 
 #include <fstream>
@@ -397,6 +399,10 @@ XSECCryptoKey* SecurityHelper::loadKeyFromURL(SOAPTransport& transport, const ch
     transport.send();
     istream& msg = transport.receive();
 
+    // Check for "not modified" status.
+    if (dynamic_cast<HTTPSOAPTransport*>(&transport) && transport.getStatusCode() == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED)
+        throw (long)HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED;
+
     // Dump to output file.
     ofstream out(backing, fstream::trunc|fstream::binary);
     out << msg.rdbuf();
@@ -411,6 +417,10 @@ vector<XSECCryptoX509*>::size_type SecurityHelper::loadCertificatesFromURL(
 {
     transport.send();
     istream& msg = transport.receive();
+
+    // Check for "not modified" status.
+    if (dynamic_cast<HTTPSOAPTransport*>(&transport) && transport.getStatusCode() == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED)
+        throw (long)HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED;
 
     // Dump to output file.
     ofstream out(backing, fstream::trunc|fstream::binary);
@@ -427,6 +437,10 @@ vector<XSECCryptoX509CRL*>::size_type SecurityHelper::loadCRLsFromURL(
     // Fetch the data.
     transport.send();
     istream& msg = transport.receive();
+
+    // Check for "not modified" status.
+    if (dynamic_cast<HTTPSOAPTransport*>(&transport) && transport.getStatusCode() == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED)
+        throw (long)HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED;
 
     // Dump to output file.
     ofstream out(backing, fstream::trunc|fstream::binary);
