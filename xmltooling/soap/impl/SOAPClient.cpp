@@ -50,6 +50,23 @@ bool SOAPTransport::setProviderOption(const char* provider, const char* option, 
     return false;
 }
 
+bool SOAPTransport::setCacheTag(string* cacheTag)
+{
+    return false;
+}
+
+void SOAPTransport::send(istream* in)
+{
+    if (!in)
+        throw IOException("SOAP transport does not support an empty request body.");
+    return send(*in);
+}
+
+long SOAPTransport::getStatusCode() const
+{
+    return 0;
+}
+
 HTTPSOAPTransport::HTTPSOAPTransport()
 {
 }
@@ -76,13 +93,6 @@ void SOAPClient::reset()
 {
     delete m_transport;
     m_transport=NULL;
-}
-
-void SOAPTransport::send(istream* in)
-{
-    if (!in)
-        throw IOException("SOAP transport does not support an empty request body.");
-    return send(*in);
 }
 
 void SOAPClient::send(const Envelope& env, const SOAPTransport::Address& addr)

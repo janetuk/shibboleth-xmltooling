@@ -24,6 +24,8 @@
 #define __xmltooling_soaptrans_h__
 
 #include <xmltooling/base.h>
+
+#include <string>
 #include <iostream>
 
 namespace xmltooling {
@@ -156,6 +158,15 @@ namespace xmltooling {
 #endif
 
         /**
+         * Installs (or clears) a pointer to an object used for cache management of the
+         * content being accessed. The lifetime of the object must be longer than the lifetime
+         * of this object.
+         *
+         * @param cacheTag  optional pointer to string used for cache management
+         */
+        virtual bool setCacheTag(std::string* cacheTag=NULL);
+
+        /**
          * Sets an implementation-specific transport provider option.
          *
          * <p>Requires knowledge of the underlying SOAPTransport implementation.
@@ -211,6 +222,13 @@ namespace xmltooling {
          * @return  MIME type of response, or an empty string
          */
         virtual std::string getContentType() const=0;
+
+        /**
+         * Returns the status code of the response.
+         *
+         * @return  transport status code, or 0 if unknown
+         */
+        virtual long getStatusCode() const;
     };
 
 #ifndef XMLTOOLING_NO_XMLSEC

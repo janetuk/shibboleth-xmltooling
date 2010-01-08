@@ -72,7 +72,7 @@ namespace xmltooling {
 #ifndef XMLTOOLING_NO_XMLSEC
                     m_cred(NULL), m_trustEngine(NULL), m_peerResolver(NULL), m_mandatory(false),
 #endif
-                    m_ssl_callback(NULL), m_ssl_userptr(NULL), m_chunked(true), m_authenticated(false) {
+                    m_ssl_callback(NULL), m_ssl_userptr(NULL), m_chunked(true), m_authenticated(false), m_cacheTag(NULL) {
             m_handle = g_CURLPool->get(addr);
             curl_easy_setopt(m_handle,CURLOPT_URL,addr.m_endpoint);
             curl_easy_setopt(m_handle,CURLOPT_CONNECTTIMEOUT,15);
@@ -147,6 +147,11 @@ namespace xmltooling {
             return true;
         }
 
+        bool setCacheTag(string* cacheTag) {
+            m_cacheTag = cacheTag;
+            return true;
+        }
+
         bool setProviderOption(const char* provider, const char* option, const char* value) {
             if (!provider || strcmp(provider, "CURL"))
                 return false;
@@ -196,6 +201,7 @@ namespace xmltooling {
         }
 
         string getContentType() const;
+        long getStatusCode() const;
 
         bool setRequestHeader(const char* name, const char* val) {
             string temp(name);
@@ -231,6 +237,7 @@ namespace xmltooling {
         void* m_ssl_userptr;
         bool m_chunked;
         bool m_authenticated;
+        string* m_cacheTag;
 
         friend size_t XMLTOOL_DLLLOCAL curl_header_hook(void* ptr, size_t size, size_t nmemb, void* stream);
         friend CURLcode XMLTOOL_DLLLOCAL xml_ssl_ctx_callback(CURL* curl, SSL_CTX* ssl_ctx, void* userptr);
@@ -428,6 +435,14 @@ string CURLSOAPTransport::getContentType() const
     return content_type ? content_type : "";
 }
 
+long CURLSOAPTransport::getStatusCode() const
+{
+    long code=200;
+    if (curl_easy_getinfo(m_handle, CURLINFO_RESPONSE_CODE, &code) != CURLE_OK)
+        code = 200;
+    return code;
+}
+
 void CURLSOAPTransport::send(istream* in)
 {
 #ifdef _DEBUG
@@ -475,6 +490,13 @@ void CURLSOAPTransport::send(istream* in)
     if (log_curl.isDebugEnabled())
         curl_easy_setopt(m_handle,CURLOPT_VERBOSE,1);
 
+    // Check for cache tag.
+    if (m_cacheTag && !m_cacheTag->empty()) {
+        string hdr("If-None-Match: ");
+        hdr += *m_cacheTag;
+        m_headers = curl_slist_append(m_headers, hdr.c_str());
+    }
+
     // Set request headers.
     curl_easy_setopt(m_handle,CURLOPT_HTTPHEADER,m_headers);
 
@@ -504,6 +526,13 @@ void CURLSOAPTransport::send(istream* in)
         throw IOException(
             string("CURLSOAPTransport failed while contacting SOAP endpoint (") + m_endpoint + "): " +
                 (curl_errorbuf[0] ? curl_errorbuf : "no further information available"));
+    }
+
+    // Check for outgoing cache tag.
+    if (m_cacheTag) {
+        const vector<string>& tags = getResponseHeader("ETag");
+        if (!tags.empty())
+            *m_cacheTag = tags.front();
     }
 }
 
