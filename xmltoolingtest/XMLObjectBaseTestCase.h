@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 
 #include <cxxtest/TestSuite.h>
+#include <xmltooling/AbstractAttributeExtensibleXMLObject.h>
 #include <xmltooling/AbstractComplexElement.h>
 #include <xmltooling/ElementProxy.h>
 #include <xmltooling/exceptions.h>
@@ -46,14 +47,15 @@ extern string data_path;
 #endif
 
 class SimpleXMLObject
-    : public AbstractComplexElement,
+    : public AbstractAttributeExtensibleXMLObject,
+        public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
 {
 protected:
     SimpleXMLObject(const SimpleXMLObject& src)
-            : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src),
+            : AbstractXMLObject(src), AbstractAttributeExtensibleXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src),
                 m_id(XMLString::replicate(src.m_id)) {
 #ifndef XMLTOOLING_NO_XMLSEC
         m_children.push_back(NULL);
@@ -132,6 +134,7 @@ protected:
             domElement->setIdAttributeNS(NULL, SimpleXMLObject::ID_ATTRIB_NAME);
 #endif
         }
+        marshallExtensionAttributes(domElement);
     }
 
     void processChildElement(XMLObject* childXMLObject, const xercesc::DOMElement* root) {
@@ -153,10 +156,11 @@ protected:
     }
 
     void processAttribute(const xercesc::DOMAttr* attribute) {
-        if (XMLHelper::isNodeNamed(attribute, NULL, SimpleXMLObject::ID_ATTRIB_NAME))
+        if (XMLHelper::isNodeNamed(attribute, NULL, SimpleXMLObject::ID_ATTRIB_NAME)) {
             setId(attribute->getValue());
-        else
-            throw UnmarshallingException("Unknown attribute cannot be processed by parent object.");
+            return;
+        }
+        unmarshallExtensionAttribute(attribute);
     }
 
 private:

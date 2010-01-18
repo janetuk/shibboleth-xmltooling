@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,8 +43,9 @@ namespace xmltooling {
          * @param uri               namespace URI
          * @param prefix            namespace prefix (without the colon)
          * @param alwaysDeclare     true iff the namespace should always be declared regardless of in-scope declarations
+         * @param visiblyUsed       true iff the namespace is visibly used by an XMLObject its attached to
          */
-        Namespace(const XMLCh* uri=NULL, const XMLCh* prefix=NULL, bool alwaysDeclare=false);
+        Namespace(const XMLCh* uri=NULL, const XMLCh* prefix=NULL, bool alwaysDeclare=false, bool visiblyUsed=true);
         
         ~Namespace();
         
@@ -64,7 +65,13 @@ namespace xmltooling {
          * Returns true iff the namespace should always be declared regardless of in-scope declarations
          * @return the alwaysDeclared setting
          */
-        const bool alwaysDeclare() const { return m_pinned; } 
+        const bool alwaysDeclare() const { return m_pinned; }
+
+        /**
+         * Returns true iff the namespace is visibly used by an XMLObject its attached to
+         * @return the visiblyUsed setting
+         */
+        const bool visiblyUsed() const { return m_visiblyUsed; }
 
         /**
          * Sets the namespace prefix
@@ -84,8 +91,14 @@ namespace xmltooling {
          */
         void setAlwaysDeclare(bool alwaysDeclare) { m_pinned = alwaysDeclare; } 
         
+        /**
+         * Sets the visiblyUsed property
+         * @param visiblyUsed     true iff the namespace is visibly used by an XMLObject its attached to
+         */
+        void setVisiblyUsed(bool visiblyUsed) { m_visiblyUsed = visiblyUsed; }
+
     private:
-        bool m_pinned;
+        bool m_pinned,m_visiblyUsed;
         xstring m_uri;
         xstring m_prefix;
     };

@@ -35,6 +35,7 @@ xmltoolingtest_h = \
     ExceptionTest.h \
     KeyInfoTest.h \
     MarshallingTest.h \
+    NonVisibleNamespaceTest.h \
     UnmarshallingTest.h \
     TemplateEngineTest.h \
     xmltoolingtest.h \

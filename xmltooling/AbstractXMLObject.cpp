@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2009 Internet2
+*  Copyright 2001-2010 Internet2
  *
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,8 @@ AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName,
     addNamespace(Namespace(nsURI, prefix));
     if (schemaType) {
         m_typeQname = new QName(*schemaType);
-        addNamespace(Namespace(m_typeQname->getNamespaceURI(), m_typeQname->getPrefix()));
+        // Attach a non-visibly used namespace.
+        addNamespace(Namespace(m_typeQname->getNamespaceURI(), m_typeQname->getPrefix(), false, false));
     }
 }
 
@@ -133,8 +134,12 @@ void AbstractXMLObject::addNamespace(const Namespace& ns) const
     std::set<Namespace>::iterator i = m_namespaces.find(ns);
     if (i == m_namespaces.end())
         m_namespaces.insert(ns);
-    else if (ns.alwaysDeclare())
-        const_cast<Namespace&>(*i).setAlwaysDeclare(true);
+    else {
+        if (ns.alwaysDeclare())
+            const_cast<Namespace&>(*i).setAlwaysDeclare(true);
+        if (ns.visiblyUsed())
+            const_cast<Namespace&>(*i).setVisiblyUsed(true);
+    }
 }
 
 void AbstractXMLObject::removeNamespace(const Namespace& ns)
@@ -196,8 +201,8 @@ QName* AbstractXMLObject::prepareForAssignment(QName* oldValue, const QName* new
     if (!oldValue) {
         if (newValue) {
             releaseThisandParentDOM();
-            Namespace newNamespace(newValue->getNamespaceURI(), newValue->getPrefix());
-            addNamespace(newNamespace);
+            // Attach a non-visibly used namespace.
+            addNamespace(Namespace(newValue->getNamespaceURI(), newValue->getPrefix(), false, false));
             return new QName(*newValue);
         }
         return NULL;
@@ -206,8 +211,8 @@ QName* AbstractXMLObject::prepareForAssignment(QName* oldValue, const QName* new
     delete oldValue;
     releaseThisandParentDOM();
     if (newValue) {
-        Namespace newNamespace(newValue->getNamespaceURI(), newValue->getPrefix());
-        addNamespace(newNamespace);
+        // Attach a non-visibly used namespace.
+        addNamespace(Namespace(newValue->getNamespaceURI(), newValue->getPrefix(), false, false));
         return new QName(*newValue);
     }
     return NULL;

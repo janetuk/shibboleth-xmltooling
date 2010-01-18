@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,6 +59,14 @@ namespace xmltooling {
          * @param ID            true iff the attribute is an XML ID
          */
         virtual void setAttribute(const QName& qualifiedName, const XMLCh* value, bool ID=false)=0;
+
+        /**
+         * Sets a QName-valued XML attribute of the object.
+         * 
+         * @param qualifiedName qualified name of the attribute   
+         * @param value         value to set
+         */
+        virtual void setAttribute(const QName& qualifiedName, const QName& value);
 
         /**
          * Gets an immutable map of the extended XML attributes of the object.

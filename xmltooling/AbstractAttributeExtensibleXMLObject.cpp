@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@
 
 using namespace xmltooling;
 using namespace std;
+using xercesc::chColon;
 
 using xercesc::DOMAttr;
 using xercesc::DOMElement;
@@ -137,7 +138,28 @@ void AbstractAttributeExtensibleXMLObject::setAttribute(const QName& qualifiedNa
         m_attributeMap[qualifiedName]=XMLString::replicate(value);
         if (ID)
             m_idAttribute = m_attributeMap.find(qualifiedName);
+        Namespace newNamespace(qualifiedName.getNamespaceURI(), qualifiedName.getPrefix());
+        addNamespace(newNamespace);
     }
+}
+
+void AttributeExtensibleXMLObject::setAttribute(const QName& qualifiedName, const QName& value)
+{
+    if (!value.hasLocalPart())
+        return;
+
+    if (value.hasPrefix()) {
+        xstring buf(value.getPrefix());
+        buf = buf + chColon + value.getLocalPart();
+        setAttribute(qualifiedName, buf.c_str());
+    }
+    else {
+        setAttribute(qualifiedName, value.getLocalPart());
+    }
+
+    // Attach a non-visibly used namespace.
+    Namespace newNamespace(value.getNamespaceURI(), value.getPrefix(), false, false);
+    addNamespace(newNamespace);
 }
 
 const map<QName,XMLCh*>& AbstractAttributeExtensibleXMLObject::getExtensionAttributes() const

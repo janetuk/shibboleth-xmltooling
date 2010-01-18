@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,8 @@ using namespace xmltooling;
 
 using xercesc::XMLString;
 
-Namespace::Namespace(const XMLCh* uri, const XMLCh* prefix, bool alwaysDeclare) : m_pinned(alwaysDeclare)
+Namespace::Namespace(const XMLCh* uri, const XMLCh* prefix, bool alwaysDeclare, bool visiblyUsed)
+    : m_pinned(alwaysDeclare), m_visiblyUsed(visiblyUsed)
 {
     setNamespaceURI(uri);
     setNamespacePrefix(prefix);
