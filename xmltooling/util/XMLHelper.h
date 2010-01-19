@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 
 #include <xmltooling/base.h>
 
+#include <set>
 #include <iostream>
 #include <xercesc/dom/DOM.hpp>
 
@@ -132,6 +133,14 @@ namespace xmltooling {
          * @return XMLObject in the tree with a matching ID value, or NULL
          */
         static XMLObject* getXMLObjectById(XMLObject& tree, const XMLCh* id);
+
+        /**
+         * Returns a list of non-visibly-used namespace prefixes found in a tree.
+         *
+         * @param tree      root of tree to search
+         * @param prefixes  container to store prefix list
+         */
+        static void getNonVisiblyUsedPrefixes(const XMLObject& tree, std::set<xstring>& prefixes);
 
         /**
          * Gets the QName for the given DOM node.

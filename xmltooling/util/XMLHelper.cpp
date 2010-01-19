@@ -38,13 +38,7 @@ static const XMLCh type[]={chLatin_t, chLatin_y, chLatin_p, chLatin_e, chNull };
     
 bool XMLHelper::hasXSIType(const DOMElement* e)
 {
-    if (e) {
-        if (e->hasAttributeNS(xmlconstants::XSI_NS, type)) {
-            return true;
-        }
-    }
-
-    return false;
+    return (e && e->hasAttributeNS(xmlconstants::XSI_NS, type));
 }
 
 xmltooling::QName* XMLHelper::getXSIType(const DOMElement* e)
@@ -123,6 +117,33 @@ XMLObject* XMLHelper::getXMLObjectById(XMLObject& tree, const XMLCh* id)
     }
     
     return NULL;
+}
+
+void XMLHelper::getNonVisiblyUsedPrefixes(const XMLObject& tree, set<xstring>& prefixes)
+{
+    set<xstring> child_prefixes;
+    const list<XMLObject*>& children = tree.getOrderedChildren();
+    for (list<XMLObject*>::const_iterator i = children.begin(); i != children.end(); ++i) {
+        if (*i)
+            getNonVisiblyUsedPrefixes(*(*i), child_prefixes);
+    }
+    const set<Namespace>& nsset = tree.getNamespaces();
+    for (set<Namespace>::const_iterator ns = nsset.begin(); ns != nsset.end(); ++ns) {
+        // Check for xmlns:xml.
+        if (XMLString::equals(ns->getNamespacePrefix(), xmlconstants::XML_PREFIX) && XMLString::equals(ns->getNamespaceURI(), xmlconstants::XML_NS))
+            continue;
+        switch (ns->usage()) {
+            case Namespace::Indeterminate:
+                break;
+            case Namespace::VisiblyUsed:
+                child_prefixes.erase(ns->getNamespacePrefix() ? ns->getNamespacePrefix() : &chNull);
+                break;
+            case Namespace::NonVisiblyUsed:
+                prefixes.insert(ns->getNamespacePrefix() ? ns->getNamespacePrefix() : &chNull);
+                break;
+        }
+    }
+    prefixes.insert(child_prefixes.begin(), child_prefixes.end());
 }
 
 xmltooling::QName* XMLHelper::getNodeQName(const DOMNode* domNode)
