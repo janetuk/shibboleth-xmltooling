@@ -146,6 +146,8 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
             	setNil(attribute->getValue());
             	continue;
             }
+            // Note that the prefix is visibly used.
+            addNamespace(Namespace(nsuri, attribute->getPrefix()));
         }
         else if (nsuri && !XMLString::equals(nsuri,XML_NS)) {
             m_log.debug("found namespace-qualified attribute, adding prefix to the list of namespaces on the XMLObject");
