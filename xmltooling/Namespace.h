@@ -17,7 +17,7 @@
 /**
  * @file xmltooling/Namespace.h
  * 
- * Representing XML namespace attributes 
+ * Representing XML namespace attributes.
  */
 
 #if !defined(__xmltooling_namespace_h__)
@@ -33,19 +33,28 @@ namespace xmltooling {
 #endif
 
     /**
-     * A data structure for encapsulating XML Namespace attributes
+     * A data structure for encapsulating XML Namespace attributes.
      */
     class XMLTOOL_API Namespace
     {
     public:
         /**
+         * Tri-state indicator of namespace usage.
+         */
+        enum namespace_usage_t {
+            Indeterminate,
+            NonVisiblyUsed,
+            VisiblyUsed
+        };
+
+        /**
          * Constructor
          * @param uri               namespace URI
          * @param prefix            namespace prefix (without the colon)
          * @param alwaysDeclare     true iff the namespace should always be declared regardless of in-scope declarations
-         * @param visiblyUsed       true iff the namespace is visibly used by an XMLObject its attached to
+         * @param usage             indicates usage of namespace in the context of an XMLObject
          */
-        Namespace(const XMLCh* uri=NULL, const XMLCh* prefix=NULL, bool alwaysDeclare=false, bool visiblyUsed=true);
+        Namespace(const XMLCh* uri=NULL, const XMLCh* prefix=NULL, bool alwaysDeclare=false, namespace_usage_t usage=Indeterminate);
         
         ~Namespace();
         
@@ -68,10 +77,10 @@ namespace xmltooling {
         const bool alwaysDeclare() const { return m_pinned; }
 
         /**
-         * Returns true iff the namespace is visibly used by an XMLObject its attached to
-         * @return the visiblyUsed setting
+         * Returns the usage of the namespace by an XMLObject
+         * @return the usage setting
          */
-        const bool visiblyUsed() const { return m_visiblyUsed; }
+        const namespace_usage_t usage() const { return m_usage; }
 
         /**
          * Sets the namespace prefix
@@ -92,13 +101,14 @@ namespace xmltooling {
         void setAlwaysDeclare(bool alwaysDeclare) { m_pinned = alwaysDeclare; } 
         
         /**
-         * Sets the visiblyUsed property
-         * @param visiblyUsed     true iff the namespace is visibly used by an XMLObject its attached to
+         * Sets the usage property
+         * @param usage usage of the namespace by an XMLObject
          */
-        void setVisiblyUsed(bool visiblyUsed) { m_visiblyUsed = visiblyUsed; }
+        void setUsage(namespace_usage_t usage) { m_usage = usage; }
 
     private:
-        bool m_pinned,m_visiblyUsed;
+        bool m_pinned;
+        namespace_usage_t m_usage;
         xstring m_uri;
         xstring m_prefix;
     };

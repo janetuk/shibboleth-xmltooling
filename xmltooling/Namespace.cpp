@@ -17,7 +17,7 @@
 /**
  * Namespace.cpp
  * 
- * Representing XML namespace attributes 
+ * Representing XML namespace attributes.
  */
 
 #include "internal.h"
@@ -27,8 +27,8 @@ using namespace xmltooling;
 
 using xercesc::XMLString;
 
-Namespace::Namespace(const XMLCh* uri, const XMLCh* prefix, bool alwaysDeclare, bool visiblyUsed)
-    : m_pinned(alwaysDeclare), m_visiblyUsed(visiblyUsed)
+Namespace::Namespace(const XMLCh* uri, const XMLCh* prefix, bool alwaysDeclare, namespace_usage_t usage)
+    : m_pinned(alwaysDeclare), m_usage(usage)
 {
     setNamespaceURI(uri);
     setNamespacePrefix(prefix);

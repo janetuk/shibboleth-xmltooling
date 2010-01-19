@@ -138,7 +138,7 @@ void AbstractAttributeExtensibleXMLObject::setAttribute(const QName& qualifiedNa
         m_attributeMap[qualifiedName]=XMLString::replicate(value);
         if (ID)
             m_idAttribute = m_attributeMap.find(qualifiedName);
-        Namespace newNamespace(qualifiedName.getNamespaceURI(), qualifiedName.getPrefix());
+        Namespace newNamespace(qualifiedName.getNamespaceURI(), qualifiedName.getPrefix(), false, Namespace::VisiblyUsed);
         addNamespace(newNamespace);
     }
 }
@@ -157,8 +157,7 @@ void AttributeExtensibleXMLObject::setAttribute(const QName& qualifiedName, cons
         setAttribute(qualifiedName, value.getLocalPart());
     }
 
-    // Attach a non-visibly used namespace.
-    Namespace newNamespace(value.getNamespaceURI(), value.getPrefix(), false, false);
+    Namespace newNamespace(value.getNamespaceURI(), value.getPrefix(), false, Namespace::NonVisiblyUsed);
     addNamespace(newNamespace);
 }
 

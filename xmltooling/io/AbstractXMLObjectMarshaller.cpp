@@ -228,8 +228,8 @@ void AbstractXMLObjectMarshaller::marshallInto(
             	targetElement->setAttributeNS(XSI_NS, _nil, xmlconstants::XML_ZERO);
                 break;
         }
-        m_log.debug("adding XSI namespace to list of namespaces used by XMLObject");
-        addNamespace(Namespace(XSI_NS, XSI_PREFIX));
+        m_log.debug("adding XSI namespace to list of namespaces visibly used by XMLObject");
+        addNamespace(Namespace(XSI_NS, XSI_PREFIX, false, Namespace::VisiblyUsed));
     }
 
     marshallElementType(targetElement);
@@ -275,8 +275,8 @@ void AbstractXMLObjectMarshaller::marshallElementType(DOMElement* domElement) co
         if (xsivalue != typeLocalName)
             XMLString::release(&xsivalue);
 
-        m_log.debug("adding XSI namespace to list of namespaces used by XMLObject");
-        addNamespace(Namespace(XSI_NS, XSI_PREFIX));
+        m_log.debug("adding XSI namespace to list of namespaces visibly used by XMLObject");
+        addNamespace(Namespace(XSI_NS, XSI_PREFIX, false, Namespace::VisiblyUsed));
     }
 }
 

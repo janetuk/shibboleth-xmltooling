@@ -106,14 +106,14 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
         if (XMLString::equals(nsuri,XMLNS_NS)) {
             if (XMLString::equals(attribute->getLocalName(),XMLNS_PREFIX)) {
                 m_log.debug("found default namespace declaration, adding it to the list of namespaces on the XMLObject");
-                addNamespace(Namespace(attribute->getValue(), NULL, true, false));
+                addNamespace(Namespace(attribute->getValue(), NULL, true));
             }
             else if (XMLString::equals(attribute->getLocalName(),XML_PREFIX) && XMLString::equals(attribute->getNodeValue(),XML_NS)) {
                 m_log.debug("found standard xml prefix declaration, ignoring as superfluous");
             }
             else {
                 m_log.debug("found namespace declaration, adding it to the list of namespaces on the XMLObject");
-                addNamespace(Namespace(attribute->getValue(), attribute->getLocalName(), true, false));
+                addNamespace(Namespace(attribute->getValue(), attribute->getLocalName(), true));
             }
             continue;
         }
@@ -147,11 +147,11 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
             	continue;
             }
             // Note that the prefix is visibly used.
-            addNamespace(Namespace(nsuri, attribute->getPrefix()));
+            addNamespace(Namespace(nsuri, attribute->getPrefix(), false, Namespace::VisiblyUsed));
         }
         else if (nsuri && !XMLString::equals(nsuri,XML_NS)) {
-            m_log.debug("found namespace-qualified attribute, adding prefix to the list of namespaces on the XMLObject");
-            addNamespace(Namespace(nsuri, attribute->getPrefix()));
+            m_log.debug("found namespace-qualified attribute, adding prefix to the list of visible namespaces on the XMLObject");
+            addNamespace(Namespace(nsuri, attribute->getPrefix(), false, Namespace::VisiblyUsed));
         }
 
         m_log.debug("processing generic attribute");

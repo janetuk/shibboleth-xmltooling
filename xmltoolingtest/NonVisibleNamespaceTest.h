@@ -53,15 +53,15 @@ public:
         bool cond1=false, cond2=false, cond3 = false;
         for (set<Namespace>::const_iterator ns = namespaces.begin(); ns != namespaces.end(); ++ns) {
             if (XMLString::equals(ns->getNamespacePrefix(), SimpleXMLObject::NAMESPACE_PREFIX)) {
-                TSM_ASSERT("'test' namespace was visibly used", !ns->visiblyUsed());
+                TSM_ASSERT("'test' namespace was visibly used", ns->usage() != Namespace::VisiblyUsed);
                 cond1 = true;
             }
             else if (XMLString::equals(ns->getNamespacePrefix(), TEST2_PREFIX)) {
-                TSM_ASSERT("'test2' namespace was visibly used", !ns->visiblyUsed());
+                TSM_ASSERT("'test2' namespace was visibly used", ns->usage() != Namespace::VisiblyUsed);
                 cond2 = true;
             }
             else if (XMLString::equals(ns->getNamespacePrefix(), &chNull)) {
-                TSM_ASSERT("Default namespace was not visibly used", ns->visiblyUsed());
+                TSM_ASSERT("Default namespace was not visibly used", ns->usage() == Namespace::VisiblyUsed);
                 cond3 = true;
             }
         }
@@ -88,11 +88,11 @@ public:
         bool cond1=false, cond2=false, cond3=false;
         for (set<Namespace>::const_iterator ns = namespaces.begin(); ns != namespaces.end(); ++ns) {
             if (XMLString::equals(ns->getNamespacePrefix(), SimpleXMLObject::NAMESPACE_PREFIX)) {
-                TSM_ASSERT("'test' namespace was visibly used", !ns->visiblyUsed());
+                TSM_ASSERT("'test' namespace was visibly used", ns->usage() != Namespace::VisiblyUsed);
                 cond1 = true;
             }
             else if (XMLString::equals(ns->getNamespacePrefix(), &chNull)) {
-                TSM_ASSERT("Default namespace was not visibly used", ns->visiblyUsed());
+                TSM_ASSERT("Default namespace was not visibly used", ns->usage() == Namespace::VisiblyUsed);
                 cond2 = true;
             }
         }

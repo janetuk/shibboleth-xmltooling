@@ -57,11 +57,10 @@ AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName,
     	m_schemaLocation(NULL), m_noNamespaceSchemaLocation(NULL), m_nil(xmlconstants::XML_BOOL_NULL),
         m_parent(NULL), m_elementQname(nsURI, localName, prefix), m_typeQname(NULL)
 {
-    addNamespace(Namespace(nsURI, prefix));
+    addNamespace(Namespace(nsURI, prefix, false, Namespace::VisiblyUsed));
     if (schemaType) {
         m_typeQname = new QName(*schemaType);
-        // Attach a non-visibly used namespace.
-        addNamespace(Namespace(m_typeQname->getNamespaceURI(), m_typeQname->getPrefix(), false, false));
+        addNamespace(Namespace(m_typeQname->getNamespaceURI(), m_typeQname->getPrefix(), false, Namespace::NonVisiblyUsed));
     }
 }
 
@@ -137,8 +136,17 @@ void AbstractXMLObject::addNamespace(const Namespace& ns) const
     else {
         if (ns.alwaysDeclare())
             const_cast<Namespace&>(*i).setAlwaysDeclare(true);
-        if (ns.visiblyUsed())
-            const_cast<Namespace&>(*i).setVisiblyUsed(true);
+        switch (ns.usage()) {
+            case Namespace::Indeterminate:
+                break;
+            case Namespace::VisiblyUsed:
+                const_cast<Namespace&>(*i).setUsage(Namespace::VisiblyUsed);
+                break;
+            case Namespace::NonVisiblyUsed:
+                if (i->usage() == Namespace::Indeterminate)
+                    const_cast<Namespace&>(*i).setUsage(Namespace::NonVisiblyUsed);
+                break;
+        }
     }
 }
 
@@ -201,8 +209,7 @@ QName* AbstractXMLObject::prepareForAssignment(QName* oldValue, const QName* new
     if (!oldValue) {
         if (newValue) {
             releaseThisandParentDOM();
-            // Attach a non-visibly used namespace.
-            addNamespace(Namespace(newValue->getNamespaceURI(), newValue->getPrefix(), false, false));
+            addNamespace(Namespace(newValue->getNamespaceURI(), newValue->getPrefix(), false, Namespace::NonVisiblyUsed));
             return new QName(*newValue);
         }
         return NULL;
@@ -212,7 +219,7 @@ QName* AbstractXMLObject::prepareForAssignment(QName* oldValue, const QName* new
     releaseThisandParentDOM();
     if (newValue) {
         // Attach a non-visibly used namespace.
-        addNamespace(Namespace(newValue->getNamespaceURI(), newValue->getPrefix(), false, false));
+        addNamespace(Namespace(newValue->getNamespaceURI(), newValue->getPrefix(), false, Namespace::NonVisiblyUsed));
         return new QName(*newValue);
     }
     return NULL;
