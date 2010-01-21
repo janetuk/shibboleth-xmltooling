@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,9 @@ namespace xmltooling
     class XMLTOOL_API Thread
     {
         MAKE_NONCOPYABLE(Thread);
-    public:
+    protected:
         Thread() {}
+    public:
         virtual ~Thread() {}
 
         /**
@@ -69,9 +70,10 @@ namespace xmltooling
          *
          * @param start_routine the function to execute on the thread
          * @param arg           a parameter for the start routine
+         * @param stacksize     size of stack to use, or 0 for default
          * @return  the created and running thread object
          */
-        static Thread* create(void* (*start_routine)(void*), void* arg);
+        static Thread* create(void* (*start_routine)(void*), void* arg, size_t stacksize=0);
 
         /**
          * Exits a thread gracefully.
@@ -110,8 +112,9 @@ namespace xmltooling
     class XMLTOOL_API ThreadKey
     {
         MAKE_NONCOPYABLE(ThreadKey);
-    public:
+    protected:
         ThreadKey() {}
+    public:
         virtual ~ThreadKey() {}
 
         /**
@@ -154,8 +157,9 @@ namespace xmltooling
     class XMLTOOL_API Mutex
     {
         MAKE_NONCOPYABLE(Mutex);
-    public:
+    protected:
         Mutex() {}
+    public:
         virtual ~Mutex() {}
 
         /**
@@ -186,8 +190,9 @@ namespace xmltooling
     class XMLTOOL_API RWLock
     {
         MAKE_NONCOPYABLE(RWLock);
-    public:
+    protected:
         RWLock() {}
+    public:
         virtual ~RWLock() {}
 
         /**
@@ -225,8 +230,9 @@ namespace xmltooling
     class XMLTOOL_API CondWait
     {
         MAKE_NONCOPYABLE(CondWait);
-    public:
+    protected:
         CondWait() {}
+    public:
         virtual ~CondWait() {}
 
         /**

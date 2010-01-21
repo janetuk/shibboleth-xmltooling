@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,13 +96,13 @@ namespace xmltooling {
     private:
         HANDLE thread_id;
     public:
-        ThreadImpl(void* (*start_routine)(void*), void* arg) : thread_id(0) {
+        ThreadImpl(void* (*start_routine)(void*), void* arg, size_t stacksize) : thread_id(0) {
             thread_id=CreateThread(
                 0, // security attributes
-                0, // use default stack size, maybe this should be setable
+                stacksize, // 0 just means the default size anyway
                 (LPTHREAD_START_ROUTINE ) start_routine,
                 arg,
-                0, // flags, default is ignore stacksize and don't create suspended which is what we want
+                0, // flags, default is don't create suspended which is what we want
                 0);
             if (thread_id==0) {
                 map_windows_error_status_to_pthreads();
@@ -381,9 +381,9 @@ namespace xmltooling {
 // public "static" creation functions
 //
 
-Thread* Thread::create(void* (*start_routine)(void*), void* arg)
+Thread* Thread::create(void* (*start_routine)(void*), void* arg, size_t stacksize)
 {
-    return new ThreadImpl(start_routine, arg);
+    return new ThreadImpl(start_routine, arg, stacksize);
 }
 
 void Thread::exit(void* return_val)
