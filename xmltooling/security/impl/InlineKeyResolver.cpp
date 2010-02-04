@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -394,14 +394,33 @@ void InlineCredential::resolve(DSIGKeyInfoList* keyInfo, int types)
     }
 
     if (types & X509Credential::RESOLVE_CRLS) {
-        DOMNode* x509Node;
-        DOMElement* crlElement;
         for (DSIGKeyInfoList::size_type i=0; i<sz; ++i) {
             if (keyInfo->item(i)->getKeyInfoType()==DSIGKeyInfo::KEYINFO_X509) {
+#ifdef XMLTOOLING_XMLSEC_MULTIPLECRL
+                DSIGKeyInfoX509* x509 = static_cast<DSIGKeyInfoX509*>(keyInfo->item(i));
+                int count = x509->getX509CRLListSize();
+                for (int j=0; j<count; ++j) {
+                    auto_ptr_char buf(x509->getX509CRLItem(j));
+                    if (buf.get()) {
+                        try {
+                            auto_ptr<XSECCryptoX509CRL> crlobj(XMLToolingConfig::getConfig().X509CRL());
+                            crlobj->loadX509CRLBase64Bin(buf.get(), strlen(buf.get()));
+                            m_crls.push_back(crlobj.release());
+                        }
+                        catch(XSECException& e) {
+                            auto_ptr_char temp(e.getMsg());
+                            Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver."INLINE_KEYINFO_RESOLVER).error("caught XML-Security exception loading CRL: %s", temp.get());
+                        }
+                        catch(XSECCryptoException& e) {
+                            Category::getInstance(XMLTOOLING_LOGCAT".KeyResolver."INLINE_KEYINFO_RESOLVER).error("caught XML-Security exception loading CRL: %s", e.getMsg());
+                        }
+                    }
+                }
+#else
                 // The current xmlsec API is limited to one CRL per KeyInfo.
                 // For now, I'm going to process the DOM directly.
-                x509Node = keyInfo->item(i)->getKeyInfoDOMNode();
-                crlElement = x509Node ? XMLHelper::getFirstChildElement(x509Node, xmlconstants::XMLSIG_NS, X509CRL::LOCAL_NAME) : NULL;
+                DOMNode* x509Node = keyInfo->item(i)->getKeyInfoDOMNode();
+                DOMElement* crlElement = x509Node ? XMLHelper::getFirstChildElement(x509Node, xmlconstants::XMLSIG_NS, X509CRL::LOCAL_NAME) : NULL;
                 while (crlElement) {
                     if (crlElement->hasChildNodes()) {
                         auto_ptr_char buf(crlElement->getFirstChild()->getNodeValue());
@@ -422,6 +441,7 @@ void InlineCredential::resolve(DSIGKeyInfoList* keyInfo, int types)
                     }
                     crlElement = XMLHelper::getNextSiblingElement(crlElement, xmlconstants::XMLSIG_NS, X509CRL::LOCAL_NAME);
                 }
+#endif
             }
         }
     }

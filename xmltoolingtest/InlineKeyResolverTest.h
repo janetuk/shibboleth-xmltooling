@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,6 @@ public:
         TSM_ASSERT("Unable to resolve public key.", cred->getPublicKey()!=NULL);
         TSM_ASSERT_EQUALS("Unexpected key type.", cred->getPublicKey()->getKeyType(), XSECCryptoKey::KEY_RSA_PUBLIC);
         TSM_ASSERT_EQUALS("Wrong certificate count.", cred->getEntityCertificateChain().size(), 1);
-        TSM_ASSERT("Unable to resolve CRL.", cred->getCRL()!=NULL);
+        TSM_ASSERT_EQUALS("Wrong CRL count.", cred->getCRLs().size(), 3);
     }
 };

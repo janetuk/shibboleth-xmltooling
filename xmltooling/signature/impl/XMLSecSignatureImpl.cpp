@@ -91,12 +91,15 @@ namespace xmlsignature {
         }
         const XMLCh* getSignatureAlgorithm() const {
             if (!m_sm && m_signature) {
+#ifdef XMLTOOLING_XMLSEC_SIGALGORITHM
+                m_sm = XMLString::replicate(m_signature->getAlgorithmURI());
+#else
                 safeBuffer sURI;
-                if (signatureHashMethod2URI(sURI, m_signature->getSignatureMethod(), m_signature->getHashMethod()) == false)
-                    return NULL;
-                m_sm = XMLString::replicate(sURI.sbStrToXMLCh());
+                if (signatureHashMethod2URI(sURI, m_signature->getSignatureMethod(), m_signature->getHashMethod()))
+                    m_sm = XMLString::replicate(sURI.sbStrToXMLCh());
+#endif
             }
-            return m_sm ? m_sm : DSIGConstants::s_unicodeStrURIRSA_SHA1;
+            return m_sm;
         }
 
         KeyInfo* getKeyInfo() const { return m_keyInfo; }
@@ -276,7 +279,10 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, const vector<Si
         }
         DSIGSignature* temp=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignature();
         temp->setDSIGNSPrefix(XMLSIG_PREFIX);
-        cachedDOM=temp->createBlankSignature(document, getCanonicalizationMethod(), getSignatureAlgorithm());
+        const XMLCh* alg = getSignatureAlgorithm();
+        if (!alg)
+            alg = DSIGConstants::s_unicodeStrURIRSA_SHA1;
+        cachedDOM=temp->createBlankSignature(document, getCanonicalizationMethod(), alg);
         m_signature = temp;
     }
     else {
@@ -373,7 +379,10 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, const vecto
         log.debug("creating empty Signature element");
         DSIGSignature* temp=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignature();
         temp->setDSIGNSPrefix(XMLSIG_PREFIX);
-        cachedDOM=temp->createBlankSignature(parentElement->getOwnerDocument(), getCanonicalizationMethod(), getSignatureAlgorithm());
+        const XMLCh* alg = getSignatureAlgorithm();
+        if (!alg)
+            alg = DSIGConstants::s_unicodeStrURIRSA_SHA1;
+        cachedDOM=temp->createBlankSignature(parentElement->getOwnerDocument(), getCanonicalizationMethod(), alg);
         m_signature = temp;
     }
     else {

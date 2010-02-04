@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public:
         auto_ptr<KeyInfo> kiObject(dynamic_cast<KeyInfo*>(b->buildFromDocument(doc)));
         TS_ASSERT(kiObject.get()!=NULL);
         TSM_ASSERT_EQUALS("Number of child elements was not expected value",
-            3, kiObject->getOrderedChildren().size());
+            4, kiObject->getOrderedChildren().size());
         TSM_ASSERT_EQUALS("Number of child elements was not expected value",
             1, kiObject->getKeyValues().size());
         TSM_ASSERT_EQUALS("Number of child elements was not expected value",

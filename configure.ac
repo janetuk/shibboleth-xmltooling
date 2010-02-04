@@ -291,6 +291,20 @@ int i = 0;
             [AC_MSG_ERROR([unable to link with XML-Security])])
     AC_CHECK_TYPE([xsecsize_t],[AC_DEFINE([HAVE_XSECSIZE_T], [1], [Define to 1 if you have the 'xsecsize_t' type.])])
 
+    AC_MSG_CHECKING([whether XML-Security-C has multiple CRL support])
+    AC_TRY_COMPILE([#include <xsec/dsig/DSIGKeyInfoList.hpp>],
+          [DSIGKeyInfoList* klist; klist->getX509CRLListSize();],
+          [AC_MSG_RESULT([yes])]
+          [AC_DEFINE([XMLTOOLING_XMLSEC_MULTIPLECRL], [1], [Define to 1 if XML-Security-C handles multiple CRLs.])],
+          [AC_MSG_RESULT([no])])
+
+    AC_MSG_CHECKING([whether XML-Security-C exposes the signature algorithm URI])
+    AC_TRY_COMPILE([#include <xsec/dsig/DSIGSignature.hpp>],
+          [DSIGSignature* sig; sig->getAlgorithmURI();],
+          [AC_MSG_RESULT([yes])]
+          [AC_DEFINE([XMLTOOLING_XMLSEC_SIGALGORITHM], [1], [Define to 1 if XML-Security-C exposes the signature algorithm URI.])],
+          [AC_MSG_RESULT([no])])
+
 	# restore master libs
 	LIBS="$save_LIBS"
 

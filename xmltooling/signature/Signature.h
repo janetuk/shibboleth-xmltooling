@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ namespace xmlsignature {
         /**
          * Gets the signing algorithm for the signature.
          * 
-         * @return    the signature algorithm
+         * @return    the signature algorithm, or NULL if indeterminate
          */
         virtual const XMLCh* getSignatureAlgorithm() const=0;
 
