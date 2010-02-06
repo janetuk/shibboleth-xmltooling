@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -268,9 +268,19 @@ XSECCryptoKey* Decrypter::decryptKey(const EncryptedKey& encryptedKey, const XML
     if (encryptedKey.getDOM()==NULL)
         throw DecryptionException("The object must be marshalled before decryption.");
 
-    XSECAlgorithmHandler* handler = XSECPlatformUtils::g_algorithmMapper->mapURIToHandler(algorithm);
-    if (!handler)
-        throw DecryptionException("Unrecognized algorithm, no way to build object around decrypted key.");
+    XSECAlgorithmHandler* handler;
+    try {
+        handler = XSECPlatformUtils::g_algorithmMapper->mapURIToHandler(algorithm);
+        if (!handler)
+            throw DecryptionException("Unrecognized algorithm, no way to build object around decrypted key.");
+    }
+    catch(XSECException& e) {
+        auto_ptr_char temp(e.getMsg());
+        throw DecryptionException(string("XMLSecurity exception while decrypting key: ") + temp.get());
+    }
+    catch(XSECCryptoException& e) {
+        throw DecryptionException(string("XMLSecurity exception while decrypting key: ") + e.getMsg());
+    }
     
     // We can reuse the cipher object if the document hasn't changed.
 
