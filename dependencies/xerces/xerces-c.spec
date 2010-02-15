@@ -1,7 +1,7 @@
 Summary:    Xerces-C++ validating XML parser
 Name:       xerces-c
-Version:    3.0.1
-Release:    2
+Version:    3.1.0
+Release:    1
 URL:        http://xerces.apache.org/xerces-c/
 Source0:    %{name}-%{version}.tar.gz
 License:    Apache
@@ -33,13 +33,13 @@ manipulating, and validating XML documents.
 
 This package contains the utility programs.
 
-%package -n libxerces-c-3_0
+%package -n libxerces-c-3_1
 Summary:    Shared library for Xerces-C++ validating XML parser
 Group:      Development/Libraries
 Provides:   xerces-c = %{version}
 Obsoletes:  xerces-c
 
-%description -n libxerces-c-3_0
+%description -n libxerces-c-3_1
 Xerces-C++ is a validating XML parser written in a portable subset of C++.
 Xerces-C++ makes it easy to give your application the ability to read and
 write XML data. A shared library is provided for parsing, generating,
@@ -50,7 +50,7 @@ This package contains just the shared library.
 %package -n libxerces-c-devel
 Group:      Development/Libraries
 Summary:    Header files for Xerces-C++ validating XML parser
-Requires:   libxerces-c-3_0 = %{version}
+Requires:   libxerces-c-3_1 = %{version}
 Provides:   xerces-c-devel = %{version}
 Obsoletes:  xerces-c-devel
 
@@ -76,18 +76,18 @@ The static libraries and header files needed for development with Xerces-C++.
 [ "$RPM_BUILD_ROOT" != "/" ] && %{__rm} -rf $RPM_BUILD_ROOT
 
 %ifnos solaris2.8 solaris2.9 solaris2.10
-%post -n libxerces-c-3_0 -p /sbin/ldconfig
+%post -n libxerces-c-3_1 -p /sbin/ldconfig
 %endif
 
 %ifnos solaris2.8 solaris2.9 solaris2.10
-%postun -n libxerces-c-3_0 -p /sbin/ldconfig
+%postun -n libxerces-c-3_1 -p /sbin/ldconfig
 %endif
 
 %files -n xerces-c-bin
 %defattr(755,root,root)
 %{_bindir}/*
 
-%files -n libxerces-c-3_0
+%files -n libxerces-c-3_1
 %defattr(755,root,root)
 %{_libdir}/libxerces-c-*.so
 
@@ -100,6 +100,9 @@ The static libraries and header files needed for development with Xerces-C++.
 %exclude %{_libdir}/libxerces-c.la
 
 %changelog
+* Sun Feb 14 2010 Scott Cantor <cantor.2@osu.edu> 3.1.0-1
+- Bump version
+
 * Mon Dec 28 2009 Scott Cantor <cantor.2@osu.edu> 3.0.1-2
 - Sync package names for side by side installation
 
