@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2009 Internet2
+*  Copyright 2001-2010 Internet2
  * 
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -295,7 +295,16 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, const vector<Si
             // The caller insists on using his own document, so we now have to import the thing
             // into it. Then we're just dumping the one we built.
             log.debug("reimporting new DOM into caller-supplied document");
-            cachedDOM=static_cast<DOMElement*>(document->importNode(internalDoc->getDocumentElement(), true));
+            try {
+                cachedDOM=static_cast<DOMElement*>(document->importNode(internalDoc->getDocumentElement(), true));
+            }
+            catch (XMLException& ex) {
+                internalDoc->release();
+                auto_ptr_char temp(ex.getMessage());
+                throw XMLParserException(
+                    string("Error importing DOM into caller-supplied document: ") + (temp.get() ? temp.get() : "no message")
+                    );
+            }
             internalDoc->release();
         }
         else {
@@ -392,7 +401,16 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, const vecto
         DOMDocument* internalDoc=XMLToolingConfig::getConfig().getParser().parse(dsrc);
         
         log.debug("reimporting new DOM into caller-supplied document");
-        cachedDOM=static_cast<DOMElement*>(parentElement->getOwnerDocument()->importNode(internalDoc->getDocumentElement(),true));
+        try {
+            cachedDOM=static_cast<DOMElement*>(parentElement->getOwnerDocument()->importNode(internalDoc->getDocumentElement(),true));
+        }
+        catch (XMLException& ex) {
+            internalDoc->release();
+            auto_ptr_char temp(ex.getMessage());
+            throw XMLParserException(
+                string("Error importing DOM into caller-supplied document: ") + (temp.get() ? temp.get() : "no message")
+                );
+        }
         internalDoc->release();
 
         // Now reload the signature from the DOM.
