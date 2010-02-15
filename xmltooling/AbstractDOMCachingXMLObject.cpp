@@ -124,9 +124,18 @@ void AbstractDOMCachingXMLObject::releaseChildrenDOM(bool propagateRelease) cons
 DOMElement* AbstractDOMCachingXMLObject::cloneDOM(DOMDocument* doc) const
 {
     if (getDOM()) {
-        if (!doc)
-            doc=DOMImplementationRegistry::getDOMImplementation(NULL)->createDocument();
-        return static_cast<DOMElement*>(doc->importNode(getDOM(),true));
+        DOMDocument* cloneDoc = doc;
+        if (!cloneDoc)
+            cloneDoc=DOMImplementationRegistry::getDOMImplementation(NULL)->createDocument();
+        try {
+            return static_cast<DOMElement*>(cloneDoc->importNode(getDOM(),true));
+        }
+        catch (XMLException& ex) {
+            if (!doc)
+                cloneDoc->release();
+            auto_ptr_char temp(ex.getMessage());
+            m_log.error("DOM clone failed: %s", temp.get());
+        }
     }
     return NULL;
 }
