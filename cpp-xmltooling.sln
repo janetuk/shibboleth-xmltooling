@@ -31,6 +31,69 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{61BF324D-2
 		xmltooling.spec.in = xmltooling.spec.in
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Schemas", "Schemas", "{23EF5C29-2A13-4F73-99D1-96B8120F148E}"
+	ProjectSection(SolutionItems) = preProject
+		schemas\catalog.xml.in = schemas\catalog.xml.in
+		schemas\Makefile.am = schemas\Makefile.am
+		schemas\soap-envelope.xsd = schemas\soap-envelope.xsd
+		schemas\xenc-schema.xsd = schemas\xenc-schema.xsd
+		schemas\xml.xsd = schemas\xml.xsd
+		schemas\xmldsig-core-schema.xsd = schemas\xmldsig-core-schema.xsd
+		schemas\xmltooling.xsd = schemas\xmltooling.xsd
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencies", "{EE6145CB-F979-4AD2-9D7D-6834345D1983}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "curl", "curl", "{85004FE4-CBD1-4A6D-B60D-EBBF0C267DEF}"
+	ProjectSection(SolutionItems) = preProject
+		dependencies\curl\depend = dependencies\curl\depend
+		dependencies\curl\pkginfo = dependencies\curl\pkginfo
+		dependencies\curl\postinstall = dependencies\curl\postinstall
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "openssl", "openssl", "{F284B9F5-612F-45B2-9D2F-A084EC6C91B5}"
+	ProjectSection(SolutionItems) = preProject
+		dependencies\openssl\pkginfo = dependencies\openssl\pkginfo
+		dependencies\openssl\postinstall = dependencies\openssl\postinstall
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "xerces", "xerces", "{06F58C02-6110-4D42-9981-B326910B3E2D}"
+	ProjectSection(SolutionItems) = preProject
+		dependencies\xerces\pkginfo = dependencies\xerces\pkginfo
+		dependencies\xerces\Portfile = dependencies\xerces\Portfile
+		dependencies\xerces\xerces-c.spec = dependencies\xerces\xerces-c.spec
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "xml-security", "xml-security", "{549A0182-0C7A-4F29-9A9F-E112C3E394E1}"
+	ProjectSection(SolutionItems) = preProject
+		dependencies\xml-security\depend = dependencies\xml-security\depend
+		dependencies\xml-security\pkginfo = dependencies\xml-security\pkginfo
+		dependencies\xml-security\Portfile = dependencies\xml-security\Portfile
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "log4shib", "log4shib", "{96FDD5D7-1231-4953-8DB6-8A5133553AB9}"
+	ProjectSection(SolutionItems) = preProject
+		dependencies\log4shib\pkginfo = dependencies\log4shib\pkginfo
+		dependencies\log4shib\postinstall = dependencies\log4shib\postinstall
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "log4cpp", "log4cpp", "{F2F0B2B6-6E60-4E61-81D2-305D1779622E}"
+	ProjectSection(SolutionItems) = preProject
+		dependencies\log4cpp\pkginfo = dependencies\log4cpp\pkginfo
+		dependencies\log4cpp\postinstall = dependencies\log4cpp\postinstall
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Doc", "Doc", "{847EC34E-0069-4427-B42C-1B6E29906930}"
+	ProjectSection(SolutionItems) = preProject
+		doc\CURL.LICENSE = doc\CURL.LICENSE
+		doc\LICENSE.txt = doc\LICENSE.txt
+		doc\LOG4CPP.LICENSE = doc\LOG4CPP.LICENSE
+		doc\Makefile.am = doc\Makefile.am
+		doc\NOTICE.txt = doc\NOTICE.txt
+		doc\OPENSSL.LICENSE = doc\OPENSSL.LICENSE
+		doc\README.txt = doc\README.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -66,5 +129,13 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{85004FE4-CBD1-4A6D-B60D-EBBF0C267DEF} = {EE6145CB-F979-4AD2-9D7D-6834345D1983}
+		{F284B9F5-612F-45B2-9D2F-A084EC6C91B5} = {EE6145CB-F979-4AD2-9D7D-6834345D1983}
+		{06F58C02-6110-4D42-9981-B326910B3E2D} = {EE6145CB-F979-4AD2-9D7D-6834345D1983}
+		{549A0182-0C7A-4F29-9A9F-E112C3E394E1} = {EE6145CB-F979-4AD2-9D7D-6834345D1983}
+		{96FDD5D7-1231-4953-8DB6-8A5133553AB9} = {EE6145CB-F979-4AD2-9D7D-6834345D1983}
+		{F2F0B2B6-6E60-4E61-81D2-305D1779622E} = {EE6145CB-F979-4AD2-9D7D-6834345D1983}
 	EndGlobalSection
 EndGlobal
