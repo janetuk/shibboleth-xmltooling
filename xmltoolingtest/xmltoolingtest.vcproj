@@ -764,7 +764,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="perl.exe -w \cxxtest\cxxtestgen.pl --part --have-eh --have-std --abort-on-fail -o &quot;$(InputName)&quot;.cpp &quot;$(InputPath)&quot;"
+						CommandLine="perl.exe -w \cxxtest\cxxtestgen.pl --part --have-eh --have-std --abort-on-fail -o &quot;$(InputName)&quot;.cpp &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="&quot;$(InputName)&quot;.cpp"
 					/>
 				</FileConfiguration>
@@ -773,7 +773,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="perl.exe -w \cxxtest\cxxtestgen.pl --part --have-eh --have-std --abort-on-fail -o &quot;$(InputName)&quot;.cpp &quot;$(InputPath)&quot;"
+						CommandLine="perl.exe -w \cxxtest\cxxtestgen.pl --part --have-eh --have-std --abort-on-fail -o &quot;$(InputName)&quot;.cpp &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="&quot;$(InputName)&quot;.cpp"
 					/>
 				</FileConfiguration>
@@ -979,6 +979,10 @@
 				</FileConfiguration>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\Makefile.am"
+			>
+		</File>
 		<File
 			RelativePath=".\XMLObjectBaseTestCase.h"
 			>

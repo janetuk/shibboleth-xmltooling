@@ -1001,6 +1001,14 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\config_pub.h.in"
+			>
+		</File>
+		<File
+			RelativePath=".\Makefile.am"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
