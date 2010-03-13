@@ -92,6 +92,15 @@ namespace xmltooling {
 
         xsecsize_t readBytes(XMLByte* const toFill, const xsecsize_t maxToRead);
 
+        /**
+         * Access the OpenSSL context options in place for this object.
+         *
+         * @return bitmask suitable for use with SSL_CTX_set_options
+         */
+        int getOpenSSLOps() const {
+            return fOpenSSLOps;
+        }
+
     private :
         CurlURLInputStream(const CurlURLInputStream&);
         CurlURLInputStream& operator=(const CurlURLInputStream&);
@@ -107,6 +116,7 @@ namespace xmltooling {
         std::string*        fCacheTag;
         std::string         fURL;
         std::vector<std::string>    fSavedOptions;
+        int                 fOpenSSLOps;
 
         CURLM*              fMulti;
         CURL*               fEasy;

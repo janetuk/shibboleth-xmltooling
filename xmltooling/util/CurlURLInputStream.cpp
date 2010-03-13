@@ -43,7 +43,8 @@ using namespace xercesc;
 using namespace std;
 
 namespace {
-    static const XMLCh  _CURL[] =           UNICODE_LITERAL_4(C,U,R,L);
+    static const XMLCh _CURL[] =            UNICODE_LITERAL_4(C,U,R,L);
+    static const XMLCh _OpenSSL[] =         UNICODE_LITERAL_7(O,p,e,n,S,S,L);
     static const XMLCh _option[] =          UNICODE_LITERAL_6(o,p,t,i,o,n);
     static const XMLCh _provider[] =        UNICODE_LITERAL_8(p,r,o,v,i,d,e,r);
     static const XMLCh TransportOption[] =  UNICODE_LITERAL_15(T,r,a,n,s,p,o,r,t,O,p,t,i,o,n);
@@ -54,13 +55,15 @@ namespace {
     // callback to invoke a caller-defined SSL callback
     CURLcode ssl_ctx_callback(CURL* curl, SSL_CTX* ssl_ctx, void* userptr)
     {
-        // Manually disable SSLv2 so we're not dependent on libcurl to do it.
+        CurlURLInputStream* str = reinterpret_cast<CurlURLInputStream*>(userptr);
+
+        // Default flags manually disable SSLv2 so we're not dependent on libcurl to do it.
         // Also disable the ticket option where implemented, since this breaks a variety
         // of servers. Newer libcurl also does this for us.
 #ifdef SSL_OP_NO_TICKET
-        SSL_CTX_set_options(ssl_ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2|SSL_OP_NO_TICKET);
+        SSL_CTX_set_options(ssl_ctx, str->getOpenSSLOps()|SSL_OP_NO_TICKET);
 #else
-        SSL_CTX_set_options(ssl_ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2);
+        SSL_CTX_set_options(ssl_ctx, str->getOpenSSLOps());
 #endif
 
         return CURLE_OK;
@@ -103,6 +106,7 @@ namespace {
 CurlURLInputStream::CurlURLInputStream(const char* url, string* cacheTag)
     : fLog(logging::Category::getInstance(XMLTOOLING_LOGCAT".libcurl.InputStream"))
     , fCacheTag(cacheTag)
+    , fOpenSSLOps(SSL_OP_ALL|SSL_OP_NO_SSLv2)
     , fURL(url ? url : "")
     , fMulti(0)
     , fEasy(0)
@@ -125,6 +129,7 @@ CurlURLInputStream::CurlURLInputStream(const char* url, string* cacheTag)
 CurlURLInputStream::CurlURLInputStream(const XMLCh* url, string* cacheTag)
     : fLog(logging::Category::getInstance(XMLTOOLING_LOGCAT".libcurl.InputStream"))
     , fCacheTag(cacheTag)
+    , fOpenSSLOps(SSL_OP_ALL|SSL_OP_NO_SSLv2)
     , fMulti(0)
     , fEasy(0)
     , fHeaders(0)
@@ -150,6 +155,7 @@ CurlURLInputStream::CurlURLInputStream(const XMLCh* url, string* cacheTag)
 CurlURLInputStream::CurlURLInputStream(const DOMElement* e, string* cacheTag)
     : fLog(logging::Category::getInstance(XMLTOOLING_LOGCAT".libcurl.InputStream"))
     , fCacheTag(cacheTag)
+    , fOpenSSLOps(SSL_OP_ALL|SSL_OP_NO_SSLv2)
     , fMulti(0)
     , fEasy(0)
     , fHeaders(0)
@@ -233,6 +239,7 @@ void CurlURLInputStream::init(const DOMElement* e)
 
     // Install SSL callback.
     curl_easy_setopt(fEasy, CURLOPT_SSL_CTX_FUNCTION, ssl_ctx_callback);
+    curl_easy_setopt(fEasy, CURLOPT_SSL_CTX_DATA, this);
 
     fError[0] = 0;
     curl_easy_setopt(fEasy, CURLOPT_ERRORBUFFER, fError);
@@ -260,7 +267,32 @@ void CurlURLInputStream::init(const DOMElement* e)
         bool success;
         DOMElement* child = XMLHelper::getLastChildElement(e, TransportOption);
         while (child) {
-            if (child->hasChildNodes() && XMLString::equals(child->getAttributeNS(NULL,_provider), _CURL)) {
+            if (child->hasChildNodes() && XMLString::equals(child->getAttributeNS(NULL,_provider), _OpenSSL)) {
+                auto_ptr_char option(child->getAttributeNS(NULL,_option));
+                auto_ptr_char value(child->getFirstChild()->getNodeValue());
+                if (option.get() && value.get() && !strcmp(option.get(), "SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION") &&
+                    (*value.get()=='1' || *value.get()=='t')) {
+                    // If the new option to enable buggy rengotiation is available, set it.
+                    // Otherwise, signal false if this is newer than 0.9.8k, because that
+                    // means it's 0.9.8l, which blocks renegotiation, and therefore will
+                    // not honor this request. Older versions are buggy, so behave as though
+                    // the flag was set anyway, so we signal true.
+#if defined(SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION)
+                    fOpenSSLOps |= SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION;
+                    success = true;
+#elif (OPENSSL_VERSION_NUMBER > 0x009080bfL)
+                    success = false;
+#else
+                    success = true;
+#endif
+                }
+                else {
+                    success = false;
+                }
+                if (!success)
+                    fLog.error("failed to set OpenSSL transport option (%s)", option.get());
+            }
+            else if (child->hasChildNodes() && XMLString::equals(child->getAttributeNS(NULL,_provider), _CURL)) {
                 auto_ptr_char option(child->getAttributeNS(NULL,_option));
                 auto_ptr_char value(child->getFirstChild()->getNodeValue());
                 if (option.get() && *option.get() && value.get() && *value.get()) {
@@ -289,7 +321,7 @@ void CurlURLInputStream::init(const DOMElement* e)
                     }
 #endif
                     if (!success)
-                        fLog.error("failed to set transport option (%s)", option.get());
+                        fLog.error("failed to set CURL transport option (%s)", option.get());
                 }
             }
             child = XMLHelper::getPreviousSiblingElement(child, TransportOption);

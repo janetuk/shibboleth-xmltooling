@@ -72,7 +72,8 @@ namespace xmltooling {
 #ifndef XMLTOOLING_NO_XMLSEC
                     m_cred(NULL), m_trustEngine(NULL), m_peerResolver(NULL), m_mandatory(false),
 #endif
-                    m_ssl_callback(NULL), m_ssl_userptr(NULL), m_chunked(true), m_authenticated(false), m_cacheTag(NULL) {
+                    m_openssl_ops(SSL_OP_ALL|SSL_OP_NO_SSLv2), m_ssl_callback(NULL), m_ssl_userptr(NULL),
+                    m_chunked(true), m_authenticated(false), m_cacheTag(NULL) {
             m_handle = g_CURLPool->get(addr);
             curl_easy_setopt(m_handle,CURLOPT_URL,addr.m_endpoint);
             curl_easy_setopt(m_handle,CURLOPT_CONNECTTIMEOUT,15);
@@ -152,35 +153,7 @@ namespace xmltooling {
             return true;
         }
 
-        bool setProviderOption(const char* provider, const char* option, const char* value) {
-            if (!provider || strcmp(provider, "CURL"))
-                return false;
-            // For libcurl, the option is an enum and the value type depends on the option.
-            CURLoption opt = static_cast<CURLoption>(strtol(option, NULL, 10));
-            if (opt < CURLOPTTYPE_OBJECTPOINT)
-                return (curl_easy_setopt(m_handle, opt, strtol(value, NULL, 10)) == CURLE_OK);
-#ifdef CURLOPTTYPE_OFF_T
-            else if (opt < CURLOPTTYPE_OFF_T) {
-                if (value)
-                    m_saved_options.push_back(value);
-                return (curl_easy_setopt(m_handle, opt, value ? m_saved_options.back().c_str() : NULL) == CURLE_OK);
-            }
-# ifdef HAVE_CURL_OFF_T
-            else if (sizeof(curl_off_t) == sizeof(long))
-                return (curl_easy_setopt(m_handle, opt, strtol(value, NULL, 10)) == CURLE_OK);
-# else
-            else if (sizeof(off_t) == sizeof(long))
-                return (curl_easy_setopt(m_handle, opt, strtol(value, NULL, 10)) == CURLE_OK);
-# endif
-            return false;
-#else
-            else {
-                if (value)
-                    m_saved_options.push_back(value);
-                return (curl_easy_setopt(m_handle, opt, value ? m_saved_options.back().c_str() : NULL) == CURLE_OK);
-            }
-#endif
-        }
+        bool setProviderOption(const char* provider, const char* option, const char* value);
 
         void send(istream& in) {
             send(&in);
@@ -233,6 +206,7 @@ namespace xmltooling {
         CredentialCriteria* m_criteria;
         bool m_mandatory;
 #endif
+        int m_openssl_ops;
         ssl_ctx_callback_fn m_ssl_callback;
         void* m_ssl_userptr;
         bool m_chunked;
@@ -406,6 +380,60 @@ bool CURLSOAPTransport::setAuth(transport_auth_t authType, const char* username,
         return false;
     m_simplecreds = string(username ? username : "") + ':' + (password ? password : "");
     return (curl_easy_setopt(m_handle,CURLOPT_USERPWD,m_simplecreds.c_str())==CURLE_OK);
+}
+
+bool CURLSOAPTransport::setProviderOption(const char* provider, const char* option, const char* value)
+{
+    if (!provider || !option || !value) {
+        return false;
+    }
+    else if (!strcmp(provider, "OpenSSL")) {
+        if (!strcmp(option, "SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION") && (*value=='1' || *value=='t')) {
+            // If the new option to enable buggy rengotiation is available, set it.
+            // Otherwise, signal false if this is newer than 0.9.8k, because that
+            // means it's 0.9.8l, which blocks renegotiation, and therefore will
+            // not honor this request. Older versions are buggy, so behave as though
+            // the flag was set anyway, so we signal true.
+#if defined(SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION)
+            m_openssl_ops |= SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION;
+            return true;
+#elif (OPENSSL_VERSION_NUMBER > 0x009080bfL)
+            return false;
+#else
+            return true;
+#endif
+        }
+        return false;
+    }
+    else if (strcmp(provider, "CURL")) {
+        return false;
+    }
+
+    // For libcurl, the option is an enum and the value type depends on the option.
+    CURLoption opt = static_cast<CURLoption>(strtol(option, NULL, 10));
+    if (opt < CURLOPTTYPE_OBJECTPOINT)
+        return (curl_easy_setopt(m_handle, opt, strtol(value, NULL, 10)) == CURLE_OK);
+#ifdef CURLOPTTYPE_OFF_T
+    else if (opt < CURLOPTTYPE_OFF_T) {
+        if (value)
+            m_saved_options.push_back(value);
+        return (curl_easy_setopt(m_handle, opt, value ? m_saved_options.back().c_str() : NULL) == CURLE_OK);
+    }
+# ifdef HAVE_CURL_OFF_T
+    else if (sizeof(curl_off_t) == sizeof(long))
+        return (curl_easy_setopt(m_handle, opt, strtol(value, NULL, 10)) == CURLE_OK);
+# else
+    else if (sizeof(off_t) == sizeof(long))
+        return (curl_easy_setopt(m_handle, opt, strtol(value, NULL, 10)) == CURLE_OK);
+# endif
+    return false;
+#else
+    else {
+        if (value)
+            m_saved_options.push_back(value);
+        return (curl_easy_setopt(m_handle, opt, value ? m_saved_options.back().c_str() : NULL) == CURLE_OK);
+    }
+#endif
 }
 
 const vector<string>& CURLSOAPTransport::getResponseHeader(const char* name) const
@@ -642,13 +670,13 @@ CURLcode xmltooling::xml_ssl_ctx_callback(CURL* curl, SSL_CTX* ssl_ctx, void* us
 {
     CURLSOAPTransport* conf = reinterpret_cast<CURLSOAPTransport*>(userptr);
 
-    // Manually disable SSLv2 so we're not dependent on libcurl to do it.
+    // Default flags manually disable SSLv2 so we're not dependent on libcurl to do it.
     // Also disable the ticket option where implemented, since this breaks a variety
     // of servers. Newer libcurl also does this for us.
 #ifdef SSL_OP_NO_TICKET
-    SSL_CTX_set_options(ssl_ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2|SSL_OP_NO_TICKET);
+    SSL_CTX_set_options(ssl_ctx, conf->m_openssl_ops|SSL_OP_NO_TICKET);
 #else
-    SSL_CTX_set_options(ssl_ctx, SSL_OP_ALL|SSL_OP_NO_SSLv2);
+    SSL_CTX_set_options(ssl_ctx, conf->m_openssl_ops);
 #endif
 
 #ifndef XMLTOOLING_NO_XMLSEC
