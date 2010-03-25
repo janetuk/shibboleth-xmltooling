@@ -70,8 +70,6 @@ namespace xmltooling {
         }
 
     private:
-        void cleanup();
-
         struct XMLTOOL_DLLLOCAL Record {
             Record() : expiration(0), version(1) {}
             Record(const string& s, time_t t) : data(s), expiration(t), version(1) {}
@@ -150,22 +148,15 @@ MemoryStorageService::~MemoryStorageService()
     delete m_lock;
 }
 
-void* MemoryStorageService::cleanup_fn(void* cache_p)
+void* MemoryStorageService::cleanup_fn(void* pv)
 {
-    MemoryStorageService* cache = reinterpret_cast<MemoryStorageService*>(cache_p);
+    MemoryStorageService* cache = reinterpret_cast<MemoryStorageService*>(pv);
 
 #ifndef WIN32
     // First, let's block all signals
     Thread::mask_all_signals();
 #endif
 
-    // Now run the cleanup process.
-    cache->cleanup();
-    return NULL;
-}
-
-void MemoryStorageService::cleanup()
-{
 #ifdef _DEBUG
     NDC ndc("cleanup");
 #endif
@@ -173,28 +164,28 @@ void MemoryStorageService::cleanup()
     auto_ptr<Mutex> mutex(Mutex::create());
     mutex->lock();
 
-    m_log.info("cleanup thread started...running every %d seconds", m_cleanupInterval);
+    cache->m_log.info("cleanup thread started...running every %d seconds", cache->m_cleanupInterval);
 
-    while (!shutdown) {
-        shutdown_wait->timedwait(mutex.get(), m_cleanupInterval);
-        if (shutdown)
+    while (!cache->shutdown) {
+        cache->shutdown_wait->timedwait(mutex.get(), cache->m_cleanupInterval);
+        if (cache->shutdown)
             break;
 
         unsigned long count=0;
         time_t now = time(NULL);
-        m_lock->wrlock();
-        SharedLock locker(m_lock, false);
-        for (map<string,Context>::iterator i=m_contextMap.begin(); i!=m_contextMap.end(); ++i)
+        cache->m_lock->wrlock();
+        SharedLock locker(cache->m_lock, false);
+        for (map<string,Context>::iterator i=cache->m_contextMap.begin(); i!=cache->m_contextMap.end(); ++i)
             count += i->second.reap(now);
 
         if (count)
-            m_log.info("purged %d expired record(s) from storage", count);
+            cache->m_log.info("purged %d expired record(s) from storage", count);
     }
 
-    m_log.info("cleanup thread finished");
+    cache->m_log.info("cleanup thread finished");
 
     mutex->unlock();
-    Thread::exit(NULL);
+    return NULL;
 }
 
 void MemoryStorageService::reap(const char* context)
