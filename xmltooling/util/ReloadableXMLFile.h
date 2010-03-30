@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,9 @@
 
 namespace xmltooling {
 
+    class XMLTOOL_API CondWait;
     class XMLTOOL_API RWLock;
+    class XMLTOOL_API Thread;
 
     /**
      * Base class for file-based XML configuration.
@@ -57,6 +59,8 @@ namespace xmltooling {
          *  <dd>enables periodic refresh of remote file</dd>
          *  <dt>backingFilePath</dt>
          *  <dd>location for backup of remote resource</dd>
+         *  <dt>id</dt>
+         *  <dd>identifies the plugin instance for logging purposes</dd>
          * </dl>
          * 
          * @param e     DOM to supply configuration
@@ -72,6 +76,25 @@ namespace xmltooling {
          * <p>This method is called to load configuration material
          * initially and any time a change is detected. The base version
          * performs basic parsing duties and returns the result.
+         *
+         * <p>This method is not called with the object locked, so actual
+         * modification of implementation state requires explicit locking within
+         * the method override.
+         * 
+         * @return a pair consisting of a flag indicating whether to take ownership of
+         *      the document, and the root element of the tree to load
+         */
+        virtual std::pair<bool,xercesc::DOMElement*> background_load();
+
+        /**
+         * Basic load/parse of configuration material.
+         * 
+         * <p>The base version performs basic parsing duties and returns the result.
+         * Subclasses should override the new background_load() method and perform
+         * their own locking in conjunction with use of this method.
+         *
+         * <p>Subclasses that continue to override this method will function, but
+         * a write lock will be acquired and held for the entire operation.
          * 
          * @return a pair consisting of a flag indicating whether to take ownership of
          *      the document, and the root element of the tree to load
@@ -93,7 +116,7 @@ namespace xmltooling {
         /** Path to backup copy for remote resource. */
         std::string m_backing;
         
-        /** Last modification of local resource or reload of remote resource. */
+        /** Last modification of local resource. */
         time_t m_filestamp;
 
         /** Time in seconds to wait before trying for new copy of remote resource. */
@@ -108,12 +131,21 @@ namespace xmltooling {
         /** Logging object. */
         logging::Category& m_log;
 
+        /** Plugin identifier. */
+        std::string m_id;
+
     public:
         Lockable* lock();
         void unlock();
 
     private:
         std::pair<bool,xercesc::DOMElement*> load(bool backup);
+
+        // Used to manage background reload/refresh.
+        bool m_shutdown;
+        CondWait* m_reload_wait;
+        Thread* m_reload_thread;
+        static void* reload_fn(void*);
     };
 
 };
