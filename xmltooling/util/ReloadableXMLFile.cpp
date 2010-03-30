@@ -62,7 +62,7 @@ static const XMLCh backingFilePath[] =  UNICODE_LITERAL_15(b,a,c,k,i,n,g,F,i,l,e
 
 
 ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
-    : m_root(e), m_local(true), m_validate(false), m_filestamp(0), m_reloadInterval(0), m_lock(NULL), m_log(log),
+    : m_root(e), m_local(true), m_validate(false), m_autocommit(true), m_filestamp(0), m_reloadInterval(0), m_lock(NULL), m_log(log),
         m_shutdown(false), m_reload_wait(NULL), m_reload_thread(NULL)
 {
 #ifdef _DEBUG
@@ -129,7 +129,7 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
                 auto_ptr_char temp2(source);
                 m_backing=temp2.get();
                 XMLToolingConfig::getConfig().getPathResolver()->resolve(m_backing, PathResolver::XMLTOOLING_RUN_FILE);
-                log.debug("backup remote resource with (%s)", m_backing.c_str());
+                log.debug("backup remote resource to (%s)", m_backing.c_str());
             }
             source = e->getAttributeNS(NULL,reloadInterval);
             if (source && *source) {
@@ -308,6 +308,8 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
             DOMDocument* doc=NULL;
             if (m_local || backup) {
                 auto_ptr_XMLCh widenit(backup ? m_backing.c_str() : m_source.c_str());
+                // Use library-wide lock for now, nothing else is using it anyway.
+                Locker locker(backup ? getBackupLock() : NULL);
                 LocalFileInputSource src(widenit.get());
                 Wrapper4InputSource dsrc(&src, false);
                 if (m_validate)
@@ -339,9 +341,10 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
 
             m_log.infoStream() << "loaded XML resource (" << (backup ? m_backing : m_source) << ")" << logging::eol;
 
-            if (!backup && !m_backing.empty()) {
+            if (!backup && m_autocommit && !m_backing.empty()) {
                 m_log.debug("backing up remote resource to (%s)", m_backing.c_str());
                 try {
+                    Locker locker(getBackupLock());
                     ofstream backer(m_backing.c_str());
                     backer << *doc;
                 }
@@ -382,4 +385,9 @@ pair<bool,DOMElement*> ReloadableXMLFile::background_load()
     m_lock->wrlock();
     SharedLock locker(m_lock, false);
     return load();
+}
+
+Lockable* ReloadableXMLFile::getBackupLock()
+{
+    return &XMLToolingConfig::getConfig();
 }

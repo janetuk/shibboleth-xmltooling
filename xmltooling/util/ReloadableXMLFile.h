@@ -100,7 +100,17 @@ namespace xmltooling {
          *      the document, and the root element of the tree to load
          */
         virtual std::pair<bool,xercesc::DOMElement*> load();
-        
+
+        /**
+         * Accesses a lock interface protecting use of backup file associated with the
+         * object.
+         *
+         * <p>The lock is <strong>NOT</strong> acquired automatically.
+         *
+         * @return  pointer to a lock interface, or NULL if unnecessary
+         */
+        virtual Lockable* getBackupLock();
+
         /** Root of the original DOM element passed into constructor. */
         const xercesc::DOMElement* m_root;
         
@@ -115,7 +125,10 @@ namespace xmltooling {
 
         /** Path to backup copy for remote resource. */
         std::string m_backing;
-        
+
+        /** Indicates whether loading process needs to defer creation of backup file. */
+        bool m_autocommit;
+
         /** Last modification of local resource. */
         time_t m_filestamp;
 
