@@ -287,14 +287,16 @@ namespace xmltooling
          * @param mtx mutex to lock
          */
         Lock(Mutex* mtx) : mutex(mtx) {
-            mutex->lock();
+            if (mutex)
+                mutex->lock();
         }
 
         /**
          * Unlocks the wrapped mutex.
          */
         ~Lock() {
-            mutex->unlock();
+            if (mutex)
+                mutex->unlock();
         }
 
     private:
@@ -314,7 +316,7 @@ namespace xmltooling
          * @param lockit    true if the lock should be acquired here, false if already acquired
          */
         SharedLock(RWLock* lock, bool lockit=true) : rwlock(lock) {
-            if (lockit)
+            if (rwlock && lockit)
                 rwlock->rdlock();
         }
 
@@ -322,7 +324,8 @@ namespace xmltooling
          * Unlocks the wrapped shared lock.
          */
         ~SharedLock() {
-            rwlock->unlock();
+            if (rwlock)
+                rwlock->unlock();
         }
 
     private:

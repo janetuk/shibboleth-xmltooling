@@ -126,8 +126,11 @@ namespace xmltooling {
         /** Path to backup copy for remote resource. */
         std::string m_backing;
 
-        /** Indicates whether loading process needs to defer creation of backup file. */
-        bool m_autocommit;
+        /**
+         * Before load, indicates whether the backup is handled by the base class,
+         * after load, will be true iff it started false and a backup needs to be done.
+         */
+        bool m_backupIndicator;
 
         /** Last modification of local resource. */
         time_t m_filestamp;

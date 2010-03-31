@@ -62,7 +62,7 @@ static const XMLCh backingFilePath[] =  UNICODE_LITERAL_15(b,a,c,k,i,n,g,F,i,l,e
 
 
 ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
-    : m_root(e), m_local(true), m_validate(false), m_autocommit(true), m_filestamp(0), m_reloadInterval(0), m_lock(NULL), m_log(log),
+    : m_root(e), m_local(true), m_validate(false), m_backupIndicator(true), m_filestamp(0), m_reloadInterval(0), m_lock(NULL), m_log(log),
         m_shutdown(false), m_reload_wait(NULL), m_reload_thread(NULL)
 {
 #ifdef _DEBUG
@@ -341,15 +341,23 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
 
             m_log.infoStream() << "loaded XML resource (" << (backup ? m_backing : m_source) << ")" << logging::eol;
 
-            if (!backup && m_autocommit && !m_backing.empty()) {
-                m_log.debug("backing up remote resource to (%s)", m_backing.c_str());
-                try {
-                    Locker locker(getBackupLock());
-                    ofstream backer(m_backing.c_str());
-                    backer << *doc;
+            if (!backup && !m_backing.empty()) {
+                // If the indicator is true, we're responsible for the backup.
+                if (m_backupIndicator) {
+                    m_log.debug("backing up remote resource to (%s)", m_backing.c_str());
+                    try {
+                        Locker locker(getBackupLock());
+                        ofstream backer(m_backing.c_str());
+                        backer << *doc;
+                    }
+                    catch (exception& ex) {
+                        m_log.crit("exception while backing up resource: %s", ex.what());
+                    }
                 }
-                catch (exception& ex) {
-                    m_log.crit("exception while backing up resource: %s", ex.what());
+                else {
+                    // If the indicator was false, set true to signal that a backup is needed.
+                    // The caller will presumably flip it back to false once that's done.
+                    m_backupIndicator = true;
                 }
             }
 
@@ -382,7 +390,8 @@ pair<bool,DOMElement*> ReloadableXMLFile::background_load()
 {
     // If this method isn't overridden, we acquire a write lock
     // and just call the old override.
-    m_lock->wrlock();
+    if (m_lock)
+        m_lock->wrlock();
     SharedLock locker(m_lock, false);
     return load();
 }
