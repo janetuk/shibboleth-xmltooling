@@ -111,6 +111,11 @@ namespace xmltooling {
          */
         virtual Lockable* getBackupLock();
 
+        /**
+         * Shuts down reload thread, should be called from subclass destructor.
+         */
+        void shutdown();
+
         /** Root of the original DOM element passed into constructor. */
         const xercesc::DOMElement* m_root;
         

@@ -160,6 +160,12 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
 
 ReloadableXMLFile::~ReloadableXMLFile()
 {
+    shutdown();
+    delete m_lock;
+}
+
+void ReloadableXMLFile::shutdown()
+{
     if (m_reload_thread) {
         // Shut down the reload thread and let it know.
         m_shutdown = true;
@@ -168,8 +174,6 @@ ReloadableXMLFile::~ReloadableXMLFile()
         delete m_reload_thread;
         delete m_reload_wait;
     }
-
-    delete m_lock;
 }
 
 void* ReloadableXMLFile::reload_fn(void* pv)
