@@ -173,6 +173,8 @@ void ReloadableXMLFile::shutdown()
         m_reload_thread->join(NULL);
         delete m_reload_thread;
         delete m_reload_wait;
+        m_reload_thread = NULL;
+        m_reload_wait = NULL;
     }
 }
 
