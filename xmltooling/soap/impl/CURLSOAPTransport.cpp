@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -510,6 +510,8 @@ void CURLSOAPTransport::send(istream* in)
     }
     else {
         curl_easy_setopt(m_handle,CURLOPT_HTTPGET,1);
+        curl_easy_setopt(m_handle,CURLOPT_FOLLOWLOCATION,1);
+        curl_easy_setopt(m_handle,CURLOPT_MAXREDIRS,6);
     }
 
     char curl_errorbuf[CURL_ERROR_SIZE];
