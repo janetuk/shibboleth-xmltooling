@@ -89,6 +89,7 @@ namespace {
                 break;
             }
             // append until whitespace
+            cacheTag->erase();
             while (remaining > 0) {
                 if (!isspace(*hdr)) {
                     (*cacheTag) += *hdr++;
@@ -97,6 +98,34 @@ namespace {
                 }
                 break;
             }
+
+            if (!cacheTag->empty())
+                *cacheTag = "If-None-Match: " + *cacheTag;
+        }
+        else if (cacheTag->empty() && strncmp(hdr, "Last-Modified:", 14) == 0) {
+            hdr += 14;
+            size_t remaining = nmemb - 14;
+            // skip leading spaces
+            while (remaining > 0) {
+                if (*hdr == ' ') {
+                    ++hdr;
+                    --remaining;
+                    continue;
+                }
+                break;
+            }
+            // append until whitespace
+            while (remaining > 0) {
+                if (!isspace(*hdr)) {
+                    (*cacheTag) += *hdr++;
+                    --remaining;
+                    continue;
+                }
+                break;
+            }
+
+            if (!cacheTag->empty())
+                *cacheTag = "If-Modified-Since: " + *cacheTag;
         }
 
         return nmemb;
@@ -248,9 +277,7 @@ void CurlURLInputStream::init(const DOMElement* e)
     if (fCacheTag) {
         // Outgoing tag.
         if (!fCacheTag->empty()) {
-            string hdr("If-None-Match: ");
-            hdr += *fCacheTag;
-            fHeaders = curl_slist_append(fHeaders, hdr.c_str());
+            fHeaders = curl_slist_append(fHeaders, fCacheTag->c_str());
             curl_easy_setopt(fEasy, CURLOPT_HTTPHEADER, fHeaders);
         }
         // Incoming tag.
