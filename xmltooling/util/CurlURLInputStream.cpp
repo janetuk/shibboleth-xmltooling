@@ -145,8 +145,10 @@ CurlURLInputStream::CurlURLInputStream(const char* url, string* cacheTag)
     , fBytesRead(0)
     , fBytesToRead(0)
     , fDataAvailable(false)
-    , fBufferHeadPtr(fBuffer)
-    , fBufferTailPtr(fBuffer)
+    , fBuffer(0)
+    , fBufferHeadPtr(0)
+    , fBufferTailPtr(0)
+    , fBufferSize(0)
     , fContentType(0)
     , fStatusCode(200)
 {
@@ -167,8 +169,10 @@ CurlURLInputStream::CurlURLInputStream(const XMLCh* url, string* cacheTag)
     , fBytesRead(0)
     , fBytesToRead(0)
     , fDataAvailable(false)
-    , fBufferHeadPtr(fBuffer)
-    , fBufferTailPtr(fBuffer)
+    , fBuffer(0)
+    , fBufferHeadPtr(0)
+    , fBufferTailPtr(0)
+    , fBufferSize(0)
     , fContentType(0)
     , fStatusCode(200)
 {
@@ -193,8 +197,10 @@ CurlURLInputStream::CurlURLInputStream(const DOMElement* e, string* cacheTag)
     , fBytesRead(0)
     , fBytesToRead(0)
     , fDataAvailable(false)
-    , fBufferHeadPtr(fBuffer)
-    , fBufferTailPtr(fBuffer)
+    , fBuffer(0)
+    , fBufferHeadPtr(0)
+    , fBufferTailPtr(0)
+    , fBufferSize(0)
     , fContentType(0)
     , fStatusCode(200)
 {
@@ -230,6 +236,7 @@ CurlURLInputStream::~CurlURLInputStream()
     }
 
     XMLString::release(&fContentType);
+    free(fBuffer);
 }
 
 void CurlURLInputStream::init(const DOMElement* e)
@@ -265,6 +272,7 @@ void CurlURLInputStream::init(const DOMElement* e)
     curl_easy_setopt(fEasy, CURLOPT_NOPROGRESS, 1);
     curl_easy_setopt(fEasy, CURLOPT_NOSIGNAL, 1);
     curl_easy_setopt(fEasy, CURLOPT_FAILONERROR, 1);
+    curl_easy_setopt(fEasy, CURLOPT_ENCODING, "");
 
     // Install SSL callback.
     curl_easy_setopt(fEasy, CURLOPT_SSL_CTX_FUNCTION, ssl_ctx_callback);
@@ -386,8 +394,17 @@ void CurlURLInputStream::init(const DOMElement* e)
                 << fStatusCode
                 << "</" << URLInputSource::asciiStatusCodeElementName << '>';
             string specialxml = specialdoc.str();
+            fBufferTailPtr = fBuffer = reinterpret_cast<XMLByte*>(malloc(specialxml.length()));
+            if (!fBuffer) {
+                curl_multi_remove_handle(fMulti, fEasy);
+                curl_easy_cleanup(fEasy);
+                fEasy = NULL;
+                curl_multi_cleanup(fMulti);
+                fMulti = NULL;
+                throw bad_alloc();
+            }
             memcpy(fBuffer, specialxml.c_str(), specialxml.length());
-            fBufferHeadPtr += specialxml.length();
+            fBufferHeadPtr = fBuffer + specialxml.length();
         }
     }
     else {
@@ -419,7 +436,7 @@ size_t CurlURLInputStream::writeCallback(char* buffer, size_t size, size_t nitem
     fTotalBytesRead += consume;
     fBytesToRead    -= consume;
 
-    //fLog.debug("write callback consuming %d bytes", consume);
+    fLog.debug("write callback consuming %u bytes", consume);
 
     // If bytes remain, rebuffer as many as possible into our holding buffer
     buffer          += consume;
@@ -427,13 +444,22 @@ size_t CurlURLInputStream::writeCallback(char* buffer, size_t size, size_t nitem
     cnt             -= consume;
     if (cnt > 0)
     {
-        size_t bufAvail = sizeof(fBuffer) - (fBufferHeadPtr - fBuffer);
-        consume = (cnt > bufAvail) ? bufAvail : cnt;
-        memcpy(fBufferHeadPtr, buffer, consume);
-        fBufferHeadPtr  += consume;
-        buffer          += consume;
-        totalConsumed   += consume;
-        //fLog.debug("write callback rebuffering %d bytes", consume);
+        size_t bufAvail = fBufferSize - (fBufferHeadPtr - fBuffer);
+        if (bufAvail < cnt) {
+            // Enlarge the buffer. TODO: limit max size
+            XMLByte* newbuf = reinterpret_cast<XMLByte*>(realloc(fBuffer, fBufferSize + (cnt - bufAvail)));
+            if (newbuf) {
+                fBufferSize = fBufferSize + (cnt - bufAvail);
+                fLog.debug("enlarged buffer to %u bytes", fBufferSize);
+                fBufferHeadPtr = newbuf + (fBufferHeadPtr - fBuffer);
+                fBuffer = fBufferTailPtr = newbuf;
+            }
+        }
+        memcpy(fBufferHeadPtr, buffer, cnt);
+        fBufferHeadPtr  += cnt;
+        buffer          += cnt;
+        totalConsumed   += cnt;
+        fLog.debug("write callback rebuffering %u bytes", cnt);
     }
 
     // Return the total amount we've consumed. If we don't consume all the bytes
@@ -452,7 +478,7 @@ bool CurlURLInputStream::readMore(int* runningHandles)
     int msgsInQueue = 0;
     for (CURLMsg* msg = NULL; (msg = curl_multi_info_read(fMulti, &msgsInQueue)) != NULL; )
     {
-        //fLog.debug("msg %d, %d from curl", msg->msg, msg->data.result);
+        fLog.debug("msg %d, %d from curl", msg->msg, msg->data.result);
 
         if (msg->msg != CURLMSG_DONE)
             return true;
@@ -544,7 +570,7 @@ xsecsize_t CurlURLInputStream::readBytes(XMLByte* const toFill, const xsecsize_t
             if (fBufferTailPtr == fBufferHeadPtr)
                 fBufferHeadPtr = fBufferTailPtr = fBuffer;
 
-            //fLog.debug("consuming %d buffered bytes", bufCnt);
+            fLog.debug("consuming %d buffered bytes", bufCnt);
 
             tryAgain = true;
             continue;
