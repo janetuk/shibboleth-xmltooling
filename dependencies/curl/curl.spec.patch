@@ -1,0 +1,145 @@
+--- curl.spec.orig	2010-04-29 14:19:36.962993346 -0400
++++ curl.spec	2010-04-29 15:46:26.500737782 -0400
+@@ -1,10 +1,10 @@
+ Summary: A utility for getting files from remote servers (FTP, HTTP, and others)
+-Name: curl
++Name: curl-openssl
+ Version: 7.20.1
+-Release: 4%{?dist}
++Release: 5%{?dist}
+ License: MIT
+ Group: Applications/Internet
+-Source: http://curl.haxx.se/download/%{name}-%{version}.tar.lzma
++Source: http://curl.haxx.se/download/curl-%{version}.tar.lzma
+ Source2: curlbuild.h
+ 
+ # upstream commit e32fe30d0cf7c1f7045ac0bd29322e7fb4feb5c8
+@@ -40,17 +40,20 @@
+ Patch107: curl-7.20.0-disable-test1112.patch
+ 
+ Provides: webclient
++Provides: curl = %{version}-%{release}
++Obsoletes: curl
+ URL: http://curl.haxx.se/
+-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
++BuildRoot: %{_tmppath}/curl-%{version}-%{release}-root-%(%{__id_u} -n)
+ BuildRequires: automake
+ BuildRequires: groff
+ BuildRequires: krb5-devel
+ BuildRequires: libidn-devel
+-BuildRequires: libssh2-devel
+-BuildRequires: nss-devel
++#BuildRequires: libssh2-devel
++#BuildRequires: nss-devel
++BuildRequires: openssl-devel
+ BuildRequires: openldap-devel
+-BuildRequires: openssh-clients
+-BuildRequires: openssh-server
++#BuildRequires: openssh-clients
++#BuildRequires: openssh-server
+ BuildRequires: pkgconfig
+ BuildRequires: stunnel
+ 
+@@ -60,7 +63,7 @@
+ %endif
+ 
+ BuildRequires: zlib-devel
+-Requires: libcurl = %{version}-%{release}
++Requires: libcurl-openssl = %{version}-%{release}
+ 
+ # TODO: mention also IMAP(S), POP3(S), SMTP(S) and RTSP protocols
+ %description
+@@ -70,32 +73,36 @@
+ interactivity. cURL offers many useful capabilities, like proxy support,
+ user authentication, FTP upload, HTTP post, and file transfer resume.
+ 
+-%package -n libcurl
++%package -n libcurl-openssl
+ Summary: A library for getting files from web servers
+ Group: Development/Libraries
++Provides: libcurl = %{version}-%{release}
++Obsoletes: libcurl
+ 
+-%description -n libcurl
++%description -n libcurl-openssl
+ This package provides a way for applications to use FTP, HTTP, Gopher and
+ other servers for getting files.
+ 
+-%package -n libcurl-devel
++%package -n libcurl-openssl-devel
+ Summary: Files needed for building applications with libcurl
+ Group: Development/Libraries
+ Requires: automake
+-Requires: libcurl = %{version}-%{release}
++Requires: libcurl-openssl = %{version}-%{release}
+ Requires: pkgconfig
+ 
+ Provides: curl-devel = %{version}-%{release}
+ Obsoletes: curl-devel < %{version}-%{release}
++Provides: libcurl-devel = %{version}-%{release}
++Obsoletes: libcurl-devel
+ 
+-%description -n libcurl-devel
++%description -n libcurl-openssl-devel
+ cURL is a tool for getting files from FTP, HTTP, Gopher, Telnet, and
+ Dict servers, using any of the supported protocols. The libcurl-devel
+ package includes files needed for developing applications which can
+ use cURL's capabilities internally.
+ 
+ %prep
+-%setup -q
++%setup -q -n curl-%{version}
+ 
+ # Convert docs to UTF-8
+ # NOTE: we do this _before_ applying of all patches, which are already UTF-8
+@@ -134,10 +141,11 @@
+     --enable-ldaps \
+     --enable-manual \
+     --with-ca-bundle=%{_sysconfdir}/pki/tls/certs/ca-bundle.crt \
+-    --with-gssapi \
++    --with-gssapi=/usr/kerberos \
+     --with-libidn \
+-    --with-libssh2 \
+-    --without-ssl --with-nss
++    --with-ssl --without-nss
++#    --with-libssh2 \
++#    --without-ssl --with-nss
+ 
+ # uncomment to turn off optimizations
+ # find -name Makefile | xargs sed -i 's/-O2/-O0/'
+@@ -189,9 +197,9 @@
+ %clean
+ rm -rf $RPM_BUILD_ROOT
+ 
+-%post -n libcurl -p /sbin/ldconfig
++%post -n libcurl-openssl -p /sbin/ldconfig
+ 
+-%postun -n libcurl -p /sbin/ldconfig
++%postun -n libcurl-openssl -p /sbin/ldconfig
+ 
+ %files
+ %defattr(-,root,root,-)
+@@ -202,11 +210,11 @@
+ %{_bindir}/curl
+ %{_mandir}/man1/curl.1*
+ 
+-%files -n libcurl
++%files -n libcurl-openssl
+ %defattr(-,root,root,-)
+ %{_libdir}/libcurl.so.*
+ 
+-%files -n libcurl-devel
++%files -n libcurl-openssl-devel
+ %defattr(-,root,root,-)
+ %doc docs/examples/*.c docs/examples/Makefile.example docs/INTERNALS
+ %doc docs/CONTRIBUTE docs/libcurl/ABI
+@@ -219,6 +227,9 @@
+ %{_datadir}/aclocal/libcurl.m4
+ 
+ %changelog
++* Thu Apr 29 2010 Scott Cantor <cantor.2@osu.edu> 7.20.1-5
++- rename packages to obsolete non-openssl version on RH6
++
+ * Sat Apr 24 2010 Kamil Dudka <kdudka@redhat.com> 7.20.1-4
+ - upstream patch preventing failure of test536 with threaded DNS resolver
+ - upstream patch preventing SSL handshake timeout underflow
