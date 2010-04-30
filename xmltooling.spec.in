@@ -38,8 +38,8 @@ support.
 %package -n lib@PACKAGE_NAME@5
 Summary:    OpenSAML XMLTooling library
 Group:      Development/Libraries
-Provides:   @PACKAGE_NAME@ = %{version}
-Obsoletes:  @PACKAGE_NAME@
+Provides:   @PACKAGE_NAME@ = %{version}-%{release}
+Obsoletes:  @PACKAGE_NAME@ < %{version}-%{release}
 
 %description -n lib@PACKAGE_NAME@5
 The XMLTooling library contains generic XML parsing and processing
@@ -53,9 +53,9 @@ This package contains just the shared library.
 %package -n lib@PACKAGE_NAME@-devel
 Summary:	XMLTooling development Headers
 Group:		Development/Libraries
-Requires:	lib@PACKAGE_NAME@5 = %{version}
-Provides:	@PACKAGE_NAME@-devel = %{version}
-Obsoletes:	@PACKAGE_NAME@-devel
+Requires:	lib@PACKAGE_NAME@5 = %{version}-%{release}
+Provides:	@PACKAGE_NAME@-devel = %{version}-%{release}
+Obsoletes:	@PACKAGE_NAME@-devel < %{version}-%{release}
 %if 0%{?suse_version} > 1030
 Requires:  libXerces-c-devel >= 2.8.0
 %else
