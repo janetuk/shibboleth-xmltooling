@@ -19,7 +19,7 @@
  
  Provides: webclient
 +Provides: curl = %{version}-%{release}
-+Obsoletes: curl
++Obsoletes: curl < %{version}-%{release}
  URL: http://curl.haxx.se/
 -BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 +BuildRoot: %{_tmppath}/curl-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -58,7 +58,7 @@
  Summary: A library for getting files from web servers
  Group: Development/Libraries
 +Provides: libcurl = %{version}-%{release}
-+Obsoletes: libcurl
++Obsoletes: libcurl < %{version}-%{release}
  
 -%description -n libcurl
 +%description -n libcurl-openssl
@@ -77,7 +77,7 @@
  Provides: curl-devel = %{version}-%{release}
  Obsoletes: curl-devel < %{version}-%{release}
 +Provides: libcurl-devel = %{version}-%{release}
-+Obsoletes: libcurl-devel
++Obsoletes: libcurl-devel < %{version}-%{release}
  
 -%description -n libcurl-devel
 +%description -n libcurl-openssl-devel
