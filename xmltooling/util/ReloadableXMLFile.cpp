@@ -35,6 +35,7 @@
 # include <log4cpp/NDC.hh>
 #endif
 
+#include <memory>
 #include <fstream>
 #include <sys/types.h>
 #include <sys/stat.h>

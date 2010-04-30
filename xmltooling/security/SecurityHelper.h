@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -161,7 +161,6 @@ namespace xmltooling {
          * @param key       the key to encode
          * @param hash      optional name of hash algorithm, syntax specific to crypto provider
          * @param nowrap    if true, any linefeeds will be stripped from the result
-         * @param hashAlg   name of hash algorithm, syntax specific to crypto provider
          * @return  the base64 encoded key value
          */
         static std::string getDEREncoding(const XSECCryptoKey& key, const char* hash, bool nowrap=true);
@@ -173,7 +172,6 @@ namespace xmltooling {
          * @param cert      the certificate's key to encode
          * @param hash      optional name of hash algorithm, syntax specific to crypto provider
          * @param nowrap    if true, any linefeeds will be stripped from the result
-         * @param hashAlg   name of hash algorithm, syntax specific to crypto provider
          * @return  the base64 encoded key value
          */
         static std::string getDEREncoding(const XSECCryptoX509& cert, const char* hash, bool nowrap=true);

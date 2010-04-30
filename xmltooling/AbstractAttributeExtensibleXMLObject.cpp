@@ -27,6 +27,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmltooling;
 using namespace std;
