@@ -1,6 +1,6 @@
 Summary:    Xerces-C++ validating XML parser
 Name:       xerces-c
-Version:    3.1.0
+Version:    3.1.1
 Release:    1
 URL:        http://xerces.apache.org/xerces-c/
 Source0:    %{name}-%{version}.tar.gz
@@ -36,8 +36,8 @@ This package contains the utility programs.
 %package -n libxerces-c-3_1
 Summary:    Shared library for Xerces-C++ validating XML parser
 Group:      Development/Libraries
-Provides:   xerces-c = %{version}
-Obsoletes:  xerces-c
+Provides:   xerces-c = %{version}-%{release}
+Obsoletes:  xerces-c < %{version}-%{release}
 
 %description -n libxerces-c-3_1
 Xerces-C++ is a validating XML parser written in a portable subset of C++.
@@ -50,9 +50,9 @@ This package contains just the shared library.
 %package -n libxerces-c-devel
 Group:      Development/Libraries
 Summary:    Header files for Xerces-C++ validating XML parser
-Requires:   libxerces-c-3_1 = %{version}
-Provides:   xerces-c-devel = %{version}
-Obsoletes:  xerces-c-devel
+Requires:   libxerces-c-3_1 = %{version}-%{release}
+Provides:   xerces-c-devel = %{version}-%{release}
+Obsoletes:  xerces-c-devel < %{version}-%{release}
 
 %description -n libxerces-c-devel
 Xerces-C++ is a validating XML parser written in a portable subset of C++.
@@ -100,6 +100,9 @@ The static libraries and header files needed for development with Xerces-C++.
 %exclude %{_libdir}/libxerces-c.la
 
 %changelog
+* Thu Apr 29 2010 Scott Cantor <cantor.2@osu.edu> 3.1.1-1
+- Bump version and fix Provides/Obsoletes versioning
+
 * Sun Feb 14 2010 Scott Cantor <cantor.2@osu.edu> 3.1.0-1
 - Bump version
 
