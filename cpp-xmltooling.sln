@@ -1,15 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xmltooling", "xmltooling\xmltooling.vcproj", "{06B55A46-D3B3-41AE-B5A5-B57830BA010D}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xmltoolingtest", "xmltoolingtest\xmltoolingtest.vcproj", "{3E34CDCC-FCBA-490D-A165-1CB6F4559799}"
-	ProjectSection(ProjectDependencies) = postProject
-		{06B55A46-D3B3-41AE-B5A5-B57830BA010D} = {06B55A46-D3B3-41AE-B5A5-B57830BA010D}
-	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xmltooling-lite", "xmltooling\xmltooling-lite.vcproj", "{06B55A46-D3B3-41AE-B5A5-B57830BA010E}"
-EndProject
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{61BF324D-2532-49C9-93CE-DF0E89529D4F}"
 	ProjectSection(SolutionItems) = preProject
 		acinclude.m4 = acinclude.m4
@@ -46,6 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Dependencies", "Dependencie
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "curl", "curl", "{85004FE4-CBD1-4A6D-B60D-EBBF0C267DEF}"
 	ProjectSection(SolutionItems) = preProject
+		dependencies\curl\curl.spec.patch = dependencies\curl\curl.spec.patch
 		dependencies\curl\depend = dependencies\curl\depend
 		dependencies\curl\pkginfo = dependencies\curl\pkginfo
 		dependencies\curl\postinstall = dependencies\curl\postinstall
@@ -93,6 +85,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Doc", "Doc", "{847EC34E-006
 		doc\OPENSSL.LICENSE = doc\OPENSSL.LICENSE
 		doc\README.txt = doc\README.txt
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xmltooling", "xmltooling\xmltooling.vcxproj", "{06B55A46-D3B3-41AE-B5A5-B57830BA010D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xmltoolingtest", "xmltoolingtest\xmltoolingtest.vcxproj", "{3E34CDCC-FCBA-490D-A165-1CB6F4559799}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xmltooling-lite", "xmltooling\xmltooling-lite.vcxproj", "{06B55A46-D3B3-41AE-B5A5-B57830BA010E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
