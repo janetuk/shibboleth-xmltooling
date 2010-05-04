@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,20 +78,20 @@ namespace xmlsignature {
         }
         
         void init() {
-            m_P=NULL;
-            m_Q=NULL;
-            m_G=NULL;
-            m_Y=NULL;
-            m_J=NULL;
-            m_Seed=NULL;
-            m_PgenCounter=NULL;
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
+            m_P=nullptr;
+            m_Q=nullptr;
+            m_G=nullptr;
+            m_Y=nullptr;
+            m_J=nullptr;
+            m_Seed=nullptr;
+            m_PgenCounter=nullptr;
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
             m_pos_P=m_children.begin();
             m_pos_Q=m_pos_P;
             ++m_pos_Q;
@@ -153,10 +153,10 @@ namespace xmlsignature {
         }
         
         void init() {
-            m_Modulus=NULL;
-            m_Exponent=NULL;
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
+            m_Modulus=nullptr;
+            m_Exponent=nullptr;
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
             m_pos_Modulus=m_children.begin();
             m_pos_Exponent=m_pos_Modulus;
             ++m_pos_Exponent;
@@ -200,12 +200,12 @@ namespace xmlsignature {
         }
         
         void init() {
-            m_DSAKeyValue=NULL;
-            m_RSAKeyValue=NULL;
-            m_UnknownXMLObject=NULL;
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
+            m_DSAKeyValue=nullptr;
+            m_RSAKeyValue=nullptr;
+            m_UnknownXMLObject=nullptr;
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
             m_pos_DSAKeyValue=m_children.begin();
             m_pos_RSAKeyValue=m_pos_DSAKeyValue;
             ++m_pos_RSAKeyValue;
@@ -246,7 +246,7 @@ namespace xmlsignature {
         }
 
         TransformImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
-            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Algorithm(NULL) {
+            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Algorithm(nullptr) {
         }
             
         TransformImpl(const TransformImpl& src)
@@ -271,7 +271,7 @@ namespace xmlsignature {
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_STRING_ATTRIB(Algorithm,ALGORITHM,NULL);
+            MARSHALL_STRING_ATTRIB(Algorithm,ALGORITHM,nullptr);
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -288,7 +288,7 @@ namespace xmlsignature {
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            PROC_STRING_ATTRIB(Algorithm,ALGORITHM,NULL);
+            PROC_STRING_ATTRIB(Algorithm,ALGORITHM,nullptr);
             AbstractXMLObjectUnmarshaller::processAttribute(attribute);
         }
     };
@@ -353,9 +353,9 @@ namespace xmlsignature {
         }
         
         void init() {
-            m_URI=m_Type=NULL;
-            m_Transforms=NULL;
-            m_children.push_back(NULL);
+            m_URI=m_Type=nullptr;
+            m_Transforms=nullptr;
+            m_children.push_back(nullptr);
             m_pos_Transforms=m_children.begin();
         }
         
@@ -366,8 +366,8 @@ namespace xmlsignature {
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_STRING_ATTRIB(URI,URI,NULL);
-            MARSHALL_STRING_ATTRIB(Type,TYPE,NULL);
+            MARSHALL_STRING_ATTRIB(URI,URI,nullptr);
+            MARSHALL_STRING_ATTRIB(Type,TYPE,nullptr);
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -376,8 +376,8 @@ namespace xmlsignature {
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            PROC_STRING_ATTRIB(URI,URI,NULL);
-            PROC_STRING_ATTRIB(Type,TYPE,NULL);
+            PROC_STRING_ATTRIB(URI,URI,nullptr);
+            PROC_STRING_ATTRIB(Type,TYPE,nullptr);
             AbstractXMLObjectUnmarshaller::processAttribute(attribute);
         }
     };
@@ -406,10 +406,10 @@ namespace xmlsignature {
         }
         
         void init() {
-            m_X509IssuerName=NULL;
-            m_X509SerialNumber=NULL;
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
+            m_X509IssuerName=nullptr;
+            m_X509SerialNumber=nullptr;
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
             m_pos_X509IssuerName=m_children.begin();
             m_pos_X509SerialNumber=m_pos_X509IssuerName;
             ++m_pos_X509SerialNumber;
@@ -524,7 +524,7 @@ namespace xmlsignature {
             VectorOfPairs(SPKISexp,XMLObject) v=getSPKISexps();
             for (vector< pair<SPKISexp*,XMLObject*> >::const_iterator i=src.m_SPKISexps.begin(); i!=src.m_SPKISexps.end(); i++) {
                 if (i->first) {
-                    v.push_back(make_pair(i->first->cloneSPKISexp(),(i->second ? i->second->clone() : (XMLObject*)NULL)));
+                    v.push_back(make_pair(i->first->cloneSPKISexp(),(i->second ? i->second->clone() : (XMLObject*)nullptr)));
                 }
             }
         }
@@ -548,7 +548,7 @@ namespace xmlsignature {
             if (XMLHelper::isNodeNamed(root,XMLSIG_NS,SPKISexp::LOCAL_NAME)) {
                 SPKISexp* typesafe=dynamic_cast<SPKISexp*>(childXMLObject);
                 if (typesafe) {
-                    getSPKISexps().push_back(make_pair(typesafe,(XMLObject*)NULL));
+                    getSPKISexps().push_back(make_pair(typesafe,(XMLObject*)nullptr));
                     return;
                 }
             }
@@ -557,7 +557,7 @@ namespace xmlsignature {
             const XMLCh* nsURI=root->getNamespaceURI();
             if (!XMLString::equals(nsURI,XMLSIG_NS) && nsURI && *nsURI) {
                 // Update second half of pair in vector, and in master list.
-                if (!m_SPKISexps.empty() && m_SPKISexps.back().second==NULL) {
+                if (!m_SPKISexps.empty() && m_SPKISexps.back().second==nullptr) {
                     m_SPKISexps.back().second=childXMLObject;
                     m_children.back()=childXMLObject;
                     return;
@@ -597,10 +597,10 @@ namespace xmlsignature {
         }
         
         void init() {
-            m_PGPKeyID=NULL;
-            m_PGPKeyPacket=NULL;
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
+            m_PGPKeyID=nullptr;
+            m_PGPKeyPacket=nullptr;
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
             m_pos_PGPKeyID=m_children.begin();
             m_pos_PGPKeyPacket=m_pos_PGPKeyID;
             ++m_pos_PGPKeyPacket;
@@ -639,7 +639,7 @@ namespace xmlsignature {
         }
 
         KeyInfoImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
-            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Id(NULL) {
+            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Id(nullptr) {
         }
             
         KeyInfoImpl(const KeyInfoImpl& src)
@@ -696,7 +696,7 @@ namespace xmlsignature {
         }
         
         IMPL_XMLOBJECT_CLONE(KeyInfo);
-        IMPL_ID_ATTRIB_EX(Id,ID,NULL);
+        IMPL_ID_ATTRIB_EX(Id,ID,nullptr);
         IMPL_TYPED_CHILDREN(KeyName,m_children.end());
         IMPL_TYPED_CHILDREN(KeyValue,m_children.end());
         IMPL_TYPED_CHILDREN(RetrievalMethod,m_children.end());
@@ -708,7 +708,7 @@ namespace xmlsignature {
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_ID_ATTRIB(Id,ID,NULL);
+            MARSHALL_ID_ATTRIB(Id,ID,nullptr);
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -731,7 +731,7 @@ namespace xmlsignature {
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            PROC_ID_ATTRIB(Id,ID,NULL);
+            PROC_ID_ATTRIB(Id,ID,nullptr);
             AbstractXMLObjectUnmarshaller::processAttribute(attribute);
         }
     };

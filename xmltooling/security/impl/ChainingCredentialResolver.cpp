@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,15 +53,15 @@ namespace xmltooling {
             for_each(m_resolvers.begin(), m_resolvers.end(), mem_fun(&Lockable::unlock));
         }
         
-        const Credential* resolve(const CredentialCriteria* criteria=NULL) const {
-            const Credential* cred = NULL;
+        const Credential* resolve(const CredentialCriteria* criteria=nullptr) const {
+            const Credential* cred = nullptr;
             for (vector<CredentialResolver*>::const_iterator cr = m_resolvers.begin(); !cred && cr!=m_resolvers.end(); ++cr)
                 cred = (*cr)->resolve(criteria);
             return cred;
         }
 
         virtual vector<const Credential*>::size_type resolve(
-            vector<const Credential*>& results, const CredentialCriteria* criteria=NULL
+            vector<const Credential*>& results, const CredentialCriteria* criteria=nullptr
             ) const {
             for (vector<CredentialResolver*>::const_iterator cr = m_resolvers.begin(); cr!=m_resolvers.end(); ++cr)
                 (*cr)->resolve(results, criteria);
@@ -87,9 +87,9 @@ ChainingCredentialResolver::ChainingCredentialResolver(const DOMElement* e)
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver."CHAINING_CREDENTIAL_RESOLVER);
 
     // Load up the chain of resolvers.
-    e = e ? XMLHelper::getFirstChildElement(e, _CredentialResolver) : NULL;
+    e = e ? XMLHelper::getFirstChildElement(e, _CredentialResolver) : nullptr;
     while (e) {
-        auto_ptr_char type(e->getAttributeNS(NULL,_type));
+        auto_ptr_char type(e->getAttributeNS(nullptr,_type));
         if (type.get() && *(type.get())) {
             log.info("building CredentialResolver of type %s", type.get());
             try {

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -123,7 +123,7 @@ namespace xmltooling {
          * @param context   arbitrary data to pass to library initialization hook
          * @return true iff library was loaded successfully
          */
-        virtual bool load_library(const char* path, void* context=NULL)=0;
+        virtual bool load_library(const char* path, void* context=nullptr)=0;
         
         /**
          * Configure logging system.
@@ -135,7 +135,7 @@ namespace xmltooling {
          *                  (DEBUG, INFO, NOTICE, WARN, ERROR, CRIT, ALERT, FATAL, EMERG)
          * @return true iff configuration was successful
          */
-        virtual bool log_config(const char* config=NULL)=0;
+        virtual bool log_config(const char* config=nullptr)=0;
 
         /**
          * Obtains a non-validating parser pool.
@@ -158,14 +158,14 @@ namespace xmltooling {
         /**
          * Returns the global KeyInfoResolver instance.
          * 
-         * @return  global KeyInfoResolver or NULL
+         * @return  global KeyInfoResolver or nullptr
          */
         const KeyInfoResolver* getKeyInfoResolver() const;
 
         /**
          * Returns the global ReplayCache instance.
          * 
-         * @return  global ReplayCache or NULL
+         * @return  global ReplayCache or nullptr
          */
         ReplayCache* getReplayCache() const;
 
@@ -191,21 +191,21 @@ namespace xmltooling {
         /**
          * Returns the global PathResolver instance.
          * 
-         * @return  global PathResolver or NULL
+         * @return  global PathResolver or nullptr
          */
         PathResolver* getPathResolver() const;
         
         /**
          * Returns the global TemplateEngine instance.
          * 
-         * @return  global TemplateEngine or NULL
+         * @return  global TemplateEngine or nullptr
          */
         TemplateEngine* getTemplateEngine() const;
 
         /**
          * Returns the global URLEncoder instance.
          * 
-         * @return  global URLEncoder or NULL
+         * @return  global URLEncoder or nullptr
          */
         const URLEncoder* getURLEncoder() const;
 

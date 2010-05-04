@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,16 +35,16 @@ public:
         string path=data_path + "ComplexXMLObject.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
         XercesJanitor<DOMDocument> janitor(doc);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
 
         auto_ptr<ElementProxy> wcObject(
             dynamic_cast<ElementProxy*>(b->buildFromDocument(doc, false))
             );
-        TS_ASSERT(wcObject.get()!=NULL);
+        TS_ASSERT(wcObject.get()!=nullptr);
         
         VectorOf(XMLObject) kids=wcObject->getUnknownXMLObjects();
         TSM_ASSERT_EQUALS("Number of child elements was not expected value", 2, kids.size());

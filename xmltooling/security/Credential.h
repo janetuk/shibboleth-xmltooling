@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ namespace xmltooling {
         /**
          * Returns an algorithm identifier for the Credential.
          *
-         * @return  the Credential algorithm, or NULL if indeterminate
+         * @return  the Credential algorithm, or nullptr if indeterminate
          */
         virtual const char* getAlgorithm() const=0;
 

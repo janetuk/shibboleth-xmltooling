@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,10 +48,10 @@ static const XMLCh type[] =                         UNICODE_LITERAL_4(t,y,p,e);
 
 ChainingTrustEngine::ChainingTrustEngine(const DOMElement* e) : TrustEngine(e) {
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine."CHAINING_TRUSTENGINE);
-    e = e ? XMLHelper::getFirstChildElement(e, _TrustEngine) : NULL;
+    e = e ? XMLHelper::getFirstChildElement(e, _TrustEngine) : nullptr;
     while (e) {
         try {
-            auto_ptr_char temp(e->getAttributeNS(NULL,type));
+            auto_ptr_char temp(e->getAttributeNS(nullptr,type));
             if (temp.get() && *temp.get()) {
                 log.info("building TrustEngine of type %s", temp.get());
                 TrustEngine* engine = XMLToolingConfig::getConfig().TrustEngineManager.newPlugin(temp.get(), e);
@@ -91,7 +91,7 @@ TrustEngine* ChainingTrustEngine::removeTrustEngine(TrustEngine* oldEngine)
             return oldEngine;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 bool ChainingTrustEngine::validate(Signature& sig, const CredentialResolver& credResolver, CredentialCriteria* criteria) const

@@ -57,7 +57,7 @@ namespace xmltooling {
         /**
          * Returns resource held by this object.
          *
-         * @return  the resource held or NULL
+         * @return  the resource held or nullptr
          */
         T* get() {
             return m_held;
@@ -66,7 +66,7 @@ namespace xmltooling {
         /**
          * Returns resource held by this object.
          *
-         * @return  the resource held or NULL
+         * @return  the resource held or nullptr
          */
         T* operator->() {
             return m_held;
@@ -75,11 +75,11 @@ namespace xmltooling {
         /**
          * Returns resource held by this object and releases it to the caller.
          *
-         * @return  the resource held or NULL
+         * @return  the resource held or nullptr
          */
         T* release() {
             T* ret=m_held;
-            m_held=NULL;
+            m_held=nullptr;
             return ret;
         }
     };
@@ -120,7 +120,7 @@ namespace xmltooling {
          *
          * @param tree  root of tree to search
          * @param id    ID value to locate
-         * @return XMLObject in the tree with a matching ID value, or NULL
+         * @return XMLObject in the tree with a matching ID value, or nullptr
          */
         static const XMLObject* getXMLObjectById(const XMLObject& tree, const XMLCh* id);
 
@@ -130,7 +130,7 @@ namespace xmltooling {
          *
          * @param tree  root of tree to search
          * @param id    ID value to locate
-         * @return XMLObject in the tree with a matching ID value, or NULL
+         * @return XMLObject in the tree with a matching ID value, or nullptr
          */
         static XMLObject* getXMLObjectById(XMLObject& tree, const XMLCh* id);
 
@@ -191,37 +191,37 @@ namespace xmltooling {
          * Returns the first matching child element of the node if any.
          *
          * @param n         node to check
-         * @param localName local name to compare with or NULL for any match
-         * @return  the first matching child node of type Element, or NULL
+         * @param localName local name to compare with or nullptr for any match
+         * @return  the first matching child node of type Element, or nullptr
          */
-        static xercesc::DOMElement* getFirstChildElement(const xercesc::DOMNode* n, const XMLCh* localName=NULL);
+        static xercesc::DOMElement* getFirstChildElement(const xercesc::DOMNode* n, const XMLCh* localName=nullptr);
 
         /**
          * Returns the last matching child element of the node if any.
          *
          * @param n     node to check
-         * @param localName local name to compare with or NULL for any match
-         * @return  the last matching child node of type Element, or NULL
+         * @param localName local name to compare with or nullptr for any match
+         * @return  the last matching child node of type Element, or nullptr
          */
-        static xercesc::DOMElement* getLastChildElement(const xercesc::DOMNode* n, const XMLCh* localName=NULL);
+        static xercesc::DOMElement* getLastChildElement(const xercesc::DOMNode* n, const XMLCh* localName=nullptr);
 
         /**
          * Returns the next matching sibling element of the node if any.
          *
          * @param n     node to check
-         * @param localName local name to compare with or NULL for any match
-         * @return  the next matching sibling node of type Element, or NULL
+         * @param localName local name to compare with or nullptr for any match
+         * @return  the next matching sibling node of type Element, or nullptr
          */
-        static xercesc::DOMElement* getNextSiblingElement(const xercesc::DOMNode* n, const XMLCh* localName=NULL);
+        static xercesc::DOMElement* getNextSiblingElement(const xercesc::DOMNode* n, const XMLCh* localName=nullptr);
 
         /**
          * Returns the previous matching sibling element of the node if any.
          *
          * @param n     node to check
-         * @param localName local name to compare with or NULL for any match
-         * @return  the previous matching sibling node of type Element, or NULL
+         * @param localName local name to compare with or nullptr for any match
+         * @return  the previous matching sibling node of type Element, or nullptr
          */
-        static xercesc::DOMElement* getPreviousSiblingElement(const xercesc::DOMNode* n, const XMLCh* localName=NULL);
+        static xercesc::DOMElement* getPreviousSiblingElement(const xercesc::DOMNode* n, const XMLCh* localName=nullptr);
 
         /**
          * Returns the first matching child element of the node if any.
@@ -229,7 +229,7 @@ namespace xmltooling {
          * @param n         node to check
          * @param ns        namespace to compare with
          * @param localName local name to compare with
-         * @return  the first matching child node of type Element, or NULL
+         * @return  the first matching child node of type Element, or nullptr
          */
         static xercesc::DOMElement* getFirstChildElement(const xercesc::DOMNode* n, const XMLCh* ns, const XMLCh* localName);
 
@@ -239,7 +239,7 @@ namespace xmltooling {
          * @param n         node to check
          * @param ns        namespace to compare with
          * @param localName local name to compare with
-         * @return  the last matching child node of type Element, or NULL
+         * @return  the last matching child node of type Element, or nullptr
          */
         static xercesc::DOMElement* getLastChildElement(const xercesc::DOMNode* n, const XMLCh* ns, const XMLCh* localName);
 
@@ -249,7 +249,7 @@ namespace xmltooling {
          * @param n         node to check
          * @param ns        namespace to compare with
          * @param localName local name to compare with
-         * @return  the next matching sibling node of type Element, or NULL
+         * @return  the next matching sibling node of type Element, or nullptr
          */
         static xercesc::DOMElement* getNextSiblingElement(const xercesc::DOMNode* n, const XMLCh* ns, const XMLCh* localName);
 
@@ -259,7 +259,7 @@ namespace xmltooling {
          * @param n         node to check
          * @param ns        namespace to compare with
          * @param localName local name to compare with
-         * @return  the previous matching sibling node of type Element, or NULL
+         * @return  the previous matching sibling node of type Element, or nullptr
          */
         static xercesc::DOMElement* getPreviousSiblingElement(const xercesc::DOMNode* n, const XMLCh* ns, const XMLCh* localName);
 
@@ -269,7 +269,7 @@ namespace xmltooling {
          * examples the immediate children of the element.
          *
          * @param e     element to examine
-         * @return the content of the first Text node found, or NULL
+         * @return the content of the first Text node found, or nullptr
          */
         static const XMLCh* getTextContent(const xercesc::DOMElement* e);
 

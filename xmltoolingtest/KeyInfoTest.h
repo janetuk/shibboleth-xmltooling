@@ -38,13 +38,13 @@ public:
         string path=data_path + "KeyInfo1.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getValidatingParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
 
         auto_ptr<KeyInfo> kiObject(dynamic_cast<KeyInfo*>(b->buildFromDocument(doc)));
-        TS_ASSERT(kiObject.get()!=NULL);
+        TS_ASSERT(kiObject.get()!=nullptr);
         TSM_ASSERT_EQUALS("Number of child elements was not expected value",
             4, kiObject->getOrderedChildren().size());
         TSM_ASSERT_EQUALS("Number of child elements was not expected value",
@@ -62,13 +62,13 @@ public:
         string path=data_path + "KeyInfo2.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getValidatingParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
 
         auto_ptr<KeyInfo> kiObject(dynamic_cast<KeyInfo*>(b->buildFromDocument(doc)));
-        TS_ASSERT(kiObject.get()!=NULL);
+        TS_ASSERT(kiObject.get()!=nullptr);
         TSM_ASSERT_EQUALS("Number of child elements was not expected value",
             2, kiObject->getOrderedChildren().size());
         TSM_ASSERT_EQUALS("Number of child elements was not expected value",
@@ -83,13 +83,13 @@ public:
         string path=data_path + "KeyInfo3.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
 
         auto_ptr<KeyInfo> kiObject(dynamic_cast<KeyInfo*>(b->buildFromDocument(doc)));
-        TS_ASSERT(kiObject.get()!=NULL);
+        TS_ASSERT(kiObject.get()!=nullptr);
         TS_ASSERT_THROWS(SchemaValidators.validate(kiObject.get()),ValidationException);
     }
 };

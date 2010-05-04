@@ -46,7 +46,7 @@ namespace xmltooling {
          * @param url       the URL of the resource to fetch
          * @param cacheTag  optional pointer to string used for cache management
          */
-        CurlURLInputStream(const char* url, std::string* cacheTag=NULL);
+        CurlURLInputStream(const char* url, std::string* cacheTag=nullptr);
 
         /**
          * Constructor.
@@ -54,7 +54,7 @@ namespace xmltooling {
          * @param url       the URL of the resource to fetch
          * @param cacheTag  optional pointer to string used for cache management
          */
-        CurlURLInputStream(const XMLCh* url, std::string* cacheTag=NULL);
+        CurlURLInputStream(const XMLCh* url, std::string* cacheTag=nullptr);
 
         /**
          * Constructor taking a DOM element supporting the following content:
@@ -71,7 +71,7 @@ namespace xmltooling {
          * @param e         DOM to supply configuration
          * @param cacheTag  optional pointer to string used for cache management
          */
-        CurlURLInputStream(const xercesc::DOMElement* e, std::string* cacheTag=NULL);
+        CurlURLInputStream(const xercesc::DOMElement* e, std::string* cacheTag=nullptr);
 
         ~CurlURLInputStream();
 
@@ -109,7 +109,7 @@ namespace xmltooling {
         static size_t staticWriteCallback(char *buffer, size_t size, size_t nitems, void *outstream);
         size_t writeCallback(char *buffer, size_t size, size_t nitems);
 
-        void init(const xercesc::DOMElement* e=NULL);
+        void init(const xercesc::DOMElement* e=nullptr);
         bool readMore(int *runningHandles);
 
         logging::Category&  fLog;

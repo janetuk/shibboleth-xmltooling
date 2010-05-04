@@ -204,9 +204,9 @@ CurlURLInputStream::CurlURLInputStream(const DOMElement* e, string* cacheTag)
     , fContentType(0)
     , fStatusCode(200)
 {
-    const XMLCh* attr = e->getAttributeNS(NULL, url);
+    const XMLCh* attr = e->getAttributeNS(nullptr, url);
     if (!attr || !*attr) {
-        attr = e->getAttributeNS(NULL, uri);
+        attr = e->getAttributeNS(nullptr, uri);
         if (!attr || !*attr)
             throw IOException("No URL supplied via DOM to CurlURLInputStream constructor.");
     }
@@ -261,13 +261,13 @@ void CurlURLInputStream::init(const DOMElement* e)
     curl_easy_setopt(fEasy, CURLOPT_MAXREDIRS, 6);
 
     // Default settings.
-    curl_easy_setopt(fEasy, CURLOPT_CONNECTTIMEOUT,10);
-    curl_easy_setopt(fEasy, CURLOPT_TIMEOUT,60);
-    curl_easy_setopt(fEasy, CURLOPT_HTTPAUTH,0);
-    curl_easy_setopt(fEasy, CURLOPT_USERPWD,NULL);
+    curl_easy_setopt(fEasy, CURLOPT_CONNECTTIMEOUT, 10);
+    curl_easy_setopt(fEasy, CURLOPT_TIMEOUT, 60);
+    curl_easy_setopt(fEasy, CURLOPT_HTTPAUTH, 0);
+    curl_easy_setopt(fEasy, CURLOPT_USERPWD, nullptr);
     curl_easy_setopt(fEasy, CURLOPT_SSL_VERIFYHOST, 2);
     curl_easy_setopt(fEasy, CURLOPT_SSL_VERIFYPEER, 0);
-    curl_easy_setopt(fEasy, CURLOPT_CAINFO, NULL);
+    curl_easy_setopt(fEasy, CURLOPT_CAINFO, nullptr);
     curl_easy_setopt(fEasy, CURLOPT_SSL_CIPHER_LIST, "ALL:!aNULL:!LOW:!EXPORT:!SSLv2");
     curl_easy_setopt(fEasy, CURLOPT_NOPROGRESS, 1);
     curl_easy_setopt(fEasy, CURLOPT_NOSIGNAL, 1);
@@ -294,7 +294,7 @@ void CurlURLInputStream::init(const DOMElement* e)
     }
 
     if (e) {
-        const XMLCh* flag = e->getAttributeNS(NULL, verifyHost);
+        const XMLCh* flag = e->getAttributeNS(nullptr, verifyHost);
         if (flag && (*flag == chLatin_f || *flag == chDigit_0))
             curl_easy_setopt(fEasy, CURLOPT_SSL_VERIFYHOST, 0);
 
@@ -302,8 +302,8 @@ void CurlURLInputStream::init(const DOMElement* e)
         bool success;
         DOMElement* child = XMLHelper::getLastChildElement(e, TransportOption);
         while (child) {
-            if (child->hasChildNodes() && XMLString::equals(child->getAttributeNS(NULL,_provider), _OpenSSL)) {
-                auto_ptr_char option(child->getAttributeNS(NULL,_option));
+            if (child->hasChildNodes() && XMLString::equals(child->getAttributeNS(nullptr,_provider), _OpenSSL)) {
+                auto_ptr_char option(child->getAttributeNS(nullptr,_option));
                 auto_ptr_char value(child->getFirstChild()->getNodeValue());
                 if (option.get() && value.get() && !strcmp(option.get(), "SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION") &&
                     (*value.get()=='1' || *value.get()=='t')) {
@@ -327,14 +327,14 @@ void CurlURLInputStream::init(const DOMElement* e)
                 if (!success)
                     fLog.error("failed to set OpenSSL transport option (%s)", option.get());
             }
-            else if (child->hasChildNodes() && XMLString::equals(child->getAttributeNS(NULL,_provider), _CURL)) {
-                auto_ptr_char option(child->getAttributeNS(NULL,_option));
+            else if (child->hasChildNodes() && XMLString::equals(child->getAttributeNS(nullptr,_provider), _CURL)) {
+                auto_ptr_char option(child->getAttributeNS(nullptr,_option));
                 auto_ptr_char value(child->getFirstChild()->getNodeValue());
                 if (option.get() && *option.get() && value.get() && *value.get()) {
                     // For libcurl, the option is an enum and the value type depends on the option.
-                    CURLoption opt = static_cast<CURLoption>(strtol(option.get(), NULL, 10));
+                    CURLoption opt = static_cast<CURLoption>(strtol(option.get(), nullptr, 10));
                     if (opt < CURLOPTTYPE_OBJECTPOINT)
-                        success = (curl_easy_setopt(fEasy, opt, strtol(value.get(), NULL, 10)) == CURLE_OK);
+                        success = (curl_easy_setopt(fEasy, opt, strtol(value.get(), nullptr, 10)) == CURLE_OK);
 #ifdef CURLOPTTYPE_OFF_T
                     else if (opt < CURLOPTTYPE_OFF_T) {
                         fSavedOptions.push_back(value.get());
@@ -342,10 +342,10 @@ void CurlURLInputStream::init(const DOMElement* e)
                     }
 # ifdef HAVE_CURL_OFF_T
                     else if (sizeof(curl_off_t) == sizeof(long))
-                        success = (curl_easy_setopt(fEasy, opt, strtol(value.get(), NULL, 10)) == CURLE_OK);
+                        success = (curl_easy_setopt(fEasy, opt, strtol(value.get(), nullptr, 10)) == CURLE_OK);
 # else
                     else if (sizeof(off_t) == sizeof(long))
-                        success = (curl_easy_setopt(fEasy, opt, strtol(value.get(), NULL, 10)) == CURLE_OK);
+                        success = (curl_easy_setopt(fEasy, opt, strtol(value.get(), nullptr, 10)) == CURLE_OK);
 # endif
                     else
                         success = false;
@@ -377,9 +377,9 @@ void CurlURLInputStream::init(const DOMElement* e)
         catch (XMLException&) {
             curl_multi_remove_handle(fMulti, fEasy);
             curl_easy_cleanup(fEasy);
-            fEasy = NULL;
+            fEasy = nullptr;
             curl_multi_cleanup(fMulti);
-            fMulti = NULL;
+            fMulti = nullptr;
             throw;
         }
         if(runningHandles == 0) break;
@@ -398,9 +398,9 @@ void CurlURLInputStream::init(const DOMElement* e)
             if (!fBuffer) {
                 curl_multi_remove_handle(fMulti, fEasy);
                 curl_easy_cleanup(fEasy);
-                fEasy = NULL;
+                fEasy = nullptr;
                 curl_multi_cleanup(fMulti);
-                fMulti = NULL;
+                fMulti = nullptr;
                 throw bad_alloc();
             }
             memcpy(fBuffer, specialxml.c_str(), specialxml.length());
@@ -412,7 +412,7 @@ void CurlURLInputStream::init(const DOMElement* e)
     }
 
     // Find the content type
-    char* contentType8 = NULL;
+    char* contentType8 = nullptr;
     if(curl_easy_getinfo(fEasy, CURLINFO_CONTENT_TYPE, &contentType8) == CURLE_OK && contentType8)
         fContentType = XMLString::transcode(contentType8);
 }
@@ -476,7 +476,7 @@ bool CurlURLInputStream::readMore(int* runningHandles)
 
     // Process messages from curl
     int msgsInQueue = 0;
-    for (CURLMsg* msg = NULL; (msg = curl_multi_info_read(fMulti, &msgsInQueue)) != NULL; )
+    for (CURLMsg* msg = nullptr; (msg = curl_multi_info_read(fMulti, &msgsInQueue)) != nullptr; )
     {
         fLog.debug("msg %d, %d from curl", msg->msg, msg->data.result);
 

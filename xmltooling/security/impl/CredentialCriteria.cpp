@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@ using namespace xmltooling;
 using namespace std;
 
 CredentialCriteria::CredentialCriteria()
-    : m_keyUsage(Credential::UNSPECIFIED_CREDENTIAL), m_keySize(0), m_key(NULL),
-        m_keyInfo(NULL), m_nativeKeyInfo(NULL), m_credential(NULL)
+    : m_keyUsage(Credential::UNSPECIFIED_CREDENTIAL), m_keySize(0), m_key(nullptr),
+        m_keyInfo(nullptr), m_nativeKeyInfo(nullptr), m_credential(nullptr)
 {
 }
 
@@ -104,7 +104,7 @@ void CredentialCriteria::setXMLAlgorithm(const XMLCh* algorithm)
         setKeySize(mapped.second);
     }
     else {
-        setKeyAlgorithm(NULL);
+        setKeyAlgorithm(nullptr);
         setKeySize(0);
     }
 }
@@ -137,7 +137,7 @@ const KeyInfo* CredentialCriteria::getKeyInfo() const
 void CredentialCriteria::setKeyInfo(const KeyInfo* keyInfo, int extraction)
 {
     delete m_credential;
-    m_credential = NULL;
+    m_credential = nullptr;
     m_keyInfo = keyInfo;
     if (!keyInfo || !extraction)
         return;
@@ -162,7 +162,7 @@ DSIGKeyInfoList* CredentialCriteria::getNativeKeyInfo() const
 void CredentialCriteria::setNativeKeyInfo(DSIGKeyInfoList* keyInfo, int extraction)
 {
     delete m_credential;
-    m_credential = NULL;
+    m_credential = nullptr;
     m_nativeKeyInfo = keyInfo;
     if (!keyInfo || !extraction)
         return;

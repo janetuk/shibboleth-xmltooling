@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,7 +110,7 @@ ParserPool::~ParserPool()
 
 DOMDocument* ParserPool::newDocument()
 {
-    return DOMImplementationRegistry::getDOMImplementation(NULL)->createDocument();
+    return DOMImplementationRegistry::getDOMImplementation(nullptr)->createDocument();
 }
 
 #ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
@@ -128,20 +128,20 @@ DOMDocument* ParserPool::parse(DOMLSInput& domsrc)
                 doc->release();
             throw XMLParserException("XML error(s) during parsing, check log for specifics");
         }
-        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, (void*)NULL);
+        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, nullptr);
         parser->getDomConfig()->setParameter(XMLUni::fgXercesUserAdoptsDOMDocument, true);
         checkinBuilder(janitor.release());
         return doc;
     }
     catch (XMLException& ex) {
-        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, (void*)NULL);
+        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, nullptr);
         parser->getDomConfig()->setParameter(XMLUni::fgXercesUserAdoptsDOMDocument, true);
         checkinBuilder(janitor.release());
         auto_ptr_char temp(ex.getMessage());
         throw XMLParserException(string("Xerces error during parsing: ") + (temp.get() ? temp.get() : "no message"));
     }
     catch (XMLToolingException&) {
-        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, (void*)NULL);
+        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, nullptr);
         parser->getDomConfig()->setParameter(XMLUni::fgXercesUserAdoptsDOMDocument, true);
         checkinBuilder(janitor.release());
         throw;
@@ -163,20 +163,20 @@ DOMDocument* ParserPool::parse(DOMInputSource& domsrc)
                 doc->release();
             throw XMLParserException("XML error(s) during parsing, check log for specifics");
         }
-        parser->setErrorHandler(NULL);
+        parser->setErrorHandler(nullptr);
         parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
         checkinBuilder(janitor.release());
         return doc;
     }
     catch (XMLException& ex) {
-        parser->setErrorHandler(NULL);
+        parser->setErrorHandler(nullptr);
         parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
         checkinBuilder(janitor.release());
         auto_ptr_char temp(ex.getMessage());
         throw XMLParserException(string("Xerces error during parsing: ") + (temp.get() ? temp.get() : "no message"));
     }
     catch (XMLToolingException&) {
-        parser->setErrorHandler(NULL);
+        parser->setErrorHandler(nullptr);
         parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
         checkinBuilder(janitor.release());
         throw;
@@ -262,7 +262,7 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
         log.debug("loading XML catalog from %s", temp.get());
     }
 
-    LocalFileInputSource fsrc(NULL,pathname);
+    LocalFileInputSource fsrc(nullptr,pathname);
     Wrapper4InputSource domsrc(&fsrc,false);
     try {
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(domsrc);
@@ -281,8 +281,8 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
         Lock lock(m_lock);
         for (XMLSize_t i=0; i<mappings->getLength(); i++) {
             root=static_cast<DOMElement*>(mappings->item(i));
-            const XMLCh* from=root->getAttributeNS(NULL,systemId);
-            const XMLCh* to=root->getAttributeNS(NULL,uri);
+            const XMLCh* from=root->getAttributeNS(nullptr,systemId);
+            const XMLCh* to=root->getAttributeNS(nullptr,uri);
             m_schemaLocMap[from]=to;
         }
         m_schemaLocations.erase();
@@ -314,7 +314,7 @@ DOMInputSource* ParserPool::resolveEntity(
     xmltooling::NDC ndc("resolveEntity");
 #endif
     if (!systemId)
-        return NULL;
+        return nullptr;
 
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".ParserPool");
     if (log.isDebugEnabled()) {
@@ -351,7 +351,7 @@ DOMLSParser* ParserPool::createBuilder()
 {
     static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };
     DOMImplementation* impl=DOMImplementationRegistry::getDOMImplementation(impltype);
-    DOMLSParser* parser=static_cast<DOMImplementationLS*>(impl)->createLSParser(DOMImplementationLS::MODE_SYNCHRONOUS,NULL);
+    DOMLSParser* parser=static_cast<DOMImplementationLS*>(impl)->createLSParser(DOMImplementationLS::MODE_SYNCHRONOUS,nullptr);
     parser->getDomConfig()->setParameter(XMLUni::fgDOMNamespaces, m_namespaceAware);
     if (m_schemaAware) {
         parser->getDomConfig()->setParameter(XMLUni::fgDOMNamespaces, true);
@@ -467,7 +467,7 @@ StreamInputSource::StreamBinInputStream::curPos() const
 #ifdef XMLTOOLING_XERCESC_64BITSAFE
 const XMLCh* StreamInputSource::StreamBinInputStream::getContentType() const
 {
-    return NULL;
+    return nullptr;
 }
 #endif
 
@@ -505,9 +505,9 @@ URLInputSource::URLInputSource(const DOMElement* e, const char* systemId, string
     static const XMLCh uri[] = UNICODE_LITERAL_3(u,r,i);
     static const XMLCh url[] = UNICODE_LITERAL_3(u,r,l);
 
-    const XMLCh* attr = e->getAttributeNS(NULL, url);
+    const XMLCh* attr = e->getAttributeNS(nullptr, url);
     if (!attr || !*attr) {
-        attr = e->getAttributeNS(NULL, uri);
+        attr = e->getAttributeNS(nullptr, uri);
         if (!attr || !*attr)
             throw IOException("No URL supplied via DOM to URLInputSource constructor.");
     }
@@ -524,7 +524,7 @@ BinInputStream* URLInputSource::makeStream() const
 #else
 
 URLInputSource::URLInputSource(const XMLCh* url, const char* systemId, string* cacheTag)
-    : InputSource(systemId), m_cacheTag(cacheTag), m_url(url), m_root(NULL)
+    : InputSource(systemId), m_cacheTag(cacheTag), m_url(url), m_root(nullptr)
 {
 }
 

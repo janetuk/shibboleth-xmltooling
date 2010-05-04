@@ -33,12 +33,12 @@ using namespace xmltooling;
 using namespace xercesc;
 using namespace std;
 
-AbstractDOMCachingXMLObject::AbstractDOMCachingXMLObject() : m_dom(NULL), m_document(NULL)
+AbstractDOMCachingXMLObject::AbstractDOMCachingXMLObject() : m_dom(nullptr), m_document(nullptr)
 {
 }
 
 AbstractDOMCachingXMLObject::AbstractDOMCachingXMLObject(const AbstractDOMCachingXMLObject& src)
-    : AbstractXMLObject(src), m_dom(NULL), m_document(NULL)
+    : AbstractXMLObject(src), m_dom(nullptr), m_document(nullptr)
 {
 }
 
@@ -79,7 +79,7 @@ void AbstractDOMCachingXMLObject::releaseDOM() const
             string qname=getElementQName().toString();
             m_log.debug("releasing cached DOM representation for (%s)", qname.empty() ? "unknown" : qname.c_str());
         }
-        setDOM(NULL);
+        setDOM(nullptr);
     }
 }
 
@@ -126,7 +126,7 @@ DOMElement* AbstractDOMCachingXMLObject::cloneDOM(DOMDocument* doc) const
     if (getDOM()) {
         DOMDocument* cloneDoc = doc;
         if (!cloneDoc)
-            cloneDoc=DOMImplementationRegistry::getDOMImplementation(NULL)->createDocument();
+            cloneDoc=DOMImplementationRegistry::getDOMImplementation(nullptr)->createDocument();
         try {
             return static_cast<DOMElement*>(cloneDoc->importNode(getDOM(),true));
         }
@@ -137,7 +137,7 @@ DOMElement* AbstractDOMCachingXMLObject::cloneDOM(DOMDocument* doc) const
             m_log.error("DOM clone failed: %s", temp.get());
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 XMLObject* AbstractDOMCachingXMLObject::clone() const
@@ -160,7 +160,7 @@ XMLObject* AbstractDOMCachingXMLObject::clone() const
         janitor.release(); // safely transferred
         return ret;
     }
-    return NULL;
+    return nullptr;
 }
 
 void AbstractDOMCachingXMLObject::detach()
@@ -178,7 +178,7 @@ void AbstractDOMCachingXMLObject::detach()
     if (parent && parent->m_document) {
         // Transfer control of document to me...
         setDocument(parent->m_document);
-        parent->m_document = NULL;
+        parent->m_document = nullptr;
     }
     // The rest is done by the base.
     AbstractXMLObject::detach();

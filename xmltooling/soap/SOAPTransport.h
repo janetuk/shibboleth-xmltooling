@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,7 +115,7 @@ namespace xmltooling {
          * @param password  simple password/credential for transport authentication
          * @return  true iff the transport supports the indicated form of authentication
          */
-        virtual bool setAuth(transport_auth_t authType, const char* username=NULL, const char* password=NULL)=0;
+        virtual bool setAuth(transport_auth_t authType, const char* username=nullptr, const char* password=nullptr)=0;
 
         /**
          * Determines whether TLS/SSL connections include a check of the server's certificate
@@ -133,26 +133,26 @@ namespace xmltooling {
          *
          * <p>The lifetime of the credential must be longer than the lifetime of this object.
          *
-         * @param credential  a Credential instance, or NULL
+         * @param credential  a Credential instance, or nullptr
          * @return true iff the transport supports the use of the Credential
          */
-        virtual bool setCredential(const Credential* credential=NULL)=0;
+        virtual bool setCredential(const Credential* credential=nullptr)=0;
 
         /**
          * Provides an X509TrustEngine to the transport to authenticate the transport peer.
          * The lifetime of the engine must be longer than the lifetime of this object.
          *
-         * @param trustEngine   an X509TrustEngine instance, or NULL
-         * @param credResolver  a CredentialResolver to supply the peer's trusted credentials, or NULL
+         * @param trustEngine   an X509TrustEngine instance, or nullptr
+         * @param credResolver  a CredentialResolver to supply the peer's trusted credentials, or nullptr
          * @param criteria      optional criteria for selecting peer credentials
          * @param mandatory     flag controls whether message is sent at all if the
          *                      transport isn't authenticated using the TrustEngine
          * @return true iff the transport supports the use of a TrustEngine
          */
         virtual bool setTrustEngine(
-            const X509TrustEngine* trustEngine=NULL,
-            const CredentialResolver* credResolver=NULL,
-            CredentialCriteria* criteria=NULL,
+            const X509TrustEngine* trustEngine=nullptr,
+            const CredentialResolver* credResolver=nullptr,
+            CredentialCriteria* criteria=nullptr,
             bool mandatory=true
             )=0;
 #endif
@@ -164,7 +164,7 @@ namespace xmltooling {
          *
          * @param cacheTag  optional pointer to string used for cache management
          */
-        virtual bool setCacheTag(std::string* cacheTag=NULL);
+        virtual bool setCacheTag(std::string* cacheTag=nullptr);
 
         /**
          * Sets an implementation-specific transport provider option.
@@ -199,7 +199,7 @@ namespace xmltooling {
          *
          * @param in    input stream to send
          */
-        virtual void send(std::istream* in=NULL);
+        virtual void send(std::istream* in=nullptr);
 
         /**
          * Returns reference to response stream.  The resulting stream must be

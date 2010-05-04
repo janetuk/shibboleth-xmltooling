@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ namespace xmltooling {
          * @param xmlObject the object to examine
          */
         bool operator()(const XMLObject* xmlObject) const {
-            const QName* xsitype = xmlObject ? xmlObject->getSchemaType() : NULL;
+            const QName* xsitype = xmlObject ? xmlObject->getSchemaType() : nullptr;
             return xsitype ? (*xsitype == m_q) : false;
         }
         
@@ -89,12 +89,12 @@ namespace xmltooling {
      *
      * @param c read-only container of pointer-based objects
      * @param p a predicate function
-     * @return  the first object in the container matching the predicate, or NULL
+     * @return  the first object in the container matching the predicate, or nullptr
      */
     template<typename Container, typename Predicate>
     typename Container::value_type find_if(const Container& c, const Predicate& p) {
         typename Container::const_iterator i = std::find_if(c.begin(), c.end(), p);
-        return (i!=c.end()) ? *i : NULL;
+        return (i!=c.end()) ? *i : nullptr;
     }
 
     /**
@@ -102,12 +102,12 @@ namespace xmltooling {
      *
      * @param c read-only container of pointer-based objects
      * @param p a predicate function
-     * @return  the first object in the container matching the predicate, or NULL
+     * @return  the first object in the container matching the predicate, or nullptr
      */
     template<typename Container, typename Predicate>
     typename Container::value_type find_if(Container& c, const Predicate& p) {
         typename Container::iterator i = std::find_if(c.begin(), c.end(), p);
-        return (i!=c.end()) ? *i : NULL;
+        return (i!=c.end()) ? *i : nullptr;
     }
 
 };

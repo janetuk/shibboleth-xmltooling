@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,10 +118,10 @@ namespace xmltooling {
         PSID  lpUserSid,
         LPCSTR  message)
     {
-        LPCSTR  messages[] = {message, NULL};
+        LPCSTR  messages[] = {message, nullptr};
 
         HANDLE hElog = RegisterEventSource(lpUNCServerName, "OpenSAML XMLTooling Library");
-        BOOL res = ReportEvent(hElog, wType, 0, dwEventID, lpUserSid, 1, 0, messages, NULL);
+        BOOL res = ReportEvent(hElog, wType, 0, dwEventID, lpUserSid, 1, 0, messages, nullptr);
         return (DeregisterEventSource(hElog) && res);
     }
 #endif
@@ -139,10 +139,10 @@ XMLToolingInternalConfig& XMLToolingInternalConfig::getInternalConfig()
 
 #ifndef XMLTOOLING_NO_XMLSEC
 XMLToolingConfig::XMLToolingConfig()
-    : m_keyInfoResolver(NULL), m_replayCache(NULL), m_pathResolver(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180)
+    : m_keyInfoResolver(nullptr), m_replayCache(nullptr), m_pathResolver(nullptr), m_templateEngine(nullptr), m_urlEncoder(nullptr), clock_skew_secs(180)
 #else
 XMLToolingConfig::XMLToolingConfig()
-    : m_pathResolver(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180)
+    : m_pathResolver(nullptr), m_templateEngine(nullptr), m_urlEncoder(nullptr), clock_skew_secs(180)
 #endif
 {
 }
@@ -209,7 +209,7 @@ bool XMLToolingInternalConfig::log_config(const char* config)
         string msg = string("failed to configure logging: ") + e.what();
         Category::getInstance(XMLTOOLING_LOGCAT".Logging").crit(msg);
 #ifdef WIN32
-        LogEvent(NULL, EVENTLOG_ERROR_TYPE, 2100, NULL, msg.c_str());
+        LogEvent(nullptr, EVENTLOG_ERROR_TYPE, 2100, nullptr, msg.c_str());
 #endif
         return false;
     }
@@ -307,7 +307,7 @@ bool XMLToolingInternalConfig::init()
         // Load catalogs from path.
         if (!catalog_path.empty()) {
             char* catpath=strdup(catalog_path.c_str());
-            char* sep=NULL;
+            char* sep=nullptr;
             char* start=catpath;
             while (start && *start) {
                 sep=strchr(start,PATH_SEPARATOR_CHAR);
@@ -315,7 +315,7 @@ bool XMLToolingInternalConfig::init()
                     *sep=0;
                 auto_ptr_XMLCh temp(start);
                 m_validatingPool->loadCatalog(temp.get());
-                start = sep ? sep + 1 : NULL;
+                start = sep ? sep + 1 : nullptr;
             }
             free(catpath);
         }
@@ -348,7 +348,7 @@ bool XMLToolingInternalConfig::init()
         registerSOAPTransports();
         initSOAPTransports();
         registerStorageServices();
-        m_keyInfoResolver = KeyInfoResolverManager.newPlugin(INLINE_KEYINFO_RESOLVER,NULL);
+        m_keyInfoResolver = KeyInfoResolverManager.newPlugin(INLINE_KEYINFO_RESOLVER,nullptr);
 #endif
 
         m_pathResolver = new PathResolver();
@@ -386,7 +386,7 @@ bool XMLToolingInternalConfig::init()
 void XMLToolingInternalConfig::term()
 {
 #ifndef XMLTOOLING_NO_XMLSEC
-    CRYPTO_set_locking_callback(NULL);
+    CRYPTO_set_locking_callback(nullptr);
     for_each(g_openssl_locks.begin(), g_openssl_locks.end(), xmltooling::cleanup<Mutex>());
     g_openssl_locks.clear();
 #endif
@@ -406,20 +406,20 @@ void XMLToolingInternalConfig::term()
     m_algorithmMap.clear();
 
     delete m_keyInfoResolver;
-    m_keyInfoResolver = NULL;
+    m_keyInfoResolver = nullptr;
 
     delete m_replayCache;
-    m_replayCache = NULL;
+    m_replayCache = nullptr;
 #endif
 
     delete m_pathResolver;
-    m_pathResolver = NULL;
+    m_pathResolver = nullptr;
 
     delete m_templateEngine;
-    m_templateEngine = NULL;
+    m_templateEngine = nullptr;
 
     delete m_urlEncoder;
-    m_urlEncoder = NULL;
+    m_urlEncoder = nullptr;
 
     for (vector<void*>::reverse_iterator i=m_libhandles.rbegin(); i!=m_libhandles.rend(); i++) {
 #if defined(WIN32)
@@ -439,18 +439,18 @@ void XMLToolingInternalConfig::term()
     m_libhandles.clear();
 
     delete m_parserPool;
-    m_parserPool=NULL;
+    m_parserPool=nullptr;
     delete m_validatingPool;
-    m_validatingPool=NULL;
+    m_validatingPool=nullptr;
 
 #ifndef XMLTOOLING_NO_XMLSEC
     delete m_xsecProvider;
-    m_xsecProvider=NULL;
+    m_xsecProvider=nullptr;
     XSECPlatformUtils::Terminate();
 #endif
 
     XMLPlatformUtils::closeMutex(m_lock);
-    m_lock=NULL;
+    m_lock=nullptr;
     XMLPlatformUtils::Terminate();
 
 #ifndef XMLTOOLING_NO_XMLSEC
@@ -487,16 +487,16 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
     m_pathResolver->resolve(resolved, PathResolver::XMLTOOLING_LIB_FILE);
 
 #if defined(WIN32)
-    HMODULE handle=NULL;
+    HMODULE handle=nullptr;
     for (string::iterator i = resolved.begin(); i != resolved.end(); ++i)
         if (*i == '/')
             *i = '\\';
 
     UINT em=SetErrorMode(SEM_FAILCRITICALERRORS);
     try {
-        handle=LoadLibraryEx(resolved.c_str(),NULL,LOAD_WITH_ALTERED_SEARCH_PATH);
+        handle=LoadLibraryEx(resolved.c_str(),nullptr,LOAD_WITH_ALTERED_SEARCH_PATH);
         if (!handle)
-             handle=LoadLibraryEx(resolved.c_str(),NULL,0);
+             handle=LoadLibraryEx(resolved.c_str(),nullptr,0);
         if (!handle)
             throw runtime_error(string("unable to load extension library: ") + resolved);
         FARPROC fn=GetProcAddress(handle,"xmltooling_extension_init");

@@ -17,7 +17,7 @@
 /**
  * Win32Threads.cpp
  *
- * Thread and locking wrappers for Win32 platforms
+ * Thread and locking wrappers for Win32 platforms.
  */
 
 #include "internal.h"
@@ -370,7 +370,7 @@ namespace xmltooling {
         void onDetach() const {
             if (destroy_hook) {
                 destroy_hook(TlsGetValue(key));
-                TlsSetValue(key, NULL);
+                TlsSetValue(key, nullptr);
             }
         }
     };

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,17 +44,17 @@ namespace xmltooling {
         virtual ~MemoryStorageService();
 
         bool createString(const char* context, const char* key, const char* value, time_t expiration);
-        int readString(const char* context, const char* key, string* pvalue=NULL, time_t* pexpiration=NULL, int version=0);
-        int updateString(const char* context, const char* key, const char* value=NULL, time_t expiration=0, int version=0);
+        int readString(const char* context, const char* key, string* pvalue=nullptr, time_t* pexpiration=nullptr, int version=0);
+        int updateString(const char* context, const char* key, const char* value=nullptr, time_t expiration=0, int version=0);
         bool deleteString(const char* context, const char* key);
 
         bool createText(const char* context, const char* key, const char* value, time_t expiration) {
             return createString(context, key, value, expiration);
         }
-        int readText(const char* context, const char* key, string* pvalue=NULL, time_t* pexpiration=NULL, int version=0) {
+        int readText(const char* context, const char* key, string* pvalue=nullptr, time_t* pexpiration=nullptr, int version=0) {
             return readString(context, key, pvalue, pexpiration, version);
         }
-        int updateText(const char* context, const char* key, const char* value=NULL, time_t expiration=0, int version=0) {
+        int updateText(const char* context, const char* key, const char* value=nullptr, time_t expiration=0, int version=0) {
             return updateString(context, key, value, expiration, version);
         }
         bool deleteText(const char* context, const char* key) {
@@ -121,10 +121,10 @@ namespace xmltooling {
 static const XMLCh cleanupInterval[] = UNICODE_LITERAL_15(c,l,e,a,n,u,p,I,n,t,e,r,v,a,l);
 
 MemoryStorageService::MemoryStorageService(const DOMElement* e)
-    : m_lock(NULL), shutdown_wait(NULL), cleanup_thread(NULL), shutdown(false), m_cleanupInterval(0),
+    : m_lock(nullptr), shutdown_wait(nullptr), cleanup_thread(nullptr), shutdown(false), m_cleanupInterval(0),
         m_log(Category::getInstance(XMLTOOLING_LOGCAT".StorageService"))
 {
-    const XMLCh* tag=e ? e->getAttributeNS(NULL,cleanupInterval) : NULL;
+    const XMLCh* tag=e ? e->getAttributeNS(nullptr,cleanupInterval) : nullptr;
     if (tag && *tag) {
         m_cleanupInterval = XMLString::parseInt(tag);
     }
@@ -141,7 +141,7 @@ MemoryStorageService::~MemoryStorageService()
     // Shut down the cleanup thread and let it know...
     shutdown = true;
     shutdown_wait->signal();
-    cleanup_thread->join(NULL);
+    cleanup_thread->join(nullptr);
 
     delete cleanup_thread;
     delete shutdown_wait;
@@ -172,7 +172,7 @@ void* MemoryStorageService::cleanup_fn(void* pv)
             break;
 
         unsigned long count=0;
-        time_t now = time(NULL);
+        time_t now = time(nullptr);
         cache->m_lock->wrlock();
         SharedLock locker(cache->m_lock, false);
         for (map<string,Context>::iterator i=cache->m_contextMap.begin(); i!=cache->m_contextMap.end(); ++i)
@@ -185,14 +185,14 @@ void* MemoryStorageService::cleanup_fn(void* pv)
     cache->m_log.info("cleanup thread finished");
 
     mutex->unlock();
-    return NULL;
+    return nullptr;
 }
 
 void MemoryStorageService::reap(const char* context)
 {
     Context& ctx = writeContext(context);
     SharedLock locker(m_lock, false);
-    ctx.reap(time(NULL));
+    ctx.reap(time(nullptr));
 }
 
 unsigned long MemoryStorageService::Context::reap(time_t exp)
@@ -223,7 +223,7 @@ bool MemoryStorageService::createString(const char* context, const char* key, co
     map<string,Record>::iterator i=ctx.m_dataMap.find(key);
     if (i!=ctx.m_dataMap.end()) {
         // Not yet expired?
-        if (time(NULL) < i->second.expiration)
+        if (time(nullptr) < i->second.expiration)
             return false;
         // It's dead, so we can just remove it now and create the new record.
         ctx.m_dataMap.erase(i);
@@ -243,7 +243,7 @@ int MemoryStorageService::readString(const char* context, const char* key, strin
     map<string,Record>::iterator i=ctx.m_dataMap.find(key);
     if (i==ctx.m_dataMap.end())
         return 0;
-    else if (time(NULL) >= i->second.expiration)
+    else if (time(nullptr) >= i->second.expiration)
         return 0;
     if (pexpiration)
         *pexpiration = i->second.expiration;
@@ -262,7 +262,7 @@ int MemoryStorageService::updateString(const char* context, const char* key, con
     map<string,Record>::iterator i=ctx.m_dataMap.find(key);
     if (i==ctx.m_dataMap.end())
         return 0;
-    else if (time(NULL) >= i->second.expiration)
+    else if (time(nullptr) >= i->second.expiration)
         return 0;
 
     if (version > 0 && version != i->second.version)
@@ -302,7 +302,7 @@ void MemoryStorageService::updateContext(const char* context, time_t expiration)
     Context& ctx = writeContext(context);
     SharedLock locker(m_lock, false);
 
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     map<string,Record>::iterator stop=ctx.m_dataMap.end();
     for (map<string,Record>::iterator i = ctx.m_dataMap.begin(); i!=stop; ++i) {
         if (now < i->second.expiration)

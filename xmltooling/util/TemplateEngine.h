@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ namespace xmltooling {
              * Returns the value of a parameter to plug into the template.
              *
              * @param name  name of parameter
-             * @return value of parameter, or NULL
+             * @return value of parameter, or nullptr
              */
             virtual const char* getParameter(const char* name) const;
 
@@ -99,7 +99,7 @@ namespace xmltooling {
              * Returns a named collection of sub-parameters to pass into a loop.
              *
              * @param name  name of sub-collection
-             * @return pointer to a multimap of sub-parameters, or NULL
+             * @return pointer to a multimap of sub-parameters, or nullptr
              */
             virtual const std::multimap<std::string,std::string>* getLoopCollection(const char* name) const;
         };
@@ -117,7 +117,7 @@ namespace xmltooling {
             std::istream& is,
             std::ostream& os,
             const TemplateParameters& parameters,
-            const XMLToolingException* e=NULL
+            const XMLToolingException* e=nullptr
             ) const;
 
         /**

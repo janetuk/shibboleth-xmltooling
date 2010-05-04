@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * TrustEngine.cpp
  * 
- * Registration of factories for built-in engines
+ * Registration of factories for built-in engines.
  */
 
 #include "internal.h"
@@ -50,11 +50,11 @@ void XMLTOOL_API xmltooling::registerTrustEngines()
 static const XMLCh _KeyInfoResolver[] = UNICODE_LITERAL_15(K,e,y,I,n,f,o,R,e,s,o,l,v,e,r);
 static const XMLCh type[] =             UNICODE_LITERAL_4(t,y,p,e);
 
-TrustEngine::TrustEngine(const DOMElement* e) : m_keyInfoResolver(NULL)
+TrustEngine::TrustEngine(const DOMElement* e) : m_keyInfoResolver(nullptr)
 {
-    DOMElement* child = e ? XMLHelper::getFirstChildElement(e,_KeyInfoResolver) : NULL;
+    DOMElement* child = e ? XMLHelper::getFirstChildElement(e,_KeyInfoResolver) : nullptr;
     if (child) {
-        auto_ptr_char t(child->getAttributeNS(NULL,type));
+        auto_ptr_char t(child->getAttributeNS(nullptr,type));
         if (t.get())
             m_keyInfoResolver = XMLToolingConfig::getConfig().KeyInfoResolverManager.newPlugin(t.get(),child);
         else

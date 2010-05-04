@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2009 Internet2
+*  Copyright 2001-2010 Internet2
  * 
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL UnknownElementImpl : public AbstractSimpleElement, public AbstractDOMCachingXMLObject
     {
     public:
-        UnknownElementImpl(const XMLCh* namespaceURI=NULL, const XMLCh* elementLocalName=NULL, const XMLCh* namespacePrefix=NULL);
+        UnknownElementImpl(const XMLCh* namespaceURI=nullptr, const XMLCh* elementLocalName=nullptr, const XMLCh* namespacePrefix=nullptr);
     
         virtual ~UnknownElementImpl();
 
@@ -52,18 +52,18 @@ namespace xmltooling {
         void setTextContent(const XMLCh*, unsigned int position=0);
 
         xercesc::DOMElement* marshall(
-            xercesc::DOMDocument* document=NULL
+            xercesc::DOMDocument* document=nullptr
 #ifndef XMLTOOLING_NO_XMLSEC
-            ,const std::vector<xmlsignature::Signature*>* sigs=NULL
-            ,const Credential* credential=NULL
+            ,const std::vector<xmlsignature::Signature*>* sigs=nullptr
+            ,const Credential* credential=nullptr
 #endif
             ) const;
 
         xercesc::DOMElement* marshall(
             xercesc::DOMElement* parentElement
 #ifndef XMLTOOLING_NO_XMLSEC
-            ,const std::vector<xmlsignature::Signature*>* sigs=NULL
-            ,const Credential* credential=NULL
+            ,const std::vector<xmlsignature::Signature*>* sigs=nullptr
+            ,const Credential* credential=nullptr
 #endif
             ) const;
         XMLObject* unmarshall(xercesc::DOMElement* element, bool bindDocument=false);
@@ -85,7 +85,7 @@ namespace xmltooling {
     {
     public:
         XMLObject* buildObject(
-            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL
+            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=nullptr, const QName* schemaType=nullptr
             ) const;
     };
 

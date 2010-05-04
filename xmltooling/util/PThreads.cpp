@@ -102,7 +102,7 @@ namespace xmltooling {
         int timedwait(MutexImpl* mutex, int delay_seconds) {
             struct timespec ts;
             memset(&ts, 0, sizeof(ts));
-            ts.tv_sec = time(NULL) + delay_seconds;
+            ts.tv_sec = time(nullptr) + delay_seconds;
             return pthread_cond_timedwait(&cond, &(mutex->mutex), &ts);
         }
         
@@ -195,7 +195,7 @@ ThreadImpl::ThreadImpl(void* (*start_routine)(void*), void* arg, size_t stacksiz
         rc = pthread_create(&thread_id, &attrs, start_routine, arg);
     }
     else {
-        rc = pthread_create(&thread_id, NULL, start_routine, arg);
+        rc = pthread_create(&thread_id, nullptr, start_routine, arg);
     }
     if (rc) {
 #ifdef HAVE_STRERROR_R
@@ -212,7 +212,7 @@ ThreadImpl::ThreadImpl(void* (*start_routine)(void*), void* arg, size_t stacksiz
 
 MutexImpl::MutexImpl()
 {
-    int rc=pthread_mutex_init(&mutex, NULL);
+    int rc=pthread_mutex_init(&mutex, nullptr);
     if (rc) {
 #ifdef HAVE_STRERROR_R
         char buf[256];
@@ -228,7 +228,7 @@ MutexImpl::MutexImpl()
 
 CondWaitImpl::CondWaitImpl()
 {
-    int rc=pthread_cond_init(&cond, NULL);
+    int rc=pthread_cond_init(&cond, nullptr);
     if (rc) {
 #ifdef HAVE_STRERROR_R
         char buf[256];
@@ -245,9 +245,9 @@ CondWaitImpl::CondWaitImpl()
 RWLockImpl::RWLockImpl()
 {
 #ifdef HAVE_PTHREAD_RWLOCK_INIT
-    int rc=pthread_rwlock_init(&lock, NULL);
+    int rc=pthread_rwlock_init(&lock, nullptr);
 #else
-    int rc=rwlock_init(&lock, USYNC_THREAD, NULL);
+    int rc=rwlock_init(&lock, USYNC_THREAD, nullptr);
 #endif
     if (rc) {
 #ifdef HAVE_STRERROR_R
@@ -297,7 +297,7 @@ void Thread::mask_all_signals(void)
 {
     sigset_t sigmask;
     sigfillset(&sigmask);
-    Thread::mask_signals(SIG_BLOCK, &sigmask, NULL);
+    Thread::mask_signals(SIG_BLOCK, &sigmask, nullptr);
 }
 
 int Thread::mask_signals(int how, const sigset_t *newmask, sigset_t *oldmask)

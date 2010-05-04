@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ Encrypter::KeyEncryptionParams::~KeyEncryptionParams()
 {
 }
 
-Encrypter::Encrypter() : m_cipher(NULL)
+Encrypter::Encrypter() : m_cipher(nullptr)
 {
 }
 
@@ -88,7 +88,7 @@ void Encrypter::checkParams(EncryptionParams& encParams, KeyEncryptionParams* ke
         }
     }
     
-    XSECCryptoKey* key=NULL;
+    XSECCryptoKey* key=nullptr;
     if (encParams.m_credential) {
         key = encParams.m_credential->getPrivateKey();
         if (!key)
@@ -99,7 +99,7 @@ void Encrypter::checkParams(EncryptionParams& encParams, KeyEncryptionParams* ke
     else {
         // We have to have a raw key now, so we need to build a wrapper around it.
         XSECAlgorithmHandler* handler =XSECPlatformUtils::g_algorithmMapper->mapURIToHandler(encParams.m_algorithm);
-        if (handler != NULL)
+        if (handler != nullptr)
             key = handler->createKeyForURI(
                 encParams.m_algorithm,const_cast<unsigned char*>(encParams.m_keyBuffer),encParams.m_keyBufferSize
                 );
@@ -132,7 +132,7 @@ EncryptedData* Encrypter::encryptElement(DOMElement* element, EncryptionParams& 
     
     if (m_cipher && m_cipher->getDocument()!=element->getOwnerDocument()) {
         XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
-        m_cipher=NULL;
+        m_cipher=nullptr;
     }
     
     if (!m_cipher) {
@@ -160,7 +160,7 @@ EncryptedData* Encrypter::encryptElementContent(DOMElement* element, EncryptionP
 
     if (m_cipher && m_cipher->getDocument()!=element->getOwnerDocument()) {
         XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
-        m_cipher=NULL;
+        m_cipher=nullptr;
     }
     
     if (!m_cipher) {
@@ -188,10 +188,10 @@ EncryptedData* Encrypter::encryptStream(istream& input, EncryptionParams& encPar
 
     if (m_cipher) {
         XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
-        m_cipher=NULL;
+        m_cipher=nullptr;
     }
     
-    DOMDocument* doc=NULL;
+    DOMDocument* doc=nullptr;
     try {
         doc=XMLToolingConfig::getConfig().getParser().newDocument();
         XercesJanitor<DOMDocument> janitor(doc);
@@ -219,7 +219,7 @@ EncryptedData* Encrypter::decorateAndUnmarshall(EncryptionParams& encParams, Key
         throw EncryptionException("No EncryptedData element found?");
 
     // Unmarshall a tooling version of EncryptedData around the DOM.
-    EncryptedData* xmlEncData=NULL;
+    EncryptedData* xmlEncData=nullptr;
     auto_ptr<XMLObject> xmlObject(XMLObjectBuilder::buildOneFromElement(encData->getElement()));
     if (!(xmlObject.get()) || !(xmlEncData=dynamic_cast<EncryptedData*>(xmlObject.get())))
         throw EncryptionException("Unable to unmarshall into EncryptedData object.");
@@ -228,7 +228,7 @@ EncryptedData* Encrypter::decorateAndUnmarshall(EncryptionParams& encParams, Key
     xmlEncData->releaseThisAndChildrenDOM();
     
     // KeyInfo?
-    KeyInfo* kinfo = encParams.m_credential ? encParams.m_credential->getKeyInfo(encParams.m_compact) : NULL;
+    KeyInfo* kinfo = encParams.m_credential ? encParams.m_credential->getKeyInfo(encParams.m_compact) : nullptr;
     if (kinfo)
         xmlEncData->setKeyInfo(kinfo);
     
@@ -245,7 +245,7 @@ EncryptedData* Encrypter::decorateAndUnmarshall(EncryptionParams& encParams, Key
         auto_ptr<XENCEncryptedKey> encKey(
             m_cipher->encryptKey(encParams.m_keyBuffer, encParams.m_keyBufferSize, ENCRYPT_NONE, kencParams->m_algorithm)
             );
-        EncryptedKey* xmlEncKey=NULL;
+        EncryptedKey* xmlEncKey=nullptr;
         auto_ptr<XMLObject> xmlObjectKey(XMLObjectBuilder::buildOneFromElement(encKey->getElement()));
         if (!(xmlObjectKey.get()) || !(xmlEncKey=dynamic_cast<EncryptedKey*>(xmlObjectKey.get())))
             throw EncryptionException("Unable to unmarshall into EncryptedKey object.");
@@ -280,14 +280,14 @@ EncryptedKey* Encrypter::encryptKey(
 
     if (m_cipher) {
         XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
-        m_cipher=NULL;
+        m_cipher=nullptr;
     }
 
     XSECCryptoKey* kek = kencParams.m_credential.getPublicKey();
     if (!kek)
         throw EncryptionException("Credential in KeyEncryptionParams structure did not supply a public key.");
 
-    DOMDocument* doc=NULL;
+    DOMDocument* doc=nullptr;
     try {
         doc=XMLToolingConfig::getConfig().getParser().newDocument();
         XercesJanitor<DOMDocument> janitor(doc);
@@ -296,7 +296,7 @@ EncryptedKey* Encrypter::encryptKey(
         m_cipher->setKEK(kek->clone());
         auto_ptr<XENCEncryptedKey> encKey(m_cipher->encryptKey(keyBuffer, keyBufferSize, ENCRYPT_NONE, kencParams.m_algorithm));
         
-        EncryptedKey* xmlEncKey=NULL;
+        EncryptedKey* xmlEncKey=nullptr;
         auto_ptr<XMLObject> xmlObjectKey(XMLObjectBuilder::buildOneFromElement(encKey->getElement()));
         if (!(xmlObjectKey.get()) || !(xmlEncKey=dynamic_cast<EncryptedKey*>(xmlObjectKey.get())))
             throw EncryptionException("Unable to unmarshall into EncryptedKey object.");
@@ -347,5 +347,5 @@ const XMLCh* Encrypter::getKeyTransportAlgorithm(const Credential& credential, c
         return DSIGConstants::s_unicodeStrURIKW_3DES;
     }
 
-    return NULL;
+    return nullptr;
 }

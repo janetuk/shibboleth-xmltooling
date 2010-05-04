@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,9 +43,9 @@ namespace xmltooling {
         /**
          * Sets or clears the MIME type of the response.
          * 
-         * @param type the MIME type, or NULL to clear
+         * @param type the MIME type, or nullptr to clear
          */
-        virtual void setContentType(const char* type=NULL)=0;
+        virtual void setContentType(const char* type=nullptr)=0;
 
         /**
          * Sends a completed response to the client along with a

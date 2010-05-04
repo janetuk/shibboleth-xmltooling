@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ namespace xmltooling {
          * 
          * @param e DOM to supply configuration for provider
          */
-        OpenSSLTrustEngine(const xercesc::DOMElement* e=NULL);
+        OpenSSLTrustEngine(const xercesc::DOMElement* e=nullptr);
         
     public:
         virtual ~OpenSSLTrustEngine();
@@ -77,7 +77,7 @@ namespace xmltooling {
         virtual bool validate(
             X509* certEE, STACK_OF(X509)* certChain,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const=0;
     };
     

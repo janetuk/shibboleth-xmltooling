@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,9 +82,9 @@ namespace xmlencryption {
              */
             EncryptionParams(
                 const XMLCh* algorithm=DSIGConstants::s_unicodeStrURIAES128_CBC,
-                const unsigned char* keyBuffer=NULL,
+                const unsigned char* keyBuffer=nullptr,
                 unsigned int keyBufferSize=0,
-                const xmltooling::Credential* credential=NULL,
+                const xmltooling::Credential* credential=nullptr,
                 bool compact=false
                 );
 
@@ -118,7 +118,7 @@ namespace xmlencryption {
              * @param recipient     optional name of recipient of encrypted key
              */
             KeyEncryptionParams(
-                const xmltooling::Credential& credential, const XMLCh* algorithm=NULL, const XMLCh* recipient=NULL
+                const xmltooling::Credential& credential, const XMLCh* algorithm=nullptr, const XMLCh* recipient=nullptr
                 );
         
             ~KeyEncryptionParams();
@@ -149,11 +149,11 @@ namespace xmlencryption {
          * 
          * @param element       the DOM element to encrypt
          * @param encParams     primary encryption settings
-         * @param kencParams    key encryption settings, or NULL
+         * @param kencParams    key encryption settings, or nullptr
          * @return a stand-alone EncryptedData object, unconnected to the source DOM 
          */
         EncryptedData* encryptElement(
-            xercesc::DOMElement* element, EncryptionParams& encParams, KeyEncryptionParams* kencParams=NULL
+            xercesc::DOMElement* element, EncryptionParams& encParams, KeyEncryptionParams* kencParams=nullptr
             );
 
         /**
@@ -168,11 +168,11 @@ namespace xmlencryption {
          * 
          * @param element       parent element of children to encrypt
          * @param encParams     primary encryption settings
-         * @param kencParams    key encryption settings, or NULL
+         * @param kencParams    key encryption settings, or nullptr
          * @return a stand-alone EncryptedData object, unconnected to the source DOM 
          */
         EncryptedData* encryptElementContent(
-            xercesc::DOMElement* element, EncryptionParams& encParams, KeyEncryptionParams* kencParams=NULL
+            xercesc::DOMElement* element, EncryptionParams& encParams, KeyEncryptionParams* kencParams=nullptr
             );
 
         /**
@@ -187,10 +187,10 @@ namespace xmlencryption {
          * 
          * @param input         the stream to encrypt
          * @param encParams     primary encryption settings
-         * @param kencParams    key encryption settings, or NULL
+         * @param kencParams    key encryption settings, or nullptr
          * @return a stand-alone EncryptedData object, unconnected to any DOM 
          */
-        EncryptedData* encryptStream(std::istream& input, EncryptionParams& encParams, KeyEncryptionParams* kencParams=NULL);
+        EncryptedData* encryptStream(std::istream& input, EncryptionParams& encParams, KeyEncryptionParams* kencParams=nullptr);
         
         /**
          * Encrypts the supplied key and returns the resulting object.

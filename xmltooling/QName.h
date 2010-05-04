@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ namespace xmltooling {
          * @param localPart local name
          * @param prefix    namespace prefix (without the colon)
          */
-        QName(const XMLCh* uri=NULL, const XMLCh* localPart=NULL, const XMLCh* prefix=NULL);
+        QName(const XMLCh* uri=nullptr, const XMLCh* localPart=nullptr, const XMLCh* prefix=nullptr);
 
         /**
          * Constructor
@@ -56,7 +56,7 @@ namespace xmltooling {
          * @param localPart local name
          * @param prefix    namespace prefix (without the colon)
          */
-        QName(const char* uri, const char* localPart, const char* prefix=NULL);
+        QName(const char* uri, const char* localPart, const char* prefix=nullptr);
         
         ~QName();
         

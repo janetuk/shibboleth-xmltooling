@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ static int passwd_callback(char* buf, int len, int verify, void* passwd)
 
 const char* SecurityHelper::guessEncodingFormat(const char* pathname)
 {
-    const char* format=NULL;
+    const char* format=nullptr;
     BIO* in=BIO_new(BIO_s_file_internal());
     if (in && BIO_read_filename(in, pathname)>0) {
         const int READSIZE = 1;
@@ -87,7 +87,7 @@ const char* SecurityHelper::guessEncodingFormat(const char* pathname)
             // Here we know it's DER-encoded, now try to parse it as a PKCS12 ASN.1 structure.
             // If it fails, must be another kind of DER-encoded structure.
             PKCS12* p12;
-            if ((p12=d2i_PKCS12_bio(in, NULL)) == NULL) {
+            if ((p12=d2i_PKCS12_bio(in, nullptr)) == nullptr) {
                 format = "DER";
             }
             else {
@@ -112,8 +112,8 @@ XSECCryptoKey* SecurityHelper::loadKeyFromFile(const char* pathname, const char*
     log.info("loading private key from file (%s)", pathname);
 
     // Native objects.
-    PKCS12* p12=NULL;
-    EVP_PKEY* pkey=NULL;
+    PKCS12* p12=nullptr;
+    EVP_PKEY* pkey=nullptr;
 
     BIO* in=BIO_new(BIO_s_file_internal());
     if (in && BIO_read_filename(in, pathname)>0) {
@@ -146,7 +146,7 @@ XSECCryptoKey* SecurityHelper::loadKeyFromFile(const char* pathname, const char*
             else {
                 // Here we know it's DER-encoded, now try to parse it as a PKCS12 ASN.1 structure.
                 // If it fails, must be another kind of DER-encoded structure.
-                if ((p12=d2i_PKCS12_bio(in, NULL)) == NULL) {
+                if ((p12=d2i_PKCS12_bio(in, nullptr)) == nullptr) {
                     format = "DER";
                     if (BIO_seek(in, mark) < 0) {
                         log_openssl();
@@ -163,17 +163,17 @@ XSECCryptoKey* SecurityHelper::loadKeyFromFile(const char* pathname, const char*
 
         // The format should be known, so parse accordingly.
         if (!strcmp(format, "PEM")) {
-            pkey = PEM_read_bio_PrivateKey(in, NULL, passwd_callback, const_cast<char*>(password));
+            pkey = PEM_read_bio_PrivateKey(in, nullptr, passwd_callback, const_cast<char*>(password));
         }
         else if (!strcmp(format, "DER")) {
-            pkey=d2i_PrivateKey_bio(in, NULL);
+            pkey=d2i_PrivateKey_bio(in, nullptr);
         }
         else if (!strcmp(format, "PKCS12")) {
             if (!p12)
-                p12 = d2i_PKCS12_bio(in, NULL);
+                p12 = d2i_PKCS12_bio(in, nullptr);
             if (p12) {
-                X509* x=NULL;
-                PKCS12_parse(p12, const_cast<char*>(password), &pkey, &x, NULL);
+                X509* x=nullptr;
+                PKCS12_parse(p12, const_cast<char*>(password), &pkey, &x, nullptr);
                 PKCS12_free(p12);
                 X509_free(x);
             }
@@ -187,7 +187,7 @@ XSECCryptoKey* SecurityHelper::loadKeyFromFile(const char* pathname, const char*
 
     // Now map it to an XSEC wrapper.
     if (pkey) {
-        XSECCryptoKey* ret=NULL;
+        XSECCryptoKey* ret=nullptr;
         switch (pkey->type) {
             case EVP_PKEY_RSA:
                 ret=new OpenSSLCryptoKeyRSA(pkey);
@@ -222,8 +222,8 @@ vector<XSECCryptoX509*>::size_type SecurityHelper::loadCertificatesFromFile(
     vector<XSECCryptoX509*>::size_type count = certs.size();
 
     // Native objects.
-    X509* x=NULL;
-    PKCS12* p12=NULL;
+    X509* x=nullptr;
+    PKCS12* p12=nullptr;
 
     BIO* in=BIO_new(BIO_s_file_internal());
     if (in && BIO_read_filename(in, pathname)>0) {
@@ -256,7 +256,7 @@ vector<XSECCryptoX509*>::size_type SecurityHelper::loadCertificatesFromFile(
             else {
                 // Here we know it's DER-encoded, now try to parse it as a PKCS12 ASN.1 structure.
                 // If it fails, must be another kind of DER-encoded structure.
-                if ((p12=d2i_PKCS12_bio(in, NULL)) == NULL) {
+                if ((p12=d2i_PKCS12_bio(in, nullptr)) == nullptr) {
                     format = "DER";
                     if (BIO_seek(in, mark) < 0) {
                         log_openssl();
@@ -272,13 +272,13 @@ vector<XSECCryptoX509*>::size_type SecurityHelper::loadCertificatesFromFile(
 
         // The format should be known, so parse accordingly.
         if (!strcmp(format, "PEM")) {
-            while (x=PEM_read_bio_X509(in, NULL, NULL, NULL)) {
+            while (x=PEM_read_bio_X509(in, nullptr, nullptr, nullptr)) {
                 certs.push_back(new OpenSSLCryptoX509(x));
                 X509_free(x);
             }
         }
         else if (!strcmp(format, "DER")) {
-            x=d2i_X509_bio(in, NULL);
+            x=d2i_X509_bio(in, nullptr);
             if (x) {
                 certs.push_back(new OpenSSLCryptoX509(x));
                 X509_free(x);
@@ -286,9 +286,9 @@ vector<XSECCryptoX509*>::size_type SecurityHelper::loadCertificatesFromFile(
         }
         else if (!strcmp(format, "PKCS12")) {
             if (!p12)
-                p12 = d2i_PKCS12_bio(in, NULL);
+                p12 = d2i_PKCS12_bio(in, nullptr);
             if (p12) {
-                EVP_PKEY* pkey=NULL;
+                EVP_PKEY* pkey=nullptr;
                 STACK_OF(X509)* CAstack = sk_X509_new_null();
                 PKCS12_parse(p12, const_cast<char*>(password), &pkey, &x, &CAstack);
                 PKCS12_free(p12);
@@ -364,15 +364,15 @@ vector<XSECCryptoX509CRL*>::size_type SecurityHelper::loadCRLsFromFile(
             log.debug("CRL encoding format for (%s) dynamically resolved as (%s)", pathname, format);
         }
 
-        X509_CRL* crl=NULL;
+        X509_CRL* crl=nullptr;
         if (!strcmp(format, "PEM")) {
-            while (crl=PEM_read_bio_X509_CRL(in, NULL, NULL, NULL)) {
+            while (crl=PEM_read_bio_X509_CRL(in, nullptr, nullptr, nullptr)) {
                 crls.push_back(new OpenSSLCryptoX509CRL(crl));
                 X509_CRL_free(crl);
             }
         }
         else if (!strcmp(format, "DER")) {
-            crl=d2i_X509_CRL_bio(in, NULL);
+            crl=d2i_X509_CRL_bio(in, nullptr);
             if (crl) {
                 crls.push_back(new OpenSSLCryptoX509CRL(crl));
                 X509_CRL_free(crl);
@@ -554,7 +554,7 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, const char* hash
             Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("key was not populated");
             return ret;
         }
-        const EVP_MD* md=NULL;
+        const EVP_MD* md=nullptr;
         if (hash) {
             md = EVP_get_digestbyname(hash);
             if (!md) {
@@ -588,7 +588,7 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, const char* hash
             BIO_write(chain, digest, len);
             BIO_flush(chain);
         }
-        BUF_MEM* bptr=NULL;
+        BUF_MEM* bptr=nullptr;
         BIO_get_mem_ptr(chain, &bptr);
         if (bptr && bptr->length > 0)
             ret.append(bptr->data, bptr->length);
@@ -600,7 +600,7 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, const char* hash
             Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("key was not populated");
             return ret;
         }
-        const EVP_MD* md=NULL;
+        const EVP_MD* md=nullptr;
         if (hash) {
             md = EVP_get_digestbyname(hash);
             if (!md) {
@@ -634,7 +634,7 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, const char* hash
             BIO_write(chain, digest, len);
             BIO_flush(chain);
         }
-        BUF_MEM* bptr=NULL;
+        BUF_MEM* bptr=nullptr;
         BIO_get_mem_ptr(chain, &bptr);
         if (bptr && bptr->length > 0)
             ret.append(bptr->data, bptr->length);
@@ -655,7 +655,7 @@ string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, const char* ha
         return ret;
     }
 
-    const EVP_MD* md=NULL;
+    const EVP_MD* md=nullptr;
     if (hash) {
         md = EVP_get_digestbyname(hash);
         if (!md) {
@@ -694,7 +694,7 @@ string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, const char* ha
         BIO_write(chain, digest, len);
         BIO_flush(chain);
     }
-    BUF_MEM* bptr=NULL;
+    BUF_MEM* bptr=nullptr;
     BIO_get_mem_ptr(chain, &bptr);
     if (bptr && bptr->length > 0)
         ret.append(bptr->data, bptr->length);
@@ -714,15 +714,15 @@ string SecurityHelper::getDEREncoding(const Credential& cred, const char* hash, 
 
 string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, bool hash, bool nowrap)
 {
-    return getDEREncoding(key, hash ? "SHA1" : NULL, nowrap);
+    return getDEREncoding(key, hash ? "SHA1" : nullptr, nowrap);
 }
 
 string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, bool hash, bool nowrap)
 {
-    return getDEREncoding(cert, hash ? "SHA1" : NULL, nowrap);
+    return getDEREncoding(cert, hash ? "SHA1" : nullptr, nowrap);
 }
 
 string SecurityHelper::getDEREncoding(const Credential& cred, bool hash, bool nowrap)
 {
-    return getDEREncoding(cred, hash ? "SHA1" : NULL, nowrap);
+    return getDEREncoding(cred, hash ? "SHA1" : nullptr, nowrap);
 }

@@ -61,7 +61,7 @@ namespace xmlsignature {
         /**
          * Gets the signing algorithm for the signature.
          * 
-         * @return    the signature algorithm, or NULL if indeterminate
+         * @return    the signature algorithm, or nullptr if indeterminate
          */
         virtual const XMLCh* getSignatureAlgorithm() const=0;
 
@@ -89,7 +89,7 @@ namespace xmlsignature {
         /**
          * Sets a KeyInfo object to embed in the Signature.
          * 
-         * @param keyInfo   pointer to a KeyInfo object, or NULL
+         * @param keyInfo   pointer to a KeyInfo object, or nullptr
          */
         virtual void setKeyInfo(KeyInfo* keyInfo)=0;
 
@@ -101,7 +101,7 @@ namespace xmlsignature {
          * for validation purposes is provided through the native
          * DSIGSignature object.
          * 
-         * @return  pointer to a KeyInfo object, or NULL
+         * @return  pointer to a KeyInfo object, or nullptr
          */
         virtual KeyInfo* getKeyInfo() const=0;
 
@@ -109,7 +109,7 @@ namespace xmlsignature {
          * Sets the ContentReference object to the Signature to be applied
          * when the signature is created.
          * 
-         * @param reference the reference to attach, or NULL 
+         * @param reference the reference to attach, or nullptr 
          */
         virtual void setContentReference(ContentReference* reference)=0;
 
@@ -121,7 +121,7 @@ namespace xmlsignature {
          * for validation purposes is provided through the native
          * DSIGSignature object.
          * 
-         * @return  pointer to a ContentReference object, or NULL
+         * @return  pointer to a ContentReference object, or nullptr
          */
         virtual ContentReference* getContentReference() const=0;
 
@@ -139,7 +139,7 @@ namespace xmlsignature {
          *
          * @param credential    optional source of signing key and KeyInfo
          */
-        virtual void sign(const xmltooling::Credential* credential=NULL)=0;
+        virtual void sign(const xmltooling::Credential* credential=nullptr)=0;
 
         /**
          * Type-safe clone operation.
@@ -209,7 +209,7 @@ namespace xmlsignature {
 #else
         virtual xmltooling::XMLObject* buildObject(
 #endif
-            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const xmltooling::QName* schemaType=NULL
+            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=nullptr, const xmltooling::QName* schemaType=nullptr
             ) const;
             
         /**

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,9 +78,9 @@ namespace xmltooling {
     class XMLToolingInternalConfig : public XMLToolingConfig
     {
     public:
-        XMLToolingInternalConfig() : m_lock(NULL), m_parserPool(NULL), m_validatingPool(NULL) {
+        XMLToolingInternalConfig() : m_lock(nullptr), m_parserPool(nullptr), m_validatingPool(nullptr) {
 #ifndef XMLTOOLING_NO_XMLSEC
-            m_xsecProvider=NULL;
+            m_xsecProvider=nullptr;
 #endif
         }
 
@@ -95,8 +95,8 @@ namespace xmltooling {
         void unlock();
 
         // configuration
-        bool load_library(const char* path, void* context=NULL);
-        bool log_config(const char* config=NULL);
+        bool load_library(const char* path, void* context=nullptr);
+        bool log_config(const char* config=nullptr);
 
         // parser access
         ParserPool& getParser() const {
@@ -118,7 +118,7 @@ namespace xmltooling {
             algmap_t::const_iterator i = m_algorithmMap.find(alg.get());
 # endif
             if (i==m_algorithmMap.end())
-                return std::pair<const char*,unsigned int>(NULL,0);
+                return std::pair<const char*,unsigned int>(nullptr,0);
             return std::make_pair(i->second.first.c_str(), i->second.second);
         }
 

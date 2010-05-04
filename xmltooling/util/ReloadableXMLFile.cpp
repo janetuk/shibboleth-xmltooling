@@ -63,25 +63,25 @@ static const XMLCh backingFilePath[] =  UNICODE_LITERAL_15(b,a,c,k,i,n,g,F,i,l,e
 
 
 ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
-    : m_root(e), m_local(true), m_validate(false), m_backupIndicator(true), m_filestamp(0), m_reloadInterval(0), m_lock(NULL), m_log(log),
-        m_shutdown(false), m_reload_wait(NULL), m_reload_thread(NULL)
+    : m_root(e), m_local(true), m_validate(false), m_backupIndicator(true), m_filestamp(0), m_reloadInterval(0), m_lock(nullptr), m_log(log),
+        m_shutdown(false), m_reload_wait(nullptr), m_reload_thread(nullptr)
 {
 #ifdef _DEBUG
     NDC ndc("ReloadableXMLFile");
 #endif
 
     // Establish source of data...
-    const XMLCh* source=e->getAttributeNS(NULL,uri);
+    const XMLCh* source=e->getAttributeNS(nullptr,uri);
     if (!source || !*source) {
-        source=e->getAttributeNS(NULL,url);
+        source=e->getAttributeNS(nullptr,url);
         if (!source || !*source) {
-            source=e->getAttributeNS(NULL,path);
+            source=e->getAttributeNS(nullptr,path);
             if (!source || !*source) {
-                source=e->getAttributeNS(NULL,pathname);
+                source=e->getAttributeNS(nullptr,pathname);
                 if (!source || !*source) {
-                    source=e->getAttributeNS(NULL,file);
+                    source=e->getAttributeNS(nullptr,file);
                     if (!source || !*source) {
-                        source=e->getAttributeNS(NULL,filename);
+                        source=e->getAttributeNS(nullptr,filename);
                     }
                 }
             }
@@ -93,7 +93,7 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
         m_local=false;
 
     if (source && *source) {
-        const XMLCh* flag=e->getAttributeNS(NULL,validate);
+        const XMLCh* flag=e->getAttributeNS(nullptr,validate);
         m_validate=(XMLString::equals(flag,xmlconstants::XML_TRUE) || XMLString::equals(flag,xmlconstants::XML_ONE));
 
         auto_ptr_char temp(source);
@@ -107,7 +107,7 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
         if (m_local) {
             XMLToolingConfig::getConfig().getPathResolver()->resolve(m_source, PathResolver::XMLTOOLING_CFG_FILE);
 
-            flag=e->getAttributeNS(NULL,reloadChanges);
+            flag=e->getAttributeNS(nullptr,reloadChanges);
             if (!XMLString::equals(flag,xmlconstants::XML_FALSE) && !XMLString::equals(flag,xmlconstants::XML_ZERO)) {
 #ifdef WIN32
                 struct _stat stat_buf;
@@ -125,14 +125,14 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
         }
         else {
             log.debug("using remote resource (%s)", m_source.c_str());
-            source = e->getAttributeNS(NULL,backingFilePath);
+            source = e->getAttributeNS(nullptr,backingFilePath);
             if (source && *source) {
                 auto_ptr_char temp2(source);
                 m_backing=temp2.get();
                 XMLToolingConfig::getConfig().getPathResolver()->resolve(m_backing, PathResolver::XMLTOOLING_RUN_FILE);
                 log.debug("backup remote resource to (%s)", m_backing.c_str());
             }
-            source = e->getAttributeNS(NULL,reloadInterval);
+            source = e->getAttributeNS(nullptr,reloadInterval);
             if (source && *source) {
                 m_reloadInterval = XMLString::parseInt(source);
                 if (m_reloadInterval > 0) {
@@ -140,7 +140,7 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
                     m_lock=RWLock::create();
                 }
             }
-            m_filestamp = time(NULL);   // assume it gets loaded initially
+            m_filestamp = time(nullptr);   // assume it gets loaded initially
         }
 
         if (m_lock) {
@@ -152,7 +152,7 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
         log.debug("no resource uri/path/name supplied, will load inline configuration");
     }
 
-    source = e->getAttributeNS(NULL, id);
+    source = e->getAttributeNS(nullptr, id);
     if (source && *source) {
         auto_ptr_char tempid(source);
         m_id = tempid.get();
@@ -171,11 +171,11 @@ void ReloadableXMLFile::shutdown()
         // Shut down the reload thread and let it know.
         m_shutdown = true;
         m_reload_wait->signal();
-        m_reload_thread->join(NULL);
+        m_reload_thread->join(nullptr);
         delete m_reload_thread;
         delete m_reload_wait;
-        m_reload_thread = NULL;
-        m_reload_wait = NULL;
+        m_reload_thread = nullptr;
+        m_reload_wait = nullptr;
     }
 }
 
@@ -242,7 +242,7 @@ void* ReloadableXMLFile::reload_fn(void* pv)
         logging::NDC::pop();
     }
 
-    return NULL;
+    return nullptr;
 }
 
 Lockable* ReloadableXMLFile::lock()
@@ -312,11 +312,11 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
             else
                 m_log.debug("loading configuration from external resource...");
 
-            DOMDocument* doc=NULL;
+            DOMDocument* doc=nullptr;
             if (m_local || backup) {
                 auto_ptr_XMLCh widenit(backup ? m_backing.c_str() : m_source.c_str());
                 // Use library-wide lock for now, nothing else is using it anyway.
-                Locker locker(backup ? getBackupLock() : NULL);
+                Locker locker(backup ? getBackupLock() : nullptr);
                 LocalFileInputSource src(widenit.get());
                 Wrapper4InputSource dsrc(&src, false);
                 if (m_validate)
@@ -325,7 +325,7 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
                     doc=XMLToolingConfig::getConfig().getParser().parse(dsrc);
             }
             else {
-                URLInputSource src(m_root, NULL, &m_cacheTag);
+                URLInputSource src(m_root, nullptr, &m_cacheTag);
                 Wrapper4InputSource dsrc(&src, false);
                 if (m_validate)
                     doc=XMLToolingConfig::getConfig().getValidatingParser().parse(dsrc);

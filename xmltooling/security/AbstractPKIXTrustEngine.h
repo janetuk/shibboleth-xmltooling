@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ namespace xmltooling {
          * 
          * @param e DOM to supply configuration for provider
          */
-        AbstractPKIXTrustEngine(const xercesc::DOMElement* e=NULL);
+        AbstractPKIXTrustEngine(const xercesc::DOMElement* e=nullptr);
 
         /** Flag controls whether every issuer in the trust path must have a CRL loaded. */
         bool m_fullCRLChain;
@@ -75,7 +75,7 @@ namespace xmltooling {
         bool validate(
             xmlsignature::Signature& sig,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const;
 
         bool validate(
@@ -85,21 +85,21 @@ namespace xmltooling {
             const char* in,
             unsigned int in_len,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const;
 
         bool validate(
             XSECCryptoX509* certEE,
             const std::vector<XSECCryptoX509*>& certChain,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const;
 
         bool validate(
             X509* certEE,
             STACK_OF(X509)* certChain,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const;
 
         /**
@@ -163,7 +163,7 @@ namespace xmltooling {
          * @return interface for obtaining validation data
          */
         virtual PKIXValidationInfoIterator* getPKIXValidationInfoIterator(
-            const CredentialResolver& pkixSource, CredentialCriteria* criteria=NULL
+            const CredentialResolver& pkixSource, CredentialCriteria* criteria=nullptr
             ) const=0;
 
     private:
@@ -171,8 +171,8 @@ namespace xmltooling {
             X509* certEE,
             STACK_OF(X509)* certChain,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL,
-            const std::vector<XSECCryptoX509CRL*>* inlineCRLs=NULL
+            CredentialCriteria* criteria=nullptr,
+            const std::vector<XSECCryptoX509CRL*>* inlineCRLs=nullptr
             ) const;
     };
 };

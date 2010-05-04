@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ namespace xmltooling {
          * 
          * @param keyInfo   the key information
          * @param types     types of credentials to resolve, or 0 for any/all
-         * @return  the resolved credential, or NULL
+         * @return  the resolved credential, or nullptr
          */
         virtual Credential* resolve(const xmlsignature::KeyInfo* keyInfo, int types=0) const=0;
 
@@ -70,7 +70,7 @@ namespace xmltooling {
          * 
          * @param keyInfo   the key information
          * @param types     types of credentials to resolve, or 0 for any/all
-         * @return  the resolved credential, or NULL
+         * @return  the resolved credential, or nullptr
          */
         virtual Credential* resolve(DSIGKeyInfoList* keyInfo, int types=0) const=0;
 
@@ -82,7 +82,7 @@ namespace xmltooling {
          * 
          * @param context   context containing the key information
          * @param types types of credentials to resolve, or 0 for any/all
-         * @return  the resolved credential, or NULL
+         * @return  the resolved credential, or nullptr
          */
         virtual Credential* resolve(KeyInfoCredentialContext* context, int types=0) const=0;
 
@@ -92,7 +92,7 @@ namespace xmltooling {
          * 
          * @param sig   signature containing the key information
          * @param types types of credentials to resolve, or 0 for any/all
-         * @return  the resolved credential, or NULL
+         * @return  the resolved credential, or nullptr
          */
         Credential* resolve(const xmlsignature::Signature* sig, int types=0) const;
 
@@ -102,7 +102,7 @@ namespace xmltooling {
          * 
          * @param criteria   criteria containing the key information
          * @param types types of credentials to resolve, or 0 for any/all
-         * @return  the resolved credential, or NULL
+         * @return  the resolved credential, or nullptr
          */
         Credential* resolve(const CredentialCriteria& criteria, int types=0) const;
     };

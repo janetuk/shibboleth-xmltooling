@@ -47,7 +47,7 @@ namespace xmltooling {
          * Gets the value of an XML attribute of the object.
          * 
          * @param   qualifiedName   qualified name of the attribute   
-         * @return the attribute value, or NULL
+         * @return the attribute value, or nullptr
          */
         virtual const XMLCh* getAttribute(const QName& qualifiedName) const=0;
         
@@ -55,7 +55,7 @@ namespace xmltooling {
          * Sets (or clears) an XML attribute of the object.
          * 
          * @param qualifiedName qualified name of the attribute   
-         * @param value         value to set, or NULL to clear
+         * @param value         value to set, or nullptr to clear
          * @param ID            true iff the attribute is an XML ID
          */
         virtual void setAttribute(const QName& qualifiedName, const XMLCh* value, bool ID=false)=0;

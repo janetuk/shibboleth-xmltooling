@@ -54,7 +54,7 @@ namespace xmltooling {
          * @param alwaysDeclare     true iff the namespace should always be declared regardless of in-scope declarations
          * @param usage             indicates usage of namespace in the context of an XMLObject
          */
-        Namespace(const XMLCh* uri=NULL, const XMLCh* prefix=NULL, bool alwaysDeclare=false, namespace_usage_t usage=Indeterminate);
+        Namespace(const XMLCh* uri=nullptr, const XMLCh* prefix=nullptr, bool alwaysDeclare=false, namespace_usage_t usage=Indeterminate);
         
         ~Namespace();
         

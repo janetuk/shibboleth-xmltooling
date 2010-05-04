@@ -54,8 +54,8 @@ void XMLObject::releaseThisAndChildrenDOM() const
 
 AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
     : m_log(logging::Category::getInstance(XMLTOOLING_LOGCAT".XMLObject")),
-    	m_schemaLocation(NULL), m_noNamespaceSchemaLocation(NULL), m_nil(xmlconstants::XML_BOOL_NULL),
-        m_parent(NULL), m_elementQname(nsURI, localName, prefix), m_typeQname(NULL)
+    	m_schemaLocation(nullptr), m_noNamespaceSchemaLocation(nullptr), m_nil(xmlconstants::XML_BOOL_NULL),
+        m_parent(nullptr), m_elementQname(nsURI, localName, prefix), m_typeQname(nullptr)
 {
     addNamespace(Namespace(nsURI, prefix, false, Namespace::VisiblyUsed));
     if (schemaType) {
@@ -67,7 +67,7 @@ AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName,
 AbstractXMLObject::AbstractXMLObject(const AbstractXMLObject& src)
     : m_namespaces(src.m_namespaces), m_log(src.m_log), m_schemaLocation(XMLString::replicate(src.m_schemaLocation)),
         m_noNamespaceSchemaLocation(XMLString::replicate(src.m_noNamespaceSchemaLocation)), m_nil(src.m_nil),
-        m_parent(NULL), m_elementQname(src.m_elementQname), m_typeQname(NULL)
+        m_parent(nullptr), m_elementQname(src.m_elementQname), m_typeQname(nullptr)
 {
     if (src.m_typeQname)
         m_typeQname=new QName(*src.m_typeQname);
@@ -90,7 +90,7 @@ void AbstractXMLObject::detach()
     // Pull ourselves out of the parent and then blast him.
     getParent()->removeChild(this);
     delete m_parent;
-    m_parent = NULL;
+    m_parent = nullptr;
 }
 
 const QName& AbstractXMLObject::getElementQName() const
@@ -162,7 +162,7 @@ const QName* AbstractXMLObject::getSchemaType() const
 
 const XMLCh* AbstractXMLObject::getXMLID() const
 {
-    return NULL;
+    return nullptr;
 }
 
 xmlconstants::xmltooling_bool_t AbstractXMLObject::getNil() const
@@ -180,7 +180,7 @@ void AbstractXMLObject::nil(xmlconstants::xmltooling_bool_t value)
 
 bool AbstractXMLObject::hasParent() const
 {
-    return m_parent != NULL;
+    return m_parent != nullptr;
 }
 
 XMLObject* AbstractXMLObject::getParent() const
@@ -212,7 +212,7 @@ QName* AbstractXMLObject::prepareForAssignment(QName* oldValue, const QName* new
             addNamespace(Namespace(newValue->getNamespaceURI(), newValue->getPrefix(), false, Namespace::NonVisiblyUsed));
             return new QName(*newValue);
         }
-        return NULL;
+        return nullptr;
     }
 
     delete oldValue;
@@ -222,7 +222,7 @@ QName* AbstractXMLObject::prepareForAssignment(QName* oldValue, const QName* new
         addNamespace(Namespace(newValue->getNamespaceURI(), newValue->getPrefix(), false, Namespace::NonVisiblyUsed));
         return new QName(*newValue);
     }
-    return NULL;
+    return nullptr;
 }
 
 DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, const DateTime* newValue)
@@ -232,12 +232,12 @@ DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, const Date
             releaseThisandParentDOM();
             return new DateTime(*newValue);
         }
-        return NULL;
+        return nullptr;
     }
 
     delete oldValue;
     releaseThisandParentDOM();
-    return newValue ? new DateTime(*newValue) : NULL;
+    return newValue ? new DateTime(*newValue) : nullptr;
 }
 
 DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, time_t newValue, bool duration)
@@ -257,7 +257,7 @@ DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, const XMLC
     delete oldValue;
     releaseThisandParentDOM();
     if (!newValue || !*newValue)
-        return NULL;
+        return nullptr;
     DateTime* ret = new DateTime(newValue);
     if (duration)
         ret->parseDuration();

@@ -53,24 +53,24 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL InlineCredential : public BasicX509Credential
     {
     public:
-        InlineCredential(const KeyInfo* keyInfo=NULL) : BasicX509Credential(keyInfo!=NULL), m_credctx(new KeyInfoCredentialContext(keyInfo)) {
+        InlineCredential(const KeyInfo* keyInfo=nullptr) : BasicX509Credential(keyInfo!=nullptr), m_credctx(new KeyInfoCredentialContext(keyInfo)) {
         }
         InlineCredential(DSIGKeyInfoList* keyInfo) : BasicX509Credential(false), m_credctx(new KeyInfoCredentialContext(keyInfo)) {
         }
-        InlineCredential(KeyInfoCredentialContext* context) : BasicX509Credential(context->getKeyInfo()!=NULL), m_credctx(NULL) {
+        InlineCredential(KeyInfoCredentialContext* context) : BasicX509Credential(context->getKeyInfo()!=nullptr), m_credctx(nullptr) {
         }
         virtual ~InlineCredential() {
             delete m_credctx;
         }
 
         XSECCryptoKey* getPrivateKey() const {
-            return NULL;
+            return nullptr;
         }
 
         KeyInfo* getKeyInfo(bool compact=false) const {
-            KeyInfo* ret = m_credctx->getKeyInfo() ? m_credctx->getKeyInfo()->cloneKeyInfo() : NULL;
+            KeyInfo* ret = m_credctx->getKeyInfo() ? m_credctx->getKeyInfo()->cloneKeyInfo() : nullptr;
             if (ret) {
-                ret->setId(NULL);
+                ret->setId(nullptr);
                 ret->getRetrievalMethods().clear();
                 if (compact) {
                     ret->getKeyValues().clear();
@@ -91,7 +91,7 @@ namespace xmltooling {
             }
             if (!ret->hasChildren()) {
                 delete ret;
-                ret = NULL;
+                ret = nullptr;
             }
             return ret;
         }
@@ -123,7 +123,7 @@ namespace xmltooling {
 
         Credential* resolve(const KeyInfo* keyInfo, int types=0) const {
             if (!keyInfo)
-                return NULL;
+                return nullptr;
             if (types == 0)
                 types = Credential::RESOLVE_KEYS|X509Credential::RESOLVE_CERTS|X509Credential::RESOLVE_CRLS;
             auto_ptr<InlineCredential> credential(new InlineCredential(keyInfo));
@@ -132,7 +132,7 @@ namespace xmltooling {
         }
         Credential* resolve(DSIGKeyInfoList* keyInfo, int types=0) const {
             if (!keyInfo)
-                return NULL;
+                return nullptr;
             if (types == 0)
                 types = Credential::RESOLVE_KEYS|X509Credential::RESOLVE_CERTS|X509Credential::RESOLVE_CRLS;
             auto_ptr<InlineCredential> credential(new InlineCredential(keyInfo));
@@ -141,7 +141,7 @@ namespace xmltooling {
         }
         Credential* resolve(KeyInfoCredentialContext* context, int types=0) const {
             if (!context)
-                return NULL;
+                return nullptr;
             if (types == 0)
                 types = Credential::RESOLVE_KEYS|X509Credential::RESOLVE_CERTS|X509Credential::RESOLVE_CRLS;
             auto_ptr<InlineCredential> credential(new InlineCredential(context));
@@ -420,7 +420,7 @@ void InlineCredential::resolve(DSIGKeyInfoList* keyInfo, int types)
                 // The current xmlsec API is limited to one CRL per KeyInfo.
                 // For now, I'm going to process the DOM directly.
                 DOMNode* x509Node = keyInfo->item(i)->getKeyInfoDOMNode();
-                DOMElement* crlElement = x509Node ? XMLHelper::getFirstChildElement(x509Node, xmlconstants::XMLSIG_NS, X509CRL::LOCAL_NAME) : NULL;
+                DOMElement* crlElement = x509Node ? XMLHelper::getFirstChildElement(x509Node, xmlconstants::XMLSIG_NS, X509CRL::LOCAL_NAME) : nullptr;
                 while (crlElement) {
                     if (crlElement->hasChildNodes()) {
                         auto_ptr_char buf(crlElement->getFirstChild()->getNodeValue());

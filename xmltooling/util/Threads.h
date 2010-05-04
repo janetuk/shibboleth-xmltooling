@@ -17,7 +17,7 @@
 /**
  * @file xmltooling/util/Threads.h
  *
- * Thread and locking wrappers
+ * Thread and locking wrappers.
  */
 
 #ifndef _xmltooling_threads_h
@@ -128,7 +128,7 @@ namespace xmltooling
         /**
          * Returns the value for a TLS key.
          *
-         * @return the value or NULL
+         * @return the value or nullptr
          */
         virtual void* getData() const=0;
 

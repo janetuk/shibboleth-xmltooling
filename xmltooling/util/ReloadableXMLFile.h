@@ -107,7 +107,7 @@ namespace xmltooling {
          *
          * <p>The lock is <strong>NOT</strong> acquired automatically.
          *
-         * @return  pointer to a lock interface, or NULL if unnecessary
+         * @return  pointer to a lock interface, or nullptr if unnecessary
          */
         virtual Lockable* getBackupLock();
 

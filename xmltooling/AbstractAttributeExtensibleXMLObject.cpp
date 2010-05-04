@@ -114,7 +114,7 @@ AbstractAttributeExtensibleXMLObject::~AbstractAttributeExtensibleXMLObject()
 const XMLCh* AbstractAttributeExtensibleXMLObject::getAttribute(const QName& qualifiedName) const
 {
     map<QName,XMLCh*>::const_iterator i=m_attributeMap.find(qualifiedName);
-    return (i==m_attributeMap.end()) ? NULL : i->second;
+    return (i==m_attributeMap.end()) ? nullptr : i->second;
 }
 
 void AbstractAttributeExtensibleXMLObject::setAttribute(const QName& qualifiedName, const XMLCh* value, bool ID)
@@ -168,7 +168,7 @@ const map<QName,XMLCh*>& AbstractAttributeExtensibleXMLObject::getExtensionAttri
 }
 const XMLCh* AbstractAttributeExtensibleXMLObject::getXMLID() const
 {
-    return (m_idAttribute == m_attributeMap.end()) ? NULL : m_idAttribute->second;
+    return (m_idAttribute == m_attributeMap.end()) ? nullptr : m_idAttribute->second;
 }
 
 void AbstractAttributeExtensibleXMLObject::unmarshallExtensionAttribute(const DOMAttr* attribute)

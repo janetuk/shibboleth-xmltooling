@@ -58,7 +58,7 @@ protected:
             : AbstractXMLObject(src), AbstractAttributeExtensibleXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src),
                 m_id(XMLString::replicate(src.m_id)) {
 #ifndef XMLTOOLING_NO_XMLSEC
-        m_children.push_back(NULL);
+        m_children.push_back(nullptr);
         m_signature=m_children.begin();
 #endif
         VectorOf(SimpleXMLObject) mine=getSimpleXMLObjects();
@@ -76,10 +76,10 @@ public:
     static const XMLCh ID_ATTRIB_NAME[];
 
     SimpleXMLObject(
-        const XMLCh* nsURI=NULL, const XMLCh* localName=NULL, const XMLCh* prefix=NULL, const xmltooling::QName* schemaType=NULL
-        ) : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_id(NULL) {
+        const XMLCh* nsURI=nullptr, const XMLCh* localName=nullptr, const XMLCh* prefix=nullptr, const xmltooling::QName* schemaType=nullptr
+        ) : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_id(nullptr) {
 #ifndef XMLTOOLING_NO_XMLSEC
-        m_children.push_back(NULL);
+        m_children.push_back(nullptr);
         m_signature=m_children.begin();
 #endif
     }
@@ -127,11 +127,11 @@ public:
 protected:
     void marshallAttributes(xercesc::DOMElement* domElement) const {
         if(getId()) {
-            domElement->setAttributeNS(NULL, SimpleXMLObject::ID_ATTRIB_NAME, getId());
+            domElement->setAttributeNS(nullptr, SimpleXMLObject::ID_ATTRIB_NAME, getId());
 #ifdef XMLTOOLING_XERCESC_BOOLSETIDATTRIBUTE
-            domElement->setIdAttributeNS(NULL, SimpleXMLObject::ID_ATTRIB_NAME, true);
+            domElement->setIdAttributeNS(nullptr, SimpleXMLObject::ID_ATTRIB_NAME, true);
 #else
-            domElement->setIdAttributeNS(NULL, SimpleXMLObject::ID_ATTRIB_NAME);
+            domElement->setIdAttributeNS(nullptr, SimpleXMLObject::ID_ATTRIB_NAME);
 #endif
         }
         marshallExtensionAttributes(domElement);
@@ -156,7 +156,7 @@ protected:
     }
 
     void processAttribute(const xercesc::DOMAttr* attribute) {
-        if (XMLHelper::isNodeNamed(attribute, NULL, SimpleXMLObject::ID_ATTRIB_NAME)) {
+        if (XMLHelper::isNodeNamed(attribute, nullptr, SimpleXMLObject::ID_ATTRIB_NAME)) {
             setId(attribute->getValue());
             return;
         }
@@ -179,7 +179,7 @@ public:
     }
 
     XMLObject* buildObject(
-        const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const xmltooling::QName* schemaType=NULL
+        const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=nullptr, const xmltooling::QName* schemaType=nullptr
         ) const {
         return new SimpleXMLObject(nsURI, localName, prefix, schemaType);
     }

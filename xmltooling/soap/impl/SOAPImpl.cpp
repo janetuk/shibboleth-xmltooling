@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2008 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * SOAPImpl.cpp
  * 
- * Implementation classes for SOAP 1.1 schema
+ * Implementation classes for SOAP 1.1 schema.
  */
 
 #include "internal.h"
@@ -62,11 +62,11 @@ namespace {
         }
 
         FaultcodeImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
-            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_qname(NULL) {
+            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_qname(nullptr) {
         }
             
         FaultcodeImpl(const FaultcodeImpl& src)
-                : AbstractXMLObject(src), AbstractSimpleElement(src), AbstractDOMCachingXMLObject(src), m_qname(NULL) {
+                : AbstractXMLObject(src), AbstractSimpleElement(src), AbstractDOMCachingXMLObject(src), m_qname(nullptr) {
             setCode(src.getCode());
         }
         
@@ -81,7 +81,7 @@ namespace {
                 setTextContent(temp.get());
             }
             else
-                setTextContent(NULL);
+                setTextContent(nullptr);
         }
         
         IMPL_XMLOBJECT_CLONE(Faultcode);
@@ -135,14 +135,14 @@ namespace {
         public AbstractXMLObjectUnmarshaller
     {
         void init() {
-            m_Faultcode=NULL;
-            m_Faultstring=NULL;
-            m_Faultactor=NULL;
-            m_Detail=NULL;
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
+            m_Faultcode=nullptr;
+            m_Faultstring=nullptr;
+            m_Faultactor=nullptr;
+            m_Detail=nullptr;
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
             m_pos_Faultcode=m_children.begin();
             m_pos_Faultstring=m_pos_Faultcode;
             ++m_pos_Faultstring;
@@ -185,10 +185,10 @@ namespace {
 
     protected:
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILD(Faultcode,NULL,false);
-            PROC_TYPED_CHILD(Faultstring,NULL,false);
-            PROC_TYPED_CHILD(Faultactor,NULL,false);
-            PROC_TYPED_CHILD(Detail,NULL,false);
+            PROC_TYPED_CHILD(Faultcode,nullptr,false);
+            PROC_TYPED_CHILD(Faultstring,nullptr,false);
+            PROC_TYPED_CHILD(Faultactor,nullptr,false);
+            PROC_TYPED_CHILD(Detail,nullptr,false);
             AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
         }
     };
@@ -285,10 +285,10 @@ namespace {
         public AbstractXMLObjectUnmarshaller
     {
         void init() {
-            m_Header=NULL;
-            m_Body=NULL;
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
+            m_Header=nullptr;
+            m_Body=nullptr;
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
             m_pos_Header=m_children.begin();
             m_pos_Body=m_pos_Header;
             ++m_pos_Body;

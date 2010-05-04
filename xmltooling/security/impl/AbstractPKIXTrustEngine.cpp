@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ namespace {
         STACK_OF(X509)* untrusted,
         AbstractPKIXTrustEngine::PKIXValidationInfoIterator* pkixInfo,
         bool fullCRLChain,
-        const vector<XSECCryptoX509CRL*>* inlineCRLs=NULL
+        const vector<XSECCryptoX509CRL*>* inlineCRLs=nullptr
         )
     {
         Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine");
@@ -174,7 +174,7 @@ AbstractPKIXTrustEngine::PKIXValidationInfoIterator::~PKIXValidationInfoIterator
 AbstractPKIXTrustEngine::AbstractPKIXTrustEngine(const xercesc::DOMElement* e) : TrustEngine(e), m_fullCRLChain(false)
 {
     static XMLCh fullCRLChain[] = UNICODE_LITERAL_12(f,u,l,l,C,R,L,C,h,a,i,n);
-    const XMLCh* flag = e ? e->getAttributeNS(NULL, fullCRLChain) : NULL;
+    const XMLCh* flag = e ? e->getAttributeNS(nullptr, fullCRLChain) : nullptr;
     m_fullCRLChain = (flag && (*flag == xercesc::chLatin_t || *flag == xercesc::chDigit_1));
 }
 
@@ -211,8 +211,8 @@ bool AbstractPKIXTrustEngine::checkEntityNames(
         X509_NAME_print_ex(b2,subject,0,XN_FLAG_RFC2253 + XN_FLAG_SEP_CPLUS_SPC - XN_FLAG_SEP_COMMA_PLUS);
         BIO_flush(b2);
 
-        BUF_MEM* bptr=NULL;
-        BUF_MEM* bptr2=NULL;
+        BUF_MEM* bptr=nullptr;
+        BUF_MEM* bptr2=nullptr;
         BIO_get_mem_ptr(b, &bptr);
         BIO_get_mem_ptr(b2, &bptr2);
 
@@ -240,7 +240,7 @@ bool AbstractPKIXTrustEngine::checkEntityNames(
         BIO_free(b2);
 
         log.debug("unable to match DN, trying TLS subjectAltName match");
-        STACK_OF(GENERAL_NAME)* altnames=(STACK_OF(GENERAL_NAME)*)X509_get_ext_d2i(certEE, NID_subject_alt_name, NULL, NULL);
+        STACK_OF(GENERAL_NAME)* altnames=(STACK_OF(GENERAL_NAME)*)X509_get_ext_d2i(certEE, NID_subject_alt_name, nullptr, nullptr);
         if (altnames) {
             int numalts = sk_GENERAL_NAME_num(altnames);
             for (int an=0; an<numalts; an++) {
@@ -268,7 +268,7 @@ bool AbstractPKIXTrustEngine::checkEntityNames(
         log.debug("unable to match subjectAltName, trying TLS CN match");
 
         // Fetch the last CN RDN.
-        char* peer_CN = NULL;
+        char* peer_CN = nullptr;
         int j,i = -1;
         while ((j=X509_NAME_get_index_by_NID(subject, NID_commonName, i)) >= 0)
             i = j;
@@ -431,7 +431,7 @@ bool AbstractPKIXTrustEngine::validate(
 
     // Find and save off a pointer to the certificate that unlocks the object.
     // Most of the time, this will be the first one anyway.
-    XSECCryptoX509* certEE=NULL;
+    XSECCryptoX509* certEE=nullptr;
     SignatureValidator keyValidator;
     for (vector<XSECCryptoX509*>::const_iterator i=certs.begin(); !certEE && i!=certs.end(); ++i) {
         try {
@@ -509,7 +509,7 @@ bool AbstractPKIXTrustEngine::validate(
 
     // Find and save off a pointer to the certificate that unlocks the object.
     // Most of the time, this will be the first one anyway.
-    XSECCryptoX509* certEE=NULL;
+    XSECCryptoX509* certEE=nullptr;
     for (vector<XSECCryptoX509*>::const_iterator i=certs.begin(); !certEE && i!=certs.end(); ++i) {
         try {
             auto_ptr<XSECCryptoKey> key((*i)->clonePublicKey());

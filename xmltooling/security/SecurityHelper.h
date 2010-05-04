@@ -58,7 +58,7 @@ namespace xmltooling {
          * @param password  optional password to decrypt key
          * @return  a populated key object
          */
-        static XSECCryptoKey* loadKeyFromFile(const char* pathname, const char* format=NULL, const char* password=NULL);
+        static XSECCryptoKey* loadKeyFromFile(const char* pathname, const char* format=nullptr, const char* password=nullptr);
 
         /**
          * Loads certificate(s) from a local file.
@@ -70,7 +70,7 @@ namespace xmltooling {
          * @return  size of the resulting array
          */
         static std::vector<XSECCryptoX509*>::size_type loadCertificatesFromFile(
-            std::vector<XSECCryptoX509*>& certs, const char* pathname, const char* format=NULL, const char* password=NULL
+            std::vector<XSECCryptoX509*>& certs, const char* pathname, const char* format=nullptr, const char* password=nullptr
             );
 
         /**
@@ -82,7 +82,7 @@ namespace xmltooling {
          * @return  size of the resulting array
          */
         static std::vector<XSECCryptoX509CRL*>::size_type loadCRLsFromFile(
-            std::vector<XSECCryptoX509CRL*>& crls, const char* pathname, const char* format=NULL
+            std::vector<XSECCryptoX509CRL*>& crls, const char* pathname, const char* format=nullptr
             );
 
         /**
@@ -94,7 +94,7 @@ namespace xmltooling {
          * @param password  optional password to decrypt key
          * @return  a populated key object
          */
-        static XSECCryptoKey* loadKeyFromURL(SOAPTransport& transport, const char* backing, const char* format=NULL, const char* password=NULL);
+        static XSECCryptoKey* loadKeyFromURL(SOAPTransport& transport, const char* backing, const char* format=nullptr, const char* password=nullptr);
 
         /**
          * Loads certificate(s) from a URL.
@@ -107,7 +107,7 @@ namespace xmltooling {
          * @return  size of the resulting array
          */
         static std::vector<XSECCryptoX509*>::size_type loadCertificatesFromURL(
-            std::vector<XSECCryptoX509*>& certs, SOAPTransport& transport, const char* backing, const char* format=NULL, const char* password=NULL
+            std::vector<XSECCryptoX509*>& certs, SOAPTransport& transport, const char* backing, const char* format=nullptr, const char* password=nullptr
             );
 
         /**
@@ -120,7 +120,7 @@ namespace xmltooling {
          * @return  size of the resulting array
          */
         static std::vector<XSECCryptoX509CRL*>::size_type loadCRLsFromURL(
-            std::vector<XSECCryptoX509CRL*>& crls, SOAPTransport& transport, const char* backing, const char* format=NULL
+            std::vector<XSECCryptoX509CRL*>& crls, SOAPTransport& transport, const char* backing, const char* format=nullptr
             );
 
         /**

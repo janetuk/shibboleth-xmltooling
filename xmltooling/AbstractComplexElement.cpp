@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2009 Internet2
+*  Copyright 2001-2010 Internet2
  * 
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ using xercesc::XMLString;
 
 namespace {
     bool _nonnull(const XMLObject* ptr) {
-        return (ptr!=NULL);
+        return (ptr!=nullptr);
     }
 }
 
@@ -71,7 +71,7 @@ void AbstractComplexElement::removeChild(XMLObject* child)
 
 const XMLCh* AbstractComplexElement::getTextContent(unsigned int position) const
 {
-    return (m_text.size() > position) ? m_text[position] : NULL;
+    return (m_text.size() > position) ? m_text[position] : nullptr;
 }
 
 void AbstractComplexElement::setTextContent(const XMLCh* value, unsigned int position)
@@ -80,7 +80,7 @@ void AbstractComplexElement::setTextContent(const XMLCh* value, unsigned int pos
         throw XMLObjectException("Can't set text content relative to non-existent child position.");
     vector<XMLCh*>::size_type size = m_text.size();
     while (position >= size) {
-        m_text.push_back(NULL);
+        m_text.push_back(nullptr);
         ++size;
     }
     m_text[position]=prepareForAssignment(m_text[position],value);

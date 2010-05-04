@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * AbstractSimpleElement.cpp
  * 
- * Extension of AbstractXMLObject that implements simple elements 
+ * Extension of AbstractXMLObject that implements simple elements.
  */
 
 #include "internal.h"
@@ -31,7 +31,7 @@ using namespace std;
 
 list<XMLObject*> AbstractSimpleElement::m_no_children;
 
-AbstractSimpleElement::AbstractSimpleElement() : m_value(NULL)
+AbstractSimpleElement::AbstractSimpleElement() : m_value(nullptr)
 {
 }
 
@@ -62,7 +62,7 @@ void AbstractSimpleElement::removeChild(XMLObject* child)
 
 const XMLCh* AbstractSimpleElement::getTextContent(unsigned int position) const
 {
-    return (position==0) ? m_value : NULL;
+    return (position==0) ? m_value : nullptr;
 }
 
 void AbstractSimpleElement::setTextContent(const XMLCh* value, unsigned int position)

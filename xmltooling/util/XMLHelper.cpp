@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,18 +57,18 @@ xmltooling::QName* XMLHelper::getXSIType(const DOMElement* e)
                 return ret;
             }
             else {
-                return new xmltooling::QName(e->lookupNamespaceURI(NULL), attributeValue);
+                return new xmltooling::QName(e->lookupNamespaceURI(nullptr), attributeValue);
             }
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 DOMAttr* XMLHelper::getIdAttribute(const DOMElement* domElement)
 {
     if(!domElement->hasAttributes()) {
-        return NULL;
+        return nullptr;
     }
     
     DOMNamedNodeMap* attributes = domElement->getAttributes();
@@ -80,7 +80,7 @@ DOMAttr* XMLHelper::getIdAttribute(const DOMElement* domElement)
         }
     }
     
-    return NULL;
+    return nullptr;
 }
 
 const XMLObject* XMLHelper::getXMLObjectById(const XMLObject& tree, const XMLCh* id)
@@ -98,7 +98,7 @@ const XMLObject* XMLHelper::getXMLObjectById(const XMLObject& tree, const XMLCh*
         }
     }
     
-    return NULL;
+    return nullptr;
 }
 
 XMLObject* XMLHelper::getXMLObjectById(XMLObject& tree, const XMLCh* id)
@@ -116,7 +116,7 @@ XMLObject* XMLHelper::getXMLObjectById(XMLObject& tree, const XMLCh* id)
         }
     }
     
-    return NULL;
+    return nullptr;
 }
 
 void XMLHelper::getNonVisiblyUsedPrefixes(const XMLObject& tree, set<xstring>& prefixes)
@@ -150,7 +150,7 @@ xmltooling::QName* XMLHelper::getNodeQName(const DOMNode* domNode)
 {
     if (domNode)
         return new xmltooling::QName(domNode->getNamespaceURI(), domNode->getLocalName(), domNode->getPrefix());
-    return NULL; 
+    return nullptr; 
 }
 
 xmltooling::QName* XMLHelper::getAttributeValueAsQName(const DOMAttr* attribute)
@@ -161,7 +161,7 @@ xmltooling::QName* XMLHelper::getAttributeValueAsQName(const DOMAttr* attribute)
 xmltooling::QName* XMLHelper::getNodeValueAsQName(const DOMNode* domNode)
 {
     if (!domNode)
-        return NULL;
+        return nullptr;
     
     int i;
     const XMLCh* value=domNode->getTextContent();
@@ -174,7 +174,7 @@ xmltooling::QName* XMLHelper::getNodeValueAsQName(const DOMNode* domNode)
         return ret;
     }
     
-    return new xmltooling::QName(domNode->lookupNamespaceURI(NULL), value);
+    return new xmltooling::QName(domNode->lookupNamespaceURI(nullptr), value);
 }
 
 DOMElement* XMLHelper::appendChildElement(DOMElement* parentElement, DOMElement* childElement)
@@ -201,7 +201,7 @@ const XMLCh* XMLHelper::getTextContent(const DOMElement* e)
             return child->getNodeValue();
         child=child->getNextSibling();
     }
-    return NULL;
+    return nullptr;
 }
 
 DOMElement* XMLHelper::getFirstChildElement(const DOMNode* n, const XMLCh* localName)

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ EncryptedKeyResolver::~EncryptedKeyResolver()
 const EncryptedKey* EncryptedKeyResolver::resolveKey(const EncryptedData& encryptedData, const XMLCh* recipient) const
 {
     if (!encryptedData.getKeyInfo())
-        return NULL;
+        return nullptr;
 
     const vector<XMLObject*>& others=const_cast<const KeyInfo*>(encryptedData.getKeyInfo())->getUnknownXMLObjects();
     for (vector<XMLObject*>::const_iterator i=others.begin(); i!=others.end(); i++) {
@@ -49,5 +49,5 @@ const EncryptedKey* EncryptedKeyResolver::resolveKey(const EncryptedData& encryp
             return encKey;
     }
 
-    return NULL;
+    return nullptr;
 }

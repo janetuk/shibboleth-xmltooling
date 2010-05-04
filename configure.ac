@@ -90,10 +90,23 @@ AC_CXX_REQUIRE_STL
 AC_CXX_NAMESPACES
 
 # are covariant methods allowed?
-AC_TRY_LINK(
-     [ class base { public: virtual base *GetPtr( void ) { return this; } }; ],
-     [ class derived: virtual public base { public: virtual derived *GetPtr( void ) { return this; } }; ],
-     [AC_DEFINE([HAVE_COVARIANT_RETURNS], [1], [Define to 1 if C++ compiler supports covariant virtual methods.])])
+AC_LINK_IFELSE(
+	[AC_LANG_PROGRAM([[]],
+		[[
+		class base { public: virtual base *GetPtr( void ) { return this; } };
+		class derived: virtual public base { public: virtual derived *GetPtr( void ) { return this; } };
+		]])],
+    [AC_DEFINE([HAVE_COVARIANT_RETURNS], [1], [Define to 1 if C++ compiler supports covariant virtual methods.])]
+	)
+
+# is nullptr supported?
+AC_COMPILE_IFELSE(
+	[AC_LANG_PROGRAM([[]],
+		[[
+		const char* ptr = nullptr;
+		]])],
+	[AC_DEFINE([HAVE_NULLPTR], [1], [Define to 1 if C++ compiler supports nullptr keyword.])]
+	)
 
 # log4shib settings (favor this version over the log4cpp code)
 AC_PATH_PROG(LOG4SHIB_CONFIG,log4shib-config)

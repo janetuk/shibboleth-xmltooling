@@ -38,13 +38,13 @@ public:
     void testNamespacesAfterBuilding() {
         xmltooling::QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME,SimpleXMLObject::NAMESPACE_PREFIX);
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(qtype);
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
         auto_ptr<SimpleXMLObject> sxObject(
-            dynamic_cast<SimpleXMLObject*>(b->buildObject(SimpleXMLObject::NAMESPACE, SimpleXMLObject::LOCAL_NAME, NULL, &qtype))
+            dynamic_cast<SimpleXMLObject*>(b->buildObject(SimpleXMLObject::NAMESPACE, SimpleXMLObject::LOCAL_NAME, nullptr, &qtype))
             );
-        TS_ASSERT(sxObject.get()!=NULL);
+        TS_ASSERT(sxObject.get()!=nullptr);
         static_cast<AttributeExtensibleXMLObject*>(sxObject.get())->setAttribute(
-            xmltooling::QName(NULL, "attr1"), xmltooling::QName("http://www.example.org/testObjects/ext", "Value1", "test2")
+            xmltooling::QName(nullptr, "attr1"), xmltooling::QName("http://www.example.org/testObjects/ext", "Value1", "test2")
             );
 
         static const XMLCh TEST2_PREFIX[] = { chLatin_t, chLatin_e, chLatin_s, chLatin_t, chDigit_2, chNull };
@@ -74,15 +74,15 @@ public:
         string path=data_path + "SimpleXMLObjectWithNonVisible.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
 
         auto_ptr<SimpleXMLObject> sxObject(
             dynamic_cast<SimpleXMLObject*>(b->buildFromDocument(doc))
             );
-        TS_ASSERT(sxObject.get()!=NULL);
+        TS_ASSERT(sxObject.get()!=nullptr);
 
         const set<Namespace>& namespaces = sxObject->getNamespaces();
         bool cond1=false, cond2=false, cond3=false;

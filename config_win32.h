@@ -3,6 +3,11 @@
 /* Define if C++ compiler supports covariant virtual methods. */
 #define HAVE_COVARIANT_RETURNS 1
 
+/* Define to 1 if C++ compiler supports nullptr keyword. */
+#if _MSC_VER >= 1600
+# define HAVE_NULLPTR 1
+#endif
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 /* #undef HAVE_DLFCN_H */
 

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -178,7 +178,7 @@ namespace xmltooling {
          * @param is        reference to an input stream
          * @param systemId  optional system identifier to attach to the stream
          */
-        StreamInputSource(std::istream& is, const char* systemId=NULL);
+        StreamInputSource(std::istream& is, const char* systemId=nullptr);
         /// @cond off
         xercesc::BinInputStream* makeStream() const;
         /// @endcond
@@ -227,7 +227,7 @@ namespace xmltooling {
          * @param systemId  optional system identifier to attach to the source
          * @param cacheTag  optional pointer to string used for cache management
          */
-        URLInputSource(const XMLCh* url, const char* systemId=NULL, std::string* cacheTag=NULL);
+        URLInputSource(const XMLCh* url, const char* systemId=nullptr, std::string* cacheTag=nullptr);
 
         /**
          * Constructor taking a DOM element supporting the following content:
@@ -245,7 +245,7 @@ namespace xmltooling {
          * @param systemId  optional system identifier to attach to the source
          * @param cacheTag  optional pointer to string used for cache management
          */
-        URLInputSource(const xercesc::DOMElement* e, const char* systemId=NULL, std::string* cacheTag=NULL);
+        URLInputSource(const xercesc::DOMElement* e, const char* systemId=nullptr, std::string* cacheTag=nullptr);
 
         /// @cond off
         virtual xercesc::BinInputStream* makeStream() const;

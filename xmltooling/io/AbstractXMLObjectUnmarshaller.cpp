@@ -106,7 +106,7 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
         if (XMLString::equals(nsuri,XMLNS_NS)) {
             if (XMLString::equals(attribute->getLocalName(),XMLNS_PREFIX)) {
                 m_log.debug("found default namespace declaration, adding it to the list of namespaces on the XMLObject");
-                addNamespace(Namespace(attribute->getValue(), NULL, true));
+                addNamespace(Namespace(attribute->getValue(), nullptr, true));
             }
             else if (XMLString::equals(attribute->getLocalName(),XML_PREFIX) && XMLString::equals(attribute->getNodeValue(),XML_NS)) {
                 m_log.debug("found standard xml prefix declaration, ignoring as superfluous");

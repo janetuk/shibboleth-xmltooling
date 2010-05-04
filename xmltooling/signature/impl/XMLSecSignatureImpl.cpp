@@ -17,7 +17,7 @@
 /**
  * XMLSecSignatureImpl.cpp
  * 
- * Signature class for XMLSec-based signature-handling
+ * Signature class for XMLSec-based signature-handling.
  */
 
 #include "internal.h"
@@ -65,7 +65,7 @@ namespace xmlsignature {
     public:
         XMLSecSignatureImpl() : AbstractXMLObject(XMLSIG_NS, Signature::LOCAL_NAME, XMLSIG_PREFIX),
             UnknownElementImpl(XMLSIG_NS, Signature::LOCAL_NAME, XMLSIG_PREFIX),
-            m_signature(NULL), m_c14n(NULL), m_sm(NULL), m_key(NULL), m_keyInfo(NULL), m_reference(NULL) {}
+            m_signature(nullptr), m_c14n(nullptr), m_sm(nullptr), m_key(nullptr), m_keyInfo(nullptr), m_reference(nullptr) {}
         virtual ~XMLSecSignatureImpl();
         
         void releaseDOM() const;
@@ -79,8 +79,8 @@ namespace xmlsignature {
         XMLObject* clone() const;
         Signature* cloneSignature() const;
 
-        DOMElement* marshall(DOMDocument* document=NULL, const vector<Signature*>* sigs=NULL, const Credential* credential=NULL) const;
-        DOMElement* marshall(DOMElement* parentElement, const vector<Signature*>* sigs=NULL, const Credential* credential=NULL) const;
+        DOMElement* marshall(DOMDocument* document=nullptr, const vector<Signature*>* sigs=nullptr, const Credential* credential=nullptr) const;
+        DOMElement* marshall(DOMElement* parentElement, const vector<Signature*>* sigs=nullptr, const Credential* credential=nullptr) const;
         XMLObject* unmarshall(DOMElement* element, bool bindDocument=false);
         
         // Getters
@@ -122,7 +122,7 @@ namespace xmlsignature {
             m_reference=reference;
         }
         
-        void sign(const Credential* credential=NULL);
+        void sign(const Credential* credential=nullptr);
 
     private:
         mutable DSIGSignature* m_signature;
@@ -176,7 +176,7 @@ void XMLSecSignatureImpl::releaseDOM() const
         // Release the associated signature.
         if (m_signature) {
             XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseSignature(m_signature);
-            m_signature=NULL;
+            m_signature=nullptr;
         }
     }
 }
@@ -274,7 +274,7 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, const vector<Si
         // Fresh signature, so we just create an empty one.
         log.debug("creating empty Signature element");
         if (!document) {
-            document=DOMImplementationRegistry::getDOMImplementation(NULL)->createDocument();
+            document=DOMImplementationRegistry::getDOMImplementation(nullptr)->createDocument();
             bindDocument=true;
         }
         DSIGSignature* temp=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignature();
@@ -337,7 +337,7 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, const vector<Si
     // Marshall KeyInfo data.
     if (credential) {
         delete m_keyInfo;
-        m_keyInfo = NULL;
+        m_keyInfo = nullptr;
         m_keyInfo = credential->getKeyInfo();
     }
     if (m_keyInfo && (!m_signature->getKeyInfoList() || m_signature->getKeyInfoList()->isEmpty())) {
@@ -432,7 +432,7 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, const vecto
     // Marshall KeyInfo data.
     if (credential) {
         delete m_keyInfo;
-        m_keyInfo = NULL;
+        m_keyInfo = nullptr;
         m_keyInfo = credential->getKeyInfo();
     }
     if (m_keyInfo && (!m_signature->getKeyInfoList() || m_signature->getKeyInfoList()->isEmpty())) {
@@ -526,7 +526,7 @@ unsigned int Signature::createRawSignature(
         // Move input into a safeBuffer to source the transform chain.
         safeBuffer sb,sbout;
         sb.sbStrncpyIn(in,in_len);
-        TXFMSB* sbt = new TXFMSB(NULL);
+        TXFMSB* sbt = new TXFMSB(nullptr);
         sbt->setInput(sb, in_len);
         TXFMChain tx(sbt);
         
@@ -572,7 +572,7 @@ bool Signature::verifyRawSignature(
         // Move input into a safeBuffer to source the transform chain.
         safeBuffer sb;
         sb.sbStrncpyIn(in,in_len);
-        TXFMSB* sbt = new TXFMSB(NULL);
+        TXFMSB* sbt = new TXFMSB(nullptr);
         sbt->setInput(sb, in_len);
         TXFMChain tx(sbt);
         
