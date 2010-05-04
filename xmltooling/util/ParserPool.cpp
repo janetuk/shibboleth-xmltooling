@@ -128,20 +128,20 @@ DOMDocument* ParserPool::parse(DOMLSInput& domsrc)
                 doc->release();
             throw XMLParserException("XML error(s) during parsing, check log for specifics");
         }
-        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, nullptr);
+        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, (void*)nullptr);
         parser->getDomConfig()->setParameter(XMLUni::fgXercesUserAdoptsDOMDocument, true);
         checkinBuilder(janitor.release());
         return doc;
     }
     catch (XMLException& ex) {
-        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, nullptr);
+        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, (void*)nullptr);
         parser->getDomConfig()->setParameter(XMLUni::fgXercesUserAdoptsDOMDocument, true);
         checkinBuilder(janitor.release());
         auto_ptr_char temp(ex.getMessage());
         throw XMLParserException(string("Xerces error during parsing: ") + (temp.get() ? temp.get() : "no message"));
     }
     catch (XMLToolingException&) {
-        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, nullptr);
+        parser->getDomConfig()->setParameter(XMLUni::fgDOMErrorHandler, (void*)nullptr);
         parser->getDomConfig()->setParameter(XMLUni::fgXercesUserAdoptsDOMDocument, true);
         checkinBuilder(janitor.release());
         throw;
