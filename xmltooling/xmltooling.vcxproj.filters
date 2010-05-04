@@ -1,0 +1,510 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\util">
+      <UniqueIdentifier>{8b8038f5-ba25-456b-9734-a70686aef04a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\io">
+      <UniqueIdentifier>{0d7d667e-e1f1-4c0b-a151-d7c4627907aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\impl">
+      <UniqueIdentifier>{122b507b-6147-4892-8a43-f30af20ef523}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\validation">
+      <UniqueIdentifier>{4bd22bc7-71ca-4d3b-8998-8ebea451cc3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\signature">
+      <UniqueIdentifier>{a4dfe3ee-9b1f-4cd1-9260-04ec12f59cf9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\signature\impl">
+      <UniqueIdentifier>{3d91cda3-da09-4fca-991b-b3162ac58c3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\encryption">
+      <UniqueIdentifier>{0f737f2b-cabf-4da5-a02a-e3df621ed5d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\encryption\impl">
+      <UniqueIdentifier>{b8372dbb-c996-4ef7-8d1e-2877eb272885}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\security">
+      <UniqueIdentifier>{b04066c6-8949-4a59-89b3-1521e6cec860}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\security\impl">
+      <UniqueIdentifier>{306c16b4-af6b-4c21-948d-0149253aa0f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\soap">
+      <UniqueIdentifier>{bd52f91d-88db-49be-a9cd-445b6a6a61d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\soap\impl">
+      <UniqueIdentifier>{733d4fc4-edbf-43d3-a95d-6796bd93c296}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\util">
+      <UniqueIdentifier>{d470e7cb-b341-46f8-8ebf-2df760ca7caa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\io">
+      <UniqueIdentifier>{74549b82-97e3-4c43-8603-07ca45818106}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\impl">
+      <UniqueIdentifier>{64d95fff-366e-4a00-bf4b-2fc8e3b3a805}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\validation">
+      <UniqueIdentifier>{0b7707f6-d7b6-4a2d-a853-83c43810c997}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\signature">
+      <UniqueIdentifier>{90125fa2-c1da-4526-88ff-4a45f7c53150}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\encryption">
+      <UniqueIdentifier>{a88763c2-8c35-46e5-8ecb-ba1f28a11577}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\security">
+      <UniqueIdentifier>{fe2da4fa-ae43-4671-ab6e-8e8abf39703f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\soap">
+      <UniqueIdentifier>{3409a378-6623-4990-97a5-a84925dc0f43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AbstractAttributeExtensibleXMLObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstractComplexElement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstractDOMCachingXMLObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstractSimpleElement.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstractXMLObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="exceptions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Lockable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Namespace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QName.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="unicode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XMLObjectBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XMLToolingConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="util\CurlURLInputStream.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\DateTime.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\NDC.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\ParserPool.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\PathResolver.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\ReloadableXMLFile.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\ReplayCache.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\StorageService.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\TemplateEngine.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\URLEncoder.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\Win32Threads.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\XMLConstants.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="util\XMLHelper.cpp">
+      <Filter>Source Files\util</Filter>
+    </ClCompile>
+    <ClCompile Include="io\AbstractXMLObjectMarshaller.cpp">
+      <Filter>Source Files\io</Filter>
+    </ClCompile>
+    <ClCompile Include="io\AbstractXMLObjectUnmarshaller.cpp">
+      <Filter>Source Files\io</Filter>
+    </ClCompile>
+    <ClCompile Include="io\HTTPRequest.cpp">
+      <Filter>Source Files\io</Filter>
+    </ClCompile>
+    <ClCompile Include="io\HTTPResponse.cpp">
+      <Filter>Source Files\io</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\AnyElement.cpp">
+      <Filter>Source Files\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\MemoryStorageService.cpp">
+      <Filter>Source Files\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="impl\UnknownElement.cpp">
+      <Filter>Source Files\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="validation\ValidatorSuite.cpp">
+      <Filter>Source Files\validation</Filter>
+    </ClCompile>
+    <ClCompile Include="signature\impl\KeyInfoImpl.cpp">
+      <Filter>Source Files\signature\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="signature\impl\KeyInfoSchemaValidators.cpp">
+      <Filter>Source Files\signature\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="signature\impl\SignatureValidator.cpp">
+      <Filter>Source Files\signature\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="signature\impl\XMLSecSignatureImpl.cpp">
+      <Filter>Source Files\signature\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="encryption\impl\Decrypter.cpp">
+      <Filter>Source Files\encryption\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="encryption\impl\EncryptedKeyResolver.cpp">
+      <Filter>Source Files\encryption\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="encryption\impl\Encrypter.cpp">
+      <Filter>Source Files\encryption\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="encryption\impl\EncryptionImpl.cpp">
+      <Filter>Source Files\encryption\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="encryption\impl\EncryptionSchemaValidators.cpp">
+      <Filter>Source Files\encryption\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="security\impl\AbstractPKIXTrustEngine.cpp">
+      <Filter>Source Files\security\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="security\impl\BasicX509Credential.cpp">
+      <Filter>Source Files\security\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="security\impl\ChainingCredentialResolver.cpp">
+      <Filter>Source Files\security\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="security\impl\ChainingTrustEngine.cpp">
+      <Filter>Source Files\security\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="security\impl\CredentialCriteria.cpp">
+      <Filter>Source Files\security\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="security\impl\CredentialResolver.cpp">
+      <Filter>Source Files\security\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="security\impl\ExplicitKeyTrustEngine.cpp">
+      <Filter>Source Files\security\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="security\impl\FilesystemCredentialResolver.cpp">
+      <Filter>Source Files\security\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="security\impl\InlineKeyResolver.cpp">
+      <Filter>Source Files\security\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="security\impl\KeyInfoResolver.cpp">
+      <Filter>Source Files\security\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="security\impl\OpenSSLCryptoX509CRL.cpp">
+      <Filter>Source Files\security\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="security\impl\SecurityHelper.cpp">
+      <Filter>Source Files\security\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="security\impl\StaticPKIXTrustEngine.cpp">
+      <Filter>Source Files\security\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="security\impl\TrustEngine.cpp">
+      <Filter>Source Files\security\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="security\impl\XSECCryptoX509CRL.cpp">
+      <Filter>Source Files\security\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="soap\impl\CURLSOAPTransport.cpp">
+      <Filter>Source Files\soap\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="soap\impl\SOAPClient.cpp">
+      <Filter>Source Files\soap\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="soap\impl\SOAPImpl.cpp">
+      <Filter>Source Files\soap\impl</Filter>
+    </ClCompile>
+    <ClCompile Include="soap\impl\SOAPSchemaValidators.cpp">
+      <Filter>Source Files\soap\impl</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AbstractAttributeExtensibleXMLObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractComplexElement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractDOMCachingXMLObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractSimpleElement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractXMLObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AttributeExtensibleXMLObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConcreteXMLObjectBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="config_pub_win32.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ElementExtensibleXMLObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ElementProxy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="exceptions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Lockable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="logging.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Namespace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PluginManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QName.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="unicode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="version.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XMLObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XMLObjectBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XMLToolingConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="util\CurlURLInputStream.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\DateTime.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\NDC.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\ParserPool.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\PathResolver.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\Predicates.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\ReloadableXMLFile.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\ReplayCache.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\StorageService.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\TemplateEngine.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\Threads.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\URLEncoder.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\XMLConstants.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\XMLHelper.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="util\XMLObjectChildrenList.h">
+      <Filter>Header Files\util</Filter>
+    </ClInclude>
+    <ClInclude Include="io\AbstractXMLObjectMarshaller.h">
+      <Filter>Header Files\io</Filter>
+    </ClInclude>
+    <ClInclude Include="io\AbstractXMLObjectUnmarshaller.h">
+      <Filter>Header Files\io</Filter>
+    </ClInclude>
+    <ClInclude Include="io\GenericRequest.h">
+      <Filter>Header Files\io</Filter>
+    </ClInclude>
+    <ClInclude Include="io\GenericResponse.h">
+      <Filter>Header Files\io</Filter>
+    </ClInclude>
+    <ClInclude Include="io\HTTPRequest.h">
+      <Filter>Header Files\io</Filter>
+    </ClInclude>
+    <ClInclude Include="io\HTTPResponse.h">
+      <Filter>Header Files\io</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\AnyElement.h">
+      <Filter>Header Files\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="impl\UnknownElement.h">
+      <Filter>Header Files\impl</Filter>
+    </ClInclude>
+    <ClInclude Include="validation\Validator.h">
+      <Filter>Header Files\validation</Filter>
+    </ClInclude>
+    <ClInclude Include="validation\ValidatorSuite.h">
+      <Filter>Header Files\validation</Filter>
+    </ClInclude>
+    <ClInclude Include="signature\ContentReference.h">
+      <Filter>Header Files\signature</Filter>
+    </ClInclude>
+    <ClInclude Include="signature\KeyInfo.h">
+      <Filter>Header Files\signature</Filter>
+    </ClInclude>
+    <ClInclude Include="signature\Signature.h">
+      <Filter>Header Files\signature</Filter>
+    </ClInclude>
+    <ClInclude Include="signature\SignatureValidator.h">
+      <Filter>Header Files\signature</Filter>
+    </ClInclude>
+    <ClInclude Include="encryption\Decrypter.h">
+      <Filter>Header Files\encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="encryption\EncryptedKeyResolver.h">
+      <Filter>Header Files\encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="encryption\Encrypter.h">
+      <Filter>Header Files\encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="encryption\Encryption.h">
+      <Filter>Header Files\encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="security\AbstractPKIXTrustEngine.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\BasicX509Credential.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\ChainingTrustEngine.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\Credential.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\CredentialContext.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\CredentialCriteria.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\CredentialResolver.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\KeyInfoCredentialContext.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\KeyInfoResolver.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\OpenSSLCredential.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\OpenSSLCryptoX509CRL.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\OpenSSLTrustEngine.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\SecurityHelper.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\SignatureTrustEngine.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\TrustEngine.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\X509Credential.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\X509TrustEngine.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\XSECCryptoX509CRL.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="soap\HTTPSOAPTransport.h">
+      <Filter>Header Files\soap</Filter>
+    </ClInclude>
+    <ClInclude Include="soap\OpenSSLSOAPTransport.h">
+      <Filter>Header Files\soap</Filter>
+    </ClInclude>
+    <ClInclude Include="soap\SOAP.h">
+      <Filter>Header Files\soap</Filter>
+    </ClInclude>
+    <ClInclude Include="soap\SOAPClient.h">
+      <Filter>Header Files\soap</Filter>
+    </ClInclude>
+    <ClInclude Include="soap\SOAPTransport.h">
+      <Filter>Header Files\soap</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="xmltooling.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="config_pub.h.in" />
+    <None Include="Makefile.am" />
+  </ItemGroup>
+</Project>
