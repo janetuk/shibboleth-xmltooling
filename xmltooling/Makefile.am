@@ -213,6 +213,8 @@ install-exec-hook:
 EXTRA_DIST = \
     xmltooling.vcxproj \
     xmltooling-lite.vcxproj \
+    xmltooling.vcxproj.filters \
+    xmltooling-lite.vcxproj.filters \
     config_pub.h.in \
     config_pub_win32.h\
     resource.h\
