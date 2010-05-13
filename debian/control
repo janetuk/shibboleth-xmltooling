@@ -26,8 +26,9 @@ Description: C++ XML parsing library with encryption support (runtime)
 Package: libxmltooling-dev
 Section: libdevel
 Architecture: any
-Depends: libxmltooling4 (= ${binary:Version}), libcurl4-openssl-dev,
- liblog4cpp5-dev, libxerces-c-dev, libxml-security-c-dev (>= 1.5)
+Depends: ${misc:Depends}, libxmltooling4 (= ${binary:Version}),
+ libcurl4-openssl-dev, liblog4cpp5-dev, libxerces-c-dev,
+ libxml-security-c-dev (>= 1.5)
 Suggests: libxmltooling-doc (= ${source:Version})
 Description: C++ XML parsing library with encryption support (development)
  The XMLTooling library contains generic XML parsing and processing
@@ -42,6 +43,7 @@ Description: C++ XML parsing library with encryption support (development)
 Package: xmltooling-schemas
 Section: text
 Architecture: all
+Depends: ${misc:Depends}
 Description: XML schemas for XMLTooling
  The XMLTooling library contains generic XML parsing and processing
  classes based on the Xerces-C DOM.  It adds more powerful facilities for
@@ -54,6 +56,7 @@ Description: XML schemas for XMLTooling
 Package: libxmltooling-doc
 Section: doc
 Architecture: all
+Depends: ${misc:Depends}
 Description: C++ XML parsing library with encryption support (API docs)
  The XMLTooling library contains generic XML parsing and processing
  classes based on the Xerces-C DOM. It adds more powerful facilities
