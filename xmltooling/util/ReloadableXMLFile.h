@@ -30,11 +30,22 @@
 #include <string>
 #include <xercesc/dom/DOM.hpp>
 
+#ifndef XMLTOOLING_LITE
+    namespace xmlsignature {
+        class XMLTOOL_API Signature;
+    };
+#endif
+
 namespace xmltooling {
 
     class XMLTOOL_API CondWait;
     class XMLTOOL_API RWLock;
     class XMLTOOL_API Thread;
+
+#ifndef XMLTOOLING_LITE
+    class XMLTOOL_API CredentialResolver;
+    class XMLTOOL_API SignatureTrustEngine;
+#endif
 
     /**
      * Base class for file-based XML configuration.
@@ -61,6 +72,15 @@ namespace xmltooling {
          *  <dd>location for backup of remote resource</dd>
          *  <dt>id</dt>
          *  <dd>identifies the plugin instance for logging purposes</dd>
+         *  <dt>certificate</dt>
+         *  <dd>requires XML be signed with an enveloped signature verifiable with specified key</dd>
+         *  <dt>signerName</dt>
+         *  <dd>requires XML be signed with an enveloped signature verifiable with &lt;TrustEngine&gt;
+         *      by certificate containing this name</dd>
+         *  <dt>&lt;CredentialResolver&gt;</dt>
+         *  <dd>requires XML be signed with an enveloped signature verifiable with specified key</dd>
+         *  <dt>&lt;TrustEngine&gt;</dt>
+         *  <dd>requires XML be signed with an enveloped signature verifiable with specified TrustEngine</dd>
          * </dl>
          * 
          * @param e     DOM to supply configuration
@@ -155,13 +175,26 @@ namespace xmltooling {
         /** Plugin identifier. */
         std::string m_id;
 
+#ifndef XMLTOOLING_LITE
+        /** CredentialResolver for signature verification. */
+        CredentialResolver* m_credResolver;
+
+        /** TrustEngine for signature verification. */
+        SignatureTrustEngine* m_trust;
+
+        /** Name of signer for signature verification. */
+        std::string m_signerName;
+#endif
+
     public:
         Lockable* lock();
         void unlock();
 
     private:
         std::pair<bool,xercesc::DOMElement*> load(bool backup);
-
+#ifndef XMLTOOLING_LITE
+        void validateSignature(xmlsignature::Signature& sigObj) const;
+#endif
         // Used to manage background reload/refresh.
         bool m_shutdown;
         CondWait* m_reload_wait;

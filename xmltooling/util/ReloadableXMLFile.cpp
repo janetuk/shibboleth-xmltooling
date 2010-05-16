@@ -22,6 +22,14 @@
 
 #include "internal.h"
 #include "io/HTTPResponse.h"
+#ifndef XMLTOOLING_LITE
+# include "security/Credential.h"
+# include "security/CredentialCriteria.h"
+# include "security/CredentialResolver.h"
+# include "security/SignatureTrustEngine.h"
+# include "signature/Signature.h"
+# include "signature/SignatureValidator.h"
+#endif
 #include "util/NDC.h"
 #include "util/PathResolver.h"
 #include "util/ReloadableXMLFile.h"
@@ -44,10 +52,35 @@
 #include <xercesc/framework/Wrapper4InputSource.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
 
+#ifndef XMLTOOLING_LITE
+# include <xsec/dsig/DSIGReference.hpp>
+# include <xsec/dsig/DSIGTransformList.hpp>
+using namespace xmlsignature;
+#endif
+
 using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace xercesc;
 using namespace std;
+
+#ifndef XMLTOOLING_LITE
+namespace {
+    class XMLTOOL_DLLLOCAL DummyCredentialResolver : public CredentialResolver
+    {
+    public:
+        DummyCredentialResolver() {}
+        ~DummyCredentialResolver() {}
+
+        Lockable* lock() {return this;}
+        void unlock() {}
+
+        const Credential* resolve(const CredentialCriteria* criteria=nullptr) const {return nullptr;}
+        vector<const Credential*>::size_type resolve(
+            vector<const Credential*>& results, const CredentialCriteria* criteria=nullptr
+            ) const {return 0;}
+    };
+};
+#endif
 
 static const XMLCh id[] =               UNICODE_LITERAL_2(i,d);
 static const XMLCh uri[] =              UNICODE_LITERAL_3(u,r,i);
@@ -60,10 +93,18 @@ static const XMLCh validate[] =         UNICODE_LITERAL_8(v,a,l,i,d,a,t,e);
 static const XMLCh reloadChanges[] =    UNICODE_LITERAL_13(r,e,l,o,a,d,C,h,a,n,g,e,s);
 static const XMLCh reloadInterval[] =   UNICODE_LITERAL_14(r,e,l,o,a,d,I,n,t,e,r,v,a,l);
 static const XMLCh backingFilePath[] =  UNICODE_LITERAL_15(b,a,c,k,i,n,g,F,i,l,e,P,a,t,h);
+static const XMLCh type[] =             UNICODE_LITERAL_4(t,y,p,e);
+static const XMLCh certificate[] =      UNICODE_LITERAL_11(c,e,r,t,i,f,i,c,a,t,e);
+static const XMLCh signerName[] =       UNICODE_LITERAL_10(s,i,g,n,e,r,N,a,m,e);
+static const XMLCh _TrustEngine[] =     UNICODE_LITERAL_11(T,r,u,s,t,E,n,g,i,n,e);
+static const XMLCh _CredentialResolver[] = UNICODE_LITERAL_18(C,r,e,d,e,n,t,i,a,l,R,e,s,o,l,v,e,r);
 
 
 ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
     : m_root(e), m_local(true), m_validate(false), m_backupIndicator(true), m_filestamp(0), m_reloadInterval(0), m_lock(nullptr), m_log(log),
+#ifndef XMLTOOLING_LITE
+        m_credResolver(nullptr), m_trust(nullptr),
+#endif
         m_shutdown(false), m_reload_wait(nullptr), m_reload_thread(nullptr)
 {
 #ifdef _DEBUG
@@ -86,11 +127,13 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
                 }
             }
         }
-        else
+        else {
             m_local=false;
+        }
     }
-    else
+    else {
         m_local=false;
+    }
 
     if (source && *source) {
         const XMLCh* flag=e->getAttributeNS(nullptr,validate);
@@ -103,6 +146,38 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
             log.warn("deprecated usage of uri/url attribute for a local resource, use path instead");
             m_local=true;
         }
+
+#ifndef XMLTOOLING_LITE
+        // Check for signature bits.
+        if (e && e->hasAttributeNS(nullptr, certificate)) {
+            // Use a file-based credential resolver rooted here.
+            m_credResolver = XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(FILESYSTEM_CREDENTIAL_RESOLVER, e);
+        }
+        else {
+            const DOMElement* sub = e ? XMLHelper::getFirstChildElement(e, _CredentialResolver) : nullptr;
+            auto_ptr_char t(sub ? sub->getAttributeNS(nullptr, type) : nullptr);
+            if (t.get()) {
+                m_credResolver = XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(t.get(), sub);
+            }
+            else {
+                sub = e ? XMLHelper::getFirstChildElement(e, _TrustEngine) : nullptr;
+                auto_ptr_char t2(sub ? sub->getAttributeNS(nullptr, type) : nullptr);
+                if (t2.get()) {
+                    TrustEngine* trust = XMLToolingConfig::getConfig().TrustEngineManager.newPlugin(t2.get(), sub);
+                    if (!(m_trust = dynamic_cast<SignatureTrustEngine*>(trust))) {
+                        delete trust;
+                        throw XMLToolingException("TrustEngine-based ReloadableXMLFile requires a SignatureTrustEngine plugin.");
+                    }
+
+                    flag = e->getAttributeNS(nullptr, signerName);
+                    if (flag && *flag) {
+                        auto_ptr_char sn(flag);
+                        m_signerName = sn.get();
+                    }
+                }
+            }
+        }
+#endif
 
         if (m_local) {
             XMLToolingConfig::getConfig().getPathResolver()->resolve(m_source, PathResolver::XMLTOOLING_CFG_FILE);
@@ -347,6 +422,25 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
             }
 
             m_log.infoStream() << "loaded XML resource (" << (backup ? m_backing : m_source) << ")" << logging::eol;
+#ifndef XMLTOOLING_LITE
+            if (m_credResolver || m_trust) {
+                m_log.debug("checking signature on XML resource");
+                try {
+                    DOMElement* sigel = XMLHelper::getFirstChildElement(doc->getDocumentElement(), xmlconstants::XMLSIG_NS, Signature::LOCAL_NAME);
+                    if (!sigel)
+                        throw XMLSecurityException("Signature validation required, but no signature found.");
+
+                    // Wrap and unmarshall the signature for the duration of the check.
+                    auto_ptr<Signature> sigobj(dynamic_cast<Signature*>(SignatureBuilder::buildOneFromElement(sigel)));    // don't bind to document
+                    validateSignature(*sigobj.get());
+                }
+                catch (exception&) {
+                    doc->release();
+                    throw;
+                }
+
+            }
+#endif
 
             if (!backup && !m_backing.empty()) {
                 // If the indicator is true, we're responsible for the backup.
@@ -387,6 +481,81 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
         throw;
     }
 }
+
+#ifndef XMLTOOLING_LITE
+
+void ReloadableXMLFile::validateSignature(Signature& sigObj) const
+{
+    DSIGSignature* sig=sigObj.getXMLSignature();
+    if (!sig)
+        throw XMLSecurityException("Signature does not exist yet.");
+
+    // Make sure the whole document was signed.
+    bool valid=false;
+    DSIGReferenceList* refs=sig->getReferenceList();
+    if (refs && refs->getSize()==1) {
+        DSIGReference* ref=refs->item(0);
+        if (ref) {
+            const XMLCh* URI=ref->getURI();
+            if (URI==nullptr || *URI==0) {
+                DSIGTransformList* tlist=ref->getTransforms();
+                if (tlist->getSize() <= 2) { 
+                    for (unsigned int i=0; tlist && i<tlist->getSize(); i++) {
+                        if (tlist->item(i)->getTransformType()==TRANSFORM_ENVELOPED_SIGNATURE)
+                            valid=true;
+                        else if (tlist->item(i)->getTransformType()!=TRANSFORM_EXC_C14N &&
+                                 tlist->item(i)->getTransformType()!=TRANSFORM_C14N &&
+                                 tlist->item(i)->getTransformType()!=TRANSFORM_C14N11) {
+                            valid=false;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    if (!valid)
+        throw XMLSecurityException("Invalid signature profile for signed configuration resource.");
+
+    // Set up criteria.
+    CredentialCriteria cc;
+    cc.setUsage(Credential::SIGNING_CREDENTIAL);
+    cc.setSignature(sigObj, CredentialCriteria::KEYINFO_EXTRACTION_KEY);
+    if (!m_signerName.empty())
+        cc.setPeerName(m_signerName.c_str());
+
+    if (m_credResolver) {
+        Locker locker(m_credResolver);
+        vector<const Credential*> creds;
+        if (m_credResolver->resolve(creds, &cc)) {
+            SignatureValidator sigValidator;
+            for (vector<const Credential*>::const_iterator i = creds.begin(); i != creds.end(); ++i) {
+                try {
+                    sigValidator.setCredential(*i);
+                    sigValidator.validate(&sigObj);
+                    return; // success!
+                }
+                catch (exception&) {
+                }
+            }
+            throw XMLSecurityException("Unable to verify signature with supplied key(s).");
+        }
+        else {
+            throw XMLSecurityException("CredentialResolver did not supply any candidate keys.");
+        }
+    }
+    else if (m_trust) {
+        DummyCredentialResolver dummy;
+        if (m_trust->validate(sigObj, dummy, &cc))
+            return;
+        throw XMLSecurityException("TrustEngine unable to verify signature.");
+    }
+
+    throw XMLSecurityException("Unable to verify signature.");
+}
+
+#endif
 
 pair<bool,DOMElement*> ReloadableXMLFile::load()
 {
