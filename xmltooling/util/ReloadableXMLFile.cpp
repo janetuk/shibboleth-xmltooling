@@ -92,6 +92,7 @@ static const XMLCh filename[] =         UNICODE_LITERAL_8(f,i,l,e,n,a,m,e);
 static const XMLCh validate[] =         UNICODE_LITERAL_8(v,a,l,i,d,a,t,e);
 static const XMLCh reloadChanges[] =    UNICODE_LITERAL_13(r,e,l,o,a,d,C,h,a,n,g,e,s);
 static const XMLCh reloadInterval[] =   UNICODE_LITERAL_14(r,e,l,o,a,d,I,n,t,e,r,v,a,l);
+static const XMLCh maxRefreshDelay[] =  UNICODE_LITERAL_15(m,a,x,R,e,f,r,e,s,h,D,e,l,a,y);
 static const XMLCh backingFilePath[] =  UNICODE_LITERAL_15(b,a,c,k,i,n,g,F,i,l,e,P,a,t,h);
 static const XMLCh type[] =             UNICODE_LITERAL_4(t,y,p,e);
 static const XMLCh certificate[] =      UNICODE_LITERAL_11(c,e,r,t,i,f,i,c,a,t,e);
@@ -100,12 +101,13 @@ static const XMLCh _TrustEngine[] =     UNICODE_LITERAL_11(T,r,u,s,t,E,n,g,i,n,e
 static const XMLCh _CredentialResolver[] = UNICODE_LITERAL_18(C,r,e,d,e,n,t,i,a,l,R,e,s,o,l,v,e,r);
 
 
-ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
-    : m_root(e), m_local(true), m_validate(false), m_backupIndicator(true), m_filestamp(0), m_reloadInterval(0), m_lock(nullptr), m_log(log),
+ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log, bool startReloadThread)
+    : m_root(e), m_local(true), m_validate(false), m_filestamp(0), m_reloadInterval(0),
+      m_lock(nullptr), m_loaded(false), m_log(log),
 #ifndef XMLTOOLING_LITE
-        m_credResolver(nullptr), m_trust(nullptr),
+      m_credResolver(nullptr), m_trust(nullptr),
 #endif
-        m_shutdown(false), m_reload_wait(nullptr), m_reload_thread(nullptr)
+      m_shutdown(false), m_reload_wait(nullptr), m_reload_thread(nullptr)
 {
 #ifdef _DEBUG
     NDC ndc("ReloadableXMLFile");
@@ -208,6 +210,8 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
                 log.debug("backup remote resource to (%s)", m_backing.c_str());
             }
             source = e->getAttributeNS(nullptr,reloadInterval);
+            if (!source || !*source)
+                source = e->getAttributeNS(nullptr,maxRefreshDelay);
             if (source && *source) {
                 m_reloadInterval = XMLString::parseInt(source);
                 if (m_reloadInterval > 0) {
@@ -218,10 +222,8 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log)
             m_filestamp = time(nullptr);   // assume it gets loaded initially
         }
 
-        if (m_lock) {
-            m_reload_wait = CondWait::create();
-            m_reload_thread = Thread::create(&reload_fn, this);
-        }
+        if (startReloadThread)
+            startup();
     }
     else {
         log.debug("no resource uri/path/name supplied, will load inline configuration");
@@ -238,6 +240,14 @@ ReloadableXMLFile::~ReloadableXMLFile()
 {
     shutdown();
     delete m_lock;
+}
+
+void ReloadableXMLFile::startup()
+{
+    if (m_lock && !m_reload_thread) {
+        m_reload_wait = CondWait::create();
+        m_reload_thread = Thread::create(&reload_fn, this);
+    }
 }
 
 void ReloadableXMLFile::shutdown()
@@ -441,27 +451,6 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
 
             }
 #endif
-
-            if (!backup && !m_backing.empty()) {
-                // If the indicator is true, we're responsible for the backup.
-                if (m_backupIndicator) {
-                    m_log.debug("backing up remote resource to (%s)", m_backing.c_str());
-                    try {
-                        Locker locker(getBackupLock());
-                        ofstream backer(m_backing.c_str());
-                        backer << *doc;
-                    }
-                    catch (exception& ex) {
-                        m_log.crit("exception while backing up resource: %s", ex.what());
-                    }
-                }
-                else {
-                    // If the indicator was false, set true to signal that a backup is needed.
-                    // The caller will presumably flip it back to false once that's done.
-                    m_backupIndicator = true;
-                }
-            }
-
             return make_pair(true, doc->getDocumentElement());
         }
     }
@@ -469,17 +458,65 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
         auto_ptr_char msg(e.getMessage());
         m_log.errorStream() << "Xerces error while loading resource (" << (backup ? m_backing : m_source) << "): "
             << msg.get() << logging::eol;
-        if (!backup && !m_backing.empty())
-            return load(true);
         throw XMLParserException(msg.get());
     }
     catch (exception& e) {
         m_log.errorStream() << "error while loading resource ("
             << (m_source.empty() ? "inline" : (backup ? m_backing : m_source)) << "): " << e.what() << logging::eol;
-        if (!backup && !m_backing.empty())
+        throw;
+    }
+}
+
+pair<bool,DOMElement*> ReloadableXMLFile::load()
+{
+    // If this method is used, we're responsible for managing failover to a
+    // backup of a remote resource (if available), and for backing up remote
+    // resources.
+    try {
+        pair<bool,DOMElement*> ret = load(false);
+        if (!m_backing.empty()) {
+            m_log.debug("backing up remote resource to (%s)", m_backing.c_str());
+            try {
+                Locker locker(getBackupLock());
+                ofstream backer(m_backing.c_str());
+                backer << *(ret.second->getOwnerDocument());
+            }
+            catch (exception& ex) {
+                m_log.crit("exception while backing up resource: %s", ex.what());
+            }
+        }
+        return ret;
+    }
+    catch (long&) {
+        // If there's an HTTP error or the document hasn't changed,
+        // use the backup iff we have no "valid" resource in place.
+        // That prevents reload of the backup copy any time the document
+        // hasn't changed.
+        if (!m_loaded && !m_backing.empty())
             return load(true);
         throw;
     }
+    catch (exception&) {
+        // Same as above, but for general load/parse errors.
+        if (!m_loaded && !m_backing.empty())
+            return load(true);
+        throw;
+    }
+}
+
+pair<bool,DOMElement*> ReloadableXMLFile::background_load()
+{
+    // If this method isn't overridden, we acquire a write lock
+    // and just call the old override.
+    if (m_lock)
+        m_lock->wrlock();
+    SharedLock locker(m_lock, false);
+    return load();
+}
+
+Lockable* ReloadableXMLFile::getBackupLock()
+{
+    return &XMLToolingConfig::getConfig();
 }
 
 #ifndef XMLTOOLING_LITE
@@ -556,23 +593,3 @@ void ReloadableXMLFile::validateSignature(Signature& sigObj) const
 }
 
 #endif
-
-pair<bool,DOMElement*> ReloadableXMLFile::load()
-{
-    return load(false);
-}
-
-pair<bool,DOMElement*> ReloadableXMLFile::background_load()
-{
-    // If this method isn't overridden, we acquire a write lock
-    // and just call the old override.
-    if (m_lock)
-        m_lock->wrlock();
-    SharedLock locker(m_lock, false);
-    return load();
-}
-
-Lockable* ReloadableXMLFile::getBackupLock()
-{
-    return &XMLToolingConfig::getConfig();
-}

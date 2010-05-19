@@ -66,7 +66,7 @@ namespace xmltooling {
          *  <dd>use a validating parser</dd>
          *  <dt>reloadChanges</dt>
          *  <dd>enables monitoring of local file for changes</dd>
-         *  <dt>reloadInterval</dt>
+         *  <dt>reloadInterval or maxRefreshDelay</dt>
          *  <dd>enables periodic refresh of remote file</dd>
          *  <dt>backingFilePath</dt>
          *  <dd>location for backup of remote resource</dd>
@@ -83,10 +83,11 @@ namespace xmltooling {
          *  <dd>requires XML be signed with an enveloped signature verifiable with specified TrustEngine</dd>
          * </dl>
          * 
-         * @param e     DOM to supply configuration
-         * @param log   logging object to use
+         * @param e                 DOM to supply configuration
+         * @param log               logging object to use
+         * @param startReloadThread true iff refresh thread for resources should be started by constructor
          */
-        ReloadableXMLFile(const xercesc::DOMElement* e, logging::Category& log);
+        ReloadableXMLFile(const xercesc::DOMElement* e, logging::Category& log, bool startReloadThread=true);
     
         virtual ~ReloadableXMLFile();
 
@@ -107,6 +108,7 @@ namespace xmltooling {
         virtual std::pair<bool,xercesc::DOMElement*> background_load();
 
         /**
+         * @deprecated
          * Basic load/parse of configuration material.
          * 
          * <p>The base version performs basic parsing duties and returns the result.
@@ -122,6 +124,23 @@ namespace xmltooling {
         virtual std::pair<bool,xercesc::DOMElement*> load();
 
         /**
+         * Basic load/parse of configuration material.
+         *
+         * <p>The base version performs basic parsing duties and returns the result.
+         * Subclasses should override the new background_load() method and perform
+         * their own locking in conjunction with use of this method.
+         *
+         * <p>This version allows subclasses to explicitly control the use of a
+         * backup for remote resources, which allows additional validation to be
+         * performed besides just successful XML parsing.
+         *
+         * @param backup    true iff the backup source should be loaded
+         * @return a pair consisting of a flag indicating whether to take ownership of
+         *      the document, and the root element of the tree to load
+         */
+        virtual std::pair<bool,xercesc::DOMElement*> load(bool backup);
+
+        /**
          * Accesses a lock interface protecting use of backup file associated with the
          * object.
          *
@@ -130,6 +149,12 @@ namespace xmltooling {
          * @return  pointer to a lock interface, or nullptr if unnecessary
          */
         virtual Lockable* getBackupLock();
+
+        /**
+         * Starts up reload thread, can be automatically called by constructor, or
+         * manually invoked by subclass.
+         */
+        void startup();
 
         /**
          * Shuts down reload thread, should be called from subclass destructor.
@@ -151,12 +176,6 @@ namespace xmltooling {
         /** Path to backup copy for remote resource. */
         std::string m_backing;
 
-        /**
-         * Before load, indicates whether the backup is handled by the base class,
-         * after load, will be true iff it started false and a backup needs to be done.
-         */
-        bool m_backupIndicator;
-
         /** Last modification of local resource. */
         time_t m_filestamp;
 
@@ -175,6 +194,9 @@ namespace xmltooling {
         /** Plugin identifier. */
         std::string m_id;
 
+        /** Indicates whether a usable version of the resource is in place. */
+        bool m_loaded;
+
 #ifndef XMLTOOLING_LITE
         /** CredentialResolver for signature verification. */
         CredentialResolver* m_credResolver;
@@ -191,7 +213,6 @@ namespace xmltooling {
         void unlock();
 
     private:
-        std::pair<bool,xercesc::DOMElement*> load(bool backup);
 #ifndef XMLTOOLING_LITE
         void validateSignature(xmlsignature::Signature& sigObj) const;
 #endif
