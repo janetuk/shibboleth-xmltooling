@@ -151,6 +151,12 @@ namespace xmltooling {
         virtual Lockable* getBackupLock();
 
         /**
+         * Preserves the last remote resource caching identifier in a backup file
+         * for use on the next restart.
+         */
+        void preserveCacheTag();
+
+        /**
          * Starts up reload thread, can be automatically called by constructor, or
          * manually invoked by subclass.
          */

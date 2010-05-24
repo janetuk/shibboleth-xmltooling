@@ -208,6 +208,18 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log, bool st
                 m_backing=temp2.get();
                 XMLToolingConfig::getConfig().getPathResolver()->resolve(m_backing, PathResolver::XMLTOOLING_RUN_FILE);
                 log.debug("backup remote resource to (%s)", m_backing.c_str());
+                try {
+                    ifstream backer(m_backing + ".tag");
+                    if (backer) {
+                        char cachebuf[256];
+                        if (backer.getline(cachebuf, 255)) {
+                            m_cacheTag = cachebuf;
+                            log.debug("loaded initial cache tag (%s)", m_cacheTag.c_str());
+                        }
+                    }
+                }
+                catch (exception&) {
+                }
             }
             source = e->getAttributeNS(nullptr,reloadInterval);
             if (!source || !*source)
@@ -421,9 +433,8 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
                 if (XMLHelper::isNodeNamed(doc->getDocumentElement(), xmlconstants::XMLTOOLING_NS, URLInputSource::utf16StatusCodeElementName)) {
                     int responseCode = XMLString::parseInt(doc->getDocumentElement()->getFirstChild()->getNodeValue());
                     doc->release();
-                    if (responseCode == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED) {
+                    if (responseCode == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED)
                         throw (long)responseCode; // toss out as a "known" case to handle gracefully
-                    }
                     else {
                         m_log.warn("remote resource fetch returned atypical status code (%d)", responseCode);
                         throw IOException("remote resource fetch failed, check log for status code of response");
@@ -478,8 +489,9 @@ pair<bool,DOMElement*> ReloadableXMLFile::load()
             m_log.debug("backing up remote resource to (%s)", m_backing.c_str());
             try {
                 Locker locker(getBackupLock());
-                ofstream backer(m_backing.c_str());
+                ofstream backer(m_backing);
                 backer << *(ret.second->getOwnerDocument());
+                preserveCacheTag();
             }
             catch (exception& ex) {
                 m_log.crit("exception while backing up resource: %s", ex.what());
@@ -487,11 +499,13 @@ pair<bool,DOMElement*> ReloadableXMLFile::load()
         }
         return ret;
     }
-    catch (long&) {
+    catch (long& responseCode) {
         // If there's an HTTP error or the document hasn't changed,
         // use the backup iff we have no "valid" resource in place.
         // That prevents reload of the backup copy any time the document
         // hasn't changed.
+        if (responseCode == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED)
+            m_log.info("remote resource (%s) unchanged from cached version", m_source.c_str());
         if (!m_loaded && !m_backing.empty())
             return load(true);
         throw;
@@ -517,6 +531,18 @@ pair<bool,DOMElement*> ReloadableXMLFile::background_load()
 Lockable* ReloadableXMLFile::getBackupLock()
 {
     return &XMLToolingConfig::getConfig();
+}
+
+void ReloadableXMLFile::preserveCacheTag()
+{
+    if (!m_cacheTag.empty() && !m_backing.empty()) {
+        try {
+            ofstream backer(m_backing + ".tag");
+            backer << m_cacheTag;
+        }
+        catch (exception&) {
+        }
+    }
 }
 
 #ifndef XMLTOOLING_LITE
