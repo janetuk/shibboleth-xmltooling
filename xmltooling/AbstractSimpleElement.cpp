@@ -23,8 +23,11 @@
 #include "internal.h"
 #include "AbstractSimpleElement.h"
 
+#include <xercesc/util/XMLChar.hpp>
+
 using namespace xmltooling;
 using xercesc::XMLString;
+using xercesc::XMLChar1_0;
 using namespace std;
 
 // shared "empty" list of children for childless objects
@@ -69,5 +72,13 @@ void AbstractSimpleElement::setTextContent(const XMLCh* value, unsigned int posi
 {
     if (position > 0)
         throw XMLObjectException("Cannot set text content in simple element at position > 0.");
-    m_value=prepareForAssignment(m_value,value);
+
+    // We overwrite the "one" piece of Text content if:
+    //  - the new value is null
+    //  - there is no existing value
+    //  - the old value is all whitespace
+    // If there's a non-whitespace value set, we leave it alone unless we're clearing it with a null.
+
+    if (!value || !m_value || XMLChar1_0::isAllSpaces(m_value, XMLString::stringLen(m_value)))
+        m_value=prepareForAssignment(m_value, value);
 }
