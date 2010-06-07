@@ -234,6 +234,40 @@ namespace xmlsignature {
         }
     };
 
+    class XMLTOOL_DLLLOCAL DEREncodedKeyValueImpl : public virtual DEREncodedKeyValue,
+        public AbstractSimpleElement,
+        public AbstractDOMCachingXMLObject,
+        public AbstractXMLObjectMarshaller,
+        public AbstractXMLObjectUnmarshaller
+    {
+    public:
+        virtual ~DEREncodedKeyValueImpl() {
+            XMLString::release(&m_Id);
+        }
+
+        DEREncodedKeyValueImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
+                : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Id(nullptr) {
+        }
+
+        DEREncodedKeyValueImpl(const DEREncodedKeyValueImpl& src)
+                : AbstractXMLObject(src), AbstractSimpleElement(src), AbstractDOMCachingXMLObject(src), m_Id(nullptr) {
+            setId(src.getId());
+        }
+
+        IMPL_XMLOBJECT_CLONE(DEREncodedKeyValue);
+        IMPL_ID_ATTRIB(Id);
+
+    protected:
+        void marshallAttributes(DOMElement* domElement) const {
+            MARSHALL_ID_ATTRIB(Id,ID,nullptr);
+        }
+
+        void processAttribute(const DOMAttr* attribute) {
+            PROC_ID_ATTRIB(Id,ID,nullptr);
+            AbstractXMLObjectUnmarshaller::processAttribute(attribute);
+        }
+    };
+
     class XMLTOOL_DLLLOCAL TransformImpl : public virtual Transform,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
@@ -735,6 +769,52 @@ namespace xmlsignature {
             AbstractXMLObjectUnmarshaller::processAttribute(attribute);
         }
     };
+
+    class XMLTOOL_DLLLOCAL KeyInfoReferenceImpl : public virtual KeyInfoReference,
+        public AbstractComplexElement,
+        public AbstractDOMCachingXMLObject,
+        public AbstractXMLObjectMarshaller,
+        public AbstractXMLObjectUnmarshaller
+    {
+    public:
+        virtual ~KeyInfoReferenceImpl() {
+            XMLString::release(&m_Id);
+            XMLString::release(&m_URI);
+        }
+
+        KeyInfoReferenceImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
+            : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
+            init();
+        }
+
+        KeyInfoReferenceImpl(const KeyInfoReferenceImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
+            init();
+            setId(getId());
+            setURI(getURI());
+        }
+
+        void init() {
+            m_Id=m_URI=nullptr;
+        }
+
+        IMPL_XMLOBJECT_CLONE(KeyInfoReference);
+        IMPL_ID_ATTRIB(Id);
+        IMPL_STRING_ATTRIB(URI);
+
+    protected:
+        void marshallAttributes(DOMElement* domElement) const {
+            MARSHALL_ID_ATTRIB(Id,ID,nullptr);
+            MARSHALL_STRING_ATTRIB(URI,URI,nullptr);
+        }
+
+        void processAttribute(const DOMAttr* attribute) {
+            PROC_ID_ATTRIB(Id,ID,nullptr);
+            PROC_STRING_ATTRIB(URI,URI,nullptr);
+            AbstractXMLObjectUnmarshaller::processAttribute(attribute);
+        }
+    };
+
     
     DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,KeyName);
     DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,MgmtData);
@@ -754,6 +834,7 @@ namespace xmlsignature {
     DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,X509SubjectName);
     DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,X509Certificate);
     DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,X509CRL);
+    DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,OCSPResponse);
     DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,SPKISexp);
     DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,PGPKeyID);
     DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,PGPKeyPacket);
@@ -765,6 +846,7 @@ namespace xmlsignature {
 
 // Builder Implementations
 
+IMPL_XMLOBJECTBUILDER(OCSPResponse);
 IMPL_XMLOBJECTBUILDER(X509IssuerSerial);
 IMPL_XMLOBJECTBUILDER(X509IssuerName);
 IMPL_XMLOBJECTBUILDER(X509SerialNumber);
@@ -791,7 +873,9 @@ IMPL_XMLOBJECTBUILDER(J);
 IMPL_XMLOBJECTBUILDER(DSAKeyValue);
 IMPL_XMLOBJECTBUILDER(RSAKeyValue);
 IMPL_XMLOBJECTBUILDER(KeyValue);
+IMPL_XMLOBJECTBUILDER(DEREncodedKeyValue);
 IMPL_XMLOBJECTBUILDER(KeyInfo);
+IMPL_XMLOBJECTBUILDER(KeyInfoReference);
 IMPL_XMLOBJECTBUILDER(SPKISexp);
 IMPL_XMLOBJECTBUILDER(SPKIData);
 IMPL_XMLOBJECTBUILDER(PGPKeyID);
@@ -800,43 +884,51 @@ IMPL_XMLOBJECTBUILDER(PGPData);
 
 // Unicode literals
 
-const XMLCh KeyInfo::LOCAL_NAME[] =             UNICODE_LITERAL_7(K,e,y,I,n,f,o);
-const XMLCh KeyInfo::TYPE_NAME[] =              UNICODE_LITERAL_11(K,e,y,I,n,f,o,T,y,p,e);
-const XMLCh KeyInfo::ID_ATTRIB_NAME[] =         UNICODE_LITERAL_2(I,d);
-const XMLCh KeyValue::LOCAL_NAME[] =            UNICODE_LITERAL_8(K,e,y,V,a,l,u,e);
-const XMLCh KeyValue::TYPE_NAME[] =             UNICODE_LITERAL_12(K,e,y,V,a,l,u,e,T,y,p,e);
-const XMLCh DSAKeyValue::LOCAL_NAME[] =         UNICODE_LITERAL_11(D,S,A,K,e,y,V,a,l,u,e);
-const XMLCh DSAKeyValue::TYPE_NAME[] =          UNICODE_LITERAL_15(D,S,A,K,e,y,V,a,l,u,e,T,y,p,e);
-const XMLCh RSAKeyValue::LOCAL_NAME[] =         UNICODE_LITERAL_11(R,S,A,K,e,y,V,a,l,u,e);
-const XMLCh RSAKeyValue::TYPE_NAME[] =          UNICODE_LITERAL_15(R,S,A,K,e,y,V,a,l,u,e,T,y,p,e);
-const XMLCh MgmtData::LOCAL_NAME[] =            UNICODE_LITERAL_8(M,g,m,t,D,a,t,a);
-const XMLCh KeyName::LOCAL_NAME[] =             UNICODE_LITERAL_7(K,e,y,N,a,m,e);
-const XMLCh Modulus::LOCAL_NAME[] =             UNICODE_LITERAL_7(M,o,d,u,l,u,s);
-const XMLCh Exponent::LOCAL_NAME[] =            UNICODE_LITERAL_8(E,x,p,o,n,e,n,t);
-const XMLCh Seed::LOCAL_NAME[] =                UNICODE_LITERAL_4(S,e,e,d);
-const XMLCh PgenCounter::LOCAL_NAME[] =         UNICODE_LITERAL_11(P,g,e,n,C,o,u,n,t,e,r);
-const XMLCh P::LOCAL_NAME[] =                   UNICODE_LITERAL_1(P);
-const XMLCh Q::LOCAL_NAME[] =                   UNICODE_LITERAL_1(Q);
-const XMLCh G::LOCAL_NAME[] =                   UNICODE_LITERAL_1(G);
-const XMLCh Y::LOCAL_NAME[] =                   UNICODE_LITERAL_1(Y);
-const XMLCh J::LOCAL_NAME[] =                   UNICODE_LITERAL_1(J);
-const XMLCh XPath::LOCAL_NAME[] =               UNICODE_LITERAL_5(X,P,a,t,h);
-const XMLCh Transform::LOCAL_NAME[] =           UNICODE_LITERAL_9(T,r,a,n,s,f,o,r,m);
-const XMLCh Transform::TYPE_NAME[] =            UNICODE_LITERAL_13(T,r,a,n,s,f,o,r,m,T,y,p,e);
-const XMLCh Transform::ALGORITHM_ATTRIB_NAME[] = UNICODE_LITERAL_9(A,l,g,o,r,i,t,h,m);
-const XMLCh Transforms::LOCAL_NAME[] =          UNICODE_LITERAL_10(T,r,a,n,s,f,o,r,m,s);
-const XMLCh Transforms::TYPE_NAME[] =           UNICODE_LITERAL_14(T,r,a,n,s,f,o,r,m,s,T,y,p,e);
-const XMLCh RetrievalMethod::LOCAL_NAME[] =     UNICODE_LITERAL_15(R,e,t,r,i,e,v,a,l,M,e,t,h,o,d);
-const XMLCh RetrievalMethod::TYPE_NAME[] =      UNICODE_LITERAL_19(R,e,t,r,i,e,v,a,l,M,e,t,h,o,d,T,y,p,e);
-const XMLCh RetrievalMethod::URI_ATTRIB_NAME[] = UNICODE_LITERAL_3(U,R,I);
-const XMLCh RetrievalMethod::TYPE_ATTRIB_NAME[] = UNICODE_LITERAL_4(T,y,p,e);
-const XMLCh SPKISexp::LOCAL_NAME[] =            UNICODE_LITERAL_8(S,P,K,I,S,e,x,p);
-const XMLCh SPKIData::LOCAL_NAME[] =            UNICODE_LITERAL_8(S,P,K,I,D,a,t,a);
-const XMLCh SPKIData::TYPE_NAME[] =             UNICODE_LITERAL_12(S,P,K,I,D,a,t,a,T,y,p,e);
-const XMLCh PGPKeyID::LOCAL_NAME[] =            UNICODE_LITERAL_8(P,G,P,K,e,y,I,D);
-const XMLCh PGPKeyPacket::LOCAL_NAME[] =        UNICODE_LITERAL_12(P,G,P,K,e,y,P,a,c,k,e,t);
-const XMLCh PGPData::LOCAL_NAME[] =             UNICODE_LITERAL_7(P,G,P,D,a,t,a);
-const XMLCh PGPData::TYPE_NAME[] =              UNICODE_LITERAL_11(P,G,P,D,a,t,a,T,y,p,e);
+const XMLCh KeyInfo::LOCAL_NAME[] =                 UNICODE_LITERAL_7(K,e,y,I,n,f,o);
+const XMLCh KeyInfo::TYPE_NAME[] =                  UNICODE_LITERAL_11(K,e,y,I,n,f,o,T,y,p,e);
+const XMLCh KeyInfo::ID_ATTRIB_NAME[] =             UNICODE_LITERAL_2(I,d);
+const XMLCh KeyInfoReference::LOCAL_NAME[] =        UNICODE_LITERAL_16(K,e,y,I,n,f,o,R,e,f,e,r,e,n,c,e);
+const XMLCh KeyInfoReference::TYPE_NAME[] =         UNICODE_LITERAL_20(K,e,y,I,n,f,o,R,e,f,e,r,e,n,c,e,T,y,p,e);
+const XMLCh KeyInfoReference::ID_ATTRIB_NAME[] =    UNICODE_LITERAL_2(I,d);
+const XMLCh KeyInfoReference::URI_ATTRIB_NAME[] =   UNICODE_LITERAL_3(U,R,I);
+const XMLCh KeyValue::LOCAL_NAME[] =                UNICODE_LITERAL_8(K,e,y,V,a,l,u,e);
+const XMLCh KeyValue::TYPE_NAME[] =                 UNICODE_LITERAL_12(K,e,y,V,a,l,u,e,T,y,p,e);
+const XMLCh DSAKeyValue::LOCAL_NAME[] =             UNICODE_LITERAL_11(D,S,A,K,e,y,V,a,l,u,e);
+const XMLCh DSAKeyValue::TYPE_NAME[] =              UNICODE_LITERAL_15(D,S,A,K,e,y,V,a,l,u,e,T,y,p,e);
+const XMLCh RSAKeyValue::LOCAL_NAME[] =             UNICODE_LITERAL_11(R,S,A,K,e,y,V,a,l,u,e);
+const XMLCh RSAKeyValue::TYPE_NAME[] =              UNICODE_LITERAL_15(R,S,A,K,e,y,V,a,l,u,e,T,y,p,e);
+const XMLCh DEREncodedKeyValue::LOCAL_NAME[] =      UNICODE_LITERAL_18(D,E,R,E,n,c,o,d,e,d,K,e,y,V,a,l,u,e);
+const XMLCh DEREncodedKeyValue::TYPE_NAME[] =       UNICODE_LITERAL_22(D,E,R,E,n,c,o,d,e,d,K,e,y,V,a,l,u,e,T,y,p,e);
+const XMLCh DEREncodedKeyValue::ID_ATTRIB_NAME[] =  UNICODE_LITERAL_2(I,d);
+const XMLCh MgmtData::LOCAL_NAME[] =                UNICODE_LITERAL_8(M,g,m,t,D,a,t,a);
+const XMLCh KeyName::LOCAL_NAME[] =                 UNICODE_LITERAL_7(K,e,y,N,a,m,e);
+const XMLCh Modulus::LOCAL_NAME[] =                 UNICODE_LITERAL_7(M,o,d,u,l,u,s);
+const XMLCh Exponent::LOCAL_NAME[] =                UNICODE_LITERAL_8(E,x,p,o,n,e,n,t);
+const XMLCh Seed::LOCAL_NAME[] =                    UNICODE_LITERAL_4(S,e,e,d);
+const XMLCh PgenCounter::LOCAL_NAME[] =             UNICODE_LITERAL_11(P,g,e,n,C,o,u,n,t,e,r);
+const XMLCh P::LOCAL_NAME[] =                       UNICODE_LITERAL_1(P);
+const XMLCh Q::LOCAL_NAME[] =                       UNICODE_LITERAL_1(Q);
+const XMLCh G::LOCAL_NAME[] =                       UNICODE_LITERAL_1(G);
+const XMLCh Y::LOCAL_NAME[] =                       UNICODE_LITERAL_1(Y);
+const XMLCh J::LOCAL_NAME[] =                       UNICODE_LITERAL_1(J);
+const XMLCh XPath::LOCAL_NAME[] =                   UNICODE_LITERAL_5(X,P,a,t,h);
+const XMLCh Transform::LOCAL_NAME[] =               UNICODE_LITERAL_9(T,r,a,n,s,f,o,r,m);
+const XMLCh Transform::TYPE_NAME[] =                UNICODE_LITERAL_13(T,r,a,n,s,f,o,r,m,T,y,p,e);
+const XMLCh Transform::ALGORITHM_ATTRIB_NAME[] =    UNICODE_LITERAL_9(A,l,g,o,r,i,t,h,m);
+const XMLCh Transforms::LOCAL_NAME[] =              UNICODE_LITERAL_10(T,r,a,n,s,f,o,r,m,s);
+const XMLCh Transforms::TYPE_NAME[] =               UNICODE_LITERAL_14(T,r,a,n,s,f,o,r,m,s,T,y,p,e);
+const XMLCh RetrievalMethod::LOCAL_NAME[] =         UNICODE_LITERAL_15(R,e,t,r,i,e,v,a,l,M,e,t,h,o,d);
+const XMLCh RetrievalMethod::TYPE_NAME[] =          UNICODE_LITERAL_19(R,e,t,r,i,e,v,a,l,M,e,t,h,o,d,T,y,p,e);
+const XMLCh RetrievalMethod::URI_ATTRIB_NAME[] =    UNICODE_LITERAL_3(U,R,I);
+const XMLCh RetrievalMethod::TYPE_ATTRIB_NAME[] =   UNICODE_LITERAL_4(T,y,p,e);
+const XMLCh SPKISexp::LOCAL_NAME[] =                UNICODE_LITERAL_8(S,P,K,I,S,e,x,p);
+const XMLCh SPKIData::LOCAL_NAME[] =                UNICODE_LITERAL_8(S,P,K,I,D,a,t,a);
+const XMLCh SPKIData::TYPE_NAME[] =                 UNICODE_LITERAL_12(S,P,K,I,D,a,t,a,T,y,p,e);
+const XMLCh PGPKeyID::LOCAL_NAME[] =                UNICODE_LITERAL_8(P,G,P,K,e,y,I,D);
+const XMLCh PGPKeyPacket::LOCAL_NAME[] =            UNICODE_LITERAL_12(P,G,P,K,e,y,P,a,c,k,e,t);
+const XMLCh PGPData::LOCAL_NAME[] =                 UNICODE_LITERAL_7(P,G,P,D,a,t,a);
+const XMLCh PGPData::TYPE_NAME[] =                  UNICODE_LITERAL_11(P,G,P,D,a,t,a,T,y,p,e);
+const XMLCh OCSPResponse::LOCAL_NAME[] =            UNICODE_LITERAL_12(O,C,S,P,R,e,s,p,o,n,s,e);
 
 #define XCH(ch) chLatin_##ch
 #define XNUM(d) chDigit_##d

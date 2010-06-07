@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2009 Internet2
+*  Copyright 2001-2010 Internet2
  * 
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * KeyInfoSchemaValidators.cpp
  * 
- * Schema validators for KeyInfo schema
+ * Schema validators for KeyInfo schema.
  */
 
 #include "internal.h"
@@ -30,6 +30,7 @@ using namespace xmlsignature;
 using namespace xmltooling;
 using namespace std;
 using xmlconstants::XMLSIG_NS;
+using xmlconstants::XMLSIG11_NS;
 
 namespace xmlsignature {
 
@@ -51,9 +52,11 @@ namespace xmlsignature {
     XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,X509SubjectName);
     XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,X509Certificate);
     XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,X509CRL);
+    XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,OCSPResponse);
     XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,SPKISexp);
     XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,PGPKeyID);
     XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,PGPKeyPacket);
+    XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,DEREncodedKeyValue);
     
     BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,RSAKeyValue);
         XMLOBJECTVALIDATOR_REQUIRE(RSAKeyValue,Modulus);
@@ -122,6 +125,10 @@ namespace xmlsignature {
         for_each(anys.begin(),anys.end(),checkWildcardNS());
     END_XMLOBJECTVALIDATOR;
 
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,KeyInfoReference);
+        XMLOBJECTVALIDATOR_REQUIRE(KeyInfoReference,URI);
+    END_XMLOBJECTVALIDATOR;
+
 };
 
 #define REGISTER_ELEMENT(namespaceURI,cname) \
@@ -180,4 +187,10 @@ void xmlsignature::registerKeyInfoClasses()
     REGISTER_TYPE(XMLSIG_NS,X509Data);
     REGISTER_TYPE(XMLSIG_NS,SPKIData);
     REGISTER_TYPE(XMLSIG_NS,PGPData);
+
+    REGISTER_ELEMENT(XMLSIG11_NS,OCSPResponse);
+    REGISTER_ELEMENT(XMLSIG11_NS,DEREncodedKeyValue);
+    REGISTER_ELEMENT(XMLSIG11_NS,KeyInfoReference);
+    REGISTER_TYPE(XMLSIG11_NS,DEREncodedKeyValue);
+    REGISTER_TYPE(XMLSIG11_NS,KeyInfoReference);
 }

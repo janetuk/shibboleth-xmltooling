@@ -60,6 +60,12 @@ namespace xmlconstants {
     
     /**  XML Signature QName prefix ("ds") */
     extern XMLTOOL_API const XMLCh XMLSIG_PREFIX[];
+
+    /**  XML Signature namespace ("http://www.w3.org/2009/xmldsig11#") */
+    extern XMLTOOL_API const XMLCh XMLSIG11_NS[];
+
+    /**  XML Signature QName prefix ("ds11") */
+    extern XMLTOOL_API const XMLCh XMLSIG11_PREFIX[];
     
     /**  XML Encryption namespace ("http://www.w3.org/2001/04/xmlenc#") */
     extern XMLTOOL_API const XMLCh XMLENC_NS[];

@@ -56,6 +56,7 @@ namespace xmlsignature {
     DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,X509SubjectName,Name,XML Digital Signature version 20020212 X509SubjectName element);
     DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,X509Certificate,Value,XML Digital Signature version 20020212 X509Certificate element);
     DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,X509CRL,Value,XML Digital Signature version 20020212 X509CRL element);
+    DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,OCSPResponse,Response,XML Digital Signature version 1.1 OCSPResponse element);
     DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,SPKISexp,Value,XML Digital Signature version 20020212 SPKISexp element);
     DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,PGPKeyID,ID,XML Digital Signature version 20020212 PGPKeyID element);
     DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,PGPKeyPacket,Packet,XML Digital Signature version 20020212 PGPKeyPacket element);
@@ -84,6 +85,13 @@ namespace xmlsignature {
         DECL_TYPED_CHILD(RSAKeyValue);
         DECL_XMLOBJECT_CHILD(UnknownXMLObject);
         /** KeyValueType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
+    BEGIN_XMLOBJECT(XMLTOOL_API,DEREncodedKeyValue,xmltooling::XMLObject,XML Digital Signature version 1.1 DEREncodedKeyValue element);
+        DECL_STRING_ATTRIB(Id,ID);
+        DECL_SIMPLE_CONTENT(Value);
+        /** DEREncodedKeyValueType local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
@@ -162,11 +170,19 @@ namespace xmlsignature {
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
+    BEGIN_XMLOBJECT(XMLTOOL_API,KeyInfoReference,xmltooling::XMLObject,XML Digital Signature version 1.1 KeyInfoReference element);
+        DECL_STRING_ATTRIB(Id,ID);
+        DECL_STRING_ATTRIB(URI,URI);
+        /** KeyInfoReferenceType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
     DECL_XMLSIGOBJECTBUILDER(PGPData);
     DECL_XMLSIGOBJECTBUILDER(PGPKeyID);
     DECL_XMLSIGOBJECTBUILDER(PGPKeyPacket);
     DECL_XMLSIGOBJECTBUILDER(SPKIData);
     DECL_XMLSIGOBJECTBUILDER(SPKISexp);
+    DECL_XMLSIGOBJECTBUILDER(OCSPResponse);
     DECL_XMLSIGOBJECTBUILDER(X509IssuerSerial);
     DECL_XMLSIGOBJECTBUILDER(X509IssuerName);
     DECL_XMLSIGOBJECTBUILDER(X509SerialNumber);
@@ -193,7 +209,9 @@ namespace xmlsignature {
     DECL_XMLSIGOBJECTBUILDER(DSAKeyValue);
     DECL_XMLSIGOBJECTBUILDER(RSAKeyValue);
     DECL_XMLSIGOBJECTBUILDER(KeyValue);
+    DECL_XMLSIGOBJECTBUILDER(DEREncodedKeyValue);
     DECL_XMLSIGOBJECTBUILDER(KeyInfo);
+    DECL_XMLSIGOBJECTBUILDER(KeyInfoReference);
 
     /**
      * Registers builders and validators for KeyInfo classes into the runtime.
