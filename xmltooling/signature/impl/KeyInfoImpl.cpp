@@ -36,6 +36,7 @@ using namespace xmltooling;
 using namespace xercesc;
 using namespace std;
 using xmlconstants::XMLSIG_NS;
+using xmlconstants::XMLSIG11_NS;
 
 #if defined (_MSC_VER)
     #pragma warning( push )
@@ -508,6 +509,12 @@ namespace xmlsignature {
                         continue;
                     }
 
+                    OCSPResponse* ocsp=dynamic_cast<OCSPResponse*>(*i);
+                    if (ocsp) {
+                        getOCSPResponses().push_back(ocsp->cloneOCSPResponse());
+                        continue;
+                    }
+
                     getUnknownXMLObjects().push_back((*i)->clone());
                 }
             }
@@ -519,6 +526,7 @@ namespace xmlsignature {
         IMPL_TYPED_CHILDREN(X509SubjectName,m_children.end());
         IMPL_TYPED_CHILDREN(X509Certificate,m_children.end());
         IMPL_TYPED_CHILDREN(X509CRL,m_children.end());
+        IMPL_TYPED_CHILDREN(OCSPResponse,m_children.end());
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject,m_children.end());
 
     protected:
@@ -528,6 +536,7 @@ namespace xmlsignature {
             PROC_TYPED_CHILDREN(X509SubjectName,XMLSIG_NS,false);
             PROC_TYPED_CHILDREN(X509Certificate,XMLSIG_NS,false);
             PROC_TYPED_CHILDREN(X509CRL,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(OCSPResponse,XMLSIG_NS,false);
             
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
@@ -661,115 +670,6 @@ namespace xmlsignature {
         }
     };
 
-    class XMLTOOL_DLLLOCAL KeyInfoImpl : public virtual KeyInfo,
-        public AbstractComplexElement,
-        public AbstractDOMCachingXMLObject,
-        public AbstractXMLObjectMarshaller,
-        public AbstractXMLObjectUnmarshaller
-    {
-    public:
-        virtual ~KeyInfoImpl() {
-            XMLString::release(&m_Id);
-        }
-
-        KeyInfoImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
-            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Id(nullptr) {
-        }
-            
-        KeyInfoImpl(const KeyInfoImpl& src)
-                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src),
-                    m_Id(XMLString::replicate(src.m_Id)) {
-
-            for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
-                if (*i) {
-                    X509Data* xd=dynamic_cast<X509Data*>(*i);
-                    if (xd) {
-                        getX509Datas().push_back(xd->cloneX509Data());
-                        continue;
-                    }
-
-                    KeyName* kn=dynamic_cast<KeyName*>(*i);
-                    if (kn) {
-                        getKeyNames().push_back(kn->cloneKeyName());
-                        continue;
-                    }
-
-                    KeyValue* kv=dynamic_cast<KeyValue*>(*i);
-                    if (kv) {
-                        getKeyValues().push_back(kv->cloneKeyValue());
-                        continue;
-                    }
-
-                    RetrievalMethod* rm=dynamic_cast<RetrievalMethod*>(*i);
-                    if (rm) {
-                        getRetrievalMethods().push_back(rm->cloneRetrievalMethod());
-                        continue;
-                    }
-
-                    MgmtData* md=dynamic_cast<MgmtData*>(*i);
-                    if (md) {
-                        getMgmtDatas().push_back(md->cloneMgmtData());
-                        continue;
-                    }
-
-                    SPKIData* sd=dynamic_cast<SPKIData*>(*i);
-                    if (sd) {
-                        getSPKIDatas().push_back(sd->cloneSPKIData());
-                        continue;
-                    }
-
-                    PGPData* pd=dynamic_cast<PGPData*>(*i);
-                    if (pd) {
-                        getPGPDatas().push_back(pd->clonePGPData());
-                        continue;
-                    }
-
-                    getUnknownXMLObjects().push_back((*i)->clone());
-                }
-            }
-        }
-        
-        IMPL_XMLOBJECT_CLONE(KeyInfo);
-        IMPL_ID_ATTRIB_EX(Id,ID,nullptr);
-        IMPL_TYPED_CHILDREN(KeyName,m_children.end());
-        IMPL_TYPED_CHILDREN(KeyValue,m_children.end());
-        IMPL_TYPED_CHILDREN(RetrievalMethod,m_children.end());
-        IMPL_TYPED_CHILDREN(X509Data,m_children.end());
-        IMPL_TYPED_CHILDREN(MgmtData,m_children.end());
-        IMPL_TYPED_CHILDREN(SPKIData,m_children.end());
-        IMPL_TYPED_CHILDREN(PGPData,m_children.end());
-        IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject,m_children.end());
-
-    protected:
-        void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_ID_ATTRIB(Id,ID,nullptr);
-        }
-
-        void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
-            PROC_TYPED_CHILDREN(X509Data,XMLSIG_NS,false);
-            PROC_TYPED_CHILDREN(KeyName,XMLSIG_NS,false);
-            PROC_TYPED_CHILDREN(KeyValue,XMLSIG_NS,false);
-            PROC_TYPED_CHILDREN(RetrievalMethod,XMLSIG_NS,false);
-            PROC_TYPED_CHILDREN(MgmtData,XMLSIG_NS,false);
-            PROC_TYPED_CHILDREN(SPKIData,XMLSIG_NS,false);
-            PROC_TYPED_CHILDREN(PGPData,XMLSIG_NS,false);
-            
-            // Unknown child.
-            const XMLCh* nsURI=root->getNamespaceURI();
-            if (!XMLString::equals(nsURI,XMLSIG_NS) && nsURI && *nsURI) {
-                getUnknownXMLObjects().push_back(childXMLObject);
-                return;
-            }
-            
-            AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
-        }
-
-        void processAttribute(const DOMAttr* attribute) {
-            PROC_ID_ATTRIB(Id,ID,nullptr);
-            AbstractXMLObjectUnmarshaller::processAttribute(attribute);
-        }
-    };
-
     class XMLTOOL_DLLLOCAL KeyInfoReferenceImpl : public virtual KeyInfoReference,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
@@ -815,7 +715,131 @@ namespace xmlsignature {
         }
     };
 
-    
+    class XMLTOOL_DLLLOCAL KeyInfoImpl : public virtual KeyInfo,
+        public AbstractComplexElement,
+        public AbstractDOMCachingXMLObject,
+        public AbstractXMLObjectMarshaller,
+        public AbstractXMLObjectUnmarshaller
+    {
+    public:
+        virtual ~KeyInfoImpl() {
+            XMLString::release(&m_Id);
+        }
+
+        KeyInfoImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
+            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Id(nullptr) {
+        }
+            
+        KeyInfoImpl(const KeyInfoImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src),
+                    m_Id(XMLString::replicate(src.m_Id)) {
+
+            for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
+                if (*i) {
+                    X509Data* xd=dynamic_cast<X509Data*>(*i);
+                    if (xd) {
+                        getX509Datas().push_back(xd->cloneX509Data());
+                        continue;
+                    }
+
+                    KeyName* kn=dynamic_cast<KeyName*>(*i);
+                    if (kn) {
+                        getKeyNames().push_back(kn->cloneKeyName());
+                        continue;
+                    }
+
+                    KeyValue* kv=dynamic_cast<KeyValue*>(*i);
+                    if (kv) {
+                        getKeyValues().push_back(kv->cloneKeyValue());
+                        continue;
+                    }
+
+                    DEREncodedKeyValue* ekv=dynamic_cast<DEREncodedKeyValue*>(*i);
+                    if (ekv) {
+                        getDEREncodedKeyValues().push_back(ekv->cloneDEREncodedKeyValue());
+                        continue;
+                    }
+
+                    RetrievalMethod* rm=dynamic_cast<RetrievalMethod*>(*i);
+                    if (rm) {
+                        getRetrievalMethods().push_back(rm->cloneRetrievalMethod());
+                        continue;
+                    }
+
+                    MgmtData* md=dynamic_cast<MgmtData*>(*i);
+                    if (md) {
+                        getMgmtDatas().push_back(md->cloneMgmtData());
+                        continue;
+                    }
+
+                    SPKIData* sd=dynamic_cast<SPKIData*>(*i);
+                    if (sd) {
+                        getSPKIDatas().push_back(sd->cloneSPKIData());
+                        continue;
+                    }
+
+                    PGPData* pd=dynamic_cast<PGPData*>(*i);
+                    if (pd) {
+                        getPGPDatas().push_back(pd->clonePGPData());
+                        continue;
+                    }
+
+                    KeyInfoReference* kref=dynamic_cast<KeyInfoReference*>(*i);
+                    if (kref) {
+                        getKeyInfoReferences().push_back(kref->cloneKeyInfoReference());
+                        continue;
+                    }
+
+                    getUnknownXMLObjects().push_back((*i)->clone());
+                }
+            }
+        }
+        
+        IMPL_XMLOBJECT_CLONE(KeyInfo);
+        IMPL_ID_ATTRIB_EX(Id,ID,nullptr);
+        IMPL_TYPED_CHILDREN(KeyName,m_children.end());
+        IMPL_TYPED_CHILDREN(KeyValue,m_children.end());
+        IMPL_TYPED_CHILDREN(DEREncodedKeyValue,m_children.end());
+        IMPL_TYPED_CHILDREN(RetrievalMethod,m_children.end());
+        IMPL_TYPED_CHILDREN(X509Data,m_children.end());
+        IMPL_TYPED_CHILDREN(MgmtData,m_children.end());
+        IMPL_TYPED_CHILDREN(SPKIData,m_children.end());
+        IMPL_TYPED_CHILDREN(PGPData,m_children.end());
+        IMPL_TYPED_CHILDREN(KeyInfoReference,m_children.end());
+        IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject,m_children.end());
+
+    protected:
+        void marshallAttributes(DOMElement* domElement) const {
+            MARSHALL_ID_ATTRIB(Id,ID,nullptr);
+        }
+
+        void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
+            PROC_TYPED_CHILDREN(X509Data,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(KeyName,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(KeyValue,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(DEREncodedKeyValue,XMLSIG11_NS,false);
+            PROC_TYPED_CHILDREN(RetrievalMethod,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(MgmtData,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(SPKIData,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(PGPData,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(KeyInfoReference,XMLSIG11_NS,false);
+            
+            // Unknown child.
+            const XMLCh* nsURI=root->getNamespaceURI();
+            if (!XMLString::equals(nsURI,XMLSIG_NS) && nsURI && *nsURI) {
+                getUnknownXMLObjects().push_back(childXMLObject);
+                return;
+            }
+            
+            AbstractXMLObjectUnmarshaller::processChildElement(childXMLObject,root);
+        }
+
+        void processAttribute(const DOMAttr* attribute) {
+            PROC_ID_ATTRIB(Id,ID,nullptr);
+            AbstractXMLObjectUnmarshaller::processAttribute(attribute);
+        }
+    };
+   
     DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,KeyName);
     DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,MgmtData);
     DECL_XMLOBJECTIMPL_SIMPLE(XMLTOOL_DLLLOCAL,Modulus);

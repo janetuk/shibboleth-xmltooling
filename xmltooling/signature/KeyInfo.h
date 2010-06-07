@@ -36,6 +36,14 @@
 #define DECL_XMLSIGOBJECTBUILDER(cname) \
     DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,xmlconstants::XMLSIG_NS,xmlconstants::XMLSIG_PREFIX)
 
+/**
+ * Macro for declaring signature builders.
+ * 
+ * @param cname name of class being built
+ */
+#define DECL_XMLSIG11OBJECTBUILDER(cname) \
+    DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,xmlconstants::XMLSIG11_NS,xmlconstants::XMLSIG11_PREFIX)
+
 namespace xmlsignature {
 
     DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,KeyName,Name,XML Digital Signature version 20020212 KeyName element);
@@ -135,6 +143,7 @@ namespace xmlsignature {
         DECL_TYPED_CHILDREN(X509SubjectName);
         DECL_TYPED_CHILDREN(X509Certificate);
         DECL_TYPED_CHILDREN(X509CRL);
+        DECL_TYPED_CHILDREN(OCSPResponse);
         /** X509DataType local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
@@ -157,23 +166,25 @@ namespace xmlsignature {
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
+    BEGIN_XMLOBJECT(XMLTOOL_API,KeyInfoReference,xmltooling::XMLObject,XML Digital Signature version 1.1 KeyInfoReference element);
+        DECL_STRING_ATTRIB(Id,ID);
+        DECL_STRING_ATTRIB(URI,URI);
+        /** KeyInfoReferenceType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
     BEGIN_XMLOBJECT(XMLTOOL_API,KeyInfo,xmltooling::ElementExtensibleXMLObject,XML Digital Signature version 20020212 KeyInfo element);
         DECL_STRING_ATTRIB(Id,ID);
         DECL_TYPED_CHILDREN(X509Data);
         DECL_TYPED_CHILDREN(KeyName);
         DECL_TYPED_CHILDREN(KeyValue);
+        DECL_TYPED_CHILDREN(DEREncodedKeyValue);
         DECL_TYPED_CHILDREN(RetrievalMethod);
         DECL_TYPED_CHILDREN(MgmtData);
         DECL_TYPED_CHILDREN(PGPData);
         DECL_TYPED_CHILDREN(SPKIData);
+        DECL_TYPED_CHILDREN(KeyInfoReference);
         /** KeyInfoType local name */
-        static const XMLCh TYPE_NAME[];
-    END_XMLOBJECT;
-
-    BEGIN_XMLOBJECT(XMLTOOL_API,KeyInfoReference,xmltooling::XMLObject,XML Digital Signature version 1.1 KeyInfoReference element);
-        DECL_STRING_ATTRIB(Id,ID);
-        DECL_STRING_ATTRIB(URI,URI);
-        /** KeyInfoReferenceType local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
@@ -182,7 +193,6 @@ namespace xmlsignature {
     DECL_XMLSIGOBJECTBUILDER(PGPKeyPacket);
     DECL_XMLSIGOBJECTBUILDER(SPKIData);
     DECL_XMLSIGOBJECTBUILDER(SPKISexp);
-    DECL_XMLSIGOBJECTBUILDER(OCSPResponse);
     DECL_XMLSIGOBJECTBUILDER(X509IssuerSerial);
     DECL_XMLSIGOBJECTBUILDER(X509IssuerName);
     DECL_XMLSIGOBJECTBUILDER(X509SerialNumber);
@@ -209,9 +219,11 @@ namespace xmlsignature {
     DECL_XMLSIGOBJECTBUILDER(DSAKeyValue);
     DECL_XMLSIGOBJECTBUILDER(RSAKeyValue);
     DECL_XMLSIGOBJECTBUILDER(KeyValue);
-    DECL_XMLSIGOBJECTBUILDER(DEREncodedKeyValue);
     DECL_XMLSIGOBJECTBUILDER(KeyInfo);
-    DECL_XMLSIGOBJECTBUILDER(KeyInfoReference);
+
+    DECL_XMLSIG11OBJECTBUILDER(DEREncodedKeyValue);
+    DECL_XMLSIG11OBJECTBUILDER(KeyInfoReference);
+    DECL_XMLSIG11OBJECTBUILDER(OCSPResponse);
 
     /**
      * Registers builders and validators for KeyInfo classes into the runtime.
