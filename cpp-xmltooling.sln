@@ -30,6 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Schemas", "Schemas", "{23EF
 		schemas\xenc-schema.xsd = schemas\xenc-schema.xsd
 		schemas\xml.xsd = schemas\xml.xsd
 		schemas\xmldsig-core-schema.xsd = schemas\xmldsig-core-schema.xsd
+		schemas\xmldsig11-schema.xsd = schemas\xmldsig11-schema.xsd
 		schemas\xmltooling.xsd = schemas\xmltooling.xsd
 	EndProjectSection
 EndProject
