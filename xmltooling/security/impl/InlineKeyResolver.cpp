@@ -104,13 +104,13 @@ namespace xmltooling {
             m_credctx = context;
         }
 
-        void resolve(const KeyInfo* keyInfo, int types=0, bool followRefs=true);
-        void resolve(DSIGKeyInfoList* keyInfo, int types=0, bool followRefs=true);
+        void resolve(const KeyInfo* keyInfo, int types=0, bool followRefs=false);
+        void resolve(DSIGKeyInfoList* keyInfo, int types=0, bool followRefs=false);
 
     private:
-        bool resolveCerts(const KeyInfo* keyInfo, bool followRefs=true);
-        bool resolveKey(const KeyInfo* keyInfo, bool followRefs=true);
-        bool resolveCRLs(const KeyInfo* keyInfo, bool followRefs=true);
+        bool resolveCerts(const KeyInfo* keyInfo, bool followRefs=false);
+        bool resolveKey(const KeyInfo* keyInfo, bool followRefs=false);
+        bool resolveCRLs(const KeyInfo* keyInfo, bool followRefs=false);
 
         KeyInfoCredentialContext* m_credctx;
     };
@@ -121,7 +121,7 @@ namespace xmltooling {
     {
     public:
         InlineKeyResolver(const DOMElement* e)
-            : m_followRefs(XMLHelper::getNodeValueAsBool(e ? e->getAttributeNodeNS(nullptr, keyInfoReferences) : nullptr, true)) {
+            : m_followRefs(XMLHelper::getNodeValueAsBool(e ? e->getAttributeNodeNS(nullptr, keyInfoReferences) : nullptr, false)) {
         }
 
         virtual ~InlineKeyResolver() {}
