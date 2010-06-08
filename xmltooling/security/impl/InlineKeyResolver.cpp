@@ -104,21 +104,26 @@ namespace xmltooling {
             m_credctx = context;
         }
 
-        void resolve(const KeyInfo* keyInfo, int types=0);
-        void resolve(DSIGKeyInfoList* keyInfo, int types=0);
+        void resolve(const KeyInfo* keyInfo, int types=0, bool followRefs=true);
+        void resolve(DSIGKeyInfoList* keyInfo, int types=0, bool followRefs=true);
 
     private:
-        bool resolveCerts(const KeyInfo* keyInfo);
-        bool resolveKey(const KeyInfo* keyInfo);
-        bool resolveCRLs(const KeyInfo* keyInfo);
+        bool resolveCerts(const KeyInfo* keyInfo, bool followRefs=true);
+        bool resolveKey(const KeyInfo* keyInfo, bool followRefs=true);
+        bool resolveCRLs(const KeyInfo* keyInfo, bool followRefs=true);
 
         KeyInfoCredentialContext* m_credctx;
     };
 
+    static const XMLCh keyInfoReferences[] = UNICODE_LITERAL_17(k,e,y,I,n,f,o,R,e,f,e,r,e,n,c,e,s);
+
     class XMLTOOL_DLLLOCAL InlineKeyResolver : public KeyInfoResolver
     {
     public:
-        InlineKeyResolver() {}
+        InlineKeyResolver(const DOMElement* e)
+            : m_followRefs(XMLHelper::getNodeValueAsBool(e ? e->getAttributeNodeNS(nullptr, keyInfoReferences) : nullptr, true)) {
+        }
+
         virtual ~InlineKeyResolver() {}
 
         Credential* resolve(const KeyInfo* keyInfo, int types=0) const {
@@ -127,7 +132,7 @@ namespace xmltooling {
             if (types == 0)
                 types = Credential::RESOLVE_KEYS|X509Credential::RESOLVE_CERTS|X509Credential::RESOLVE_CRLS;
             auto_ptr<InlineCredential> credential(new InlineCredential(keyInfo));
-            credential->resolve(keyInfo, types);
+            credential->resolve(keyInfo, types, m_followRefs);
             return credential.release();
         }
         Credential* resolve(DSIGKeyInfoList* keyInfo, int types=0) const {
@@ -136,7 +141,7 @@ namespace xmltooling {
             if (types == 0)
                 types = Credential::RESOLVE_KEYS|X509Credential::RESOLVE_CERTS|X509Credential::RESOLVE_CRLS;
             auto_ptr<InlineCredential> credential(new InlineCredential(keyInfo));
-            credential->resolve(keyInfo, types);
+            credential->resolve(keyInfo, types, m_followRefs);
             return credential.release();
         }
         Credential* resolve(KeyInfoCredentialContext* context, int types=0) const {
@@ -146,28 +151,31 @@ namespace xmltooling {
                 types = Credential::RESOLVE_KEYS|X509Credential::RESOLVE_CERTS|X509Credential::RESOLVE_CRLS;
             auto_ptr<InlineCredential> credential(new InlineCredential(context));
             if (context->getKeyInfo())
-                credential->resolve(context->getKeyInfo(), types);
+                credential->resolve(context->getKeyInfo(), types, m_followRefs);
             else if (context->getNativeKeyInfo())
-                credential->resolve(context->getNativeKeyInfo(), types);
+                credential->resolve(context->getNativeKeyInfo(), types, m_followRefs);
             credential->setCredentialContext(context);
             return credential.release();
         }
+
+    private:
+        bool m_followRefs;
     };
 
     KeyInfoResolver* XMLTOOL_DLLLOCAL InlineKeyInfoResolverFactory(const DOMElement* const & e)
     {
-        return new InlineKeyResolver();
+        return new InlineKeyResolver(e);
     }
 };
 
-void InlineCredential::resolve(const KeyInfo* keyInfo, int types)
+void InlineCredential::resolve(const KeyInfo* keyInfo, int types, bool followRefs)
 {
 #ifdef _DEBUG
     NDC ndc("resolve");
 #endif
 
     if (types & X509Credential::RESOLVE_CERTS)
-        resolveCerts(keyInfo);
+        resolveCerts(keyInfo, followRefs);
     
     if (types & Credential::RESOLVE_KEYS) {
         if (types & X509Credential::RESOLVE_CERTS) {
@@ -175,16 +183,16 @@ void InlineCredential::resolve(const KeyInfo* keyInfo, int types)
             if (!m_xseccerts.empty())
                 m_key = m_xseccerts.front()->clonePublicKey();
             else
-                resolveKey(keyInfo);
+                resolveKey(keyInfo, followRefs);
         }
         // Otherwise try directly for a key and then go for certs if none is found.
-        else if (!resolveKey(keyInfo) && resolveCerts(keyInfo)) {
+        else if (!resolveKey(keyInfo, followRefs) && resolveCerts(keyInfo, followRefs)) {
             m_key = m_xseccerts.front()->clonePublicKey();
         }
     }
 
     if (types & X509Credential::RESOLVE_CRLS)
-        resolveCRLs(keyInfo);
+        resolveCRLs(keyInfo, followRefs);
 
     const XMLCh* n;
     char* kn;
@@ -229,7 +237,7 @@ void InlineCredential::resolve(const KeyInfo* keyInfo, int types)
     }
 }
 
-bool InlineCredential::resolveKey(const KeyInfo* keyInfo)
+bool InlineCredential::resolveKey(const KeyInfo* keyInfo, bool followRefs)
 {
     Category& log = Category::getInstance(XMLTOOLING_LOGCAT".KeyInfoResolver."INLINE_KEYINFO_RESOLVER);
 
@@ -283,10 +291,36 @@ bool InlineCredential::resolveKey(const KeyInfo* keyInfo)
         }
     }
 
+    if (followRefs) {
+        // Check for KeyInfoReference.
+        const XMLCh* fragID=NULL;
+        const XMLObject* treeRoot=NULL;
+        const vector<KeyInfoReference*>& refs = keyInfo->getKeyInfoReferences();
+        for (vector<KeyInfoReference*>::const_iterator ref = refs.begin(); ref != refs.end(); ++ref) {
+            fragID = (*ref)->getURI();
+            if (!fragID || *fragID != chPound || !*(fragID+1)) {
+                log.warn("skipping ds11:KeyInfoReference with an empty or non-local reference");
+                continue;
+            }
+            if (!treeRoot) {
+                treeRoot = keyInfo;
+                while (treeRoot->getParent())
+                    treeRoot = treeRoot->getParent();
+            }
+            keyInfo = dynamic_cast<const KeyInfo*>(XMLHelper::getXMLObjectById(*treeRoot, fragID+1));
+            if (!keyInfo) {
+                log.warn("skipping ds11:KeyInfoReference, local reference did not resolve to a ds:KeyInfo");
+                continue;
+            }
+            if (resolveKey(keyInfo, false))
+                return true;
+        }
+    }
+
     return false;
 }
 
-bool InlineCredential::resolveCerts(const KeyInfo* keyInfo)
+bool InlineCredential::resolveCerts(const KeyInfo* keyInfo, bool followRefs)
 {
     Category& log = Category::getInstance(XMLTOOLING_LOGCAT".KeyInfoResolver."INLINE_KEYINFO_RESOLVER);
 
@@ -316,12 +350,39 @@ bool InlineCredential::resolveCerts(const KeyInfo* keyInfo)
             }
         }
     }
+
+    if (followRefs && m_xseccerts.empty()) {
+        // Check for KeyInfoReference.
+        const XMLCh* fragID=NULL;
+        const XMLObject* treeRoot=NULL;
+        const vector<KeyInfoReference*>& refs = keyInfo->getKeyInfoReferences();
+        for (vector<KeyInfoReference*>::const_iterator ref = refs.begin(); ref != refs.end(); ++ref) {
+            fragID = (*ref)->getURI();
+            if (!fragID || *fragID != chPound || !*(fragID+1)) {
+                log.warn("skipping ds11:KeyInfoReference with an empty or non-local reference");
+                continue;
+            }
+            if (!treeRoot) {
+                treeRoot = keyInfo;
+                while (treeRoot->getParent())
+                    treeRoot = treeRoot->getParent();
+            }
+            keyInfo = dynamic_cast<const KeyInfo*>(XMLHelper::getXMLObjectById(*treeRoot, fragID+1));
+            if (!keyInfo) {
+                log.warn("skipping ds11:KeyInfoReference, local reference did not resolve to a ds:KeyInfo");
+                continue;
+            }
+            if (resolveCerts(keyInfo, false))
+                return true;
+        }
+        return false;
+    }
     
     log.debug("resolved %d certificate(s)", m_xseccerts.size());
     return !m_xseccerts.empty();
 }
 
-bool InlineCredential::resolveCRLs(const KeyInfo* keyInfo)
+bool InlineCredential::resolveCRLs(const KeyInfo* keyInfo, bool followRefs)
 {
     Category& log = Category::getInstance(XMLTOOLING_LOGCAT".KeyInfoResolver."INLINE_KEYINFO_RESOLVER);
 
@@ -352,11 +413,38 @@ bool InlineCredential::resolveCRLs(const KeyInfo* keyInfo)
         }
     }
 
+    if (followRefs && m_crls.empty()) {
+        // Check for KeyInfoReference.
+        const XMLCh* fragID=NULL;
+        const XMLObject* treeRoot=NULL;
+        const vector<KeyInfoReference*>& refs = keyInfo->getKeyInfoReferences();
+        for (vector<KeyInfoReference*>::const_iterator ref = refs.begin(); ref != refs.end(); ++ref) {
+            fragID = (*ref)->getURI();
+            if (!fragID || *fragID != chPound || !*(fragID+1)) {
+                log.warn("skipping ds11:KeyInfoReference with an empty or non-local reference");
+                continue;
+            }
+            if (!treeRoot) {
+                treeRoot = keyInfo;
+                while (treeRoot->getParent())
+                    treeRoot = treeRoot->getParent();
+            }
+            keyInfo = dynamic_cast<const KeyInfo*>(XMLHelper::getXMLObjectById(*treeRoot, fragID+1));
+            if (!keyInfo) {
+                log.warn("skipping ds11:KeyInfoReference, local reference did not resolve to a ds:KeyInfo");
+                continue;
+            }
+            if (resolveCRLs(keyInfo, false))
+                return true;
+        }
+        return false;
+    }
+
     log.debug("resolved %d CRL(s)", m_crls.size());
     return !m_crls.empty();
 }
 
-void InlineCredential::resolve(DSIGKeyInfoList* keyInfo, int types)
+void InlineCredential::resolve(DSIGKeyInfoList* keyInfo, int types, bool followRefs)
 {
 #ifdef _DEBUG
     NDC ndc("resolve");

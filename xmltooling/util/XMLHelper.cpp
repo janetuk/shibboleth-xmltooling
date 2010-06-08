@@ -177,6 +177,20 @@ xmltooling::QName* XMLHelper::getNodeValueAsQName(const DOMNode* domNode)
     return new xmltooling::QName(domNode->lookupNamespaceURI(nullptr), value);
 }
 
+bool XMLHelper::getNodeValueAsBool(const xercesc::DOMNode* domNode, bool def)
+{
+    if (!domNode)
+        return def;
+    const XMLCh* value = domNode->getNodeValue();
+    if (!value || !*value)
+        return def;
+    if (*value == chLatin_t || *value == chDigit_1)
+        return true;
+    else if (*value == chLatin_f || *value == chDigit_0)
+        return false;
+    return def;
+}
+
 DOMElement* XMLHelper::appendChildElement(DOMElement* parentElement, DOMElement* childElement)
 {
     DOMDocument* parentDocument = parentElement->getOwnerDocument();

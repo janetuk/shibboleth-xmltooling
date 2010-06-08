@@ -168,6 +168,15 @@ namespace xmltooling {
         static QName* getNodeValueAsQName(const xercesc::DOMNode* domNode);
 
         /**
+         * Returns a boolean based on a node's value.
+         *
+         * @param domNode   the DOM node with a boolean (1/0/true/false) value
+         * @param def       value to return if the node is null/missing
+         * @return a bool value based on the node's value, or a default value
+         */
+        static bool getNodeValueAsBool(const xercesc::DOMNode* domNode, bool def);
+
+        /**
          * Appends the child Element to the parent Element,
          * importing the child Element into the parent's Document if needed.
          *
