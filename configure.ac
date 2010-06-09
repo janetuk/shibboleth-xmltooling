@@ -223,6 +223,16 @@ AC_TRY_COMPILE([#include <xercesc/dom/DOM.hpp>],
       [AC_DEFINE([XMLTOOLING_XERCESC_BOOLSETIDATTRIBUTE], [1], [Define to 1 if Xerces DOM ID methods take extra parameter.])],
       [AC_MSG_RESULT([no])])
 
+AC_MSG_CHECKING([whether Xerces XMLString::release(XMLByte**) exists])
+AC_TRY_COMPILE([#include <xercesc/util/XMLString.hpp>],
+    [using namespace XERCES_CPP_NAMESPACE;
+      XMLByte* buf=NULL;
+      XMLString::release(&buf);
+    ],
+    [AC_MSG_RESULT([yes])]
+    [AC_DEFINE([XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE], [1], [Define to 1 if Xerces XMLString includes XMLByte release.])],
+    [AC_MSG_RESULT([no])])
+
 # XML-Security settings
 AC_ARG_WITH(xmlsec,
             AC_HELP_STRING([--with-xmlsec=PATH], [where xmlsec is installed]),,

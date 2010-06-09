@@ -25,6 +25,7 @@
 #include "security/BasicX509Credential.h"
 #include "security/KeyInfoCredentialContext.h"
 #include "security/KeyInfoResolver.h"
+#include "security/SecurityHelper.h"
 #include "security/XSECCryptoX509CRL.h"
 #include "signature/KeyInfo.h"
 #include "signature/Signature.h"
@@ -36,9 +37,9 @@
 #include <xercesc/util/XMLUniDefs.hpp>
 #include <xsec/dsig/DSIGKeyInfoX509.hpp>
 #include <xsec/enc/XSECKeyInfoResolverDefault.hpp>
-#include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
-#include <xsec/enc/OpenSSL/OpenSSLCryptoKeyRSA.hpp>
-#include <xsec/enc/OpenSSL/OpenSSLCryptoKeyDSA.hpp>
+#include <xsec/enc/XSECCryptoX509.hpp>
+#include <xsec/enc/XSECCryptoKeyRSA.hpp>
+#include <xsec/enc/XSECCryptoKeyDSA.hpp>
 #include <xsec/enc/XSECCryptoException.hpp>
 #include <xsec/framework/XSECException.hpp>
 
@@ -72,8 +73,10 @@ namespace xmltooling {
             if (ret) {
                 ret->setId(nullptr);
                 ret->getRetrievalMethods().clear();
+                ret->getKeyInfoReferences().clear();
                 if (compact) {
                     ret->getKeyValues().clear();
+                    ret->getDEREncodedKeyValues().clear();
                     ret->getSPKIDatas().clear();
                     ret->getPGPDatas().clear();
                     ret->getUnknownXMLObjects().clear();
@@ -81,6 +84,7 @@ namespace xmltooling {
                     for (VectorOf(X509Data)::size_type pos = 0; pos < x509Datas.size();) {
                         x509Datas[pos]->getX509Certificates().clear();
                         x509Datas[pos]->getX509CRLs().clear();
+                        x509Datas[pos]->getOCSPResponses().clear();
                         x509Datas[pos]->getUnknownXMLObjects().clear();
                         if (x509Datas[pos]->hasChildren())
                             ++pos;
@@ -243,7 +247,7 @@ bool InlineCredential::resolveKey(const KeyInfo* keyInfo, bool followRefs)
 
     // Check for ds:KeyValue
     const vector<KeyValue*>& keyValues = keyInfo->getKeyValues();
-    for (vector<KeyValue*>::const_iterator i=keyValues.begin(); i!=keyValues.end(); ++i) {
+    for (vector<KeyValue*>::const_iterator i = keyValues.begin(); i != keyValues.end(); ++i) {
         try {
             SchemaValidators.validate(*i);    // see if it's a "valid" key
             RSAKeyValue* rsakv = (*i)->getRSAKeyValue();
@@ -278,6 +282,10 @@ bool InlineCredential::resolveKey(const KeyInfo* keyInfo, bool followRefs)
                 m_key = dsa.release();
                 return true;
             }
+            ECKeyValue* eckv = (*i)->getECKeyValue();
+            if (eckv) {
+                log.warn("skipping ds11:ECKeyValue, not yet supported");
+            }
         }
         catch (ValidationException& ex) {
             log.warn("skipping invalid ds:KeyValue (%s)", ex.what());
@@ -290,6 +298,17 @@ bool InlineCredential::resolveKey(const KeyInfo* keyInfo, bool followRefs)
             log.error("caught XML-Security exception loading key: %s", e.getMsg());
         }
     }
+
+    // Check for ds11:DEREncodedKeyValue
+    const vector<DEREncodedKeyValue*>& derValues = keyInfo->getDEREncodedKeyValues();
+    for (vector<DEREncodedKeyValue*>::const_iterator j = derValues.begin(); j != derValues.end(); ++j) {
+        log.debug("resolving ds11:DEREncodedKeyValue");
+        m_key = SecurityHelper::fromDEREncoding((*j)->getValue());
+        if (m_key)
+            return true;
+        log.warn("failed to resolve ds11:DEREncodedKeyValue");
+    }
+
 
     if (followRefs) {
         // Check for KeyInfoReference.

@@ -60,4 +60,23 @@ public:
         TSM_ASSERT_EQUALS("Wrong certificate count.", cred->getEntityCertificateChain().size(), 1);
         TSM_ASSERT_EQUALS("Wrong CRL count.", cred->getCRLs().size(), 3);
     }
+
+    void testDER() {
+        string path=data_path + "KeyInfo5.xml";
+        ifstream fs(path.c_str());
+        DOMDocument* doc=XMLToolingConfig::getConfig().getValidatingParser().parse(fs);
+        TS_ASSERT(doc!=nullptr);
+        const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
+        TS_ASSERT(b!=nullptr);
+        auto_ptr<KeyInfo> kiObject(dynamic_cast<KeyInfo*>(b->buildFromDocument(doc)));
+        TS_ASSERT(kiObject.get()!=nullptr);
+
+        auto_ptr<X509Credential> cred(dynamic_cast<X509Credential*>(m_resolver->resolve(kiObject.get())));
+        TSM_ASSERT("Unable to resolve KeyInfo into Credential.", cred.get()!=nullptr);
+
+        TSM_ASSERT("Unable to resolve public key.", cred->getPublicKey()!=nullptr);
+        TSM_ASSERT_EQUALS("Unexpected key type.", cred->getPublicKey()->getKeyType(), XSECCryptoKey::KEY_RSA_PUBLIC);
+        TSM_ASSERT_EQUALS("Wrong certificate count.", cred->getEntityCertificateChain().size(), 0);
+        TSM_ASSERT_EQUALS("Wrong CRL count.", cred->getCRLs().size(), 0);
+    }
 };

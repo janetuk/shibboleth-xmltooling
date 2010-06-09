@@ -200,7 +200,7 @@ namespace xmltooling {
 
         /**
          * @deprecated
-         * Returns the base64-encoded DER encoding of a certifiate's public key in SubjectPublicKeyInfo format.
+         * Returns the base64-encoded DER encoding of a certificate's public key in SubjectPublicKeyInfo format.
          *
          * @param cert      the certificate's key to encode
          * @param hash      if true, the DER encoded data is hashed with SHA-1 before base64 encoding
@@ -208,6 +208,24 @@ namespace xmltooling {
          * @return  the base64 encoded key value
          */
         static std::string getDEREncoding(const XSECCryptoX509& cert, bool hash=false, bool nowrap=true);
+
+        /**
+         * Decodes a DER-encoded public key.
+         *
+         * @param buf       DER encoded data
+         * @param buflen    length of data in bytes
+         * @param base64    true iff DER is base64-encoded
+         * @return  the decoded public key, or nullptr
+         */
+        static XSECCryptoKey* fromDEREncoding(const char* buf, unsigned long buflen, bool base64=true);
+
+        /**
+         * Decodes a base64-encoded and DER-encoded public key.
+         *
+         * @param buf       base64 and DER encoded data
+         * @return  the decoded public key, or nullptr
+         */
+        static XSECCryptoKey* fromDEREncoding(const XMLCh* buf);
     };
 };
 

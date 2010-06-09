@@ -30,11 +30,14 @@
 #include "util/NDC.h"
 
 #include <fstream>
+#include <openssl/evp.h>
 #include <openssl/pem.h>
 #include <openssl/pkcs12.h>
+#include <xsec/enc/XSECCryptoException.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyRSA.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyDSA.hpp>
+#include <xercesc/util/Base64.hpp>
 
 using namespace xmltooling::logging;
 using namespace xmltooling;
@@ -725,4 +728,71 @@ string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, bool hash, boo
 string SecurityHelper::getDEREncoding(const Credential& cred, bool hash, bool nowrap)
 {
     return getDEREncoding(cred, hash ? "SHA1" : nullptr, nowrap);
+}
+
+XSECCryptoKey* SecurityHelper::fromDEREncoding(const char* buf, unsigned long buflen, bool base64)
+{
+    xsecsize_t x;
+    XMLByte* decoded=nullptr;
+    if (base64) {
+        decoded = xercesc::Base64::decode(reinterpret_cast<const XMLByte*>(buf), &x);
+        if (!decoded) {
+            Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("base64 decode failed");
+            return nullptr;
+        }
+    }
+
+    BIO* b = BIO_new_mem_buf((void*)(base64 ? (char*)decoded : buf), (base64 ? x : buflen));
+    EVP_PKEY* pkey = d2i_PUBKEY_bio(b, nullptr);
+    BIO_free(b);
+    if (base64) {
+#ifdef XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE
+        XMLString::release(&decoded);
+#else
+        XMLString::release((char**)&decoded);
+#endif
+    }
+
+    if (pkey) {
+        // Now map it to an XSEC wrapper.
+        XSECCryptoKey* ret = nullptr;
+        try {
+            switch (pkey->type) {
+                case EVP_PKEY_RSA:
+                    ret = new OpenSSLCryptoKeyRSA(pkey);
+                    break;
+
+                case EVP_PKEY_DSA:
+                    ret = new OpenSSLCryptoKeyDSA(pkey);
+                    break;
+
+                default:
+                    Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("unsupported public key type");
+            }
+        }
+        catch (XSECCryptoException& ex) {
+            Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error(ex.getMsg());
+        }
+        EVP_PKEY_free(pkey);
+        return ret;
+    }
+
+    return nullptr;
+}
+
+XSECCryptoKey* SecurityHelper::fromDEREncoding(const XMLCh* buf)
+{
+    xsecsize_t x;
+    XMLByte* decoded = xercesc::Base64::decodeToXMLByte(buf, &x);
+    if (!decoded) {
+        Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("base64 decode failed");
+        return nullptr;
+    }
+    XSECCryptoKey* ret = fromDEREncoding((const char*)decoded, x, false);
+#ifdef XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE
+    XMLString::release(&decoded);
+#else
+    XMLString::release((char**)&decoded);
+#endif
+    return ret;
 }
