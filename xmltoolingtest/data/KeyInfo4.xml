@@ -1,0 +1,11 @@
+<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ds11="http://www.w3.org/2009/xmldsig11#">
+    <ds:KeyValue>
+        <ds11:ECKeyValue>
+            <ds11:NamedCurve URI="urn:oid:1.2.840.10045.3.1.7"/>
+            <ds11:PublicKey>
+            MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAER9z9tFObV/MdgFT0IDEUq6b8VZFL
+            sj+qeNjJMVgEIrioShi5HfJfZq/aLuTvt5DZEybsFNC1Fit5cYx7+0DN3g==
+            </ds11:PublicKey>
+        </ds11:ECKeyValue>
+    </ds:KeyValue>
+</ds:KeyInfo>

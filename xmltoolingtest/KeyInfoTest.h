@@ -92,4 +92,25 @@ public:
         TS_ASSERT(kiObject.get()!=nullptr);
         TS_ASSERT_THROWS(SchemaValidators.validate(kiObject.get()),ValidationException);
     }
+
+    void testKeyInfo4() {
+        string path=data_path + "KeyInfo4.xml";
+        ifstream fs(path.c_str());
+        DOMDocument* doc=XMLToolingConfig::getConfig().getValidatingParser().parse(fs);
+        TS_ASSERT(doc!=nullptr);
+
+        const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
+        TS_ASSERT(b!=nullptr);
+
+        auto_ptr<KeyInfo> kiObject(dynamic_cast<KeyInfo*>(b->buildFromDocument(doc)));
+        TS_ASSERT(kiObject.get()!=nullptr);
+        TSM_ASSERT_EQUALS("Number of child elements was not expected value",
+            1, kiObject->getKeyValues().size());
+        ECKeyValue* kv = kiObject->getKeyValues().front()->getECKeyValue();
+        TSM_ASSERT("Missing ECKeyValue", kv!=nullptr);
+        TSM_ASSERT("Missing NamedCurve", kv->getNamedCurve()!=nullptr);
+        TSM_ASSERT("Missing PublicKey", kv->getPublicKey()!=nullptr);
+
+        SchemaValidators.validate(kiObject.get());
+    }
 };

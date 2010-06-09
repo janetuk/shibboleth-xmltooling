@@ -32,6 +32,19 @@ using namespace std;
 using xmlconstants::XMLSIG_NS;
 using xmlconstants::XMLSIG11_NS;
 
+#define XMLOBJECTVALIDATOR_ONLYONEOF4(cname,proper1,proper2,proper3,proper4) \
+    int c##proper1##proper2##proper3##proper4=0; \
+    if (ptr->get##proper1()!=nullptr) \
+        c##proper1##proper2##proper3##proper4++; \
+    if (ptr->get##proper2()!=nullptr) \
+        c##proper1##proper2##proper3##proper4++; \
+    if (ptr->get##proper3()!=nullptr) \
+        c##proper1##proper2##proper3##proper4++; \
+    if (ptr->get##proper4()!=nullptr) \
+        c##proper1##proper2##proper3##proper4++; \
+    if (c##proper1##proper2##proper3##proper4 != 1) \
+        throw xmltooling::ValidationException(#cname" must have only one of "#proper1", "#proper2", "#proper3", or "#proper4".")
+
 namespace xmlsignature {
 
     XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,KeyName);
@@ -72,7 +85,7 @@ namespace xmlsignature {
     END_XMLOBJECTVALIDATOR;
 
     BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,KeyValue);
-        XMLOBJECTVALIDATOR_ONLYONEOF3(KeyValue,DSAKeyValue,RSAKeyValue,UnknownXMLObject);
+        XMLOBJECTVALIDATOR_ONLYONEOF4(KeyValue,DSAKeyValue,RSAKeyValue,ECKeyValue,UnknownXMLObject);
     END_XMLOBJECTVALIDATOR;
 
     BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,Transform);
