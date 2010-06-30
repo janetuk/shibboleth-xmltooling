@@ -40,6 +40,7 @@
 #include <xsec/enc/XSECCryptoX509.hpp>
 #include <xsec/enc/XSECCryptoKeyRSA.hpp>
 #include <xsec/enc/XSECCryptoKeyDSA.hpp>
+#include <xsec/enc/XSECCryptoKeyEC.hpp>
 #include <xsec/enc/XSECCryptoException.hpp>
 #include <xsec/framework/XSECException.hpp>
 
@@ -282,10 +283,20 @@ bool InlineCredential::resolveKey(const KeyInfo* keyInfo, bool followRefs)
                 m_key = dsa.release();
                 return true;
             }
+#ifdef XMLTOOLING_XMLSEC_ECC
             ECKeyValue* eckv = (*i)->getECKeyValue();
-            if (eckv) {
-                log.warn("skipping ds11:ECKeyValue, not yet supported");
+            if (eckv && eckv->getNamedCurve() && eckv->getPublicKey()) {
+                log.warn("resolving ds11:ECKeyValue");
+                auto_ptr<XSECCryptoKeyEC> ec(XSECPlatformUtils::g_cryptoProvider->keyEC());
+                auto_ptr_char uri(eckv->getNamedCurve()->getURI());
+                auto_ptr_char val(eckv->getPublicKey()->getValue());
+                if (uri.get() && val.get()) {
+                    ec->loadPublicKeyBase64(uri.get(), val.get(), XMLString::stringLen(val.get()));
+                    m_key = ec.release();
+                    return true;
+                }
             }
+#endif
         }
         catch (ValidationException& ex) {
             log.warn("skipping invalid ds:KeyValue (%s)", ex.what());

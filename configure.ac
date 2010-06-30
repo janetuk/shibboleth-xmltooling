@@ -328,6 +328,13 @@ int i = 0;
           [AC_DEFINE([XMLTOOLING_XMLSEC_SIGALGORITHM], [1], [Define to 1 if XML-Security-C exposes the signature algorithm URI.])],
           [AC_MSG_RESULT([no])])
 
+    AC_MSG_CHECKING([whether XML-Security-C includes ECC support])
+    AC_TRY_COMPILE([#include <xsec/dsig/DSIGKeyInfoValue.hpp>],
+          [DSIGKeyInfoValue* info; info->getECNamedCurve();],
+          [AC_MSG_RESULT([yes])]
+          [AC_DEFINE([XMLTOOLING_XMLSEC_ECC], [1], [Define to 1 if XML-Security-C includes ECC support.])],
+          [AC_MSG_RESULT([no])])
+
 	# restore master libs
 	LIBS="$save_LIBS"
 

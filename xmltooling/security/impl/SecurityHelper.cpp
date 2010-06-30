@@ -37,6 +37,7 @@
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyRSA.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyDSA.hpp>
+#include <xsec/enc/OpenSSL/OpenSSLCryptoKeyEC.hpp>
 #include <xercesc/util/Base64.hpp>
 
 using namespace xmltooling::logging;
@@ -200,6 +201,11 @@ XSECCryptoKey* SecurityHelper::loadKeyFromFile(const char* pathname, const char*
                 ret=new OpenSSLCryptoKeyDSA(pkey);
                 break;
 
+#ifdef XSEC_OPENSSL_HAVE_EC
+            case EVP_PKEY_EC:
+                ret=new OpenSSLCryptoKeyEC(pkey);
+                break;
+#endif
             default:
                 log.error("unsupported private key type");
         }
@@ -497,6 +503,30 @@ bool SecurityHelper::matches(const XSECCryptoKey& key1, const XSECCryptoKey& key
         return (dsa1 && dsa2 && BN_cmp(dsa1->priv_key,dsa2->priv_key) == 0);
     }
 
+#ifdef XMLTOOLING_XMLSEC_ECC
+    // If one key is public or both, just compare the public key half.
+    if (key1.getKeyType()==XSECCryptoKey::KEY_EC_PUBLIC || key1.getKeyType()==XSECCryptoKey::KEY_EC_PAIR) {
+        if (key2.getKeyType()!=XSECCryptoKey::KEY_EC_PUBLIC && key2.getKeyType()!=XSECCryptoKey::KEY_EC_PAIR)
+            return false;
+        const EC_KEY* ec1 = static_cast<const OpenSSLCryptoKeyEC&>(key1).getOpenSSLEC();
+        const EC_KEY* ec2 = static_cast<const OpenSSLCryptoKeyEC&>(key2).getOpenSSLEC();
+        if (!ec1 || !ec2)
+            return false;
+        if (EC_GROUP_cmp(EC_KEY_get0_group(ec1), EC_KEY_get0_group(ec2), nullptr) != 0)
+            return false;
+        return (EC_POINT_cmp(EC_KEY_get0_group(ec1), EC_KEY_get0_public_key(ec1), EC_KEY_get0_public_key(ec2), nullptr) == 0);
+    }
+
+    // For a private key, compare the private half.
+    if (key1.getKeyType()==XSECCryptoKey::KEY_EC_PRIVATE) {
+        if (key2.getKeyType()!=XSECCryptoKey::KEY_EC_PRIVATE && key2.getKeyType()!=XSECCryptoKey::KEY_EC_PAIR)
+            return false;
+        const EC_KEY* ec1 = static_cast<const OpenSSLCryptoKeyEC&>(key1).getOpenSSLEC();
+        const EC_KEY* ec2 = static_cast<const OpenSSLCryptoKeyEC&>(key2).getOpenSSLEC();
+        return (ec1 && ec2 && BN_cmp(EC_KEY_get0_private_key(ec1), EC_KEY_get0_private_key(ec2)) == 0);
+    }
+#endif
+
     Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("unsupported key type for comparison");
     return false;
 }
@@ -551,101 +581,90 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, const char* hash
         return ret;
     }
 
+    const RSA* rsa = nullptr;
+    const DSA* dsa = nullptr;
+#ifdef XMLTOOLING_XMLSEC_ECC
+    const EC_KEY* ec = nullptr;
+#endif
+
     if (key.getKeyType() == XSECCryptoKey::KEY_RSA_PUBLIC || key.getKeyType() == XSECCryptoKey::KEY_RSA_PAIR) {
-        const RSA* rsa = static_cast<const OpenSSLCryptoKeyRSA&>(key).getOpenSSLRSA();
+        rsa = static_cast<const OpenSSLCryptoKeyRSA&>(key).getOpenSSLRSA();
         if (!rsa) {
             Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("key was not populated");
             return ret;
         }
-        const EVP_MD* md=nullptr;
-        if (hash) {
-            md = EVP_get_digestbyname(hash);
-            if (!md) {
-                Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("hash algorithm (%s) not available", hash);
-                return ret;
-            }
-        }
-        BIO* chain = BIO_new(BIO_s_mem());
-        BIO* b = BIO_new(BIO_f_base64());
-        if (nowrap)
-            BIO_set_flags(b, BIO_FLAGS_BASE64_NO_NL);
-        chain = BIO_push(b, chain);
-        if (md) {
-            b = BIO_new(BIO_f_md());
-            BIO_set_md(b, md);
-            chain = BIO_push(b, chain);
-        }
-        i2d_RSA_PUBKEY_bio(chain, const_cast<RSA*>(rsa));
-        BIO_flush(chain);
-        if (md) {
-            char digest[EVP_MAX_MD_SIZE];
-            int len = BIO_gets(chain, digest, EVP_MD_size(md));
-            if (len != EVP_MD_size(md)) {
-                BIO_free_all(chain);
-                return ret;
-            }
-            b = BIO_pop(chain);
-            BIO_free(chain);
-            chain = b;
-            BIO_reset(chain);
-            BIO_write(chain, digest, len);
-            BIO_flush(chain);
-        }
-        BUF_MEM* bptr=nullptr;
-        BIO_get_mem_ptr(chain, &bptr);
-        if (bptr && bptr->length > 0)
-            ret.append(bptr->data, bptr->length);
-        BIO_free_all(chain);
     }
     else if (key.getKeyType() == XSECCryptoKey::KEY_DSA_PUBLIC || key.getKeyType() == XSECCryptoKey::KEY_DSA_PAIR) {
-        const DSA* dsa = static_cast<const OpenSSLCryptoKeyDSA&>(key).getOpenSSLDSA();
+        dsa = static_cast<const OpenSSLCryptoKeyDSA&>(key).getOpenSSLDSA();
         if (!dsa) {
             Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("key was not populated");
             return ret;
         }
-        const EVP_MD* md=nullptr;
-        if (hash) {
-            md = EVP_get_digestbyname(hash);
-            if (!md) {
-                Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("hash algorithm (%s) not available", hash);
-                return ret;
-            }
-        }
-        BIO* chain = BIO_new(BIO_s_mem());
-        BIO* b = BIO_new(BIO_f_base64());
-        if (nowrap)
-            BIO_set_flags(b, BIO_FLAGS_BASE64_NO_NL);
-        chain = BIO_push(b, chain);
-        if (md) {
-            b = BIO_new(BIO_f_md());
-            BIO_set_md(b, md);
-            chain = BIO_push(b, chain);
-        }
-        i2d_DSA_PUBKEY_bio(chain, const_cast<DSA*>(dsa));
-        BIO_flush(chain);
-        if (md) {
-            char digest[EVP_MAX_MD_SIZE];
-            int len = BIO_gets(chain, digest, EVP_MD_size(md));
-            if (len != EVP_MD_size(md)) {
-                BIO_free_all(chain);
-                return ret;
-            }
-            b = BIO_pop(chain);
-            BIO_free(chain);
-            chain = b;
-            BIO_reset(chain);
-            BIO_write(chain, digest, len);
-            BIO_flush(chain);
-        }
-        BUF_MEM* bptr=nullptr;
-        BIO_get_mem_ptr(chain, &bptr);
-        if (bptr && bptr->length > 0)
-            ret.append(bptr->data, bptr->length);
-        BIO_free_all(chain);
     }
+#ifdef XMLTOOLING_XMLSEC_ECC
+    else if (key.getKeyType() == XSECCryptoKey::KEY_EC_PUBLIC || key.getKeyType() == XSECCryptoKey::KEY_EC_PAIR) {
+        ec = static_cast<const OpenSSLCryptoKeyEC&>(key).getOpenSSLEC();
+        if (!ec) {
+            Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("key was not populated");
+            return ret;
+        }
+    }
+#endif
     else {
-        Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("encoding of non-RSA/DSA public keys not supported");
+        Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("public key type not supported");
+        return ret;
     }
+
+    const EVP_MD* md=nullptr;
+    if (hash) {
+        md = EVP_get_digestbyname(hash);
+        if (!md) {
+            Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("hash algorithm (%s) not available", hash);
+            return ret;
+        }
+    }
+
+    BIO* chain = BIO_new(BIO_s_mem());
+    BIO* b = BIO_new(BIO_f_base64());
+    if (nowrap)
+        BIO_set_flags(b, BIO_FLAGS_BASE64_NO_NL);
+    chain = BIO_push(b, chain);
+    if (md) {
+        b = BIO_new(BIO_f_md());
+        BIO_set_md(b, md);
+        chain = BIO_push(b, chain);
+    }
+
+    if (rsa)
+        i2d_RSA_PUBKEY_bio(chain, const_cast<RSA*>(rsa));
+    else if (dsa)
+        i2d_DSA_PUBKEY_bio(chain, const_cast<DSA*>(dsa));
+#ifdef XMLTOOLING_XMLSEC_ECC
+    else
+        i2d_EC_PUBKEY_bio(chain, const_cast<EC_KEY*>(ec));
+#endif
+
+    BIO_flush(chain);
+    if (md) {
+        char digest[EVP_MAX_MD_SIZE];
+        int len = BIO_gets(chain, digest, EVP_MD_size(md));
+        if (len != EVP_MD_size(md)) {
+            BIO_free_all(chain);
+            return ret;
+        }
+        b = BIO_pop(chain);
+        BIO_free(chain);
+        chain = b;
+        BIO_reset(chain);
+        BIO_write(chain, digest, len);
+        BIO_flush(chain);
+    }
+    BUF_MEM* bptr=nullptr;
+    BIO_get_mem_ptr(chain, &bptr);
+    if (bptr && bptr->length > 0)
+        ret.append(bptr->data, bptr->length);
+    BIO_free_all(chain);
+
     return ret;
 }
 
@@ -766,6 +785,11 @@ XSECCryptoKey* SecurityHelper::fromDEREncoding(const char* buf, unsigned long bu
                     ret = new OpenSSLCryptoKeyDSA(pkey);
                     break;
 
+#ifdef XMLTOOLING_XMLSEC_ECC
+                case EVP_PKEY_EC:
+                    ret = new OpenSSLCryptoKeyEC(pkey);
+                    break;
+#endif
                 default:
                     Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("unsupported public key type");
             }
