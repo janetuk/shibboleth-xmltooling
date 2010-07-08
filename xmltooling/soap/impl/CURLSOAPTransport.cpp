@@ -148,6 +148,13 @@ namespace xmltooling {
             return true;
         }
 
+        bool followRedirects(bool follow, unsigned int maxRedirs) {
+            return (
+                curl_easy_setopt(m_handle, CURLOPT_FOLLOWLOCATION, (follow ? 1 : 0)) == CURLE_OK &&
+                curl_easy_setopt(m_handle, CURLOPT_MAXREDIRS, (follow ? maxRedirs : 0)) == CURLE_OK
+                );
+        }
+
         bool setCacheTag(string* cacheTag) {
             m_cacheTag = cacheTag;
             return true;

@@ -75,6 +75,11 @@ HTTPSOAPTransport::~HTTPSOAPTransport()
 {
 }
 
+bool HTTPSOAPTransport::followRedirects(bool follow, unsigned int maxRedirs)
+{
+    return false;
+}
+
 SOAPClient::SOAPClient(bool validate) : m_validate(validate), m_transport(nullptr)
 {
 }
