@@ -119,7 +119,7 @@ namespace {
             input = nullptr;
         }
         ~TXFMOutputLog() {
-            m_log.debug("----- END SIGNATURE DEBUG -----");
+            m_log.debug("\n----- END SIGNATURE DEBUG -----\n");
         }
 
 	    void setInput(TXFMBase *newInput) {
@@ -127,7 +127,7 @@ namespace {
 	        if (newInput->getOutputType() != TXFMBase::BYTE_STREAM)
 		        throw XSECException(XSECException::TransformInputOutputFail, "OutputLog transform requires BYTE_STREAM input");
 	        keepComments = input->getCommentsStatus();
-            m_log.debug("----- BEGIN SIGNATURE DEBUG -----");
+            m_log.debug("\n----- BEGIN SIGNATURE DEBUG -----\n");
         }
 
 	    TXFMBase::ioType getInputType() {
