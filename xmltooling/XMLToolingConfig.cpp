@@ -61,15 +61,17 @@
 #ifndef XMLTOOLING_NO_XMLSEC
 # include <curl/curl.h>
 # include <openssl/err.h>
+# include <xsec/framework/XSECException.hpp>
 # include <xsec/framework/XSECProvider.hpp>
+# include <xsec/transformers/TXFMBase.hpp>
 #endif
 
 using namespace soap11;
 using namespace xmltooling::logging;
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 
-using xercesc::XMLPlatformUtils;
 
 DECL_XMLTOOLING_EXCEPTION_FACTORY(XMLParserException,xmltooling);
 DECL_XMLTOOLING_EXCEPTION_FACTORY(XMLObjectException,xmltooling);
@@ -89,7 +91,7 @@ using namespace xmlsignature;
     DECL_XMLTOOLING_EXCEPTION_FACTORY(EncryptionException,xmlencryption);
 #endif
 
-namespace xmltooling {
+namespace {
     static XMLToolingInternalConfig g_config;
 #ifndef XMLTOOLING_NO_XMLSEC
     static vector<Mutex*> g_openssl_locks;
@@ -108,6 +110,63 @@ namespace xmltooling {
         return (unsigned long)(pthread_self());
     }
 # endif
+
+# ifdef XMLTOOLING_XMLSEC_DEBUGLOGGING
+    class TXFMOutputLog : public TXFMBase {
+	    TXFMOutputLog();
+    public:
+        TXFMOutputLog(DOMDocument* doc) : TXFMBase(doc), m_log(Category::getInstance(XMLTOOLING_LOGCAT".Signature.Debugger")) {
+            input = nullptr;
+        }
+        ~TXFMOutputLog() {
+            m_log.debug("----- END SIGNATURE DEBUG -----");
+        }
+
+	    void setInput(TXFMBase *newInput) {
+	        input = newInput;
+	        if (newInput->getOutputType() != TXFMBase::BYTE_STREAM)
+		        throw XSECException(XSECException::TransformInputOutputFail, "OutputLog transform requires BYTE_STREAM input");
+	        keepComments = input->getCommentsStatus();
+            m_log.debug("----- BEGIN SIGNATURE DEBUG -----");
+        }
+
+	    TXFMBase::ioType getInputType() {
+            return TXFMBase::BYTE_STREAM;
+        }
+	    TXFMBase::ioType getOutputType() {
+            return TXFMBase::BYTE_STREAM;
+        }
+	    TXFMBase::nodeType getNodeType() {
+            return TXFMBase::DOM_NODE_NONE;
+        }
+
+	    unsigned int readBytes(XMLByte * const toFill, const unsigned int maxToFill) {
+	        unsigned int sz = input->readBytes(toFill, maxToFill);
+            m_log.debug(string(reinterpret_cast<char* const>(toFill), sz));
+	        return sz;
+        }
+
+	    DOMDocument* getDocument() {
+            return nullptr;
+        }
+	    DOMNode* getFragmentNode() {
+            return nullptr;
+        }
+	    const XMLCh* getFragmentId() {
+            return nullptr;
+        }
+	
+    private:
+        Category& m_log;
+    };
+
+    TXFMBase* TXFMOutputLogFactory(DOMDocument* doc) {
+        if (Category::getInstance(XMLTOOLING_LOGCAT".Signature.Debugger").isDebugEnabled())
+            return new TXFMOutputLog(doc);
+        return nullptr;
+    }
+# endif
+
 #endif
 
 #ifdef WIN32
@@ -296,6 +355,9 @@ bool XMLToolingInternalConfig::init()
 
 #ifndef XMLTOOLING_NO_XMLSEC
         XSECPlatformUtils::Initialise();
+# ifdef XMLTOOLING_XMLSEC_DEBUGLOGGING
+        XSECPlatformUtils::SetReferenceLoggingSink(TXFMOutputLogFactory);
+# endif
         m_xsecProvider=new XSECProvider();
         log.debug("XML-Security %s initialization complete", XSEC_FULLVERSIONDOT);
 #endif
