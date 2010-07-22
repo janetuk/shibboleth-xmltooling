@@ -209,18 +209,18 @@ bool XMLHelper::isNodeNamed(const xercesc::DOMNode* n, const XMLCh* ns, const XM
 
 const XMLCh* XMLHelper::getTextContent(const DOMElement* e)
 {
-    DOMNode* child=e->getFirstChild();
+    DOMNode* child = e ? e->getFirstChild() : nullptr;
     while (child) {
-        if (child->getNodeType()==DOMNode::TEXT_NODE)
+        if (child->getNodeType() == DOMNode::TEXT_NODE)
             return child->getNodeValue();
-        child=child->getNextSibling();
+        child = child->getNextSibling();
     }
     return nullptr;
 }
 
 DOMElement* XMLHelper::getFirstChildElement(const DOMNode* n, const XMLCh* localName)
 {
-    DOMNode* child = n->getFirstChild();
+    DOMNode* child = n ? n->getFirstChild() : nullptr;
     while (child && child->getNodeType() != DOMNode::ELEMENT_NODE)
         child = child->getNextSibling();
     if (child && localName) {
@@ -232,7 +232,7 @@ DOMElement* XMLHelper::getFirstChildElement(const DOMNode* n, const XMLCh* local
 
 DOMElement* XMLHelper::getLastChildElement(const DOMNode* n, const XMLCh* localName)
 {
-    DOMNode* child = n->getLastChild();
+    DOMNode* child = n ? n->getLastChild() : nullptr;
     while (child && child->getNodeType() != DOMNode::ELEMENT_NODE)
         child = child->getPreviousSibling();
     if (child && localName) {
@@ -260,7 +260,7 @@ DOMElement* XMLHelper::getLastChildElement(const DOMNode* n, const XMLCh* ns, co
 
 DOMElement* XMLHelper::getNextSiblingElement(const DOMNode* n, const XMLCh* localName)
 {
-    DOMNode* sib = n->getNextSibling();
+    DOMNode* sib = n ? n->getNextSibling() : nullptr;
     while (sib && sib->getNodeType() != DOMNode::ELEMENT_NODE)
         sib = sib->getNextSibling();
     if (sib && localName) {
@@ -272,7 +272,7 @@ DOMElement* XMLHelper::getNextSiblingElement(const DOMNode* n, const XMLCh* loca
 
 DOMElement* XMLHelper::getPreviousSiblingElement(const DOMNode* n, const XMLCh* localName)
 {
-    DOMNode* sib = n->getPreviousSibling();
+    DOMNode* sib = n ? n->getPreviousSibling() : nullptr;
     while (sib && sib->getNodeType() != DOMNode::ELEMENT_NODE)
         sib = sib->getPreviousSibling();
     if (sib && localName) {
