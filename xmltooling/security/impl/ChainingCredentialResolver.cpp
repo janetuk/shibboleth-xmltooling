@@ -78,7 +78,7 @@ namespace xmltooling {
     }
 
     static const XMLCh _CredentialResolver[] =  UNICODE_LITERAL_18(C,r,e,d,e,n,t,i,a,l,R,e,s,o,l,v,e,r);
-    static const XMLCh _type[] =                UNICODE_LITERAL_4(t,y,p,e);
+    static const XMLCh type[] =                 UNICODE_LITERAL_4(t,y,p,e);
 };
 
 ChainingCredentialResolver::ChainingCredentialResolver(const DOMElement* e)
@@ -89,11 +89,11 @@ ChainingCredentialResolver::ChainingCredentialResolver(const DOMElement* e)
     // Load up the chain of resolvers.
     e = e ? XMLHelper::getFirstChildElement(e, _CredentialResolver) : nullptr;
     while (e) {
-        auto_ptr_char type(e->getAttributeNS(nullptr,_type));
-        if (type.get() && *(type.get())) {
-            log.info("building CredentialResolver of type %s", type.get());
+        string t = XMLHelper::getAttrString(e, nullptr, type);
+        if (!t.empty()) {
+            log.info("building CredentialResolver of type %s", t.c_str());
             try {
-                m_resolvers.push_back(conf.CredentialResolverManager.newPlugin(type.get(),e));
+                m_resolvers.push_back(conf.CredentialResolverManager.newPlugin(t.c_str(), e));
             }
             catch (exception& ex) {
                 log.error("caught exception processing embedded CredentialResolver element: %s", ex.what());

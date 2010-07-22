@@ -52,11 +52,11 @@ static const XMLCh type[] =             UNICODE_LITERAL_4(t,y,p,e);
 
 TrustEngine::TrustEngine(const DOMElement* e) : m_keyInfoResolver(nullptr)
 {
-    DOMElement* child = e ? XMLHelper::getFirstChildElement(e,_KeyInfoResolver) : nullptr;
+    DOMElement* child = e ? XMLHelper::getFirstChildElement(e, _KeyInfoResolver) : nullptr;
     if (child) {
-        auto_ptr_char t(child->getAttributeNS(nullptr,type));
-        if (t.get())
-            m_keyInfoResolver = XMLToolingConfig::getConfig().KeyInfoResolverManager.newPlugin(t.get(),child);
+        string t = XMLHelper::getAttrString(child, nullptr, type);
+        if (!t.empty())
+            m_keyInfoResolver = XMLToolingConfig::getConfig().KeyInfoResolverManager.newPlugin(t.c_str(), child);
         else
             throw UnknownExtensionException("<KeyInfoResolver> element found with no type attribute");
     }

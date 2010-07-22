@@ -320,13 +320,13 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver."FILESYSTEM_CREDENTIAL_RESOLVER);
 
     // Default to disable X509IssuerSerial due to schema validation issues.
-    m_keyinfomask =
+    m_keyinfomask = XMLHelper::getAttrInt(e,
         Credential::KEYINFO_KEY_NAME |
         Credential::KEYINFO_KEY_VALUE |
         X509Credential::KEYINFO_X509_CERTIFICATE |
-        X509Credential::KEYINFO_X509_SUBJECTNAME;
-    if (e && e->hasAttributeNS(nullptr,keyInfoMask))
-        m_keyinfomask = XMLString::parseInt(e->getAttributeNS(nullptr,keyInfoMask));
+        X509Credential::KEYINFO_X509_SUBJECTNAME,
+        keyInfoMask
+        );
 
     if (e && (e->hasAttributeNS(nullptr,_certificate) || e->hasAttributeNS(nullptr,_key))) {
         // Dummy up a simple file resolver config using these attributes.
@@ -363,31 +363,19 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
     const DOMElement* root = e;
 
     // Save off usage bits.
-    const XMLCh* usage = root->getAttributeNS(nullptr,_use);
-    if (usage && *usage) {
-        auto_ptr_char u(usage);
-        if (!strcmp(u.get(), "signing"))
-            m_usage = Credential::SIGNING_CREDENTIAL | Credential::TLS_CREDENTIAL;
-        else if (!strcmp(u.get(), "TLS"))
-            m_usage = Credential::TLS_CREDENTIAL;
-        else if (!strcmp(u.get(), "encryption"))
-            m_usage = Credential::ENCRYPTION_CREDENTIAL;
-    }
+    string usage = XMLHelper::getAttrString(root, nullptr, _use);
+    if (usage == "signing")
+        m_usage = Credential::SIGNING_CREDENTIAL | Credential::TLS_CREDENTIAL;
+    else if (usage == "TLS")
+        m_usage = Credential::TLS_CREDENTIAL;
+    else if (usage == "encryption")
+        m_usage = Credential::ENCRYPTION_CREDENTIAL;
 
     // Move to Key.
     const DOMElement* keynode = XMLHelper::getFirstChildElement(root,Key);
     if (keynode) {
-        prop = keynode->getAttributeNS(nullptr,_format);
-        if (prop && *prop) {
-            auto_ptr_char f(prop);
-            m_key.format = f.get();
-        }
-
-        prop = keynode->getAttributeNS(nullptr,password);
-        if (prop && *prop) {
-            auto_ptr_char kp(prop);
-            m_keypass = kp.get();
-        }
+        m_key.format = XMLHelper::getAttrString(keynode, nullptr, _format);
+        m_keypass = XMLHelper::getAttrString(keynode, nullptr, password);
 
         if ((e=XMLHelper::getFirstChildElement(keynode,Path)) && e->hasChildNodes()) {
             prop = e->getFirstChild()->getNodeValue();
@@ -395,24 +383,18 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
             m_key.source = kpath.get();
             XMLToolingConfig::getConfig().getPathResolver()->resolve(m_key.source, PathResolver::XMLTOOLING_CFG_FILE);
             m_key.local = true;
-            prop = e->getAttributeNS(nullptr,_reloadChanges);
-            if (prop && (*prop==chLatin_f) || (*prop==chDigit_0))
-                m_key.reloadChanges = false;
+            m_key.reloadChanges = XMLHelper::getAttrBool(e, true, _reloadChanges);
         }
         else if ((e=XMLHelper::getFirstChildElement(keynode,_URL)) && e->hasChildNodes()) {
             prop = e->getFirstChild()->getNodeValue();
             auto_ptr_char kpath(prop);
             m_key.source = kpath.get();
             m_key.local = false;
-            prop = e->getAttributeNS(nullptr,backingFilePath);
-            if (!prop || !*prop)
+            m_key.backing = XMLHelper::getAttrString(e, nullptr, backingFilePath);
+            if (m_key.backing.empty())
                 throw XMLSecurityException("FilesystemCredentialResolver can't access key, backingFilePath missing from URL element.");
-            auto_ptr_char b(prop);
-            m_key.backing = b.get();
             XMLToolingConfig::getConfig().getPathResolver()->resolve(m_key.backing, PathResolver::XMLTOOLING_RUN_FILE);
-            prop = e->getAttributeNS(nullptr,_reloadInterval);
-            if (prop && *prop)
-                m_key.reloadInterval = XMLString::parseInt(prop);
+            m_key.reloadInterval = XMLHelper::getAttrInt(e, 0, _reloadInterval);
         }
         else {
             log.error("Path/URL element missing inside Key element");
@@ -431,54 +413,42 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
     }
 
     // Check for CRL.
-    const DOMElement* crlnode = XMLHelper::getFirstChildElement(root,CRL);
+    const DOMElement* crlnode = XMLHelper::getFirstChildElement(root, CRL);
     if (crlnode) {
-        const XMLCh* crlformat = crlnode->getAttributeNS(nullptr,_format);
-        e = XMLHelper::getFirstChildElement(crlnode,Path);
+        string crlformat = XMLHelper::getAttrString(crlnode, nullptr, _format);
+        e = XMLHelper::getFirstChildElement(crlnode, Path);
         while (e) {
             if (e->hasChildNodes()) {
                 m_crls.push_back(ManagedCRL());
                 ManagedResource& crl = m_crls.back();
-                if (crlformat && *crlformat) {
-                    auto_ptr_char f(crlformat);
-                    crl.format = f.get();
-                }
+                crl.format = crlformat;
                 prop = e->getFirstChild()->getNodeValue();
                 auto_ptr_char crlpath(prop);
                 crl.source = crlpath.get();
                 XMLToolingConfig::getConfig().getPathResolver()->resolve(crl.source, PathResolver::XMLTOOLING_CFG_FILE);
                 crl.local = true;
-                prop = e->getAttributeNS(nullptr,_reloadChanges);
-                if (prop && (*prop==chLatin_f) || (*prop==chDigit_0))
-                    crl.reloadChanges = false;
+                crl.reloadChanges = XMLHelper::getAttrBool(e, true, _reloadChanges);
             }
-            e = XMLHelper::getNextSiblingElement(e,Path);
+            e = XMLHelper::getNextSiblingElement(e, Path);
         }
 
-        e=XMLHelper::getFirstChildElement(crlnode,_URL);
+        e = XMLHelper::getFirstChildElement(crlnode, _URL);
         while (e) {
             if (e->hasChildNodes()) {
                 m_crls.push_back(ManagedCRL());
                 ManagedResource& crl = m_crls.back();
-                if (crlformat && *crlformat) {
-                    auto_ptr_char f(crlformat);
-                    crl.format = f.get();
-                }
+                crl.format = crlformat;
                 prop = e->getFirstChild()->getNodeValue();
                 auto_ptr_char crlpath(prop);
                 crl.source = crlpath.get();
                 crl.local = false;
-                prop = e->getAttributeNS(nullptr,backingFilePath);
-                if (!prop || !*prop)
+                crl.backing = XMLHelper::getAttrString(e, nullptr, backingFilePath);
+                if (crl.backing.empty())
                     throw XMLSecurityException("FilesystemCredentialResolver can't access CRL, backingFilePath missing from URL element.");
-                auto_ptr_char b(prop);
-                crl.backing = b.get();
                 XMLToolingConfig::getConfig().getPathResolver()->resolve(crl.backing, PathResolver::XMLTOOLING_RUN_FILE);
-                prop = e->getAttributeNS(nullptr,_reloadInterval);
-                if (prop && *prop)
-                    crl.reloadInterval = XMLString::parseInt(prop);
+                crl.reloadInterval = XMLHelper::getAttrInt(e, 0, _reloadInterval);
             }
-            e = XMLHelper::getNextSiblingElement(e,_URL);
+            e = XMLHelper::getNextSiblingElement(e, _URL);
         }
         if (m_crls.empty()) {
             log.error("Path/URL element missing inside CRL element");
@@ -489,56 +459,36 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
     // Check for Certificate
     DOMElement* certnode = XMLHelper::getFirstChildElement(root,Certificate);
     if (certnode) {
-        prop = certnode->getAttributeNS(nullptr,password);
-        if (prop && *prop) {
-            auto_ptr_char certpass(prop);
-            m_certpass = certpass.get();
-        }
-
-        const XMLCh* certformat = certnode->getAttributeNS(nullptr,_format);
-
-        const XMLCh* extractFlag = certnode->getAttributeNS(nullptr, extractNames);
-        if (extractFlag && (*extractFlag == chLatin_f || *extractFlag == chDigit_0))
-            m_extractNames = false;
+        m_certpass = XMLHelper::getAttrString(certnode, nullptr, password);
+        string certformat = XMLHelper::getAttrString(certnode, nullptr, _format);
+        m_extractNames = XMLHelper::getAttrBool(certnode, true, extractNames);
 
         e = XMLHelper::getFirstChildElement(certnode);
         while (e) {
             if (e->hasChildNodes() && (XMLString::equals(e->getLocalName(), Path) || XMLString::equals(e->getLocalName(), CAPath))) {
                 m_certs.push_back(ManagedCert());
                 ManagedResource& cert = m_certs.back();
-                if (certformat && *certformat) {
-                    auto_ptr_char f(certformat);
-                    cert.format = f.get();
-                }
+                cert.format = certformat;
                 prop = e->getFirstChild()->getNodeValue();
                 auto_ptr_char certpath(prop);
                 cert.source = certpath.get();
                 XMLToolingConfig::getConfig().getPathResolver()->resolve(cert.source, PathResolver::XMLTOOLING_CFG_FILE);
                 cert.local = true;
-                prop = e->getAttributeNS(nullptr,_reloadChanges);
-                if (prop && (*prop==chLatin_f) || (*prop==chDigit_0))
-                    cert.reloadChanges = false;
+                cert.reloadChanges = XMLHelper::getAttrBool(e, true, _reloadChanges);
             }
             else if (e->hasChildNodes() && XMLString::equals(e->getLocalName(), _URL)) {
                 m_certs.push_back(ManagedCert());
                 ManagedResource& cert = m_certs.back();
-                if (certformat && *certformat) {
-                    auto_ptr_char f(certformat);
-                    cert.format = f.get();
-                }
+                cert.format = certformat;
                 prop = e->getFirstChild()->getNodeValue();
                 auto_ptr_char certpath(prop);
                 cert.source = certpath.get();
                 cert.local = false;
-                prop = e->getAttributeNS(nullptr,backingFilePath);
-                if (!prop || !*prop)
+                cert.backing = XMLHelper::getAttrString(e, nullptr, backingFilePath);
+                if (cert.backing.empty())
                     throw XMLSecurityException("FilesystemCredentialResolver can't access certificate, backingFilePath missing from URL element.");
-                auto_ptr_char b(prop);
-                cert.backing = b.get();
                 XMLToolingConfig::getConfig().getPathResolver()->resolve(cert.backing, PathResolver::XMLTOOLING_RUN_FILE);
-                prop = e->getAttributeNS(nullptr,_reloadInterval);
-                if (prop && *prop)
-                    cert.reloadInterval = XMLString::parseInt(prop);
+                cert.reloadInterval = XMLHelper::getAttrInt(e, 0, _reloadInterval);
             }
             e = XMLHelper::getNextSiblingElement(e);
         }

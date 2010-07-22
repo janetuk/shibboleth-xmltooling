@@ -298,6 +298,43 @@ DOMElement* XMLHelper::getPreviousSiblingElement(const DOMNode* n, const XMLCh* 
     return e;
 }
 
+string XMLHelper::getAttrString(const DOMElement* e, const char* defValue, const XMLCh* localName, const XMLCh* ns)
+{
+    if (e) {
+        auto_ptr_char val(e->getAttributeNS(ns, localName));
+        if (val.get() && *val.get())
+            return val.get();
+    }
+    return defValue ? defValue : "";
+}
+
+int XMLHelper::getAttrInt(const DOMElement* e, int defValue, const XMLCh* localName, const XMLCh* ns)
+{
+    if (e) {
+        const XMLCh* val = e->getAttributeNS(ns, localName);
+        if (val && *val) {
+            int i = XMLString::parseInt(val);
+            if (i)
+                return i;
+        }
+    }
+    return defValue;
+}
+
+bool XMLHelper::getAttrBool(const DOMElement* e, bool defValue, const XMLCh* localName, const XMLCh* ns)
+{
+    if (e) {
+        const XMLCh* val = e->getAttributeNS(ns, localName);
+        if (val) {
+            if (*val == chLatin_t || *val == chDigit_1)
+                return true;
+            if (*val == chLatin_f || *val == chDigit_0)
+                return false;
+        }
+    }
+    return defValue;
+}
+
 void XMLHelper::serialize(const DOMNode* n, std::string& buf, bool pretty)
 {
     static const XMLCh impltype[] = { chLatin_L, chLatin_S, chNull };

@@ -126,7 +126,7 @@ namespace xmltooling {
     {
     public:
         InlineKeyResolver(const DOMElement* e)
-            : m_followRefs(XMLHelper::getNodeValueAsBool(e ? e->getAttributeNodeNS(nullptr, keyInfoReferences) : nullptr, false)) {
+            : m_followRefs(XMLHelper::getAttrBool(e, false, keyInfoReferences)) {
         }
 
         virtual ~InlineKeyResolver() {}

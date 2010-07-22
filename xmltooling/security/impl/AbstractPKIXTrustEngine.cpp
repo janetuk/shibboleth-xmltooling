@@ -161,6 +161,8 @@ namespace {
         
         return false;
     }
+
+    static XMLCh fullCRLChain[] = UNICODE_LITERAL_12(f,u,l,l,C,R,L,C,h,a,i,n);
 };
 
 AbstractPKIXTrustEngine::PKIXValidationInfoIterator::PKIXValidationInfoIterator()
@@ -171,11 +173,9 @@ AbstractPKIXTrustEngine::PKIXValidationInfoIterator::~PKIXValidationInfoIterator
 {
 }
 
-AbstractPKIXTrustEngine::AbstractPKIXTrustEngine(const xercesc::DOMElement* e) : TrustEngine(e), m_fullCRLChain(false)
+AbstractPKIXTrustEngine::AbstractPKIXTrustEngine(const xercesc::DOMElement* e)
+    : TrustEngine(e), m_fullCRLChain(XMLHelper::getAttrBool(e, false, fullCRLChain))
 {
-    static XMLCh fullCRLChain[] = UNICODE_LITERAL_12(f,u,l,l,C,R,L,C,h,a,i,n);
-    const XMLCh* flag = e ? e->getAttributeNS(nullptr, fullCRLChain) : nullptr;
-    m_fullCRLChain = (flag && (*flag == xercesc::chLatin_t || *flag == xercesc::chDigit_1));
 }
 
 AbstractPKIXTrustEngine::~AbstractPKIXTrustEngine()

@@ -121,16 +121,10 @@ namespace xmltooling {
 static const XMLCh cleanupInterval[] = UNICODE_LITERAL_15(c,l,e,a,n,u,p,I,n,t,e,r,v,a,l);
 
 MemoryStorageService::MemoryStorageService(const DOMElement* e)
-    : m_lock(nullptr), shutdown_wait(nullptr), cleanup_thread(nullptr), shutdown(false), m_cleanupInterval(0),
+    : m_lock(nullptr), shutdown_wait(nullptr), cleanup_thread(nullptr), shutdown(false),
+        m_cleanupInterval(XMLHelper::getAttrInt(e, 900, cleanupInterval)),
         m_log(Category::getInstance(XMLTOOLING_LOGCAT".StorageService"))
 {
-    const XMLCh* tag=e ? e->getAttributeNS(nullptr,cleanupInterval) : nullptr;
-    if (tag && *tag) {
-        m_cleanupInterval = XMLString::parseInt(tag);
-    }
-    if (!m_cleanupInterval)
-        m_cleanupInterval=900;
-
     m_lock = RWLock::create();
     shutdown_wait = CondWait::create();
     cleanup_thread = Thread::create(&cleanup_fn, (void*)this);

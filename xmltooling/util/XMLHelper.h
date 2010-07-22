@@ -275,12 +275,54 @@ namespace xmltooling {
         /**
          * Returns the content of the first Text node found in the element, if any.
          * This is roughly similar to the DOM getTextContent function, but only
-         * examples the immediate children of the element.
+         * examines the immediate children of the element.
          *
          * @param e     element to examine
          * @return the content of the first Text node found, or nullptr
          */
         static const XMLCh* getTextContent(const xercesc::DOMElement* e);
+
+        /**
+         * Returns the content of the specified attribute node as a string,
+         * or the default value, if the attribute is not present.
+         *
+         * @param e         element to examine (may be nullptr)
+         * @param defValue  default value to return
+         * @param localName local name of attribute
+         * @param ns        namespace of attribute
+         * @return  the specified attribute's value, or the specified default
+         */
+        static std::string getAttrString(
+            const xercesc::DOMElement* e, const char* defValue, const XMLCh* localName, const XMLCh* ns=nullptr
+            );
+
+        /**
+         * Returns the content of the specified attribute node as an integer,
+         * or the default value, if the attribute is not present.
+         *
+         * @param e         element to examine (may be nullptr)
+         * @param defValue  default value to return
+         * @param localName local name of attribute
+         * @param ns        namespace of attribute
+         * @return  the specified attribute's value, or the specified default
+         */
+        static int getAttrInt(
+            const xercesc::DOMElement* e, int defValue, const XMLCh* localName, const XMLCh* ns=nullptr
+            );
+
+        /**
+         * Returns the content of the specified attribute node as a boolean,
+         * or the default value, if the attribute is not present.
+         *
+         * @param e         element to examine (may be nullptr)
+         * @param defValue  default value to return
+         * @param localName local name of attribute
+         * @param ns        namespace of attribute
+         * @return  the specified attribute's value, or the specified default
+         */
+        static bool getAttrBool(
+            const xercesc::DOMElement* e, bool defValue, const XMLCh* localName, const XMLCh* ns=nullptr
+            );
 
         /**
          * Serializes the DOM node provided into a buffer using UTF-8 encoding and

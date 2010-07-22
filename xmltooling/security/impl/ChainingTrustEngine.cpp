@@ -51,10 +51,10 @@ ChainingTrustEngine::ChainingTrustEngine(const DOMElement* e) : TrustEngine(e) {
     e = e ? XMLHelper::getFirstChildElement(e, _TrustEngine) : nullptr;
     while (e) {
         try {
-            auto_ptr_char temp(e->getAttributeNS(nullptr,type));
-            if (temp.get() && *temp.get()) {
-                log.info("building TrustEngine of type %s", temp.get());
-                TrustEngine* engine = XMLToolingConfig::getConfig().TrustEngineManager.newPlugin(temp.get(), e);
+            string t = XMLHelper::getAttrString(e, nullptr, type);
+            if (!t.empty()) {
+                log.info("building TrustEngine of type %s", t.c_str());
+                TrustEngine* engine = XMLToolingConfig::getConfig().TrustEngineManager.newPlugin(t.c_str(), e);
                 m_engines.push_back(engine);
                 SignatureTrustEngine* sig = dynamic_cast<SignatureTrustEngine*>(engine);
                 if (sig)

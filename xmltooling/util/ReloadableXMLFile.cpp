@@ -138,44 +138,39 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log, bool st
     }
 
     if (source && *source) {
-        const XMLCh* flag=e->getAttributeNS(nullptr,validate);
-        m_validate=(XMLString::equals(flag,xmlconstants::XML_TRUE) || XMLString::equals(flag,xmlconstants::XML_ONE));
+        m_validate = XMLHelper::getAttrBool(e, false, validate);
 
         auto_ptr_char temp(source);
-        m_source=temp.get();
+        m_source = temp.get();
 
         if (!m_local && !strstr(m_source.c_str(),"://")) {
             log.warn("deprecated usage of uri/url attribute for a local resource, use path instead");
-            m_local=true;
+            m_local = true;
         }
 
 #ifndef XMLTOOLING_LITE
         // Check for signature bits.
-        if (e && e->hasAttributeNS(nullptr, certificate)) {
+        if (e->hasAttributeNS(nullptr, certificate)) {
             // Use a file-based credential resolver rooted here.
             m_credResolver = XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(FILESYSTEM_CREDENTIAL_RESOLVER, e);
         }
         else {
-            const DOMElement* sub = e ? XMLHelper::getFirstChildElement(e, _CredentialResolver) : nullptr;
-            auto_ptr_char t(sub ? sub->getAttributeNS(nullptr, type) : nullptr);
-            if (t.get()) {
-                m_credResolver = XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(t.get(), sub);
+            const DOMElement* sub = XMLHelper::getFirstChildElement(e, _CredentialResolver);
+            string t(XMLHelper::getAttrString(sub, nullptr, type));
+            if (!t.empty()) {
+                m_credResolver = XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(t.c_str(), sub);
             }
             else {
-                sub = e ? XMLHelper::getFirstChildElement(e, _TrustEngine) : nullptr;
-                auto_ptr_char t2(sub ? sub->getAttributeNS(nullptr, type) : nullptr);
-                if (t2.get()) {
-                    TrustEngine* trust = XMLToolingConfig::getConfig().TrustEngineManager.newPlugin(t2.get(), sub);
+                sub = XMLHelper::getFirstChildElement(e, _TrustEngine);
+                t = XMLHelper::getAttrString(sub, nullptr, type);
+                if (!t.empty()) {
+                    TrustEngine* trust = XMLToolingConfig::getConfig().TrustEngineManager.newPlugin(t.c_str(), sub);
                     if (!(m_trust = dynamic_cast<SignatureTrustEngine*>(trust))) {
                         delete trust;
                         throw XMLToolingException("TrustEngine-based ReloadableXMLFile requires a SignatureTrustEngine plugin.");
                     }
 
-                    flag = e->getAttributeNS(nullptr, signerName);
-                    if (flag && *flag) {
-                        auto_ptr_char sn(flag);
-                        m_signerName = sn.get();
-                    }
+                    m_signerName = XMLHelper::getAttrString(e, nullptr, signerName);
                 }
             }
         }
@@ -184,8 +179,8 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log, bool st
         if (m_local) {
             XMLToolingConfig::getConfig().getPathResolver()->resolve(m_source, PathResolver::XMLTOOLING_CFG_FILE);
 
-            flag=e->getAttributeNS(nullptr,reloadChanges);
-            if (!XMLString::equals(flag,xmlconstants::XML_FALSE) && !XMLString::equals(flag,xmlconstants::XML_ZERO)) {
+            bool flag = XMLHelper::getAttrBool(e, true, reloadChanges);
+            if (flag) {
 #ifdef WIN32
                 struct _stat stat_buf;
                 if (_stat(m_source.c_str(), &stat_buf) == 0)
@@ -193,19 +188,17 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log, bool st
                 struct stat stat_buf;
                 if (stat(m_source.c_str(), &stat_buf) == 0)
 #endif
-                    m_filestamp=stat_buf.st_mtime;
+                    m_filestamp = stat_buf.st_mtime;
                 else
                     throw IOException("Unable to access local file ($1)", params(1,m_source.c_str()));
-                m_lock=RWLock::create();
+                m_lock = RWLock::create();
             }
             log.debug("using local resource (%s), will %smonitor for changes", m_source.c_str(), m_lock ? "" : "not ");
         }
         else {
             log.debug("using remote resource (%s)", m_source.c_str());
-            source = e->getAttributeNS(nullptr,backingFilePath);
-            if (source && *source) {
-                auto_ptr_char temp2(source);
-                m_backing=temp2.get();
+            m_backing = XMLHelper::getAttrString(e, nullptr, backingFilePath);
+            if (!m_backing.empty()) {
                 XMLToolingConfig::getConfig().getPathResolver()->resolve(m_backing, PathResolver::XMLTOOLING_RUN_FILE);
                 log.debug("backup remote resource to (%s)", m_backing.c_str());
                 try {
@@ -221,15 +214,12 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log, bool st
                 catch (exception&) {
                 }
             }
-            source = e->getAttributeNS(nullptr,reloadInterval);
-            if (!source || !*source)
-                source = e->getAttributeNS(nullptr,maxRefreshDelay);
-            if (source && *source) {
-                m_reloadInterval = XMLString::parseInt(source);
-                if (m_reloadInterval > 0) {
-                    m_log.debug("will reload remote resource at most every %d seconds", m_reloadInterval);
-                    m_lock=RWLock::create();
-                }
+            m_reloadInterval = XMLHelper::getAttrInt(e, 0, reloadInterval);
+            if (m_reloadInterval == 0)
+                m_reloadInterval = XMLHelper::getAttrInt(e, 0, maxRefreshDelay);
+            if (m_reloadInterval > 0) {
+                m_log.debug("will reload remote resource at most every %d seconds", m_reloadInterval);
+                m_lock = RWLock::create();
             }
             m_filestamp = time(nullptr);   // assume it gets loaded initially
         }
@@ -241,11 +231,7 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log, bool st
         log.debug("no resource uri/path/name supplied, will load inline configuration");
     }
 
-    source = e->getAttributeNS(nullptr, id);
-    if (source && *source) {
-        auto_ptr_char tempid(source);
-        m_id = tempid.get();
-    }
+    m_id = XMLHelper::getAttrString(e, nullptr, id);
 }
 
 ReloadableXMLFile::~ReloadableXMLFile()
