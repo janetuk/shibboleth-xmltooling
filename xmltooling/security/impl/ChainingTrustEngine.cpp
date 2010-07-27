@@ -54,17 +54,7 @@ ChainingTrustEngine::ChainingTrustEngine(const DOMElement* e) : TrustEngine(e) {
             string t = XMLHelper::getAttrString(e, nullptr, type);
             if (!t.empty()) {
                 log.info("building TrustEngine of type %s", t.c_str());
-                TrustEngine* engine = XMLToolingConfig::getConfig().TrustEngineManager.newPlugin(t.c_str(), e);
-                m_engines.push_back(engine);
-                SignatureTrustEngine* sig = dynamic_cast<SignatureTrustEngine*>(engine);
-                if (sig)
-                    m_sigEngines.push_back(sig);
-                X509TrustEngine* x509 = dynamic_cast<X509TrustEngine*>(engine);
-                if (x509)
-                    m_x509Engines.push_back(x509);
-                OpenSSLTrustEngine* ossl = dynamic_cast<OpenSSLTrustEngine*>(engine);
-                if (ossl)
-                    m_osslEngines.push_back(ossl);
+                addTrustEngine(XMLToolingConfig::getConfig().TrustEngineManager.newPlugin(t.c_str(), e));
             }
         }
         catch (exception& ex) {
@@ -81,15 +71,45 @@ ChainingTrustEngine::~ChainingTrustEngine() {
 void ChainingTrustEngine::addTrustEngine(TrustEngine* newEngine)
 {
     m_engines.push_back(newEngine);
+    SignatureTrustEngine* sig = dynamic_cast<SignatureTrustEngine*>(newEngine);
+    if (sig)
+        m_sigEngines.push_back(sig);
+    X509TrustEngine* x509 = dynamic_cast<X509TrustEngine*>(newEngine);
+    if (x509)
+        m_x509Engines.push_back(x509);
+    OpenSSLTrustEngine* ossl = dynamic_cast<OpenSSLTrustEngine*>(newEngine);
+    if (ossl)
+        m_osslEngines.push_back(ossl);
 }
 
 TrustEngine* ChainingTrustEngine::removeTrustEngine(TrustEngine* oldEngine)
 {
-    for (vector<TrustEngine*>::iterator i=m_engines.begin(); i!=m_engines.end(); i++) {
-        if (oldEngine==(*i)) {
-            m_engines.erase(i);
-            return oldEngine;
+    vector<TrustEngine*>::iterator i = find(m_engines.begin(), m_engines.end(), oldEngine);
+    if (i != m_engines.end()) {
+        m_engines.erase(i);
+
+        SignatureTrustEngine* sig = dynamic_cast<SignatureTrustEngine*>(oldEngine);
+        if (sig) {
+            vector<SignatureTrustEngine*>::iterator s = find(m_sigEngines.begin(), m_sigEngines.end(), sig);
+            if (s != m_sigEngines.end())
+                m_sigEngines.erase(s);
         }
+
+        X509TrustEngine* x509 = dynamic_cast<X509TrustEngine*>(oldEngine);
+        if (x509) {
+            vector<X509TrustEngine*>::iterator x = find(m_x509Engines.begin(), m_x509Engines.end(), x509);
+            if (x != m_x509Engines.end())
+                m_x509Engines.erase(x);
+        }
+
+        OpenSSLTrustEngine* ossl = dynamic_cast<OpenSSLTrustEngine*>(oldEngine);
+        if (ossl) {
+            vector<OpenSSLTrustEngine*>::iterator o = find(m_osslEngines.begin(), m_osslEngines.end(), ossl);
+            if (o != m_osslEngines.end())
+                m_osslEngines.erase(o);
+        }
+
+        return oldEngine;
     }
     return nullptr;
 }
