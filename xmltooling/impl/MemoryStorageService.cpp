@@ -225,7 +225,7 @@ bool MemoryStorageService::createString(const char* context, const char* key, co
 
     ctx.m_dataMap[key]=Record(value,expiration);
 
-    m_log.debug("inserted record (%s) in context (%s)", key, context);
+    m_log.debug("inserted record (%s) in context (%s) with expiration (%lu)", key, context, expiration);
     return true;
 }
 
@@ -270,7 +270,7 @@ int MemoryStorageService::updateString(const char* context, const char* key, con
     if (expiration && expiration != i->second.expiration)
         i->second.expiration = expiration;
 
-    m_log.debug("updated record (%s) in context (%s)", key, context);
+    m_log.debug("updated record (%s) in context (%s) with expiration (%lu)", key, context, i->second.expiration);
     return i->second.version;
 }
 
@@ -303,5 +303,5 @@ void MemoryStorageService::updateContext(const char* context, time_t expiration)
             i->second.expiration = expiration;
     }
 
-    m_log.debug("updated expiration of valid records in context (%s)", context);
+    m_log.debug("updated expiration of valid records in context (%s) to (%lu)", context, expiration);
 }
