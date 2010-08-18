@@ -38,8 +38,7 @@
 namespace xmltooling {
 
     /**
-     * A factory interface for obtaining XMLObjects.
-     * Subclasses MAY supply additional factory methods.
+     * A factory interface for obtaining an XMLObject.
      */
     class XMLTOOL_API XMLObjectBuilder
     {
@@ -50,6 +49,7 @@ namespace xmltooling {
         /**
          * Creates an empty XMLObject with a particular element name.
          * <p>The results are undefined if localName is nullptr or empty.
+         * <p>The caller is responsible for freeing the resulting object.
          * 
          * @param nsURI         namespace URI for element
          * @param localName     local name of element
@@ -63,6 +63,7 @@ namespace xmltooling {
 
         /**
          * Creates an empty XMLObject with a particular element name.
+         * <p>The caller is responsible for freeing the resulting object.
          * 
          * @param q     QName of element for object
          * @return the empty XMLObject
@@ -71,6 +72,7 @@ namespace xmltooling {
 
         /**
          * Creates an unmarshalled XMLObject from a DOM Element.
+         * <p>The caller is responsible for freeing the resulting object.
          * 
          * @param element       the unmarshalling source
          * @param bindDocument  true iff the XMLObject should take ownership of the DOM Document
@@ -80,6 +82,7 @@ namespace xmltooling {
 
         /**
          * Creates an unmarshalled XMLObject from the root of a DOM Document.
+         * <p>The caller is responsible for freeing the resulting object.
          * 
          * @param doc           the unmarshalling source
          * @param bindDocument  true iff the XMLObject should take ownership of the DOM Document
@@ -89,6 +92,7 @@ namespace xmltooling {
 
         /**
          * Creates an unmarshalled XMLObject using the default build method, if a builder can be found.
+         * <p>The caller is responsible for freeing the resulting object.
          * 
          * @param element       the unmarshalling source
          * @param bindDocument  true iff the new XMLObject should take ownership of the DOM Document
