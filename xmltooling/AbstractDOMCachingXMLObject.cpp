@@ -56,18 +56,14 @@ DOMElement* AbstractDOMCachingXMLObject::getDOM() const
 void AbstractDOMCachingXMLObject::setDOM(DOMElement* dom, bool bindDocument) const
 {
     m_dom = dom;
-    if (dom) {
-        if (bindDocument) {
-            DOMDocument* doc = dom->getOwnerDocument();
-            setDocument(doc);
-            if (dom) {
-                DOMElement* documentRoot = doc->getDocumentElement();
-                if (!documentRoot)
-                    doc->appendChild(dom);
-                else if (documentRoot != dom)
-                    doc->replaceChild(dom, documentRoot);
-            }
-        }
+    if (dom && bindDocument) {
+        DOMDocument* doc = dom->getOwnerDocument();
+        setDocument(doc);
+        DOMElement* documentRoot = doc->getDocumentElement();
+        if (!documentRoot)
+            doc->appendChild(dom);
+        else if (documentRoot != dom)
+            doc->replaceChild(dom, documentRoot);
     }
 }
 
