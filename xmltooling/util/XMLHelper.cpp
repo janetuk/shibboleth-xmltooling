@@ -119,9 +119,9 @@ XMLObject* XMLHelper::getXMLObjectById(XMLObject& tree, const XMLCh* id)
     return nullptr;
 }
 
-void XMLHelper::getNonVisiblyUsedPrefixes(const XMLObject& tree, set<xstring>& prefixes)
+void XMLHelper::getNonVisiblyUsedPrefixes(const XMLObject& tree, map<xstring,xstring>& prefixes)
 {
-    set<xstring> child_prefixes;
+    map<xstring,xstring> child_prefixes;
     const list<XMLObject*>& children = tree.getOrderedChildren();
     for (list<XMLObject*>::const_iterator i = children.begin(); i != children.end(); ++i) {
         if (*i)
@@ -136,13 +136,26 @@ void XMLHelper::getNonVisiblyUsedPrefixes(const XMLObject& tree, set<xstring>& p
             case Namespace::Indeterminate:
                 break;
             case Namespace::VisiblyUsed:
-                child_prefixes.erase(ns->getNamespacePrefix() ? ns->getNamespacePrefix() : &chNull);
+            {
+                // See if the prefix was noted as non-visible below.
+                const XMLCh* p = ns->getNamespacePrefix() ? ns->getNamespacePrefix() : &chNull;
+                map<xstring,xstring>::iterator decl = child_prefixes.find(p);
+                if (decl != child_prefixes.end()) {
+                    // It's declared below, see if it's the same namespace. If so, pull it from the set,
+                    // otherwise leave it in the set.
+                    if (decl->second == (ns->getNamespaceURI() ? ns->getNamespaceURI() : &chNull))
+                        child_prefixes.erase(decl);
+                }
                 break;
+            }
             case Namespace::NonVisiblyUsed:
-                prefixes.insert(ns->getNamespacePrefix() ? ns->getNamespacePrefix() : &chNull);
+                // It may already be in the map from another branch of the tree, but as long
+                // as it's set to something so the parent knows about it, we're good.
+                prefixes[ns->getNamespacePrefix() ? ns->getNamespacePrefix() : &chNull] = (ns->getNamespaceURI() ? ns->getNamespaceURI() : &chNull);
                 break;
         }
     }
+
     prefixes.insert(child_prefixes.begin(), child_prefixes.end());
 }
 

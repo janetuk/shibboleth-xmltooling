@@ -130,24 +130,31 @@ void XMLObject::setNil(const XMLCh* value)
 
 void AbstractXMLObject::addNamespace(const Namespace& ns) const
 {
-    std::set<Namespace>::iterator i = m_namespaces.find(ns);
-    if (i == m_namespaces.end())
-        m_namespaces.insert(ns);
-    else {
-        if (ns.alwaysDeclare())
-            const_cast<Namespace&>(*i).setAlwaysDeclare(true);
-        switch (ns.usage()) {
-            case Namespace::Indeterminate:
-                break;
-            case Namespace::VisiblyUsed:
-                const_cast<Namespace&>(*i).setUsage(Namespace::VisiblyUsed);
-                break;
-            case Namespace::NonVisiblyUsed:
-                if (i->usage() == Namespace::Indeterminate)
-                    const_cast<Namespace&>(*i).setUsage(Namespace::NonVisiblyUsed);
-                break;
+    for (set<Namespace>::const_iterator n = m_namespaces.begin(); n != m_namespaces.end(); ++n) {
+        // Look for the prefix in the existing set.
+        if (XMLString::equals(ns.getNamespacePrefix(), n->getNamespacePrefix())) {
+            // See if it's the same declaration, and overlay various properties if so.
+            if (XMLString::equals(ns.getNamespaceURI(), n->getNamespaceURI())) {
+                if (ns.alwaysDeclare())
+                    const_cast<Namespace&>(*n).setAlwaysDeclare(true);
+                switch (ns.usage()) {
+                    case Namespace::Indeterminate:
+                        break;
+                    case Namespace::VisiblyUsed:
+                        const_cast<Namespace&>(*n).setUsage(Namespace::VisiblyUsed);
+                        break;
+                    case Namespace::NonVisiblyUsed:
+                        if (n->usage() == Namespace::Indeterminate)
+                            const_cast<Namespace&>(*n).setUsage(Namespace::NonVisiblyUsed);
+                        break;
+                }
+            }
+            return;
         }
     }
+
+    // If the prefix is now, go ahead and add it.
+    m_namespaces.insert(ns);
 }
 
 void AbstractXMLObject::removeNamespace(const Namespace& ns)

@@ -96,6 +96,8 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(
     }
     
     // If we get here, we didn't have a usable DOM (and/or we released the one we had).
+    prepareForMarshalling();
+
     // We may need to create our own document.
     bool bindDocument=false;
     if (!document) {
@@ -161,6 +163,8 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(
     }
     
     // If we get here, we didn't have a usable DOM (and/or we released the one we had).
+    prepareForMarshalling();
+
     m_log.debug("creating root element to marshall");
     DOMElement* domElement = parentElement->getOwnerDocument()->createElementNS(
         getElementQName().getNamespaceURI(), getElementQName().getLocalPart()
@@ -380,5 +384,9 @@ void AbstractXMLObjectMarshaller::marshallContent(
 }
 
 void AbstractXMLObjectMarshaller::marshallAttributes(DOMElement* domElement) const
+{
+}
+
+void AbstractXMLObjectMarshaller::prepareForMarshalling() const
 {
 }

@@ -141,6 +141,12 @@ namespace xmltooling {
          * @throws MarshallingException thrown if there is a problem marshalling an attribute
          */
         virtual void marshallAttributes(xercesc::DOMElement* domElement) const;
+
+        /**
+         * Called before marshalling in the event that a new DOM is being generated.
+         * <p>Allows objects to adjust internal state prior to the marshalling step.
+         */
+        virtual void prepareForMarshalling() const;
     };
     
 };

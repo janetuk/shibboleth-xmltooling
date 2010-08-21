@@ -135,12 +135,13 @@ namespace xmltooling {
         static XMLObject* getXMLObjectById(XMLObject& tree, const XMLCh* id);
 
         /**
-         * Returns a list of non-visibly-used namespace prefixes found in a tree.
+         * Returns the set of non-visibly-used namespace declarations found in a tree.
+         * <p>Each member of the set is a prefix/URI pair.
          *
          * @param tree      root of tree to search
-         * @param prefixes  container to store prefix list
+         * @param prefixes  container to store declarations
          */
-        static void getNonVisiblyUsedPrefixes(const XMLObject& tree, std::set<xstring>& prefixes);
+        static void getNonVisiblyUsedPrefixes(const XMLObject& tree, std::map<xstring,xstring>& prefixes);
 
         /**
          * Gets the QName for the given DOM node.
