@@ -273,6 +273,12 @@ void CurlURLInputStream::init(const DOMElement* e)
     curl_easy_setopt(fEasy, CURLOPT_NOSIGNAL, 1);
     curl_easy_setopt(fEasy, CURLOPT_FAILONERROR, 1);
     curl_easy_setopt(fEasy, CURLOPT_ENCODING, "");
+    string ua = XMLToolingConfig::getConfig().user_agent;
+    if (!ua.empty()) {
+        ua = ua + " libcurl/" + LIBCURL_VERSION + ' ' + OPENSSL_VERSION_TEXT;
+        curl_easy_setopt(fEasy, CURLOPT_USERAGENT, ua.c_str());
+    }
+
 
     // Install SSL callback.
     curl_easy_setopt(fEasy, CURLOPT_SSL_CTX_FUNCTION, ssl_ctx_callback);

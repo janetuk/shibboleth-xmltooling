@@ -323,7 +323,11 @@ CURL* CURLPool::get(const SOAPTransport::Address& addr)
     curl_easy_setopt(handle,CURLOPT_HEADERFUNCTION,&curl_header_hook);
     curl_easy_setopt(handle,CURLOPT_WRITEFUNCTION,&curl_write_hook);
     curl_easy_setopt(handle,CURLOPT_DEBUGFUNCTION,&curl_debug_hook);
-
+    string ua = XMLToolingConfig::getConfig().user_agent;
+    if (!ua.empty()) {
+        ua = ua + " libcurl/" + LIBCURL_VERSION + ' ' + OPENSSL_VERSION_TEXT;
+        curl_easy_setopt(handle, CURLOPT_USERAGENT, ua.c_str());
+    }
     return handle;
 }
 

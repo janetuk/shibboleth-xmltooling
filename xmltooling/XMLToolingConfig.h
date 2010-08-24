@@ -55,7 +55,7 @@ namespace xmltooling {
     /**
      * Singleton object that manages library startup/shutdown.configuration.
      * 
-     * A locking interface is supplied as a convenience for code that wants to
+     * <p>A locking interface is supplied as a convenience for code that wants to
      * obtain a global system lock, but the actual configuration itself is not
      * synchronized.
      */
@@ -104,20 +104,19 @@ namespace xmltooling {
         
         /**
          * Shuts down library
-         * 
-         * Each process using the library SHOULD call this function exactly once
+         * <p>Each process using the library SHOULD call this function exactly once
          * before terminating itself
          */
         virtual void term()=0;
 
         /**
          * Loads a shared/dynamic library extension.
-         * 
-         * Extension libraries are managed using a pair of "C" linkage functions:<br>
+         *
+         * <p>Extension libraries are managed using a pair of "C" linkage functions:<br>
          *      extern "C" int xmltooling_extension_init(void* context);<br>
          *      extern "C" void xmltooling_extension_term();
-         * 
-         * This method is internally synchronized.
+         *
+         * <p>This method is internally synchronized.
          * 
          * @param path      pathname of shared library to load into process
          * @param context   arbitrary data to pass to library initialization hook
@@ -127,8 +126,7 @@ namespace xmltooling {
         
         /**
          * Configure logging system.
-         * 
-         * May be called first, before initializing the library. Other calls to it
+         * <p>May be called first, before initializing the library. Other calls to it
          * must be externally synchronized. 
          * 
          * @param config    either a logging configuration file, or a level from the set
@@ -139,7 +137,7 @@ namespace xmltooling {
 
         /**
          * Obtains a non-validating parser pool.
-         * Library must be initialized first.
+         * <p>Library must be initialized first.
          *
          * @return reference to a non-validating parser pool.
          */
@@ -147,7 +145,7 @@ namespace xmltooling {
 
         /**
          * Obtains a validating parser pool.
-         * Library must be initialized first. Schema/catalog registration must be
+         * <p>Library must be initialized first. Schema/catalog registration must be
          * externally synchronized.
          *
          * @return reference to a validating parser pool.
@@ -171,7 +169,7 @@ namespace xmltooling {
 
         /**
          * Sets the global KeyInfoResolver instance.
-         * This method must be externally synchronized with any code that uses the object.
+         * <p>This method must be externally synchronized with any code that uses the object.
          * Any previously set object is destroyed.
          * 
          * @param keyInfoResolver   new KeyInfoResolver instance to store
@@ -180,7 +178,7 @@ namespace xmltooling {
 
         /**
          * Sets the global ReplayCache instance.
-         * This method must be externally synchronized with any code that uses the object.
+         * <p>This method must be externally synchronized with any code that uses the object.
          * Any previously set object is destroyed.
          * 
          * @param replayCache   new ReplayCache instance to store
@@ -211,7 +209,7 @@ namespace xmltooling {
 
         /**
          * Sets the global PathResolver instance.
-         * This method must be externally synchronized with any code that uses the object.
+         * <p>This method must be externally synchronized with any code that uses the object.
          * Any previously set object is destroyed.
          * 
          * @param pathResolver   new PathResolver instance to store
@@ -220,7 +218,7 @@ namespace xmltooling {
         
         /**
          * Sets the global TemplateEngine instance.
-         * This method must be externally synchronized with any code that uses the object.
+         * <p>This method must be externally synchronized with any code that uses the object.
          * Any previously set object is destroyed.
          * 
          * @param templateEngine   new TemplateEngine instance to store
@@ -229,7 +227,7 @@ namespace xmltooling {
 
         /**
          * Sets the global URLEncoder instance.
-         * This method must be externally synchronized with any code that uses the object.
+         * <p>This method must be externally synchronized with any code that uses the object.
          * Any previously set object is destroyed.
          * 
          * @param urlEncoder   new URLEncoder instance to store
@@ -238,11 +236,14 @@ namespace xmltooling {
         
         /**
          * List of catalog files to load into validating parser pool at initialization time.
-         * Like other path settings, the separator depends on the platform
+         * <p>Like other path settings, the separator depends on the platform
          * (semicolon on Windows, colon otherwise). 
          */
         std::string catalog_path;
-        
+
+        /** A User-Agent header to include in HTTP client requests. */
+        std::string user_agent;
+
         /**
          * Adjusts any clock comparisons to be more liberal/permissive by the
          * indicated number of seconds.
