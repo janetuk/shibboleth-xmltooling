@@ -102,12 +102,13 @@ namespace xmltooling {
         /**
          * Set the key algorithm criteria.
          * 
-         * @param keyAlgorithm The key algorithm to set
+         * @param keyAlgorithm the key algorithm to set
          */
         void setKeyAlgorithm(const char* keyAlgorithm);
 
         /**
          * Get the key size criteria.
+         * <p>If a a maximum size is also set, this is treated as a minimum.
          *
          * @return  the key size, or 0
          */
@@ -115,11 +116,26 @@ namespace xmltooling {
 
         /**
          * Set the key size criteria.
+         * <p>If a a maximum size is also set, this is treated as a minimum.
          *
-         * @param keySize Key size to set
+         * @param keySize key size to set
          */
         void setKeySize(unsigned int keySize);
-    
+
+        /**
+         * Get the maximum key size criteria.
+         *
+         * @return  the maximum key size, or 0
+         */
+        unsigned int getMaxKeySize() const;
+
+        /**
+         * Set the maximum key size criteria.
+         *
+         * @param keySize maximum key size to set
+         */
+        void setMaxKeySize(unsigned int keySize);
+
         /**
          * Set the key algorithm and size criteria based on an XML algorithm specifier.
          *
@@ -207,7 +223,7 @@ namespace xmltooling {
 
     private:
         unsigned int m_keyUsage;
-        unsigned int m_keySize;
+        unsigned int m_keySize,m_maxKeySize;
         std::string m_peerName,m_keyAlgorithm;
         std::set<std::string> m_keyNames;
         XSECCryptoKey* m_key;

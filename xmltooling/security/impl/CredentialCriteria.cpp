@@ -42,7 +42,7 @@ using namespace xmltooling;
 using namespace std;
 
 CredentialCriteria::CredentialCriteria()
-    : m_keyUsage(Credential::UNSPECIFIED_CREDENTIAL), m_keySize(0), m_key(nullptr),
+    : m_keyUsage(Credential::UNSPECIFIED_CREDENTIAL), m_keySize(0), m_maxKeySize(0), m_key(nullptr),
         m_keyInfo(nullptr), m_nativeKeyInfo(nullptr), m_credential(nullptr)
 {
 }
@@ -94,6 +94,16 @@ unsigned int CredentialCriteria::getKeySize() const
 void CredentialCriteria::setKeySize(unsigned int keySize)
 {
     m_keySize = keySize;
+}
+
+unsigned int CredentialCriteria::getMaxKeySize() const
+{
+    return m_maxKeySize;
+}
+
+void CredentialCriteria::setMaxKeySize(unsigned int keySize)
+{
+    m_maxKeySize = keySize;
 }
 
 void CredentialCriteria::setXMLAlgorithm(const XMLCh* algorithm)
@@ -218,10 +228,21 @@ bool CredentialCriteria::matches(const Credential& credential) const
     }
 
     // KeySize check, if specified and we have one.
-    if (credential.getKeySize()>0 && getKeySize()>0 && credential.getKeySize() != getKeySize()) {
-        if (log.isDebugEnabled())
-            log.debug("key size didn't match (%u != %u)", getKeySize(), credential.getKeySize());
-        return false;
+    if (credential.getKeySize() > 0) {
+        if (m_keySize > 0 && m_maxKeySize == 0) {
+            if (credential.getKeySize() != m_keySize) {
+                log.debug("key size (%u) didn't match (%u)", credential.getKeySize(), m_keySize);
+                return false;
+            }
+        }
+        else if (m_keySize > 0 && credential.getKeySize() < m_keySize) {
+            log.debug("key size (%u) smaller than minimum (%u)", credential.getKeySize(), m_keySize);
+            return false;
+        }
+        else if (m_maxKeySize > 0 && credential.getKeySize() > m_maxKeySize) {
+            log.debug("key size (%u) larger than maximum (%u)", credential.getKeySize(), m_maxKeySize);
+            return false;
+        }
     }
 
     // See if we can test key names.
