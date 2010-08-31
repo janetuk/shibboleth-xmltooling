@@ -64,7 +64,7 @@ void CredentialCriteria::setUsage(unsigned int usage)
 
 const char* CredentialCriteria::getPeerName() const
 {
-    return m_peerName.c_str();
+    return m_peerName.empty() ? nullptr : m_peerName.c_str();
 }
 
 void CredentialCriteria::setPeerName(const char* peerName)
@@ -76,7 +76,7 @@ void CredentialCriteria::setPeerName(const char* peerName)
 
 const char* CredentialCriteria::getKeyAlgorithm() const
 {
-    return m_keyAlgorithm.c_str();
+    return m_keyAlgorithm.empty() ? nullptr : m_keyAlgorithm.c_str();
 }
 
 void CredentialCriteria::setKeyAlgorithm(const char* keyAlgorithm)
