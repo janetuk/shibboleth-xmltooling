@@ -95,7 +95,7 @@ namespace xmltooling {
         virtual const char* getAlgorithm() const=0;
 
         /**
-         * Returns the size of the key.
+         * Returns the size of the key in bits.
          *
          * @return  the key size, or 0 if indeterminate
          */

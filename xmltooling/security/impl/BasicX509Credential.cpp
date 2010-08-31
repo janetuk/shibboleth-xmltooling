@@ -239,7 +239,7 @@ unsigned int BasicX509Credential::getKeySize() const
             case XSECCryptoKey::KEY_RSA_PUBLIC:
             case XSECCryptoKey::KEY_RSA_PAIR: {
                 XSECCryptoKeyRSA* rkey = static_cast<XSECCryptoKeyRSA*>(m_key);
-                return rkey->getLength();
+                return 8 * rkey->getLength();
             }
 
             case XSECCryptoKey::KEY_SYMMETRIC: {
