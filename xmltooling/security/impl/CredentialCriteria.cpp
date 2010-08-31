@@ -239,19 +239,20 @@ bool CredentialCriteria::matches(const Credential& credential) const
     }
 
     // KeySize check, if specified and we have one.
-    if (credential.getKeySize() > 0) {
+    unsigned int ksize = credential.getKeySize();
+    if (ksize > 0) {
         if (m_keySize > 0 && m_maxKeySize == 0) {
-            if (credential.getKeySize() != m_keySize) {
-                log.debug("key size (%u) didn't match (%u)", credential.getKeySize(), m_keySize);
+            if (ksize != m_keySize) {
+                log.debug("key size (%u) didn't match (%u)", ksize, m_keySize);
                 return false;
             }
         }
-        else if (m_keySize > 0 && credential.getKeySize() < m_keySize) {
-            log.debug("key size (%u) smaller than minimum (%u)", credential.getKeySize(), m_keySize);
+        else if (m_keySize > 0 && ksize < m_keySize) {
+            log.debug("key size (%u) smaller than minimum (%u)", ksize, m_keySize);
             return false;
         }
-        else if (m_maxKeySize > 0 && credential.getKeySize() > m_maxKeySize) {
-            log.debug("key size (%u) larger than maximum (%u)", credential.getKeySize(), m_maxKeySize);
+        else if (m_maxKeySize > 0 && ksize > m_maxKeySize) {
+            log.debug("key size (%u) larger than maximum (%u)", ksize, m_maxKeySize);
             return false;
         }
     }
