@@ -131,6 +131,7 @@ namespace xmltooling {
 # endif
         }
 
+        bool isXMLAlgorithmSupported(const XMLCh* xmlAlgorithm);
         void registerXMLAlgorithms();
 
         XSECProvider* m_xsecProvider;

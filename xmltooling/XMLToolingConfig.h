@@ -294,6 +294,13 @@ namespace xmltooling {
          * @param size          a key size (or 0 if the size is irrelevant)
          */
         virtual void registerXMLAlgorithm(const XMLCh* xmlAlgorithm, const char* keyAlgorithm, unsigned int size=0)=0;
+
+        /**
+         * Checks for implementation support of a particular XML security algorithm.
+         *
+         * @return  true iff the algorithm is supported by the underlying libraries
+         */
+        virtual bool isXMLAlgorithmSupported(const XMLCh* xmlAlgorithm)=0;
 #endif
 
         /**

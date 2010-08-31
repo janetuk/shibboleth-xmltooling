@@ -61,6 +61,7 @@
 #ifndef XMLTOOLING_NO_XMLSEC
 # include <curl/curl.h>
 # include <openssl/err.h>
+# include <xsec/framework/XSECAlgorithmMapper.hpp>
 # include <xsec/framework/XSECException.hpp>
 # include <xsec/framework/XSECProvider.hpp>
 # include <xsec/transformers/TXFMBase.hpp>
@@ -605,6 +606,7 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
 }
 
 #ifndef XMLTOOLING_NO_XMLSEC
+
 void xmltooling::log_openssl()
 {
     const char* file;
@@ -624,6 +626,17 @@ void xmltooling::log_openssl()
 XSECCryptoX509CRL* XMLToolingInternalConfig::X509CRL() const
 {
     return new OpenSSLCryptoX509CRL();
+}
+
+bool XMLToolingInternalConfig::isXMLAlgorithmSupported(const XMLCh* xmlAlgorithm)
+{
+    try {
+        if (XSECPlatformUtils::g_algorithmMapper->mapURIToHandler(xmlAlgorithm))
+            return true;
+    }
+    catch (XSECException&) {
+    }
+    return false;
 }
 
 void XMLToolingInternalConfig::registerXMLAlgorithms()
@@ -663,6 +676,7 @@ void XMLToolingInternalConfig::registerXMLAlgorithms()
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES256_CBC, "AES", 256);
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES256, "AES", 256);
 }
+
 #endif
 
 #ifdef WIN32
