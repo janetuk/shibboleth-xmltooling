@@ -221,6 +221,11 @@ namespace xmltooling {
          */
         void setSignature(const xmlsignature::Signature& sig, int extraction=0);
 
+        /**
+         * Resets object to a default state.
+         */
+        virtual void reset();
+
     private:
         unsigned int m_keyUsage;
         unsigned int m_keySize,m_maxKeySize;

@@ -200,6 +200,17 @@ void CredentialCriteria::setSignature(const Signature& sig, int extraction)
         setNativeKeyInfo(dsig->getKeyInfoList(), extraction);
 }
 
+void CredentialCriteria::reset()
+{
+    setUsage(Credential::UNSPECIFIED_CREDENTIAL);
+    setKeySize(0);
+    setMaxKeySize(0);
+    setKeyAlgorithm(nullptr);
+    getKeyNames().clear();
+    setKeyInfo(nullptr);
+    setNativeKeyInfo(nullptr);
+}
+
 bool CredentialCriteria::matches(const Credential& credential) const
 {
     Category& log = Category::getInstance(XMLTOOLING_LOGCAT".CredentialCriteria");
