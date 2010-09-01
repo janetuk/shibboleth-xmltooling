@@ -363,8 +363,13 @@ Lockable* ReloadableXMLFile::lock()
 
         // Update the timestamp regardless.
         m_filestamp = stat_buf.st_mtime;
-        m_log.info("change detected, signaling reload thread...");
-        m_reload_wait->signal();
+        if (m_reload_wait) {
+            m_log.info("change detected, signaling reload thread...");
+            m_reload_wait->signal();
+        }
+        else {
+            m_log.warn("change detected, but reload thread not started");
+        }
     }
 
     return this;
