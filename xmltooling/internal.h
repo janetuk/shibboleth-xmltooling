@@ -78,10 +78,12 @@ namespace xmltooling {
     class XMLToolingInternalConfig : public XMLToolingConfig
     {
     public:
-        XMLToolingInternalConfig() : m_lock(nullptr), m_parserPool(nullptr), m_validatingPool(nullptr) {
+        XMLToolingInternalConfig()
+            : m_lock(nullptr), m_parserPool(nullptr), m_validatingPool(nullptr)
 #ifndef XMLTOOLING_NO_XMLSEC
-            m_xsecProvider=nullptr;
+            ,m_xsecProvider(nullptr)
 #endif
+        {
         }
 
         static XMLToolingInternalConfig& getInternalConfig();
@@ -109,38 +111,14 @@ namespace xmltooling {
 
 #ifndef XMLTOOLING_NO_XMLSEC
         XSECCryptoX509CRL* X509CRL() const;
-
-        std::pair<const char*,unsigned int> mapXMLAlgorithmToKeyAlgorithm(const XMLCh* xmlAlgorithm) const {
-# ifdef HAVE_GOOD_STL
-            algmap_t::const_iterator i = m_algorithmMap.find(xmlAlgorithm);
-# else
-            auto_ptr_char alg(xmlAlgorithm);
-            algmap_t::const_iterator i = m_algorithmMap.find(alg.get());
-# endif
-            if (i==m_algorithmMap.end())
-                return std::pair<const char*,unsigned int>(nullptr,0);
-            return std::make_pair(i->second.first.c_str(), i->second.second);
-        }
-
-        void registerXMLAlgorithm(const XMLCh* xmlAlgorithm, const char* keyAlgorithm, unsigned int size=0) {
-# ifdef HAVE_GOOD_STL
-            m_algorithmMap[xmlAlgorithm] = std::pair<std::string,unsigned int>(keyAlgorithm,size);
-# else
-            auto_ptr_char alg(xmlAlgorithm);
-            m_algorithmMap[alg.get()] = std::pair<std::string,unsigned int>(keyAlgorithm,size);
-# endif
-        }
-
+        std::pair<const char*,unsigned int> mapXMLAlgorithmToKeyAlgorithm(const XMLCh* xmlAlgorithm) const;
+        void registerXMLAlgorithm(const XMLCh* xmlAlgorithm, const char* keyAlgorithm, unsigned int size=0);
         bool isXMLAlgorithmSupported(const XMLCh* xmlAlgorithm);
         void registerXMLAlgorithms();
 
         XSECProvider* m_xsecProvider;
     private:
-# ifdef HAVE_GOOD_STL
         typedef std::map< xstring,std::pair<std::string,unsigned int> > algmap_t;
-# else
-        typedef std::map< std::string,std::pair<std::string,unsigned int> > algmap_t;
-# endif
         algmap_t m_algorithmMap;
 #endif
 
