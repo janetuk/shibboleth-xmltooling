@@ -628,6 +628,19 @@ XSECCryptoX509CRL* XMLToolingInternalConfig::X509CRL() const
     return new OpenSSLCryptoX509CRL();
 }
 
+pair<const char*,unsigned int> XMLToolingInternalConfig::mapXMLAlgorithmToKeyAlgorithm(const XMLCh* xmlAlgorithm) const
+{
+    algmap_t::const_iterator i = m_algorithmMap.find(xmlAlgorithm);
+    if (i == m_algorithmMap.end())
+        return pair<const char*,unsigned int>(nullptr, 0);
+    return make_pair(i->second.first.c_str(), i->second.second);
+}
+
+void XMLToolingInternalConfig::registerXMLAlgorithm(const XMLCh* xmlAlgorithm, const char* keyAlgorithm, unsigned int size)
+{
+    m_algorithmMap[xmlAlgorithm] = pair<string,unsigned int>(keyAlgorithm, size);
+}
+
 bool XMLToolingInternalConfig::isXMLAlgorithmSupported(const XMLCh* xmlAlgorithm)
 {
     try {
