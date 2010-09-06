@@ -323,8 +323,8 @@ bool InlineCredential::resolveKey(const KeyInfo* keyInfo, bool followRefs)
 
     if (followRefs) {
         // Check for KeyInfoReference.
-        const XMLCh* fragID=NULL;
-        const XMLObject* treeRoot=NULL;
+        const XMLCh* fragID=nullptr;
+        const XMLObject* treeRoot=nullptr;
         const vector<KeyInfoReference*>& refs = keyInfo->getKeyInfoReferences();
         for (vector<KeyInfoReference*>::const_iterator ref = refs.begin(); ref != refs.end(); ++ref) {
             fragID = (*ref)->getURI();
