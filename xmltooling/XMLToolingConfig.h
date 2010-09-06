@@ -286,21 +286,38 @@ namespace xmltooling {
         virtual std::pair<const char*,unsigned int> mapXMLAlgorithmToKeyAlgorithm(const XMLCh* xmlAlgorithm) const=0;
 
         /**
+         * Types of XML Security algorithms.
+         */
+        enum XMLSecurityAlgorithmType {
+            ALGTYPE_UNK,
+            ALGTYPE_DIGEST,
+            ALGTYPE_SIGN,
+            ALGTYPE_ENCRYPT,
+            ALGTYPE_KEYENCRYPT,
+            ALGTYPE_KEYAGREE
+        };
+
+        /**
          * Registers an XML Signature/Encryption algorithm identifier against a library-specific
          * key algorithm and size for use in resolving credentials.
          *
          * @param xmlAlgorithm  XML Signature/Encryption algorithm identifier
          * @param keyAlgorithm  a key algorithm
          * @param size          a key size (or 0 if the size is irrelevant)
+         * @param type          type of algorithm, if known
          */
-        virtual void registerXMLAlgorithm(const XMLCh* xmlAlgorithm, const char* keyAlgorithm, unsigned int size=0)=0;
+        virtual void registerXMLAlgorithm(
+            const XMLCh* xmlAlgorithm, const char* keyAlgorithm, unsigned int size=0, XMLSecurityAlgorithmType type=ALGTYPE_UNK
+            )=0;
 
         /**
-         * Checks for implementation support of a particular XML security algorithm.
+         * Checks for implementation support of a particular XML Security algorithm.
          *
+         * @param xmlAlgorithm  XML Signature/Encryption algorithm identifier
+         * @param type          type of algorithm, or ALGTYPE_UNK to ignore
          * @return  true iff the algorithm is supported by the underlying libraries
          */
-        virtual bool isXMLAlgorithmSupported(const XMLCh* xmlAlgorithm)=0;
+        virtual bool isXMLAlgorithmSupported(const XMLCh* xmlAlgorithm, XMLSecurityAlgorithmType type=ALGTYPE_UNK)=0;
 #endif
 
         /**

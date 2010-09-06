@@ -81,7 +81,11 @@ namespace xmlencryption {
              * @param compact       true iff the encrypted representation should be made as small as possible
              */
             EncryptionParams(
+#ifdef XSEC_OPENSSL_HAVE_AES
                 const XMLCh* algorithm=DSIGConstants::s_unicodeStrURIAES128_CBC,
+#else
+                const XMLCh* algorithm=DSIGConstants::s_unicodeStrURI3DES_CBC,
+#endif
                 const unsigned char* keyBuffer=nullptr,
                 unsigned int keyBufferSize=0,
                 const xmltooling::Credential* credential=nullptr,

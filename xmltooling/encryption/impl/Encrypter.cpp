@@ -239,6 +239,8 @@ EncryptedData* Encrypter::decorateAndUnmarshall(EncryptionParams& encParams, Key
             throw EncryptionException("Credential in KeyEncryptionParams structure did not supply a public key.");
         if (!kencParams->m_algorithm)
             kencParams->m_algorithm = getKeyTransportAlgorithm(kencParams->m_credential, encParams.m_algorithm);
+        if (!kencParams->m_algorithm)
+            throw EncryptionException("Unable to derive a supported key encryption algorithm.");
 
         m_cipher->setKEK(kek->clone());
         // ownership of this belongs to us, for some reason...
@@ -276,6 +278,9 @@ EncryptedKey* Encrypter::encryptKey(
     const unsigned char* keyBuffer, unsigned int keyBufferSize, KeyEncryptionParams& kencParams, bool compact
     )
 {
+    if (!kencParams.m_algorithm)
+        throw EncryptionException("KeyEncryptionParams structure did not include a key encryption algorithm.");
+
     // Get a fresh cipher object and document.
 
     if (m_cipher) {
@@ -326,25 +331,40 @@ EncryptedKey* Encrypter::encryptKey(
 
 const XMLCh* Encrypter::getKeyTransportAlgorithm(const Credential& credential, const XMLCh* encryptionAlg)
 {
+    XMLToolingConfig& conf = XMLToolingConfig::getConfig();
     const char* alg = credential.getAlgorithm();
     if (!alg || !strcmp(alg, "RSA")) {
-        if (XMLString::equals(encryptionAlg,DSIGConstants::s_unicodeStrURI3DES_CBC))
-            return DSIGConstants::s_unicodeStrURIRSA_1_5;
-        else
-            return DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1;
-    }
-    else if (!strcmp(alg, "AES")) {
-        switch (credential.getKeySize()) {
-            case 128:
-                return DSIGConstants::s_unicodeStrURIKW_AES128;
-            case 192:
-                return DSIGConstants::s_unicodeStrURIKW_AES192;
-            case 256:
-                return DSIGConstants::s_unicodeStrURIKW_AES256;
+        if (XMLString::equals(encryptionAlg,DSIGConstants::s_unicodeStrURI3DES_CBC)) {
+            if (conf.isXMLAlgorithmSupported(DSIGConstants::s_unicodeStrURIRSA_1_5, XMLToolingConfig::ALGTYPE_KEYENCRYPT))
+                return DSIGConstants::s_unicodeStrURIRSA_1_5;
+            else if (conf.isXMLAlgorithmSupported(DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1, XMLToolingConfig::ALGTYPE_KEYENCRYPT))
+                return DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1;
+        }
+        else {
+            if (conf.isXMLAlgorithmSupported(DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1, XMLToolingConfig::ALGTYPE_KEYENCRYPT))
+                return DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1;
+            else if (conf.isXMLAlgorithmSupported(DSIGConstants::s_unicodeStrURIRSA_1_5, XMLToolingConfig::ALGTYPE_KEYENCRYPT))
+                return DSIGConstants::s_unicodeStrURIRSA_1_5;
         }
     }
+    else if (!strcmp(alg, "AES")) {
+        const XMLCh* ret = nullptr;
+        switch (credential.getKeySize()) {
+            case 128:
+                ret = DSIGConstants::s_unicodeStrURIKW_AES128;
+            case 192:
+                ret = DSIGConstants::s_unicodeStrURIKW_AES192;
+            case 256:
+                ret = DSIGConstants::s_unicodeStrURIKW_AES256;
+            default:
+                return nullptr;
+        }
+        if (conf.isXMLAlgorithmSupported(ret, XMLToolingConfig::ALGTYPE_KEYENCRYPT))
+            return ret;
+    }
     else if (!strcmp(alg, "DESede")) {
-        return DSIGConstants::s_unicodeStrURIKW_3DES;
+        if (conf.isXMLAlgorithmSupported(DSIGConstants::s_unicodeStrURIKW_3DES, XMLToolingConfig::ALGTYPE_KEYENCRYPT))
+            return DSIGConstants::s_unicodeStrURIKW_3DES;
     }
 
     return nullptr;

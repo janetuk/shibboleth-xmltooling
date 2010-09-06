@@ -112,13 +112,15 @@ namespace xmltooling {
 #ifndef XMLTOOLING_NO_XMLSEC
         XSECCryptoX509CRL* X509CRL() const;
         std::pair<const char*,unsigned int> mapXMLAlgorithmToKeyAlgorithm(const XMLCh* xmlAlgorithm) const;
-        void registerXMLAlgorithm(const XMLCh* xmlAlgorithm, const char* keyAlgorithm, unsigned int size=0);
-        bool isXMLAlgorithmSupported(const XMLCh* xmlAlgorithm);
+        void registerXMLAlgorithm(
+            const XMLCh* xmlAlgorithm, const char* keyAlgorithm, unsigned int size=0, XMLSecurityAlgorithmType type=ALGTYPE_UNK
+            );
+        bool isXMLAlgorithmSupported(const XMLCh* xmlAlgorithm, XMLSecurityAlgorithmType type=ALGTYPE_UNK);
         void registerXMLAlgorithms();
 
         XSECProvider* m_xsecProvider;
     private:
-        typedef std::map< xstring,std::pair<std::string,unsigned int> > algmap_t;
+        typedef std::map<XMLSecurityAlgorithmType, std::map< xstring,std::pair<std::string,unsigned int> > > algmap_t;
         algmap_t m_algorithmMap;
 #endif
 

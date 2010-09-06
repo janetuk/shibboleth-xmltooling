@@ -61,6 +61,7 @@
 #ifndef XMLTOOLING_NO_XMLSEC
 # include <curl/curl.h>
 # include <openssl/err.h>
+# include <openssl/evp.h>
 # include <xsec/framework/XSECAlgorithmMapper.hpp>
 # include <xsec/framework/XSECException.hpp>
 # include <xsec/framework/XSECProvider.hpp>
@@ -72,6 +73,12 @@ using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace xercesc;
 using namespace std;
+
+#ifdef WIN32
+# if (OPENSSL_VERSION_NUMBER >= 0x00908000)
+#  define XMLTOOLING_OPENSSL_HAVE_SHA2
+# endif
+#endif
 
 
 DECL_XMLTOOLING_EXCEPTION_FACTORY(XMLParserException,xmltooling);
@@ -630,22 +637,34 @@ XSECCryptoX509CRL* XMLToolingInternalConfig::X509CRL() const
 
 pair<const char*,unsigned int> XMLToolingInternalConfig::mapXMLAlgorithmToKeyAlgorithm(const XMLCh* xmlAlgorithm) const
 {
-    algmap_t::const_iterator i = m_algorithmMap.find(xmlAlgorithm);
-    if (i == m_algorithmMap.end())
-        return pair<const char*,unsigned int>(nullptr, 0);
-    return make_pair(i->second.first.c_str(), i->second.second);
+    for (algmap_t::const_iterator i = m_algorithmMap.begin(); i != m_algorithmMap.end(); ++i) {
+        algmap_t::value_type::second_type::const_iterator j = i->second.find(xmlAlgorithm);
+        if (j != i->second.end())
+            return pair<const char*,unsigned int>(j->second.first.c_str(), j->second.second);
+    }
+    return pair<const char*,unsigned int>(nullptr, 0);
 }
 
-void XMLToolingInternalConfig::registerXMLAlgorithm(const XMLCh* xmlAlgorithm, const char* keyAlgorithm, unsigned int size)
+void XMLToolingInternalConfig::registerXMLAlgorithm(
+    const XMLCh* xmlAlgorithm, const char* keyAlgorithm, unsigned int size, XMLSecurityAlgorithmType type
+    )
 {
-    m_algorithmMap[xmlAlgorithm] = pair<string,unsigned int>(keyAlgorithm, size);
+    m_algorithmMap[type][xmlAlgorithm] = pair<string,unsigned int>((keyAlgorithm ? keyAlgorithm : ""), size);
 }
 
-bool XMLToolingInternalConfig::isXMLAlgorithmSupported(const XMLCh* xmlAlgorithm)
+bool XMLToolingInternalConfig::isXMLAlgorithmSupported(const XMLCh* xmlAlgorithm, XMLSecurityAlgorithmType type)
 {
     try {
-        if (XSECPlatformUtils::g_algorithmMapper->mapURIToHandler(xmlAlgorithm))
-            return true;
+        // First check for basic support from the xmlsec layer.
+        if (XSECPlatformUtils::g_algorithmMapper->mapURIToHandler(xmlAlgorithm)) {
+            // Make sure the algorithm is registered.
+            algmap_t::const_iterator i = m_algorithmMap.find(type);
+            if (i != m_algorithmMap.end()) {
+                algmap_t::value_type::second_type::const_iterator j = i->second.find(xmlAlgorithm);
+                if (j != i->second.end())
+                    return true;
+            }
+        }
     }
     catch (XSECException&) {
     }
@@ -654,40 +673,78 @@ bool XMLToolingInternalConfig::isXMLAlgorithmSupported(const XMLCh* xmlAlgorithm
 
 void XMLToolingInternalConfig::registerXMLAlgorithms()
 {
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_MD5, "RSA", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA1, "RSA", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA224, "RSA", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA256, "RSA", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA384, "RSA", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA512, "RSA", 0);
+    // The deal with all the macros is to try and figure out with no false positives whether
+    // the OpenSSL version *and* the XML-Security version support the algorithms.
 
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_1_5, "RSA", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1, "RSA", 0);
+    // With ECDSA, XML-Security exports a public macro for OpenSSL's support, and any
+    // versions of XML-Security that didn't provide the macro don't handle ECDSA anyway.
 
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIDSA_SHA1, "DSA", 0);
+    // With AES, all supported XML-Security versions export a macro for OpenSSL's support.
 
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA1, "EC", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA256, "EC", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA384, "EC", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA512, "EC", 0);
+    // With SHA2, only the very latest XML-Security exports a macro, but all the versions
+    // will handle SHA2 *if* OpenSSL does. So we use our own macro to check OpenSSL's
+    // support, and then add checks to see if specific versions are compiled out.
 
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA1, "HMAC", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA224, "HMAC", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA256, "HMAC", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA384, "HMAC", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA512, "HMAC", 0);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIMD5, nullptr, 0, ALGTYPE_DIGEST);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURISHA1, nullptr, 0, ALGTYPE_DIGEST);
+#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA256)
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURISHA224, nullptr, 0, ALGTYPE_DIGEST);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURISHA256, nullptr, 0, ALGTYPE_DIGEST);
+#endif
+#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA512)
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURISHA384, nullptr, 0, ALGTYPE_DIGEST);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURISHA512, nullptr, 0, ALGTYPE_DIGEST);
+#endif
 
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURI3DES_CBC, "DESede", 192);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_3DES, "DESede", 192);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIDSA_SHA1, "DSA", 0, ALGTYPE_SIGN);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_MD5, "RSA", 0, ALGTYPE_SIGN);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA1, "RSA", 0, ALGTYPE_SIGN);
+#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA256)
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA224, "RSA", 0, ALGTYPE_SIGN);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA256, "RSA", 0, ALGTYPE_SIGN);
+#endif
+#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA512)
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA384, "RSA", 0, ALGTYPE_SIGN);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA512, "RSA", 0, ALGTYPE_SIGN);
+#endif
 
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES128_CBC, "AES", 128);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES128, "AES", 128);
+#ifdef XSEC_OPENSSL_HAVE_EC
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA1, "EC", 0, ALGTYPE_SIGN);
+#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA256)
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA256, "EC", 0, ALGTYPE_SIGN);
+# endif
+#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA512)
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA384, "EC", 0, ALGTYPE_SIGN);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA512, "EC", 0, ALGTYPE_SIGN);
+# endif
+#endif
 
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES192_CBC, "AES", 192);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES192, "AES", 192);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA1, "HMAC", 0, ALGTYPE_SIGN);
+#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA256)
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA224, "HMAC", 0, ALGTYPE_SIGN);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA256, "HMAC", 0, ALGTYPE_SIGN);
+#endif
+#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA512)
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA384, "HMAC", 0, ALGTYPE_SIGN);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA512, "HMAC", 0, ALGTYPE_SIGN);
+#endif
 
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES256_CBC, "AES", 256);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES256, "AES", 256);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_1_5, "RSA", 0, ALGTYPE_KEYENCRYPT);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1, "RSA", 0, ALGTYPE_KEYENCRYPT);
+
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURI3DES_CBC, "DESede", 192, ALGTYPE_ENCRYPT);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_3DES, "DESede", 192, ALGTYPE_KEYENCRYPT);
+
+#ifdef XSEC_OPENSSL_HAVE_AES
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES128_CBC, "AES", 128, ALGTYPE_ENCRYPT);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES128, "AES", 128, ALGTYPE_KEYENCRYPT);
+
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES192_CBC, "AES", 192, ALGTYPE_ENCRYPT);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES192, "AES", 192, ALGTYPE_KEYENCRYPT);
+
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES256_CBC, "AES", 256, ALGTYPE_ENCRYPT);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES256, "AES", 256, ALGTYPE_KEYENCRYPT);
+#endif
 }
 
 #endif
