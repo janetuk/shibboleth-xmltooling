@@ -56,8 +56,8 @@ else
 	esac
 fi
 
-AC_DISABLE_STATIC
 AC_PROG_LIBTOOL
+AC_DISABLE_STATIC
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
