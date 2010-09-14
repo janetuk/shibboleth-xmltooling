@@ -25,7 +25,7 @@
 
 #include <xmltooling/base.h>
 
-#include <set>
+#include <map>
 #include <iostream>
 #include <xercesc/dom/DOM.hpp>
 
