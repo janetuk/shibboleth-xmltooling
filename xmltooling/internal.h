@@ -78,11 +78,11 @@ namespace xmltooling {
     class XMLToolingInternalConfig : public XMLToolingConfig
     {
     public:
-        XMLToolingInternalConfig()
-            : m_lock(nullptr), m_parserPool(nullptr), m_validatingPool(nullptr)
+        XMLToolingInternalConfig() :
 #ifndef XMLTOOLING_NO_XMLSEC
-            ,m_xsecProvider(nullptr)
+            m_xsecProvider(nullptr),
 #endif
+            m_lock(nullptr), m_parserPool(nullptr), m_validatingPool(nullptr)
         {
         }
 
