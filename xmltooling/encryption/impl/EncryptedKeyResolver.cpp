@@ -24,6 +24,8 @@
 #include "encryption/EncryptedKeyResolver.h"
 #include "signature/KeyInfo.h"
 
+#include <xercesc/util/XMLUniDefs.hpp>
+
 using namespace xmlencryption;
 using namespace xmlsignature;
 using namespace xmltooling;
