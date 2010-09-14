@@ -481,7 +481,7 @@ pair<bool,DOMElement*> ReloadableXMLFile::load()
             m_log.debug("backing up remote resource to (%s)", m_backing.c_str());
             try {
                 Locker locker(getBackupLock());
-                ofstream backer(m_backing);
+                ofstream backer(m_backing.c_str());
                 backer << *(ret.second->getOwnerDocument());
                 preserveCacheTag();
             }
