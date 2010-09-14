@@ -206,10 +206,12 @@ const char* BasicX509Credential::getAlgorithm() const
             case XSECCryptoKey::KEY_DSA_PAIR:
                 return "DSA";
 
+#ifdef XMLTOOLING_XMLSEC_ECC
             case XSECCryptoKey::KEY_EC_PRIVATE:
             case XSECCryptoKey::KEY_EC_PUBLIC:
             case XSECCryptoKey::KEY_EC_PAIR:
                 return "EC";
+#endif
 
             case XSECCryptoKey::KEY_HMAC:
                 return "HMAC";
@@ -263,7 +265,11 @@ XSECCryptoKey* BasicX509Credential::getPrivateKey() const
 {
     if (m_key) {
         XSECCryptoKey::KeyType type = m_key->getKeyType();
-        if (type!=XSECCryptoKey::KEY_RSA_PUBLIC && type!=XSECCryptoKey::KEY_DSA_PUBLIC && type!=XSECCryptoKey::KEY_EC_PUBLIC)
+        if (type != XSECCryptoKey::KEY_RSA_PUBLIC && type != XSECCryptoKey::KEY_DSA_PUBLIC
+#ifdef XMLTOOLING_XMLSEC_ECC
+            && type != XSECCryptoKey::KEY_EC_PUBLIC
+#endif
+            )
             return m_key;
     }
     return nullptr;
@@ -273,7 +279,11 @@ XSECCryptoKey* BasicX509Credential::getPublicKey() const
 {
     if (m_key) {
         XSECCryptoKey::KeyType type = m_key->getKeyType();
-        if (type!=XSECCryptoKey::KEY_RSA_PRIVATE && type!=XSECCryptoKey::KEY_DSA_PRIVATE && type!=XSECCryptoKey::KEY_EC_PRIVATE)
+        if (type != XSECCryptoKey::KEY_RSA_PRIVATE && type != XSECCryptoKey::KEY_DSA_PRIVATE
+#ifdef XMLTOOLING_XMLSEC_ECC
+            && type != XSECCryptoKey::KEY_EC_PRIVATE
+#endif
+            )
             return m_key;
     }
     return nullptr;

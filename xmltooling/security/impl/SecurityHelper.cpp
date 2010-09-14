@@ -37,7 +37,9 @@
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyRSA.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyDSA.hpp>
-#include <xsec/enc/OpenSSL/OpenSSLCryptoKeyEC.hpp>
+#ifdef XMLTOOLING_XMLSEC_ECC
+# include <xsec/enc/OpenSSL/OpenSSLCryptoKeyEC.hpp>
+#endif
 #include <xercesc/util/Base64.hpp>
 
 using namespace xmltooling::logging;
