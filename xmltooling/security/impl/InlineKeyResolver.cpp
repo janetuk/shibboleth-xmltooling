@@ -40,7 +40,9 @@
 #include <xsec/enc/XSECCryptoX509.hpp>
 #include <xsec/enc/XSECCryptoKeyRSA.hpp>
 #include <xsec/enc/XSECCryptoKeyDSA.hpp>
-#include <xsec/enc/XSECCryptoKeyEC.hpp>
+#ifdef XMLTOOLING_XMLSEC_ECC
+# include <xsec/enc/XSECCryptoKeyEC.hpp>
+#endif
 #include <xsec/enc/XSECCryptoException.hpp>
 #include <xsec/framework/XSECException.hpp>
 
