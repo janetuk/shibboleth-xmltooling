@@ -103,7 +103,7 @@ static const XMLCh _CredentialResolver[] = UNICODE_LITERAL_18(C,r,e,d,e,n,t,i,a,
 
 ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log, bool startReloadThread)
     : m_root(e), m_local(true), m_validate(false), m_filestamp(0), m_reloadInterval(0),
-      m_lock(nullptr), m_loaded(false), m_log(log),
+      m_lock(nullptr), m_log(log), m_loaded(false),
 #ifndef XMLTOOLING_LITE
       m_credResolver(nullptr), m_trust(nullptr),
 #endif
@@ -202,7 +202,8 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log, bool st
                 XMLToolingConfig::getConfig().getPathResolver()->resolve(m_backing, PathResolver::XMLTOOLING_RUN_FILE);
                 log.debug("backup remote resource to (%s)", m_backing.c_str());
                 try {
-                    ifstream backer(m_backing + ".tag");
+                    string tagname = m_backing + ".tag";
+                    ifstream backer(tagname.c_str());
                     if (backer) {
                         char cachebuf[256];
                         if (backer.getline(cachebuf, 255)) {
@@ -528,7 +529,8 @@ void ReloadableXMLFile::preserveCacheTag()
 {
     if (!m_cacheTag.empty() && !m_backing.empty()) {
         try {
-            ofstream backer(m_backing + ".tag");
+            string tagname = m_backing + ".tag";
+            ofstream backer(tagname.c_str());
             backer << m_cacheTag;
         }
         catch (exception&) {
