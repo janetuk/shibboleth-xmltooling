@@ -397,7 +397,7 @@ pair<bool,DOMElement*> ReloadableXMLFile::load(bool backup)
         else {
             // Data comes from a file we have to parse.
             if (backup)
-                m_log.warn("using local backup of remote resource");
+                m_log.info("using local backup of remote resource");
             else
                 m_log.debug("loading configuration from external resource...");
 
