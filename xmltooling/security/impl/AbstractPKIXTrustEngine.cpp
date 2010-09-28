@@ -26,16 +26,16 @@
 #include "security/AbstractPKIXTrustEngine.h"
 #include "signature/KeyInfo.h"
 #include "signature/Signature.h"
+#include "security/CredentialCriteria.h"
+#include "security/CredentialResolver.h"
+#include "security/KeyInfoResolver.h"
+#include "security/OpenSSLCryptoX509CRL.h"
+#include "security/X509Credential.h"
+#include "signature/SignatureValidator.h"
+#include "util/NDC.h"
 
 #include <openssl/x509_vfy.h>
 #include <openssl/x509v3.h>
-#include <xmltooling/security/CredentialCriteria.h>
-#include <xmltooling/security/CredentialResolver.h>
-#include <xmltooling/security/KeyInfoResolver.h>
-#include <xmltooling/security/OpenSSLCryptoX509CRL.h>
-#include <xmltooling/security/X509Credential.h>
-#include <xmltooling/signature/SignatureValidator.h>
-#include <xmltooling/util/NDC.h>
 #include <xercesc/util/XMLUniDefs.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
 
