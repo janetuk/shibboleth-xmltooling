@@ -92,29 +92,29 @@ AC_CXX_NAMESPACES
 
 # are covariant methods allowed?
 AC_LINK_IFELSE(
-	[AC_LANG_PROGRAM([[]],
-		[[
-		class base { public: virtual base *GetPtr( void ) { return this; } };
-		class derived: virtual public base { public: virtual derived *GetPtr( void ) { return this; } };
-		]])],
-    [AC_DEFINE([HAVE_COVARIANT_RETURNS], [1], [Define to 1 if C++ compiler supports covariant virtual methods.])])
+    [AC_LANG_PROGRAM([[]],
+        [[
+        class base { public: virtual base *GetPtr( void ) { return this; } };
+        class derived: virtual public base { public: virtual derived *GetPtr( void ) { return this; } };
+        ]])],
+    [AC_DEFINE([HAVE_COVARIANT_RETURNS],[1],[Define to 1 if C++ compiler supports covariant virtual methods.])])
 
 # is nullptr supported?
 AC_COMPILE_IFELSE(
-	[AC_LANG_PROGRAM([[]],[[const char* ptr = nullptr;]])],
-	[AC_DEFINE([HAVE_NULLPTR], [1], [Define to 1 if C++ compiler supports nullptr keyword.])])
+    [AC_LANG_PROGRAM([[]],[[const char* ptr = nullptr;]])],
+    [AC_DEFINE([HAVE_NULLPTR],[1],[Define to 1 if C++ compiler supports nullptr keyword.])])
 
 # log4shib settings (favor this version over the log4cpp code)
 AC_PATH_PROG(LOG4SHIB_CONFIG,log4shib-config)
 AC_ARG_WITH(log4shib,
-    AS_HELP_STRING([--with-log4shib=PATH], [where log4shib-config is installed]),
+    AS_HELP_STRING([--with-log4shib=PATH],[where log4shib-config is installed]),
     [
     LOG4SHIB_CONFIG="${with_log4shib}"
     if ! test -f "${LOG4SHIB_CONFIG}" ; then
     	LOG4SHIB_CONFIG="${with_log4shib}/bin/log4shib-config"
     fi
     ])
-if test -f "${LOG4SHIB_CONFIG}"; then
+if test -f "${LOG4SHIB_CONFIG}" ; then
     LIBS="`${LOG4SHIB_CONFIG} --libs` $LIBS"
     CPPFLAGS="`${LOG4SHIB_CONFIG} --cflags` $CPPFLAGS"
     AC_CHECK_HEADER([log4shib/CategoryStream.hh],,AC_MSG_ERROR([unable to find log4shib header files]))
@@ -122,7 +122,7 @@ if test -f "${LOG4SHIB_CONFIG}"; then
         [AC_LANG_PROGRAM([[#include <log4shib/Category.hh>
 #include <log4shib/CategoryStream.hh>]],
             [[log4shib::Category::getInstance("foo").errorStream() << log4shib::eol]])],
-        [AC_DEFINE([XMLTOOLING_LOG4SHIB], [1], [Define to 1 if log4shib library is used.])],
+        [AC_DEFINE([XMLTOOLING_LOG4SHIB],[1],[Define to 1 if log4shib library is used.])],
         [AC_MSG_ERROR([unable to link with log4shib])])
 else
     AC_MSG_WARN([log4shib-config not found, may need to use --with-log4shib option])
@@ -131,7 +131,7 @@ else
     # log4cpp settings
     AC_PATH_PROG(LOG4CPP_CONFIG,log4cpp-config)
     AC_ARG_WITH(log4cpp,
-        AS_HELP_STRING([--with-log4cpp=PATH], [where log4cpp-config is installed]),
+        AS_HELP_STRING([--with-log4cpp=PATH],[where log4cpp-config is installed]),
         [
         LOG4CPP_CONFIG="${with_log4cpp}"
         if ! test -f "${LOG4CPP_CONFIG}" ; then
@@ -147,7 +147,7 @@ else
             [AC_LANG_PROGRAM([[#include <log4cpp/Category.hh>
 #include <log4cpp/CategoryStream.hh>]],
                 [[log4cpp::Category::getInstance("foo").errorStream() << log4cpp::eol]])],
-            [AC_DEFINE([XMLTOOLING_LOG4CPP], [1], [Define to 1 if log4cpp library is used.])],
+            [AC_DEFINE([XMLTOOLING_LOG4CPP],[1],[Define to 1 if log4cpp library is used.])],
             [AC_MSG_ERROR([unable to link with log4cpp, need version 1.0 or later])])
 	else
 	    AC_MSG_ERROR([log4cpp-config not found, may need to use --with-log4cpp option])
