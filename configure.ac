@@ -97,17 +97,12 @@ AC_LINK_IFELSE(
 		class base { public: virtual base *GetPtr( void ) { return this; } };
 		class derived: virtual public base { public: virtual derived *GetPtr( void ) { return this; } };
 		]])],
-    [AC_DEFINE([HAVE_COVARIANT_RETURNS], [1], [Define to 1 if C++ compiler supports covariant virtual methods.])]
-	)
+    [AC_DEFINE([HAVE_COVARIANT_RETURNS], [1], [Define to 1 if C++ compiler supports covariant virtual methods.])])
 
 # is nullptr supported?
 AC_COMPILE_IFELSE(
-	[AC_LANG_PROGRAM([[]],
-		[[
-		const char* ptr = nullptr;
-		]])],
-	[AC_DEFINE([HAVE_NULLPTR], [1], [Define to 1 if C++ compiler supports nullptr keyword.])]
-	)
+	[AC_LANG_PROGRAM([[]],[[const char* ptr = nullptr;]])],
+	[AC_DEFINE([HAVE_NULLPTR], [1], [Define to 1 if C++ compiler supports nullptr keyword.])])
 
 # log4shib settings (favor this version over the log4cpp code)
 AC_PATH_PROG(LOG4SHIB_CONFIG,log4shib-config)
@@ -122,30 +117,38 @@ AC_ARG_WITH(log4shib,
 if test -f "${LOG4SHIB_CONFIG}"; then
     LIBS="`${LOG4SHIB_CONFIG} --libs` $LIBS"
     CPPFLAGS="`${LOG4SHIB_CONFIG} --cflags` $CPPFLAGS"
-	AC_CHECK_HEADER([log4shib/CategoryStream.hh],,AC_MSG_ERROR([unable to find log4shib header files]))
-	AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <log4shib/Category.hh>
-#include <log4shib/CategoryStream.hh>]], [[log4shib::Category::getInstance("foo").errorStream() << log4shib::eol]])],[AC_DEFINE([XMLTOOLING_LOG4SHIB], [1], [Define to 1 if log4shib library is used.])],[AC_MSG_ERROR([unable to link with log4shib])])
+    AC_CHECK_HEADER([log4shib/CategoryStream.hh],,AC_MSG_ERROR([unable to find log4shib header files]))
+    AC_LINK_IFELSE(
+        [AC_LANG_PROGRAM([[#include <log4shib/Category.hh>
+#include <log4shib/CategoryStream.hh>]],
+            [[log4shib::Category::getInstance("foo").errorStream() << log4shib::eol]])],
+        [AC_DEFINE([XMLTOOLING_LOG4SHIB], [1], [Define to 1 if log4shib library is used.])],
+        [AC_MSG_ERROR([unable to link with log4shib])])
 else
     AC_MSG_WARN([log4shib-config not found, may need to use --with-log4shib option])
     AC_MSG_WARN([will look for original log4cpp library])
     
-	# log4cpp settings
-	AC_PATH_PROG(LOG4CPP_CONFIG,log4cpp-config)
-	AC_ARG_WITH(log4cpp,
-	    AS_HELP_STRING([--with-log4cpp=PATH], [where log4cpp-config is installed]),
-	    [
-	    LOG4CPP_CONFIG="${with_log4cpp}"
-	    if ! test -f "${LOG4CPP_CONFIG}" ; then
-	    	LOG4CPP_CONFIG="${with_log4cpp}/bin/log4cpp-config"
-	    fi
-	    ])
-	if test -f "${LOG4CPP_CONFIG}"; then
-		AC_MSG_WARN([will try to use log4cpp, note that most non-Internet2 supplied versions are not thread-safe])
-	    LIBS="`${LOG4CPP_CONFIG} --libs` $LIBS"
-	    CPPFLAGS="`${LOG4CPP_CONFIG} --cflags` $CPPFLAGS"
-		AC_CHECK_HEADER([log4cpp/CategoryStream.hh],,AC_MSG_ERROR([unable to find log4cpp header files]))
-		AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <log4cpp/Category.hh>
-#include <log4cpp/CategoryStream.hh>]], [[log4cpp::Category::getInstance("foo").errorStream() << log4cpp::eol]])],[AC_DEFINE([XMLTOOLING_LOG4CPP], [1], [Define to 1 if log4cpp library is used.])],[AC_MSG_ERROR([unable to link with log4cpp, need version 1.0 or later])])
+    # log4cpp settings
+    AC_PATH_PROG(LOG4CPP_CONFIG,log4cpp-config)
+    AC_ARG_WITH(log4cpp,
+        AS_HELP_STRING([--with-log4cpp=PATH], [where log4cpp-config is installed]),
+        [
+        LOG4CPP_CONFIG="${with_log4cpp}"
+        if ! test -f "${LOG4CPP_CONFIG}" ; then
+        	LOG4CPP_CONFIG="${with_log4cpp}/bin/log4cpp-config"
+        fi
+        ])
+    if test -f "${LOG4CPP_CONFIG}"; then
+        AC_MSG_WARN([will try to use log4cpp, note that most non-Internet2 supplied versions are not thread-safe])
+        LIBS="`${LOG4CPP_CONFIG} --libs` $LIBS"
+        CPPFLAGS="`${LOG4CPP_CONFIG} --cflags` $CPPFLAGS"
+        AC_CHECK_HEADER([log4cpp/CategoryStream.hh],,AC_MSG_ERROR([unable to find log4cpp header files]))
+        AC_LINK_IFELSE(
+            [AC_LANG_PROGRAM([[#include <log4cpp/Category.hh>
+#include <log4cpp/CategoryStream.hh>]],
+                [[log4cpp::Category::getInstance("foo").errorStream() << log4cpp::eol]])],
+            [AC_DEFINE([XMLTOOLING_LOG4CPP], [1], [Define to 1 if log4cpp library is used.])],
+            [AC_MSG_ERROR([unable to link with log4cpp, need version 1.0 or later])])
 	else
 	    AC_MSG_ERROR([log4cpp-config not found, may need to use --with-log4cpp option])
 	fi
@@ -153,11 +156,11 @@ fi
 
 # Xerces settings
 AC_ARG_WITH(xerces, 
-            AS_HELP_STRING([--with-xerces=PATH], [where xerces-c is installed]),
-            [if test x_$with_xerces != x_/usr; then
-                LDFLAGS="-L${with_xerces}/lib $LDFLAGS"
-                CPPFLAGS="-I${with_xerces}/include $CPPFLAGS"
-            fi])
+    AS_HELP_STRING([--with-xerces=PATH], [where xerces-c is installed]),
+    [if test x_$with_xerces != x_/usr; then
+        LDFLAGS="-L${with_xerces}/lib $LDFLAGS"
+        CPPFLAGS="-I${with_xerces}/include $CPPFLAGS"
+    fi])
 LIBS="-lxerces-c $LIBS"
 AC_CHECK_HEADER([xercesc/dom/DOM.hpp],,AC_MSG_ERROR([unable to find xerces header files]))
 AC_MSG_CHECKING([Xerces version])
@@ -170,47 +173,52 @@ int i = 0;
 #endif])],
     [AC_MSG_RESULT(OK)],
     [AC_MSG_FAILURE([Xerces-C v2.6.0 has bugs that inhibit use with signed XML, please use a newer version])])
-AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <xercesc/util/PlatformUtils.hpp>]], [[xercesc::XMLPlatformUtils::Initialize()]])],[AC_DEFINE([HAVE_LIBXERCESC], [1], [Define to 1 if Xerces-C library was found])],[AC_MSG_ERROR([unable to link with Xerces])])
+AC_LINK_IFELSE(
+    [AC_LANG_PROGRAM([[#include <xercesc/util/PlatformUtils.hpp>]],
+        [[xercesc::XMLPlatformUtils::Initialize()]])],
+    ,[AC_MSG_ERROR([unable to link with Xerces])])
 
 AC_MSG_CHECKING([whether Xerces is 64-bit clean])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <xercesc/framework/MemBufInputSource.hpp>]], [[using namespace XERCES_CPP_NAMESPACE;
-      XMLFilePos testvar;
-    ]])],[AC_MSG_RESULT([yes])
-    AC_DEFINE([XMLTOOLING_XERCESC_64BITSAFE], [1], [Define to 1 if Xerces has a 64-bit-safe API.])],[AC_MSG_RESULT([no])])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[#include <xercesc/framework/MemBufInputSource.hpp>]],
+        [[using namespace XERCES_CPP_NAMESPACE; XMLFilePos testvar;]])],
+    [AC_MSG_RESULT([yes])AC_DEFINE([XMLTOOLING_XERCESC_64BITSAFE],[1],[Define to 1 if Xerces has a 64-bit-safe API.])],
+    [AC_MSG_RESULT([no])])
 
 AC_MSG_CHECKING([whether Xerces BinInputStream requires getContentType])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <xercesc/util/BinMemInputStream.hpp>]], [[using namespace XERCES_CPP_NAMESPACE;
-      XMLByte buf[1024];
-      BinMemInputStream in(buf,1024);
-      in.getContentType();
-    ]])],[AC_MSG_RESULT([yes])
-    AC_DEFINE([XMLTOOLING_XERCESC_INPUTSTREAM_HAS_CONTENTTYPE], [1], [Define to 1 if Xerces InputStream class requires getContentType.])],[AC_MSG_RESULT([no])])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[#include <xercesc/util/BinMemInputStream.hpp>]],
+        [[using namespace XERCES_CPP_NAMESPACE; XMLByte buf[1024]; BinMemInputStream in(buf,1024); in.getContentType();]])],
+    [AC_MSG_RESULT([yes])AC_DEFINE([XMLTOOLING_XERCESC_INPUTSTREAM_HAS_CONTENTTYPE],[1],[Define to 1 if Xerces InputStream class requires getContentType.])],
+    [AC_MSG_RESULT([no])])
 
 AC_MSG_CHECKING([whether Xerces DOMLS API is compliant])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <xercesc/dom/DOM.hpp>]], [[using namespace XERCES_CPP_NAMESPACE;
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[#include <xercesc/dom/DOM.hpp>]],
+        [[using namespace XERCES_CPP_NAMESPACE;
         DOMImplementation *impl = DOMImplementationRegistry::getDOMImplementation(NULL);
-        DOMLSSerializer *ls = ((DOMImplementationLS*)impl)->createLSSerializer();
-    ]])],[AC_MSG_RESULT([yes])
-    AC_DEFINE([XMLTOOLING_XERCESC_COMPLIANT_DOMLS], [1], [Define to 1 if Xerces supports a compliant DOMLS API.])],[AC_MSG_RESULT([no])])
+        DOMLSSerializer *ls = ((DOMImplementationLS*)impl)->createLSSerializer();]])],
+    [AC_MSG_RESULT([yes])AC_DEFINE([XMLTOOLING_XERCESC_COMPLIANT_DOMLS],[1],[Define to 1 if Xerces supports a compliant DOMLS API.])],
+    [AC_MSG_RESULT([no])])
 
 AC_MSG_CHECKING([whether Xerces has setIdAttribute(XMLCh*, bool)])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <xercesc/dom/DOM.hpp>]], [[using namespace XERCES_CPP_NAMESPACE;
-          DOMElement * elt;
-          elt->setIdAttribute(NULL, false);
-      ]])],[AC_MSG_RESULT([yes])
-      AC_DEFINE([XMLTOOLING_XERCESC_BOOLSETIDATTRIBUTE], [1], [Define to 1 if Xerces DOM ID methods take extra parameter.])],[AC_MSG_RESULT([no])])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[#include <xercesc/dom/DOM.hpp>]],
+        [[using namespace XERCES_CPP_NAMESPACE; DOMElement * elt; elt->setIdAttribute(NULL, false);]])],
+    [AC_MSG_RESULT([yes])AC_DEFINE([XMLTOOLING_XERCESC_BOOLSETIDATTRIBUTE],[1],[Define to 1 if Xerces DOM ID methods take extra parameter.])],
+    [AC_MSG_RESULT([no])])
 
 AC_MSG_CHECKING([whether Xerces XMLString::release(XMLByte**) exists])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <xercesc/util/XMLString.hpp>]], [[using namespace XERCES_CPP_NAMESPACE;
-      XMLByte* buf=NULL;
-      XMLString::release(&buf);
-    ]])],[AC_MSG_RESULT([yes])
-    AC_DEFINE([XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE], [1], [Define to 1 if Xerces XMLString includes XMLByte release.])],[AC_MSG_RESULT([no])])
+AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[#include <xercesc/util/XMLString.hpp>]],
+    [[using namespace XERCES_CPP_NAMESPACE; XMLByte* buf=NULL; XMLString::release(&buf);]])],
+    [AC_MSG_RESULT([yes])AC_DEFINE([XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE],[1],[Define to 1 if Xerces XMLString includes XMLByte release.])],
+    [AC_MSG_RESULT([no])])
 
 # XML-Security settings
 AC_ARG_WITH(xmlsec,
-            AS_HELP_STRING([--with-xmlsec=PATH], [where xmlsec is installed]),,
-            [with_xmlsec=/usr])
+    AS_HELP_STRING([--with-xmlsec=PATH], [where xmlsec is installed]),,
+    [with_xmlsec=/usr])
 
 if test x_$with_xmlsec != x_no; then
 
@@ -251,15 +259,13 @@ if test x_$with_xmlsec != x_no; then
     save_LIBS="$LIBS"
     LIBS="$XMLSEC_LIBS $LIBS"
     
-    AC_CHECK_HEADER([openssl/pem.h],,
-                    AC_MSG_ERROR([unable to find openssl header files]))
+    AC_CHECK_HEADER([openssl/pem.h],,AC_MSG_ERROR([unable to find openssl header files]))
     AC_MSG_CHECKING(for ERR_load_CRYPTO_string)
-    AC_TRY_LINK_FUNC([ERR_load_CRYPTO_strings],,
-                 AC_MSG_ERROR([unable to link with openssl libraries]))
+    AC_TRY_LINK_FUNC([ERR_load_CRYPTO_strings],,AC_MSG_ERROR([unable to link with openssl libraries]))
     AC_MSG_RESULT(yes)
 
-	AC_CHECK_DECL(EVP_sha512,
-		[AC_DEFINE([XMLTOOLING_OPENSSL_HAVE_SHA2],[],[Define to 1 if OpenSSL supports the SHA-2 hash family.])],
+    AC_CHECK_DECL(EVP_sha512,
+        [AC_DEFINE([XMLTOOLING_OPENSSL_HAVE_SHA2],[1],[Define to 1 if OpenSSL supports the SHA-2 hash family.])],
 		,[#include <openssl/evp.h>])
 
     # restore master libs
@@ -286,82 +292,100 @@ int i = 0;
 #endif])],
         [AC_MSG_RESULT(OK)],
         [AC_MSG_FAILURE([XML-Security version 1.4.0 or greater is required.])])
-    AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <xsec/utils/XSECPlatformUtils.hpp>]], [[XSECPlatformUtils::Initialise()]])],[],[AC_MSG_ERROR([unable to link with XML-Security])])
-    AC_CHECK_TYPE([xsecsize_t],[AC_DEFINE([HAVE_XSECSIZE_T], [1], [Define to 1 if you have the 'xsecsize_t' type.])])
+        
+    AC_LINK_IFELSE(
+        [AC_LANG_PROGRAM([[#include <xsec/utils/XSECPlatformUtils.hpp>]],
+            [[XSECPlatformUtils::Initialise()]])],,
+        [AC_MSG_ERROR([unable to link with XML-Security])])
+    AC_CHECK_TYPE([xsecsize_t],[AC_DEFINE([HAVE_XSECSIZE_T],[1],[Define to 1 if you have the 'xsecsize_t' type.])])
 
     AC_MSG_CHECKING([whether XML-Security-C has multiple CRL support])
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <xsec/dsig/DSIGKeyInfoList.hpp>]], [[DSIGKeyInfoList* klist; klist->getX509CRLListSize();]])],[AC_MSG_RESULT([yes])
-          AC_DEFINE([XMLTOOLING_XMLSEC_MULTIPLECRL], [1], [Define to 1 if XML-Security-C handles multiple CRLs.])],[AC_MSG_RESULT([no])])
+    AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([[#include <xsec/dsig/DSIGKeyInfoList.hpp>]],
+            [[DSIGKeyInfoList* klist; klist->getX509CRLListSize();]])],
+        [AC_MSG_RESULT([yes])AC_DEFINE([XMLTOOLING_XMLSEC_MULTIPLECRL],[1],[Define to 1 if XML-Security-C handles multiple CRLs.])],
+        [AC_MSG_RESULT([no])])
 
     AC_MSG_CHECKING([whether XML-Security-C exposes the signature algorithm URI])
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <xsec/dsig/DSIGSignature.hpp>]], [[DSIGSignature* sig; sig->getAlgorithmURI();]])],[AC_MSG_RESULT([yes])
-          AC_DEFINE([XMLTOOLING_XMLSEC_SIGALGORITHM], [1], [Define to 1 if XML-Security-C exposes the signature algorithm URI.])],[AC_MSG_RESULT([no])])
+    AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([[#include <xsec/dsig/DSIGSignature.hpp>]],
+            [[DSIGSignature* sig; sig->getAlgorithmURI();]])],
+        [AC_MSG_RESULT([yes])AC_DEFINE([XMLTOOLING_XMLSEC_SIGALGORITHM],[1],[Define to 1 if XML-Security-C exposes the signature algorithm URI.])],
+        [AC_MSG_RESULT([no])])
 
     AC_MSG_CHECKING([whether XML-Security-C includes ECC support])
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <xsec/dsig/DSIGKeyInfoValue.hpp>]], [[DSIGKeyInfoValue* info; info->getECNamedCurve();]])],[AC_MSG_RESULT([yes])
-          AC_DEFINE([XMLTOOLING_XMLSEC_ECC], [1], [Define to 1 if XML-Security-C includes ECC support.])],[AC_MSG_RESULT([no])])
+    AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([[#include <xsec/dsig/DSIGKeyInfoValue.hpp>]],
+            [[DSIGKeyInfoValue* info; info->getECNamedCurve();]])],
+        [AC_MSG_RESULT([yes])AC_DEFINE([XMLTOOLING_XMLSEC_ECC],[1],[Define to 1 if XML-Security-C includes ECC support.])],
+        [AC_MSG_RESULT([no])])
 
     AC_MSG_CHECKING([whether XML-Security-C includes debug logging support])
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <xsec/utils/XSECPlatformUtils.hpp>]], [[XSECPlatformUtils::SetReferenceLoggingSink(NULL)]])],[AC_MSG_RESULT([yes])
-          AC_DEFINE([XMLTOOLING_XMLSEC_DEBUGLOGGING], [1], [Define to 1 if XML-Security-C includes debug logging support.])],[AC_MSG_RESULT([no])])
+    AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([[#include <xsec/utils/XSECPlatformUtils.hpp>]],
+            [[XSECPlatformUtils::SetReferenceLoggingSink(NULL)]])],
+        [AC_MSG_RESULT([yes])AC_DEFINE([XMLTOOLING_XMLSEC_DEBUGLOGGING],[1],[Define to 1 if XML-Security-C includes debug logging support.])],
+        [AC_MSG_RESULT([no])])
 
-	# restore master libs
-	LIBS="$save_LIBS"
+    # restore master libs
+    LIBS="$save_LIBS"
 
-	# libcurl settings
-	AC_PATH_PROG(CURL_CONFIG,curl-config)
-	AC_ARG_WITH(curl,
-	    AS_HELP_STRING([--with-curl=PATH], [where curl-config is installed]),
-	    [
-	    CURL_CONFIG="${with_curl}"
-	    if ! test -f "${CURL_CONFIG}" ; then
-	    	CURL_CONFIG="${with_curl}/bin/curl-config"
-	    fi
-	    ])
-	if test -f "${CURL_CONFIG}" ; then
-	    CPPFLAGS="`${CURL_CONFIG} --cflags` $CPPFLAGS"
-	    XMLSEC_LIBS="`${CURL_CONFIG} --libs` $XMLSEC_LIBS"
-	else
-	    AC_MSG_ERROR([curl-config not found, may need to use --with-curl option])
-	fi
+    # libcurl settings
+    AC_PATH_PROG(CURL_CONFIG,curl-config)
+    AC_ARG_WITH(curl,
+        AS_HELP_STRING([--with-curl=PATH], [where curl-config is installed]),
+        [
+        CURL_CONFIG="${with_curl}"
+        if ! test -f "${CURL_CONFIG}" ; then
+            CURL_CONFIG="${with_curl}/bin/curl-config"
+        fi
+        ])
+    if test -f "${CURL_CONFIG}" ; then
+        CPPFLAGS="`${CURL_CONFIG} --cflags` $CPPFLAGS"
+        XMLSEC_LIBS="`${CURL_CONFIG} --libs` $XMLSEC_LIBS"
+    else
+        AC_MSG_ERROR([curl-config not found, may need to use --with-curl option])
+    fi
 
-	# save and append master libs
-	save_LIBS="$LIBS"
-	LIBS="$XMLSEC_LIBS $LIBS"
+    # save and append master libs
+    save_LIBS="$LIBS"
+    LIBS="$XMLSEC_LIBS $LIBS"
 	
-	AC_CHECK_HEADER([curl/curl.h],,AC_MSG_ERROR([unable to find libcurl header files]))
-	AC_CHECK_LIB([curl],[curl_global_init],,AC_MSG_ERROR([unable to link with libcurl]))
-	AC_MSG_CHECKING([for CURLOPT_SSL_CTX_FUNCTION in curl.h])
-	AC_EGREP_HEADER([CURLOPT_SSL_CTX_FUNCTION], [curl/curl.h],
-			[AC_MSG_RESULT(yes)],
-			[AC_MSG_ERROR([need libcurl that supports CURLOPT_SSL_CTX_FUNCTION])])
-    AC_CHECK_TYPE([curl_off_t],[AC_DEFINE([HAVE_CURL_OFF_T], [1], [Define to 1 if you have the 'curl_off_t' type.])])
-
-	# restore master libs
-	LIBS="$save_LIBS"
-
-	AC_SUBST(XMLSEC_LIBS)
+    AC_CHECK_HEADER([curl/curl.h],,AC_MSG_ERROR([unable to find libcurl header files]))
+    AC_CHECK_LIB([curl],[curl_global_init],,AC_MSG_ERROR([unable to link with libcurl]))
+    AC_MSG_CHECKING([for CURLOPT_SSL_CTX_FUNCTION in curl.h])
+    AC_EGREP_HEADER([CURLOPT_SSL_CTX_FUNCTION], [curl/curl.h],
+        [AC_MSG_RESULT(yes)],
+        [AC_MSG_ERROR([need libcurl that supports CURLOPT_SSL_CTX_FUNCTION])])
+    AC_CHECK_TYPE([curl_off_t],[AC_DEFINE([HAVE_CURL_OFF_T],[1],[Define to 1 if you have the 'curl_off_t' type.])])
+    
+    # restore master libs
+    LIBS="$save_LIBS"
+    
+    AC_SUBST(XMLSEC_LIBS)
 else
     AC_MSG_WARN([xmlsec disabled, building without signature/encryption support])
-    AC_DEFINE([XMLTOOLING_NO_XMLSEC], [1], [Define to 1 if you wish to disable XML-Security-dependent features.])
+    AC_DEFINE([XMLTOOLING_NO_XMLSEC],[1],[Define to 1 if you wish to disable XML-Security-dependent features.])
 fi
 AM_CONDITIONAL(BUILD_XMLSEC,test x_$with_xmlsec != x_no)
 
 # Does the STL in use help or screw us?
-AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <string>]], [[std::basic_string<unsigned short> foo; foo=foo+(unsigned short)65]])],[AC_DEFINE([HAVE_GOOD_STL], [1],
-            [Define to 1 if you have an STL implementation that supports useful string specialization.])],[])
-AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <vector>]], [[std::iterator_traits<std::vector<int>::iterator>::value_type foo=0]])],[AC_DEFINE([HAVE_ITERATOR_TRAITS], [1],
-            [Define to 1 if you have an STL implementation that supports std::iterator_traits.])],[])
+AC_LINK_IFELSE(
+    [AC_LANG_PROGRAM([[#include <string>]],[[std::basic_string<unsigned short> foo; foo=foo+(unsigned short)65]])],
+    [AC_DEFINE([HAVE_GOOD_STL],[1],[Define to 1 if you have an STL implementation that supports useful string specialization.])],[])
+AC_LINK_IFELSE(
+    [AC_LANG_PROGRAM([[#include <vector>]],[[std::iterator_traits<std::vector<int>::iterator>::value_type foo=0]])],
+    [AC_DEFINE([HAVE_ITERATOR_TRAITS],[1],[Define to 1 if you have an STL implementation that supports std::iterator_traits.])],[])
 
 # Check for unit test support
 CXXTEST="/usr/bin/cxxtestgen.pl"
 CXXTESTFLAGS=""
 AC_ARG_WITH(cxxtest,
-            AS_HELP_STRING([--with-cxxtest=PATH], [where cxxtest is installed]),
-            [if test x_$with_cxxtest != x_/usr; then
-                CXXTEST="${with_cxxtest}/cxxtestgen.pl"
-                CXXTESTFLAGS="-I${with_cxxtest}"
-            fi])
+    AS_HELP_STRING([--with-cxxtest=PATH], [where cxxtest is installed]),
+    [if test x_$with_cxxtest != x_/usr; then
+        CXXTEST="${with_cxxtest}/cxxtestgen.pl"
+        CXXTESTFLAGS="-I${with_cxxtest}"
+    fi])
 if ! test -f "${CXXTEST}"; then
     AC_MSG_WARN([cxxtestgen not found, won't build unit tests])
 fi

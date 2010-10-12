@@ -76,7 +76,7 @@ using namespace std;
 
 #ifdef WIN32
 # if (OPENSSL_VERSION_NUMBER >= 0x00908000)
-#  define XMLTOOLING_OPENSSL_HAVE_SHA2
+#  define XMLTOOLING_OPENSSL_HAVE_SHA2 1
 # endif
 #endif
 

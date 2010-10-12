@@ -31,9 +31,6 @@
 /* Define if log4cpp library is used. */
 /* #undef XMLTOOLING_LOG4CPP */
 
-/* Define if Xerces-C library was found */
-#define HAVE_LIBXERCESC 1
-
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1
 
