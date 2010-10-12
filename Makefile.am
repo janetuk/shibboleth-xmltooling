@@ -1,6 +1,5 @@
 AUTOMAKE_OPTIONS = foreign
-
-ACLOCAL_AMFLAGS = -I .
+ACLOCAL_AMFLAGS = -I m4
 
 include doxygen.am
 
@@ -26,14 +25,11 @@ GENFILES = @PACKAGE_NAME@.spec pkginfo Portfile
 
 EXTRA_DIST = $(DX_CONFIG) \
         cpp-@PACKAGE_NAME@.sln \
-        acx_pthread.m4 \
-        acinclude.m4 \
-        ax_create_pkgconfig_info.m4 \
-        libtool.m4 \
-        doxygen.m4 \
-        depcomp \
+        m4/acx_pthread.m4 \
+        m4/acinclude.m4 \
+        m4/ax_create_pkgconfig_info.m4 \
+        m4/doxygen.m4 \
         config_win32.h \
         $(GENFILES) \
         $(GENFILES:%=%.in) \
-        depend \
         postinstall

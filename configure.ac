@@ -1,12 +1,11 @@
-AC_PREREQ([2.50])
-AC_INIT([xmltooling], [1.4], [mace-opensaml-users@internet2.edu], [xmltooling])
-AM_CONFIG_HEADER(config.h)
-AM_CONFIG_HEADER(xmltooling/config_pub.h)
-AM_INIT_AUTOMAKE([xmltooling], [1.4])
-
-sinclude(doxygen.m4)
-sinclude(acx_pthread.m4)
-sinclude(ax_create_pkgconfig_info.m4)
+# Process this file with autoreconf
+AC_PREREQ([2.60])
+AC_INIT([xmltooling],[1.4],[https://bugs.internet2.edu/],[xmltooling])
+AC_CONFIG_SRCDIR(xmltooling)
+AC_CONFIG_AUX_DIR(build-aux)
+AC_CONFIG_MACRO_DIR(m4)
+AM_INIT_AUTOMAKE
+LT_INIT
 
 # Docygen features
 DX_HTML_FEATURE(ON)
@@ -20,7 +19,7 @@ DX_PS_FEATURE(OFF)
 DX_INIT_DOXYGEN(xmltooling, doxygen.cfg, doc/api)
 
 AC_ARG_ENABLE(debug,
-    AC_HELP_STRING(--enable-debug, [Have GCC compile with symbols (Default = no)]),
+    AS_HELP_STRING([--enable-debug],[Have GCC compile with symbols (Default = no)]),
     enable_debug=$enableval, enable_debug=no)
 
 if test "$enable_debug" = "yes" ; then
@@ -31,8 +30,13 @@ else
     GCC_CXXFLAGS="$CXXFLAGS -O2 -DNDEBUG"
 fi
 
+AC_CONFIG_HEADERS([config.h xmltooling/config_pub.h])
+AC_CONFIG_FILES([xmltooling.spec pkginfo Portfile])
+AC_CONFIG_FILES([Makefile xmltooling/Makefile xmltoolingtest/Makefile schemas/Makefile doc/Makefile])
+
 AC_PROG_CC([gcc gcc3 cc])
 AC_PROG_CXX([g++ g++3 c++ CC])
+AC_DISABLE_STATIC
 AC_CANONICAL_HOST
 
 if test "$GCC" = "yes" ; then
@@ -56,9 +60,6 @@ else
 	esac
 fi
 
-AC_DISABLE_STATIC
-AC_PROG_LIBTOOL
-
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_SIZE_T
@@ -74,7 +75,7 @@ ACX_PTHREAD([enable_threads="pthread"],[enable_threads="no"])
 if test $enable_threads != "pthread"; then
     AC_MSG_ERROR([unable to find pthreads, currently this is required])
 else
-    AC_DEFINE(HAVE_PTHREAD,1,[Define if you have POSIX threads libraries and header files.])
+    AC_DEFINE([HAVE_PTHREAD],[1],[Define if you have POSIX threads libraries and header files.])
 	AM_CONDITIONAL(BUILD_PTHREAD,test "$enable_threads" = "pthread")
     LIBS="$PTHREAD_LIBS $LIBS"
     CFLAGS="$PTHREAD_CFLAGS $CFLAGS"
@@ -111,7 +112,7 @@ AC_COMPILE_IFELSE(
 # log4shib settings (favor this version over the log4cpp code)
 AC_PATH_PROG(LOG4SHIB_CONFIG,log4shib-config)
 AC_ARG_WITH(log4shib,
-    AC_HELP_STRING([--with-log4shib=PATH], [where log4shib-config is installed]),
+    AS_HELP_STRING([--with-log4shib=PATH], [where log4shib-config is installed]),
     [
     LOG4SHIB_CONFIG="${with_log4shib}"
     if ! test -f "${LOG4SHIB_CONFIG}" ; then
@@ -135,7 +136,7 @@ else
 	# log4cpp settings
 	AC_PATH_PROG(LOG4CPP_CONFIG,log4cpp-config)
 	AC_ARG_WITH(log4cpp,
-	    AC_HELP_STRING([--with-log4cpp=PATH], [where log4cpp-config is installed]),
+	    AS_HELP_STRING([--with-log4cpp=PATH], [where log4cpp-config is installed]),
 	    [
 	    LOG4CPP_CONFIG="${with_log4cpp}"
 	    if ! test -f "${LOG4CPP_CONFIG}" ; then
@@ -160,7 +161,7 @@ fi
 
 # Xerces settings
 AC_ARG_WITH(xerces, 
-            AC_HELP_STRING([--with-xerces=PATH], [where xerces-c is installed]),
+            AS_HELP_STRING([--with-xerces=PATH], [where xerces-c is installed]),
             [if test x_$with_xerces != x_/usr; then
                 LDFLAGS="-L${with_xerces}/lib $LDFLAGS"
                 CPPFLAGS="-I${with_xerces}/include $CPPFLAGS"
@@ -235,14 +236,14 @@ AC_TRY_COMPILE([#include <xercesc/util/XMLString.hpp>],
 
 # XML-Security settings
 AC_ARG_WITH(xmlsec,
-            AC_HELP_STRING([--with-xmlsec=PATH], [where xmlsec is installed]),,
+            AS_HELP_STRING([--with-xmlsec=PATH], [where xmlsec is installed]),,
             [with_xmlsec=/usr])
 
 if test x_$with_xmlsec != x_no; then
 
     # OpenSSL settings (need to do this first in case it's in a different spot from xmlsec)
     AC_ARG_WITH(openssl,
-        AC_HELP_STRING([--with-openssl=PATH], [where openssl is installed]),
+        AS_HELP_STRING([--with-openssl=PATH], [where openssl is installed]),
         [if test x_$with_openssl != x_/usr; then
             SSLFLAGS="-I${with_openssl}/include"
             SSLLIBS="-L${with_openssl}/lib -lcrypto -lssl"
@@ -352,7 +353,7 @@ int i = 0;
 	# libcurl settings
 	AC_PATH_PROG(CURL_CONFIG,curl-config)
 	AC_ARG_WITH(curl,
-	    AC_HELP_STRING([--with-curl=PATH], [where curl-config is installed]),
+	    AS_HELP_STRING([--with-curl=PATH], [where curl-config is installed]),
 	    [
 	    CURL_CONFIG="${with_curl}"
 	    if ! test -f "${CURL_CONFIG}" ; then
@@ -406,7 +407,7 @@ AC_TRY_LINK(
 CXXTEST="/usr/bin/cxxtestgen.pl"
 CXXTESTFLAGS=""
 AC_ARG_WITH(cxxtest,
-            AC_HELP_STRING([--with-cxxtest=PATH], [where cxxtest is installed]),
+            AS_HELP_STRING([--with-cxxtest=PATH], [where cxxtest is installed]),
             [if test x_$with_cxxtest != x_/usr; then
                 CXXTEST="${with_cxxtest}/cxxtestgen.pl"
                 CXXTESTFLAGS="-I${with_cxxtest}"
@@ -424,6 +425,4 @@ AX_CREATE_PKGCONFIG_INFO(,,[$XMLSEC_LIBS -lxmltooling],[OpenSAML XMLTooling-C li
 LIBTOOL="$LIBTOOL --silent"
 
 # output packaging and makefiles
-AC_CONFIG_FILES([xmltooling.spec pkginfo Portfile])
-AC_CONFIG_FILES([Makefile xmltooling/Makefile xmltoolingtest/Makefile schemas/Makefile doc/Makefile])
 AC_OUTPUT

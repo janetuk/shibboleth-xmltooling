@@ -65,7 +65,7 @@ BEGIN
             VALUE "InternalName", "xmltooling1_4\0"
 #endif
 #endif
-            VALUE "LegalCopyright", "Copyright © 2009 Internet2\0"
+            VALUE "LegalCopyright", "Copyright © 2010 Internet2\0"
             VALUE "LegalTrademarks", "\0"
 #ifdef XMLTOOLING_LITE
 #ifdef _DEBUG
