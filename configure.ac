@@ -1,5 +1,5 @@
 # Process this file with autoreconf
-AC_PREREQ([2.60])
+AC_PREREQ([2.67])
 AC_INIT([xmltooling],[1.4],[https://bugs.internet2.edu/],[xmltooling])
 AC_CONFIG_SRCDIR(xmltooling)
 AC_CONFIG_AUX_DIR(build-aux)
@@ -123,12 +123,8 @@ if test -f "${LOG4SHIB_CONFIG}"; then
     LIBS="`${LOG4SHIB_CONFIG} --libs` $LIBS"
     CPPFLAGS="`${LOG4SHIB_CONFIG} --cflags` $CPPFLAGS"
 	AC_CHECK_HEADER([log4shib/CategoryStream.hh],,AC_MSG_ERROR([unable to find log4shib header files]))
-	AC_TRY_LINK(
-		[#include <log4shib/Category.hh>
-#include <log4shib/CategoryStream.hh>],
-		[log4shib::Category::getInstance("foo").errorStream() << log4shib::eol],
-		[AC_DEFINE([XMLTOOLING_LOG4SHIB], [1], [Define to 1 if log4shib library is used.])],
-		[AC_MSG_ERROR([unable to link with log4shib])])
+	AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <log4shib/Category.hh>
+#include <log4shib/CategoryStream.hh>]], [[log4shib::Category::getInstance("foo").errorStream() << log4shib::eol]])],[AC_DEFINE([XMLTOOLING_LOG4SHIB], [1], [Define to 1 if log4shib library is used.])],[AC_MSG_ERROR([unable to link with log4shib])])
 else
     AC_MSG_WARN([log4shib-config not found, may need to use --with-log4shib option])
     AC_MSG_WARN([will look for original log4cpp library])
@@ -148,12 +144,8 @@ else
 	    LIBS="`${LOG4CPP_CONFIG} --libs` $LIBS"
 	    CPPFLAGS="`${LOG4CPP_CONFIG} --cflags` $CPPFLAGS"
 		AC_CHECK_HEADER([log4cpp/CategoryStream.hh],,AC_MSG_ERROR([unable to find log4cpp header files]))
-		AC_TRY_LINK(
-			[#include <log4cpp/Category.hh>
-#include <log4cpp/CategoryStream.hh>],
-			[log4cpp::Category::getInstance("foo").errorStream() << log4cpp::eol],
-			[AC_DEFINE([XMLTOOLING_LOG4CPP], [1], [Define to 1 if log4cpp library is used.])],
-			[AC_MSG_ERROR([unable to link with log4cpp, need version 1.0 or later])])
+		AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <log4cpp/Category.hh>
+#include <log4cpp/CategoryStream.hh>]], [[log4cpp::Category::getInstance("foo").errorStream() << log4cpp::eol]])],[AC_DEFINE([XMLTOOLING_LOG4CPP], [1], [Define to 1 if log4cpp library is used.])],[AC_MSG_ERROR([unable to link with log4cpp, need version 1.0 or later])])
 	else
 	    AC_MSG_ERROR([log4cpp-config not found, may need to use --with-log4cpp option])
 	fi
@@ -178,61 +170,42 @@ int i = 0;
 #endif])],
     [AC_MSG_RESULT(OK)],
     [AC_MSG_FAILURE([Xerces-C v2.6.0 has bugs that inhibit use with signed XML, please use a newer version])])
-AC_TRY_LINK(
-        [#include <xercesc/util/PlatformUtils.hpp>],
-        [xercesc::XMLPlatformUtils::Initialize()],
-        [AC_DEFINE([HAVE_LIBXERCESC], [1], [Define to 1 if Xerces-C library was found])],
-        [AC_MSG_ERROR([unable to link with Xerces])])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <xercesc/util/PlatformUtils.hpp>]], [[xercesc::XMLPlatformUtils::Initialize()]])],[AC_DEFINE([HAVE_LIBXERCESC], [1], [Define to 1 if Xerces-C library was found])],[AC_MSG_ERROR([unable to link with Xerces])])
 
 AC_MSG_CHECKING([whether Xerces is 64-bit clean])
-AC_TRY_COMPILE([#include <xercesc/framework/MemBufInputSource.hpp>],
-    [using namespace XERCES_CPP_NAMESPACE;
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <xercesc/framework/MemBufInputSource.hpp>]], [[using namespace XERCES_CPP_NAMESPACE;
       XMLFilePos testvar;
-    ],
-    [AC_MSG_RESULT([yes])]
-    [AC_DEFINE([XMLTOOLING_XERCESC_64BITSAFE], [1], [Define to 1 if Xerces has a 64-bit-safe API.])],
-    [AC_MSG_RESULT([no])])
+    ]])],[AC_MSG_RESULT([yes])
+    AC_DEFINE([XMLTOOLING_XERCESC_64BITSAFE], [1], [Define to 1 if Xerces has a 64-bit-safe API.])],[AC_MSG_RESULT([no])])
 
 AC_MSG_CHECKING([whether Xerces BinInputStream requires getContentType])
-AC_TRY_COMPILE([#include <xercesc/util/BinMemInputStream.hpp>],
-    [using namespace XERCES_CPP_NAMESPACE;
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <xercesc/util/BinMemInputStream.hpp>]], [[using namespace XERCES_CPP_NAMESPACE;
       XMLByte buf[1024];
       BinMemInputStream in(buf,1024);
       in.getContentType();
-    ],
-    [AC_MSG_RESULT([yes])]
-    [AC_DEFINE([XMLTOOLING_XERCESC_INPUTSTREAM_HAS_CONTENTTYPE], [1], [Define to 1 if Xerces InputStream class requires getContentType.])],
-    [AC_MSG_RESULT([no])])
+    ]])],[AC_MSG_RESULT([yes])
+    AC_DEFINE([XMLTOOLING_XERCESC_INPUTSTREAM_HAS_CONTENTTYPE], [1], [Define to 1 if Xerces InputStream class requires getContentType.])],[AC_MSG_RESULT([no])])
 
 AC_MSG_CHECKING([whether Xerces DOMLS API is compliant])
-AC_TRY_COMPILE([#include <xercesc/dom/DOM.hpp>],
-    [using namespace XERCES_CPP_NAMESPACE;
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <xercesc/dom/DOM.hpp>]], [[using namespace XERCES_CPP_NAMESPACE;
         DOMImplementation *impl = DOMImplementationRegistry::getDOMImplementation(NULL);
         DOMLSSerializer *ls = ((DOMImplementationLS*)impl)->createLSSerializer();
-    ],
-    [AC_MSG_RESULT([yes])]
-    [AC_DEFINE([XMLTOOLING_XERCESC_COMPLIANT_DOMLS], [1], [Define to 1 if Xerces supports a compliant DOMLS API.])],
-    [AC_MSG_RESULT([no])])
+    ]])],[AC_MSG_RESULT([yes])
+    AC_DEFINE([XMLTOOLING_XERCESC_COMPLIANT_DOMLS], [1], [Define to 1 if Xerces supports a compliant DOMLS API.])],[AC_MSG_RESULT([no])])
 
 AC_MSG_CHECKING([whether Xerces has setIdAttribute(XMLCh*, bool)])
-AC_TRY_COMPILE([#include <xercesc/dom/DOM.hpp>],
-      [using namespace XERCES_CPP_NAMESPACE;
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <xercesc/dom/DOM.hpp>]], [[using namespace XERCES_CPP_NAMESPACE;
           DOMElement * elt;
           elt->setIdAttribute(NULL, false);
-      ],
-      [AC_MSG_RESULT([yes])]
-      [AC_DEFINE([XMLTOOLING_XERCESC_BOOLSETIDATTRIBUTE], [1], [Define to 1 if Xerces DOM ID methods take extra parameter.])],
-      [AC_MSG_RESULT([no])])
+      ]])],[AC_MSG_RESULT([yes])
+      AC_DEFINE([XMLTOOLING_XERCESC_BOOLSETIDATTRIBUTE], [1], [Define to 1 if Xerces DOM ID methods take extra parameter.])],[AC_MSG_RESULT([no])])
 
 AC_MSG_CHECKING([whether Xerces XMLString::release(XMLByte**) exists])
-AC_TRY_COMPILE([#include <xercesc/util/XMLString.hpp>],
-    [using namespace XERCES_CPP_NAMESPACE;
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <xercesc/util/XMLString.hpp>]], [[using namespace XERCES_CPP_NAMESPACE;
       XMLByte* buf=NULL;
       XMLString::release(&buf);
-    ],
-    [AC_MSG_RESULT([yes])]
-    [AC_DEFINE([XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE], [1], [Define to 1 if Xerces XMLString includes XMLByte release.])],
-    [AC_MSG_RESULT([no])])
+    ]])],[AC_MSG_RESULT([yes])
+    AC_DEFINE([XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE], [1], [Define to 1 if Xerces XMLString includes XMLByte release.])],[AC_MSG_RESULT([no])])
 
 # XML-Security settings
 AC_ARG_WITH(xmlsec,
@@ -313,39 +286,24 @@ int i = 0;
 #endif])],
         [AC_MSG_RESULT(OK)],
         [AC_MSG_FAILURE([XML-Security version 1.4.0 or greater is required.])])
-    AC_TRY_LINK(
-            [#include <xsec/utils/XSECPlatformUtils.hpp>],
-            [XSECPlatformUtils::Initialise()],,
-            [AC_MSG_ERROR([unable to link with XML-Security])])
+    AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <xsec/utils/XSECPlatformUtils.hpp>]], [[XSECPlatformUtils::Initialise()]])],[],[AC_MSG_ERROR([unable to link with XML-Security])])
     AC_CHECK_TYPE([xsecsize_t],[AC_DEFINE([HAVE_XSECSIZE_T], [1], [Define to 1 if you have the 'xsecsize_t' type.])])
 
     AC_MSG_CHECKING([whether XML-Security-C has multiple CRL support])
-    AC_TRY_COMPILE([#include <xsec/dsig/DSIGKeyInfoList.hpp>],
-          [DSIGKeyInfoList* klist; klist->getX509CRLListSize();],
-          [AC_MSG_RESULT([yes])]
-          [AC_DEFINE([XMLTOOLING_XMLSEC_MULTIPLECRL], [1], [Define to 1 if XML-Security-C handles multiple CRLs.])],
-          [AC_MSG_RESULT([no])])
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <xsec/dsig/DSIGKeyInfoList.hpp>]], [[DSIGKeyInfoList* klist; klist->getX509CRLListSize();]])],[AC_MSG_RESULT([yes])
+          AC_DEFINE([XMLTOOLING_XMLSEC_MULTIPLECRL], [1], [Define to 1 if XML-Security-C handles multiple CRLs.])],[AC_MSG_RESULT([no])])
 
     AC_MSG_CHECKING([whether XML-Security-C exposes the signature algorithm URI])
-    AC_TRY_COMPILE([#include <xsec/dsig/DSIGSignature.hpp>],
-          [DSIGSignature* sig; sig->getAlgorithmURI();],
-          [AC_MSG_RESULT([yes])]
-          [AC_DEFINE([XMLTOOLING_XMLSEC_SIGALGORITHM], [1], [Define to 1 if XML-Security-C exposes the signature algorithm URI.])],
-          [AC_MSG_RESULT([no])])
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <xsec/dsig/DSIGSignature.hpp>]], [[DSIGSignature* sig; sig->getAlgorithmURI();]])],[AC_MSG_RESULT([yes])
+          AC_DEFINE([XMLTOOLING_XMLSEC_SIGALGORITHM], [1], [Define to 1 if XML-Security-C exposes the signature algorithm URI.])],[AC_MSG_RESULT([no])])
 
     AC_MSG_CHECKING([whether XML-Security-C includes ECC support])
-    AC_TRY_COMPILE([#include <xsec/dsig/DSIGKeyInfoValue.hpp>],
-          [DSIGKeyInfoValue* info; info->getECNamedCurve();],
-          [AC_MSG_RESULT([yes])]
-          [AC_DEFINE([XMLTOOLING_XMLSEC_ECC], [1], [Define to 1 if XML-Security-C includes ECC support.])],
-          [AC_MSG_RESULT([no])])
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <xsec/dsig/DSIGKeyInfoValue.hpp>]], [[DSIGKeyInfoValue* info; info->getECNamedCurve();]])],[AC_MSG_RESULT([yes])
+          AC_DEFINE([XMLTOOLING_XMLSEC_ECC], [1], [Define to 1 if XML-Security-C includes ECC support.])],[AC_MSG_RESULT([no])])
 
     AC_MSG_CHECKING([whether XML-Security-C includes debug logging support])
-    AC_TRY_COMPILE([#include <xsec/utils/XSECPlatformUtils.hpp>],
-          [XSECPlatformUtils::SetReferenceLoggingSink(NULL)],
-          [AC_MSG_RESULT([yes])]
-          [AC_DEFINE([XMLTOOLING_XMLSEC_DEBUGLOGGING], [1], [Define to 1 if XML-Security-C includes debug logging support.])],
-          [AC_MSG_RESULT([no])])
+    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#include <xsec/utils/XSECPlatformUtils.hpp>]], [[XSECPlatformUtils::SetReferenceLoggingSink(NULL)]])],[AC_MSG_RESULT([yes])
+          AC_DEFINE([XMLTOOLING_XMLSEC_DEBUGLOGGING], [1], [Define to 1 if XML-Security-C includes debug logging support.])],[AC_MSG_RESULT([no])])
 
 	# restore master libs
 	LIBS="$save_LIBS"
@@ -390,18 +348,10 @@ fi
 AM_CONDITIONAL(BUILD_XMLSEC,test x_$with_xmlsec != x_no)
 
 # Does the STL in use help or screw us?
-AC_TRY_LINK(
-        [#include <string>],
-        [std::basic_string<unsigned short> foo; foo=foo+(unsigned short)65],
-        [AC_DEFINE([HAVE_GOOD_STL], [1],
-            [Define to 1 if you have an STL implementation that supports useful string specialization.])],
-        )
-AC_TRY_LINK(
-        [#include <vector>],
-        [std::iterator_traits<std::vector<int>::iterator>::value_type foo=0],
-        [AC_DEFINE([HAVE_ITERATOR_TRAITS], [1],
-            [Define to 1 if you have an STL implementation that supports std::iterator_traits.])],
-        )
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <string>]], [[std::basic_string<unsigned short> foo; foo=foo+(unsigned short)65]])],[AC_DEFINE([HAVE_GOOD_STL], [1],
+            [Define to 1 if you have an STL implementation that supports useful string specialization.])],[])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[#include <vector>]], [[std::iterator_traits<std::vector<int>::iterator>::value_type foo=0]])],[AC_DEFINE([HAVE_ITERATOR_TRAITS], [1],
+            [Define to 1 if you have an STL implementation that supports std::iterator_traits.])],[])
 
 # Check for unit test support
 CXXTEST="/usr/bin/cxxtestgen.pl"
