@@ -84,11 +84,11 @@ fi
 
 AC_CHECK_FUNCS([pthread_rwlock_init])
 
-AC_LANG(C++)
+AC_LANG([C++])
 
 # C++ requirements
-AC_CXX_REQUIRE_STL
 AC_CXX_NAMESPACES
+AC_CXX_REQUIRE_STL
 
 # are covariant methods allowed?
 AC_LINK_IFELSE(
