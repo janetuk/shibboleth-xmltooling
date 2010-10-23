@@ -1,5 +1,5 @@
 # Process this file with autoreconf
-AC_PREREQ([2.67])
+AC_PREREQ([2.50])
 AC_INIT([xmltooling],[1.4],[https://bugs.internet2.edu/],[xmltooling])
 AC_CONFIG_SRCDIR(xmltooling)
 AC_CONFIG_AUX_DIR(build-aux)
