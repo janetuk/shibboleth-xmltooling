@@ -267,6 +267,9 @@ if test x_$with_xmlsec != x_no; then
     AC_CHECK_DECL(EVP_sha512,
         [AC_DEFINE([XMLTOOLING_OPENSSL_HAVE_SHA2],[1],[Define to 1 if OpenSSL supports the SHA-2 hash family.])],
 		,[#include <openssl/evp.h>])
+    AC_CHECK_DECL(EVP_PKEY_set1_EC_KEY,
+        [AC_DEFINE([XMLTOOLING_OPENSSL_HAVE_EC],[1],[Define to 1 if OpenSSL has EC support.])],
+        ,[#include <openssl/evp.h>])
 
     # restore master libs
     LIBS="$save_LIBS"
