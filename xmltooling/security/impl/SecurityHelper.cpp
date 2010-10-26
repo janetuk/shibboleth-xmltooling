@@ -37,15 +37,16 @@
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyRSA.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyDSA.hpp>
-#if defined(XMLTOOLING_XMLSEC_ECC) && defined(XMLTOOLING_OPENSSL_HAVE_EC)
-# include <xsec/enc/OpenSSL/OpenSSLCryptoKeyEC.hpp>
-#endif
 #include <xercesc/util/Base64.hpp>
 
 #ifdef WIN32
 # if (OPENSSL_VERSION_NUMBER >= 0x00907000)
 #  define XMLTOOLING_OPENSSL_HAVE_EC 1
 # endif
+#endif
+
+#if defined(XMLTOOLING_XMLSEC_ECC) && defined(XMLTOOLING_OPENSSL_HAVE_EC)
+# include <xsec/enc/OpenSSL/OpenSSLCryptoKeyEC.hpp>
 #endif
 
 using namespace xmltooling::logging;
