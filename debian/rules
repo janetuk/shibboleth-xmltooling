@@ -1,0 +1,101 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# Sample debian/rules that uses debhelper.
+#
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+#
+# Modified to make a template file for a multi-binary package with separated
+# build-arch and build-indep targets  by Bill Allombert 2001
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+    DEBUG = --enable-debug
+else
+    DEBUG =
+endif
+
+# Tell Autoconf the correct system types.
+DEB_HOST_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+ifeq ($(DEB_BUILD_GNU_TYPE),$(DEB_HOST_GNU_TYPE))
+    SYSTEM = --build $(DEB_HOST_GNU_TYPE)
+else
+    SYSTEM = --build $(DEB_BUILD_GNU_TYPE) --host $(DEB_HOST_GNU_TYPE)
+endif
+
+configure: configure-stamp
+configure-stamp:
+	dh_testdir
+	cp /usr/share/misc/config.guess config.guess
+	cp /usr/share/misc/config.sub config.sub
+	CFLAGS="$(CFLAGS)" LIBS=-lpthread ./configure --prefix=/usr \
+	    --disable-dependency-tracking $(SYSTEM) $(DEBUG)
+	touch $@
+
+build: build-arch build-indep
+build-arch: build-stamp
+build-indep:
+build-stamp: configure-stamp
+	dh_testdir
+	$(MAKE)
+	touch $@
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f configure-stamp build-stamp install-stamp
+	[ ! -f Makefile ] || $(MAKE) distclean
+	dh_clean config.guess config.sub
+
+install: install-stamp
+install-stamp:
+	dh_testdir
+	dh_testroot
+	dh_prep
+	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
+	rm -r $(CURDIR)/debian/tmp/usr/share/doc/xmltooling*
+	dh_install -a -i --fail-missing
+	touch $@
+
+binary: binary-arch binary-indep
+binary-arch: DH_OPTIONS=-a
+binary-arch: install-stamp
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs -A doc/NOTICE.txt
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_makeshlibs
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary-indep: DH_OPTIONS=-i
+binary-indep: install-stamp
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs -A doc/NOTICE.txt
+	dh_link
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+.PHONY: binary binary-arch binary-indep build build-arch build-indep clean
+.PHONY: install

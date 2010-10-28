@@ -1,0 +1,111 @@
+xmltooling (1.3.3-2) unstable; urgency=low
+
+  * Force source format 1.0 for now since it makes backporting easier.
+  * Add ${misc:Depends} to all package dependencies.
+  * Update standards version to 3.8.4 (no changes required).
+
+ -- Russ Allbery <rra@debian.org>  Thu, 13 May 2010 10:03:36 -0700
+
+xmltooling (1.3.3-1) unstable; urgency=low
+
+  * New upstream release.
+    - Allow the empty string in assignment to DateTime members.
+    - Allow configuration to not extract local credential names for
+      matching purposes.
+
+ -- Russ Allbery <rra@debian.org>  Thu, 17 Dec 2009 18:29:08 -0800
+
+xmltooling (1.3.1-1) unstable; urgency=high
+
+  * Urgency set to high for security fix.
+  * New upstream release.
+    - SECURITY: Partial fix for improper handling of URLs that could be
+      abused for script injection and other cross-site scripting attacks.
+      The complete fix also requires newer opensaml2 and shibboleth-sp2
+      packages.  (CVE-2009-3300)
+    - Add setter for KeyInfoResolver object.
+    - Fix extraction of cert info for UTF-8 handling changes.
+    - Fix passing of TransportOption configuration to cURL.
+    - Fix instability in reusing a DOM after signing it.
+    - Remove xmlns:xml namespace declaration when marshalling and
+      unmarshalling to avoid canonicalization bugs.
+  * Rename library package for upstream SONAME bump.
+  * Build-depend on libxml-security-c-dev 1.5 or later and make
+    libxmltooling-dev depend on libxml-security-c-dev 1.5 or later to
+    ensure that all builds are consistent.  Although this package will
+    build with 1.4, the other packages built on xmltooling require 1.5.
+
+ -- Russ Allbery <rra@debian.org>  Fri, 06 Nov 2009 11:30:41 -0800
+
+xmltooling (1.2.2-1) unstable; urgency=high
+
+  * Urgency set to high for security fix.
+  * New upstream release.
+    - SECURITY: Fix potential buffer overflows and reuses of freed objects
+      in error handling code paths with invalid XML or with malformed
+      URLs.  See the upstream security advisory at
+      http://shibboleth.internet2.edu/secadv/secadv_20090826.txt
+    - Fix other validation issues with malformed objects.
+    - Fix for accessing the resolution context, which affects the ability
+      of callers to restrict keys based on use attributes.
+    - Fix encoding of backup metadata.
+  * Update debhelper compatibility level to V7.
+    - Use dh_prep instead of dh_clean -k.
+  * Update standards version to 3.8.3 (no changes required).
+
+ -- Russ Allbery <rra@debian.org>  Thu, 27 Aug 2009 11:31:37 -0700
+
+xmltooling (1.2-1) unstable; urgency=low
+
+  * New upstream release.
+    - Stop dropping the namespace of qualified attributes that aren't
+      extensions.
+    - Expose multiple certificate revocation lists via the credential
+      API, allowing separate revocation lists for intermediate certs.
+    - Provide the hostname in artifact resolution errors.
+    - Sanity-check provided credentials for consistency.
+  * Rename library package for upstream SONAME bump.
+  * Build against Xerces-C 3.0.
+  * Update standards version to 3.8.2 (no changes required).
+  * Remove duplicate section setting for the library package.
+
+ -- Russ Allbery <rra@debian.org>  Wed, 05 Aug 2009 15:45:06 -0700
+
+xmltooling (1.1-1) unstable; urgency=low
+
+  [ Russ Allbery ]
+  * New upstream bug-fix release.
+  * Bump SONAME of libxmltooling following upstream's versioning.
+  * Include <cstdio> in base.h since some of its macros use sprintf.
+    Fixes FTBFS for packages using xmltooling with GCC 4.4 that don't
+    already include cstdio.  Thanks, Martin Michlmayr.  (Closes: #505072)
+
+  [ Ferenc Wagner ]
+  * Fix watch file for upstream directory structure.
+
+ -- Russ Allbery <rra@debian.org>  Tue, 17 Feb 2009 17:23:00 -0800
+
+xmltooling (1.0-2) unstable; urgency=low
+
+  [ Ferenc Wagner ]
+  * Add dependencies to libxmltooling-dev for the packages whose header
+    files are included by XMLTooling headers.
+  * Include NOTICE.txt in all packages.
+
+  [ Russ Allbery ]
+  * Explicitly link with -lpthread to work around Bug#468555 in libtool.
+  * Change package priorities to extra.  Xerces-C is extra, so all of the
+    Shibboleth stack needs to be extra, and realistically it's somewhat of
+    an edge package in Debian.
+  * Add in copyright and license information for all of the other random
+    files in the tree, including all the Autoconf support files.
+  * Fix copyright file formatting to use the right syntax for Files.
+
+ -- Russ Allbery <rra@debian.org>  Wed, 18 Jun 2008 20:18:21 -0700
+
+xmltooling (1.0-1) unstable; urgency=low
+
+  [ Ferenc Wagner ]
+  * Initial release (Closes: #480287)
+
+ -- Russ Allbery <rra@debian.org>  Sat, 07 Jun 2008 13:00:13 -0700
