@@ -312,21 +312,13 @@ namespace xmltooling {
 };
 
 FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
-    : m_lock(nullptr), m_credential(nullptr), m_usage(Credential::UNSPECIFIED_CREDENTIAL), m_extractNames(true)
+    : m_lock(nullptr), m_credential(nullptr), m_keyinfomask(XMLHelper::getAttrInt(e, 0, keyInfoMask)),
+        m_usage(Credential::UNSPECIFIED_CREDENTIAL), m_extractNames(true)
 {
 #ifdef _DEBUG
     NDC ndc("FilesystemCredentialResolver");
 #endif
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver."FILESYSTEM_CREDENTIAL_RESOLVER);
-
-    // Default to disable X509IssuerSerial due to schema validation issues.
-    m_keyinfomask = XMLHelper::getAttrInt(e,
-        Credential::KEYINFO_KEY_NAME |
-        Credential::KEYINFO_KEY_VALUE |
-        X509Credential::KEYINFO_X509_CERTIFICATE |
-        X509Credential::KEYINFO_X509_SUBJECTNAME,
-        keyInfoMask
-        );
 
     if (e && (e->hasAttributeNS(nullptr,_certificate) || e->hasAttributeNS(nullptr,_key))) {
         // Dummy up a simple file resolver config using these attributes.

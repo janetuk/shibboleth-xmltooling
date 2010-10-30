@@ -580,6 +580,41 @@ namespace xmlsignature {
         }
     };
 
+    class XMLTOOL_DLLLOCAL X509DigestImpl : public virtual X509Digest,
+        public AbstractComplexElement,
+        public AbstractDOMCachingXMLObject,
+        public AbstractXMLObjectMarshaller,
+        public AbstractXMLObjectUnmarshaller
+    {
+    public:
+        virtual ~X509DigestImpl() {
+            XMLString::release(&m_Algorithm);
+        }
+
+        X509DigestImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
+            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Algorithm(nullptr) {
+        }
+
+        X509DigestImpl(const X509DigestImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src), m_Algorithm(nullptr) {
+            setAlgorithm(src.getAlgorithm());
+        }
+
+        IMPL_XMLOBJECT_CLONE(X509Digest);
+        IMPL_STRING_ATTRIB(Algorithm);
+
+    protected:
+        void marshallAttributes(DOMElement* domElement) const {
+            MARSHALL_STRING_ATTRIB(Algorithm,ALGORITHM,nullptr);
+        }
+
+        void processAttribute(const DOMAttr* attribute) {
+            PROC_STRING_ATTRIB(Algorithm,ALGORITHM,nullptr);
+            AbstractXMLObjectUnmarshaller::processAttribute(attribute);
+        }
+    };
+
+
     class XMLTOOL_DLLLOCAL X509DataImpl : public virtual X509Data,
         public AbstractComplexElement,
         public AbstractDOMCachingXMLObject,
@@ -627,6 +662,12 @@ namespace xmlsignature {
                         continue;
                     }
 
+                    X509Digest* xdig=dynamic_cast<X509Digest*>(*i);
+                    if (xdig) {
+                        getX509Digests().push_back(xdig->cloneX509Digest());
+                        continue;
+                    }
+
                     OCSPResponse* ocsp=dynamic_cast<OCSPResponse*>(*i);
                     if (ocsp) {
                         getOCSPResponses().push_back(ocsp->cloneOCSPResponse());
@@ -644,6 +685,7 @@ namespace xmlsignature {
         IMPL_TYPED_CHILDREN(X509SubjectName,m_children.end());
         IMPL_TYPED_CHILDREN(X509Certificate,m_children.end());
         IMPL_TYPED_CHILDREN(X509CRL,m_children.end());
+        IMPL_TYPED_CHILDREN(X509Digest,m_children.end());
         IMPL_TYPED_CHILDREN(OCSPResponse,m_children.end());
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject,m_children.end());
 
@@ -654,7 +696,8 @@ namespace xmlsignature {
             PROC_TYPED_CHILDREN(X509SubjectName,XMLSIG_NS,false);
             PROC_TYPED_CHILDREN(X509Certificate,XMLSIG_NS,false);
             PROC_TYPED_CHILDREN(X509CRL,XMLSIG_NS,false);
-            PROC_TYPED_CHILDREN(OCSPResponse,XMLSIG_NS,false);
+            PROC_TYPED_CHILDREN(X509Digest,XMLSIG11_NS,false);
+            PROC_TYPED_CHILDREN(OCSPResponse,XMLSIG11_NS,false);
             
             // Unknown child.
             const XMLCh* nsURI=root->getNamespaceURI();
@@ -1029,6 +1072,7 @@ IMPL_XMLOBJECTBUILDER(KeyInfoReference);
 IMPL_XMLOBJECTBUILDER(NamedCurve);
 IMPL_XMLOBJECTBUILDER(OCSPResponse);
 IMPL_XMLOBJECTBUILDER(PublicKey);
+IMPL_XMLOBJECTBUILDER(X509Digest);
 
 // Unicode literals
 
@@ -1085,6 +1129,7 @@ const XMLCh NamedCurve::TYPE_NAME[] =               UNICODE_LITERAL_14(N,a,m,e,d
 const XMLCh NamedCurve::URI_ATTRIB_NAME[] =         UNICODE_LITERAL_3(U,R,I);
 const XMLCh OCSPResponse::LOCAL_NAME[] =            UNICODE_LITERAL_12(O,C,S,P,R,e,s,p,o,n,s,e);
 const XMLCh PublicKey::LOCAL_NAME[] =               UNICODE_LITERAL_9(P,u,b,l,i,c,K,e,y);
+const XMLCh X509Digest::ALGORITHM_ATTRIB_NAME[] =   UNICODE_LITERAL_9(A,l,g,o,r,i,t,h,m);
 
 #define XCH(ch) chLatin_##ch
 #define XNUM(d) chDigit_##d
@@ -1121,6 +1166,12 @@ const XMLCh X509Certificate::LOCAL_NAME[] = {
     XCH(C), XCH(e), XCH(r), XCH(t), XCH(i), XCH(f), XCH(i), XCH(c), XCH(a), XCH(t), XCH(e), chNull
     };
 const XMLCh X509CRL::LOCAL_NAME[] = { XCH(X), XNUM(5), XNUM(0), XNUM(9), XCH(C), XCH(R), XCH(L), chNull };
+const XMLCh X509Digest::LOCAL_NAME[] = {
+    XCH(X), XNUM(5), XNUM(0), XNUM(9), XCH(D), XCH(i), XCH(g), XCH(e), XCH(s), XCH(t), chNull
+    };
+const XMLCh X509Digest::TYPE_NAME[] = {
+    XCH(X), XNUM(5), XNUM(0), XNUM(9),  XCH(D), XCH(i), XCH(g), XCH(e), XCH(s), XCH(t), XCH(T), XCH(y), XCH(p), XCH(e), chNull
+    };
 
 const XMLCh RetrievalMethod::TYPE_DSAKEYVALUE[] = {
     chLatin_h, chLatin_t, chLatin_t, chLatin_p, chColon, chForwardSlash, chForwardSlash,
@@ -1145,4 +1196,3 @@ const XMLCh RetrievalMethod::TYPE_X509DATA[] = {
     chLatin_x, chLatin_m, chLatin_l, chLatin_d, chLatin_s, chLatin_i, chLatin_g, chPound,
     chLatin_X, chDigit_5, chDigit_0, chDigit_9, chLatin_D, chLatin_a, chLatin_t, chLatin_a, chNull
     };
-
