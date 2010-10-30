@@ -1,0 +1,33 @@
+From 5ff28b5a11fd81a613a2e32f71e2bfb33f27e9e4 Mon Sep 17 00:00:00 2001
+From: cantor <cantor@de75baf8-a10c-0410-a50a-987c0e22f00f>
+Date: Sat, 23 Oct 2010 21:17:47 +0000
+Subject: Move AC_DISABLE_STATIC above libtool init.
+
+git-svn-id: https://svn.middleware.georgetown.edu/cpp-xmltooling/branches/REL_1@813 de75baf8-a10c-0410-a50a-987c0e22f00f
+---
+ configure.ac |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 046bfc9..851c477 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -5,6 +5,7 @@ AC_CONFIG_SRCDIR(xmltooling)
+ AC_CONFIG_AUX_DIR(build-aux)
+ AC_CONFIG_MACRO_DIR(m4)
+ AM_INIT_AUTOMAKE
++AC_DISABLE_STATIC
+ AC_PROG_LIBTOOL
+ 
+ # Docygen features
+@@ -36,7 +37,6 @@ AC_CONFIG_FILES([Makefile xmltooling/Makefile xmltoolingtest/Makefile schemas/Ma
+ 
+ AC_PROG_CC([gcc gcc3 cc])
+ AC_PROG_CXX([g++ g++3 c++ CC])
+-AC_DISABLE_STATIC
+ AC_CANONICAL_HOST
+ 
+ if test "$GCC" = "yes" ; then
+-- 
+1.7.1
+

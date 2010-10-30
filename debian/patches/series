@@ -1,1 +1,9 @@
-0001-autoreconf.patch
+0001-Add-ctime-header.patch
+0002-Back-off-autoconf-version.patch
+0003-Back-off-libtool-macro-for-compatibility.patch
+0004-Move-AC_DISABLE_STATIC-above-libtool-init.patch
+0005-Need-to-check-for-openssl-EC-support.patch
+0006-Add-X509Digest-support-adjust-default-KeyInfo-genera.patch
+0007-SUSE-11.3-Xerces-package-rename.patch
+0008-Require-pkg-config-only-on-SUSE.patch
+0009-autoreconf.patch

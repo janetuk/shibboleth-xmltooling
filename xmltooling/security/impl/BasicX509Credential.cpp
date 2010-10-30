@@ -24,15 +24,18 @@
 #include "security/BasicX509Credential.h"
 #include "security/KeyInfoCredentialContext.h"
 #include "security/OpenSSLCredential.h"
+#include "security/SecurityHelper.h"
 #include "security/XSECCryptoX509CRL.h"
 #include "signature/KeyInfo.h"
 
 #include <algorithm>
 #include <openssl/x509v3.h>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
+#include <xercesc/util/Base64.hpp>
 
 using namespace xmlsignature;
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 
 Credential::Credential()
@@ -127,8 +130,9 @@ void BasicX509Credential::initKeyInfo(unsigned int types)
     delete m_compactKeyInfo;
     m_compactKeyInfo = nullptr;
 
+    // Default will disable X509IssuerSerial due to schema validation issues.
     if (types == 0)
-        types = KEYINFO_KEY_VALUE | KEYINFO_KEY_NAME | KEYINFO_X509_CERTIFICATE | KEYINFO_X509_SUBJECTNAME | KEYINFO_X509_ISSUERSERIAL;
+        types = KEYINFO_KEY_VALUE | KEYINFO_KEY_NAME | KEYINFO_X509_CERTIFICATE | KEYINFO_X509_SUBJECTNAME | KEYINFO_X509_DIGEST;
 
     if (types & KEYINFO_KEY_NAME) {
         const set<string>& names = getKeyNames();
@@ -183,6 +187,36 @@ void BasicX509Credential::initKeyInfo(unsigned int types)
             X509Certificate* x509=X509CertificateBuilder::buildX509Certificate();
             x509->setValue(buf.sbStrToXMLCh());
             m_keyInfo->getX509Datas().front()->getX509Certificates().push_back(x509);
+        }
+    }
+
+    if (types & KEYINFO_X509_DIGEST && !m_xseccerts.empty()) {
+        if (!m_compactKeyInfo)
+            m_compactKeyInfo = KeyInfoBuilder::buildKeyInfo();
+        if (m_compactKeyInfo->getX509Datas().empty())
+            m_compactKeyInfo->getX509Datas().push_back(X509DataBuilder::buildX509Data());
+        safeBuffer& buf=m_xseccerts.front()->getDEREncodingSB();
+        xsecsize_t x;
+        XMLByte* decoded = Base64::decode(reinterpret_cast<const XMLByte*>(buf.rawCharBuffer()), &x);
+        if (decoded) {
+            string xdig = SecurityHelper::doHash("SHA1", reinterpret_cast<char*>(decoded), x);
+#ifdef XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE
+            XMLString::release(&decoded);
+#else
+            XMLString::release((char**)&decoded);
+#endif
+            XMLByte* encoded = Base64::encode(reinterpret_cast<const XMLByte*>(xdig.c_str()), xdig.length(), &x);
+            if (encoded) {
+                auto_ptr_XMLCh widenit(reinterpret_cast<char*>(encoded));
+#ifdef XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE
+                XMLString::release(&encoded);
+#else
+                XMLString::release((char**)&encoded);
+#endif
+                X509Digest* x509dig = X509DigestBuilder::buildX509Digest();
+                x509dig->setValue(widenit.get());
+                m_compactKeyInfo->getX509Datas().front()->getX509Digests().push_back(x509dig);
+            }
         }
     }
 }

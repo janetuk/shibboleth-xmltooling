@@ -1,0 +1,27 @@
+From fbf40fe5dba573334df067d95b6f18b68d8f70b8 Mon Sep 17 00:00:00 2001
+From: cantor <cantor@de75baf8-a10c-0410-a50a-987c0e22f00f>
+Date: Wed, 27 Oct 2010 02:28:17 +0000
+Subject: Require pkg-config only on SUSE.
+
+git-svn-id: https://svn.middleware.georgetown.edu/cpp-xmltooling/branches/REL_1@817 de75baf8-a10c-0410-a50a-987c0e22f00f
+---
+ xmltooling.spec.in |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/xmltooling.spec.in b/xmltooling.spec.in
+index 1921889..def50a4 100644
+--- a/xmltooling.spec.in
++++ b/xmltooling.spec.in
+@@ -17,6 +17,9 @@ BuildRequires:  libxml-security-c-devel >= 1.4.0
+ %{?_with_log4cpp:BuildRequires: liblog4cpp-devel >= 1.0}
+ %{!?_with_log4cpp:BuildRequires: liblog4shib-devel}
+ BuildRequires:	gcc-c++, openssl-devel, curl-devel >= 7.10.6
++%if 0%{?suse_version} > 1000
++BuildRequires: pkg-config
++%endif
+ %{!?_without_doxygen:BuildRequires: doxygen}
+ %if "%{_vendor}" == "redhat"
+ BuildRequires: redhat-rpm-config
+-- 
+1.7.1
+

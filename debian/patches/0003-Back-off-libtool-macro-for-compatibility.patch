@@ -1,0 +1,26 @@
+From d52d468c6d5a417ffd280538d1bc017de74d28d2 Mon Sep 17 00:00:00 2001
+From: cantor <cantor@de75baf8-a10c-0410-a50a-987c0e22f00f>
+Date: Sat, 23 Oct 2010 21:15:13 +0000
+Subject: Back off libtool macro for compatibility.
+
+git-svn-id: https://svn.middleware.georgetown.edu/cpp-xmltooling/branches/REL_1@812 de75baf8-a10c-0410-a50a-987c0e22f00f
+---
+ configure.ac |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 236f7dc..046bfc9 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -5,7 +5,7 @@ AC_CONFIG_SRCDIR(xmltooling)
+ AC_CONFIG_AUX_DIR(build-aux)
+ AC_CONFIG_MACRO_DIR(m4)
+ AM_INIT_AUTOMAKE
+-LT_INIT
++AC_PROG_LIBTOOL
+ 
+ # Docygen features
+ DX_HTML_FEATURE(ON)
+-- 
+1.7.1
+

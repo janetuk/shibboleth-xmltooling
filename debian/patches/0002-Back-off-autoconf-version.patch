@@ -1,0 +1,24 @@
+From 3158ec0a67452d0837f4f2b444430017b2baa3ec Mon Sep 17 00:00:00 2001
+From: cantor <cantor@de75baf8-a10c-0410-a50a-987c0e22f00f>
+Date: Sat, 23 Oct 2010 21:09:45 +0000
+Subject: Back off autoconf version.
+
+git-svn-id: https://svn.middleware.georgetown.edu/cpp-xmltooling/branches/REL_1@811 de75baf8-a10c-0410-a50a-987c0e22f00f
+---
+ configure.ac |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index f9b1889..236f7dc 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -1,5 +1,5 @@
+ # Process this file with autoreconf
+-AC_PREREQ([2.67])
++AC_PREREQ([2.50])
+ AC_INIT([xmltooling],[1.4],[https://bugs.internet2.edu/],[xmltooling])
+ AC_CONFIG_SRCDIR(xmltooling)
+ AC_CONFIG_AUX_DIR(build-aux)
+-- 
+1.7.1
+

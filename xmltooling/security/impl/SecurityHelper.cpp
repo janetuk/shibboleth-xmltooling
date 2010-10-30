@@ -37,10 +37,17 @@
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyRSA.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyDSA.hpp>
-#ifdef XMLTOOLING_XMLSEC_ECC
+#include <xercesc/util/Base64.hpp>
+
+#ifdef WIN32
+# if (OPENSSL_VERSION_NUMBER >= 0x00907000)
+#  define XMLTOOLING_OPENSSL_HAVE_EC 1
+# endif
+#endif
+
+#if defined(XMLTOOLING_XMLSEC_ECC) && defined(XMLTOOLING_OPENSSL_HAVE_EC)
 # include <xsec/enc/OpenSSL/OpenSSLCryptoKeyEC.hpp>
 #endif
-#include <xercesc/util/Base64.hpp>
 
 using namespace xmltooling::logging;
 using namespace xmltooling;
@@ -203,7 +210,7 @@ XSECCryptoKey* SecurityHelper::loadKeyFromFile(const char* pathname, const char*
                 ret=new OpenSSLCryptoKeyDSA(pkey);
                 break;
 
-#ifdef XSEC_OPENSSL_HAVE_EC
+#if defined(XMLTOOLING_XMLSEC_ECC) && defined(XMLTOOLING_OPENSSL_HAVE_EC)
             case EVP_PKEY_EC:
                 ret=new OpenSSLCryptoKeyEC(pkey);
                 break;
@@ -505,7 +512,7 @@ bool SecurityHelper::matches(const XSECCryptoKey& key1, const XSECCryptoKey& key
         return (dsa1 && dsa2 && BN_cmp(dsa1->priv_key,dsa2->priv_key) == 0);
     }
 
-#ifdef XMLTOOLING_XMLSEC_ECC
+#if defined(XMLTOOLING_XMLSEC_ECC) && defined(XMLTOOLING_OPENSSL_HAVE_EC)
     // If one key is public or both, just compare the public key half.
     if (key1.getKeyType()==XSECCryptoKey::KEY_EC_PUBLIC || key1.getKeyType()==XSECCryptoKey::KEY_EC_PAIR) {
         if (key2.getKeyType()!=XSECCryptoKey::KEY_EC_PUBLIC && key2.getKeyType()!=XSECCryptoKey::KEY_EC_PAIR)
@@ -585,7 +592,7 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, const char* hash
 
     const RSA* rsa = nullptr;
     const DSA* dsa = nullptr;
-#ifdef XMLTOOLING_XMLSEC_ECC
+#if defined(XMLTOOLING_XMLSEC_ECC) && defined(XMLTOOLING_OPENSSL_HAVE_EC)
     const EC_KEY* ec = nullptr;
 #endif
 
@@ -603,7 +610,7 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, const char* hash
             return ret;
         }
     }
-#ifdef XMLTOOLING_XMLSEC_ECC
+#if defined(XMLTOOLING_XMLSEC_ECC) && defined(XMLTOOLING_OPENSSL_HAVE_EC)
     else if (key.getKeyType() == XSECCryptoKey::KEY_EC_PUBLIC || key.getKeyType() == XSECCryptoKey::KEY_EC_PAIR) {
         ec = static_cast<const OpenSSLCryptoKeyEC&>(key).getOpenSSLEC();
         if (!ec) {
@@ -641,7 +648,7 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, const char* hash
         i2d_RSA_PUBKEY_bio(chain, const_cast<RSA*>(rsa));
     else if (dsa)
         i2d_DSA_PUBKEY_bio(chain, const_cast<DSA*>(dsa));
-#ifdef XMLTOOLING_XMLSEC_ECC
+#if defined(XMLTOOLING_XMLSEC_ECC) && defined(XMLTOOLING_OPENSSL_HAVE_EC)
     else
         i2d_EC_PUBKEY_bio(chain, const_cast<EC_KEY*>(ec));
 #endif
@@ -787,7 +794,7 @@ XSECCryptoKey* SecurityHelper::fromDEREncoding(const char* buf, unsigned long bu
                     ret = new OpenSSLCryptoKeyDSA(pkey);
                     break;
 
-#ifdef XMLTOOLING_XMLSEC_ECC
+#if defined(XMLTOOLING_XMLSEC_ECC) && defined(XMLTOOLING_OPENSSL_HAVE_EC)
                 case EVP_PKEY_EC:
                     ret = new OpenSSLCryptoKeyEC(pkey);
                     break;

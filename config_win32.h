@@ -75,7 +75,7 @@
 # define XMLTOOLING_XERCESC_64BITSAFE           1
 # define XMLTOOLING_XERCESC_INPUTSTREAM_HAS_CONTENTTYPE 1
 #else
-# define XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE
+# define XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE 1
 #endif
 
 /* Define to 1 if you have the `xsecsize_t' type. */

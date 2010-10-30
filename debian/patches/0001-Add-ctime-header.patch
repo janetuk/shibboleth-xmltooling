@@ -1,0 +1,32 @@
+From bd3a8702cd28015c3d3088e660e5b3f9432422bc Mon Sep 17 00:00:00 2001
+From: cantor <cantor@de75baf8-a10c-0410-a50a-987c0e22f00f>
+Date: Sat, 23 Oct 2010 20:49:35 +0000
+Subject: Add ctime header.
+
+git-svn-id: https://svn.middleware.georgetown.edu/cpp-xmltooling/branches/REL_1@810 de75baf8-a10c-0410-a50a-987c0e22f00f
+---
+ xmltooling/util/DateTime.h |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/xmltooling/util/DateTime.h b/xmltooling/util/DateTime.h
+index 7a1ced1..b4347bd 100644
+--- a/xmltooling/util/DateTime.h
++++ b/xmltooling/util/DateTime.h
+@@ -1,5 +1,5 @@
+ /*
+- *  Copyright 2001-2009 Internet2
++ *  Copyright 2001-2010 Internet2
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+@@ -30,6 +30,7 @@
+     #pragma warning( disable : 4244 )
+ #endif
+ 
++#include <ctime>
+ #include <xercesc/util/XMLDateTime.hpp>
+ 
+ #if defined (_MSC_VER)
+-- 
+1.7.1
+

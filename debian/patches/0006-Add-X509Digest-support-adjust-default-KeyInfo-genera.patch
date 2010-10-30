@@ -1,0 +1,369 @@
+From f63dff499d94ccdbf50e34d8db87a6c0ff0f8ebd Mon Sep 17 00:00:00 2001
+From: cantor <cantor@de75baf8-a10c-0410-a50a-987c0e22f00f>
+Date: Tue, 26 Oct 2010 19:07:15 +0000
+Subject: Add X509Digest support, adjust default KeyInfo generation.
+
+git-svn-id: https://svn.middleware.georgetown.edu/cpp-xmltooling/branches/REL_1@815 de75baf8-a10c-0410-a50a-987c0e22f00f
+---
+ config_win32.h                                     |    2 +-
+ schemas/xmldsig11-schema.xsd                       |    9 +++
+ xmltooling/security/X509Credential.h               |    5 +-
+ xmltooling/security/impl/BasicX509Credential.cpp   |   36 +++++++++++++-
+ .../security/impl/FilesystemCredentialResolver.cpp |   12 +----
+ xmltooling/security/impl/SecurityHelper.cpp        |    7 ++-
+ xmltooling/signature/KeyInfo.h                     |    9 +++
+ xmltooling/signature/impl/KeyInfoImpl.cpp          |   54 +++++++++++++++++++-
+ .../signature/impl/KeyInfoSchemaValidators.cpp     |    6 ++
+ 9 files changed, 121 insertions(+), 19 deletions(-)
+
+diff --git a/config_win32.h b/config_win32.h
+index eac16ca..8a14f8c 100644
+--- a/config_win32.h
++++ b/config_win32.h
+@@ -75,7 +75,7 @@
+ # define XMLTOOLING_XERCESC_64BITSAFE           1
+ # define XMLTOOLING_XERCESC_INPUTSTREAM_HAS_CONTENTTYPE 1
+ #else
+-# define XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE
++# define XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE 1
+ #endif
+ 
+ /* Define to 1 if you have the `xsecsize_t' type. */
+diff --git a/schemas/xmldsig11-schema.xsd b/schemas/xmldsig11-schema.xsd
+index 56c82be..5b63f56 100644
+--- a/schemas/xmldsig11-schema.xsd
++++ b/schemas/xmldsig11-schema.xsd
+@@ -119,5 +119,14 @@
+     <attribute name="Id" type="ID" use="optional"/>
+   </complexType>
+ 
++  <element name="X509Digest" type="dsig11:X509DigestType"/> 
++  <complexType name="X509DigestType">
++    <simpleContent>
++      <extension base="base64Binary">
++        <attribute name="Algorithm" type="anyURI" use="required"/>
++      </extension>
++    </simpleContent>
++  </complexType>
++
+ </schema>
+ 
+diff --git a/xmltooling/security/X509Credential.h b/xmltooling/security/X509Credential.h
+index 86df5e2..a2b1d89 100644
+--- a/xmltooling/security/X509Credential.h
++++ b/xmltooling/security/X509Credential.h
+@@ -1,5 +1,5 @@
+ /*
+- *  Copyright 2001-2009 Internet2
++ *  Copyright 2001-2010 Internet2
+  * 
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  * you may not use this file except in compliance with the License.
+@@ -56,7 +56,8 @@ namespace xmltooling {
+         enum KeyInfoTypes {
+             KEYINFO_X509_CERTIFICATE = 4,
+             KEYINFO_X509_SUBJECTNAME = 8,
+-            KEYINFO_X509_ISSUERSERIAL = 16
++            KEYINFO_X509_ISSUERSERIAL = 16,
++            KEYINFO_X509_DIGEST = 32
+         };
+ 
+         /**
+diff --git a/xmltooling/security/impl/BasicX509Credential.cpp b/xmltooling/security/impl/BasicX509Credential.cpp
+index 324d0f6..9fda0b0 100644
+--- a/xmltooling/security/impl/BasicX509Credential.cpp
++++ b/xmltooling/security/impl/BasicX509Credential.cpp
+@@ -24,15 +24,18 @@
+ #include "security/BasicX509Credential.h"
+ #include "security/KeyInfoCredentialContext.h"
+ #include "security/OpenSSLCredential.h"
++#include "security/SecurityHelper.h"
+ #include "security/XSECCryptoX509CRL.h"
+ #include "signature/KeyInfo.h"
+ 
+ #include <algorithm>
+ #include <openssl/x509v3.h>
+ #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
++#include <xercesc/util/Base64.hpp>
+ 
+ using namespace xmlsignature;
+ using namespace xmltooling;
++using namespace xercesc;
+ using namespace std;
+ 
+ Credential::Credential()
+@@ -127,8 +130,9 @@ void BasicX509Credential::initKeyInfo(unsigned int types)
+     delete m_compactKeyInfo;
+     m_compactKeyInfo = nullptr;
+ 
++    // Default will disable X509IssuerSerial due to schema validation issues.
+     if (types == 0)
+-        types = KEYINFO_KEY_VALUE | KEYINFO_KEY_NAME | KEYINFO_X509_CERTIFICATE | KEYINFO_X509_SUBJECTNAME | KEYINFO_X509_ISSUERSERIAL;
++        types = KEYINFO_KEY_VALUE | KEYINFO_KEY_NAME | KEYINFO_X509_CERTIFICATE | KEYINFO_X509_SUBJECTNAME | KEYINFO_X509_DIGEST;
+ 
+     if (types & KEYINFO_KEY_NAME) {
+         const set<string>& names = getKeyNames();
+@@ -185,6 +189,36 @@ void BasicX509Credential::initKeyInfo(unsigned int types)
+             m_keyInfo->getX509Datas().front()->getX509Certificates().push_back(x509);
+         }
+     }
++
++    if (types & KEYINFO_X509_DIGEST && !m_xseccerts.empty()) {
++        if (!m_compactKeyInfo)
++            m_compactKeyInfo = KeyInfoBuilder::buildKeyInfo();
++        if (m_compactKeyInfo->getX509Datas().empty())
++            m_compactKeyInfo->getX509Datas().push_back(X509DataBuilder::buildX509Data());
++        safeBuffer& buf=m_xseccerts.front()->getDEREncodingSB();
++        xsecsize_t x;
++        XMLByte* decoded = Base64::decode(reinterpret_cast<const XMLByte*>(buf.rawCharBuffer()), &x);
++        if (decoded) {
++            string xdig = SecurityHelper::doHash("SHA1", reinterpret_cast<char*>(decoded), x);
++#ifdef XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE
++            XMLString::release(&decoded);
++#else
++            XMLString::release((char**)&decoded);
++#endif
++            XMLByte* encoded = Base64::encode(reinterpret_cast<const XMLByte*>(xdig.c_str()), xdig.length(), &x);
++            if (encoded) {
++                auto_ptr_XMLCh widenit(reinterpret_cast<char*>(encoded));
++#ifdef XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE
++                XMLString::release(&encoded);
++#else
++                XMLString::release((char**)&encoded);
++#endif
++                X509Digest* x509dig = X509DigestBuilder::buildX509Digest();
++                x509dig->setValue(widenit.get());
++                m_compactKeyInfo->getX509Datas().front()->getX509Digests().push_back(x509dig);
++            }
++        }
++    }
+ }
+ 
+ unsigned int BasicX509Credential::getUsage() const
+diff --git a/xmltooling/security/impl/FilesystemCredentialResolver.cpp b/xmltooling/security/impl/FilesystemCredentialResolver.cpp
+index fcdd747..d92fd37 100644
+--- a/xmltooling/security/impl/FilesystemCredentialResolver.cpp
++++ b/xmltooling/security/impl/FilesystemCredentialResolver.cpp
+@@ -312,22 +312,14 @@ namespace xmltooling {
+ };
+ 
+ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
+-    : m_lock(nullptr), m_credential(nullptr), m_usage(Credential::UNSPECIFIED_CREDENTIAL), m_extractNames(true)
++    : m_lock(nullptr), m_credential(nullptr), m_keyinfomask(XMLHelper::getAttrInt(e, 0, keyInfoMask)),
++        m_usage(Credential::UNSPECIFIED_CREDENTIAL), m_extractNames(true)
+ {
+ #ifdef _DEBUG
+     NDC ndc("FilesystemCredentialResolver");
+ #endif
+     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver."FILESYSTEM_CREDENTIAL_RESOLVER);
+ 
+-    // Default to disable X509IssuerSerial due to schema validation issues.
+-    m_keyinfomask = XMLHelper::getAttrInt(e,
+-        Credential::KEYINFO_KEY_NAME |
+-        Credential::KEYINFO_KEY_VALUE |
+-        X509Credential::KEYINFO_X509_CERTIFICATE |
+-        X509Credential::KEYINFO_X509_SUBJECTNAME,
+-        keyInfoMask
+-        );
+-
+     if (e && (e->hasAttributeNS(nullptr,_certificate) || e->hasAttributeNS(nullptr,_key))) {
+         // Dummy up a simple file resolver config using these attributes.
+         DOMElement* dummy = e->getOwnerDocument()->createElementNS(nullptr,_CredentialResolver);
+diff --git a/xmltooling/security/impl/SecurityHelper.cpp b/xmltooling/security/impl/SecurityHelper.cpp
+index a4ac4f2..54e90fb 100644
+--- a/xmltooling/security/impl/SecurityHelper.cpp
++++ b/xmltooling/security/impl/SecurityHelper.cpp
+@@ -37,9 +37,6 @@
+ #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
+ #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyRSA.hpp>
+ #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyDSA.hpp>
+-#if defined(XMLTOOLING_XMLSEC_ECC) && defined(XMLTOOLING_OPENSSL_HAVE_EC)
+-# include <xsec/enc/OpenSSL/OpenSSLCryptoKeyEC.hpp>
+-#endif
+ #include <xercesc/util/Base64.hpp>
+ 
+ #ifdef WIN32
+@@ -48,6 +45,10 @@
+ # endif
+ #endif
+ 
++#if defined(XMLTOOLING_XMLSEC_ECC) && defined(XMLTOOLING_OPENSSL_HAVE_EC)
++# include <xsec/enc/OpenSSL/OpenSSLCryptoKeyEC.hpp>
++#endif
++
+ using namespace xmltooling::logging;
+ using namespace xmltooling;
+ using namespace std;
+diff --git a/xmltooling/signature/KeyInfo.h b/xmltooling/signature/KeyInfo.h
+index 59e1481..70508b1 100644
+--- a/xmltooling/signature/KeyInfo.h
++++ b/xmltooling/signature/KeyInfo.h
+@@ -148,12 +148,20 @@ namespace xmlsignature {
+         static const XMLCh TYPE_NAME[];
+     END_XMLOBJECT;
+ 
++    BEGIN_XMLOBJECT(XMLTOOL_API,X509Digest,xmltooling::XMLObject,XML Digital Signature version 1.1 X509Digest element);
++        DECL_STRING_ATTRIB(Algorithm,ALGORITHM);
++        DECL_SIMPLE_CONTENT(Value);
++        /** X509DigestType local name */
++        static const XMLCh TYPE_NAME[];
++    END_XMLOBJECT;
++
+     BEGIN_XMLOBJECT(XMLTOOL_API,X509Data,xmltooling::ElementExtensibleXMLObject,XML Digital Signature version 20020212 X509Data element);
+         DECL_TYPED_CHILDREN(X509IssuerSerial);
+         DECL_TYPED_CHILDREN(X509SKI);
+         DECL_TYPED_CHILDREN(X509SubjectName);
+         DECL_TYPED_CHILDREN(X509Certificate);
+         DECL_TYPED_CHILDREN(X509CRL);
++        DECL_TYPED_CHILDREN(X509Digest);
+         DECL_TYPED_CHILDREN(OCSPResponse);
+         /** X509DataType local name */
+         static const XMLCh TYPE_NAME[];
+@@ -245,6 +253,7 @@ namespace xmlsignature {
+     DECL_XMLSIG11OBJECTBUILDER(NamedCurve);
+     DECL_XMLSIG11OBJECTBUILDER(OCSPResponse);
+     DECL_XMLSIG11OBJECTBUILDER(PublicKey);
++    DECL_XMLSIG11OBJECTBUILDER(X509Digest);
+ 
+     /**
+      * Registers builders and validators for KeyInfo classes into the runtime.
+diff --git a/xmltooling/signature/impl/KeyInfoImpl.cpp b/xmltooling/signature/impl/KeyInfoImpl.cpp
+index d3be7c4..56d975b 100644
+--- a/xmltooling/signature/impl/KeyInfoImpl.cpp
++++ b/xmltooling/signature/impl/KeyInfoImpl.cpp
+@@ -580,6 +580,41 @@ namespace xmlsignature {
+         }
+     };
+ 
++    class XMLTOOL_DLLLOCAL X509DigestImpl : public virtual X509Digest,
++        public AbstractComplexElement,
++        public AbstractDOMCachingXMLObject,
++        public AbstractXMLObjectMarshaller,
++        public AbstractXMLObjectUnmarshaller
++    {
++    public:
++        virtual ~X509DigestImpl() {
++            XMLString::release(&m_Algorithm);
++        }
++
++        X509DigestImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
++            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_Algorithm(nullptr) {
++        }
++
++        X509DigestImpl(const X509DigestImpl& src)
++                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src), m_Algorithm(nullptr) {
++            setAlgorithm(src.getAlgorithm());
++        }
++
++        IMPL_XMLOBJECT_CLONE(X509Digest);
++        IMPL_STRING_ATTRIB(Algorithm);
++
++    protected:
++        void marshallAttributes(DOMElement* domElement) const {
++            MARSHALL_STRING_ATTRIB(Algorithm,ALGORITHM,nullptr);
++        }
++
++        void processAttribute(const DOMAttr* attribute) {
++            PROC_STRING_ATTRIB(Algorithm,ALGORITHM,nullptr);
++            AbstractXMLObjectUnmarshaller::processAttribute(attribute);
++        }
++    };
++
++
+     class XMLTOOL_DLLLOCAL X509DataImpl : public virtual X509Data,
+         public AbstractComplexElement,
+         public AbstractDOMCachingXMLObject,
+@@ -627,6 +662,12 @@ namespace xmlsignature {
+                         continue;
+                     }
+ 
++                    X509Digest* xdig=dynamic_cast<X509Digest*>(*i);
++                    if (xdig) {
++                        getX509Digests().push_back(xdig->cloneX509Digest());
++                        continue;
++                    }
++
+                     OCSPResponse* ocsp=dynamic_cast<OCSPResponse*>(*i);
+                     if (ocsp) {
+                         getOCSPResponses().push_back(ocsp->cloneOCSPResponse());
+@@ -644,6 +685,7 @@ namespace xmlsignature {
+         IMPL_TYPED_CHILDREN(X509SubjectName,m_children.end());
+         IMPL_TYPED_CHILDREN(X509Certificate,m_children.end());
+         IMPL_TYPED_CHILDREN(X509CRL,m_children.end());
++        IMPL_TYPED_CHILDREN(X509Digest,m_children.end());
+         IMPL_TYPED_CHILDREN(OCSPResponse,m_children.end());
+         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject,m_children.end());
+ 
+@@ -654,7 +696,8 @@ namespace xmlsignature {
+             PROC_TYPED_CHILDREN(X509SubjectName,XMLSIG_NS,false);
+             PROC_TYPED_CHILDREN(X509Certificate,XMLSIG_NS,false);
+             PROC_TYPED_CHILDREN(X509CRL,XMLSIG_NS,false);
+-            PROC_TYPED_CHILDREN(OCSPResponse,XMLSIG_NS,false);
++            PROC_TYPED_CHILDREN(X509Digest,XMLSIG11_NS,false);
++            PROC_TYPED_CHILDREN(OCSPResponse,XMLSIG11_NS,false);
+             
+             // Unknown child.
+             const XMLCh* nsURI=root->getNamespaceURI();
+@@ -1029,6 +1072,7 @@ IMPL_XMLOBJECTBUILDER(KeyInfoReference);
+ IMPL_XMLOBJECTBUILDER(NamedCurve);
+ IMPL_XMLOBJECTBUILDER(OCSPResponse);
+ IMPL_XMLOBJECTBUILDER(PublicKey);
++IMPL_XMLOBJECTBUILDER(X509Digest);
+ 
+ // Unicode literals
+ 
+@@ -1085,6 +1129,7 @@ const XMLCh NamedCurve::TYPE_NAME[] =               UNICODE_LITERAL_14(N,a,m,e,d
+ const XMLCh NamedCurve::URI_ATTRIB_NAME[] =         UNICODE_LITERAL_3(U,R,I);
+ const XMLCh OCSPResponse::LOCAL_NAME[] =            UNICODE_LITERAL_12(O,C,S,P,R,e,s,p,o,n,s,e);
+ const XMLCh PublicKey::LOCAL_NAME[] =               UNICODE_LITERAL_9(P,u,b,l,i,c,K,e,y);
++const XMLCh X509Digest::ALGORITHM_ATTRIB_NAME[] =   UNICODE_LITERAL_9(A,l,g,o,r,i,t,h,m);
+ 
+ #define XCH(ch) chLatin_##ch
+ #define XNUM(d) chDigit_##d
+@@ -1121,6 +1166,12 @@ const XMLCh X509Certificate::LOCAL_NAME[] = {
+     XCH(C), XCH(e), XCH(r), XCH(t), XCH(i), XCH(f), XCH(i), XCH(c), XCH(a), XCH(t), XCH(e), chNull
+     };
+ const XMLCh X509CRL::LOCAL_NAME[] = { XCH(X), XNUM(5), XNUM(0), XNUM(9), XCH(C), XCH(R), XCH(L), chNull };
++const XMLCh X509Digest::LOCAL_NAME[] = {
++    XCH(X), XNUM(5), XNUM(0), XNUM(9), XCH(D), XCH(i), XCH(g), XCH(e), XCH(s), XCH(t), chNull
++    };
++const XMLCh X509Digest::TYPE_NAME[] = {
++    XCH(X), XNUM(5), XNUM(0), XNUM(9),  XCH(D), XCH(i), XCH(g), XCH(e), XCH(s), XCH(t), XCH(T), XCH(y), XCH(p), XCH(e), chNull
++    };
+ 
+ const XMLCh RetrievalMethod::TYPE_DSAKEYVALUE[] = {
+     chLatin_h, chLatin_t, chLatin_t, chLatin_p, chColon, chForwardSlash, chForwardSlash,
+@@ -1145,4 +1196,3 @@ const XMLCh RetrievalMethod::TYPE_X509DATA[] = {
+     chLatin_x, chLatin_m, chLatin_l, chLatin_d, chLatin_s, chLatin_i, chLatin_g, chPound,
+     chLatin_X, chDigit_5, chDigit_0, chDigit_9, chLatin_D, chLatin_a, chLatin_t, chLatin_a, chNull
+     };
+-
+diff --git a/xmltooling/signature/impl/KeyInfoSchemaValidators.cpp b/xmltooling/signature/impl/KeyInfoSchemaValidators.cpp
+index 6b80265..e79a076 100644
+--- a/xmltooling/signature/impl/KeyInfoSchemaValidators.cpp
++++ b/xmltooling/signature/impl/KeyInfoSchemaValidators.cpp
+@@ -152,6 +152,10 @@ namespace xmlsignature {
+         XMLOBJECTVALIDATOR_ONEOF(ECKeyValue,ECParameters,NamedCurve);
+         XMLOBJECTVALIDATOR_REQUIRE(ECKeyValue,PublicKey);
+     END_XMLOBJECTVALIDATOR;
++
++    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,X509Digest);
++        XMLOBJECTVALIDATOR_REQUIRE(X509Digest,Algorithm);
++    END_XMLOBJECTVALIDATOR;
+ };
+ 
+ #define REGISTER_ELEMENT(namespaceURI,cname) \
+@@ -217,8 +221,10 @@ void xmlsignature::registerKeyInfoClasses()
+     REGISTER_ELEMENT(XMLSIG11_NS,NamedCurve);
+     REGISTER_ELEMENT(XMLSIG11_NS,OCSPResponse);
+     REGISTER_ELEMENT(XMLSIG11_NS,PublicKey);
++    REGISTER_ELEMENT(XMLSIG11_NS,X509Digest);
+     REGISTER_TYPE(XMLSIG11_NS,DEREncodedKeyValue);
+     REGISTER_TYPE(XMLSIG11_NS,ECKeyValue);
+     REGISTER_TYPE(XMLSIG11_NS,KeyInfoReference);
+     REGISTER_TYPE(XMLSIG11_NS,NamedCurve);
++    REGISTER_TYPE(XMLSIG11_NS,X509Digest);
+ }
+-- 
+1.7.1
+
