@@ -119,14 +119,5 @@
     <attribute name="Id" type="ID" use="optional"/>
   </complexType>
 
-  <element name="X509Digest" type="dsig11:X509DigestType"/> 
-  <complexType name="X509DigestType">
-    <simpleContent>
-      <extension base="base64Binary">
-        <attribute name="Algorithm" type="anyURI" use="required"/>
-      </extension>
-    </simpleContent>
-  </complexType>
-
 </schema>
 

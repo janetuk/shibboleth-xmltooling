@@ -148,20 +148,12 @@ namespace xmlsignature {
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
-    BEGIN_XMLOBJECT(XMLTOOL_API,X509Digest,xmltooling::XMLObject,XML Digital Signature version 1.1 X509Digest element);
-        DECL_STRING_ATTRIB(Algorithm,ALGORITHM);
-        DECL_SIMPLE_CONTENT(Value);
-        /** X509DigestType local name */
-        static const XMLCh TYPE_NAME[];
-    END_XMLOBJECT;
-
     BEGIN_XMLOBJECT(XMLTOOL_API,X509Data,xmltooling::ElementExtensibleXMLObject,XML Digital Signature version 20020212 X509Data element);
         DECL_TYPED_CHILDREN(X509IssuerSerial);
         DECL_TYPED_CHILDREN(X509SKI);
         DECL_TYPED_CHILDREN(X509SubjectName);
         DECL_TYPED_CHILDREN(X509Certificate);
         DECL_TYPED_CHILDREN(X509CRL);
-        DECL_TYPED_CHILDREN(X509Digest);
         DECL_TYPED_CHILDREN(OCSPResponse);
         /** X509DataType local name */
         static const XMLCh TYPE_NAME[];
@@ -253,7 +245,6 @@ namespace xmlsignature {
     DECL_XMLSIG11OBJECTBUILDER(NamedCurve);
     DECL_XMLSIG11OBJECTBUILDER(OCSPResponse);
     DECL_XMLSIG11OBJECTBUILDER(PublicKey);
-    DECL_XMLSIG11OBJECTBUILDER(X509Digest);
 
     /**
      * Registers builders and validators for KeyInfo classes into the runtime.

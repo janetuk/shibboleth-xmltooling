@@ -127,6 +127,9 @@
 /* Define to 1 if you wish to disable XML-Security-dependent features. */
 #undef XMLTOOLING_NO_XMLSEC
 
+/* Define to 1 if OpenSSL has EC support. */
+#undef XMLTOOLING_OPENSSL_HAVE_EC
+
 /* Define to 1 if OpenSSL supports the SHA-2 hash family. */
 #undef XMLTOOLING_OPENSSL_HAVE_SHA2
 
