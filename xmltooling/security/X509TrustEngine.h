@@ -42,14 +42,6 @@ namespace xmltooling {
         /**
          * Constructor.
          * 
-         * If a DOM is supplied, the following XML content is supported:
-         * 
-         * <ul>
-         *  <li>&lt;KeyInfoResolver&gt; elements with a type attribute
-         * </ul>
-         * 
-         * XML namespaces are ignored in the processing of this content.
-         * 
          * @param e DOM to supply configuration for provider
          */
         X509TrustEngine(const xercesc::DOMElement* e=nullptr);
