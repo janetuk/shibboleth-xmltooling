@@ -57,6 +57,7 @@ namespace {
         X509* EE,
         STACK_OF(X509)* untrusted,
         AbstractPKIXTrustEngine::PKIXValidationInfoIterator* pkixInfo,
+		bool requireCRL,
         bool fullCRLChain,
         const vector<XSECCryptoX509CRL*>* inlineCRLs=nullptr
         )
@@ -109,10 +110,23 @@ namespace {
             }
         }
         log.debug("supplied (%d) CRL(s)", count);
-        if (count > 0)
+        if (count > 0) {
             X509_STORE_set_flags(store, fullCRLChain ? (X509_V_FLAG_CRL_CHECK|X509_V_FLAG_CRL_CHECK_ALL) : (X509_V_FLAG_CRL_CHECK));
+		}
+		else if (requireCRL) {
+			log.warn("CRL checking is required, but none were supplied");
+            sk_X509_free(CAstack);
+            X509_STORE_free(store);
+            return false;
+		}
 #else
-        if ((inlineCRLs && !inlineCRLs->empty()) || !pkixInfo->getCRLs().empty()) {
+		if (requireCRL) {
+			log.warn("CRL checking is required, but OpenSSL version is too old");
+            sk_X509_free(CAstack);
+            X509_STORE_free(store);
+            return false;
+ 		}
+        else if ((inlineCRLs && !inlineCRLs->empty()) || !pkixInfo->getCRLs().empty()) {
             log.warn("OpenSSL versions < 0.9.7 do not support CRL checking");
         }
 #endif
@@ -162,7 +176,8 @@ namespace {
         return false;
     }
 
-    static XMLCh fullCRLChain[] = UNICODE_LITERAL_12(f,u,l,l,C,R,L,C,h,a,i,n);
+    static XMLCh fullCRLChain[] =		UNICODE_LITERAL_12(f,u,l,l,C,R,L,C,h,a,i,n);
+	static XMLCh checkRevocation[] =	UNICODE_LITERAL_15(c,h,e,c,k,R,e,v,o,c,a,t,i,o,n);
 };
 
 AbstractPKIXTrustEngine::PKIXValidationInfoIterator::PKIXValidationInfoIterator()
@@ -174,7 +189,9 @@ AbstractPKIXTrustEngine::PKIXValidationInfoIterator::~PKIXValidationInfoIterator
 }
 
 AbstractPKIXTrustEngine::AbstractPKIXTrustEngine(const xercesc::DOMElement* e)
-    : TrustEngine(e), m_fullCRLChain(XMLHelper::getAttrBool(e, false, fullCRLChain))
+	: TrustEngine(e),
+		m_fullCRLChain(XMLHelper::getAttrBool(e, false, fullCRLChain)),
+		m_checkRevocation(XMLHelper::getAttrString(e, nullptr, checkRevocation))
 {
 }
 
@@ -348,7 +365,14 @@ bool AbstractPKIXTrustEngine::validateWithCRLs(
 
     auto_ptr<PKIXValidationInfoIterator> pkix(getPKIXValidationInfoIterator(credResolver, criteria));
     while (pkix->next()) {
-        if (::validate(certEE,certChain,pkix.get(),m_fullCRLChain,inlineCRLs)) {
+        if (::validate(
+				certEE,
+				certChain,
+				pkix.get(),
+				(m_checkRevocation=="required" || m_checkRevocation=="all"),
+				(m_fullCRLChain || m_checkRevocation=="all"),
+				inlineCRLs
+				)) {
             return true;
         }
     }
@@ -522,10 +546,21 @@ bool AbstractPKIXTrustEngine::validate(
             log.debug(ex.what());
         }
     }
-    
-    if (certEE)
-        return validate(certEE,certs,credResolver,criteria);
-        
-    log.debug("failed to verify signature with embedded certificates");
-    return false;
+
+    if (!certEE) {
+        log.debug("failed to verify signature with embedded certificates");
+        return false;
+    }
+    else if (certEE->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL) {
+        log.error("only the OpenSSL XSEC provider is supported");
+        return false;
+    }
+
+    STACK_OF(X509)* untrusted=sk_X509_new_null();
+    for (vector<XSECCryptoX509*>::const_iterator i=certs.begin(); i!=certs.end(); ++i)
+        sk_X509_push(untrusted,static_cast<OpenSSLCryptoX509*>(*i)->getOpenSSLX509());
+    const vector<XSECCryptoX509CRL*>& crls = x509cred->getCRLs();
+    bool ret = validateWithCRLs(static_cast<OpenSSLCryptoX509*>(certEE)->getOpenSSLX509(), untrusted, credResolver, criteria, &crls);
+    sk_X509_free(untrusted);
+    return ret;
 }

@@ -27,6 +27,8 @@
 #include <xmltooling/security/OpenSSLTrustEngine.h>
 #include <xmltooling/security/SignatureTrustEngine.h>
 
+#include <string>
+
 namespace xmltooling {
 
     class XMLTOOL_API XSECCryptoX509CRL;
@@ -44,15 +46,15 @@ namespace xmltooling {
          * If a DOM is supplied, the following XML content is supported:
          * 
          * <ul>
-         *  <li>fullCRLChain boolean attribute
-         *  <li>&lt;KeyInfoResolver&gt; elements with a type attribute
+         *  <li>checkRevocation attribute (optional, required, all)
          * </ul>
-         * 
-         * XML namespaces are ignored in the processing of this content.
          * 
          * @param e DOM to supply configuration for provider
          */
         AbstractPKIXTrustEngine(const xercesc::DOMElement* e=nullptr);
+
+		/** Controls revocation checking, currently limited to CRLs and supports "optional" and "required". */
+		std::string m_checkRevocation;
 
         /** Flag controls whether every issuer in the trust path must have a CRL loaded. */
         bool m_fullCRLChain;
