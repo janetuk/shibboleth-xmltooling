@@ -271,7 +271,11 @@ bool XMLToolingInternalConfig::log_config(const char* config)
             string path(config);
             PropertyConfigurator::configure(m_pathResolver ? m_pathResolver->resolve(path, PathResolver::XMLTOOLING_CFG_FILE) : path);
         }
-    }
+
+#ifndef XMLTOOLING_NO_XMLSEC
+        Category::getInstance(XMLTOOLING_LOGCAT".Signature.Debugger").setAdditivity(false);
+#endif
+	}
     catch (const ConfigureFailure& e) {
         string msg = string("failed to configure logging: ") + e.what();
         Category::getInstance(XMLTOOLING_LOGCAT".Logging").crit(msg);
