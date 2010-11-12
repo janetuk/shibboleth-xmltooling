@@ -369,8 +369,8 @@ bool AbstractPKIXTrustEngine::validateWithCRLs(
 				certEE,
 				certChain,
 				pkix.get(),
-				(m_checkRevocation=="required" || m_checkRevocation=="all"),
-				(m_fullCRLChain || m_checkRevocation=="all"),
+				(m_checkRevocation=="entityOnly" || m_checkRevocation=="fullChain"),
+				(m_fullCRLChain || m_checkRevocation=="fullChain"),
 				inlineCRLs
 				)) {
             return true;

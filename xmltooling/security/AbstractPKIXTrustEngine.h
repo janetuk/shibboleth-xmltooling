@@ -46,14 +46,14 @@ namespace xmltooling {
          * If a DOM is supplied, the following XML content is supported:
          * 
          * <ul>
-         *  <li>checkRevocation attribute (optional, required, all)
+         *  <li>checkRevocation attribute (optional, entityOnly, fullChain)
          * </ul>
          * 
          * @param e DOM to supply configuration for provider
          */
         AbstractPKIXTrustEngine(const xercesc::DOMElement* e=nullptr);
 
-		/** Controls revocation checking, currently limited to CRLs and supports "optional" and "required". */
+		/** Controls revocation checking, currently limited to CRLs and supports "optional", "entityOnly", "fullChain". */
 		std::string m_checkRevocation;
 
         /** Flag controls whether every issuer in the trust path must have a CRL loaded. */
