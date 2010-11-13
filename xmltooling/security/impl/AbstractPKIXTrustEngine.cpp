@@ -57,7 +57,7 @@ namespace {
         X509* EE,
         STACK_OF(X509)* untrusted,
         AbstractPKIXTrustEngine::PKIXValidationInfoIterator* pkixInfo,
-		bool requireCRL,
+		bool useCRL,
         bool fullCRLChain,
         const vector<XSECCryptoX509CRL*>* inlineCRLs=nullptr
         )
@@ -90,46 +90,43 @@ namespace {
 
         log.debug("supplied (%d) CA certificate(s)", count);
 
+        if (useCRL) {
 #if (OPENSSL_VERSION_NUMBER >= 0x00907000L)
-        count=0;
-        if (inlineCRLs) {
-            for (vector<XSECCryptoX509CRL*>::const_iterator j=inlineCRLs->begin(); j!=inlineCRLs->end(); ++j) {
+            count=0;
+            if (inlineCRLs) {
+                for (vector<XSECCryptoX509CRL*>::const_iterator j=inlineCRLs->begin(); j!=inlineCRLs->end(); ++j) {
+                    if ((*j)->getProviderName()==DSIGConstants::s_unicodeStrPROVOpenSSL) {
+                        // owned by store
+                        X509_STORE_add_crl(store, X509_CRL_dup(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL()));
+                        ++count;
+                    }
+                }
+            }
+            const vector<XSECCryptoX509CRL*>& crls = pkixInfo->getCRLs();
+            for (vector<XSECCryptoX509CRL*>::const_iterator j=crls.begin(); j!=crls.end(); ++j) {
                 if ((*j)->getProviderName()==DSIGConstants::s_unicodeStrPROVOpenSSL) {
                     // owned by store
                     X509_STORE_add_crl(store, X509_CRL_dup(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL()));
                     ++count;
                 }
             }
-        }
-        const vector<XSECCryptoX509CRL*>& crls = pkixInfo->getCRLs();
-        for (vector<XSECCryptoX509CRL*>::const_iterator j=crls.begin(); j!=crls.end(); ++j) {
-            if ((*j)->getProviderName()==DSIGConstants::s_unicodeStrPROVOpenSSL) {
-                // owned by store
-                X509_STORE_add_crl(store, X509_CRL_dup(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL()));
-                ++count;
-            }
-        }
-        log.debug("supplied (%d) CRL(s)", count);
-        if (count > 0) {
-            X509_STORE_set_flags(store, fullCRLChain ? (X509_V_FLAG_CRL_CHECK|X509_V_FLAG_CRL_CHECK_ALL) : (X509_V_FLAG_CRL_CHECK));
-		}
-		else if (requireCRL) {
-			log.warn("CRL checking is required, but none were supplied");
-            sk_X509_free(CAstack);
-            X509_STORE_free(store);
-            return false;
-		}
+            log.debug("supplied (%d) CRL(s)", count);
+            if (count > 0) {
+                X509_STORE_set_flags(store, fullCRLChain ? (X509_V_FLAG_CRL_CHECK|X509_V_FLAG_CRL_CHECK_ALL) : (X509_V_FLAG_CRL_CHECK));
+		    }
+		    else {
+			    log.warn("CRL checking is enabled, but none were supplied");
+                sk_X509_free(CAstack);
+                X509_STORE_free(store);
+                return false;
+		    }
 #else
-		if (requireCRL) {
-			log.warn("CRL checking is required, but OpenSSL version is too old");
+			log.warn("CRL checking is enabled, but OpenSSL version is too old");
             sk_X509_free(CAstack);
             X509_STORE_free(store);
             return false;
- 		}
-        else if ((inlineCRLs && !inlineCRLs->empty()) || !pkixInfo->getCRLs().empty()) {
-            log.warn("OpenSSL versions < 0.9.7 do not support CRL checking");
-        }
 #endif
+        }
 
         // AFAICT, EE and untrusted are passed in but not owned by the ctx.
 #if (OPENSSL_VERSION_NUMBER >= 0x00907000L)
@@ -193,6 +190,15 @@ AbstractPKIXTrustEngine::AbstractPKIXTrustEngine(const xercesc::DOMElement* e)
 		m_fullCRLChain(XMLHelper::getAttrBool(e, false, fullCRLChain)),
 		m_checkRevocation(XMLHelper::getAttrString(e, nullptr, checkRevocation))
 {
+    if (m_fullCRLChain) {
+        Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine.PKIX").warn(
+            "fullCRLChain option is deprecated, setting checkRevocation to \"fullChain\""
+            );
+        m_checkRevocation = "fullChain";
+    }
+    else if (m_checkRevocation == "fullChain") {
+        m_fullCRLChain = true; // in case anything's using this
+    }
 }
 
 AbstractPKIXTrustEngine::~AbstractPKIXTrustEngine()
@@ -370,8 +376,8 @@ bool AbstractPKIXTrustEngine::validateWithCRLs(
 				certChain,
 				pkix.get(),
 				(m_checkRevocation=="entityOnly" || m_checkRevocation=="fullChain"),
-				(m_fullCRLChain || m_checkRevocation=="fullChain"),
-				inlineCRLs
+				(m_checkRevocation=="fullChain"),
+				(m_checkRevocation=="entityOnly" || m_checkRevocation=="fullChain") ? inlineCRLs : nullptr
 				)) {
             return true;
         }
