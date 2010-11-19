@@ -304,8 +304,8 @@ int i = 0;
 
     AC_MSG_CHECKING([whether XML-Security-C has multiple CRL support])
     AC_COMPILE_IFELSE(
-        [AC_LANG_PROGRAM([[#include <xsec/dsig/DSIGKeyInfoList.hpp>]],
-            [[DSIGKeyInfoList* klist; klist->getX509CRLListSize();]])],
+        [AC_LANG_PROGRAM([[#include <xsec/dsig/DSIGKeyInfoX509.hpp>]],
+            [[DSIGKeyInfoX509* klist; klist->getX509CRLListSize();]])],
         [AC_MSG_RESULT([yes])AC_DEFINE([XMLTOOLING_XMLSEC_MULTIPLECRL],[1],[Define to 1 if XML-Security-C handles multiple CRLs.])],
         [AC_MSG_RESULT([no])])
 
