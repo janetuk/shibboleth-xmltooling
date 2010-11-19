@@ -1,8 +1,8 @@
-VERSION 1.3.3
+VERSION 1.4
 
-Change Log:
+Release Notes
 -----------
-https://bugs.internet2.edu/jira/browse/CPPXT
+https://bugs.internet2.edu/jira/secure/ReleaseNote.jspa?projectId=10009&version=10279
 
 Documentation:
 --------------
