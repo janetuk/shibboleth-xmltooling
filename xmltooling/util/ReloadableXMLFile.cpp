@@ -193,6 +193,11 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log, bool st
                     throw IOException("Unable to access local file ($1)", params(1,m_source.c_str()));
                 m_lock = RWLock::create();
             }
+            FILE* cfile = fopen(m_source.c_str(), "r");
+            if (cfile)
+                fclose(cfile);
+            else
+                throw IOException("Unable to access local file ($1)", params(1,m_source.c_str()));
             log.debug("using local resource (%s), will %smonitor for changes", m_source.c_str(), m_lock ? "" : "not ");
         }
         else {
