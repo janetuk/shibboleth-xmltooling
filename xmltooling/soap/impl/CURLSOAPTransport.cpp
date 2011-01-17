@@ -87,8 +87,9 @@ namespace xmltooling {
 
         virtual ~CURLSOAPTransport() {
             curl_slist_free_all(m_headers);
-            curl_easy_setopt(m_handle,CURLOPT_ERRORBUFFER,nullptr);
-            curl_easy_setopt(m_handle,CURLOPT_PRIVATE,m_authenticated ? "secure" : nullptr); // Save off security "state".
+            curl_easy_setopt(m_handle, CURLOPT_USERAGENT, nullptr);
+            curl_easy_setopt(m_handle, CURLOPT_ERRORBUFFER, nullptr);
+            curl_easy_setopt(m_handle, CURLOPT_PRIVATE, m_authenticated ? "secure" : nullptr); // Save off security "state".
             g_CURLPool->put(m_sender.c_str(), m_peerName.c_str(), m_endpoint.c_str(), m_handle);
         }
 
@@ -204,6 +205,7 @@ namespace xmltooling {
         CURL* m_handle;
         stringstream m_stream;
         struct curl_slist* m_headers;
+		string m_useragent;
         map<string,vector<string> > m_response_headers;
         vector<string> m_saved_options;
 #ifndef XMLTOOLING_NO_XMLSEC
@@ -323,11 +325,6 @@ CURL* CURLPool::get(const SOAPTransport::Address& addr)
     curl_easy_setopt(handle,CURLOPT_HEADERFUNCTION,&curl_header_hook);
     curl_easy_setopt(handle,CURLOPT_WRITEFUNCTION,&curl_write_hook);
     curl_easy_setopt(handle,CURLOPT_DEBUGFUNCTION,&curl_debug_hook);
-    string ua = XMLToolingConfig::getConfig().user_agent;
-    if (!ua.empty()) {
-        ua = ua + " libcurl/" + LIBCURL_VERSION + ' ' + OPENSSL_VERSION_TEXT;
-        curl_easy_setopt(handle, CURLOPT_USERAGENT, ua.c_str());
-    }
     return handle;
 }
 
@@ -536,6 +533,12 @@ void CURLSOAPTransport::send(istream* in)
         string hdr("If-None-Match: ");
         hdr += *m_cacheTag;
         m_headers = curl_slist_append(m_headers, hdr.c_str());
+    }
+
+    m_useragent = XMLToolingConfig::getConfig().user_agent;
+    if (!m_useragent.empty()) {
+        m_useragent = m_useragent + " libcurl/" + LIBCURL_VERSION + ' ' + OPENSSL_VERSION_TEXT;
+        curl_easy_setopt(m_handle, CURLOPT_USERAGENT, m_useragent.c_str());
     }
 
     // Set request headers.

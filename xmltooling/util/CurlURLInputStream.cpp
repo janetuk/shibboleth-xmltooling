@@ -273,12 +273,6 @@ void CurlURLInputStream::init(const DOMElement* e)
     curl_easy_setopt(fEasy, CURLOPT_NOSIGNAL, 1);
     curl_easy_setopt(fEasy, CURLOPT_FAILONERROR, 1);
     curl_easy_setopt(fEasy, CURLOPT_ENCODING, "");
-    string ua = XMLToolingConfig::getConfig().user_agent;
-    if (!ua.empty()) {
-        ua = ua + " libcurl/" + LIBCURL_VERSION + ' ' + OPENSSL_VERSION_TEXT;
-        curl_easy_setopt(fEasy, CURLOPT_USERAGENT, ua.c_str());
-    }
-
 
     // Install SSL callback.
     curl_easy_setopt(fEasy, CURLOPT_SSL_CTX_FUNCTION, ssl_ctx_callback);
@@ -292,12 +286,20 @@ void CurlURLInputStream::init(const DOMElement* e)
         // Outgoing tag.
         if (!fCacheTag->empty()) {
             fHeaders = curl_slist_append(fHeaders, fCacheTag->c_str());
-            curl_easy_setopt(fEasy, CURLOPT_HTTPHEADER, fHeaders);
         }
         // Incoming tag.
         curl_easy_setopt(fEasy, CURLOPT_HEADERFUNCTION, curl_header_hook);
         curl_easy_setopt(fEasy, CURLOPT_HEADERDATA, fCacheTag);
     }
+
+    // Add User-Agent as a header for now. TODO: Add private member to hold the
+    // value for the standard UA option.
+    string ua = string("User-Agent: ") + XMLToolingConfig::getConfig().user_agent +
+        " libcurl/" + LIBCURL_VERSION + ' ' + OPENSSL_VERSION_TEXT;
+    fHeaders = curl_slist_append(fHeaders, ua.c_str());
+
+    // Add User-Agent and cache headers.
+    curl_easy_setopt(fEasy, CURLOPT_HTTPHEADER, fHeaders);
 
     if (e) {
         const XMLCh* flag = e->getAttributeNS(nullptr, verifyHost);
