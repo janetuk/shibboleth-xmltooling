@@ -117,11 +117,14 @@ TrustEngine* ChainingTrustEngine::removeTrustEngine(TrustEngine* oldEngine)
 
 bool ChainingTrustEngine::validate(Signature& sig, const CredentialResolver& credResolver, CredentialCriteria* criteria) const
 {
+    unsigned int usage = criteria ? criteria->getUsage() : 0;
     for (vector<SignatureTrustEngine*>::const_iterator i=m_sigEngines.begin(); i!=m_sigEngines.end(); ++i) {
         if ((*i)->validate(sig,credResolver,criteria))
             return true;
-        if (criteria)
+        if (criteria) {
             criteria->reset();
+            criteria->setUsage(usage);
+        }
     }
     return false;
 }
@@ -136,11 +139,14 @@ bool ChainingTrustEngine::validate(
     CredentialCriteria* criteria
     ) const
 {
+    unsigned int usage = criteria ? criteria->getUsage() : 0;
     for (vector<SignatureTrustEngine*>::const_iterator i=m_sigEngines.begin(); i!=m_sigEngines.end(); ++i) {
         if ((*i)->validate(sigAlgorithm, sig, keyInfo, in, in_len, credResolver, criteria))
             return true;
-        if (criteria)
+        if (criteria) {
             criteria->reset();
+            criteria->setUsage(usage);
+        }
     }
     return false;
 }
@@ -152,11 +158,14 @@ bool ChainingTrustEngine::validate(
     CredentialCriteria* criteria
     ) const
 {
+    unsigned int usage = criteria ? criteria->getUsage() : 0;
     for (vector<X509TrustEngine*>::const_iterator i=m_x509Engines.begin(); i!=m_x509Engines.end(); ++i) {
         if ((*i)->validate(certEE,certChain,credResolver,criteria))
             return true;
-        if (criteria)
+        if (criteria) {
             criteria->reset();
+            criteria->setUsage(usage);
+        }
     }
     return false;
 }
@@ -168,11 +177,14 @@ bool ChainingTrustEngine::validate(
     CredentialCriteria* criteria
     ) const
 {
+    unsigned int usage = criteria ? criteria->getUsage() : 0;
     for (vector<OpenSSLTrustEngine*>::const_iterator i=m_osslEngines.begin(); i!=m_osslEngines.end(); ++i) {
         if ((*i)->validate(certEE,certChain,credResolver,criteria))
             return true;
-        if (criteria)
+        if (criteria) {
             criteria->reset();
+            criteria->setUsage(usage);
+        }
     }
     return false;
 }
