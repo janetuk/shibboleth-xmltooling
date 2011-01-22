@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2010 Internet2
+ *  Copyright 2001-2011 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@
 #include "exceptions.h"
 #include "logging.h"
 #include "security/ChainingTrustEngine.h"
+#include "security/CredentialCriteria.h"
 #include "util/XMLHelper.h"
 
 #include <algorithm>
@@ -119,6 +120,8 @@ bool ChainingTrustEngine::validate(Signature& sig, const CredentialResolver& cre
     for (vector<SignatureTrustEngine*>::const_iterator i=m_sigEngines.begin(); i!=m_sigEngines.end(); ++i) {
         if ((*i)->validate(sig,credResolver,criteria))
             return true;
+        if (criteria)
+            criteria->reset();
     }
     return false;
 }
@@ -136,6 +139,8 @@ bool ChainingTrustEngine::validate(
     for (vector<SignatureTrustEngine*>::const_iterator i=m_sigEngines.begin(); i!=m_sigEngines.end(); ++i) {
         if ((*i)->validate(sigAlgorithm, sig, keyInfo, in, in_len, credResolver, criteria))
             return true;
+        if (criteria)
+            criteria->reset();
     }
     return false;
 }
@@ -150,6 +155,8 @@ bool ChainingTrustEngine::validate(
     for (vector<X509TrustEngine*>::const_iterator i=m_x509Engines.begin(); i!=m_x509Engines.end(); ++i) {
         if ((*i)->validate(certEE,certChain,credResolver,criteria))
             return true;
+        if (criteria)
+            criteria->reset();
     }
     return false;
 }
@@ -164,6 +171,8 @@ bool ChainingTrustEngine::validate(
     for (vector<OpenSSLTrustEngine*>::const_iterator i=m_osslEngines.begin(); i!=m_osslEngines.end(); ++i) {
         if ((*i)->validate(certEE,certChain,credResolver,criteria))
             return true;
+        if (criteria)
+            criteria->reset();
     }
     return false;
 }
