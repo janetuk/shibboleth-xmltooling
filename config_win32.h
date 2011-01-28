@@ -113,7 +113,7 @@
 /* #undef TM_IN_SYS_TIME */
 
 /* Version number of package */
-#define VERSION "1.4"
+#define VERSION "1.4.1"
 
 /* Define if you wish to disable XML-Security-dependent features. */
 /* #undef XMLTOOLING_NO_XMLSEC */
