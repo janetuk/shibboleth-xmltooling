@@ -71,26 +71,92 @@ namespace {
         return s;
     }
 
-    static void XMLTOOL_DLLLOCAL getRemoteCRLs(vector<XSECCryptoX509CRL*>& crls, const char* cdpuri, Category& log) {
+    static time_t XMLTOOL_DLLLOCAL getCRLTime(const ASN1_TIME *a)
+    {
+        struct tm t;
+        memset(&t, 0, sizeof(t));
+        // RFC 5280, sections 5.1.2.4 and 5.1.2.5 require thisUpdate and nextUpdate
+        // to be encoded as UTCTime until 2049, and RFC 5280 section 4.1.2.5.1
+        // further restricts the format to "YYMMDDHHMMSSZ" ("even where the number
+        // of seconds is zero").
+        // As long as OpenSSL doesn't provide any API to convert ASN1_TIME values
+        // time_t, we therefore have to parse it ourselves, unfortunately.
+        if (sscanf((const char*)a->data, "%2d%2d%2d%2d%2d%2dZ",
+            &t.tm_year, &t.tm_mon, &t.tm_mday,
+            &t.tm_hour, &t.tm_min, &t.tm_sec) == 6) {
+            if (t.tm_year <= 50) {
+                // RFC 5280, section 4.1.2.5.1
+                t.tm_year += 100;
+            }
+            t.tm_mon--;
+#if defined(HAVE_TIMEGM)
+            return timegm(&t);
+#else
+            // Windows, and hopefully most others...?
+            return mktime(&t) - timezone;
+#endif
+        }
+        return (time_t)-1;
+    }
+
+    static bool XMLTOOL_DLLLOCAL isFreshCRL(XSECCryptoX509CRL *c, Category* log=nullptr)
+    {
+        // eventually, these should be made configurable
+        #define MIN_SECS_REMAINING 86400
+        #define MIN_PERCENT_REMAINING 10
+        if (c) {
+            const X509_CRL* crl = static_cast<OpenSSLCryptoX509CRL*>(c)->getOpenSSLX509CRL();
+            time_t thisUpdate = getCRLTime(X509_CRL_get_lastUpdate(crl));
+            time_t nextUpdate = getCRLTime(X509_CRL_get_nextUpdate(crl));
+            time_t now = time(nullptr);
+
+            if (thisUpdate < 0 || nextUpdate < 0) {
+                // we failed to parse at least one of the fields (they were not encoded
+                // as required by RFC 5280, actually)
+                time_t exp = now + MIN_SECS_REMAINING;
+                if (log) {
+                    log->warn("isFreshCRL (issuer '%s'): improperly encoded thisUpdate or nextUpdate field - falling back to simple time comparison",
+                              (X509_NAME_to_string(X509_CRL_get_issuer(crl))).c_str());
+                }
+                return (X509_cmp_time(X509_CRL_get_nextUpdate(crl), &exp) > 0) ? true : false;
+            }
+            else {
+                if (log && log->isDebugEnabled()) {
+                    log->debug("isFreshCRL (issuer '%s'): %.0f seconds until nextUpdate (%3.2f%% elapsed since thisUpdate)",
+                              (X509_NAME_to_string(X509_CRL_get_issuer(crl))).c_str(),
+                              difftime(nextUpdate, now), (difftime(now, thisUpdate) * 100) / difftime(nextUpdate, thisUpdate));
+                }
+
+                // consider it recent enough if there are at least MIN_SECS_REMAINING
+                // to the nextUpdate, and at least MIN_PERCENT_REMAINING of its
+                // overall "validity" are remaining to the nextUpdate
+                return (now + MIN_SECS_REMAINING < nextUpdate) &&
+                        ((difftime(nextUpdate, now) * 100) / difftime(nextUpdate, thisUpdate) > MIN_PERCENT_REMAINING);
+            }
+        }
+        return false;
+    }
+
+    static XSECCryptoX509CRL* XMLTOOL_DLLLOCAL getRemoteCRLs(const char* cdpuri, Category& log) {
         // This is a temporary CRL cache implementation to avoid breaking binary compatibility
         // for the library. Caching can't rely on any member objects within the TrustEngine,
         // including locks, so we're using the global library lock for the time being.
         // All other state is kept in the file system.
 
+        // minimum number of seconds between re-attempting a download from one particular CRLDP
+        #define MIN_RETRY_WAIT 60
+
         // The filenames for the CRL cache are based on a hash of the CRL location.
         string cdpfile = SecurityHelper::doHash("SHA1", cdpuri, strlen(cdpuri)) + ".crl";
         XMLToolingConfig::getConfig().getPathResolver()->resolve(cdpfile, PathResolver::XMLTOOLING_RUN_FILE);
-        string cdpstaging = cdpfile + ".bak";
-        string counterfile = cdpfile + ".cnt";
+        string cdpstaging = cdpfile + ".tmp";
+        string tsfile = cdpfile + ".ts";
 
-        // Need to move this to a configurable parameter once we can break binary compatibility.
-        // Ideally this would be based on a percentage of the original CRL window, but OpenSSL
-        // doesn't provide much in the way of ASN1_TIME parsing functions. It does support adding
-        // a fixed time value and comparing against known times.
-        #define MIN_SECS_REMAINING 86400;
-        long counter = 0;
+        time_t now = time(nullptr);
+        vector<XSECCryptoX509CRL*> crls;
+
         try {
-            // While holding the lock, check for a cached copy of the CRL, and check its validity.
+            // While holding the lock, check for a cached copy of the CRL, and remove "expired" ones.
             Locker glock(&XMLToolingConfig::getConfig());
 #ifdef WIN32
             struct _stat stat_buf;
@@ -101,104 +167,86 @@ namespace {
 #endif
                 SecurityHelper::loadCRLsFromFile(crls, cdpfile.c_str());
                 if (crls.empty() || crls.front()->getProviderName() != DSIGConstants::s_unicodeStrPROVOpenSSL ||
-                    X509_cmp_time(X509_CRL_get_nextUpdate(static_cast<OpenSSLCryptoX509CRL*>(crls.front())->getOpenSSLX509CRL()), nullptr) < 0) {
+                    X509_cmp_time(X509_CRL_get_nextUpdate(static_cast<OpenSSLCryptoX509CRL*>(crls.front())->getOpenSSLX509CRL()), &now) < 0) {
                     for_each(crls.begin(), crls.end(), xmltooling::cleanup<XSECCryptoX509CRL>());
                     crls.clear();
                     remove(cdpfile.c_str());    // may as well delete the local copy
-                    remove(counterfile.c_str());
-                    log.info("cached CRL(s) from (%s) have expired", cdpuri);
-                }
-                else {
-                    // Look for a file containing the allowable time remaining on the CRL.
-                    // We store this counter in the file system because of the binary compatibility issue.
-                    try {
-                        ifstream countersrc(counterfile.c_str());
-                        if (countersrc)
-                            countersrc >> counter;
-                    }
-                    catch (exception&) {
-                        counter = 0;
-                    }
-                    if (counter == 0)
-                        counter = MIN_SECS_REMAINING;
-
-                    // See if the time left is under the counter threshold.
-                    time_t exp = time(nullptr) + counter;
-                    if (X509_cmp_time(X509_CRL_get_nextUpdate(static_cast<OpenSSLCryptoX509CRL*>(crls.front())->getOpenSSLX509CRL()), &exp) < 0) {
-                        for_each(crls.begin(), crls.end(), xmltooling::cleanup<XSECCryptoX509CRL>());
-                        crls.clear();
-                        log.info("cached CRL(s) from (%s) will expire within %ld seconds, attempting to update them", cdpuri, counter);
-                    }
+                    remove(tsfile.c_str());
+                    log.info("deleting cached CRL from %s with nextUpdate field in the past", cdpuri);
                 }
             }
         }
         catch (exception& ex) {
-            log.error("exception loading cached copy of CRL at (%s): %s", cdpuri, ex.what());
+            log.error("exception loading cached copy of CRL from %s: %s", cdpuri, ex.what());
         }
 
-        if (crls.empty()) {
+        if (crls.empty() || !isFreshCRL(crls.front(), &log)) {
+            bool updateTimestamp = true;
             try {
                 // If we get here, the cached copy didn't exist yet, or it's time to refresh.
-                SOAPTransport::Address addr("AbstractPKIXTrustEngine", cdpuri, cdpuri);
-                string scheme(addr.m_endpoint, strchr(addr.m_endpoint,':') - addr.m_endpoint);
-                auto_ptr<SOAPTransport> soap(XMLToolingConfig::getConfig().SOAPTransportManager.newPlugin(scheme.c_str(), addr));
-                soap->send();
-                istream& msg = soap->receive();
-                Locker glock(&XMLToolingConfig::getConfig());
-                ofstream out(cdpstaging.c_str(), fstream::trunc|fstream::binary);
-                out << msg.rdbuf();
-                out.close();
-                SecurityHelper::loadCRLsFromFile(crls, cdpstaging.c_str());
-                if (crls.empty() || crls.front()->getProviderName() != DSIGConstants::s_unicodeStrPROVOpenSSL ||
-                    X509_cmp_time(X509_CRL_get_nextUpdate(static_cast<OpenSSLCryptoX509CRL*>(crls.front())->getOpenSSLX509CRL()), nullptr) < 0) {
-                    // The "new" CRLs weren't usable, so get rid of them.
-                    for_each(crls.begin(), crls.end(), xmltooling::cleanup<XSECCryptoX509CRL>());
-                    crls.clear();
-                    remove(cdpstaging.c_str());
-                    log.error("updated CRL(s) from (%s) have already expired", cdpuri);
-
-                    // If counter isn't 0, then we were attempting an update of still-valid CRLs, so reload the old ones
-                    // and cut the counter in half for next time.
-                    if (counter > 0) {
-                        SecurityHelper::loadCRLsFromFile(crls, cdpfile.c_str());
-                        ofstream countersink(counterfile.c_str(), fstream::trunc);
-                        counter /= 2;
-                        countersink << counter;
-                        log.info("failed CRL update attempt, reducing threshold to %ld seconds", counter);
-                    }
+                // To limit the rate of unsuccessful attempts when a CRLDP is unreachable,
+                // we remember the timestamp of the last attempt (both successful/unsuccessful).
+                // We store this in the file system because of the binary compatibility issue.
+                time_t ts = 0;
+                try {
+                    Locker glock(&XMLToolingConfig::getConfig());
+                    ifstream tssrc(tsfile.c_str());
+                    if (tssrc)
+                        tssrc >> ts;
                 }
-                else {
-                    // If counter isn't zero, we reloaded; see if the new CRLs are "more" valid than before.
-                    if (counter > 0) {
-                        time_t exp = time(nullptr) + counter;
-                        if (X509_cmp_time(X509_CRL_get_nextUpdate(static_cast<OpenSSLCryptoX509CRL*>(crls.front())->getOpenSSLX509CRL()), &exp) < 0) {
-                            // Still invalid past the acceptable interval, so they're the same as what we had.
-                            // Remove the extra copy, and cut the counter in half for next time.
-                            remove(cdpstaging.c_str());
-                            ofstream countersink(counterfile.c_str(), fstream::trunc);
-                            counter /= 2;
-                            countersink << counter;
-                            log.info("remote CRL(s) unchanged, reducing threshold to %ld seconds", counter);
-                        }
-                        else {
-                            counter = 0;
-                            log.info("remote CRL(s) updated");
-                        }
-                    }
+                catch (exception&) {
+                    ts = 0;
+                }
 
-                    if (counter == 0) {
-                        // "Commit" the new CRLs.
+                if (difftime(now, ts) > MIN_RETRY_WAIT) {
+                    SOAPTransport::Address addr("AbstractPKIXTrustEngine", cdpuri, cdpuri);
+                    string scheme(addr.m_endpoint, strchr(addr.m_endpoint,':') - addr.m_endpoint);
+                    auto_ptr<SOAPTransport> soap(XMLToolingConfig::getConfig().SOAPTransportManager.newPlugin(scheme.c_str(), addr));
+                    soap->send();
+                    istream& msg = soap->receive();
+                    Locker glock(&XMLToolingConfig::getConfig());
+                    ofstream out(cdpstaging.c_str(), fstream::trunc|fstream::binary);
+                    out << msg.rdbuf();
+                    out.close();
+                    SecurityHelper::loadCRLsFromFile(crls, cdpstaging.c_str());
+                    if (crls.empty() || crls.front()->getProviderName() != DSIGConstants::s_unicodeStrPROVOpenSSL ||
+                        X509_cmp_time(X509_CRL_get_nextUpdate(static_cast<OpenSSLCryptoX509CRL*>(crls.front())->getOpenSSLX509CRL()), &now) < 0) {
+                        // The "new" CRL wasn't usable, so get rid of it.
+                        for_each(crls.begin(), crls.end(), xmltooling::cleanup<XSECCryptoX509CRL>());
+                        crls.clear();
+                        remove(cdpstaging.c_str());
+                        log.error("ignoring CRL retrieved from %s with nextUpdate field in the past", cdpuri);
+                    }
+                    else {
+                        // "Commit" the new CRL. Note that we might add a CRL which doesn't pass
+                        // isFreshCRL, but that's preferrable over adding none at all.
+                        log.info("CRL refreshed from %s", cdpuri);
                         remove(cdpfile.c_str());
-                        remove(counterfile.c_str());
                         if (rename(cdpstaging.c_str(), cdpfile.c_str()) != 0)
                             log.error("unable to rename CRL staging file");
                     }
                 }
+                else {
+                    updateTimestamp = false;    // don't update if we're within the backoff window
+                }
             }
             catch (exception& ex) {
-                log.error("exception downloading/caching CRL at (%s): %s", cdpuri, ex.what());
+                log.error("exception downloading/caching CRL from %s: %s", cdpuri, ex.what());
+            }
+
+            if (updateTimestamp) {
+                // update the timestamp file
+                Locker glock(&XMLToolingConfig::getConfig());
+                ofstream tssink(tsfile.c_str(), fstream::trunc);
+                tssink << now;
+                tssink.close();
             }
         }
+
+        if (crls.empty())
+            return nullptr;
+        for_each(crls.begin() + 1, crls.end(), xmltooling::cleanup<XSECCryptoX509CRL>());
+        return crls.front();
     }
 
     static bool XMLTOOL_DLLLOCAL validate(
@@ -274,15 +322,16 @@ namespace {
             // the CRL in that case. If we end up not adding a CRL for a particular link in the chain, the
             // validation will fail (if the fullChain option was set).
             set<string> crlissuers;
+            time_t now = time(nullptr);
             if (inlineCRLs) {
                 for (vector<XSECCryptoX509CRL*>::const_iterator j=inlineCRLs->begin(); j!=inlineCRLs->end(); ++j) {
                     if ((*j)->getProviderName()==DSIGConstants::s_unicodeStrPROVOpenSSL &&
-                        (X509_cmp_time(X509_CRL_get_nextUpdate(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL()), nullptr)==1)) {
+                        (X509_cmp_time(X509_CRL_get_nextUpdate(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL()), &now) > 0)) {
                         // owned by store
                         X509_STORE_add_crl(store, X509_CRL_dup(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL()));
                         string crlissuer(X509_NAME_to_string(X509_CRL_get_issuer(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL())));
                         if (!crlissuer.empty()) {
-                            log.debug("added CRL issued by (%s)", crlissuer.c_str());
+                            log.debug("added inline CRL issued by (%s)", crlissuer.c_str());
                             crlissuers.insert(crlissuer);
                         }
                     }
@@ -291,7 +340,7 @@ namespace {
             const vector<XSECCryptoX509CRL*>& crls = pkixInfo->getCRLs();
             for (vector<XSECCryptoX509CRL*>::const_iterator j=crls.begin(); j!=crls.end(); ++j) {
                 if ((*j)->getProviderName()==DSIGConstants::s_unicodeStrPROVOpenSSL &&
-                    (X509_cmp_time(X509_CRL_get_nextUpdate(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL()), nullptr)==1)) {
+                    (X509_cmp_time(X509_CRL_get_nextUpdate(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL()), &now) > 0)) {
                     // owned by store
                     X509_STORE_add_crl(store, X509_CRL_dup(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL()));
                     string crlissuer(X509_NAME_to_string(X509_CRL_get_issuer(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL())));
@@ -306,7 +355,7 @@ namespace {
                 X509 *cert = sk_X509_value(untrusted, i);
                 string crlissuer(X509_NAME_to_string(X509_get_issuer_name(cert)));
                 if (crlissuers.count(crlissuer)) {
-                   // We already have a CRL for this cert, so skip it.
+                   // We already have a CRL for this cert, so skip CRLDP processing for this one.
                    continue;
                 }
 
@@ -320,33 +369,27 @@ namespace {
                         GENERAL_NAME* gen = sk_GENERAL_NAME_value(dp->distpoint->name.fullname, iii);
                         // Only consider HTTP URIs, and stop after the first one we find.
 #ifdef HAVE_STRCASECMP
-                        if (gen->type == GEN_URI && (!strncasecmp((const char*)gen->d.ia5->data, "http:", 5) ||
-                                !strncasecmp((const char*)gen->d.ia5->data, "https:", 6))) {
+                        if (gen->type == GEN_URI && (!strncasecmp((const char*)gen->d.ia5->data, "http:", 5))) {
 #else
-                        if (gen->type == GEN_URI && (!strnicmp((const char*)gen->d.ia5->data, "http:", 5) ||
-                                !strnicmp((const char*)gen->d.ia5->data, "https:", 6))) {
+                        if (gen->type == GEN_URI && (!strnicmp((const char*)gen->d.ia5->data, "http:", 5))) {
 #endif
                             const char* cdpuri = (const char*)gen->d.ia5->data;
-                            vector<XSECCryptoX509CRL*> crls;
-                            getRemoteCRLs(crls, cdpuri, log);
-                            for (vector<XSECCryptoX509CRL*>::const_iterator j = crls.begin(); j != crls.end(); ++j) {
-                                if ((*j)->getProviderName()==DSIGConstants::s_unicodeStrPROVOpenSSL &&
-                                    X509_cmp_time(X509_CRL_get_nextUpdate(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL()), nullptr) > 0) {
-                                    // owned by store
-                                    X509_STORE_add_crl(store, X509_CRL_dup(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL()));
-                                    log.debug("added CRL issued by (%s)", crlissuer.c_str());
-                                    crlissuers.insert(crlissuer);
-                                    foundUsableCDP = true;
-                                }
+                            auto_ptr<XSECCryptoX509CRL> crl(getRemoteCRLs(cdpuri, log));
+                            if (crl.get() && crl->getProviderName()==DSIGConstants::s_unicodeStrPROVOpenSSL &&
+                                (isFreshCRL(crl.get()) || (ii == sk_DIST_POINT_num(dps) && iii == sk_GENERAL_NAME_num(dp->distpoint->name.fullname)))) {
+                                // owned by store
+                                X509_STORE_add_crl(store, X509_CRL_dup(static_cast<OpenSSLCryptoX509CRL*>(crl.get())->getOpenSSLX509CRL()));
+                                log.debug("added CRL issued by (%s)", crlissuer.c_str());
+                                crlissuers.insert(crlissuer);
+                                foundUsableCDP = true;
                             }
-                            for_each(crls.begin(), crls.end(), xmltooling::cleanup<XSECCryptoX509CRL>());
                         }
                     }
                 }
                 sk_DIST_POINT_free(dps);
             }
 
-            if (count > 0) {
+            if (!crlissuers.empty()) {
                 X509_STORE_set_flags(store, fullCRLChain ? (X509_V_FLAG_CRL_CHECK|X509_V_FLAG_CRL_CHECK_ALL) : (X509_V_FLAG_CRL_CHECK));
 		    }
 		    else {
