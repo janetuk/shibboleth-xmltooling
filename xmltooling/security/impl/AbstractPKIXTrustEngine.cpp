@@ -376,7 +376,7 @@ namespace {
                             const char* cdpuri = (const char*)gen->d.ia5->data;
                             auto_ptr<XSECCryptoX509CRL> crl(getRemoteCRLs(cdpuri, log));
                             if (crl.get() && crl->getProviderName()==DSIGConstants::s_unicodeStrPROVOpenSSL &&
-                                (isFreshCRL(crl.get()) || (ii == sk_DIST_POINT_num(dps) && iii == sk_GENERAL_NAME_num(dp->distpoint->name.fullname)))) {
+                                (isFreshCRL(crl.get()) || (ii == sk_DIST_POINT_num(dps)-1 && iii == sk_GENERAL_NAME_num(dp->distpoint->name.fullname)-1))) {
                                 // owned by store
                                 X509_STORE_add_crl(store, X509_CRL_dup(static_cast<OpenSSLCryptoX509CRL*>(crl.get())->getOpenSSLX509CRL()));
                                 log.debug("added CRL issued by (%s)", crlissuer.c_str());
@@ -389,25 +389,13 @@ namespace {
                 sk_DIST_POINT_free(dps);
             }
 
-            if (!crlissuers.empty()) {
-                X509_STORE_set_flags(store, fullCRLChain ? (X509_V_FLAG_CRL_CHECK|X509_V_FLAG_CRL_CHECK_ALL) : (X509_V_FLAG_CRL_CHECK));
-		    }
-		    else {
-			    log.warn("CRL checking is enabled, but none were supplied");
-                X509_STORE_CTX_cleanup(&ctx);
-                X509_STORE_free(store);
-                sk_X509_free(CAstack);
-                return false;
-		    }
-#else
-			log.warn("CRL checking is enabled, but OpenSSL version is too old");
-            X509_STORE_CTX_cleanup(&ctx);
-            X509_STORE_free(store);
-            sk_X509_free(CAstack);
-            return false;
-#endif
             // Do a second pass verify with CRLs in place.
+            X509_STORE_CTX_set_flags(&ctx, fullCRLChain ? (X509_V_FLAG_CRL_CHECK|X509_V_FLAG_CRL_CHECK_ALL) : (X509_V_FLAG_CRL_CHECK));
             ret=X509_verify_cert(&ctx);
+#else
+            log.warn("CRL checking is enabled, but OpenSSL version is too old");
+            ret = 0;
+#endif
         }
 
         // Clean up...
