@@ -1,5 +1,3 @@
-VERSION 1.4.1
-
 Release Notes
 -----------
 See https://bugs.internet2.edu/jira/secure/ReleaseNote.jspa?projectId=10009
