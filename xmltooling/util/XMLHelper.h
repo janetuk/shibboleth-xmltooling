@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2010 Internet2
+ *  Copyright 2001-2011 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 #ifndef __xmltooling_xmlhelper_h__
 #define __xmltooling_xmlhelper_h__
 
-#include <xmltooling/base.h>
+#include <xmltooling/unicode.h>
 
 #include <map>
 #include <iostream>
