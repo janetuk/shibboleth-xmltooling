@@ -1,5 +1,7 @@
 #!/usr/bin/make -f
 
+DOCS = debian/libxmltooling-doc/usr/share/doc/libxmltooling-doc
+
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
     DEBUG = --enable-debug
 else
@@ -11,6 +13,9 @@ override_dh_auto_configure:
 
 override_dh_installdocs:
 	dh_installdocs -A doc/NOTICE.txt
+	rm $(DOCS)/html/jquery.js
+	ln -s /usr/share/javascript/jquery/jquery.min.js \
+	    $(DOCS)/html/jquery.js
 
 %:
 	dh $@ --with autotools_dev
