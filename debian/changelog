@@ -23,6 +23,9 @@ xmltooling (1.4.1-1) UNRELEASED; urgency=low
     - Use the autotools-dev debhelper module for config.{sub,guess}.
     - Use debhelper rule minimization.
   * Update debian/copyright to the current DEP-5 specification.
+  * Change to Debian source format 3.0 (quilt).  Force a single Debian
+    patch for simplicity since the packaging is maintained in Git using
+    branches, and include a patch header explaining why.
 
  -- Russ Allbery <rra@debian.org>  Sun, 13 Mar 2011 17:55:12 -0700
 
