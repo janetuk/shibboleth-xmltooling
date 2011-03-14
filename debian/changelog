@@ -1,3 +1,23 @@
+xmltooling (1.4.1-1) UNRELEASED; urgency=low
+
+  * New upstream release.
+    - gzip/deflate encoding support to HTTP transfers
+    - Support for top-level signature verification to reloadable XML files
+    - Support fetching CRLs based on the CRL distribution point extension
+    - Fix adding trust engines manually to chaining engine
+    - Fix root element handling in unmarshalling around a cloned DOM
+    - Fix config loader detection of no access to file
+    - Fix User-Agent string handling for AttributeQuery
+    - Ensure chained TrustEngine is not affected by ordering
+    - Isolate schema files in a versioned directory
+    - Support ETag caching in reloadable config files
+    - Support HTTP caching when accessing remote CRLs
+    - Switch to background thread for reloading files
+    - Option to re-enable TLS renegotiation when running on 0.9.8m+
+    - Improve handling of simple content when comments are present
+
+ -- Russ Allbery <rra@debian.org>  Sun, 13 Mar 2011 17:55:12 -0700
+
 xmltooling (1.3.3-2) unstable; urgency=low
 
   * Force source format 1.0 for now since it makes backporting easier.
