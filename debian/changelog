@@ -23,6 +23,7 @@ xmltooling (1.4.1-1) UNRELEASED; urgency=low
   * Update to debhelper compatibility level V8.
     - Use the autotools-dev debhelper module for config.{sub,guess}.
     - Use debhelper rule minimization.
+  * Clean some additional files not removed by upstream make distclean.
   * Update debian/copyright to the current DEP-5 specification.
   * Change to Debian source format 3.0 (quilt).  Force a single Debian
     patch for simplicity since the packaging is maintained in Git using
