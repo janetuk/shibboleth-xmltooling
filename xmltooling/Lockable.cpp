@@ -1,5 +1,5 @@
 /*
- *  Copyright 2009 Internet2
+ *  Copyright 2009-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,20 +36,20 @@ Lockable::~Lockable()
 Locker::Locker(Lockable* lockee, bool lock)
 {
     if (lockee && lock)
-        m_lockee=lockee->lock();
+        m_lockee = lockee->lock();
     else
-        m_lockee=lockee;
+        m_lockee = lockee;
 }
 
 void Locker::assign(Lockable* lockee, bool lock)
 {
     if (m_lockee)
         m_lockee->unlock();
-    m_lockee=NULL;
+    m_lockee = nullptr;
     if (lockee && lock)
-        m_lockee=lockee->lock();
+        m_lockee = lockee->lock();
     else
-        m_lockee=lockee;
+        m_lockee = lockee;
 }
 
 Locker::~Locker()

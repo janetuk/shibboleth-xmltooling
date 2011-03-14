@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,12 +33,12 @@ using namespace xmltooling;
 using namespace xercesc;
 using namespace std;
 
-AbstractDOMCachingXMLObject::AbstractDOMCachingXMLObject() : m_dom(NULL), m_document(NULL)
+AbstractDOMCachingXMLObject::AbstractDOMCachingXMLObject() : m_dom(nullptr), m_document(nullptr)
 {
 }
 
 AbstractDOMCachingXMLObject::AbstractDOMCachingXMLObject(const AbstractDOMCachingXMLObject& src)
-    : AbstractXMLObject(src), m_dom(NULL), m_document(NULL)
+    : AbstractXMLObject(src), m_dom(nullptr), m_document(nullptr)
 {
 }
 
@@ -55,11 +55,15 @@ DOMElement* AbstractDOMCachingXMLObject::getDOM() const
 
 void AbstractDOMCachingXMLObject::setDOM(DOMElement* dom, bool bindDocument) const
 {
-    m_dom=dom;
-    if (dom) {
-        if (bindDocument) {
-            setDocument(dom->getOwnerDocument());
-        }
+    m_dom = dom;
+    if (dom && bindDocument) {
+        DOMDocument* doc = dom->getOwnerDocument();
+        setDocument(doc);
+        DOMElement* documentRoot = doc->getDocumentElement();
+        if (!documentRoot)
+            doc->appendChild(dom);
+        else if (documentRoot != dom)
+            doc->replaceChild(dom, documentRoot);
     }
 }
 
@@ -79,7 +83,7 @@ void AbstractDOMCachingXMLObject::releaseDOM() const
             string qname=getElementQName().toString();
             m_log.debug("releasing cached DOM representation for (%s)", qname.empty() ? "unknown" : qname.c_str());
         }
-        setDOM(NULL);
+        setDOM(nullptr);
     }
 }
 
@@ -124,11 +128,20 @@ void AbstractDOMCachingXMLObject::releaseChildrenDOM(bool propagateRelease) cons
 DOMElement* AbstractDOMCachingXMLObject::cloneDOM(DOMDocument* doc) const
 {
     if (getDOM()) {
-        if (!doc)
-            doc=DOMImplementationRegistry::getDOMImplementation(NULL)->createDocument();
-        return static_cast<DOMElement*>(doc->importNode(getDOM(),true));
+        DOMDocument* cloneDoc = doc;
+        if (!cloneDoc)
+            cloneDoc=DOMImplementationRegistry::getDOMImplementation(nullptr)->createDocument();
+        try {
+            return static_cast<DOMElement*>(cloneDoc->importNode(getDOM(),true));
+        }
+        catch (XMLException& ex) {
+            if (!doc)
+                cloneDoc->release();
+            auto_ptr_char temp(ex.getMessage());
+            m_log.error("DOM clone failed: %s", temp.get());
+        }
     }
-    return NULL;
+    return nullptr;
 }
 
 XMLObject* AbstractDOMCachingXMLObject::clone() const
@@ -151,7 +164,7 @@ XMLObject* AbstractDOMCachingXMLObject::clone() const
         janitor.release(); // safely transferred
         return ret;
     }
-    return NULL;
+    return nullptr;
 }
 
 void AbstractDOMCachingXMLObject::detach()
@@ -169,7 +182,7 @@ void AbstractDOMCachingXMLObject::detach()
     if (parent && parent->m_document) {
         // Transfer control of document to me...
         setDocument(parent->m_document);
-        parent->m_document = NULL;
+        parent->m_document = nullptr;
     }
     // The rest is done by the base.
     AbstractXMLObject::detach();

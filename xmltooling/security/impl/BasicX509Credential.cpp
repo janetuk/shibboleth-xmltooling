@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,15 +24,18 @@
 #include "security/BasicX509Credential.h"
 #include "security/KeyInfoCredentialContext.h"
 #include "security/OpenSSLCredential.h"
+#include "security/SecurityHelper.h"
 #include "security/XSECCryptoX509CRL.h"
 #include "signature/KeyInfo.h"
 
 #include <algorithm>
 #include <openssl/x509v3.h>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
+#include <xercesc/util/Base64.hpp>
 
 using namespace xmlsignature;
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 
 Credential::Credential()
@@ -45,7 +48,7 @@ Credential::~Credential()
 
 const CredentialContext* Credential::getCredentalContext() const
 {
-    return NULL;
+    return nullptr;
 }
 
 X509Credential::X509Credential()
@@ -72,11 +75,11 @@ CredentialContext::~CredentialContext()
 {
 }
 
-KeyInfoCredentialContext::KeyInfoCredentialContext(const KeyInfo* keyInfo) : m_keyInfo(keyInfo), m_nativeKeyInfo(NULL)
+KeyInfoCredentialContext::KeyInfoCredentialContext(const KeyInfo* keyInfo) : m_keyInfo(keyInfo), m_nativeKeyInfo(nullptr)
 {
 }
 
-KeyInfoCredentialContext::KeyInfoCredentialContext(DSIGKeyInfoList* keyInfo) : m_keyInfo(NULL), m_nativeKeyInfo(keyInfo)
+KeyInfoCredentialContext::KeyInfoCredentialContext(DSIGKeyInfoList* keyInfo) : m_keyInfo(nullptr), m_nativeKeyInfo(keyInfo)
 {
 }
 
@@ -94,19 +97,19 @@ DSIGKeyInfoList* KeyInfoCredentialContext::getNativeKeyInfo() const
     return m_nativeKeyInfo;
 }
 
-BasicX509Credential::BasicX509Credential(bool ownCerts) : m_key(NULL), m_ownCerts(ownCerts), m_keyInfo(NULL), m_compactKeyInfo(NULL)
+BasicX509Credential::BasicX509Credential(bool ownCerts) : m_key(nullptr), m_ownCerts(ownCerts), m_keyInfo(nullptr), m_compactKeyInfo(nullptr)
 {
 }
 
 BasicX509Credential::BasicX509Credential(XSECCryptoKey* key, const vector<XSECCryptoX509*>& certs, XSECCryptoX509CRL* crl)
-    : m_key(key), m_xseccerts(certs), m_ownCerts(true), m_keyInfo(NULL), m_compactKeyInfo(NULL)
+    : m_key(key), m_xseccerts(certs), m_ownCerts(true), m_keyInfo(nullptr), m_compactKeyInfo(nullptr)
 {
     if (crl)
         m_crls.push_back(crl);
 }
 
 BasicX509Credential::BasicX509Credential(XSECCryptoKey* key, const vector<XSECCryptoX509*>& certs, const vector<XSECCryptoX509CRL*>& crls)
-    : m_key(key), m_xseccerts(certs), m_ownCerts(true), m_crls(crls), m_keyInfo(NULL), m_compactKeyInfo(NULL)
+    : m_key(key), m_xseccerts(certs), m_ownCerts(true), m_crls(crls), m_keyInfo(nullptr), m_compactKeyInfo(nullptr)
 {
 }
 
@@ -123,12 +126,13 @@ BasicX509Credential::~BasicX509Credential()
 void BasicX509Credential::initKeyInfo(unsigned int types)
 {
     delete m_keyInfo;
-    m_keyInfo = NULL;
+    m_keyInfo = nullptr;
     delete m_compactKeyInfo;
-    m_compactKeyInfo = NULL;
+    m_compactKeyInfo = nullptr;
 
+    // Default will disable X509IssuerSerial due to schema validation issues.
     if (types == 0)
-        types = KEYINFO_KEY_VALUE | KEYINFO_KEY_NAME | KEYINFO_X509_CERTIFICATE | KEYINFO_X509_SUBJECTNAME | KEYINFO_X509_ISSUERSERIAL;
+        types = KEYINFO_KEY_VALUE | KEYINFO_KEY_NAME | KEYINFO_X509_CERTIFICATE | KEYINFO_X509_SUBJECTNAME | KEYINFO_X509_DIGEST;
 
     if (types & KEYINFO_KEY_NAME) {
         const set<string>& names = getKeyNames();
@@ -185,6 +189,36 @@ void BasicX509Credential::initKeyInfo(unsigned int types)
             m_keyInfo->getX509Datas().front()->getX509Certificates().push_back(x509);
         }
     }
+
+    if (types & KEYINFO_X509_DIGEST && !m_xseccerts.empty()) {
+        if (!m_compactKeyInfo)
+            m_compactKeyInfo = KeyInfoBuilder::buildKeyInfo();
+        if (m_compactKeyInfo->getX509Datas().empty())
+            m_compactKeyInfo->getX509Datas().push_back(X509DataBuilder::buildX509Data());
+        safeBuffer& buf=m_xseccerts.front()->getDEREncodingSB();
+        xsecsize_t x;
+        XMLByte* decoded = Base64::decode(reinterpret_cast<const XMLByte*>(buf.rawCharBuffer()), &x);
+        if (decoded) {
+            string xdig = SecurityHelper::doHash("SHA1", reinterpret_cast<char*>(decoded), x);
+#ifdef XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE
+            XMLString::release(&decoded);
+#else
+            XMLString::release((char**)&decoded);
+#endif
+            XMLByte* encoded = Base64::encode(reinterpret_cast<const XMLByte*>(xdig.c_str()), xdig.length(), &x);
+            if (encoded) {
+                auto_ptr_XMLCh widenit(reinterpret_cast<char*>(encoded));
+#ifdef XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE
+                XMLString::release(&encoded);
+#else
+                XMLString::release((char**)&encoded);
+#endif
+                X509Digest* x509dig = X509DigestBuilder::buildX509Digest();
+                x509dig->setValue(widenit.get());
+                m_compactKeyInfo->getX509Datas().front()->getX509Digests().push_back(x509dig);
+            }
+        }
+    }
 }
 
 unsigned int BasicX509Credential::getUsage() const
@@ -206,6 +240,13 @@ const char* BasicX509Credential::getAlgorithm() const
             case XSECCryptoKey::KEY_DSA_PAIR:
                 return "DSA";
 
+#ifdef XMLTOOLING_XMLSEC_ECC
+            case XSECCryptoKey::KEY_EC_PRIVATE:
+            case XSECCryptoKey::KEY_EC_PUBLIC:
+            case XSECCryptoKey::KEY_EC_PAIR:
+                return "EC";
+#endif
+
             case XSECCryptoKey::KEY_HMAC:
                 return "HMAC";
 
@@ -223,7 +264,7 @@ const char* BasicX509Credential::getAlgorithm() const
             }
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 unsigned int BasicX509Credential::getKeySize() const
@@ -234,7 +275,7 @@ unsigned int BasicX509Credential::getKeySize() const
             case XSECCryptoKey::KEY_RSA_PUBLIC:
             case XSECCryptoKey::KEY_RSA_PAIR: {
                 XSECCryptoKeyRSA* rkey = static_cast<XSECCryptoKeyRSA*>(m_key);
-                return rkey->getLength();
+                return 8 * rkey->getLength();
             }
 
             case XSECCryptoKey::KEY_SYMMETRIC: {
@@ -258,20 +299,28 @@ XSECCryptoKey* BasicX509Credential::getPrivateKey() const
 {
     if (m_key) {
         XSECCryptoKey::KeyType type = m_key->getKeyType();
-        if (type!=XSECCryptoKey::KEY_RSA_PUBLIC && type!=XSECCryptoKey::KEY_DSA_PUBLIC)
+        if (type != XSECCryptoKey::KEY_RSA_PUBLIC && type != XSECCryptoKey::KEY_DSA_PUBLIC
+#ifdef XMLTOOLING_XMLSEC_ECC
+            && type != XSECCryptoKey::KEY_EC_PUBLIC
+#endif
+            )
             return m_key;
     }
-    return NULL;
+    return nullptr;
 }
 
 XSECCryptoKey* BasicX509Credential::getPublicKey() const
 {
     if (m_key) {
         XSECCryptoKey::KeyType type = m_key->getKeyType();
-        if (type!=XSECCryptoKey::KEY_RSA_PRIVATE && type!=XSECCryptoKey::KEY_DSA_PRIVATE)
+        if (type != XSECCryptoKey::KEY_RSA_PRIVATE && type != XSECCryptoKey::KEY_DSA_PRIVATE
+#ifdef XMLTOOLING_XMLSEC_ECC
+            && type != XSECCryptoKey::KEY_EC_PRIVATE
+#endif
+            )
             return m_key;
     }
-    return NULL;
+    return nullptr;
 }
 
 const set<string>& BasicX509Credential::getKeyNames() const
@@ -282,7 +331,7 @@ const set<string>& BasicX509Credential::getKeyNames() const
 KeyInfo* BasicX509Credential::getKeyInfo(bool compact) const
 {
     if (compact || !m_keyInfo)
-        return m_compactKeyInfo ? m_compactKeyInfo->cloneKeyInfo() : NULL;
+        return m_compactKeyInfo ? m_compactKeyInfo->cloneKeyInfo() : nullptr;
     return m_keyInfo->cloneKeyInfo();
 }
 
@@ -293,7 +342,7 @@ const vector<XSECCryptoX509*>& BasicX509Credential::getEntityCertificateChain() 
 
 XSECCryptoX509CRL* BasicX509Credential::getCRL() const
 {
-    return m_crls.empty() ? NULL : m_crls.front();
+    return m_crls.empty() ? nullptr : m_crls.front();
 }
 
 const vector<XSECCryptoX509CRL*>& BasicX509Credential::getCRLs() const
@@ -318,7 +367,7 @@ const char* BasicX509Credential::getSerialNumber() const
 
 void BasicX509Credential::extract()
 {
-    XSECCryptoX509* x509 = m_xseccerts.empty() ? NULL : m_xseccerts.front();
+    XSECCryptoX509* x509 = m_xseccerts.empty() ? nullptr : m_xseccerts.front();
     if (!x509 || x509->getProviderName()!=DSIGConstants::s_unicodeStrPROVOpenSSL)
         return;
     X509* cert = static_cast<OpenSSLCryptoX509*>(x509)->getOpenSSLX509();
@@ -330,7 +379,7 @@ void BasicX509Credential::extract()
         BIO* b = BIO_new(BIO_s_mem());
         X509_NAME_print_ex(b,issuer,0,XN_FLAG_RFC2253);
         BIO_flush(b);
-        BUF_MEM* bptr=NULL;
+        BUF_MEM* bptr=nullptr;
         BIO_get_mem_ptr(b, &bptr);
         m_issuerName.erase();
         m_issuerName.append(bptr->data, bptr->length);
@@ -338,12 +387,12 @@ void BasicX509Credential::extract()
     }
 
     ASN1_INTEGER* serialASN = X509_get_serialNumber(cert);
-    BIGNUM* serialBN = ASN1_INTEGER_to_BN(serialASN, NULL);
+    BIGNUM* serialBN = ASN1_INTEGER_to_BN(serialASN, nullptr);
     if (serialBN) {
         char* serial = BN_bn2dec(serialBN);
         if (serial) {
             m_serial = serial;
-            free(serial);
+            OPENSSL_free(serial);
         }
         BN_free(serialBN);
     }
@@ -353,7 +402,7 @@ void BasicX509Credential::extract()
         BIO* b = BIO_new(BIO_s_mem());
         X509_NAME_print_ex(b,subject,0,XN_FLAG_RFC2253);
         BIO_flush(b);
-        BUF_MEM* bptr=NULL;
+        BUF_MEM* bptr=nullptr;
         BIO_get_mem_ptr(b, &bptr);
         m_subjectName.erase();
         m_subjectName.append(bptr->data, bptr->length);
@@ -361,7 +410,7 @@ void BasicX509Credential::extract()
         BIO_free(b);
         
         // Fetch the last CN RDN.
-        char* peer_CN = NULL;
+        char* peer_CN = nullptr;
         int j,i = -1;
         while ((j=X509_NAME_get_index_by_NID(subject, NID_commonName, i)) >= 0)
             i = j;
@@ -389,7 +438,7 @@ void BasicX509Credential::extract()
                 OPENSSL_free(peer_CN);
         }
 
-        STACK_OF(GENERAL_NAME)* altnames=(STACK_OF(GENERAL_NAME)*)X509_get_ext_d2i(cert, NID_subject_alt_name, NULL, NULL);
+        STACK_OF(GENERAL_NAME)* altnames=(STACK_OF(GENERAL_NAME)*)X509_get_ext_d2i(cert, NID_subject_alt_name, nullptr, nullptr);
         if (altnames) {
             int numalts = sk_GENERAL_NAME_num(altnames);
             for (int an=0; an<numalts; an++) {

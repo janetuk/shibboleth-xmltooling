@@ -35,6 +35,7 @@ xmltoolingtest_h = \
     ExceptionTest.h \
     KeyInfoTest.h \
     MarshallingTest.h \
+    NonVisibleNamespaceTest.h \
     UnmarshallingTest.h \
     TemplateEngineTest.h \
     xmltoolingtest.h \
@@ -57,4 +58,4 @@ do-cxxtestgen:
 $(nodist_xmltoolingtest_SOURCES): %.cpp: %.h
 	$(MAKE) do-cxxtestgen HFILE=$< CPPFILE=$@
 
-EXTRA_DIST = xmltoolingtest.vcproj $(xmltoolingtest_h) data
+EXTRA_DIST = xmltoolingtest.vcxproj xmltoolingtest.vcxproj.filters $(xmltoolingtest_h) data

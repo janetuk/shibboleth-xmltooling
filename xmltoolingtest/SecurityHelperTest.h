@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ public:
         pathname = data_path + "key.der";
         auto_ptr<XSECCryptoKey> key2(SecurityHelper::loadKeyFromFile(pathname.c_str()));
         pathname = data_path + "test.pfx";
-        auto_ptr<XSECCryptoKey> key3(SecurityHelper::loadKeyFromFile(pathname.c_str(), NULL, "password"));
+        auto_ptr<XSECCryptoKey> key3(SecurityHelper::loadKeyFromFile(pathname.c_str(), nullptr, "password"));
 
         TSM_ASSERT("PEM/DER keys did not match", SecurityHelper::matches(*key1.get(), *key2.get()));
         TSM_ASSERT("DER/PKCS12 keys did not match", SecurityHelper::matches(*key2.get(), *key3.get()));
@@ -63,7 +63,7 @@ public:
         auto_ptr<XSECCryptoKey> key2(SecurityHelper::loadKeyFromURL(*t2.get(), pathname.c_str()));
         pathname = data_path + "test.pfx.bak";
         auto_ptr<SOAPTransport> t3(getTransport("https://spaces.internet2.edu/download/attachments/5305/test.pfx"));
-        auto_ptr<XSECCryptoKey> key3(SecurityHelper::loadKeyFromURL(*t3.get(), pathname.c_str(), NULL, "password"));
+        auto_ptr<XSECCryptoKey> key3(SecurityHelper::loadKeyFromURL(*t3.get(), pathname.c_str(), nullptr, "password"));
 
         TSM_ASSERT("PEM/DER keys did not match", SecurityHelper::matches(*key1.get(), *key2.get()));
         TSM_ASSERT("DER/PKCS12 keys did not match", SecurityHelper::matches(*key2.get(), *key3.get()));
@@ -75,7 +75,7 @@ public:
         pathname = data_path + "cert.der";
         SecurityHelper::loadCertificatesFromFile(certs, pathname.c_str());
         pathname = data_path + "test.pfx";
-        SecurityHelper::loadCertificatesFromFile(certs, pathname.c_str(), NULL, "password");
+        SecurityHelper::loadCertificatesFromFile(certs, pathname.c_str(), nullptr, "password");
 
         TSM_ASSERT_EQUALS("Wrong certificate count", certs.size(), 3);
 
@@ -114,7 +114,7 @@ public:
         SecurityHelper::loadCertificatesFromURL(certs, *t2.get(), pathname.c_str());
         pathname = data_path + "test.pfx.bak";
         auto_ptr<SOAPTransport> t3(getTransport("https://spaces.internet2.edu/download/attachments/5305/test.pfx"));
-        SecurityHelper::loadCertificatesFromURL(certs, *t3.get(), pathname.c_str(), NULL, "password");
+        SecurityHelper::loadCertificatesFromURL(certs, *t3.get(), pathname.c_str(), nullptr, "password");
 
         TSM_ASSERT_EQUALS("Wrong certificate count", certs.size(), 3);
 

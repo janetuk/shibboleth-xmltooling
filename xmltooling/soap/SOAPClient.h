@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@ namespace soap11 {
         
         /**
          * Returns the response message, if any. As long as a response is
-         * "expected" but not available, NULL will be returned. If no response
+         * "expected" but not available, nullptr will be returned. If no response
          * will be forthcoming, an exception is raised.
          * 
          * <p>The caller is responsible for freeing the returned envelope.

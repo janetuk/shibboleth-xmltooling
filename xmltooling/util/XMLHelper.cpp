@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,13 +38,7 @@ static const XMLCh type[]={chLatin_t, chLatin_y, chLatin_p, chLatin_e, chNull };
     
 bool XMLHelper::hasXSIType(const DOMElement* e)
 {
-    if (e) {
-        if (e->hasAttributeNS(xmlconstants::XSI_NS, type)) {
-            return true;
-        }
-    }
-
-    return false;
+    return (e && e->hasAttributeNS(xmlconstants::XSI_NS, type));
 }
 
 xmltooling::QName* XMLHelper::getXSIType(const DOMElement* e)
@@ -63,18 +57,18 @@ xmltooling::QName* XMLHelper::getXSIType(const DOMElement* e)
                 return ret;
             }
             else {
-                return new xmltooling::QName(e->lookupNamespaceURI(NULL), attributeValue);
+                return new xmltooling::QName(e->lookupNamespaceURI(nullptr), attributeValue);
             }
         }
     }
 
-    return NULL;
+    return nullptr;
 }
 
 DOMAttr* XMLHelper::getIdAttribute(const DOMElement* domElement)
 {
     if(!domElement->hasAttributes()) {
-        return NULL;
+        return nullptr;
     }
     
     DOMNamedNodeMap* attributes = domElement->getAttributes();
@@ -86,7 +80,7 @@ DOMAttr* XMLHelper::getIdAttribute(const DOMElement* domElement)
         }
     }
     
-    return NULL;
+    return nullptr;
 }
 
 const XMLObject* XMLHelper::getXMLObjectById(const XMLObject& tree, const XMLCh* id)
@@ -104,7 +98,7 @@ const XMLObject* XMLHelper::getXMLObjectById(const XMLObject& tree, const XMLCh*
         }
     }
     
-    return NULL;
+    return nullptr;
 }
 
 XMLObject* XMLHelper::getXMLObjectById(XMLObject& tree, const XMLCh* id)
@@ -122,14 +116,54 @@ XMLObject* XMLHelper::getXMLObjectById(XMLObject& tree, const XMLCh* id)
         }
     }
     
-    return NULL;
+    return nullptr;
+}
+
+void XMLHelper::getNonVisiblyUsedPrefixes(const XMLObject& tree, map<xstring,xstring>& prefixes)
+{
+    map<xstring,xstring> child_prefixes;
+    const list<XMLObject*>& children = tree.getOrderedChildren();
+    for (list<XMLObject*>::const_iterator i = children.begin(); i != children.end(); ++i) {
+        if (*i)
+            getNonVisiblyUsedPrefixes(*(*i), child_prefixes);
+    }
+    const set<Namespace>& nsset = tree.getNamespaces();
+    for (set<Namespace>::const_iterator ns = nsset.begin(); ns != nsset.end(); ++ns) {
+        // Check for xmlns:xml.
+        if (XMLString::equals(ns->getNamespacePrefix(), xmlconstants::XML_PREFIX) && XMLString::equals(ns->getNamespaceURI(), xmlconstants::XML_NS))
+            continue;
+        switch (ns->usage()) {
+            case Namespace::Indeterminate:
+                break;
+            case Namespace::VisiblyUsed:
+            {
+                // See if the prefix was noted as non-visible below.
+                const XMLCh* p = ns->getNamespacePrefix() ? ns->getNamespacePrefix() : &chNull;
+                map<xstring,xstring>::iterator decl = child_prefixes.find(p);
+                if (decl != child_prefixes.end()) {
+                    // It's declared below, see if it's the same namespace. If so, pull it from the set,
+                    // otherwise leave it in the set.
+                    if (decl->second == (ns->getNamespaceURI() ? ns->getNamespaceURI() : &chNull))
+                        child_prefixes.erase(decl);
+                }
+                break;
+            }
+            case Namespace::NonVisiblyUsed:
+                // It may already be in the map from another branch of the tree, but as long
+                // as it's set to something so the parent knows about it, we're good.
+                prefixes[ns->getNamespacePrefix() ? ns->getNamespacePrefix() : &chNull] = (ns->getNamespaceURI() ? ns->getNamespaceURI() : &chNull);
+                break;
+        }
+    }
+
+    prefixes.insert(child_prefixes.begin(), child_prefixes.end());
 }
 
 xmltooling::QName* XMLHelper::getNodeQName(const DOMNode* domNode)
 {
     if (domNode)
         return new xmltooling::QName(domNode->getNamespaceURI(), domNode->getLocalName(), domNode->getPrefix());
-    return NULL; 
+    return nullptr; 
 }
 
 xmltooling::QName* XMLHelper::getAttributeValueAsQName(const DOMAttr* attribute)
@@ -140,7 +174,7 @@ xmltooling::QName* XMLHelper::getAttributeValueAsQName(const DOMAttr* attribute)
 xmltooling::QName* XMLHelper::getNodeValueAsQName(const DOMNode* domNode)
 {
     if (!domNode)
-        return NULL;
+        return nullptr;
     
     int i;
     const XMLCh* value=domNode->getTextContent();
@@ -153,7 +187,21 @@ xmltooling::QName* XMLHelper::getNodeValueAsQName(const DOMNode* domNode)
         return ret;
     }
     
-    return new xmltooling::QName(domNode->lookupNamespaceURI(NULL), value);
+    return new xmltooling::QName(domNode->lookupNamespaceURI(nullptr), value);
+}
+
+bool XMLHelper::getNodeValueAsBool(const xercesc::DOMNode* domNode, bool def)
+{
+    if (!domNode)
+        return def;
+    const XMLCh* value = domNode->getNodeValue();
+    if (!value || !*value)
+        return def;
+    if (*value == chLatin_t || *value == chDigit_1)
+        return true;
+    else if (*value == chLatin_f || *value == chDigit_0)
+        return false;
+    return def;
 }
 
 DOMElement* XMLHelper::appendChildElement(DOMElement* parentElement, DOMElement* childElement)
@@ -174,18 +222,18 @@ bool XMLHelper::isNodeNamed(const xercesc::DOMNode* n, const XMLCh* ns, const XM
 
 const XMLCh* XMLHelper::getTextContent(const DOMElement* e)
 {
-    DOMNode* child=e->getFirstChild();
+    DOMNode* child = e ? e->getFirstChild() : nullptr;
     while (child) {
-        if (child->getNodeType()==DOMNode::TEXT_NODE)
+        if (child->getNodeType() == DOMNode::TEXT_NODE)
             return child->getNodeValue();
-        child=child->getNextSibling();
+        child = child->getNextSibling();
     }
-    return NULL;
+    return nullptr;
 }
 
 DOMElement* XMLHelper::getFirstChildElement(const DOMNode* n, const XMLCh* localName)
 {
-    DOMNode* child = n->getFirstChild();
+    DOMNode* child = n ? n->getFirstChild() : nullptr;
     while (child && child->getNodeType() != DOMNode::ELEMENT_NODE)
         child = child->getNextSibling();
     if (child && localName) {
@@ -197,7 +245,7 @@ DOMElement* XMLHelper::getFirstChildElement(const DOMNode* n, const XMLCh* local
 
 DOMElement* XMLHelper::getLastChildElement(const DOMNode* n, const XMLCh* localName)
 {
-    DOMNode* child = n->getLastChild();
+    DOMNode* child = n ? n->getLastChild() : nullptr;
     while (child && child->getNodeType() != DOMNode::ELEMENT_NODE)
         child = child->getPreviousSibling();
     if (child && localName) {
@@ -225,7 +273,7 @@ DOMElement* XMLHelper::getLastChildElement(const DOMNode* n, const XMLCh* ns, co
 
 DOMElement* XMLHelper::getNextSiblingElement(const DOMNode* n, const XMLCh* localName)
 {
-    DOMNode* sib = n->getNextSibling();
+    DOMNode* sib = n ? n->getNextSibling() : nullptr;
     while (sib && sib->getNodeType() != DOMNode::ELEMENT_NODE)
         sib = sib->getNextSibling();
     if (sib && localName) {
@@ -237,7 +285,7 @@ DOMElement* XMLHelper::getNextSiblingElement(const DOMNode* n, const XMLCh* loca
 
 DOMElement* XMLHelper::getPreviousSiblingElement(const DOMNode* n, const XMLCh* localName)
 {
-    DOMNode* sib = n->getPreviousSibling();
+    DOMNode* sib = n ? n->getPreviousSibling() : nullptr;
     while (sib && sib->getNodeType() != DOMNode::ELEMENT_NODE)
         sib = sib->getPreviousSibling();
     if (sib && localName) {
@@ -261,6 +309,43 @@ DOMElement* XMLHelper::getPreviousSiblingElement(const DOMNode* n, const XMLCh* 
     while (e && !XMLString::equals(e->getNamespaceURI(),ns))
         e = getPreviousSiblingElement(e, localName);
     return e;
+}
+
+string XMLHelper::getAttrString(const DOMElement* e, const char* defValue, const XMLCh* localName, const XMLCh* ns)
+{
+    if (e) {
+        auto_ptr_char val(e->getAttributeNS(ns, localName));
+        if (val.get() && *val.get())
+            return val.get();
+    }
+    return defValue ? defValue : "";
+}
+
+int XMLHelper::getAttrInt(const DOMElement* e, int defValue, const XMLCh* localName, const XMLCh* ns)
+{
+    if (e) {
+        const XMLCh* val = e->getAttributeNS(ns, localName);
+        if (val && *val) {
+            int i = XMLString::parseInt(val);
+            if (i)
+                return i;
+        }
+    }
+    return defValue;
+}
+
+bool XMLHelper::getAttrBool(const DOMElement* e, bool defValue, const XMLCh* localName, const XMLCh* ns)
+{
+    if (e) {
+        const XMLCh* val = e->getAttributeNS(ns, localName);
+        if (val) {
+            if (*val == chLatin_t || *val == chDigit_1)
+                return true;
+            if (*val == chLatin_f || *val == chDigit_0)
+                return false;
+        }
+    }
+    return defValue;
 }
 
 void XMLHelper::serialize(const DOMNode* n, std::string& buf, bool pretty)

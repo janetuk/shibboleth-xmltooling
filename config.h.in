@@ -26,14 +26,14 @@
 /* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL
 
-/* Define to 1 if Xerces-C library was found */
-#undef HAVE_LIBXERCESC
-
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
 /* define if the compiler implements namespaces */
 #undef HAVE_NAMESPACES
+
+/* Define to 1 if C++ compiler supports nullptr keyword. */
+#undef HAVE_NULLPTR
 
 /* Define if you have POSIX threads libraries and header files. */
 #undef HAVE_PTHREAD
@@ -80,6 +80,10 @@
 /* Define to 1 if you have the 'xsecsize_t' type. */
 #undef HAVE_XSECSIZE_T
 
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#undef LT_OBJDIR
+
 /* Name of package */
 #undef PACKAGE
 
@@ -95,6 +99,9 @@
 /* Define to the one symbol short name of this package. */
 #undef PACKAGE_TARNAME
 
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
@@ -102,7 +109,7 @@
    your system. */
 #undef PTHREAD_CREATE_JOINABLE
 
-/* The size of a `long', as computed by sizeof. */
+/* The size of `long', as computed by sizeof. */
 #undef SIZEOF_LONG
 
 /* Define to 1 if you have the ANSI C header files. */
@@ -120,6 +127,12 @@
 /* Define to 1 if you wish to disable XML-Security-dependent features. */
 #undef XMLTOOLING_NO_XMLSEC
 
+/* Define to 1 if OpenSSL has EC support. */
+#undef XMLTOOLING_OPENSSL_HAVE_EC
+
+/* Define to 1 if OpenSSL supports the SHA-2 hash family. */
+#undef XMLTOOLING_OPENSSL_HAVE_SHA2
+
 /* Define to 1 if Xerces has a 64-bit-safe API. */
 #undef XMLTOOLING_XERCESC_64BITSAFE
 
@@ -129,11 +142,29 @@
 /* Define to 1 if Xerces supports a compliant DOMLS API. */
 #undef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
 
+/* Define to 1 if Xerces XMLString includes XMLByte release. */
+#undef XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE
+
 /* Define to 1 if Xerces InputStream class requires getContentType. */
 #undef XMLTOOLING_XERCESC_INPUTSTREAM_HAS_CONTENTTYPE
+
+/* Define to 1 if XML-Security-C includes C14N 1.1 support. */
+#undef XMLTOOLING_XMLSEC_C14N11
+
+/* Define to 1 if XML-Security-C includes debug logging support. */
+#undef XMLTOOLING_XMLSEC_DEBUGLOGGING
+
+/* Define to 1 if XML-Security-C includes ECC support. */
+#undef XMLTOOLING_XMLSEC_ECC
+
+/* Define to 1 if XML-Security-C handles multiple CRLs. */
+#undef XMLTOOLING_XMLSEC_MULTIPLECRL
+
+/* Define to 1 if XML-Security-C exposes the signature algorithm URI. */
+#undef XMLTOOLING_XMLSEC_SIGALGORITHM
 
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const
 
-/* Define to `unsigned' if <sys/types.h> does not define. */
+/* Define to `unsigned int' if <sys/types.h> does not define. */
 #undef size_t

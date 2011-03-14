@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL ThreadImpl : public Thread {
         pthread_t thread_id;
     public:
-        ThreadImpl(void* (*start_routine)(void*), void* arg);
+        ThreadImpl(void* (*start_routine)(void*), void* arg, size_t stacksize);
         virtual ~ThreadImpl() {}
     
         int detach() {
@@ -102,7 +102,7 @@ namespace xmltooling {
         int timedwait(MutexImpl* mutex, int delay_seconds) {
             struct timespec ts;
             memset(&ts, 0, sizeof(ts));
-            ts.tv_sec = time(NULL) + delay_seconds;
+            ts.tv_sec = time(nullptr) + delay_seconds;
             return pthread_cond_timedwait(&cond, &(mutex->mutex), &ts);
         }
         
@@ -176,9 +176,27 @@ namespace xmltooling {
 
 };
 
-ThreadImpl::ThreadImpl(void* (*start_routine)(void*), void* arg)
+ThreadImpl::ThreadImpl(void* (*start_routine)(void*), void* arg, size_t stacksize)
 {
-    int rc=pthread_create(&thread_id, NULL, start_routine, arg);
+    int rc;
+
+    if (stacksize > 0) {
+        pthread_attr_t attrs;
+        rc = pthread_attr_init(&attrs);
+        if (rc) {
+            Category::getInstance(XMLTOOLING_LOGCAT".Threads").error("pthread_attr_init error (%d)", rc);
+            throw ThreadingException("Thread creation failed.");
+        }
+        rc = pthread_attr_setstacksize(&attrs, stacksize);
+        if (rc) {
+            Category::getInstance(XMLTOOLING_LOGCAT".Threads").error("pthread_attr_setstacksize error (%d)", rc);
+            throw ThreadingException("Thread creation failed.");
+        }
+        rc = pthread_create(&thread_id, &attrs, start_routine, arg);
+    }
+    else {
+        rc = pthread_create(&thread_id, nullptr, start_routine, arg);
+    }
     if (rc) {
 #ifdef HAVE_STRERROR_R
         char buf[256];
@@ -194,7 +212,7 @@ ThreadImpl::ThreadImpl(void* (*start_routine)(void*), void* arg)
 
 MutexImpl::MutexImpl()
 {
-    int rc=pthread_mutex_init(&mutex, NULL);
+    int rc=pthread_mutex_init(&mutex, nullptr);
     if (rc) {
 #ifdef HAVE_STRERROR_R
         char buf[256];
@@ -210,7 +228,7 @@ MutexImpl::MutexImpl()
 
 CondWaitImpl::CondWaitImpl()
 {
-    int rc=pthread_cond_init(&cond, NULL);
+    int rc=pthread_cond_init(&cond, nullptr);
     if (rc) {
 #ifdef HAVE_STRERROR_R
         char buf[256];
@@ -227,9 +245,9 @@ CondWaitImpl::CondWaitImpl()
 RWLockImpl::RWLockImpl()
 {
 #ifdef HAVE_PTHREAD_RWLOCK_INIT
-    int rc=pthread_rwlock_init(&lock, NULL);
+    int rc=pthread_rwlock_init(&lock, nullptr);
 #else
-    int rc=rwlock_init(&lock, USYNC_THREAD, NULL);
+    int rc=rwlock_init(&lock, USYNC_THREAD, nullptr);
 #endif
     if (rc) {
 #ifdef HAVE_STRERROR_R
@@ -260,9 +278,9 @@ ThreadKeyImpl::ThreadKeyImpl(void (*destroy_fcn)(void*))
     }
 }
 
-Thread* Thread::create(void* (*start_routine)(void*), void* arg)
+Thread* Thread::create(void* (*start_routine)(void*), void* arg, size_t stacksize)
 {
-    return new ThreadImpl(start_routine, arg);
+    return new ThreadImpl(start_routine, arg, stacksize);
 }
 
 void Thread::exit(void* return_val)
@@ -279,7 +297,7 @@ void Thread::mask_all_signals(void)
 {
     sigset_t sigmask;
     sigfillset(&sigmask);
-    Thread::mask_signals(SIG_BLOCK, &sigmask, NULL);
+    Thread::mask_signals(SIG_BLOCK, &sigmask, nullptr);
 }
 
 int Thread::mask_signals(int how, const sigset_t *newmask, sigset_t *oldmask)

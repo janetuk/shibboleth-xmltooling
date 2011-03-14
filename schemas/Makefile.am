@@ -1,15 +1,14 @@
-## $Id:$ 
-
 AUTOMAKE_OPTIONS = foreign
 
 schemafiles = \
 	soap-envelope.xsd \
 	xenc-schema.xsd \
-        xmldsig-core-schema.xsd \
-        xml.xsd \
-        xmltooling.xsd
+	xmldsig-core-schema.xsd \
+	xmldsig11-schema.xsd \
+	xml.xsd \
+	xmltooling.xsd
 
-pkgxmldir = $(datadir)/xml/@PACKAGE@
+pkgxmldir = $(datadir)/xml/@PACKAGE_NAME@
 
 pkgxml_DATA = \
 	catalog.xml \

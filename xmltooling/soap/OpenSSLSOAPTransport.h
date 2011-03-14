@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ namespace xmltooling {
          * @param userptr   a caller-supplied value to pass to the callback function
          * @return true iff the callback was set
          */
-        virtual bool setSSLCallback(ssl_ctx_callback_fn fn, void* userptr=NULL)=0;
+        virtual bool setSSLCallback(ssl_ctx_callback_fn fn, void* userptr=nullptr)=0;
         
         /**
          * Sets indicator that the transport peer has been authenticated.

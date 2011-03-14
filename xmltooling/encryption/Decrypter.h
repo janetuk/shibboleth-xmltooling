@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,9 +53,9 @@ namespace xmlencryption {
          * @param EKResolver    locates an EncryptedKey pertaining to the EncryptedData
          */
         Decrypter(
-            const xmltooling::CredentialResolver* credResolver=NULL,
-            xmltooling::CredentialCriteria* criteria=NULL,
-            const EncryptedKeyResolver* EKResolver=NULL
+            const xmltooling::CredentialResolver* credResolver=nullptr,
+            xmltooling::CredentialCriteria* criteria=nullptr,
+            const EncryptedKeyResolver* EKResolver=nullptr
             );
 
         virtual ~Decrypter();
@@ -70,7 +70,7 @@ namespace xmlencryption {
         /**
          * Replace the current CredentialResolver interface, if any, with a new one.
          * 
-         * @param resolver  the locked CredentialResolver to attach, or NULL to clear
+         * @param resolver  the locked CredentialResolver to attach, or nullptr to clear
          * @param criteria  optional external criteria to use with resolver
          */
         void setKEKResolver(const xmltooling::CredentialResolver* resolver, xmltooling::CredentialCriteria* criteria);
@@ -107,7 +107,7 @@ namespace xmlencryption {
          * @param recipient identifier of decrypting entity for use in identifying multi-cast keys
          * @return  the decrypted DOM fragment
          */
-        xercesc::DOMDocumentFragment* decryptData(const EncryptedData& encryptedData, const XMLCh* recipient=NULL);
+        xercesc::DOMDocumentFragment* decryptData(const EncryptedData& encryptedData, const XMLCh* recipient=nullptr);
         
         /**
          * Decrypts the supplied information to an output stream.
@@ -125,7 +125,7 @@ namespace xmlencryption {
          * @param encryptedData the data to decrypt
          * @param recipient     identifier of decrypting entity for use in identifying multi-cast keys
          */
-        void decryptData(std::ostream& out, const EncryptedData& encryptedData, const XMLCh* recipient=NULL);
+        void decryptData(std::ostream& out, const EncryptedData& encryptedData, const XMLCh* recipient=nullptr);
 
         /**
          * Decrypts the supplied information and returns the resulting key.

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -177,13 +177,13 @@ const char* XMLToolingException::getProperty(unsigned int index) const
 {
     char buf[20];
     map<string,string>::const_iterator i=m_params.find(unsigned_integer_to_string(buf,sizeof(buf),index));
-    return (i==m_params.end()) ? NULL : i->second.c_str();
+    return (i==m_params.end()) ? nullptr : i->second.c_str();
 }
 
 const char* XMLToolingException::getProperty(const char* name) const
 {
     map<string,string>::const_iterator i=m_params.find(name);
-    return (i==m_params.end()) ? NULL : i->second.c_str();
+    return (i==m_params.end()) ? nullptr : i->second.c_str();
 }
 
 const char* XMLToolingException::getMessage() const
@@ -287,7 +287,7 @@ XMLToolingException* XMLToolingException::fromStream(std::istream& in)
         throw XMLToolingException("Invalid root element on serialized exception.");
     }
     
-    auto_ptr_char classname(root->getAttributeNS(NULL,type));
+    auto_ptr_char classname(root->getAttributeNS(nullptr,type));
     auto_ptr<XMLToolingException> excep(XMLToolingException::getInstance(classname.get()));
     
     DOMElement* child=XMLHelper::getFirstChildElement(root,XMLTOOLING_NS,message);
@@ -299,7 +299,7 @@ XMLToolingException* XMLToolingException::fromStream(std::istream& in)
     const URLEncoder* encoder = XMLToolingConfig::getConfig().getURLEncoder();
     child=XMLHelper::getFirstChildElement(root,XMLTOOLING_NS,param);
     while (child && child->hasChildNodes()) {
-        auto_ptr_char n(child->getAttributeNS(NULL,name));
+        auto_ptr_char n(child->getAttributeNS(nullptr,name));
         char* encoded = XMLString::transcode(child->getFirstChild()->getNodeValue());
         if (n.get() && encoded) {
             encoder->decode(encoded);

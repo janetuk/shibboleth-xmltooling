@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2009 Internet2
+*  Copyright 2001-2010 Internet2
  *
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,20 +54,20 @@ void XMLObject::releaseThisAndChildrenDOM() const
 
 AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
     : m_log(logging::Category::getInstance(XMLTOOLING_LOGCAT".XMLObject")),
-    	m_schemaLocation(NULL), m_noNamespaceSchemaLocation(NULL), m_nil(xmlconstants::XML_BOOL_NULL),
-        m_parent(NULL), m_elementQname(nsURI, localName, prefix), m_typeQname(NULL)
+    	m_schemaLocation(nullptr), m_noNamespaceSchemaLocation(nullptr), m_nil(xmlconstants::XML_BOOL_NULL),
+        m_parent(nullptr), m_elementQname(nsURI, localName, prefix), m_typeQname(nullptr)
 {
-    addNamespace(Namespace(nsURI, prefix));
+    addNamespace(Namespace(nsURI, prefix, false, Namespace::VisiblyUsed));
     if (schemaType) {
         m_typeQname = new QName(*schemaType);
-        addNamespace(Namespace(m_typeQname->getNamespaceURI(), m_typeQname->getPrefix()));
+        addNamespace(Namespace(m_typeQname->getNamespaceURI(), m_typeQname->getPrefix(), false, Namespace::NonVisiblyUsed));
     }
 }
 
 AbstractXMLObject::AbstractXMLObject(const AbstractXMLObject& src)
     : m_namespaces(src.m_namespaces), m_log(src.m_log), m_schemaLocation(XMLString::replicate(src.m_schemaLocation)),
         m_noNamespaceSchemaLocation(XMLString::replicate(src.m_noNamespaceSchemaLocation)), m_nil(src.m_nil),
-        m_parent(NULL), m_elementQname(src.m_elementQname), m_typeQname(NULL)
+        m_parent(nullptr), m_elementQname(src.m_elementQname), m_typeQname(nullptr)
 {
     if (src.m_typeQname)
         m_typeQname=new QName(*src.m_typeQname);
@@ -90,7 +90,7 @@ void AbstractXMLObject::detach()
     // Pull ourselves out of the parent and then blast him.
     getParent()->removeChild(this);
     delete m_parent;
-    m_parent = NULL;
+    m_parent = nullptr;
 }
 
 const QName& AbstractXMLObject::getElementQName() const
@@ -130,11 +130,31 @@ void XMLObject::setNil(const XMLCh* value)
 
 void AbstractXMLObject::addNamespace(const Namespace& ns) const
 {
-    std::set<Namespace>::iterator i = m_namespaces.find(ns);
-    if (i == m_namespaces.end())
-        m_namespaces.insert(ns);
-    else if (ns.alwaysDeclare())
-        const_cast<Namespace&>(*i).setAlwaysDeclare(true);
+    for (set<Namespace>::const_iterator n = m_namespaces.begin(); n != m_namespaces.end(); ++n) {
+        // Look for the prefix in the existing set.
+        if (XMLString::equals(ns.getNamespacePrefix(), n->getNamespacePrefix())) {
+            // See if it's the same declaration, and overlay various properties if so.
+            if (XMLString::equals(ns.getNamespaceURI(), n->getNamespaceURI())) {
+                if (ns.alwaysDeclare())
+                    const_cast<Namespace&>(*n).setAlwaysDeclare(true);
+                switch (ns.usage()) {
+                    case Namespace::Indeterminate:
+                        break;
+                    case Namespace::VisiblyUsed:
+                        const_cast<Namespace&>(*n).setUsage(Namespace::VisiblyUsed);
+                        break;
+                    case Namespace::NonVisiblyUsed:
+                        if (n->usage() == Namespace::Indeterminate)
+                            const_cast<Namespace&>(*n).setUsage(Namespace::NonVisiblyUsed);
+                        break;
+                }
+            }
+            return;
+        }
+    }
+
+    // If the prefix is now, go ahead and add it.
+    m_namespaces.insert(ns);
 }
 
 void AbstractXMLObject::removeNamespace(const Namespace& ns)
@@ -149,7 +169,7 @@ const QName* AbstractXMLObject::getSchemaType() const
 
 const XMLCh* AbstractXMLObject::getXMLID() const
 {
-    return NULL;
+    return nullptr;
 }
 
 xmlconstants::xmltooling_bool_t AbstractXMLObject::getNil() const
@@ -167,7 +187,7 @@ void AbstractXMLObject::nil(xmlconstants::xmltooling_bool_t value)
 
 bool AbstractXMLObject::hasParent() const
 {
-    return m_parent != NULL;
+    return m_parent != nullptr;
 }
 
 XMLObject* AbstractXMLObject::getParent() const
@@ -196,21 +216,20 @@ QName* AbstractXMLObject::prepareForAssignment(QName* oldValue, const QName* new
     if (!oldValue) {
         if (newValue) {
             releaseThisandParentDOM();
-            Namespace newNamespace(newValue->getNamespaceURI(), newValue->getPrefix());
-            addNamespace(newNamespace);
+            addNamespace(Namespace(newValue->getNamespaceURI(), newValue->getPrefix(), false, Namespace::NonVisiblyUsed));
             return new QName(*newValue);
         }
-        return NULL;
+        return nullptr;
     }
 
     delete oldValue;
     releaseThisandParentDOM();
     if (newValue) {
-        Namespace newNamespace(newValue->getNamespaceURI(), newValue->getPrefix());
-        addNamespace(newNamespace);
+        // Attach a non-visibly used namespace.
+        addNamespace(Namespace(newValue->getNamespaceURI(), newValue->getPrefix(), false, Namespace::NonVisiblyUsed));
         return new QName(*newValue);
     }
-    return NULL;
+    return nullptr;
 }
 
 DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, const DateTime* newValue)
@@ -220,12 +239,12 @@ DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, const Date
             releaseThisandParentDOM();
             return new DateTime(*newValue);
         }
-        return NULL;
+        return nullptr;
     }
 
     delete oldValue;
     releaseThisandParentDOM();
-    return newValue ? new DateTime(*newValue) : NULL;
+    return newValue ? new DateTime(*newValue) : nullptr;
 }
 
 DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, time_t newValue, bool duration)
@@ -245,7 +264,7 @@ DateTime* AbstractXMLObject::prepareForAssignment(DateTime* oldValue, const XMLC
     delete oldValue;
     releaseThisandParentDOM();
     if (!newValue || !*newValue)
-        return NULL;
+        return nullptr;
     DateTime* ret = new DateTime(newValue);
     if (duration)
         ret->parseDuration();

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * @file xmltooling/util/XMLObjectChildrenList.h
  * 
- * STL-compatible container wrapper
+ * STL-compatible container wrapper.
  */
 
 #ifndef __xmltooling_list_h__
@@ -558,7 +558,7 @@ namespace xmltooling {
         void removeParent(const_reference _Val) {
             if (_Val->getParent()!=m_parent)
                 throw XMLObjectException("Child object not owned by this parent.");
-            _Val->setParent(NULL);
+            _Val->setParent(nullptr);
             m_parent->releaseParentDOM(true);
         }
 
@@ -720,9 +720,9 @@ namespace xmltooling {
         void removeParent(const_reference _Val) {
             if (_Val.first->getParent()!=m_parent || (_Val.second && _Val.second->getParent()!=m_parent))
                 throw XMLObjectException("One of the child objects not owned by this parent.");
-            _Val.first->setParent(NULL);
+            _Val.first->setParent(nullptr);
             if (_Val.second)
-                _Val.second->setParent(NULL);
+                _Val.second->setParent(nullptr);
             m_parent->releaseParentDOM(true);
         }
 

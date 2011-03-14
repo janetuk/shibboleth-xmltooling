@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@ using namespace xmltooling;
 using namespace std;
 
 CredentialCriteria::CredentialCriteria()
-    : m_keyUsage(Credential::UNSPECIFIED_CREDENTIAL), m_keySize(0), m_key(NULL),
-        m_keyInfo(NULL), m_nativeKeyInfo(NULL), m_credential(NULL)
+    : m_keyUsage(Credential::UNSPECIFIED_CREDENTIAL), m_keySize(0), m_maxKeySize(0), m_key(nullptr),
+        m_keyInfo(nullptr), m_nativeKeyInfo(nullptr), m_credential(nullptr)
 {
 }
 
@@ -64,7 +64,7 @@ void CredentialCriteria::setUsage(unsigned int usage)
 
 const char* CredentialCriteria::getPeerName() const
 {
-    return m_peerName.c_str();
+    return m_peerName.empty() ? nullptr : m_peerName.c_str();
 }
 
 void CredentialCriteria::setPeerName(const char* peerName)
@@ -76,7 +76,7 @@ void CredentialCriteria::setPeerName(const char* peerName)
 
 const char* CredentialCriteria::getKeyAlgorithm() const
 {
-    return m_keyAlgorithm.c_str();
+    return m_keyAlgorithm.empty() ? nullptr : m_keyAlgorithm.c_str();
 }
 
 void CredentialCriteria::setKeyAlgorithm(const char* keyAlgorithm)
@@ -96,6 +96,16 @@ void CredentialCriteria::setKeySize(unsigned int keySize)
     m_keySize = keySize;
 }
 
+unsigned int CredentialCriteria::getMaxKeySize() const
+{
+    return m_maxKeySize;
+}
+
+void CredentialCriteria::setMaxKeySize(unsigned int keySize)
+{
+    m_maxKeySize = keySize;
+}
+
 void CredentialCriteria::setXMLAlgorithm(const XMLCh* algorithm)
 {
     if (algorithm) {
@@ -104,7 +114,7 @@ void CredentialCriteria::setXMLAlgorithm(const XMLCh* algorithm)
         setKeySize(mapped.second);
     }
     else {
-        setKeyAlgorithm(NULL);
+        setKeyAlgorithm(nullptr);
         setKeySize(0);
     }
 }
@@ -137,7 +147,7 @@ const KeyInfo* CredentialCriteria::getKeyInfo() const
 void CredentialCriteria::setKeyInfo(const KeyInfo* keyInfo, int extraction)
 {
     delete m_credential;
-    m_credential = NULL;
+    m_credential = nullptr;
     m_keyInfo = keyInfo;
     if (!keyInfo || !extraction)
         return;
@@ -162,7 +172,7 @@ DSIGKeyInfoList* CredentialCriteria::getNativeKeyInfo() const
 void CredentialCriteria::setNativeKeyInfo(DSIGKeyInfoList* keyInfo, int extraction)
 {
     delete m_credential;
-    m_credential = NULL;
+    m_credential = nullptr;
     m_nativeKeyInfo = keyInfo;
     if (!keyInfo || !extraction)
         return;
@@ -188,6 +198,17 @@ void CredentialCriteria::setSignature(const Signature& sig, int extraction)
     DSIGSignature* dsig = sig.getXMLSignature();
     if (dsig)
         setNativeKeyInfo(dsig->getKeyInfoList(), extraction);
+}
+
+void CredentialCriteria::reset()
+{
+    setUsage(Credential::UNSPECIFIED_CREDENTIAL);
+    setKeySize(0);
+    setMaxKeySize(0);
+    setKeyAlgorithm(nullptr);
+    getKeyNames().clear();
+    setKeyInfo(nullptr);
+    setNativeKeyInfo(nullptr);
 }
 
 bool CredentialCriteria::matches(const Credential& credential) const
@@ -218,10 +239,22 @@ bool CredentialCriteria::matches(const Credential& credential) const
     }
 
     // KeySize check, if specified and we have one.
-    if (credential.getKeySize()>0 && getKeySize()>0 && credential.getKeySize() != getKeySize()) {
-        if (log.isDebugEnabled())
-            log.debug("key size didn't match (%u != %u)", getKeySize(), credential.getKeySize());
-        return false;
+    unsigned int ksize = credential.getKeySize();
+    if (ksize > 0) {
+        if (m_keySize > 0 && m_maxKeySize == 0) {
+            if (ksize != m_keySize) {
+                log.debug("key size (%u) didn't match (%u)", ksize, m_keySize);
+                return false;
+            }
+        }
+        else if (m_keySize > 0 && ksize < m_keySize) {
+            log.debug("key size (%u) smaller than minimum (%u)", ksize, m_keySize);
+            return false;
+        }
+        else if (m_maxKeySize > 0 && ksize > m_maxKeySize) {
+            log.debug("key size (%u) larger than maximum (%u)", ksize, m_maxKeySize);
+            return false;
+        }
     }
 
     // See if we can test key names.

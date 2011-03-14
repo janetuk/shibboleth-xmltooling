@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,7 +122,7 @@ namespace xmltooling {
         /**
          * Gets the value of the ID attribute set on this object, if any.
          * 
-         * @return an ID value or NULL 
+         * @return an ID value or nullptr 
          */
         virtual const XMLCh* getXMLID() const=0;
 
@@ -234,7 +234,7 @@ namespace xmltooling {
         /**
          * Sets (or clears) text content relative to a child element's position. 
          * 
-         * @param value         value to set, or NULL to clear
+         * @param value         value to set, or nullptr to clear
          * @param position      position relative to child element 
          */
         virtual void setTextContent(const XMLCh* value, unsigned int position=0)=0;
@@ -299,7 +299,7 @@ namespace xmltooling {
          * a new document will be created and bound to the lifetime of the root object being
          * marshalled, unless an existing DOM can be reused without creating a new document. 
          * 
-         * @param document  the DOM document the marshalled element will be placed in, or NULL
+         * @param document  the DOM document the marshalled element will be placed in, or nullptr
          * @param sigs      ordered array of signatures to create after marshalling is complete
          * @param credential    optional credential to supply signing key and related info
          * @return the DOM element representing this XMLObject
@@ -308,10 +308,10 @@ namespace xmltooling {
          * @throws SignatureException thrown if a problem occurs during signature creation 
          */
         virtual xercesc::DOMElement* marshall(
-            xercesc::DOMDocument* document=NULL
+            xercesc::DOMDocument* document=nullptr
 #ifndef XMLTOOLING_NO_XMLSEC
-            ,const std::vector<xmlsignature::Signature*>* sigs=NULL
-            ,const Credential* credential=NULL
+            ,const std::vector<xmlsignature::Signature*>* sigs=nullptr
+            ,const Credential* credential=nullptr
 #endif
             ) const=0;
         
@@ -332,8 +332,8 @@ namespace xmltooling {
         virtual xercesc::DOMElement* marshall(
             xercesc::DOMElement* parentElement
 #ifndef XMLTOOLING_NO_XMLSEC
-            ,const std::vector<xmlsignature::Signature*>* sigs=NULL
-            ,const Credential* credential=NULL
+            ,const std::vector<xmlsignature::Signature*>* sigs=nullptr
+            ,const Credential* credential=nullptr
 #endif
             ) const=0;
 

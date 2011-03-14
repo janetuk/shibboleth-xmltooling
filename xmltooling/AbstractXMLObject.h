@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2009 Internet2
+*  Copyright 2001-2010 Internet2
  *
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ namespace xmltooling {
          * @param schemaType    the xsi:type to use
          */
         AbstractXMLObject(
-            const XMLCh* nsURI=NULL, const XMLCh* localName=NULL, const XMLCh* prefix=NULL, const QName* schemaType=NULL
+            const XMLCh* nsURI=nullptr, const XMLCh* localName=nullptr, const XMLCh* prefix=nullptr, const QName* schemaType=nullptr
             );
 
         /** Copy constructor. */
@@ -147,7 +147,7 @@ namespace xmltooling {
          *
          * It is indifferent to whether either the old or the new version of the value is null.
          * This method will do a safe compare of the objects and will also invalidate the DOM if appropriate.
-         * Note that since the new value (even if NULL) is always returned, it may be more efficient
+         * Note that since the new value (even if nullptr) is always returned, it may be more efficient
          * to discard the return value and just assign independently if a dynamic cast would be involved.
          *
          * @param oldValue current value

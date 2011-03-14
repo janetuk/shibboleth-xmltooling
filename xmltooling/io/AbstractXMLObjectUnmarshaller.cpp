@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2009 Internet2
+*  Copyright 2001-2010 Internet2
  * 
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,7 +106,7 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
         if (XMLString::equals(nsuri,XMLNS_NS)) {
             if (XMLString::equals(attribute->getLocalName(),XMLNS_PREFIX)) {
                 m_log.debug("found default namespace declaration, adding it to the list of namespaces on the XMLObject");
-                addNamespace(Namespace(attribute->getValue(), NULL, true));
+                addNamespace(Namespace(attribute->getValue(), nullptr, true));
             }
             else if (XMLString::equals(attribute->getLocalName(),XML_PREFIX) && XMLString::equals(attribute->getNodeValue(),XML_NS)) {
                 m_log.debug("found standard xml prefix declaration, ignoring as superfluous");
@@ -146,10 +146,12 @@ void AbstractXMLObjectUnmarshaller::unmarshallAttributes(const DOMElement* domEl
             	setNil(attribute->getValue());
             	continue;
             }
+            // Note that the prefix is visibly used.
+            addNamespace(Namespace(nsuri, attribute->getPrefix(), false, Namespace::VisiblyUsed));
         }
         else if (nsuri && !XMLString::equals(nsuri,XML_NS)) {
-            m_log.debug("found namespace-qualified attribute, adding prefix to the list of namespaces on the XMLObject");
-            addNamespace(Namespace(nsuri, attribute->getPrefix()));
+            m_log.debug("found namespace-qualified attribute, adding prefix to the list of visible namespaces on the XMLObject");
+            addNamespace(Namespace(nsuri, attribute->getPrefix(), false, Namespace::VisiblyUsed));
         }
 
         m_log.debug("processing generic attribute");

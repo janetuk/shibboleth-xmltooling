@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ namespace xmltooling {
          * @throws IOException  raised if errors occur in the read process 
          */
         virtual int readString(
-            const char* context, const char* key, std::string* pvalue=NULL, time_t* pexpiration=NULL, int version=0
+            const char* context, const char* key, std::string* pvalue=nullptr, time_t* pexpiration=nullptr, int version=0
             )=0;
 
         /**
@@ -81,7 +81,7 @@ namespace xmltooling {
          * 
          * @param context       a storage context label
          * @param key           null-terminated unique key of up to 255 bytes
-         * @param value         null-terminated value of up to 255 bytes to store, or NULL to leave alone
+         * @param value         null-terminated value of up to 255 bytes to store, or nullptr to leave alone
          * @param expiration    a new expiration timestamp, or 0 to leave alone
          * @param version       if > 0, only update if the current version matches this value
          * @return the version of the record after update, 0 if no record exists, or -1 if the version
@@ -90,7 +90,7 @@ namespace xmltooling {
          * @throws IOException  raised if errors occur in the update process 
          */
         virtual int updateString(
-            const char* context, const char* key, const char* value=NULL, time_t expiration=0, int version=0
+            const char* context, const char* key, const char* value=nullptr, time_t expiration=0, int version=0
             )=0;
         
         /**
@@ -132,7 +132,7 @@ namespace xmltooling {
          * @throws IOException  raised if errors occur in the read process 
          */
         virtual int readText(
-            const char* context, const char* key, std::string* pvalue=NULL, time_t* pexpiration=NULL, int version=0
+            const char* context, const char* key, std::string* pvalue=nullptr, time_t* pexpiration=nullptr, int version=0
             )=0;
 
         /**
@@ -140,7 +140,7 @@ namespace xmltooling {
          * 
          * @param context       a storage context label
          * @param key           null-terminated unique key of up to 255 bytes
-         * @param value         null-terminated value of arbitrary length to store, or NULL to leave alone
+         * @param value         null-terminated value of arbitrary length to store, or nullptr to leave alone
          * @param expiration    a new expiration timestamp, or 0 to leave alone
          * @param version       if > 0, only update if the current version matches this value
          * @return the version of the record after update, 0 if no record exists, or -1 if the version
@@ -149,7 +149,7 @@ namespace xmltooling {
          * @throws IOException  raised if errors occur in the update process 
          */
         virtual int updateText(
-            const char* context, const char* key, const char* value=NULL, time_t expiration=0, int version=0
+            const char* context, const char* key, const char* value=nullptr, time_t expiration=0, int version=0
             )=0;
         
         /**

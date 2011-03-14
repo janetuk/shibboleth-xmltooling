@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,15 +72,15 @@ public:
         string path=data_path + "SimpleXMLObjectWithAttribute.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
 
         auto_ptr<SimpleXMLObject> sxObject(
             dynamic_cast<SimpleXMLObject*>(b->buildFromDocument(doc))
             );
-        TS_ASSERT(sxObject.get()!=NULL);
+        TS_ASSERT(sxObject.get()!=nullptr);
 
         auto_ptr_XMLCh expected("Firefly");
         TSM_ASSERT("ID was not expected value", XMLString::equals(expected.get(), sxObject->getId()));
@@ -90,15 +90,15 @@ public:
         string path=data_path + "SimpleXMLObjectWithContent.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
 
         auto_ptr<SimpleXMLObject> sxObject(
             dynamic_cast<SimpleXMLObject*>(b->buildFromDocument(doc))
             );
-        TS_ASSERT(sxObject.get()!=NULL);
+        TS_ASSERT(sxObject.get()!=nullptr);
 
         auto_ptr_XMLCh expected("Sample Content");
         TSM_ASSERT("Element content was not expected value", XMLString::equals(expected.get(), sxObject->getValue()));
@@ -108,15 +108,15 @@ public:
         string path=data_path + "SimpleXMLObjectWithChildren.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
 
         auto_ptr<SimpleXMLObject> sxObject(
             dynamic_cast<SimpleXMLObject*>(b->buildFromDocument(doc))
             );
-        TS_ASSERT(sxObject.get()!=NULL);
+        TS_ASSERT(sxObject.get()!=nullptr);
 
         VectorOf(SimpleXMLObject) kids=sxObject->getSimpleXMLObjects();
         TSM_ASSERT_EQUALS("Number of child elements was not expected value", 3, kids.size());
@@ -128,15 +128,15 @@ public:
         string path=data_path + "SimpleXMLObjectWithChildren.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
 
         auto_ptr<SimpleXMLObject> sxObject(
             dynamic_cast<SimpleXMLObject*>(b->buildFromDocument(doc))
             );
-        TS_ASSERT(sxObject.get()!=NULL);
+        TS_ASSERT(sxObject.get()!=nullptr);
 
         sxObject->releaseThisAndChildrenDOM();
         auto_ptr<SimpleXMLObject> clonedObject(dynamic_cast<SimpleXMLObject*>(sxObject->clone()));
@@ -151,10 +151,10 @@ public:
         string path=data_path + "SimpleXMLObjectWithUnknownChild.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
 
         TS_ASSERT_THROWS(b->buildFromDocument(doc),UnmarshallingException);
         doc->release();

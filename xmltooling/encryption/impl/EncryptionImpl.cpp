@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,11 +59,11 @@ namespace xmlencryption {
         public AbstractXMLObjectUnmarshaller
     {
         void init() {
-            m_Algorithm=NULL;
-            m_KeySize=NULL;
-            m_OAEPparams=NULL;
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
+            m_Algorithm=nullptr;
+            m_KeySize=nullptr;
+            m_OAEPparams=nullptr;
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
             m_pos_KeySize=m_children.begin();
             m_pos_OAEPparams=m_pos_KeySize;
             ++m_pos_OAEPparams;
@@ -99,7 +99,7 @@ namespace xmlencryption {
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_STRING_ATTRIB(Algorithm,ALGORITHM,NULL);
+            MARSHALL_STRING_ATTRIB(Algorithm,ALGORITHM,nullptr);
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -117,7 +117,7 @@ namespace xmlencryption {
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            PROC_STRING_ATTRIB(Algorithm,ALGORITHM,NULL);
+            PROC_STRING_ATTRIB(Algorithm,ALGORITHM,nullptr);
             AbstractXMLObjectUnmarshaller::processAttribute(attribute);
         }
     };
@@ -162,9 +162,9 @@ namespace xmlencryption {
         public AbstractXMLObjectUnmarshaller
     {
         void init() {
-            m_URI=NULL;
-            m_Transforms=NULL;
-            m_children.push_back(NULL);
+            m_URI=nullptr;
+            m_Transforms=nullptr;
+            m_children.push_back(nullptr);
             m_pos_Transforms=m_children.begin();
         }
     public:
@@ -191,7 +191,7 @@ namespace xmlencryption {
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_STRING_ATTRIB(URI,URI,NULL);
+            MARSHALL_STRING_ATTRIB(URI,URI,nullptr);
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -200,7 +200,7 @@ namespace xmlencryption {
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            PROC_STRING_ATTRIB(URI,URI,NULL);
+            PROC_STRING_ATTRIB(URI,URI,nullptr);
             AbstractXMLObjectUnmarshaller::processAttribute(attribute);
         }
     };
@@ -212,10 +212,10 @@ namespace xmlencryption {
         public AbstractXMLObjectUnmarshaller
     {
         void init() {
-            m_CipherValue=NULL;
-            m_CipherReference=NULL;
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
+            m_CipherValue=nullptr;
+            m_CipherReference=nullptr;
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
             m_pos_CipherValue=m_children.begin();
             m_pos_CipherReference=m_pos_CipherValue;
             ++m_pos_CipherReference;
@@ -257,7 +257,7 @@ namespace xmlencryption {
         public AbstractXMLObjectUnmarshaller
     {
         void init() {
-            m_Id=m_Target=NULL;
+            m_Id=m_Target=nullptr;
         }
     public:
         virtual ~EncryptionPropertyImpl() {
@@ -284,7 +284,7 @@ namespace xmlencryption {
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptionProperty);
-        IMPL_ID_ATTRIB_EX(Id,ID,NULL);
+        IMPL_ID_ATTRIB_EX(Id,ID,nullptr);
         IMPL_STRING_ATTRIB(Target);
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject, m_children.end());
 
@@ -304,8 +304,8 @@ namespace xmlencryption {
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_ID_ATTRIB(Id,ID,NULL);
-            MARSHALL_STRING_ATTRIB(Target,TARGET,NULL);
+            MARSHALL_ID_ATTRIB(Id,ID,nullptr);
+            MARSHALL_STRING_ATTRIB(Target,TARGET,nullptr);
             marshallExtensionAttributes(domElement);
         }
 
@@ -314,7 +314,7 @@ namespace xmlencryption {
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            PROC_ID_ATTRIB(Id,ID,NULL);
+            PROC_ID_ATTRIB(Id,ID,nullptr);
             unmarshallExtensionAttribute(attribute);
         }
     };
@@ -326,7 +326,7 @@ namespace xmlencryption {
         public AbstractXMLObjectUnmarshaller
     {
         void init() {
-            m_Id=NULL;
+            m_Id=nullptr;
         }
     public:
         virtual ~EncryptionPropertiesImpl() {
@@ -351,12 +351,12 @@ namespace xmlencryption {
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptionProperties);
-        IMPL_ID_ATTRIB_EX(Id,ID,NULL);
+        IMPL_ID_ATTRIB_EX(Id,ID,nullptr);
         IMPL_TYPED_CHILDREN(EncryptionProperty,m_children.end());
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_ID_ATTRIB(Id,ID,NULL);
+            MARSHALL_ID_ATTRIB(Id,ID,nullptr);
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -365,7 +365,7 @@ namespace xmlencryption {
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            PROC_ID_ATTRIB(Id,ID,NULL);
+            PROC_ID_ATTRIB(Id,ID,nullptr);
             AbstractXMLObjectUnmarshaller::processAttribute(attribute);
         }
     };
@@ -377,7 +377,7 @@ namespace xmlencryption {
         public AbstractXMLObjectUnmarshaller
     {
         void init() {
-            m_URI=NULL;
+            m_URI=nullptr;
         }
         
     protected:
@@ -410,7 +410,7 @@ namespace xmlencryption {
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_STRING_ATTRIB(URI,URI,NULL);
+            MARSHALL_STRING_ATTRIB(URI,URI,nullptr);
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -418,7 +418,7 @@ namespace xmlencryption {
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            PROC_STRING_ATTRIB(URI,URI,NULL);
+            PROC_STRING_ATTRIB(URI,URI,nullptr);
             AbstractXMLObjectUnmarshaller::processAttribute(attribute);
         }
     };
@@ -506,15 +506,15 @@ namespace xmlencryption {
         public AbstractXMLObjectUnmarshaller
     {
         void init() {
-            m_Id=m_Type=m_MimeType=m_Encoding=NULL;
-            m_EncryptionMethod=NULL;
-            m_KeyInfo=NULL;
-            m_CipherData=NULL;
-            m_EncryptionProperties=NULL;
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
+            m_Id=m_Type=m_MimeType=m_Encoding=nullptr;
+            m_EncryptionMethod=nullptr;
+            m_KeyInfo=nullptr;
+            m_CipherData=nullptr;
+            m_EncryptionProperties=nullptr;
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
             m_pos_EncryptionMethod=m_children.begin();
             m_pos_KeyInfo=m_pos_EncryptionMethod;
             ++m_pos_KeyInfo;
@@ -559,7 +559,7 @@ namespace xmlencryption {
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptedType);
-        IMPL_ID_ATTRIB_EX(Id,ID,NULL);
+        IMPL_ID_ATTRIB_EX(Id,ID,nullptr);
         IMPL_STRING_ATTRIB(Type);
         IMPL_STRING_ATTRIB(MimeType);
         IMPL_STRING_ATTRIB(Encoding);
@@ -570,10 +570,10 @@ namespace xmlencryption {
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_ID_ATTRIB(Id,ID,NULL);
-            MARSHALL_STRING_ATTRIB(Type,TYPE,NULL);
-            MARSHALL_STRING_ATTRIB(MimeType,MIMETYPE,NULL);
-            MARSHALL_STRING_ATTRIB(Encoding,ENCODING,NULL);
+            MARSHALL_ID_ATTRIB(Id,ID,nullptr);
+            MARSHALL_STRING_ATTRIB(Type,TYPE,nullptr);
+            MARSHALL_STRING_ATTRIB(MimeType,MIMETYPE,nullptr);
+            MARSHALL_STRING_ATTRIB(Encoding,ENCODING,nullptr);
         }
 
         void processChildElement(XMLObject* childXMLObject, const DOMElement* root) {
@@ -585,10 +585,10 @@ namespace xmlencryption {
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            PROC_ID_ATTRIB(Id,ID,NULL);
-            PROC_STRING_ATTRIB(Type,TYPE,NULL);
-            PROC_STRING_ATTRIB(MimeType,MIMETYPE,NULL);
-            PROC_STRING_ATTRIB(Encoding,ENCODING,NULL);
+            PROC_ID_ATTRIB(Id,ID,nullptr);
+            PROC_STRING_ATTRIB(Type,TYPE,nullptr);
+            PROC_STRING_ATTRIB(MimeType,MIMETYPE,nullptr);
+            PROC_STRING_ATTRIB(Encoding,ENCODING,nullptr);
             AbstractXMLObjectUnmarshaller::processAttribute(attribute);
         }
     };
@@ -612,11 +612,11 @@ namespace xmlencryption {
     class XMLTOOL_DLLLOCAL EncryptedKeyImpl : public virtual EncryptedKey, public EncryptedTypeImpl
     {
         void init() {
-            m_Recipient=NULL;
-            m_ReferenceList=NULL;
-            m_CarriedKeyName=NULL;
-            m_children.push_back(NULL);
-            m_children.push_back(NULL);
+            m_Recipient=nullptr;
+            m_ReferenceList=nullptr;
+            m_CarriedKeyName=nullptr;
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
             m_pos_ReferenceList=m_pos_EncryptionProperties;
             ++m_pos_ReferenceList;
             m_pos_CarriedKeyName=m_pos_ReferenceList;
@@ -647,7 +647,7 @@ namespace xmlencryption {
     
     protected:
         void marshallAttributes(DOMElement* domElement) const {
-            MARSHALL_STRING_ATTRIB(Recipient,RECIPIENT,NULL);
+            MARSHALL_STRING_ATTRIB(Recipient,RECIPIENT,nullptr);
             EncryptedTypeImpl::marshallAttributes(domElement);
         }
 
@@ -658,7 +658,7 @@ namespace xmlencryption {
         }
 
         void processAttribute(const DOMAttr* attribute) {
-            PROC_STRING_ATTRIB(Recipient,RECIPIENT,NULL);
+            PROC_STRING_ATTRIB(Recipient,RECIPIENT,nullptr);
             EncryptedTypeImpl::processAttribute(attribute);
         }
     };

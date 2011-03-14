@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ Credential* KeyInfoResolver::resolve(const Signature* sig, int types) const
     if (keyInfo)
         return resolve(keyInfo, types);
     DSIGSignature* native = sig->getXMLSignature();
-    return resolve(native ? native->getKeyInfoList() : (DSIGKeyInfoList*)NULL, types);
+    return resolve(native ? native->getKeyInfoList() : (DSIGKeyInfoList*)nullptr, types);
 }
 
 Credential* KeyInfoResolver::resolve(const CredentialCriteria& criteria, int types) const
@@ -62,5 +62,5 @@ Credential* KeyInfoResolver::resolve(const CredentialCriteria& criteria, int typ
     if (keyInfo)
         return resolve(keyInfo, types);
     DSIGKeyInfoList* native = criteria.getNativeKeyInfo();
-    return native ? resolve(native, types) : NULL;
+    return native ? resolve(native, types) : nullptr;
 }

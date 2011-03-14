@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,10 +78,12 @@ namespace xmltooling {
     class XMLToolingInternalConfig : public XMLToolingConfig
     {
     public:
-        XMLToolingInternalConfig() : m_lock(NULL), m_parserPool(NULL), m_validatingPool(NULL) {
+        XMLToolingInternalConfig() :
 #ifndef XMLTOOLING_NO_XMLSEC
-            m_xsecProvider=NULL;
+            m_xsecProvider(nullptr),
 #endif
+            m_lock(nullptr), m_parserPool(nullptr), m_validatingPool(nullptr)
+        {
         }
 
         static XMLToolingInternalConfig& getInternalConfig();
@@ -95,8 +97,8 @@ namespace xmltooling {
         void unlock();
 
         // configuration
-        bool load_library(const char* path, void* context=NULL);
-        bool log_config(const char* config=NULL);
+        bool load_library(const char* path, void* context=nullptr);
+        bool log_config(const char* config=nullptr);
 
         // parser access
         ParserPool& getParser() const {
@@ -109,37 +111,16 @@ namespace xmltooling {
 
 #ifndef XMLTOOLING_NO_XMLSEC
         XSECCryptoX509CRL* X509CRL() const;
-
-        std::pair<const char*,unsigned int> mapXMLAlgorithmToKeyAlgorithm(const XMLCh* xmlAlgorithm) const {
-# ifdef HAVE_GOOD_STL
-            algmap_t::const_iterator i = m_algorithmMap.find(xmlAlgorithm);
-# else
-            auto_ptr_char alg(xmlAlgorithm);
-            algmap_t::const_iterator i = m_algorithmMap.find(alg.get());
-# endif
-            if (i==m_algorithmMap.end())
-                return std::pair<const char*,unsigned int>(NULL,0);
-            return std::make_pair(i->second.first.c_str(), i->second.second);
-        }
-
-        void registerXMLAlgorithm(const XMLCh* xmlAlgorithm, const char* keyAlgorithm, unsigned int size=0) {
-# ifdef HAVE_GOOD_STL
-            m_algorithmMap[xmlAlgorithm] = std::pair<std::string,unsigned int>(keyAlgorithm,size);
-# else
-            auto_ptr_char alg(xmlAlgorithm);
-            m_algorithmMap[alg.get()] = std::pair<std::string,unsigned int>(keyAlgorithm,size);
-# endif
-        }
-
+        std::pair<const char*,unsigned int> mapXMLAlgorithmToKeyAlgorithm(const XMLCh* xmlAlgorithm) const;
+        void registerXMLAlgorithm(
+            const XMLCh* xmlAlgorithm, const char* keyAlgorithm, unsigned int size=0, XMLSecurityAlgorithmType type=ALGTYPE_UNK
+            );
+        bool isXMLAlgorithmSupported(const XMLCh* xmlAlgorithm, XMLSecurityAlgorithmType type=ALGTYPE_UNK);
         void registerXMLAlgorithms();
 
         XSECProvider* m_xsecProvider;
     private:
-# ifdef HAVE_GOOD_STL
-        typedef std::map< xstring,std::pair<std::string,unsigned int> > algmap_t;
-# else
-        typedef std::map< std::string,std::pair<std::string,unsigned int> > algmap_t;
-# endif
+        typedef std::map<XMLSecurityAlgorithmType, std::map< xstring,std::pair<std::string,unsigned int> > > algmap_t;
         algmap_t m_algorithmMap;
 #endif
 

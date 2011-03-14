@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 
 #include <map>
 #include <stack>
+#include <string>
 #include <istream>
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/sax/InputSource.hpp>
@@ -177,7 +178,7 @@ namespace xmltooling {
          * @param is        reference to an input stream
          * @param systemId  optional system identifier to attach to the stream
          */
-        StreamInputSource(std::istream& is, const char* systemId=NULL);
+        StreamInputSource(std::istream& is, const char* systemId=nullptr);
         /// @cond off
         xercesc::BinInputStream* makeStream() const;
         /// @endcond
@@ -224,8 +225,9 @@ namespace xmltooling {
          *
          * @param url       source of input
          * @param systemId  optional system identifier to attach to the source
+         * @param cacheTag  optional pointer to string used for cache management
          */
-        URLInputSource(const XMLCh* url, const char* systemId=NULL);
+        URLInputSource(const XMLCh* url, const char* systemId=nullptr, std::string* cacheTag=nullptr);
 
         /**
          * Constructor taking a DOM element supporting the following content:
@@ -241,17 +243,24 @@ namespace xmltooling {
          *
          * @param e         DOM to supply configuration
          * @param systemId  optional system identifier to attach to the source
+         * @param cacheTag  optional pointer to string used for cache management
          */
-        URLInputSource(const xercesc::DOMElement* e, const char* systemId=NULL);
+        URLInputSource(const xercesc::DOMElement* e, const char* systemId=nullptr, std::string* cacheTag=nullptr);
 
         /// @cond off
         virtual xercesc::BinInputStream* makeStream() const;
         /// @endcond
 
+        /** Element name used to signal a non-successful response when fetching a remote document. */
+        static const char asciiStatusCodeElementName[];
+
+        /** Element name used to signal a non-successful response when fetching a remote document. */
+        static const XMLCh utf16StatusCodeElementName[];
     private:
 #ifdef XMLTOOLING_LITE
         xercesc::XMLURL m_url;
 #else
+        std::string* m_cacheTag;
         xmltooling::auto_ptr_char m_url;
         const xercesc::DOMElement* m_root;
 #endif

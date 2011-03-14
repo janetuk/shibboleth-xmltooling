@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,11 @@
 
 #include <algorithm>
 #include <functional>
+#include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmltooling;
 using namespace std;
+using xercesc::chColon;
 
 using xercesc::DOMAttr;
 using xercesc::DOMElement;
@@ -112,7 +114,7 @@ AbstractAttributeExtensibleXMLObject::~AbstractAttributeExtensibleXMLObject()
 const XMLCh* AbstractAttributeExtensibleXMLObject::getAttribute(const QName& qualifiedName) const
 {
     map<QName,XMLCh*>::const_iterator i=m_attributeMap.find(qualifiedName);
-    return (i==m_attributeMap.end()) ? NULL : i->second;
+    return (i==m_attributeMap.end()) ? nullptr : i->second;
 }
 
 void AbstractAttributeExtensibleXMLObject::setAttribute(const QName& qualifiedName, const XMLCh* value, bool ID)
@@ -137,7 +139,27 @@ void AbstractAttributeExtensibleXMLObject::setAttribute(const QName& qualifiedNa
         m_attributeMap[qualifiedName]=XMLString::replicate(value);
         if (ID)
             m_idAttribute = m_attributeMap.find(qualifiedName);
+        Namespace newNamespace(qualifiedName.getNamespaceURI(), qualifiedName.getPrefix(), false, Namespace::VisiblyUsed);
+        addNamespace(newNamespace);
     }
+}
+
+void AttributeExtensibleXMLObject::setAttribute(const QName& qualifiedName, const QName& value)
+{
+    if (!value.hasLocalPart())
+        return;
+
+    if (value.hasPrefix()) {
+        xstring buf(value.getPrefix());
+        buf = buf + chColon + value.getLocalPart();
+        setAttribute(qualifiedName, buf.c_str());
+    }
+    else {
+        setAttribute(qualifiedName, value.getLocalPart());
+    }
+
+    Namespace newNamespace(value.getNamespaceURI(), value.getPrefix(), false, Namespace::NonVisiblyUsed);
+    addNamespace(newNamespace);
 }
 
 const map<QName,XMLCh*>& AbstractAttributeExtensibleXMLObject::getExtensionAttributes() const
@@ -146,7 +168,7 @@ const map<QName,XMLCh*>& AbstractAttributeExtensibleXMLObject::getExtensionAttri
 }
 const XMLCh* AbstractAttributeExtensibleXMLObject::getXMLID() const
 {
-    return (m_idAttribute == m_attributeMap.end()) ? NULL : m_idAttribute->second;
+    return (m_idAttribute == m_attributeMap.end()) ? nullptr : m_idAttribute->second;
 }
 
 void AbstractAttributeExtensibleXMLObject::unmarshallExtensionAttribute(const DOMAttr* attribute)

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,15 +61,25 @@
 #ifndef XMLTOOLING_NO_XMLSEC
 # include <curl/curl.h>
 # include <openssl/err.h>
+# include <openssl/evp.h>
+# include <xsec/framework/XSECAlgorithmMapper.hpp>
+# include <xsec/framework/XSECException.hpp>
 # include <xsec/framework/XSECProvider.hpp>
+# include <xsec/transformers/TXFMBase.hpp>
 #endif
 
 using namespace soap11;
 using namespace xmltooling::logging;
 using namespace xmltooling;
+using namespace xercesc;
 using namespace std;
 
-using xercesc::XMLPlatformUtils;
+#ifdef WIN32
+# if (OPENSSL_VERSION_NUMBER >= 0x00908000)
+#  define XMLTOOLING_OPENSSL_HAVE_SHA2 1
+# endif
+#endif
+
 
 DECL_XMLTOOLING_EXCEPTION_FACTORY(XMLParserException,xmltooling);
 DECL_XMLTOOLING_EXCEPTION_FACTORY(XMLObjectException,xmltooling);
@@ -89,7 +99,7 @@ using namespace xmlsignature;
     DECL_XMLTOOLING_EXCEPTION_FACTORY(EncryptionException,xmlencryption);
 #endif
 
-namespace xmltooling {
+namespace {
     static XMLToolingInternalConfig g_config;
 #ifndef XMLTOOLING_NO_XMLSEC
     static vector<Mutex*> g_openssl_locks;
@@ -108,6 +118,63 @@ namespace xmltooling {
         return (unsigned long)(pthread_self());
     }
 # endif
+
+# ifdef XMLTOOLING_XMLSEC_DEBUGLOGGING
+    class TXFMOutputLog : public TXFMBase {
+	    TXFMOutputLog();
+    public:
+        TXFMOutputLog(DOMDocument* doc) : TXFMBase(doc), m_log(Category::getInstance(XMLTOOLING_LOGCAT".Signature.Debugger")) {
+            input = nullptr;
+        }
+        ~TXFMOutputLog() {
+            m_log.debug("\n----- END SIGNATURE DEBUG -----\n");
+        }
+
+	    void setInput(TXFMBase *newInput) {
+	        input = newInput;
+	        if (newInput->getOutputType() != TXFMBase::BYTE_STREAM)
+		        throw XSECException(XSECException::TransformInputOutputFail, "OutputLog transform requires BYTE_STREAM input");
+	        keepComments = input->getCommentsStatus();
+            m_log.debug("\n----- BEGIN SIGNATURE DEBUG -----\n");
+        }
+
+	    TXFMBase::ioType getInputType() {
+            return TXFMBase::BYTE_STREAM;
+        }
+	    TXFMBase::ioType getOutputType() {
+            return TXFMBase::BYTE_STREAM;
+        }
+	    TXFMBase::nodeType getNodeType() {
+            return TXFMBase::DOM_NODE_NONE;
+        }
+
+	    unsigned int readBytes(XMLByte * const toFill, const unsigned int maxToFill) {
+	        unsigned int sz = input->readBytes(toFill, maxToFill);
+            m_log.debug(string(reinterpret_cast<char* const>(toFill), sz));
+	        return sz;
+        }
+
+	    DOMDocument* getDocument() {
+            return nullptr;
+        }
+	    DOMNode* getFragmentNode() {
+            return nullptr;
+        }
+	    const XMLCh* getFragmentId() {
+            return nullptr;
+        }
+	
+    private:
+        Category& m_log;
+    };
+
+    TXFMBase* TXFMOutputLogFactory(DOMDocument* doc) {
+        if (Category::getInstance(XMLTOOLING_LOGCAT".Signature.Debugger").isDebugEnabled())
+            return new TXFMOutputLog(doc);
+        return nullptr;
+    }
+# endif
+
 #endif
 
 #ifdef WIN32
@@ -118,10 +185,10 @@ namespace xmltooling {
         PSID  lpUserSid,
         LPCSTR  message)
     {
-        LPCSTR  messages[] = {message, NULL};
+        LPCSTR  messages[] = {message, nullptr};
 
         HANDLE hElog = RegisterEventSource(lpUNCServerName, "OpenSAML XMLTooling Library");
-        BOOL res = ReportEvent(hElog, wType, 0, dwEventID, lpUserSid, 1, 0, messages, NULL);
+        BOOL res = ReportEvent(hElog, wType, 0, dwEventID, lpUserSid, 1, 0, messages, nullptr);
         return (DeregisterEventSource(hElog) && res);
     }
 #endif
@@ -139,10 +206,10 @@ XMLToolingInternalConfig& XMLToolingInternalConfig::getInternalConfig()
 
 #ifndef XMLTOOLING_NO_XMLSEC
 XMLToolingConfig::XMLToolingConfig()
-    : m_keyInfoResolver(NULL), m_replayCache(NULL), m_pathResolver(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180)
+    : m_keyInfoResolver(nullptr), m_replayCache(nullptr), m_pathResolver(nullptr), m_templateEngine(nullptr), m_urlEncoder(nullptr), clock_skew_secs(180)
 #else
 XMLToolingConfig::XMLToolingConfig()
-    : m_pathResolver(NULL), m_templateEngine(NULL), m_urlEncoder(NULL), clock_skew_secs(180)
+    : m_pathResolver(nullptr), m_templateEngine(nullptr), m_urlEncoder(nullptr), clock_skew_secs(180)
 #endif
 {
 }
@@ -204,12 +271,16 @@ bool XMLToolingInternalConfig::log_config(const char* config)
             string path(config);
             PropertyConfigurator::configure(m_pathResolver ? m_pathResolver->resolve(path, PathResolver::XMLTOOLING_CFG_FILE) : path);
         }
-    }
+
+#ifndef XMLTOOLING_NO_XMLSEC
+        Category::getInstance(XMLTOOLING_LOGCAT".Signature.Debugger").setAdditivity(false);
+#endif
+	}
     catch (const ConfigureFailure& e) {
         string msg = string("failed to configure logging: ") + e.what();
         Category::getInstance(XMLTOOLING_LOGCAT".Logging").crit(msg);
 #ifdef WIN32
-        LogEvent(NULL, EVENTLOG_ERROR_TYPE, 2100, NULL, msg.c_str());
+        LogEvent(nullptr, EVENTLOG_ERROR_TYPE, 2100, nullptr, msg.c_str());
 #endif
         return false;
     }
@@ -296,6 +367,9 @@ bool XMLToolingInternalConfig::init()
 
 #ifndef XMLTOOLING_NO_XMLSEC
         XSECPlatformUtils::Initialise();
+# ifdef XMLTOOLING_XMLSEC_DEBUGLOGGING
+        XSECPlatformUtils::SetReferenceLoggingSink(TXFMOutputLogFactory);
+# endif
         m_xsecProvider=new XSECProvider();
         log.debug("XML-Security %s initialization complete", XSEC_FULLVERSIONDOT);
 #endif
@@ -307,7 +381,7 @@ bool XMLToolingInternalConfig::init()
         // Load catalogs from path.
         if (!catalog_path.empty()) {
             char* catpath=strdup(catalog_path.c_str());
-            char* sep=NULL;
+            char* sep=nullptr;
             char* start=catpath;
             while (start && *start) {
                 sep=strchr(start,PATH_SEPARATOR_CHAR);
@@ -315,7 +389,7 @@ bool XMLToolingInternalConfig::init()
                     *sep=0;
                 auto_ptr_XMLCh temp(start);
                 m_validatingPool->loadCatalog(temp.get());
-                start = sep ? sep + 1 : NULL;
+                start = sep ? sep + 1 : nullptr;
             }
             free(catpath);
         }
@@ -348,7 +422,7 @@ bool XMLToolingInternalConfig::init()
         registerSOAPTransports();
         initSOAPTransports();
         registerStorageServices();
-        m_keyInfoResolver = KeyInfoResolverManager.newPlugin(INLINE_KEYINFO_RESOLVER,NULL);
+        m_keyInfoResolver = KeyInfoResolverManager.newPlugin(INLINE_KEYINFO_RESOLVER,nullptr);
 #endif
 
         m_pathResolver = new PathResolver();
@@ -386,7 +460,7 @@ bool XMLToolingInternalConfig::init()
 void XMLToolingInternalConfig::term()
 {
 #ifndef XMLTOOLING_NO_XMLSEC
-    CRYPTO_set_locking_callback(NULL);
+    CRYPTO_set_locking_callback(nullptr);
     for_each(g_openssl_locks.begin(), g_openssl_locks.end(), xmltooling::cleanup<Mutex>());
     g_openssl_locks.clear();
 #endif
@@ -406,20 +480,20 @@ void XMLToolingInternalConfig::term()
     m_algorithmMap.clear();
 
     delete m_keyInfoResolver;
-    m_keyInfoResolver = NULL;
+    m_keyInfoResolver = nullptr;
 
     delete m_replayCache;
-    m_replayCache = NULL;
+    m_replayCache = nullptr;
 #endif
 
     delete m_pathResolver;
-    m_pathResolver = NULL;
+    m_pathResolver = nullptr;
 
     delete m_templateEngine;
-    m_templateEngine = NULL;
+    m_templateEngine = nullptr;
 
     delete m_urlEncoder;
-    m_urlEncoder = NULL;
+    m_urlEncoder = nullptr;
 
     for (vector<void*>::reverse_iterator i=m_libhandles.rbegin(); i!=m_libhandles.rend(); i++) {
 #if defined(WIN32)
@@ -439,18 +513,18 @@ void XMLToolingInternalConfig::term()
     m_libhandles.clear();
 
     delete m_parserPool;
-    m_parserPool=NULL;
+    m_parserPool=nullptr;
     delete m_validatingPool;
-    m_validatingPool=NULL;
+    m_validatingPool=nullptr;
 
 #ifndef XMLTOOLING_NO_XMLSEC
     delete m_xsecProvider;
-    m_xsecProvider=NULL;
+    m_xsecProvider=nullptr;
     XSECPlatformUtils::Terminate();
 #endif
 
     XMLPlatformUtils::closeMutex(m_lock);
-    m_lock=NULL;
+    m_lock=nullptr;
     XMLPlatformUtils::Terminate();
 
 #ifndef XMLTOOLING_NO_XMLSEC
@@ -487,16 +561,16 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
     m_pathResolver->resolve(resolved, PathResolver::XMLTOOLING_LIB_FILE);
 
 #if defined(WIN32)
-    HMODULE handle=NULL;
+    HMODULE handle=nullptr;
     for (string::iterator i = resolved.begin(); i != resolved.end(); ++i)
         if (*i == '/')
             *i = '\\';
 
     UINT em=SetErrorMode(SEM_FAILCRITICALERRORS);
     try {
-        handle=LoadLibraryEx(resolved.c_str(),NULL,LOAD_WITH_ALTERED_SEARCH_PATH);
+        handle=LoadLibraryEx(resolved.c_str(),nullptr,LOAD_WITH_ALTERED_SEARCH_PATH);
         if (!handle)
-             handle=LoadLibraryEx(resolved.c_str(),NULL,0);
+             handle=LoadLibraryEx(resolved.c_str(),nullptr,0);
         if (!handle)
             throw runtime_error(string("unable to load extension library: ") + resolved);
         FARPROC fn=GetProcAddress(handle,"xmltooling_extension_init");
@@ -543,6 +617,7 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
 }
 
 #ifndef XMLTOOLING_NO_XMLSEC
+
 void xmltooling::log_openssl()
 {
     const char* file;
@@ -564,38 +639,118 @@ XSECCryptoX509CRL* XMLToolingInternalConfig::X509CRL() const
     return new OpenSSLCryptoX509CRL();
 }
 
+pair<const char*,unsigned int> XMLToolingInternalConfig::mapXMLAlgorithmToKeyAlgorithm(const XMLCh* xmlAlgorithm) const
+{
+    for (algmap_t::const_iterator i = m_algorithmMap.begin(); i != m_algorithmMap.end(); ++i) {
+        algmap_t::value_type::second_type::const_iterator j = i->second.find(xmlAlgorithm);
+        if (j != i->second.end())
+            return pair<const char*,unsigned int>(j->second.first.c_str(), j->second.second);
+    }
+    return pair<const char*,unsigned int>(nullptr, 0);
+}
+
+void XMLToolingInternalConfig::registerXMLAlgorithm(
+    const XMLCh* xmlAlgorithm, const char* keyAlgorithm, unsigned int size, XMLSecurityAlgorithmType type
+    )
+{
+    m_algorithmMap[type][xmlAlgorithm] = pair<string,unsigned int>((keyAlgorithm ? keyAlgorithm : ""), size);
+}
+
+bool XMLToolingInternalConfig::isXMLAlgorithmSupported(const XMLCh* xmlAlgorithm, XMLSecurityAlgorithmType type)
+{
+    try {
+        // First check for basic support from the xmlsec layer.
+        if (XSECPlatformUtils::g_algorithmMapper->mapURIToHandler(xmlAlgorithm)) {
+            // Make sure the algorithm is registered.
+            algmap_t::const_iterator i = m_algorithmMap.find(type);
+            if (i != m_algorithmMap.end()) {
+                algmap_t::value_type::second_type::const_iterator j = i->second.find(xmlAlgorithm);
+                if (j != i->second.end())
+                    return true;
+            }
+        }
+    }
+    catch (XSECException&) {
+    }
+    return false;
+}
+
 void XMLToolingInternalConfig::registerXMLAlgorithms()
 {
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_MD5, "RSA", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA1, "RSA", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA224, "RSA", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA256, "RSA", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA384, "RSA", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA512, "RSA", 0);
+    // The deal with all the macros is to try and figure out with no false positives whether
+    // the OpenSSL version *and* the XML-Security version support the algorithms.
 
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_1_5, "RSA", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1, "RSA", 0);
+    // With ECDSA, XML-Security exports a public macro for OpenSSL's support, and any
+    // versions of XML-Security that didn't provide the macro don't handle ECDSA anyway.
 
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIDSA_SHA1, "DSA", 0);
+    // With AES, all supported XML-Security versions export a macro for OpenSSL's support.
 
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA1, "HMAC", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA224, "HMAC", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA256, "HMAC", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA384, "HMAC", 0);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA512, "HMAC", 0);
+    // With SHA2, only the very latest XML-Security exports a macro, but all the versions
+    // will handle SHA2 *if* OpenSSL does. So we use our own macro to check OpenSSL's
+    // support, and then add checks to see if specific versions are compiled out.
 
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURI3DES_CBC, "DESede", 192);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_3DES, "DESede", 192);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIMD5, nullptr, 0, ALGTYPE_DIGEST);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURISHA1, nullptr, 0, ALGTYPE_DIGEST);
+#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA256)
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURISHA224, nullptr, 0, ALGTYPE_DIGEST);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURISHA256, nullptr, 0, ALGTYPE_DIGEST);
+#endif
+#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA512)
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURISHA384, nullptr, 0, ALGTYPE_DIGEST);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURISHA512, nullptr, 0, ALGTYPE_DIGEST);
+#endif
 
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES128_CBC, "AES", 128);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES128, "AES", 128);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIDSA_SHA1, "DSA", 0, ALGTYPE_SIGN);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_MD5, "RSA", 0, ALGTYPE_SIGN);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA1, "RSA", 0, ALGTYPE_SIGN);
+#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA256)
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA224, "RSA", 0, ALGTYPE_SIGN);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA256, "RSA", 0, ALGTYPE_SIGN);
+#endif
+#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA512)
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA384, "RSA", 0, ALGTYPE_SIGN);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA512, "RSA", 0, ALGTYPE_SIGN);
+#endif
 
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES192_CBC, "AES", 192);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES192, "AES", 192);
+#ifdef XSEC_OPENSSL_HAVE_EC
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA1, "EC", 0, ALGTYPE_SIGN);
+#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA256)
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA256, "EC", 0, ALGTYPE_SIGN);
+# endif
+#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA512)
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA384, "EC", 0, ALGTYPE_SIGN);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA512, "EC", 0, ALGTYPE_SIGN);
+# endif
+#endif
 
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES256_CBC, "AES", 256);
-    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES256, "AES", 256);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA1, "HMAC", 0, ALGTYPE_SIGN);
+#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA256)
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA224, "HMAC", 0, ALGTYPE_SIGN);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA256, "HMAC", 0, ALGTYPE_SIGN);
+#endif
+#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA512)
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA384, "HMAC", 0, ALGTYPE_SIGN);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIHMAC_SHA512, "HMAC", 0, ALGTYPE_SIGN);
+#endif
+
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_1_5, "RSA", 0, ALGTYPE_KEYENCRYPT);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1, "RSA", 0, ALGTYPE_KEYENCRYPT);
+
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURI3DES_CBC, "DESede", 192, ALGTYPE_ENCRYPT);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_3DES, "DESede", 192, ALGTYPE_KEYENCRYPT);
+
+#ifdef XSEC_OPENSSL_HAVE_AES
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES128_CBC, "AES", 128, ALGTYPE_ENCRYPT);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES128, "AES", 128, ALGTYPE_KEYENCRYPT);
+
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES192_CBC, "AES", 192, ALGTYPE_ENCRYPT);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES192, "AES", 192, ALGTYPE_KEYENCRYPT);
+
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES256_CBC, "AES", 256, ALGTYPE_ENCRYPT);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES256, "AES", 256, ALGTYPE_KEYENCRYPT);
+#endif
 }
+
 #endif
 
 #ifdef WIN32

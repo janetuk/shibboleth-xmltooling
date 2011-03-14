@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * Namespace.cpp
  * 
- * Representing XML namespace attributes 
+ * Representing XML namespace attributes.
  */
 
 #include "internal.h"
@@ -27,7 +27,8 @@ using namespace xmltooling;
 
 using xercesc::XMLString;
 
-Namespace::Namespace(const XMLCh* uri, const XMLCh* prefix, bool alwaysDeclare) : m_pinned(alwaysDeclare)
+Namespace::Namespace(const XMLCh* uri, const XMLCh* prefix, bool alwaysDeclare, namespace_usage_t usage)
+    : m_pinned(alwaysDeclare), m_usage(usage)
 {
     setNamespaceURI(uri);
     setNamespacePrefix(prefix);

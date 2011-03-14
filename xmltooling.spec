@@ -1,25 +1,25 @@
 Name:		xmltooling
-Version:	1.3.3
+Version:	1.4.1
 Release:	1
 Summary:    OpenSAML XMLTooling library
-Group:		System Environment/Libraries
+Group:		Development/Libraries/C and C++
 Vendor:		Internet2
 License:	Apache 2.0
 URL:		http://www.opensaml.org/
 Source:	    %{name}-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root
-%if 0%{?suse_version} > 1030
+%if 0%{?suse_version} > 1030 && 0%{?suse_version} < 1130
 BuildRequires:  libXerces-c-devel >= 2.8.0
+%else
+BuildRequires:  libxerces-c-devel >= 2.8.0
+%endif
 BuildRequires:  libxml-security-c-devel >= 1.4.0
 %{?_with_log4cpp:BuildRequires: liblog4cpp-devel >= 1.0}
 %{!?_with_log4cpp:BuildRequires: liblog4shib-devel}
-%else
-BuildRequires:  xerces%{?xercesver}-c-devel >= 2.8.0
-BuildRequires:  xml-security-c-devel >= 1.4.0
-%{?_with_log4cpp:BuildRequires: log4cpp-devel >= 1.0}
-%{!?_with_log4cpp:BuildRequires: log4shib-devel}
-%endif
 BuildRequires:	gcc-c++, openssl-devel, curl-devel >= 7.10.6
+%if 0%{?suse_version} > 1000
+BuildRequires: pkg-config
+%endif
 %{!?_without_doxygen:BuildRequires: doxygen}
 %if "%{_vendor}" == "redhat"
 BuildRequires: redhat-rpm-config
@@ -38,14 +38,13 @@ for declaring element- and type-specific API and implementation
 classes to add value around the DOM, as well as signing and encryption
 support.
 
-%if 0%{?suse_version} > 1030
-%package -n libxmltooling4
+%package -n libxmltooling5
 Summary:    OpenSAML XMLTooling library
-Group:      Development/Libraries
-Provides:   xmltooling = %{version}
-Obsoletes:  xmltooling
+Group:      Development/Libraries/C and C++
+Provides:   xmltooling = %{version}-%{release}
+Obsoletes:  xmltooling < %{version}-%{release}
 
-%description -n libxmltooling4
+%description -n libxmltooling5
 The XMLTooling library contains generic XML parsing and processing
 classes based on the Xerces-C DOM. It adds more powerful facilities
 for declaring element- and type-specific API and implementation
@@ -53,36 +52,24 @@ classes to add value around the DOM, as well as signing and encryption
 support.
 
 This package contains just the shared library.
-%endif
 
-%if 0%{?suse_version} > 1030
 %package -n libxmltooling-devel
-Requires:   libxmltooling4 = %version
-Obsoletes:  xmltooling-devel
+Summary:	XMLTooling development Headers
+Group:		Development/Libraries/C and C++
+Requires:	libxmltooling5 = %{version}-%{release}
+Provides:	xmltooling-devel = %{version}-%{release}
+Obsoletes:	xmltooling-devel < %{version}-%{release}
+%if 0%{?suse_version} > 1030 && 0%{?suse_version} < 1130
+Requires:  libXerces-c-devel >= 2.8.0
 %else
-%package devel
-Requires:   %name = %version
+Requires:  libxerces-c-devel >= 2.8.0
 %endif
-Summary: XMLTooling development Headers
-Group: Development/Libraries
-%if 0%{?suse_version} > 1030
-Requires: libXerces-c-devel >= 2.8.0
 Requires: libxml-security-c-devel >= 1.4.0
 %{?_with_log4cpp:Requires: liblog4cpp-devel >= 1.0}
 %{!?_with_log4cpp:Requires: liblog4shib-devel}
-%else
-Requires: xerces%{?xercesver}-c-devel >= 2.8.0
-Requires: xml-security-c-devel >= 1.4.0
-%{?_with_log4cpp:Requires: log4cpp-devel >= 1.0}
-%{!?_with_log4cpp:Requires: log4shib-devel}
-%endif
 Requires: openssl-devel, curl-devel >= 7.10.6
 
-%if 0%{?suse_version} > 1030
 %description -n libxmltooling-devel
-%else
-%description devel
-%endif
 The XMLTooling library contains generic XML parsing and processing
 classes based on the Xerces-C DOM. It adds more powerful facilities
 for declaring element- and type-specific API and implementation
@@ -90,6 +77,19 @@ classes to add value around the DOM, as well as signing and encryption
 support.
 
 This package includes files needed for development with XMLTooling.
+
+%package -n xmltooling-schemas
+Summary:	XMLTooling schemas and catalog
+Group:		Development/Libraries/C and C++
+
+%description -n xmltooling-schemas
+The XMLTooling library contains generic XML parsing and processing
+classes based on the Xerces-C DOM. It adds more powerful facilities
+for declaring element- and type-specific API and implementation
+classes to add value around the DOM, as well as signing and encryption
+support.
+
+This package includes XML schemas and related files.
 
 %prep
 %setup -q
@@ -110,42 +110,37 @@ This package includes files needed for development with XMLTooling.
 [ "$RPM_BUILD_ROOT" != "/" ] && %{__rm} -rf $RPM_BUILD_ROOT
 
 %ifnos solaris2.8 solaris2.9 solaris2.10
-%if 0%{?suse_version} > 1030
-%post -n libxmltooling4 -p /sbin/ldconfig
-%else
-%post -p /sbin/ldconfig
-%endif
+%post -n libxmltooling5 -p /sbin/ldconfig
 %endif
 
 %ifnos solaris2.8 solaris2.9 solaris2.10
-%if 0%{?suse_version} > 1030
-%postun -n libxmltooling4 -p /sbin/ldconfig
-%else
-%postun -p /sbin/ldconfig
-%endif
+%postun -n libxmltooling5 -p /sbin/ldconfig
 %endif
 
-%if 0%{?suse_version} > 1030
-%files -n libxmltooling4
-%else
-%files
-%endif
+%files -n libxmltooling5
 %defattr(-,root,root,-)
 %{_libdir}/*.so.*
+
+%files -n xmltooling-schemas
+%defattr(-,root,root,-)
 %dir %{_datadir}/xml/xmltooling
 %{_datadir}/xml/xmltooling/*
 
-%if 0%{?suse_version} > 1030
 %files -n libxmltooling-devel
-%else
-%files devel
-%endif
 %defattr(-,root,root,-)
 %{_includedir}/*
 %{_libdir}/*.so
+%{_libdir}/pkgconfig/xmltooling.pc
 %doc %{pkgdocdir}
 
 %changelog
+* Tue Oct 26 2010  Scott Cantor  <cantor.2@osu.edu>  - 1.4-1
+- Update version
+- Add pkg-config support.
+- Sync package names for side by side install.
+- Adjust Xerces dependency name and Group setting
+- Split out schemas into separate subpackage
+
 * Mon Aug 31 2009  Scott Cantor  <cantor.2@osu.edu>  - 1.3-1
 - Bump soname for SUSE packaging.
 

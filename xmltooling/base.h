@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2008 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 /**
  * @file xmltooling/base.h
  *
- * Base header file definitions
- * Must be included prior to including any other header
+ * Base header file definitions.
+ * Must be included prior to including any other header.
  */
 
 #ifndef __xmltooling_base_h__
@@ -37,6 +37,10 @@
 
 #ifdef XMLTOOLING_LITE
 # define XMLTOOLING_NO_XMLSEC 1
+#endif
+
+#ifndef HAVE_NULLPTR
+# define nullptr 0
 #endif
 
 #if defined(XMLTOOLING_NO_XMLSEC) || !defined(HAVE_XSECSIZE_T)
@@ -683,7 +687,7 @@
         XMLCh* m_##proper; \
     public: \
         pair<bool,int> get##proper() const { \
-            return make_pair((m_##proper!=NULL),(m_##proper!=NULL ? xercesc::XMLString::parseInt(m_##proper): 0)); \
+            return make_pair((m_##proper!=nullptr),(m_##proper!=nullptr ? xercesc::XMLString::parseInt(m_##proper): 0)); \
         } \
         void set##proper(const XMLCh* proper) { \
             m_##proper = prepareForAssignment(m_##proper,proper); \
@@ -731,7 +735,7 @@
         void set##proper(const type* proper) { \
             m_##proper = prepareForAssignment(m_##proper,proper); \
             XMLString::release(&m_##proper##Prefix); \
-            m_##proper##Prefix = NULL; \
+            m_##proper##Prefix = nullptr; \
         }
 
 /**
@@ -1237,7 +1241,7 @@
 #define DECL_INTEGER_CONTENT(proper) \
     XMLTOOLING_DOXYGEN(Returns proper in integer form after a NULL indicator.) \
     std::pair<bool,int> get##proper() const { \
-        return std::make_pair((getTextContent()!=NULL), (getTextContent()!=NULL ? xercesc::XMLString::parseInt(getTextContent()) : 0)); \
+        return std::make_pair((getTextContent()!=nullptr), (getTextContent()!=nullptr ? xercesc::XMLString::parseInt(getTextContent()) : 0)); \
     } \
     XMLTOOLING_DOXYGEN(Sets proper.) \
     void set##proper(int proper) { \
@@ -1334,7 +1338,7 @@
         } \
         XMLTOOLING_DOXYGEN(Builder that allows element/type override.) \
         virtual cname* buildObject( \
-            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const xmltooling::QName* schemaType=NULL \
+            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=nullptr, const xmltooling::QName* schemaType=nullptr \
             ) const
 
 /**
@@ -1399,7 +1403,7 @@
         } \
         XMLTOOLING_DOXYGEN(Builder that allows element/type override.) \
         virtual xmltooling::XMLObject* buildObject( \
-            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const xmltooling::QName* schemaType=NULL \
+            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=nullptr, const xmltooling::QName* schemaType=nullptr \
             ) const
 
 /**
@@ -1561,11 +1565,11 @@
  */
 #define XMLOBJECTVALIDATOR_ONLYONEOF3(cname,proper1,proper2,proper3) \
     int c##proper1##proper2##proper3=0; \
-    if (ptr->get##proper1()!=NULL) \
+    if (ptr->get##proper1()!=nullptr) \
         c##proper1##proper2##proper3++; \
-    if (ptr->get##proper2()!=NULL) \
+    if (ptr->get##proper2()!=nullptr) \
         c##proper1##proper2##proper3++; \
-    if (ptr->get##proper3()!=NULL) \
+    if (ptr->get##proper3()!=nullptr) \
         c##proper1##proper2##proper3++; \
     if (c##proper1##proper2##proper3 != 1) \
         throw xmltooling::ValidationException(#cname" must have only one of "#proper1", "#proper2", or "#proper3".")

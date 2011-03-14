@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ class EncryptionTest : public CxxTest::TestSuite {
     CredentialResolver* m_resolver;
 public:
     void setUp() {
-        m_resolver=NULL;
+        m_resolver=nullptr;
         string config = data_path + "FilesystemCredentialResolver.xml";
         ifstream in(config.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(in);
@@ -53,14 +53,14 @@ public:
         string path=data_path + "ComplexXMLObject.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
 
         try {
             CredentialCriteria cc;
             cc.setUsage(Credential::ENCRYPTION_CREDENTIAL);
             Locker locker(m_resolver);
             const Credential* cred=m_resolver->resolve(&cc);
-            TSM_ASSERT("Retrieved credential was null", cred!=NULL);
+            TSM_ASSERT("Retrieved credential was null", cred!=nullptr);
 
             Encrypter encrypter;
             Encrypter::EncryptionParams ep;

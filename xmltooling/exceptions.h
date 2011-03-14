@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@
     class linkage name : public base { \
     public: \
         XMLTOOLING_DOXYGEN(Constructor) \
-        name(const char* msg=NULL, const xmltooling::params& p=xmltooling::params()) : base(msg,p) {} \
+        name(const char* msg=nullptr, const xmltooling::params& p=xmltooling::params()) : base(msg,p) {} \
         XMLTOOLING_DOXYGEN(Constructor) \
         name(const char* msg, const xmltooling::namedparams& p) : base(msg,p) {} \
         XMLTOOLING_DOXYGEN(Constructor) \
@@ -148,7 +148,7 @@ namespace xmltooling {
          * @param msg   error message
          * @param p     an ordered set of positional parameter strings
          */
-        XMLToolingException(const char* msg=NULL, const params& p=params());
+        XMLToolingException(const char* msg=nullptr, const params& p=params());
 
         /**
          * Constructs an exception using a message and named parameters.
@@ -241,7 +241,7 @@ namespace xmltooling {
          * Returns the parameter property with the designated position (based from one).
          * 
          * @param index     position to access
-         * @return  the parameter property or NULL
+         * @return  the parameter property or nullptr
          */
         const char* getProperty(unsigned int index) const;
 
@@ -249,7 +249,7 @@ namespace xmltooling {
          * Returns the parameter property with the designated name.
          * 
          * @param name     named parameter to access
-         * @return  the parameter property or NULL
+         * @return  the parameter property or nullptr
          */
         const char* getProperty(const char* name) const;
 

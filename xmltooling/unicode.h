@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ namespace xmltooling {
         /**
          * Default constructor.
          */
-        auto_ptr_char() : m_buf(NULL) {
+        auto_ptr_char() : m_buf(nullptr) {
         }
 
         /**
@@ -138,7 +138,7 @@ namespace xmltooling {
          * @return a null-terminated local code page string
          */
         char* release() {
-            char* temp=m_buf; m_buf=NULL; return temp;
+            char* temp=m_buf; m_buf=nullptr; return temp;
         }
 
     private:
@@ -159,7 +159,7 @@ namespace xmltooling {
         /**
          * Default constructor.
          */
-        auto_ptr_XMLCh() : m_buf(NULL) {
+        auto_ptr_XMLCh() : m_buf(nullptr) {
         }
 
         /**
@@ -200,7 +200,7 @@ namespace xmltooling {
          * @return a null-terminated Unicode string
          */
         XMLCh* release() {
-            XMLCh* temp=m_buf; m_buf=NULL; return temp;
+            XMLCh* temp=m_buf; m_buf=nullptr; return temp;
         }
 
     private:
@@ -247,7 +247,7 @@ namespace xmltooling {
          * @return the wrapped pointer
          */
         T* release() {
-            T* temp=m_ptr; m_ptr=NULL; return temp;
+            T* temp=m_ptr; m_ptr=nullptr; return temp;
         }
     };
 };

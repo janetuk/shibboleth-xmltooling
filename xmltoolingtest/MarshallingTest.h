@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public:
 
     void testMarshallingWithAttributes() {
         auto_ptr<SimpleXMLObject> sxObject(SimpleXMLObjectBuilder::buildSimpleXMLObject());
-        TS_ASSERT(sxObject.get()!=NULL);
+        TS_ASSERT(sxObject.get()!=nullptr);
         auto_ptr_XMLCh expected("Firefly");
         sxObject->setId(expected.get());
         
@@ -45,7 +45,7 @@ public:
         string path=data_path + "SimpleXMLObjectWithAttribute.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
 
         TS_ASSERT(rootElement->isEqualNode(doc->getDocumentElement()));
         doc->release();
@@ -53,7 +53,7 @@ public:
 
     void testMarshallingWithElementContent() {
         auto_ptr<SimpleXMLObject> sxObject(SimpleXMLObjectBuilder::buildSimpleXMLObject());
-        TS_ASSERT(sxObject.get()!=NULL);
+        TS_ASSERT(sxObject.get()!=nullptr);
         auto_ptr_XMLCh expected("Sample Content");
         sxObject->setValue(expected.get());
         
@@ -62,7 +62,7 @@ public:
         string path=data_path + "SimpleXMLObjectWithContent.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
 
         TS_ASSERT(rootElement->isEqualNode(doc->getDocumentElement()));
         doc->release();
@@ -71,10 +71,10 @@ public:
     void testMarshallingWithChildElements() {
         xmltooling::QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
         const SimpleXMLObjectBuilder* b=dynamic_cast<const SimpleXMLObjectBuilder*>(XMLObjectBuilder::getBuilder(qname));
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
         
         auto_ptr<SimpleXMLObject> sxObject(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
-        TS_ASSERT(sxObject.get()!=NULL);
+        TS_ASSERT(sxObject.get()!=nullptr);
         VectorOf(SimpleXMLObject) kids=sxObject->getSimpleXMLObjects();
         kids.push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
         kids.push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
@@ -102,7 +102,7 @@ public:
         string path=data_path + "SimpleXMLObjectWithChildren.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
 
         TS_ASSERT(rootElement->isEqualNode(doc->getDocumentElement()));
         doc->release();

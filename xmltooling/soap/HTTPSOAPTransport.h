@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,14 @@ namespace xmltooling {
          * @return  true iff the header is successfully set
          */
         virtual bool setRequestHeader(const char* name, const char* value)=0;
+
+        /**
+         * Controls redirect behavior.
+         *
+         * @param follow    true iff Location-based redirects should be honored
+         * @param maxRedirs maximum number of redirects to permit
+         */
+        virtual bool followRedirects(bool follow, unsigned int maxRedirs);
         
         /**
          * Returns the values of an HTTP response header.

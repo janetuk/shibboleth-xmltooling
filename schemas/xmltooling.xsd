@@ -2,7 +2,8 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema" 
     xmlns:xt="http://www.opensaml.org/xmltooling"
     targetNamespace="http://www.opensaml.org/xmltooling"
-    elementFormDefault="qualified">
+    elementFormDefault="qualified"
+    version="1.4">
 
     <element name="exception" type="xt:XMLToolingExceptionType"/>
     <complexType name="XMLToolingExceptionType">
@@ -20,5 +21,7 @@
         </sequence>
         <attribute name="type" type="string" use="required"/>
     </complexType>
+
+    <element name="URLInputSourceStatus" type="unsignedShort"/>
 
 </schema>

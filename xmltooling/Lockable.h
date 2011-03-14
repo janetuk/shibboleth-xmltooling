@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ namespace xmltooling {
          * @param lockee    pointer to an object to hold, and optionally lock
          * @param lock      true iff object is not yet locked
          */
-        Locker(Lockable* lockee=NULL, bool lock=true);
+        Locker(Lockable* lockee=nullptr, bool lock=true);
 
         /**
          * Optionally locks an object and stores it for later release.
@@ -72,7 +72,7 @@ namespace xmltooling {
          * @param lockee    pointer to an object to hold, and optionally lock
          * @param lock      true iff object is not yet locked
          */
-        void assign(Lockable* lockee=NULL, bool lock=true);
+        void assign(Lockable* lockee=nullptr, bool lock=true);
         
         /**
          * Destructor releases lock on held pointer, if any.

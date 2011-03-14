@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ using namespace xmlsignature;
 class InlineKeyResolverTest : public CxxTest::TestSuite {
     KeyInfoResolver* m_resolver;
 public:
-    InlineKeyResolverTest() : m_resolver(NULL) {}
+    InlineKeyResolverTest() : m_resolver(nullptr) {}
 
     void setUp() {
         string config = data_path + "InlineKeyResolver.xml";
@@ -39,25 +39,44 @@ public:
 
     void tearDown() {
         delete m_resolver;
-        m_resolver=NULL;
+        m_resolver=nullptr;
     }
 
     void testResolver() {
         string path=data_path + "KeyInfo1.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getValidatingParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
         auto_ptr<KeyInfo> kiObject(dynamic_cast<KeyInfo*>(b->buildFromDocument(doc)));
-        TS_ASSERT(kiObject.get()!=NULL);
+        TS_ASSERT(kiObject.get()!=nullptr);
 
         auto_ptr<X509Credential> cred(dynamic_cast<X509Credential*>(m_resolver->resolve(kiObject.get())));
-        TSM_ASSERT("Unable to resolve KeyInfo into Credential.", cred.get()!=NULL);
+        TSM_ASSERT("Unable to resolve KeyInfo into Credential.", cred.get()!=nullptr);
 
-        TSM_ASSERT("Unable to resolve public key.", cred->getPublicKey()!=NULL);
+        TSM_ASSERT("Unable to resolve public key.", cred->getPublicKey()!=nullptr);
         TSM_ASSERT_EQUALS("Unexpected key type.", cred->getPublicKey()->getKeyType(), XSECCryptoKey::KEY_RSA_PUBLIC);
         TSM_ASSERT_EQUALS("Wrong certificate count.", cred->getEntityCertificateChain().size(), 1);
-        TSM_ASSERT("Unable to resolve CRL.", cred->getCRL()!=NULL);
+        TSM_ASSERT_EQUALS("Wrong CRL count.", cred->getCRLs().size(), 3);
+    }
+
+    void testDER() {
+        string path=data_path + "KeyInfo5.xml";
+        ifstream fs(path.c_str());
+        DOMDocument* doc=XMLToolingConfig::getConfig().getValidatingParser().parse(fs);
+        TS_ASSERT(doc!=nullptr);
+        const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
+        TS_ASSERT(b!=nullptr);
+        auto_ptr<KeyInfo> kiObject(dynamic_cast<KeyInfo*>(b->buildFromDocument(doc)));
+        TS_ASSERT(kiObject.get()!=nullptr);
+
+        auto_ptr<X509Credential> cred(dynamic_cast<X509Credential*>(m_resolver->resolve(kiObject.get())));
+        TSM_ASSERT("Unable to resolve KeyInfo into Credential.", cred.get()!=nullptr);
+
+        TSM_ASSERT("Unable to resolve public key.", cred->getPublicKey()!=nullptr);
+        TSM_ASSERT_EQUALS("Unexpected key type.", cred->getPublicKey()->getKeyType(), XSECCryptoKey::KEY_RSA_PUBLIC);
+        TSM_ASSERT_EQUALS("Wrong certificate count.", cred->getEntityCertificateChain().size(), 0);
+        TSM_ASSERT_EQUALS("Wrong CRL count.", cred->getCRLs().size(), 0);
     }
 };

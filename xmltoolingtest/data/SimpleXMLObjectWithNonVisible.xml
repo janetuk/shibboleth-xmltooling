@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SimpleElement xmlns="http://www.example.org/testObjects" xmlns:test="http://www.example.org/testObjects"
+Id="Firefly" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="test:SimpleElementType" attr1="test2:Value1"/>

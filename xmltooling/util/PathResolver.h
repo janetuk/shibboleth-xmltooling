@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,12 +106,12 @@ namespace xmltooling {
          *
          * @param s         filename to resolve
          * @param filetype  type of file being resolved
-         * @param pkgname   application package name to use in resolving the file (or NULL for the default)
-         * @param prefix    installation prefix to use in resolving the file (or NULL for the default)
+         * @param pkgname   application package name to use in resolving the file (or nullptr for the default)
+         * @param prefix    installation prefix to use in resolving the file (or nullptr for the default)
          *
          * @return a const reference to the input string
          */
-        virtual const std::string& resolve(std::string& s, file_type_t filetype, const char* pkgname=NULL, const char* prefix=NULL) const;
+        virtual const std::string& resolve(std::string& s, file_type_t filetype, const char* pkgname=nullptr, const char* prefix=nullptr) const;
 
     private:
         bool isAbsolute(const char* s) const;

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ using xercesc::DOMDocument;
 using xercesc::DOMElement;
 
 map<QName,XMLObjectBuilder*> XMLObjectBuilder::m_map;
-XMLObjectBuilder* XMLObjectBuilder::m_default=NULL;
+XMLObjectBuilder* XMLObjectBuilder::m_default = nullptr;
 
 XMLObjectBuilder::XMLObjectBuilder()
 {
@@ -66,13 +66,13 @@ XMLObject* XMLObjectBuilder::buildFromDocument(DOMDocument* doc, bool bindDocume
 XMLObject* XMLObjectBuilder::buildOneFromElement(xercesc::DOMElement* element, bool bindDocument)
 {
     const XMLObjectBuilder* b=getBuilder(element);
-    return b ? b->buildFromElement(element,bindDocument) : NULL;
+    return b ? b->buildFromElement(element,bindDocument) : nullptr;
 }
 
 const XMLObjectBuilder* XMLObjectBuilder::getBuilder(const QName& key)
 {
     map<QName,XMLObjectBuilder*>::const_iterator i=m_map.find(key);
-    return (i==m_map.end()) ? NULL : i->second;
+    return (i==m_map.end()) ? nullptr : i->second;
 }
 
 const XMLObjectBuilder* XMLObjectBuilder::getBuilder(const DOMElement* domElement)
@@ -83,7 +83,7 @@ const XMLObjectBuilder* XMLObjectBuilder::getBuilder(const DOMElement* domElemen
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".XMLObject.Builder");
  
     auto_ptr<QName> schemaType(XMLHelper::getXSIType(domElement));
-    const XMLObjectBuilder* xmlObjectBuilder = schemaType.get() ? getBuilder(*(schemaType.get())) : NULL;
+    const XMLObjectBuilder* xmlObjectBuilder = schemaType.get() ? getBuilder(*(schemaType.get())) : nullptr;
     if (xmlObjectBuilder) {
         if (log.isDebugEnabled()) {
             log.debug("located XMLObjectBuilder for schema type: %s", schemaType->toString().c_str());
@@ -137,7 +137,7 @@ void XMLObjectBuilder::deregisterBuilder(const QName& builderKey)
 void XMLObjectBuilder::deregisterDefaultBuilder()
 {
     delete m_default;
-    m_default=NULL;
+    m_default = nullptr;
 }
 
 void XMLObjectBuilder::destroyBuilders()

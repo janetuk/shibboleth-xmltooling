@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ namespace xmltooling {
     /**
      * Singleton object that manages library startup/shutdown.configuration.
      * 
-     * A locking interface is supplied as a convenience for code that wants to
+     * <p>A locking interface is supplied as a convenience for code that wants to
      * obtain a global system lock, but the actual configuration itself is not
      * synchronized.
      */
@@ -104,42 +104,40 @@ namespace xmltooling {
         
         /**
          * Shuts down library
-         * 
-         * Each process using the library SHOULD call this function exactly once
+         * <p>Each process using the library SHOULD call this function exactly once
          * before terminating itself
          */
         virtual void term()=0;
 
         /**
          * Loads a shared/dynamic library extension.
-         * 
-         * Extension libraries are managed using a pair of "C" linkage functions:<br>
+         *
+         * <p>Extension libraries are managed using a pair of "C" linkage functions:<br>
          *      extern "C" int xmltooling_extension_init(void* context);<br>
          *      extern "C" void xmltooling_extension_term();
-         * 
-         * This method is internally synchronized.
+         *
+         * <p>This method is internally synchronized.
          * 
          * @param path      pathname of shared library to load into process
          * @param context   arbitrary data to pass to library initialization hook
          * @return true iff library was loaded successfully
          */
-        virtual bool load_library(const char* path, void* context=NULL)=0;
+        virtual bool load_library(const char* path, void* context=nullptr)=0;
         
         /**
          * Configure logging system.
-         * 
-         * May be called first, before initializing the library. Other calls to it
+         * <p>May be called first, before initializing the library. Other calls to it
          * must be externally synchronized. 
          * 
          * @param config    either a logging configuration file, or a level from the set
          *                  (DEBUG, INFO, NOTICE, WARN, ERROR, CRIT, ALERT, FATAL, EMERG)
          * @return true iff configuration was successful
          */
-        virtual bool log_config(const char* config=NULL)=0;
+        virtual bool log_config(const char* config=nullptr)=0;
 
         /**
          * Obtains a non-validating parser pool.
-         * Library must be initialized first.
+         * <p>Library must be initialized first.
          *
          * @return reference to a non-validating parser pool.
          */
@@ -147,7 +145,7 @@ namespace xmltooling {
 
         /**
          * Obtains a validating parser pool.
-         * Library must be initialized first. Schema/catalog registration must be
+         * <p>Library must be initialized first. Schema/catalog registration must be
          * externally synchronized.
          *
          * @return reference to a validating parser pool.
@@ -158,20 +156,20 @@ namespace xmltooling {
         /**
          * Returns the global KeyInfoResolver instance.
          * 
-         * @return  global KeyInfoResolver or NULL
+         * @return  global KeyInfoResolver or nullptr
          */
         const KeyInfoResolver* getKeyInfoResolver() const;
 
         /**
          * Returns the global ReplayCache instance.
          * 
-         * @return  global ReplayCache or NULL
+         * @return  global ReplayCache or nullptr
          */
         ReplayCache* getReplayCache() const;
 
         /**
          * Sets the global KeyInfoResolver instance.
-         * This method must be externally synchronized with any code that uses the object.
+         * <p>This method must be externally synchronized with any code that uses the object.
          * Any previously set object is destroyed.
          * 
          * @param keyInfoResolver   new KeyInfoResolver instance to store
@@ -180,7 +178,7 @@ namespace xmltooling {
 
         /**
          * Sets the global ReplayCache instance.
-         * This method must be externally synchronized with any code that uses the object.
+         * <p>This method must be externally synchronized with any code that uses the object.
          * Any previously set object is destroyed.
          * 
          * @param replayCache   new ReplayCache instance to store
@@ -191,27 +189,27 @@ namespace xmltooling {
         /**
          * Returns the global PathResolver instance.
          * 
-         * @return  global PathResolver or NULL
+         * @return  global PathResolver or nullptr
          */
         PathResolver* getPathResolver() const;
         
         /**
          * Returns the global TemplateEngine instance.
          * 
-         * @return  global TemplateEngine or NULL
+         * @return  global TemplateEngine or nullptr
          */
         TemplateEngine* getTemplateEngine() const;
 
         /**
          * Returns the global URLEncoder instance.
          * 
-         * @return  global URLEncoder or NULL
+         * @return  global URLEncoder or nullptr
          */
         const URLEncoder* getURLEncoder() const;
 
         /**
          * Sets the global PathResolver instance.
-         * This method must be externally synchronized with any code that uses the object.
+         * <p>This method must be externally synchronized with any code that uses the object.
          * Any previously set object is destroyed.
          * 
          * @param pathResolver   new PathResolver instance to store
@@ -220,7 +218,7 @@ namespace xmltooling {
         
         /**
          * Sets the global TemplateEngine instance.
-         * This method must be externally synchronized with any code that uses the object.
+         * <p>This method must be externally synchronized with any code that uses the object.
          * Any previously set object is destroyed.
          * 
          * @param templateEngine   new TemplateEngine instance to store
@@ -229,7 +227,7 @@ namespace xmltooling {
 
         /**
          * Sets the global URLEncoder instance.
-         * This method must be externally synchronized with any code that uses the object.
+         * <p>This method must be externally synchronized with any code that uses the object.
          * Any previously set object is destroyed.
          * 
          * @param urlEncoder   new URLEncoder instance to store
@@ -238,11 +236,14 @@ namespace xmltooling {
         
         /**
          * List of catalog files to load into validating parser pool at initialization time.
-         * Like other path settings, the separator depends on the platform
+         * <p>Like other path settings, the separator depends on the platform
          * (semicolon on Windows, colon otherwise). 
          */
         std::string catalog_path;
-        
+
+        /** A User-Agent header to include in HTTP client requests. */
+        std::string user_agent;
+
         /**
          * Adjusts any clock comparisons to be more liberal/permissive by the
          * indicated number of seconds.
@@ -285,14 +286,38 @@ namespace xmltooling {
         virtual std::pair<const char*,unsigned int> mapXMLAlgorithmToKeyAlgorithm(const XMLCh* xmlAlgorithm) const=0;
 
         /**
+         * Types of XML Security algorithms.
+         */
+        enum XMLSecurityAlgorithmType {
+            ALGTYPE_UNK,
+            ALGTYPE_DIGEST,
+            ALGTYPE_SIGN,
+            ALGTYPE_ENCRYPT,
+            ALGTYPE_KEYENCRYPT,
+            ALGTYPE_KEYAGREE
+        };
+
+        /**
          * Registers an XML Signature/Encryption algorithm identifier against a library-specific
          * key algorithm and size for use in resolving credentials.
          *
          * @param xmlAlgorithm  XML Signature/Encryption algorithm identifier
          * @param keyAlgorithm  a key algorithm
          * @param size          a key size (or 0 if the size is irrelevant)
+         * @param type          type of algorithm, if known
          */
-        virtual void registerXMLAlgorithm(const XMLCh* xmlAlgorithm, const char* keyAlgorithm, unsigned int size=0)=0;
+        virtual void registerXMLAlgorithm(
+            const XMLCh* xmlAlgorithm, const char* keyAlgorithm, unsigned int size=0, XMLSecurityAlgorithmType type=ALGTYPE_UNK
+            )=0;
+
+        /**
+         * Checks for implementation support of a particular XML Security algorithm.
+         *
+         * @param xmlAlgorithm  XML Signature/Encryption algorithm identifier
+         * @param type          type of algorithm, or ALGTYPE_UNK to ignore
+         * @return  true iff the algorithm is supported by the underlying libraries
+         */
+        virtual bool isXMLAlgorithmSupported(const XMLCh* xmlAlgorithm, XMLSecurityAlgorithmType type=ALGTYPE_UNK)=0;
 #endif
 
         /**

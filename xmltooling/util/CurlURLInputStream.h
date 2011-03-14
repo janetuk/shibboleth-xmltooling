@@ -43,16 +43,18 @@ namespace xmltooling {
         /**
          * Constructor.
          *
-         * @param url   the URL of the resource to fetch
+         * @param url       the URL of the resource to fetch
+         * @param cacheTag  optional pointer to string used for cache management
          */
-        CurlURLInputStream(const char* url);
+        CurlURLInputStream(const char* url, std::string* cacheTag=nullptr);
 
         /**
          * Constructor.
          *
-         * @param url   the URL of the resource to fetch
+         * @param url       the URL of the resource to fetch
+         * @param cacheTag  optional pointer to string used for cache management
          */
-        CurlURLInputStream(const XMLCh* url);
+        CurlURLInputStream(const XMLCh* url, std::string* cacheTag=nullptr);
 
         /**
          * Constructor taking a DOM element supporting the following content:
@@ -66,9 +68,10 @@ namespace xmltooling {
          *  <dd>&lt;TransportOption provider="CURL" option="150"&gt;0&lt;/TransportOption&gt;</dd>
          * </dl>
          * 
-         * @param e     DOM to supply configuration
+         * @param e         DOM to supply configuration
+         * @param cacheTag  optional pointer to string used for cache management
          */
-        CurlURLInputStream(const xercesc::DOMElement* e);
+        CurlURLInputStream(const xercesc::DOMElement* e, std::string* cacheTag=nullptr);
 
         ~CurlURLInputStream();
 
@@ -89,6 +92,15 @@ namespace xmltooling {
 
         xsecsize_t readBytes(XMLByte* const toFill, const xsecsize_t maxToRead);
 
+        /**
+         * Access the OpenSSL context options in place for this object.
+         *
+         * @return bitmask suitable for use with SSL_CTX_set_options
+         */
+        int getOpenSSLOps() const {
+            return fOpenSSLOps;
+        }
+
     private :
         CurlURLInputStream(const CurlURLInputStream&);
         CurlURLInputStream& operator=(const CurlURLInputStream&);
@@ -97,15 +109,18 @@ namespace xmltooling {
         static size_t staticWriteCallback(char *buffer, size_t size, size_t nitems, void *outstream);
         size_t writeCallback(char *buffer, size_t size, size_t nitems);
 
-        void init(const xercesc::DOMElement* e=NULL);
+        void init(const xercesc::DOMElement* e=nullptr);
         bool readMore(int *runningHandles);
 
         logging::Category&  fLog;
+        std::string*        fCacheTag;
         std::string         fURL;
         std::vector<std::string>    fSavedOptions;
+        int                 fOpenSSLOps;
 
         CURLM*              fMulti;
         CURL*               fEasy;
+        struct curl_slist*  fHeaders;
 
         unsigned long       fTotalBytesRead;
         XMLByte*            fWritePtr;
@@ -115,11 +130,13 @@ namespace xmltooling {
 
         // Overflow buffer for when curl writes more data to us
         // than we've asked for.
-        XMLByte             fBuffer[CURL_MAX_WRITE_SIZE];
+        XMLByte*            fBuffer;
         XMLByte*            fBufferHeadPtr;
         XMLByte*            fBufferTailPtr;
+        size_t              fBufferSize;
 
         XMLCh*              fContentType;
+        long                fStatusCode;
 
         char                fError[CURL_ERROR_SIZE];
     };
