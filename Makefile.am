@@ -5,6 +5,12 @@ include doxygen.am
 
 MOSTLYCLEANFILES = $(DX_CLEANFILES)
 
+DISTCLEANFILES = \
+	@PACKAGE_NAME@.pc \
+	@PACKAGE_NAME@.pc.in \
+	@PACKAGE_NAME@-uninstalled.pc \
+	@PACKAGE_NAME@-uninstalled.sh
+
 dist-hook:
 	rm -rf `find $(distdir)/xmltoolingtest/data -name .svn`
 	rm -rf `find $(distdir)/doc/api -name .svn`
