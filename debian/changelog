@@ -15,6 +15,7 @@ xmltooling (1.4.1-1) UNRELEASED; urgency=low
     - Switch to background thread for reloading files
     - Option to re-enable TLS renegotiation when running on 0.9.8m+
     - Improve handling of simple content when comments are present
+    - Fix configure probing with ld --as-needed (Closes: #606486)
   * Force build dependency on xml-security-c 1.6 or later for consistent
     build results.
   * Add build dependency on pkg-config, which upstream now uses to find
