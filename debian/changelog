@@ -9,7 +9,6 @@ xmltooling (1.4.1-1) UNRELEASED; urgency=low
     - Fix config loader detection of no access to file
     - Fix User-Agent string handling for AttributeQuery
     - Ensure chained TrustEngine is not affected by ordering
-    - Isolate schema files in a versioned directory
     - Support ETag caching in reloadable config files
     - Support HTTP caching when accessing remote CRLs
     - Switch to background thread for reloading files
