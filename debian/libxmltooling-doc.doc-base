@@ -9,5 +9,4 @@ Format: HTML
 Index: /usr/share/doc/libxmltooling-doc/html/index.html
 Files: /usr/share/doc/libxmltooling-doc/html/*.html
  /usr/share/doc/libxmltooling-doc/html/*.png
- /usr/share/doc/libxmltooling-doc/html/*.gif
  /usr/share/doc/libxmltooling-doc/html/*.css
