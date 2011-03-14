@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ TemplateEngine::~TemplateEngine()
 {
 }
 
-TemplateEngine::TemplateParameters::TemplateParameters() : m_request(NULL)
+TemplateEngine::TemplateParameters::TemplateParameters() : m_request(nullptr)
 {
 }
 
@@ -51,13 +51,13 @@ TemplateEngine::TemplateParameters::~TemplateParameters()
 const char* TemplateEngine::TemplateParameters::getParameter(const char* name) const
 {
     map<string,string>::const_iterator i=m_map.find(name);
-    return (i!=m_map.end() ? i->second.c_str() : (m_request ? m_request->getParameter(name) : NULL));
+    return (i!=m_map.end() ? i->second.c_str() : (m_request ? m_request->getParameter(name) : nullptr));
 }
 
 const multimap<string,string>* TemplateEngine::TemplateParameters::getLoopCollection(const char* name) const
 {
     map< string,multimap<string,string> >::const_iterator i=m_collectionMap.find(name);
-    return (i!=m_collectionMap.end() ? &(i->second) : NULL);
+    return (i!=m_collectionMap.end() ? &(i->second) : nullptr);
 }
 
 void TemplateEngine::setTagPrefix(const char* tagPrefix)
@@ -135,7 +135,7 @@ void TemplateEngine::process(
     const char* line = buf.c_str();
     const char* thispos;
 
-    while ((thispos = strchr(lastpos, '<')) != NULL) {
+    while ((thispos = strchr(lastpos, '<')) != nullptr) {
         // Output the string up to this token.
         if (visible)
             os << buf.substr(lastpos-line, thispos-lastpos);
@@ -151,7 +151,7 @@ void TemplateEngine::process(
             lastpos = thispos + keytag.length();
 
             // search for the end-tag
-            if ((thispos = strstr(lastpos, "/>")) != NULL) {
+            if ((thispos = strstr(lastpos, "/>")) != nullptr) {
                 string key = buf.substr(lastpos-line, thispos-lastpos);
                 trimspace(key);
 
@@ -179,7 +179,7 @@ void TemplateEngine::process(
             lastpos = thispos + iftag.length();
 
             // search for the end of this tag
-            if ((thispos = strchr(lastpos, '>')) != NULL) {
+            if ((thispos = strchr(lastpos, '>')) != nullptr) {
                 string key = buf.substr(lastpos-line, thispos-lastpos);
                 trimspace(key);
                 bool cond=false;
@@ -209,7 +209,7 @@ void TemplateEngine::process(
             lastpos = thispos + ifnottag.length();
 
             // search for the end of this tag
-            if ((thispos = strchr(lastpos, '>')) != NULL) {
+            if ((thispos = strchr(lastpos, '>')) != nullptr) {
                 string key = buf.substr(lastpos-line, thispos-lastpos);
                 trimspace(key);
                 bool cond=visible;
@@ -242,7 +242,7 @@ void TemplateEngine::process(
             bool cond = visible;
 
             // search for the end of this tag
-            if ((thispos = strchr(lastpos, '>')) != NULL) {
+            if ((thispos = strchr(lastpos, '>')) != nullptr) {
                 key = buf.substr(lastpos-line, thispos-lastpos);
                 trimspace(key);
                 lastpos = thispos + 1; // strlen(">")

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ class SignatureTest : public CxxTest::TestSuite {
     CredentialResolver* m_resolver;
 public:
     void setUp() {
-        m_resolver=NULL;
+        m_resolver=nullptr;
         xmltooling::QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
         xmltooling::QName qtype(SimpleXMLObject::NAMESPACE,SimpleXMLObject::TYPE_NAME);
         XMLObjectBuilder::registerBuilder(qname, new SimpleXMLObjectBuilder());
@@ -101,10 +101,10 @@ public:
     void testSignature() {
         xmltooling::QName qname(SimpleXMLObject::NAMESPACE,SimpleXMLObject::LOCAL_NAME);
         const SimpleXMLObjectBuilder* b=dynamic_cast<const SimpleXMLObjectBuilder*>(XMLObjectBuilder::getBuilder(qname));
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
         
         auto_ptr<SimpleXMLObject> sxObject(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
-        TS_ASSERT(sxObject.get()!=NULL);
+        TS_ASSERT(sxObject.get()!=nullptr);
         VectorOf(SimpleXMLObject) kids=sxObject->getSimpleXMLObjects();
         kids.push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
         kids.push_back(dynamic_cast<SimpleXMLObject*>(b->buildObject()));
@@ -124,12 +124,12 @@ public:
         cc.setUsage(Credential::SIGNING_CREDENTIAL);
         Locker locker(m_resolver);
         const Credential* cred = m_resolver->resolve(&cc);
-        TSM_ASSERT("Retrieved credential was null", cred!=NULL);
+        TSM_ASSERT("Retrieved credential was null", cred!=nullptr);
         
-        DOMElement* rootElement = NULL;
+        DOMElement* rootElement = nullptr;
         try {
             vector<Signature*> sigs(1,sig);
-            rootElement=sxObject->marshall((DOMDocument*)NULL,&sigs,cred);
+            rootElement=sxObject->marshall((DOMDocument*)nullptr,&sigs,cred);
         }
         catch (XMLToolingException& e) {
             TS_TRACE(e.what());
@@ -143,8 +143,8 @@ public:
         istringstream in(buf);
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(in);
         auto_ptr<SimpleXMLObject> sxObject2(dynamic_cast<SimpleXMLObject*>(b->buildFromDocument(doc)));
-        TS_ASSERT(sxObject2.get()!=NULL);
-        TS_ASSERT(sxObject2->getSignature()!=NULL);
+        TS_ASSERT(sxObject2.get()!=nullptr);
+        TS_ASSERT(sxObject2->getSignature()!=nullptr);
         
         try {
             TestValidator tv(&chNull, cred);

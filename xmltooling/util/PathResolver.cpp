@@ -78,6 +78,8 @@ void PathResolver::setCfgDir(const char* dir)
 bool PathResolver::isAbsolute(const char* s) const
 {
     switch (*s) {
+        case 0:
+            return false;
         case '/':
         case '\\':
             return true;

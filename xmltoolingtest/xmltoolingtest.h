@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,22 +73,22 @@ public:
     void testUnknown() {
         ifstream fs("../xmltoolingtest/data/SimpleXMLObjectWithChildren.xml");
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
 
         string buf1;
         XMLHelper::serialize(doc->getDocumentElement(), buf1);
 
         const XMLObjectBuilder* b=XMLObjectBuilder::getBuilder(doc->getDocumentElement());
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
 
         auto_ptr<XMLObject> xmlObject(b->buildFromDocument(doc)); // bind document
-        TS_ASSERT(xmlObject.get()!=NULL);
+        TS_ASSERT(xmlObject.get()!=nullptr);
 
         auto_ptr<XMLObject> clonedObject(xmlObject->clone());
-        TS_ASSERT(clonedObject.get()!=NULL);
+        TS_ASSERT(clonedObject.get()!=nullptr);
 
         DOMElement* rootElement=clonedObject->marshall();
-        TS_ASSERT(rootElement!=NULL);
+        TS_ASSERT(rootElement!=nullptr);
 
         // should reuse DOM
         TS_ASSERT(rootElement==clonedObject->marshall());
@@ -101,20 +101,20 @@ public:
     void testUnknownWithDocChange() {
         ifstream fs("../xmltoolingtest/data/SimpleXMLObjectWithChildren.xml");
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
 
         string buf1;
         XMLHelper::serialize(doc->getDocumentElement(), buf1);
 
         const XMLObjectBuilder* b=XMLObjectBuilder::getBuilder(doc->getDocumentElement());
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
 
         auto_ptr<XMLObject> xmlObject(b->buildFromDocument(doc)); // bind document
-        TS_ASSERT(xmlObject.get()!=NULL);
+        TS_ASSERT(xmlObject.get()!=nullptr);
 
         DOMDocument* newDoc=XMLToolingConfig::getConfig().getParser().newDocument();
         DOMElement* rootElement=xmlObject->marshall(newDoc);
-        TS_ASSERT(rootElement!=NULL);
+        TS_ASSERT(rootElement!=nullptr);
 
         string buf2;
         XMLHelper::serialize(rootElement, buf2);

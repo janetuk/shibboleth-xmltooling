@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ namespace xmltooling {
          * 
          * @param e DOM to supply configuration for provider
          */
-        ChainingTrustEngine(const xercesc::DOMElement* e=NULL);
+        ChainingTrustEngine(const xercesc::DOMElement* e=nullptr);
         
         /**
          * Destructor will delete any embedded engines.
@@ -73,7 +73,7 @@ namespace xmltooling {
         bool validate(
             xmlsignature::Signature& sig,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const;
         bool validate(
             const XMLCh* sigAlgorithm,
@@ -82,19 +82,19 @@ namespace xmltooling {
             const char* in,
             unsigned int in_len,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const;
         bool validate(
             XSECCryptoX509* certEE,
             const std::vector<XSECCryptoX509*>& certChain,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const;
         bool validate(
             X509* certEE,
             STACK_OF(X509)* certChain,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const;
     private:
         std::vector<TrustEngine*> m_engines;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 The Apache Software Foundation.
+ * Copyright 2001-2010 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ XSECCryptoX509CRL::~XSECCryptoX509CRL()
 void XSECCryptoX509CRL::loadX509CRLPEM(const char* buf, unsigned int len)
 {
 	const char * b;
-	char * b1 = NULL;
+	char * b1 = nullptr;
 	if (len == 0)
 		b = buf;
 	else {
@@ -51,9 +51,9 @@ void XSECCryptoX509CRL::loadX509CRLPEM(const char* buf, unsigned int len)
 
 	const char *p = strstr(buf, "-----BEGIN X509 CRL-----");
 
-	if (p == NULL) {
+	if (p == nullptr) {
 
-		if (b1 != NULL)
+		if (b1 != nullptr)
 			delete[] b1;
 
 		throw XSECCryptoException(XSECCryptoException::X509Error,
@@ -75,7 +75,7 @@ void XSECCryptoX509CRL::loadX509CRLPEM(const char* buf, unsigned int len)
 
 	if (strstr(p, "-----END X509 CRL-----") != p) {
 
-		if (b1 != NULL)
+		if (b1 != nullptr)
 			delete[] b1;
 
 		throw XSECCryptoException(XSECCryptoException::X509Error,
@@ -83,7 +83,7 @@ void XSECCryptoX509CRL::loadX509CRLPEM(const char* buf, unsigned int len)
 
 	}
 	
-	if (b1 != NULL)
+	if (b1 != nullptr)
 		delete[] b1;
 
 	output[i] = '\0';

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ namespace xmltooling {
         /**
          * Returns the raw request body.
          *
-         * @return the request body, or NULL
+         * @return the request body, or nullptr
          */
         virtual const char* getRequestBody() const=0;
 
@@ -100,7 +100,7 @@ namespace xmltooling {
          * If a parameter has multiple values, only one will be returned.
          *
          * @param name  the name of the parameter to return
-         * @return a single parameter value or NULL
+         * @return a single parameter value or nullptr
          */
         virtual const char* getParameter(const char* name) const=0;
 
@@ -127,7 +127,7 @@ namespace xmltooling {
         /**
          * Gets the authentication type associated with the request.
          *
-         * @return  the authentication type or NULL
+         * @return  the authentication type or nullptr
          */
         virtual std::string getAuthType() const {
             return "";

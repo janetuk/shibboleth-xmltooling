@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2009 Internet2
+*  Copyright 2001-2010 Internet2
  * 
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,12 +73,12 @@ void soap11::registerSOAPClasses()
 {
     QName q;
     REGISTER_ELEMENT_NOVAL(SOAP11ENV_NS,Body);
-    REGISTER_ELEMENT_NOVAL(NULL,Detail);
+    REGISTER_ELEMENT_NOVAL(nullptr,Detail);
     REGISTER_ELEMENT(SOAP11ENV_NS,Envelope);
     REGISTER_ELEMENT(SOAP11ENV_NS,Fault);
-    REGISTER_ELEMENT(NULL,Faultactor);
-    REGISTER_ELEMENT(NULL,Faultcode);
-    REGISTER_ELEMENT(NULL,Faultstring);
+    REGISTER_ELEMENT(nullptr,Faultactor);
+    REGISTER_ELEMENT(nullptr,Faultcode);
+    REGISTER_ELEMENT(nullptr,Faultstring);
     REGISTER_ELEMENT_NOVAL(SOAP11ENV_NS,Header);
     REGISTER_TYPE_NOVAL(SOAP11ENV_NS,Body);
     REGISTER_TYPE_NOVAL(SOAP11ENV_NS,Detail);

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,9 +46,9 @@ namespace xmltooling {
          * Returns a single Credential according to the supplied criteria.
          * 
          * @param criteria   an optional CredentialCriteria object 
-         * @return  a Credential, or NULL if none could be found
+         * @return  a Credential, or nullptr if none could be found
          */
-        virtual const Credential* resolve(const CredentialCriteria* criteria=NULL) const=0;
+        virtual const Credential* resolve(const CredentialCriteria* criteria=nullptr) const=0;
 
         /**
          * Returns all matching Credentials according to the supplied criteria.
@@ -58,7 +58,7 @@ namespace xmltooling {
          * @return  number of credentials found
          */
         virtual std::vector<const Credential*>::size_type resolve(
-            std::vector<const Credential*>& results, const CredentialCriteria* criteria=NULL
+            std::vector<const Credential*>& results, const CredentialCriteria* criteria=nullptr
             ) const=0;
     };
 

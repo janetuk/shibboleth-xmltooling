@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,23 @@ bool SOAPTransport::setProviderOption(const char* provider, const char* option, 
     return false;
 }
 
+bool SOAPTransport::setCacheTag(string* cacheTag)
+{
+    return false;
+}
+
+void SOAPTransport::send(istream* in)
+{
+    if (!in)
+        throw IOException("SOAP transport does not support an empty request body.");
+    return send(*in);
+}
+
+long SOAPTransport::getStatusCode() const
+{
+    return 0;
+}
+
 HTTPSOAPTransport::HTTPSOAPTransport()
 {
 }
@@ -58,7 +75,12 @@ HTTPSOAPTransport::~HTTPSOAPTransport()
 {
 }
 
-SOAPClient::SOAPClient(bool validate) : m_validate(validate), m_transport(NULL)
+bool HTTPSOAPTransport::followRedirects(bool follow, unsigned int maxRedirs)
+{
+    return false;
+}
+
+SOAPClient::SOAPClient(bool validate) : m_validate(validate), m_transport(nullptr)
 {
 }
 
@@ -75,20 +97,13 @@ void SOAPClient::setValidating(bool validate)
 void SOAPClient::reset()
 {
     delete m_transport;
-    m_transport=NULL;
-}
-
-void SOAPTransport::send(istream* in)
-{
-    if (!in)
-        throw IOException("SOAP transport does not support an empty request body.");
-    return send(*in);
+    m_transport=nullptr;
 }
 
 void SOAPClient::send(const Envelope& env, const SOAPTransport::Address& addr)
 {
     // Prepare a transport object.
-    const char* pch = addr.m_endpoint ? strchr(addr.m_endpoint,':') : NULL;
+    const char* pch = addr.m_endpoint ? strchr(addr.m_endpoint,':') : nullptr;
     if (!pch)
         throw IOException("SOAP endpoint was not a URL.");
     string scheme(addr.m_endpoint, pch-addr.m_endpoint);
@@ -115,7 +130,7 @@ Envelope* SOAPClient::receive()
     // If we can get the stream, then the call is still active.
     istream& out = m_transport->receive();
     if (!out)
-        return NULL;    // nothing yet
+        return nullptr;    // nothing yet
     
     // Check content type.
     string s = m_transport->getContentType();
@@ -165,8 +180,8 @@ void SOAPClient::prepareTransport(SOAPTransport& transport)
 
 bool SOAPClient::handleFault(const Fault& fault)
 {
-    const xmltooling::QName* code = (fault.getFaultcode() ? fault.getFaultcode()->getCode() : NULL);
-    auto_ptr_char str((fault.getFaultstring() ? fault.getFaultstring()->getString() : NULL));
+    const xmltooling::QName* code = (fault.getFaultcode() ? fault.getFaultcode()->getCode() : nullptr);
+    auto_ptr_char str((fault.getFaultstring() ? fault.getFaultstring()->getString() : nullptr));
     Category::getInstance(XMLTOOLING_LOGCAT".SOAPClient").error(
         "SOAP client detected a Fault: (%s) (%s)",
         (code ? code->toString().c_str() : "no code"),

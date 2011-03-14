@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,17 +22,32 @@
 
 #include "internal.h"
 #include "logging.h"
+#include "io/HTTPResponse.h"
 #include "security/OpenSSLCryptoX509CRL.h"
 #include "security/SecurityHelper.h"
 #include "security/X509Credential.h"
+#include "soap/HTTPSOAPTransport.h"
 #include "util/NDC.h"
 
 #include <fstream>
+#include <openssl/evp.h>
 #include <openssl/pem.h>
 #include <openssl/pkcs12.h>
+#include <xsec/enc/XSECCryptoException.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyRSA.hpp>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoKeyDSA.hpp>
+#include <xercesc/util/Base64.hpp>
+
+#ifdef WIN32
+# if (OPENSSL_VERSION_NUMBER >= 0x00907000)
+#  define XMLTOOLING_OPENSSL_HAVE_EC 1
+# endif
+#endif
+
+#if defined(XMLTOOLING_XMLSEC_ECC) && defined(XMLTOOLING_OPENSSL_HAVE_EC)
+# include <xsec/enc/OpenSSL/OpenSSLCryptoKeyEC.hpp>
+#endif
 
 using namespace xmltooling::logging;
 using namespace xmltooling;
@@ -54,7 +69,7 @@ static int passwd_callback(char* buf, int len, int verify, void* passwd)
 
 const char* SecurityHelper::guessEncodingFormat(const char* pathname)
 {
-    const char* format=NULL;
+    const char* format=nullptr;
     BIO* in=BIO_new(BIO_s_file_internal());
     if (in && BIO_read_filename(in, pathname)>0) {
         const int READSIZE = 1;
@@ -85,7 +100,7 @@ const char* SecurityHelper::guessEncodingFormat(const char* pathname)
             // Here we know it's DER-encoded, now try to parse it as a PKCS12 ASN.1 structure.
             // If it fails, must be another kind of DER-encoded structure.
             PKCS12* p12;
-            if ((p12=d2i_PKCS12_bio(in, NULL)) == NULL) {
+            if ((p12=d2i_PKCS12_bio(in, nullptr)) == nullptr) {
                 format = "DER";
             }
             else {
@@ -110,8 +125,8 @@ XSECCryptoKey* SecurityHelper::loadKeyFromFile(const char* pathname, const char*
     log.info("loading private key from file (%s)", pathname);
 
     // Native objects.
-    PKCS12* p12=NULL;
-    EVP_PKEY* pkey=NULL;
+    PKCS12* p12=nullptr;
+    EVP_PKEY* pkey=nullptr;
 
     BIO* in=BIO_new(BIO_s_file_internal());
     if (in && BIO_read_filename(in, pathname)>0) {
@@ -144,7 +159,7 @@ XSECCryptoKey* SecurityHelper::loadKeyFromFile(const char* pathname, const char*
             else {
                 // Here we know it's DER-encoded, now try to parse it as a PKCS12 ASN.1 structure.
                 // If it fails, must be another kind of DER-encoded structure.
-                if ((p12=d2i_PKCS12_bio(in, NULL)) == NULL) {
+                if ((p12=d2i_PKCS12_bio(in, nullptr)) == nullptr) {
                     format = "DER";
                     if (BIO_seek(in, mark) < 0) {
                         log_openssl();
@@ -161,17 +176,17 @@ XSECCryptoKey* SecurityHelper::loadKeyFromFile(const char* pathname, const char*
 
         // The format should be known, so parse accordingly.
         if (!strcmp(format, "PEM")) {
-            pkey = PEM_read_bio_PrivateKey(in, NULL, passwd_callback, const_cast<char*>(password));
+            pkey = PEM_read_bio_PrivateKey(in, nullptr, passwd_callback, const_cast<char*>(password));
         }
         else if (!strcmp(format, "DER")) {
-            pkey=d2i_PrivateKey_bio(in, NULL);
+            pkey=d2i_PrivateKey_bio(in, nullptr);
         }
         else if (!strcmp(format, "PKCS12")) {
             if (!p12)
-                p12 = d2i_PKCS12_bio(in, NULL);
+                p12 = d2i_PKCS12_bio(in, nullptr);
             if (p12) {
-                X509* x=NULL;
-                PKCS12_parse(p12, const_cast<char*>(password), &pkey, &x, NULL);
+                X509* x=nullptr;
+                PKCS12_parse(p12, const_cast<char*>(password), &pkey, &x, nullptr);
                 PKCS12_free(p12);
                 X509_free(x);
             }
@@ -185,7 +200,7 @@ XSECCryptoKey* SecurityHelper::loadKeyFromFile(const char* pathname, const char*
 
     // Now map it to an XSEC wrapper.
     if (pkey) {
-        XSECCryptoKey* ret=NULL;
+        XSECCryptoKey* ret=nullptr;
         switch (pkey->type) {
             case EVP_PKEY_RSA:
                 ret=new OpenSSLCryptoKeyRSA(pkey);
@@ -195,6 +210,11 @@ XSECCryptoKey* SecurityHelper::loadKeyFromFile(const char* pathname, const char*
                 ret=new OpenSSLCryptoKeyDSA(pkey);
                 break;
 
+#if defined(XMLTOOLING_XMLSEC_ECC) && defined(XMLTOOLING_OPENSSL_HAVE_EC)
+            case EVP_PKEY_EC:
+                ret=new OpenSSLCryptoKeyEC(pkey);
+                break;
+#endif
             default:
                 log.error("unsupported private key type");
         }
@@ -220,8 +240,8 @@ vector<XSECCryptoX509*>::size_type SecurityHelper::loadCertificatesFromFile(
     vector<XSECCryptoX509*>::size_type count = certs.size();
 
     // Native objects.
-    X509* x=NULL;
-    PKCS12* p12=NULL;
+    X509* x=nullptr;
+    PKCS12* p12=nullptr;
 
     BIO* in=BIO_new(BIO_s_file_internal());
     if (in && BIO_read_filename(in, pathname)>0) {
@@ -254,7 +274,7 @@ vector<XSECCryptoX509*>::size_type SecurityHelper::loadCertificatesFromFile(
             else {
                 // Here we know it's DER-encoded, now try to parse it as a PKCS12 ASN.1 structure.
                 // If it fails, must be another kind of DER-encoded structure.
-                if ((p12=d2i_PKCS12_bio(in, NULL)) == NULL) {
+                if ((p12=d2i_PKCS12_bio(in, nullptr)) == nullptr) {
                     format = "DER";
                     if (BIO_seek(in, mark) < 0) {
                         log_openssl();
@@ -270,13 +290,13 @@ vector<XSECCryptoX509*>::size_type SecurityHelper::loadCertificatesFromFile(
 
         // The format should be known, so parse accordingly.
         if (!strcmp(format, "PEM")) {
-            while (x=PEM_read_bio_X509(in, NULL, NULL, NULL)) {
+            while (x=PEM_read_bio_X509(in, nullptr, nullptr, nullptr)) {
                 certs.push_back(new OpenSSLCryptoX509(x));
                 X509_free(x);
             }
         }
         else if (!strcmp(format, "DER")) {
-            x=d2i_X509_bio(in, NULL);
+            x=d2i_X509_bio(in, nullptr);
             if (x) {
                 certs.push_back(new OpenSSLCryptoX509(x));
                 X509_free(x);
@@ -284,9 +304,9 @@ vector<XSECCryptoX509*>::size_type SecurityHelper::loadCertificatesFromFile(
         }
         else if (!strcmp(format, "PKCS12")) {
             if (!p12)
-                p12 = d2i_PKCS12_bio(in, NULL);
+                p12 = d2i_PKCS12_bio(in, nullptr);
             if (p12) {
-                EVP_PKEY* pkey=NULL;
+                EVP_PKEY* pkey=nullptr;
                 STACK_OF(X509)* CAstack = sk_X509_new_null();
                 PKCS12_parse(p12, const_cast<char*>(password), &pkey, &x, &CAstack);
                 PKCS12_free(p12);
@@ -362,15 +382,15 @@ vector<XSECCryptoX509CRL*>::size_type SecurityHelper::loadCRLsFromFile(
             log.debug("CRL encoding format for (%s) dynamically resolved as (%s)", pathname, format);
         }
 
-        X509_CRL* crl=NULL;
+        X509_CRL* crl=nullptr;
         if (!strcmp(format, "PEM")) {
-            while (crl=PEM_read_bio_X509_CRL(in, NULL, NULL, NULL)) {
+            while (crl=PEM_read_bio_X509_CRL(in, nullptr, nullptr, nullptr)) {
                 crls.push_back(new OpenSSLCryptoX509CRL(crl));
                 X509_CRL_free(crl);
             }
         }
         else if (!strcmp(format, "DER")) {
-            crl=d2i_X509_CRL_bio(in, NULL);
+            crl=d2i_X509_CRL_bio(in, nullptr);
             if (crl) {
                 crls.push_back(new OpenSSLCryptoX509CRL(crl));
                 X509_CRL_free(crl);
@@ -397,6 +417,10 @@ XSECCryptoKey* SecurityHelper::loadKeyFromURL(SOAPTransport& transport, const ch
     transport.send();
     istream& msg = transport.receive();
 
+    // Check for "not modified" status.
+    if (dynamic_cast<HTTPSOAPTransport*>(&transport) && transport.getStatusCode() == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED)
+        throw (long)HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED;
+
     // Dump to output file.
     ofstream out(backing, fstream::trunc|fstream::binary);
     out << msg.rdbuf();
@@ -411,6 +435,10 @@ vector<XSECCryptoX509*>::size_type SecurityHelper::loadCertificatesFromURL(
 {
     transport.send();
     istream& msg = transport.receive();
+
+    // Check for "not modified" status.
+    if (dynamic_cast<HTTPSOAPTransport*>(&transport) && transport.getStatusCode() == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED)
+        throw (long)HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED;
 
     // Dump to output file.
     ofstream out(backing, fstream::trunc|fstream::binary);
@@ -427,6 +455,10 @@ vector<XSECCryptoX509CRL*>::size_type SecurityHelper::loadCRLsFromURL(
     // Fetch the data.
     transport.send();
     istream& msg = transport.receive();
+
+    // Check for "not modified" status.
+    if (dynamic_cast<HTTPSOAPTransport*>(&transport) && transport.getStatusCode() == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED)
+        throw (long)HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED;
 
     // Dump to output file.
     ofstream out(backing, fstream::trunc|fstream::binary);
@@ -479,6 +511,30 @@ bool SecurityHelper::matches(const XSECCryptoKey& key1, const XSECCryptoKey& key
         const DSA* dsa2 = static_cast<const OpenSSLCryptoKeyDSA&>(key2).getOpenSSLDSA();
         return (dsa1 && dsa2 && BN_cmp(dsa1->priv_key,dsa2->priv_key) == 0);
     }
+
+#if defined(XMLTOOLING_XMLSEC_ECC) && defined(XMLTOOLING_OPENSSL_HAVE_EC)
+    // If one key is public or both, just compare the public key half.
+    if (key1.getKeyType()==XSECCryptoKey::KEY_EC_PUBLIC || key1.getKeyType()==XSECCryptoKey::KEY_EC_PAIR) {
+        if (key2.getKeyType()!=XSECCryptoKey::KEY_EC_PUBLIC && key2.getKeyType()!=XSECCryptoKey::KEY_EC_PAIR)
+            return false;
+        const EC_KEY* ec1 = static_cast<const OpenSSLCryptoKeyEC&>(key1).getOpenSSLEC();
+        const EC_KEY* ec2 = static_cast<const OpenSSLCryptoKeyEC&>(key2).getOpenSSLEC();
+        if (!ec1 || !ec2)
+            return false;
+        if (EC_GROUP_cmp(EC_KEY_get0_group(ec1), EC_KEY_get0_group(ec2), nullptr) != 0)
+            return false;
+        return (EC_POINT_cmp(EC_KEY_get0_group(ec1), EC_KEY_get0_public_key(ec1), EC_KEY_get0_public_key(ec2), nullptr) == 0);
+    }
+
+    // For a private key, compare the private half.
+    if (key1.getKeyType()==XSECCryptoKey::KEY_EC_PRIVATE) {
+        if (key2.getKeyType()!=XSECCryptoKey::KEY_EC_PRIVATE && key2.getKeyType()!=XSECCryptoKey::KEY_EC_PAIR)
+            return false;
+        const EC_KEY* ec1 = static_cast<const OpenSSLCryptoKeyEC&>(key1).getOpenSSLEC();
+        const EC_KEY* ec2 = static_cast<const OpenSSLCryptoKeyEC&>(key2).getOpenSSLEC();
+        return (ec1 && ec2 && BN_cmp(EC_KEY_get0_private_key(ec1), EC_KEY_get0_private_key(ec2)) == 0);
+    }
+#endif
 
     Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("unsupported key type for comparison");
     return false;
@@ -534,101 +590,90 @@ string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, const char* hash
         return ret;
     }
 
+    const RSA* rsa = nullptr;
+    const DSA* dsa = nullptr;
+#if defined(XMLTOOLING_XMLSEC_ECC) && defined(XMLTOOLING_OPENSSL_HAVE_EC)
+    const EC_KEY* ec = nullptr;
+#endif
+
     if (key.getKeyType() == XSECCryptoKey::KEY_RSA_PUBLIC || key.getKeyType() == XSECCryptoKey::KEY_RSA_PAIR) {
-        const RSA* rsa = static_cast<const OpenSSLCryptoKeyRSA&>(key).getOpenSSLRSA();
+        rsa = static_cast<const OpenSSLCryptoKeyRSA&>(key).getOpenSSLRSA();
         if (!rsa) {
             Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("key was not populated");
             return ret;
         }
-        const EVP_MD* md=NULL;
-        if (hash) {
-            md = EVP_get_digestbyname(hash);
-            if (!md) {
-                Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("hash algorithm (%s) not available", hash);
-                return ret;
-            }
-        }
-        BIO* chain = BIO_new(BIO_s_mem());
-        BIO* b = BIO_new(BIO_f_base64());
-        if (nowrap)
-            BIO_set_flags(b, BIO_FLAGS_BASE64_NO_NL);
-        chain = BIO_push(b, chain);
-        if (md) {
-            b = BIO_new(BIO_f_md());
-            BIO_set_md(b, md);
-            chain = BIO_push(b, chain);
-        }
-        i2d_RSA_PUBKEY_bio(chain, const_cast<RSA*>(rsa));
-        BIO_flush(chain);
-        if (md) {
-            char digest[EVP_MAX_MD_SIZE];
-            int len = BIO_gets(chain, digest, EVP_MD_size(md));
-            if (len != EVP_MD_size(md)) {
-                BIO_free_all(chain);
-                return ret;
-            }
-            b = BIO_pop(chain);
-            BIO_free(chain);
-            chain = b;
-            BIO_reset(chain);
-            BIO_write(chain, digest, len);
-            BIO_flush(chain);
-        }
-        BUF_MEM* bptr=NULL;
-        BIO_get_mem_ptr(chain, &bptr);
-        if (bptr && bptr->length > 0)
-            ret.append(bptr->data, bptr->length);
-        BIO_free_all(chain);
     }
     else if (key.getKeyType() == XSECCryptoKey::KEY_DSA_PUBLIC || key.getKeyType() == XSECCryptoKey::KEY_DSA_PAIR) {
-        const DSA* dsa = static_cast<const OpenSSLCryptoKeyDSA&>(key).getOpenSSLDSA();
+        dsa = static_cast<const OpenSSLCryptoKeyDSA&>(key).getOpenSSLDSA();
         if (!dsa) {
             Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("key was not populated");
             return ret;
         }
-        const EVP_MD* md=NULL;
-        if (hash) {
-            md = EVP_get_digestbyname(hash);
-            if (!md) {
-                Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("hash algorithm (%s) not available", hash);
-                return ret;
-            }
-        }
-        BIO* chain = BIO_new(BIO_s_mem());
-        BIO* b = BIO_new(BIO_f_base64());
-        if (nowrap)
-            BIO_set_flags(b, BIO_FLAGS_BASE64_NO_NL);
-        chain = BIO_push(b, chain);
-        if (md) {
-            b = BIO_new(BIO_f_md());
-            BIO_set_md(b, md);
-            chain = BIO_push(b, chain);
-        }
-        i2d_DSA_PUBKEY_bio(chain, const_cast<DSA*>(dsa));
-        BIO_flush(chain);
-        if (md) {
-            char digest[EVP_MAX_MD_SIZE];
-            int len = BIO_gets(chain, digest, EVP_MD_size(md));
-            if (len != EVP_MD_size(md)) {
-                BIO_free_all(chain);
-                return ret;
-            }
-            b = BIO_pop(chain);
-            BIO_free(chain);
-            chain = b;
-            BIO_reset(chain);
-            BIO_write(chain, digest, len);
-            BIO_flush(chain);
-        }
-        BUF_MEM* bptr=NULL;
-        BIO_get_mem_ptr(chain, &bptr);
-        if (bptr && bptr->length > 0)
-            ret.append(bptr->data, bptr->length);
-        BIO_free_all(chain);
     }
+#if defined(XMLTOOLING_XMLSEC_ECC) && defined(XMLTOOLING_OPENSSL_HAVE_EC)
+    else if (key.getKeyType() == XSECCryptoKey::KEY_EC_PUBLIC || key.getKeyType() == XSECCryptoKey::KEY_EC_PAIR) {
+        ec = static_cast<const OpenSSLCryptoKeyEC&>(key).getOpenSSLEC();
+        if (!ec) {
+            Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("key was not populated");
+            return ret;
+        }
+    }
+#endif
     else {
-        Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("encoding of non-RSA/DSA public keys not supported");
+        Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").warn("public key type not supported");
+        return ret;
     }
+
+    const EVP_MD* md=nullptr;
+    if (hash) {
+        md = EVP_get_digestbyname(hash);
+        if (!md) {
+            Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("hash algorithm (%s) not available", hash);
+            return ret;
+        }
+    }
+
+    BIO* chain = BIO_new(BIO_s_mem());
+    BIO* b = BIO_new(BIO_f_base64());
+    if (nowrap)
+        BIO_set_flags(b, BIO_FLAGS_BASE64_NO_NL);
+    chain = BIO_push(b, chain);
+    if (md) {
+        b = BIO_new(BIO_f_md());
+        BIO_set_md(b, md);
+        chain = BIO_push(b, chain);
+    }
+
+    if (rsa)
+        i2d_RSA_PUBKEY_bio(chain, const_cast<RSA*>(rsa));
+    else if (dsa)
+        i2d_DSA_PUBKEY_bio(chain, const_cast<DSA*>(dsa));
+#if defined(XMLTOOLING_XMLSEC_ECC) && defined(XMLTOOLING_OPENSSL_HAVE_EC)
+    else
+        i2d_EC_PUBKEY_bio(chain, const_cast<EC_KEY*>(ec));
+#endif
+
+    BIO_flush(chain);
+    if (md) {
+        char digest[EVP_MAX_MD_SIZE];
+        int len = BIO_gets(chain, digest, EVP_MD_size(md));
+        if (len != EVP_MD_size(md)) {
+            BIO_free_all(chain);
+            return ret;
+        }
+        b = BIO_pop(chain);
+        BIO_free(chain);
+        chain = b;
+        BIO_reset(chain);
+        BIO_write(chain, digest, len);
+        BIO_flush(chain);
+    }
+    BUF_MEM* bptr=nullptr;
+    BIO_get_mem_ptr(chain, &bptr);
+    if (bptr && bptr->length > 0)
+        ret.append(bptr->data, bptr->length);
+    BIO_free_all(chain);
+
     return ret;
 }
 
@@ -641,7 +686,7 @@ string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, const char* ha
         return ret;
     }
 
-    const EVP_MD* md=NULL;
+    const EVP_MD* md=nullptr;
     if (hash) {
         md = EVP_get_digestbyname(hash);
         if (!md) {
@@ -680,7 +725,7 @@ string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, const char* ha
         BIO_write(chain, digest, len);
         BIO_flush(chain);
     }
-    BUF_MEM* bptr=NULL;
+    BUF_MEM* bptr=nullptr;
     BIO_get_mem_ptr(chain, &bptr);
     if (bptr && bptr->length > 0)
         ret.append(bptr->data, bptr->length);
@@ -700,15 +745,87 @@ string SecurityHelper::getDEREncoding(const Credential& cred, const char* hash, 
 
 string SecurityHelper::getDEREncoding(const XSECCryptoKey& key, bool hash, bool nowrap)
 {
-    return getDEREncoding(key, hash ? "SHA1" : NULL, nowrap);
+    return getDEREncoding(key, hash ? "SHA1" : nullptr, nowrap);
 }
 
 string SecurityHelper::getDEREncoding(const XSECCryptoX509& cert, bool hash, bool nowrap)
 {
-    return getDEREncoding(cert, hash ? "SHA1" : NULL, nowrap);
+    return getDEREncoding(cert, hash ? "SHA1" : nullptr, nowrap);
 }
 
 string SecurityHelper::getDEREncoding(const Credential& cred, bool hash, bool nowrap)
 {
-    return getDEREncoding(cred, hash ? "SHA1" : NULL, nowrap);
+    return getDEREncoding(cred, hash ? "SHA1" : nullptr, nowrap);
+}
+
+XSECCryptoKey* SecurityHelper::fromDEREncoding(const char* buf, unsigned long buflen, bool base64)
+{
+    xsecsize_t x;
+    XMLByte* decoded=nullptr;
+    if (base64) {
+        decoded = xercesc::Base64::decode(reinterpret_cast<const XMLByte*>(buf), &x);
+        if (!decoded) {
+            Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("base64 decode failed");
+            return nullptr;
+        }
+    }
+
+    BIO* b = BIO_new_mem_buf((void*)(base64 ? (char*)decoded : buf), (base64 ? x : buflen));
+    EVP_PKEY* pkey = d2i_PUBKEY_bio(b, nullptr);
+    BIO_free(b);
+    if (base64) {
+#ifdef XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE
+        XMLString::release(&decoded);
+#else
+        XMLString::release((char**)&decoded);
+#endif
+    }
+
+    if (pkey) {
+        // Now map it to an XSEC wrapper.
+        XSECCryptoKey* ret = nullptr;
+        try {
+            switch (pkey->type) {
+                case EVP_PKEY_RSA:
+                    ret = new OpenSSLCryptoKeyRSA(pkey);
+                    break;
+
+                case EVP_PKEY_DSA:
+                    ret = new OpenSSLCryptoKeyDSA(pkey);
+                    break;
+
+#if defined(XMLTOOLING_XMLSEC_ECC) && defined(XMLTOOLING_OPENSSL_HAVE_EC)
+                case EVP_PKEY_EC:
+                    ret = new OpenSSLCryptoKeyEC(pkey);
+                    break;
+#endif
+                default:
+                    Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("unsupported public key type");
+            }
+        }
+        catch (XSECCryptoException& ex) {
+            Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error(ex.getMsg());
+        }
+        EVP_PKEY_free(pkey);
+        return ret;
+    }
+
+    return nullptr;
+}
+
+XSECCryptoKey* SecurityHelper::fromDEREncoding(const XMLCh* buf)
+{
+    xsecsize_t x;
+    XMLByte* decoded = xercesc::Base64::decodeToXMLByte(buf, &x);
+    if (!decoded) {
+        Category::getInstance(XMLTOOLING_LOGCAT".SecurityHelper").error("base64 decode failed");
+        return nullptr;
+    }
+    XSECCryptoKey* ret = fromDEREncoding((const char*)decoded, x, false);
+#ifdef XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE
+    XMLString::release(&decoded);
+#else
+    XMLString::release((char**)&decoded);
+#endif
+    return ret;
 }

@@ -3,6 +3,7 @@
     <system systemId="http://www.w3.org/XML/1998/namespace" uri="@-PKGXMLDIR-@/xml.xsd"/>
     <system systemId="http://www.w3.org/2001/04/xmlenc#" uri="@-PKGXMLDIR-@/xenc-schema.xsd"/>
     <system systemId="http://www.w3.org/2000/09/xmldsig#" uri="@-PKGXMLDIR-@/xmldsig-core-schema.xsd"/>
+    <system systemId="http://www.w3.org/2009/xmldsig11#" uri="@-PKGXMLDIR-@/xmldsig11-schema.xsd"/>
     <system systemId="http://www.opensaml.org/xmltooling" uri="@-PKGXMLDIR-@/xmltooling.xsd"/>
     <system systemId="http://schemas.xmlsoap.org/soap/envelope/" uri="@-PKGXMLDIR-@/soap-envelope.xsd"/>
 </catalog>

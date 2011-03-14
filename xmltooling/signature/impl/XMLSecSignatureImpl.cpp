@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2009 Internet2
+*  Copyright 2001-2010 Internet2
  * 
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * XMLSecSignatureImpl.cpp
  * 
- * Signature class for XMLSec-based signature-handling
+ * Signature class for XMLSec-based signature-handling.
  */
 
 #include "internal.h"
@@ -65,7 +65,7 @@ namespace xmlsignature {
     public:
         XMLSecSignatureImpl() : AbstractXMLObject(XMLSIG_NS, Signature::LOCAL_NAME, XMLSIG_PREFIX),
             UnknownElementImpl(XMLSIG_NS, Signature::LOCAL_NAME, XMLSIG_PREFIX),
-            m_signature(NULL), m_c14n(NULL), m_sm(NULL), m_key(NULL), m_keyInfo(NULL), m_reference(NULL) {}
+            m_signature(nullptr), m_c14n(nullptr), m_sm(nullptr), m_key(nullptr), m_keyInfo(nullptr), m_reference(nullptr) {}
         virtual ~XMLSecSignatureImpl();
         
         void releaseDOM() const;
@@ -79,8 +79,8 @@ namespace xmlsignature {
         XMLObject* clone() const;
         Signature* cloneSignature() const;
 
-        DOMElement* marshall(DOMDocument* document=NULL, const vector<Signature*>* sigs=NULL, const Credential* credential=NULL) const;
-        DOMElement* marshall(DOMElement* parentElement, const vector<Signature*>* sigs=NULL, const Credential* credential=NULL) const;
+        DOMElement* marshall(DOMDocument* document=nullptr, const vector<Signature*>* sigs=nullptr, const Credential* credential=nullptr) const;
+        DOMElement* marshall(DOMElement* parentElement, const vector<Signature*>* sigs=nullptr, const Credential* credential=nullptr) const;
         XMLObject* unmarshall(DOMElement* element, bool bindDocument=false);
         
         // Getters
@@ -91,12 +91,15 @@ namespace xmlsignature {
         }
         const XMLCh* getSignatureAlgorithm() const {
             if (!m_sm && m_signature) {
+#ifdef XMLTOOLING_XMLSEC_SIGALGORITHM
+                m_sm = XMLString::replicate(m_signature->getAlgorithmURI());
+#else
                 safeBuffer sURI;
-                if (signatureHashMethod2URI(sURI, m_signature->getSignatureMethod(), m_signature->getHashMethod()) == false)
-                    return NULL;
-                m_sm = XMLString::replicate(sURI.sbStrToXMLCh());
+                if (signatureHashMethod2URI(sURI, m_signature->getSignatureMethod(), m_signature->getHashMethod()))
+                    m_sm = XMLString::replicate(sURI.sbStrToXMLCh());
+#endif
             }
-            return m_sm ? m_sm : DSIGConstants::s_unicodeStrURIRSA_SHA1;
+            return m_sm;
         }
 
         KeyInfo* getKeyInfo() const { return m_keyInfo; }
@@ -119,7 +122,7 @@ namespace xmlsignature {
             m_reference=reference;
         }
         
-        void sign(const Credential* credential=NULL);
+        void sign(const Credential* credential=nullptr);
 
     private:
         mutable DSIGSignature* m_signature;
@@ -173,7 +176,7 @@ void XMLSecSignatureImpl::releaseDOM() const
         // Release the associated signature.
         if (m_signature) {
             XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseSignature(m_signature);
-            m_signature=NULL;
+            m_signature=nullptr;
         }
     }
 }
@@ -271,12 +274,15 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, const vector<Si
         // Fresh signature, so we just create an empty one.
         log.debug("creating empty Signature element");
         if (!document) {
-            document=DOMImplementationRegistry::getDOMImplementation(NULL)->createDocument();
+            document=DOMImplementationRegistry::getDOMImplementation(nullptr)->createDocument();
             bindDocument=true;
         }
         DSIGSignature* temp=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignature();
         temp->setDSIGNSPrefix(XMLSIG_PREFIX);
-        cachedDOM=temp->createBlankSignature(document, getCanonicalizationMethod(), getSignatureAlgorithm());
+        const XMLCh* alg = getSignatureAlgorithm();
+        if (!alg)
+            alg = DSIGConstants::s_unicodeStrURIRSA_SHA1;
+        cachedDOM=temp->createBlankSignature(document, getCanonicalizationMethod(), alg);
         m_signature = temp;
     }
     else {
@@ -289,7 +295,16 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, const vector<Si
             // The caller insists on using his own document, so we now have to import the thing
             // into it. Then we're just dumping the one we built.
             log.debug("reimporting new DOM into caller-supplied document");
-            cachedDOM=static_cast<DOMElement*>(document->importNode(internalDoc->getDocumentElement(), true));
+            try {
+                cachedDOM=static_cast<DOMElement*>(document->importNode(internalDoc->getDocumentElement(), true));
+            }
+            catch (XMLException& ex) {
+                internalDoc->release();
+                auto_ptr_char temp(ex.getMessage());
+                throw XMLParserException(
+                    string("Error importing DOM into caller-supplied document: ") + (temp.get() ? temp.get() : "no message")
+                    );
+            }
             internalDoc->release();
         }
         else {
@@ -322,7 +337,7 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMDocument* document, const vector<Si
     // Marshall KeyInfo data.
     if (credential) {
         delete m_keyInfo;
-        m_keyInfo = NULL;
+        m_keyInfo = nullptr;
         m_keyInfo = credential->getKeyInfo();
     }
     if (m_keyInfo && (!m_signature->getKeyInfoList() || m_signature->getKeyInfoList()->isEmpty())) {
@@ -373,7 +388,10 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, const vecto
         log.debug("creating empty Signature element");
         DSIGSignature* temp=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newSignature();
         temp->setDSIGNSPrefix(XMLSIG_PREFIX);
-        cachedDOM=temp->createBlankSignature(parentElement->getOwnerDocument(), getCanonicalizationMethod(), getSignatureAlgorithm());
+        const XMLCh* alg = getSignatureAlgorithm();
+        if (!alg)
+            alg = DSIGConstants::s_unicodeStrURIRSA_SHA1;
+        cachedDOM=temp->createBlankSignature(parentElement->getOwnerDocument(), getCanonicalizationMethod(), alg);
         m_signature = temp;
     }
     else {
@@ -383,7 +401,16 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, const vecto
         DOMDocument* internalDoc=XMLToolingConfig::getConfig().getParser().parse(dsrc);
         
         log.debug("reimporting new DOM into caller-supplied document");
-        cachedDOM=static_cast<DOMElement*>(parentElement->getOwnerDocument()->importNode(internalDoc->getDocumentElement(),true));
+        try {
+            cachedDOM=static_cast<DOMElement*>(parentElement->getOwnerDocument()->importNode(internalDoc->getDocumentElement(),true));
+        }
+        catch (XMLException& ex) {
+            internalDoc->release();
+            auto_ptr_char temp(ex.getMessage());
+            throw XMLParserException(
+                string("Error importing DOM into caller-supplied document: ") + (temp.get() ? temp.get() : "no message")
+                );
+        }
         internalDoc->release();
 
         // Now reload the signature from the DOM.
@@ -405,7 +432,7 @@ DOMElement* XMLSecSignatureImpl::marshall(DOMElement* parentElement, const vecto
     // Marshall KeyInfo data.
     if (credential) {
         delete m_keyInfo;
-        m_keyInfo = NULL;
+        m_keyInfo = nullptr;
         m_keyInfo = credential->getKeyInfo();
     }
     if (m_keyInfo && (!m_signature->getKeyInfoList() || m_signature->getKeyInfoList()->isEmpty())) {
@@ -499,7 +526,7 @@ unsigned int Signature::createRawSignature(
         // Move input into a safeBuffer to source the transform chain.
         safeBuffer sb,sbout;
         sb.sbStrncpyIn(in,in_len);
-        TXFMSB* sbt = new TXFMSB(NULL);
+        TXFMSB* sbt = new TXFMSB(nullptr);
         sbt->setInput(sb, in_len);
         TXFMChain tx(sbt);
         
@@ -545,7 +572,7 @@ bool Signature::verifyRawSignature(
         // Move input into a safeBuffer to source the transform chain.
         safeBuffer sb;
         sb.sbStrncpyIn(in,in_len);
-        TXFMSB* sbt = new TXFMSB(NULL);
+        TXFMSB* sbt = new TXFMSB(nullptr);
         sbt->setInput(sb, in_len);
         TXFMChain tx(sbt);
         

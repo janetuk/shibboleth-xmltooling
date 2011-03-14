@@ -3,6 +3,11 @@
 /* Define if C++ compiler supports covariant virtual methods. */
 #define HAVE_COVARIANT_RETURNS 1
 
+/* Define to 1 if C++ compiler supports nullptr keyword. */
+#if _MSC_VER >= 1600
+# define HAVE_NULLPTR 1
+#endif
+
 /* Define to 1 if you have the <dlfcn.h> header file. */
 /* #undef HAVE_DLFCN_H */
 
@@ -25,9 +30,6 @@
 
 /* Define if log4cpp library is used. */
 /* #undef XMLTOOLING_LOG4CPP */
-
-/* Define if Xerces-C library was found */
-#define HAVE_LIBXERCESC 1
 
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1
@@ -72,6 +74,8 @@
 # define XMLTOOLING_XERCESC_BOOLSETIDATTRIBUTE  1
 # define XMLTOOLING_XERCESC_64BITSAFE           1
 # define XMLTOOLING_XERCESC_INPUTSTREAM_HAS_CONTENTTYPE 1
+#else
+# define XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE 1
 #endif
 
 /* Define to 1 if you have the `xsecsize_t' type. */
@@ -84,19 +88,19 @@
 #define PACKAGE "xmltooling"
 
 /* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "mace-opensaml-users@internet2.edu"
+#define PACKAGE_BUGREPORT "https://bugs.internet2.edu/"
 
 /* Define to the full name of this package. */
 #define PACKAGE_NAME "xmltooling"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "xmltooling 1.3.3"
+#define PACKAGE_STRING "xmltooling 1.4.1"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "xmltooling"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.3.3"
+#define PACKAGE_VERSION "1.4.1"
 
 /* Define to the necessary symbol if this constant uses a non-standard name on
    your system. */
@@ -109,13 +113,26 @@
 /* #undef TM_IN_SYS_TIME */
 
 /* Version number of package */
-#define VERSION "1.3.3"
+#define VERSION "1.4.1"
 
 /* Define if you wish to disable XML-Security-dependent features. */
 /* #undef XMLTOOLING_NO_XMLSEC */
 
 /* Define if you wish to disable Xalan-dependent features. */
 #define XSEC_NO_XALAN
+
+#ifndef XMLTOOLING_NO_XMLSEC
+# include <xsec/framework/XSECDefs.hpp>
+# if (_XSEC_VERSION_FULL >= 10500)
+#  define XMLTOOLING_XMLSEC_C14N11 1
+# endif
+# if (_XSEC_VERSION_FULL >= 10600)
+#  define XMLTOOLING_XMLSEC_MULTIPLECRL 1
+#  define XMLTOOLING_XMLSEC_SIGALGORITHM 1
+#  define XMLTOOLING_XMLSEC_ECC 1
+#  define XMLTOOLING_XMLSEC_DEBUGLOGGING 1
+# endif
+#endif
 
 /* Define to empty if `const' does not conform to ANSI C. */
 /* #undef const */

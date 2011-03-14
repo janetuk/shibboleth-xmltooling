@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * PKIXTrustEngine.cpp
  * 
- * Shibboleth-specific PKIX-validation TrustEngine
+ * Shibboleth-specific PKIX-validation TrustEngine.
  */
 
 #include "internal.h"
@@ -48,14 +48,14 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL StaticPKIXTrustEngine : public AbstractPKIXTrustEngine
     {
     public:
-        StaticPKIXTrustEngine(const DOMElement* e=NULL);
+        StaticPKIXTrustEngine(const DOMElement* e=nullptr);
 
         virtual ~StaticPKIXTrustEngine() {
             delete m_credResolver;
         }
         
         AbstractPKIXTrustEngine::PKIXValidationInfoIterator* getPKIXValidationInfoIterator(
-            const CredentialResolver& pkixSource, CredentialCriteria* criteria=NULL
+            const CredentialResolver& pkixSource, CredentialCriteria* criteria=nullptr
             ) const;
 
         const KeyInfoResolver* getKeyInfoResolver() const {
@@ -126,22 +126,18 @@ namespace xmltooling {
     };
 };
 
-StaticPKIXTrustEngine::StaticPKIXTrustEngine(const DOMElement* e) : AbstractPKIXTrustEngine(e), m_depth(1), m_credResolver(NULL)
+StaticPKIXTrustEngine::StaticPKIXTrustEngine(const DOMElement* e)
+    : AbstractPKIXTrustEngine(e), m_depth(XMLHelper::getAttrInt(e, 1, verifyDepth)), m_credResolver(nullptr)
 {
-    const XMLCh* depth = e ? e->getAttributeNS(NULL, verifyDepth) : NULL;
-    if (depth && *depth)
-        m_depth = XMLString::parseInt(depth);
-
-    if (e && e->hasAttributeNS(NULL,certificate)) {
+    if (e && e->hasAttributeNS(nullptr, certificate)) {
         // Simple File resolver config rooted here.
-        m_credResolver = XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(FILESYSTEM_CREDENTIAL_RESOLVER,e);
+        m_credResolver = XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(FILESYSTEM_CREDENTIAL_RESOLVER, e);
     }
     else {
-        e = e ? XMLHelper::getFirstChildElement(e, _CredentialResolver) : NULL;
-        auto_ptr_char t(e ? e->getAttributeNS(NULL,type) : NULL);
-        if (t.get()) {
-            m_credResolver = XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(t.get(),e);
-        }
+        e = e ? XMLHelper::getFirstChildElement(e, _CredentialResolver) : nullptr;
+        string t = XMLHelper::getAttrString(e, nullptr, type);
+        if (!t.empty())
+            m_credResolver = XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(t.c_str(), e);
         else
             throw XMLSecurityException("Missing <CredentialResolver> element, or no type attribute found");
     }

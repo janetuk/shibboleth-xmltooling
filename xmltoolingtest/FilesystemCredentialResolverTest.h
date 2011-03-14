@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,8 +43,8 @@ public:
 
         Locker locker(credResolver.get());
         const X509Credential* cred=dynamic_cast<const X509Credential*>(credResolver->resolve());
-        TSM_ASSERT("Retrieved credential was null", cred!=NULL);
-        TSM_ASSERT("Retrieved key was null", cred->getPrivateKey()!=NULL);
+        TSM_ASSERT("Retrieved credential was null", cred!=nullptr);
+        TSM_ASSERT("Retrieved key was null", cred->getPrivateKey()!=nullptr);
         TSM_ASSERT_EQUALS("Unexpected number of certificates", 1, cred->getEntityCertificateChain().size());
         TSM_ASSERT_EQUALS("Custom key name not found", 1, cred->getKeyNames().count("Sample Key"));
     }

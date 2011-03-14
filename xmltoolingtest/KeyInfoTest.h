@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,15 +38,15 @@ public:
         string path=data_path + "KeyInfo1.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getValidatingParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
 
         auto_ptr<KeyInfo> kiObject(dynamic_cast<KeyInfo*>(b->buildFromDocument(doc)));
-        TS_ASSERT(kiObject.get()!=NULL);
+        TS_ASSERT(kiObject.get()!=nullptr);
         TSM_ASSERT_EQUALS("Number of child elements was not expected value",
-            3, kiObject->getOrderedChildren().size());
+            4, kiObject->getOrderedChildren().size());
         TSM_ASSERT_EQUALS("Number of child elements was not expected value",
             1, kiObject->getKeyValues().size());
         TSM_ASSERT_EQUALS("Number of child elements was not expected value",
@@ -62,13 +62,13 @@ public:
         string path=data_path + "KeyInfo2.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getValidatingParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
 
         auto_ptr<KeyInfo> kiObject(dynamic_cast<KeyInfo*>(b->buildFromDocument(doc)));
-        TS_ASSERT(kiObject.get()!=NULL);
+        TS_ASSERT(kiObject.get()!=nullptr);
         TSM_ASSERT_EQUALS("Number of child elements was not expected value",
             2, kiObject->getOrderedChildren().size());
         TSM_ASSERT_EQUALS("Number of child elements was not expected value",
@@ -83,13 +83,34 @@ public:
         string path=data_path + "KeyInfo3.xml";
         ifstream fs(path.c_str());
         DOMDocument* doc=XMLToolingConfig::getConfig().getParser().parse(fs);
-        TS_ASSERT(doc!=NULL);
+        TS_ASSERT(doc!=nullptr);
 
         const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
-        TS_ASSERT(b!=NULL);
+        TS_ASSERT(b!=nullptr);
 
         auto_ptr<KeyInfo> kiObject(dynamic_cast<KeyInfo*>(b->buildFromDocument(doc)));
-        TS_ASSERT(kiObject.get()!=NULL);
+        TS_ASSERT(kiObject.get()!=nullptr);
         TS_ASSERT_THROWS(SchemaValidators.validate(kiObject.get()),ValidationException);
+    }
+
+    void testKeyInfo4() {
+        string path=data_path + "KeyInfo4.xml";
+        ifstream fs(path.c_str());
+        DOMDocument* doc=XMLToolingConfig::getConfig().getValidatingParser().parse(fs);
+        TS_ASSERT(doc!=nullptr);
+
+        const XMLObjectBuilder* b = XMLObjectBuilder::getBuilder(doc->getDocumentElement());
+        TS_ASSERT(b!=nullptr);
+
+        auto_ptr<KeyInfo> kiObject(dynamic_cast<KeyInfo*>(b->buildFromDocument(doc)));
+        TS_ASSERT(kiObject.get()!=nullptr);
+        TSM_ASSERT_EQUALS("Number of child elements was not expected value",
+            1, kiObject->getKeyValues().size());
+        ECKeyValue* kv = kiObject->getKeyValues().front()->getECKeyValue();
+        TSM_ASSERT("Missing ECKeyValue", kv!=nullptr);
+        TSM_ASSERT("Missing NamedCurve", kv->getNamedCurve()!=nullptr);
+        TSM_ASSERT("Missing PublicKey", kv->getPublicKey()!=nullptr);
+
+        SchemaValidators.validate(kiObject.get());
     }
 };

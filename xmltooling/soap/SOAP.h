@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,10 +100,10 @@ namespace soap11 {
     DECL_SOAP11OBJECTBUILDER(Envelope);
     DECL_SOAP11OBJECTBUILDER(Fault);
     DECL_SOAP11OBJECTBUILDER(Header);
-    DECL_XMLOBJECTBUILDER(XMLTOOL_API,Detail,NULL,NULL);
-    DECL_XMLOBJECTBUILDER(XMLTOOL_API,Faultactor,NULL,NULL);
-    DECL_XMLOBJECTBUILDER(XMLTOOL_API,Faultcode,NULL,NULL);
-    DECL_XMLOBJECTBUILDER(XMLTOOL_API,Faultstring,NULL,NULL);
+    DECL_XMLOBJECTBUILDER(XMLTOOL_API,Detail,nullptr,nullptr);
+    DECL_XMLOBJECTBUILDER(XMLTOOL_API,Faultactor,nullptr,nullptr);
+    DECL_XMLOBJECTBUILDER(XMLTOOL_API,Faultcode,nullptr,nullptr);
+    DECL_XMLOBJECTBUILDER(XMLTOOL_API,Faultstring,nullptr,nullptr);
 
     /**
      * Registers builders and validators for SOAP 1.1 classes into the runtime.

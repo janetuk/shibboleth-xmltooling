@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,17 +43,9 @@ namespace xmltooling {
         /**
          * Constructor.
          * 
-         * If a DOM is supplied, the following XML content is supported:
-         * 
-         * <ul>
-         *  <li>&lt;KeyInfoResolver&gt; elements with a type attribute
-         * </ul>
-         * 
-         * XML namespaces are ignored in the processing of this content.
-         * 
          * @param e DOM to supply configuration for provider
          */
-        SignatureTrustEngine(const xercesc::DOMElement* e=NULL);
+        SignatureTrustEngine(const xercesc::DOMElement* e=nullptr);
         
     public:
         virtual ~SignatureTrustEngine();
@@ -79,7 +71,7 @@ namespace xmltooling {
         virtual bool validate(
             xmlsignature::Signature& sig,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const=0;
 
         /**
@@ -115,7 +107,7 @@ namespace xmltooling {
             const char* in,
             unsigned int in_len,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const=0;
     };
 };

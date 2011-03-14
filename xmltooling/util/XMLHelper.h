@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 
 #include <xmltooling/base.h>
 
+#include <map>
 #include <iostream>
 #include <xercesc/dom/DOM.hpp>
 
@@ -56,7 +57,7 @@ namespace xmltooling {
         /**
          * Returns resource held by this object.
          *
-         * @return  the resource held or NULL
+         * @return  the resource held or nullptr
          */
         T* get() {
             return m_held;
@@ -65,7 +66,7 @@ namespace xmltooling {
         /**
          * Returns resource held by this object.
          *
-         * @return  the resource held or NULL
+         * @return  the resource held or nullptr
          */
         T* operator->() {
             return m_held;
@@ -74,11 +75,11 @@ namespace xmltooling {
         /**
          * Returns resource held by this object and releases it to the caller.
          *
-         * @return  the resource held or NULL
+         * @return  the resource held or nullptr
          */
         T* release() {
             T* ret=m_held;
-            m_held=NULL;
+            m_held=nullptr;
             return ret;
         }
     };
@@ -119,7 +120,7 @@ namespace xmltooling {
          *
          * @param tree  root of tree to search
          * @param id    ID value to locate
-         * @return XMLObject in the tree with a matching ID value, or NULL
+         * @return XMLObject in the tree with a matching ID value, or nullptr
          */
         static const XMLObject* getXMLObjectById(const XMLObject& tree, const XMLCh* id);
 
@@ -129,9 +130,18 @@ namespace xmltooling {
          *
          * @param tree  root of tree to search
          * @param id    ID value to locate
-         * @return XMLObject in the tree with a matching ID value, or NULL
+         * @return XMLObject in the tree with a matching ID value, or nullptr
          */
         static XMLObject* getXMLObjectById(XMLObject& tree, const XMLCh* id);
+
+        /**
+         * Returns the set of non-visibly-used namespace declarations found in a tree.
+         * <p>Each member of the set is a prefix/URI pair.
+         *
+         * @param tree      root of tree to search
+         * @param prefixes  container to store declarations
+         */
+        static void getNonVisiblyUsedPrefixes(const XMLObject& tree, std::map<xstring,xstring>& prefixes);
 
         /**
          * Gets the QName for the given DOM node.
@@ -159,6 +169,15 @@ namespace xmltooling {
         static QName* getNodeValueAsQName(const xercesc::DOMNode* domNode);
 
         /**
+         * Returns a boolean based on a node's value.
+         *
+         * @param domNode   the DOM node with a boolean (1/0/true/false) value
+         * @param def       value to return if the node is null/missing
+         * @return a bool value based on the node's value, or a default value
+         */
+        static bool getNodeValueAsBool(const xercesc::DOMNode* domNode, bool def);
+
+        /**
          * Appends the child Element to the parent Element,
          * importing the child Element into the parent's Document if needed.
          *
@@ -182,37 +201,37 @@ namespace xmltooling {
          * Returns the first matching child element of the node if any.
          *
          * @param n         node to check
-         * @param localName local name to compare with or NULL for any match
-         * @return  the first matching child node of type Element, or NULL
+         * @param localName local name to compare with or nullptr for any match
+         * @return  the first matching child node of type Element, or nullptr
          */
-        static xercesc::DOMElement* getFirstChildElement(const xercesc::DOMNode* n, const XMLCh* localName=NULL);
+        static xercesc::DOMElement* getFirstChildElement(const xercesc::DOMNode* n, const XMLCh* localName=nullptr);
 
         /**
          * Returns the last matching child element of the node if any.
          *
          * @param n     node to check
-         * @param localName local name to compare with or NULL for any match
-         * @return  the last matching child node of type Element, or NULL
+         * @param localName local name to compare with or nullptr for any match
+         * @return  the last matching child node of type Element, or nullptr
          */
-        static xercesc::DOMElement* getLastChildElement(const xercesc::DOMNode* n, const XMLCh* localName=NULL);
+        static xercesc::DOMElement* getLastChildElement(const xercesc::DOMNode* n, const XMLCh* localName=nullptr);
 
         /**
          * Returns the next matching sibling element of the node if any.
          *
          * @param n     node to check
-         * @param localName local name to compare with or NULL for any match
-         * @return  the next matching sibling node of type Element, or NULL
+         * @param localName local name to compare with or nullptr for any match
+         * @return  the next matching sibling node of type Element, or nullptr
          */
-        static xercesc::DOMElement* getNextSiblingElement(const xercesc::DOMNode* n, const XMLCh* localName=NULL);
+        static xercesc::DOMElement* getNextSiblingElement(const xercesc::DOMNode* n, const XMLCh* localName=nullptr);
 
         /**
          * Returns the previous matching sibling element of the node if any.
          *
          * @param n     node to check
-         * @param localName local name to compare with or NULL for any match
-         * @return  the previous matching sibling node of type Element, or NULL
+         * @param localName local name to compare with or nullptr for any match
+         * @return  the previous matching sibling node of type Element, or nullptr
          */
-        static xercesc::DOMElement* getPreviousSiblingElement(const xercesc::DOMNode* n, const XMLCh* localName=NULL);
+        static xercesc::DOMElement* getPreviousSiblingElement(const xercesc::DOMNode* n, const XMLCh* localName=nullptr);
 
         /**
          * Returns the first matching child element of the node if any.
@@ -220,7 +239,7 @@ namespace xmltooling {
          * @param n         node to check
          * @param ns        namespace to compare with
          * @param localName local name to compare with
-         * @return  the first matching child node of type Element, or NULL
+         * @return  the first matching child node of type Element, or nullptr
          */
         static xercesc::DOMElement* getFirstChildElement(const xercesc::DOMNode* n, const XMLCh* ns, const XMLCh* localName);
 
@@ -230,7 +249,7 @@ namespace xmltooling {
          * @param n         node to check
          * @param ns        namespace to compare with
          * @param localName local name to compare with
-         * @return  the last matching child node of type Element, or NULL
+         * @return  the last matching child node of type Element, or nullptr
          */
         static xercesc::DOMElement* getLastChildElement(const xercesc::DOMNode* n, const XMLCh* ns, const XMLCh* localName);
 
@@ -240,7 +259,7 @@ namespace xmltooling {
          * @param n         node to check
          * @param ns        namespace to compare with
          * @param localName local name to compare with
-         * @return  the next matching sibling node of type Element, or NULL
+         * @return  the next matching sibling node of type Element, or nullptr
          */
         static xercesc::DOMElement* getNextSiblingElement(const xercesc::DOMNode* n, const XMLCh* ns, const XMLCh* localName);
 
@@ -250,19 +269,61 @@ namespace xmltooling {
          * @param n         node to check
          * @param ns        namespace to compare with
          * @param localName local name to compare with
-         * @return  the previous matching sibling node of type Element, or NULL
+         * @return  the previous matching sibling node of type Element, or nullptr
          */
         static xercesc::DOMElement* getPreviousSiblingElement(const xercesc::DOMNode* n, const XMLCh* ns, const XMLCh* localName);
 
         /**
          * Returns the content of the first Text node found in the element, if any.
          * This is roughly similar to the DOM getTextContent function, but only
-         * examples the immediate children of the element.
+         * examines the immediate children of the element.
          *
          * @param e     element to examine
-         * @return the content of the first Text node found, or NULL
+         * @return the content of the first Text node found, or nullptr
          */
         static const XMLCh* getTextContent(const xercesc::DOMElement* e);
+
+        /**
+         * Returns the content of the specified attribute node as a string,
+         * or the default value, if the attribute is not present.
+         *
+         * @param e         element to examine (may be nullptr)
+         * @param defValue  default value to return
+         * @param localName local name of attribute
+         * @param ns        namespace of attribute
+         * @return  the specified attribute's value, or the specified default
+         */
+        static std::string getAttrString(
+            const xercesc::DOMElement* e, const char* defValue, const XMLCh* localName, const XMLCh* ns=nullptr
+            );
+
+        /**
+         * Returns the content of the specified attribute node as an integer,
+         * or the default value, if the attribute is not present.
+         *
+         * @param e         element to examine (may be nullptr)
+         * @param defValue  default value to return
+         * @param localName local name of attribute
+         * @param ns        namespace of attribute
+         * @return  the specified attribute's value, or the specified default
+         */
+        static int getAttrInt(
+            const xercesc::DOMElement* e, int defValue, const XMLCh* localName, const XMLCh* ns=nullptr
+            );
+
+        /**
+         * Returns the content of the specified attribute node as a boolean,
+         * or the default value, if the attribute is not present.
+         *
+         * @param e         element to examine (may be nullptr)
+         * @param defValue  default value to return
+         * @param localName local name of attribute
+         * @param ns        namespace of attribute
+         * @return  the specified attribute's value, or the specified default
+         */
+        static bool getAttrBool(
+            const xercesc::DOMElement* e, bool defValue, const XMLCh* localName, const XMLCh* ns=nullptr
+            );
 
         /**
          * Serializes the DOM node provided into a buffer using UTF-8 encoding and

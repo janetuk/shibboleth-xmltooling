@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ namespace xmltooling {
          * @param password  optional password to decrypt key
          * @return  a populated key object
          */
-        static XSECCryptoKey* loadKeyFromFile(const char* pathname, const char* format=NULL, const char* password=NULL);
+        static XSECCryptoKey* loadKeyFromFile(const char* pathname, const char* format=nullptr, const char* password=nullptr);
 
         /**
          * Loads certificate(s) from a local file.
@@ -70,7 +70,7 @@ namespace xmltooling {
          * @return  size of the resulting array
          */
         static std::vector<XSECCryptoX509*>::size_type loadCertificatesFromFile(
-            std::vector<XSECCryptoX509*>& certs, const char* pathname, const char* format=NULL, const char* password=NULL
+            std::vector<XSECCryptoX509*>& certs, const char* pathname, const char* format=nullptr, const char* password=nullptr
             );
 
         /**
@@ -82,7 +82,7 @@ namespace xmltooling {
          * @return  size of the resulting array
          */
         static std::vector<XSECCryptoX509CRL*>::size_type loadCRLsFromFile(
-            std::vector<XSECCryptoX509CRL*>& crls, const char* pathname, const char* format=NULL
+            std::vector<XSECCryptoX509CRL*>& crls, const char* pathname, const char* format=nullptr
             );
 
         /**
@@ -94,7 +94,7 @@ namespace xmltooling {
          * @param password  optional password to decrypt key
          * @return  a populated key object
          */
-        static XSECCryptoKey* loadKeyFromURL(SOAPTransport& transport, const char* backing, const char* format=NULL, const char* password=NULL);
+        static XSECCryptoKey* loadKeyFromURL(SOAPTransport& transport, const char* backing, const char* format=nullptr, const char* password=nullptr);
 
         /**
          * Loads certificate(s) from a URL.
@@ -107,7 +107,7 @@ namespace xmltooling {
          * @return  size of the resulting array
          */
         static std::vector<XSECCryptoX509*>::size_type loadCertificatesFromURL(
-            std::vector<XSECCryptoX509*>& certs, SOAPTransport& transport, const char* backing, const char* format=NULL, const char* password=NULL
+            std::vector<XSECCryptoX509*>& certs, SOAPTransport& transport, const char* backing, const char* format=nullptr, const char* password=nullptr
             );
 
         /**
@@ -120,7 +120,7 @@ namespace xmltooling {
          * @return  size of the resulting array
          */
         static std::vector<XSECCryptoX509CRL*>::size_type loadCRLsFromURL(
-            std::vector<XSECCryptoX509CRL*>& crls, SOAPTransport& transport, const char* backing, const char* format=NULL
+            std::vector<XSECCryptoX509CRL*>& crls, SOAPTransport& transport, const char* backing, const char* format=nullptr
             );
 
         /**
@@ -161,7 +161,6 @@ namespace xmltooling {
          * @param key       the key to encode
          * @param hash      optional name of hash algorithm, syntax specific to crypto provider
          * @param nowrap    if true, any linefeeds will be stripped from the result
-         * @param hashAlg   name of hash algorithm, syntax specific to crypto provider
          * @return  the base64 encoded key value
          */
         static std::string getDEREncoding(const XSECCryptoKey& key, const char* hash, bool nowrap=true);
@@ -173,7 +172,6 @@ namespace xmltooling {
          * @param cert      the certificate's key to encode
          * @param hash      optional name of hash algorithm, syntax specific to crypto provider
          * @param nowrap    if true, any linefeeds will be stripped from the result
-         * @param hashAlg   name of hash algorithm, syntax specific to crypto provider
          * @return  the base64 encoded key value
          */
         static std::string getDEREncoding(const XSECCryptoX509& cert, const char* hash, bool nowrap=true);
@@ -202,7 +200,7 @@ namespace xmltooling {
 
         /**
          * @deprecated
-         * Returns the base64-encoded DER encoding of a certifiate's public key in SubjectPublicKeyInfo format.
+         * Returns the base64-encoded DER encoding of a certificate's public key in SubjectPublicKeyInfo format.
          *
          * @param cert      the certificate's key to encode
          * @param hash      if true, the DER encoded data is hashed with SHA-1 before base64 encoding
@@ -210,6 +208,24 @@ namespace xmltooling {
          * @return  the base64 encoded key value
          */
         static std::string getDEREncoding(const XSECCryptoX509& cert, bool hash=false, bool nowrap=true);
+
+        /**
+         * Decodes a DER-encoded public key.
+         *
+         * @param buf       DER encoded data
+         * @param buflen    length of data in bytes
+         * @param base64    true iff DER is base64-encoded
+         * @return  the decoded public key, or nullptr
+         */
+        static XSECCryptoKey* fromDEREncoding(const char* buf, unsigned long buflen, bool base64=true);
+
+        /**
+         * Decodes a base64-encoded and DER-encoded public key.
+         *
+         * @param buf       base64 and DER encoded data
+         * @return  the decoded public key, or nullptr
+         */
+        static XSECCryptoKey* fromDEREncoding(const XMLCh* buf);
     };
 };
 

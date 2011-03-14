@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009 The Apache Software Foundation.
+ * Copyright 2001-2010 The Apache Software Foundation.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ XSEC_USING_XERCES(Janitor);
 
 using namespace xmltooling;
 
-OpenSSLCryptoX509CRL::OpenSSLCryptoX509CRL() : mp_X509CRL(NULL), m_DERX509CRL("")
+OpenSSLCryptoX509CRL::OpenSSLCryptoX509CRL() : mp_X509CRL(nullptr), m_DERX509CRL("")
 {
 }
 
@@ -105,14 +105,14 @@ void OpenSSLCryptoX509CRL::loadX509CRLBase64Bin(const char* buf, unsigned int le
 
 	if (bufLen > 0) {
 #if defined(XSEC_OPENSSL_D2IX509_CONST_BUFFER)
-		mp_X509CRL=  d2i_X509_CRL(NULL, (const unsigned char **) (&outBuf), bufLen);
+		mp_X509CRL=  d2i_X509_CRL(nullptr, (const unsigned char **) (&outBuf), bufLen);
 #else
-		mp_X509CRL=  d2i_X509_CRL(NULL, &outBuf, bufLen);
+		mp_X509CRL=  d2i_X509_CRL(nullptr, &outBuf, bufLen);
 #endif
 	}
 
 	// Check to see if we have a CRL....
-	if (mp_X509CRL == NULL) {
+	if (mp_X509CRL == nullptr) {
 		throw XSECCryptoException(XSECCryptoException::X509Error,
 		"OpenSSL:X509CRL - Error translating Base64 DER encoding into OpenSSL X509 CRL structure");
 	}

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@
 #include <xmltooling/security/OpenSSLTrustEngine.h>
 #include <xmltooling/security/SignatureTrustEngine.h>
 
+#include <string>
+
 namespace xmltooling {
 
     class XMLTOOL_API XSECCryptoX509CRL;
@@ -44,17 +46,17 @@ namespace xmltooling {
          * If a DOM is supplied, the following XML content is supported:
          * 
          * <ul>
-         *  <li>fullCRLChain boolean attribute
-         *  <li>&lt;KeyInfoResolver&gt; elements with a type attribute
+         *  <li>checkRevocation attribute (off, entityOnly, fullChain)
          * </ul>
-         * 
-         * XML namespaces are ignored in the processing of this content.
          * 
          * @param e DOM to supply configuration for provider
          */
-        AbstractPKIXTrustEngine(const xercesc::DOMElement* e=NULL);
+        AbstractPKIXTrustEngine(const xercesc::DOMElement* e=nullptr);
 
-        /** Flag controls whether every issuer in the trust path must have a CRL loaded. */
+		/** Controls revocation checking, currently limited to CRLs and supports "off", "entityOnly", "fullChain". */
+		std::string m_checkRevocation;
+
+        /** Deprecated option, equivalent to checkRevocation="fullChain". */
         bool m_fullCRLChain;
         
         /**
@@ -75,7 +77,7 @@ namespace xmltooling {
         bool validate(
             xmlsignature::Signature& sig,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const;
 
         bool validate(
@@ -85,21 +87,21 @@ namespace xmltooling {
             const char* in,
             unsigned int in_len,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const;
 
         bool validate(
             XSECCryptoX509* certEE,
             const std::vector<XSECCryptoX509*>& certChain,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const;
 
         bool validate(
             X509* certEE,
             STACK_OF(X509)* certChain,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const;
 
         /**
@@ -163,7 +165,7 @@ namespace xmltooling {
          * @return interface for obtaining validation data
          */
         virtual PKIXValidationInfoIterator* getPKIXValidationInfoIterator(
-            const CredentialResolver& pkixSource, CredentialCriteria* criteria=NULL
+            const CredentialResolver& pkixSource, CredentialCriteria* criteria=nullptr
             ) const=0;
 
     private:
@@ -171,8 +173,8 @@ namespace xmltooling {
             X509* certEE,
             STACK_OF(X509)* certChain,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL,
-            const std::vector<XSECCryptoX509CRL*>* inlineCRLs=NULL
+            CredentialCriteria* criteria=nullptr,
+            const std::vector<XSECCryptoX509CRL*>* inlineCRLs=nullptr
             ) const;
     };
 };

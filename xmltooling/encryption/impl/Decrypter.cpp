@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ using namespace xercesc;
 using namespace std;
 
 Decrypter::Decrypter(const CredentialResolver* credResolver, CredentialCriteria* criteria, const EncryptedKeyResolver* EKResolver)
-    : m_cipher(NULL), m_credResolver(credResolver), m_criteria(criteria), m_EKResolver(EKResolver)
+    : m_cipher(nullptr), m_credResolver(credResolver), m_criteria(criteria), m_EKResolver(EKResolver)
 {
 }
 
@@ -68,14 +68,14 @@ void Decrypter::setKEKResolver(const CredentialResolver* resolver, CredentialCri
 
 DOMDocumentFragment* Decrypter::decryptData(const EncryptedData& encryptedData, XSECCryptoKey* key)
 {
-    if (encryptedData.getDOM()==NULL)
+    if (encryptedData.getDOM()==nullptr)
         throw DecryptionException("The object must be marshalled before decryption.");
 
     // We can reuse the cipher object if the document hasn't changed.
 
     if (m_cipher && m_cipher->getDocument()!=encryptedData.getDOM()->getOwnerDocument()) {
         XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
-        m_cipher=NULL;
+        m_cipher=nullptr;
     }
     
     if (!m_cipher)
@@ -141,12 +141,12 @@ DOMDocumentFragment* Decrypter::decryptData(const EncryptedData& encryptedData, 
 
     // We need to find an encrypted decryption key somewhere. We'll need the underlying algorithm...
     const XMLCh* algorithm=
-        encryptedData.getEncryptionMethod() ? encryptedData.getEncryptionMethod()->getAlgorithm() : NULL;
+        encryptedData.getEncryptionMethod() ? encryptedData.getEncryptionMethod()->getAlgorithm() : nullptr;
     if (!algorithm)
         throw DecryptionException("No EncryptionMethod/@Algorithm set, key decryption cannot proceed.");
     
     // Check for external resolver.
-    const EncryptedKey* encKey=NULL;
+    const EncryptedKey* encKey=nullptr;
     if (m_EKResolver)
         encKey = m_EKResolver->resolveKey(encryptedData, recipient);
     else {
@@ -165,14 +165,14 @@ DOMDocumentFragment* Decrypter::decryptData(const EncryptedData& encryptedData, 
 
 void Decrypter::decryptData(ostream& out, const EncryptedData& encryptedData, XSECCryptoKey* key)
 {
-    if (encryptedData.getDOM()==NULL)
+    if (encryptedData.getDOM()==nullptr)
         throw DecryptionException("The object must be marshalled before decryption.");
 
     // We can reuse the cipher object if the document hasn't changed.
 
     if (m_cipher && m_cipher->getDocument()!=encryptedData.getDOM()->getOwnerDocument()) {
         XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
-        m_cipher=NULL;
+        m_cipher=nullptr;
     }
     
     if (!m_cipher)
@@ -238,12 +238,12 @@ void Decrypter::decryptData(ostream& out, const EncryptedData& encryptedData, co
 
     // We need to find an encrypted decryption key somewhere. We'll need the underlying algorithm...
     const XMLCh* algorithm=
-        encryptedData.getEncryptionMethod() ? encryptedData.getEncryptionMethod()->getAlgorithm() : NULL;
+        encryptedData.getEncryptionMethod() ? encryptedData.getEncryptionMethod()->getAlgorithm() : nullptr;
     if (!algorithm)
         throw DecryptionException("No EncryptionMethod/@Algorithm set, key decryption cannot proceed.");
     
     // Check for external resolver.
-    const EncryptedKey* encKey=NULL;
+    const EncryptedKey* encKey=nullptr;
     if (m_EKResolver)
         encKey = m_EKResolver->resolveKey(encryptedData, recipient);
     else {
@@ -265,18 +265,28 @@ XSECCryptoKey* Decrypter::decryptKey(const EncryptedKey& encryptedKey, const XML
     if (!m_credResolver)
         throw DecryptionException("No CredentialResolver supplied to provide decryption keys.");
 
-    if (encryptedKey.getDOM()==NULL)
+    if (encryptedKey.getDOM()==nullptr)
         throw DecryptionException("The object must be marshalled before decryption.");
 
-    XSECAlgorithmHandler* handler = XSECPlatformUtils::g_algorithmMapper->mapURIToHandler(algorithm);
-    if (!handler)
-        throw DecryptionException("Unrecognized algorithm, no way to build object around decrypted key.");
+    XSECAlgorithmHandler* handler;
+    try {
+        handler = XSECPlatformUtils::g_algorithmMapper->mapURIToHandler(algorithm);
+        if (!handler)
+            throw DecryptionException("Unrecognized algorithm, no way to build object around decrypted key.");
+    }
+    catch(XSECException& e) {
+        auto_ptr_char temp(e.getMsg());
+        throw DecryptionException(string("XMLSecurity exception while decrypting key: ") + temp.get());
+    }
+    catch(XSECCryptoException& e) {
+        throw DecryptionException(string("XMLSecurity exception while decrypting key: ") + e.getMsg());
+    }
     
     // We can reuse the cipher object if the document hasn't changed.
 
     if (m_cipher && m_cipher->getDocument()!=encryptedKey.getDOM()->getOwnerDocument()) {
         XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
-        m_cipher=NULL;
+        m_cipher=nullptr;
     }
     
     if (!m_cipher)

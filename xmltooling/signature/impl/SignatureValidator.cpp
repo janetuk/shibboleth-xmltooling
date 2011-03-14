@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,11 +32,11 @@ using namespace xmlsignature;
 using namespace xmltooling;
 using namespace std;
 
-SignatureValidator::SignatureValidator(XSECCryptoKey* key) : m_key(key), m_credential(NULL)
+SignatureValidator::SignatureValidator(XSECCryptoKey* key) : m_key(key), m_credential(nullptr)
 {
 }
 
-SignatureValidator::SignatureValidator(const Credential* credential) : m_key(NULL), m_credential(credential)
+SignatureValidator::SignatureValidator(const Credential* credential) : m_key(nullptr), m_credential(credential)
 {
 }
 
@@ -47,12 +47,12 @@ SignatureValidator::~SignatureValidator()
 void SignatureValidator::setKey(XSECCryptoKey* key)
 {
     m_key = key;
-    m_credential = NULL;
+    m_credential = nullptr;
 }
 
 void SignatureValidator::setCredential(const Credential* credential)
 {
-    m_key = NULL;
+    m_key = nullptr;
     m_credential = credential;
 }
 
@@ -72,7 +72,7 @@ void SignatureValidator::validate(const Signature* sigObj) const
     else if (!m_key && !m_credential)
         throw ValidationException("No Credential or key set on Validator.");
 
-    XSECCryptoKey* key = m_key ? m_key : (m_credential ? m_credential->getPublicKey() : NULL);
+    XSECCryptoKey* key = m_key ? m_key : (m_credential ? m_credential->getPublicKey() : nullptr);
     if (!key)
         throw ValidationException("Credential did not contain a verification key.");
 

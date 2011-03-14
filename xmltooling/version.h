@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2011 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,8 +38,8 @@
  */
 
 #define XMLTOOLING_VERSION_MAJOR 1
-#define XMLTOOLING_VERSION_MINOR 3
-#define XMLTOOLING_VERSION_REVISION 3
+#define XMLTOOLING_VERSION_MINOR 4
+#define XMLTOOLING_VERSION_REVISION 1
 
 /** DO NOT MODIFY BELOW THIS LINE */
 

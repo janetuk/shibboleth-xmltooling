@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2007 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ namespace xmltooling {
         virtual bool validate(
             Signature& sig,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const;
         virtual bool validate(
             const XMLCh* sigAlgorithm,
@@ -62,19 +62,19 @@ namespace xmltooling {
             const char* in,
             unsigned int in_len,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const;
         virtual bool validate(
             XSECCryptoX509* certEE,
             const vector<XSECCryptoX509*>& certChain,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const;
         virtual bool validate(
             X509* certEE,
             STACK_OF(X509)* certChain,
             const CredentialResolver& credResolver,
-            CredentialCriteria* criteria=NULL
+            CredentialCriteria* criteria=nullptr
             ) const;
     };
 
@@ -204,7 +204,7 @@ bool ExplicitKeyTrustEngine::validate(
         return false;
     }
 
-    return validate(static_cast<OpenSSLCryptoX509*>(certEE)->getOpenSSLX509(), NULL, credResolver, criteria);
+    return validate(static_cast<OpenSSLCryptoX509*>(certEE)->getOpenSSLX509(), nullptr, credResolver, criteria);
 }
 
 bool ExplicitKeyTrustEngine::validate(

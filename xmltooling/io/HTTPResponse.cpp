@@ -45,7 +45,7 @@ void HTTPResponse::sanitizeURL(const char* url)
 {
     const char* ch;
     for (ch=url; *ch; ++ch) {
-        if (iscntrl(*ch))
+        if (iscntrl((unsigned char)(*ch)))  // convert to unsigned to allow full range from 00-FF
             throw IOException("URL contained a control character.");
     }
 

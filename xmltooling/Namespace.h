@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * @file xmltooling/Namespace.h
  * 
- * Representing XML namespace attributes 
+ * Representing XML namespace attributes.
  */
 
 #if !defined(__xmltooling_namespace_h__)
@@ -33,18 +33,28 @@ namespace xmltooling {
 #endif
 
     /**
-     * A data structure for encapsulating XML Namespace attributes
+     * A data structure for encapsulating XML Namespace attributes.
      */
     class XMLTOOL_API Namespace
     {
     public:
         /**
+         * Tri-state indicator of namespace usage.
+         */
+        enum namespace_usage_t {
+            Indeterminate,
+            NonVisiblyUsed,
+            VisiblyUsed
+        };
+
+        /**
          * Constructor
          * @param uri               namespace URI
          * @param prefix            namespace prefix (without the colon)
          * @param alwaysDeclare     true iff the namespace should always be declared regardless of in-scope declarations
+         * @param usage             indicates usage of namespace in the context of an XMLObject
          */
-        Namespace(const XMLCh* uri=NULL, const XMLCh* prefix=NULL, bool alwaysDeclare=false);
+        Namespace(const XMLCh* uri=nullptr, const XMLCh* prefix=nullptr, bool alwaysDeclare=false, namespace_usage_t usage=Indeterminate);
         
         ~Namespace();
         
@@ -64,7 +74,13 @@ namespace xmltooling {
          * Returns true iff the namespace should always be declared regardless of in-scope declarations
          * @return the alwaysDeclared setting
          */
-        const bool alwaysDeclare() const { return m_pinned; } 
+        const bool alwaysDeclare() const { return m_pinned; }
+
+        /**
+         * Returns the usage of the namespace by an XMLObject
+         * @return the usage setting
+         */
+        const namespace_usage_t usage() const { return m_usage; }
 
         /**
          * Sets the namespace prefix
@@ -84,8 +100,15 @@ namespace xmltooling {
          */
         void setAlwaysDeclare(bool alwaysDeclare) { m_pinned = alwaysDeclare; } 
         
+        /**
+         * Sets the usage property
+         * @param usage usage of the namespace by an XMLObject
+         */
+        void setUsage(namespace_usage_t usage) { m_usage = usage; }
+
     private:
         bool m_pinned;
+        namespace_usage_t m_usage;
         xstring m_uri;
         xstring m_prefix;
     };

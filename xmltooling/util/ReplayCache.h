@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,9 +43,9 @@ namespace xmltooling {
          * The lifetime of the StorageService <strong>MUST</strong> be longer than
          * the lifetime of the ReplayCache.
          * 
-         * @param storage       pointer to a StorageService, or NULL to keep cache in memory
+         * @param storage       pointer to a StorageService, or nullptr to keep cache in memory
          */
-        ReplayCache(StorageService* storage=NULL);
+        ReplayCache(StorageService* storage=nullptr);
 
         virtual ~ReplayCache();
         

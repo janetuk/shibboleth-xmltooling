@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ namespace xmltooling {
          * Sets or clears a response header.
          * 
          * @param name  header name
-         * @param value value to set, or NULL to clear
+         * @param value value to set, or nullptr to clear
          */
         virtual void setResponseHeader(const char* name, const char* value);
 
@@ -64,7 +64,7 @@ namespace xmltooling {
          * Sets a client cookie.
          * 
          * @param name  cookie name
-         * @param value value to set, or NULL to clear
+         * @param value value to set, or nullptr to clear
          */
         virtual void setCookie(const char* name, const char* value);
         
@@ -84,6 +84,7 @@ namespace xmltooling {
         enum status_t {
             XMLTOOLING_HTTP_STATUS_OK = 200,
             XMLTOOLING_HTTP_STATUS_MOVED = 302,
+            XMLTOOLING_HTTP_STATUS_NOTMODIFIED = 304,
             XMLTOOLING_HTTP_STATUS_UNAUTHORIZED = 401,
             XMLTOOLING_HTTP_STATUS_FORBIDDEN = 403,
             XMLTOOLING_HTTP_STATUS_NOTFOUND = 404,

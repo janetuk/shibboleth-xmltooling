@@ -198,10 +198,10 @@ common_sources = \
 libxmltooling_lite_la_SOURCES = \
 	${common_sources}
 libxmltooling_lite_la_CPPFLAGS = -DXMLTOOLING_LITE
-libxmltooling_lite_la_LDFLAGS = -version-info 4:3:0
+libxmltooling_lite_la_LDFLAGS = -version-info 5:1:0
 
 if BUILD_XMLSEC
-libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 4:3:0
+libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 5:1:0
 libxmltooling_la_SOURCES = \
 	${common_sources} \
 	${xmlsec_sources}
@@ -211,8 +211,10 @@ install-exec-hook:
 	for la in $(lib_LTLIBRARIES) ; do rm -f $(DESTDIR)$(libdir)/$$la ; done
 
 EXTRA_DIST = \
-    xmltooling.vcproj \
-    xmltooling-lite.vcproj \
+    xmltooling.vcxproj \
+    xmltooling-lite.vcxproj \
+    xmltooling.vcxproj.filters \
+    xmltooling-lite.vcxproj.filters \
     config_pub.h.in \
     config_pub_win32.h\
     resource.h\

@@ -1,0 +1,339 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{06B55A46-D3B3-41AE-B5A5-B57830BA010D}</ProjectGuid>
+    <RootNamespace>xmltooling</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)1_4D</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)1_4D</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)1_4</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectName)1_4</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>wsock32.lib;log4shib1D.lib;xerces-c_3D.lib;xsec_1D.lib;libeay32D.lib;ssleay32D.lib;libcurld_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>$(TargetDir)$(ProjectName)1D.lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <BrowseInformation>true</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>wsock32.lib;log4shib1D.lib;xerces-c_3D.lib;xsec_1D.lib;libeay32D.lib;ssleay32D.lib;libcurld_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>$(TargetDir)$(ProjectName)1D.lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>wsock32.lib;log4shib1.lib;xerces-c_3.lib;xsec_1.lib;libeay32.lib;ssleay32.lib;libcurl_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>$(TargetDir)$(ProjectName)1.lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>wsock32.lib;log4shib1.lib;xerces-c_3.lib;xsec_1.lib;libeay32.lib;ssleay32.lib;libcurl_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <DataExecutionPrevention>
+      </DataExecutionPrevention>
+      <ImportLibrary>$(TargetDir)$(ProjectName)1.lib</ImportLibrary>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="AbstractAttributeExtensibleXMLObject.cpp" />
+    <ClCompile Include="AbstractComplexElement.cpp" />
+    <ClCompile Include="AbstractDOMCachingXMLObject.cpp" />
+    <ClCompile Include="AbstractSimpleElement.cpp" />
+    <ClCompile Include="AbstractXMLObject.cpp" />
+    <ClCompile Include="exceptions.cpp" />
+    <ClCompile Include="Lockable.cpp" />
+    <ClCompile Include="Namespace.cpp" />
+    <ClCompile Include="QName.cpp" />
+    <ClCompile Include="unicode.cpp" />
+    <ClCompile Include="XMLObjectBuilder.cpp" />
+    <ClCompile Include="XMLToolingConfig.cpp" />
+    <ClCompile Include="util\CurlURLInputStream.cpp" />
+    <ClCompile Include="util\DateTime.cpp" />
+    <ClCompile Include="util\NDC.cpp" />
+    <ClCompile Include="util\ParserPool.cpp" />
+    <ClCompile Include="util\PathResolver.cpp" />
+    <ClCompile Include="util\ReloadableXMLFile.cpp" />
+    <ClCompile Include="util\ReplayCache.cpp" />
+    <ClCompile Include="util\StorageService.cpp" />
+    <ClCompile Include="util\TemplateEngine.cpp" />
+    <ClCompile Include="util\URLEncoder.cpp" />
+    <ClCompile Include="util\Win32Threads.cpp" />
+    <ClCompile Include="util\XMLConstants.cpp" />
+    <ClCompile Include="util\XMLHelper.cpp" />
+    <ClCompile Include="io\AbstractXMLObjectMarshaller.cpp" />
+    <ClCompile Include="io\AbstractXMLObjectUnmarshaller.cpp" />
+    <ClCompile Include="io\HTTPRequest.cpp" />
+    <ClCompile Include="io\HTTPResponse.cpp" />
+    <ClCompile Include="impl\AnyElement.cpp" />
+    <ClCompile Include="impl\MemoryStorageService.cpp" />
+    <ClCompile Include="impl\UnknownElement.cpp" />
+    <ClCompile Include="validation\ValidatorSuite.cpp" />
+    <ClCompile Include="signature\impl\KeyInfoImpl.cpp" />
+    <ClCompile Include="signature\impl\KeyInfoSchemaValidators.cpp" />
+    <ClCompile Include="signature\impl\SignatureValidator.cpp" />
+    <ClCompile Include="signature\impl\XMLSecSignatureImpl.cpp" />
+    <ClCompile Include="encryption\impl\Decrypter.cpp" />
+    <ClCompile Include="encryption\impl\EncryptedKeyResolver.cpp" />
+    <ClCompile Include="encryption\impl\Encrypter.cpp" />
+    <ClCompile Include="encryption\impl\EncryptionImpl.cpp" />
+    <ClCompile Include="encryption\impl\EncryptionSchemaValidators.cpp" />
+    <ClCompile Include="security\impl\AbstractPKIXTrustEngine.cpp" />
+    <ClCompile Include="security\impl\BasicX509Credential.cpp" />
+    <ClCompile Include="security\impl\ChainingCredentialResolver.cpp" />
+    <ClCompile Include="security\impl\ChainingTrustEngine.cpp" />
+    <ClCompile Include="security\impl\CredentialCriteria.cpp" />
+    <ClCompile Include="security\impl\CredentialResolver.cpp" />
+    <ClCompile Include="security\impl\ExplicitKeyTrustEngine.cpp" />
+    <ClCompile Include="security\impl\FilesystemCredentialResolver.cpp" />
+    <ClCompile Include="security\impl\InlineKeyResolver.cpp" />
+    <ClCompile Include="security\impl\KeyInfoResolver.cpp" />
+    <ClCompile Include="security\impl\OpenSSLCryptoX509CRL.cpp" />
+    <ClCompile Include="security\impl\SecurityHelper.cpp" />
+    <ClCompile Include="security\impl\StaticPKIXTrustEngine.cpp" />
+    <ClCompile Include="security\impl\TrustEngine.cpp" />
+    <ClCompile Include="security\impl\XSECCryptoX509CRL.cpp" />
+    <ClCompile Include="soap\impl\CURLSOAPTransport.cpp" />
+    <ClCompile Include="soap\impl\SOAPClient.cpp" />
+    <ClCompile Include="soap\impl\SOAPImpl.cpp" />
+    <ClCompile Include="soap\impl\SOAPSchemaValidators.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AbstractAttributeExtensibleXMLObject.h" />
+    <ClInclude Include="AbstractComplexElement.h" />
+    <ClInclude Include="AbstractDOMCachingXMLObject.h" />
+    <ClInclude Include="AbstractSimpleElement.h" />
+    <ClInclude Include="AbstractXMLObject.h" />
+    <ClInclude Include="AttributeExtensibleXMLObject.h" />
+    <ClInclude Include="base.h" />
+    <ClInclude Include="ConcreteXMLObjectBuilder.h" />
+    <ClInclude Include="config_pub_win32.h" />
+    <ClInclude Include="ElementExtensibleXMLObject.h" />
+    <ClInclude Include="ElementProxy.h" />
+    <ClInclude Include="exceptions.h" />
+    <ClInclude Include="internal.h" />
+    <ClInclude Include="Lockable.h" />
+    <ClInclude Include="logging.h" />
+    <ClInclude Include="Namespace.h" />
+    <ClInclude Include="PluginManager.h" />
+    <ClInclude Include="QName.h" />
+    <ClInclude Include="unicode.h" />
+    <ClInclude Include="version.h" />
+    <ClInclude Include="XMLObject.h" />
+    <ClInclude Include="XMLObjectBuilder.h" />
+    <ClInclude Include="XMLToolingConfig.h" />
+    <ClInclude Include="util\CurlURLInputStream.h" />
+    <ClInclude Include="util\DateTime.h" />
+    <ClInclude Include="util\NDC.h" />
+    <ClInclude Include="util\ParserPool.h" />
+    <ClInclude Include="util\PathResolver.h" />
+    <ClInclude Include="util\Predicates.h" />
+    <ClInclude Include="util\ReloadableXMLFile.h" />
+    <ClInclude Include="util\ReplayCache.h" />
+    <ClInclude Include="util\StorageService.h" />
+    <ClInclude Include="util\TemplateEngine.h" />
+    <ClInclude Include="util\Threads.h" />
+    <ClInclude Include="util\URLEncoder.h" />
+    <ClInclude Include="util\XMLConstants.h" />
+    <ClInclude Include="util\XMLHelper.h" />
+    <ClInclude Include="util\XMLObjectChildrenList.h" />
+    <ClInclude Include="io\AbstractXMLObjectMarshaller.h" />
+    <ClInclude Include="io\AbstractXMLObjectUnmarshaller.h" />
+    <ClInclude Include="io\GenericRequest.h" />
+    <ClInclude Include="io\GenericResponse.h" />
+    <ClInclude Include="io\HTTPRequest.h" />
+    <ClInclude Include="io\HTTPResponse.h" />
+    <ClInclude Include="impl\AnyElement.h" />
+    <ClInclude Include="impl\UnknownElement.h" />
+    <ClInclude Include="validation\Validator.h" />
+    <ClInclude Include="validation\ValidatorSuite.h" />
+    <ClInclude Include="signature\ContentReference.h" />
+    <ClInclude Include="signature\KeyInfo.h" />
+    <ClInclude Include="signature\Signature.h" />
+    <ClInclude Include="signature\SignatureValidator.h" />
+    <ClInclude Include="encryption\Decrypter.h" />
+    <ClInclude Include="encryption\EncryptedKeyResolver.h" />
+    <ClInclude Include="encryption\Encrypter.h" />
+    <ClInclude Include="encryption\Encryption.h" />
+    <ClInclude Include="security\AbstractPKIXTrustEngine.h" />
+    <ClInclude Include="security\BasicX509Credential.h" />
+    <ClInclude Include="security\ChainingTrustEngine.h" />
+    <ClInclude Include="security\Credential.h" />
+    <ClInclude Include="security\CredentialContext.h" />
+    <ClInclude Include="security\CredentialCriteria.h" />
+    <ClInclude Include="security\CredentialResolver.h" />
+    <ClInclude Include="security\KeyInfoCredentialContext.h" />
+    <ClInclude Include="security\KeyInfoResolver.h" />
+    <ClInclude Include="security\OpenSSLCredential.h" />
+    <ClInclude Include="security\OpenSSLCryptoX509CRL.h" />
+    <ClInclude Include="security\OpenSSLTrustEngine.h" />
+    <ClInclude Include="security\SecurityHelper.h" />
+    <ClInclude Include="security\SignatureTrustEngine.h" />
+    <ClInclude Include="security\TrustEngine.h" />
+    <ClInclude Include="security\X509Credential.h" />
+    <ClInclude Include="security\X509TrustEngine.h" />
+    <ClInclude Include="security\XSECCryptoX509CRL.h" />
+    <ClInclude Include="soap\HTTPSOAPTransport.h" />
+    <ClInclude Include="soap\OpenSSLSOAPTransport.h" />
+    <ClInclude Include="soap\SOAP.h" />
+    <ClInclude Include="soap\SOAPClient.h" />
+    <ClInclude Include="soap\SOAPTransport.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="xmltooling.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="config_pub.h.in" />
+    <None Include="Makefile.am" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

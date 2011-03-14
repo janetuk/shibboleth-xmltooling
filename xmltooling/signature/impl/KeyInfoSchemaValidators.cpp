@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2009 Internet2
+*  Copyright 2001-2010 Internet2
  * 
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * KeyInfoSchemaValidators.cpp
  * 
- * Schema validators for KeyInfo schema
+ * Schema validators for KeyInfo schema.
  */
 
 #include "internal.h"
@@ -30,6 +30,20 @@ using namespace xmlsignature;
 using namespace xmltooling;
 using namespace std;
 using xmlconstants::XMLSIG_NS;
+using xmlconstants::XMLSIG11_NS;
+
+#define XMLOBJECTVALIDATOR_ONLYONEOF4(cname,proper1,proper2,proper3,proper4) \
+    int c##proper1##proper2##proper3##proper4=0; \
+    if (ptr->get##proper1()!=nullptr) \
+        c##proper1##proper2##proper3##proper4++; \
+    if (ptr->get##proper2()!=nullptr) \
+        c##proper1##proper2##proper3##proper4++; \
+    if (ptr->get##proper3()!=nullptr) \
+        c##proper1##proper2##proper3##proper4++; \
+    if (ptr->get##proper4()!=nullptr) \
+        c##proper1##proper2##proper3##proper4++; \
+    if (c##proper1##proper2##proper3##proper4 != 1) \
+        throw xmltooling::ValidationException(#cname" must have only one of "#proper1", "#proper2", "#proper3", or "#proper4".")
 
 namespace xmlsignature {
 
@@ -54,6 +68,10 @@ namespace xmlsignature {
     XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,SPKISexp);
     XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,PGPKeyID);
     XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,PGPKeyPacket);
+
+    XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,DEREncodedKeyValue);
+    XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,OCSPResponse);
+    XMLOBJECTVALIDATOR_SIMPLE(XMLTOOL_DLLLOCAL,PublicKey);
     
     BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,RSAKeyValue);
         XMLOBJECTVALIDATOR_REQUIRE(RSAKeyValue,Modulus);
@@ -67,7 +85,7 @@ namespace xmlsignature {
     END_XMLOBJECTVALIDATOR;
 
     BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,KeyValue);
-        XMLOBJECTVALIDATOR_ONLYONEOF3(KeyValue,DSAKeyValue,RSAKeyValue,UnknownXMLObject);
+        XMLOBJECTVALIDATOR_ONLYONEOF4(KeyValue,DSAKeyValue,RSAKeyValue,ECKeyValue,UnknownXMLObject);
     END_XMLOBJECTVALIDATOR;
 
     BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,Transform);
@@ -122,6 +140,22 @@ namespace xmlsignature {
         for_each(anys.begin(),anys.end(),checkWildcardNS());
     END_XMLOBJECTVALIDATOR;
 
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,KeyInfoReference);
+        XMLOBJECTVALIDATOR_REQUIRE(KeyInfoReference,URI);
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,NamedCurve);
+        XMLOBJECTVALIDATOR_REQUIRE(NamedCurve,URI);
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,ECKeyValue);
+        XMLOBJECTVALIDATOR_ONEOF(ECKeyValue,ECParameters,NamedCurve);
+        XMLOBJECTVALIDATOR_REQUIRE(ECKeyValue,PublicKey);
+    END_XMLOBJECTVALIDATOR;
+
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,X509Digest);
+        XMLOBJECTVALIDATOR_REQUIRE(X509Digest,Algorithm);
+    END_XMLOBJECTVALIDATOR;
 };
 
 #define REGISTER_ELEMENT(namespaceURI,cname) \
@@ -180,4 +214,17 @@ void xmlsignature::registerKeyInfoClasses()
     REGISTER_TYPE(XMLSIG_NS,X509Data);
     REGISTER_TYPE(XMLSIG_NS,SPKIData);
     REGISTER_TYPE(XMLSIG_NS,PGPData);
+
+    REGISTER_ELEMENT(XMLSIG11_NS,DEREncodedKeyValue);
+    REGISTER_ELEMENT(XMLSIG11_NS,ECKeyValue);
+    REGISTER_ELEMENT(XMLSIG11_NS,KeyInfoReference);
+    REGISTER_ELEMENT(XMLSIG11_NS,NamedCurve);
+    REGISTER_ELEMENT(XMLSIG11_NS,OCSPResponse);
+    REGISTER_ELEMENT(XMLSIG11_NS,PublicKey);
+    REGISTER_ELEMENT(XMLSIG11_NS,X509Digest);
+    REGISTER_TYPE(XMLSIG11_NS,DEREncodedKeyValue);
+    REGISTER_TYPE(XMLSIG11_NS,ECKeyValue);
+    REGISTER_TYPE(XMLSIG11_NS,KeyInfoReference);
+    REGISTER_TYPE(XMLSIG11_NS,NamedCurve);
+    REGISTER_TYPE(XMLSIG11_NS,X509Digest);
 }

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 
 #include "internal.h"
 #include "logging.h"
+#include "io/HTTPResponse.h"
 #include "security/BasicX509Credential.h"
 #include "security/CredentialCriteria.h"
 #include "security/CredentialResolver.h"
@@ -65,11 +66,14 @@ namespace xmltooling {
         SOAPTransport* getTransport() {
             SOAPTransport::Address addr("FilesystemCredentialResolver", source.c_str(), source.c_str());
             string scheme(addr.m_endpoint, strchr(addr.m_endpoint,':') - addr.m_endpoint);
-            return XMLToolingConfig::getConfig().SOAPTransportManager.newPlugin(scheme.c_str(), addr);
+            SOAPTransport* ret = XMLToolingConfig::getConfig().SOAPTransportManager.newPlugin(scheme.c_str(), addr);
+            if (ret)
+                ret->setCacheTag(&cacheTag);
+            return ret;
         }
 
     public:
-        bool stale(Category& log, RWLock* lock=NULL) {
+        bool stale(Category& log, RWLock* lock=nullptr) {
             if (local) {
 #ifdef WIN32
                 struct _stat stat_buf;
@@ -102,7 +106,7 @@ namespace xmltooling {
                 log.info("change detected, reloading local resource...");
             }
             else {
-                time_t now = time(NULL);
+                time_t now = time(nullptr);
 
                 // Time to reload?
                 if (now - filestamp < reloadInterval)
@@ -129,18 +133,18 @@ namespace xmltooling {
         }
 
         bool local,reloadChanges;
-        string format,source,backing;
+        string format,source,backing,cacheTag;
         time_t filestamp,reloadInterval;
     };
 
     class XMLTOOL_DLLLOCAL ManagedKey : public ManagedResource {
     public:
-        ManagedKey() : key(NULL) {}
+        ManagedKey() : key(nullptr) {}
         ~ManagedKey() { delete key; }
         void load(Category& log, const char* password) {
             if (source.empty())
                 return;
-            XSECCryptoKey* nkey=NULL;
+            XSECCryptoKey* nkey=nullptr;
             if (local) {
                 nkey = SecurityHelper::loadKeyFromFile(source.c_str(), format.c_str(), password);
             }
@@ -218,10 +222,10 @@ namespace xmltooling {
             m_lock->unlock();
         }
 
-        const Credential* resolve(const CredentialCriteria* criteria=NULL) const;
+        const Credential* resolve(const CredentialCriteria* criteria=nullptr) const;
 
         virtual vector<const Credential*>::size_type resolve(
-            vector<const Credential*>& results, const CredentialCriteria* criteria=NULL
+            vector<const Credential*>& results, const CredentialCriteria* criteria=nullptr
             ) const;
 
     private:
@@ -254,7 +258,7 @@ namespace xmltooling {
             XSECCryptoKey* key,
             const vector<XSECCryptoX509*>& xseccerts,
             const vector<XSECCryptoX509CRL*>& crls
-            ) : BasicX509Credential(key ? key : (xseccerts.empty() ? NULL : xseccerts.front()->clonePublicKey()), xseccerts, crls), m_resolver(resolver) {
+            ) : BasicX509Credential(key ? key : (xseccerts.empty() ? nullptr : xseccerts.front()->clonePublicKey()), xseccerts, crls), m_resolver(resolver) {
             if (m_resolver->m_extractNames)
                 extract();
             m_keyNames.insert(m_resolver->m_keynames.begin(), m_resolver->m_keynames.end());
@@ -308,49 +312,41 @@ namespace xmltooling {
 };
 
 FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
-    : m_lock(NULL), m_credential(NULL), m_usage(Credential::UNSPECIFIED_CREDENTIAL), m_extractNames(true)
+    : m_lock(nullptr), m_credential(nullptr), m_keyinfomask(XMLHelper::getAttrInt(e, 0, keyInfoMask)),
+        m_usage(Credential::UNSPECIFIED_CREDENTIAL), m_extractNames(true)
 {
 #ifdef _DEBUG
     NDC ndc("FilesystemCredentialResolver");
 #endif
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".CredentialResolver."FILESYSTEM_CREDENTIAL_RESOLVER);
 
-    // Default to disable X509IssuerSerial due to schema validation issues.
-    m_keyinfomask =
-        Credential::KEYINFO_KEY_NAME |
-        Credential::KEYINFO_KEY_VALUE |
-        X509Credential::KEYINFO_X509_CERTIFICATE |
-        X509Credential::KEYINFO_X509_SUBJECTNAME;
-    if (e && e->hasAttributeNS(NULL,keyInfoMask))
-        m_keyinfomask = XMLString::parseInt(e->getAttributeNS(NULL,keyInfoMask));
-
-    if (e && (e->hasAttributeNS(NULL,_certificate) || e->hasAttributeNS(NULL,_key))) {
+    if (e && (e->hasAttributeNS(nullptr,_certificate) || e->hasAttributeNS(nullptr,_key))) {
         // Dummy up a simple file resolver config using these attributes.
-        DOMElement* dummy = e->getOwnerDocument()->createElementNS(NULL,_CredentialResolver);
+        DOMElement* dummy = e->getOwnerDocument()->createElementNS(nullptr,_CredentialResolver);
         DOMElement* child;
         DOMElement* path;
-        if (e->hasAttributeNS(NULL,_key)) {
-            child = e->getOwnerDocument()->createElementNS(NULL,Key);
+        if (e->hasAttributeNS(nullptr,_key)) {
+            child = e->getOwnerDocument()->createElementNS(nullptr,Key);
             dummy->appendChild(child);
-            path = e->getOwnerDocument()->createElementNS(NULL,Path);
+            path = e->getOwnerDocument()->createElementNS(nullptr,Path);
             child->appendChild(path);
-            path->appendChild(e->getOwnerDocument()->createTextNode(e->getAttributeNS(NULL,_key)));
-            if (e->hasAttributeNS(NULL,password))
-                child->setAttributeNS(NULL,password,e->getAttributeNS(NULL,password));
-            if (e->hasAttributeNS(NULL,keyName)) {
-                path = e->getOwnerDocument()->createElementNS(NULL,Name);
+            path->appendChild(e->getOwnerDocument()->createTextNode(e->getAttributeNS(nullptr,_key)));
+            if (e->hasAttributeNS(nullptr,password))
+                child->setAttributeNS(nullptr,password,e->getAttributeNS(nullptr,password));
+            if (e->hasAttributeNS(nullptr,keyName)) {
+                path = e->getOwnerDocument()->createElementNS(nullptr,Name);
                 child->appendChild(path);
-                path->appendChild(e->getOwnerDocument()->createTextNode(e->getAttributeNS(NULL,keyName)));
+                path->appendChild(e->getOwnerDocument()->createTextNode(e->getAttributeNS(nullptr,keyName)));
             }
         }
-        if (e->hasAttributeNS(NULL,_certificate)) {
-            child = e->getOwnerDocument()->createElementNS(NULL,Certificate);
+        if (e->hasAttributeNS(nullptr,_certificate)) {
+            child = e->getOwnerDocument()->createElementNS(nullptr,Certificate);
             dummy->appendChild(child);
-            path = e->getOwnerDocument()->createElementNS(NULL,Path);
+            path = e->getOwnerDocument()->createElementNS(nullptr,Path);
             child->appendChild(path);
-            path->appendChild(e->getOwnerDocument()->createTextNode(e->getAttributeNS(NULL,_certificate)));
-            if (e->hasAttributeNS(NULL, extractNames))
-                child->setAttributeNS(NULL, extractNames, e->getAttributeNS(NULL, extractNames));
+            path->appendChild(e->getOwnerDocument()->createTextNode(e->getAttributeNS(nullptr,_certificate)));
+            if (e->hasAttributeNS(nullptr, extractNames))
+                child->setAttributeNS(nullptr, extractNames, e->getAttributeNS(nullptr, extractNames));
         }
         e = dummy;  // reset "root" to the dummy config element
     }
@@ -359,31 +355,19 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
     const DOMElement* root = e;
 
     // Save off usage bits.
-    const XMLCh* usage = root->getAttributeNS(NULL,_use);
-    if (usage && *usage) {
-        auto_ptr_char u(usage);
-        if (!strcmp(u.get(), "signing"))
-            m_usage = Credential::SIGNING_CREDENTIAL | Credential::TLS_CREDENTIAL;
-        else if (!strcmp(u.get(), "TLS"))
-            m_usage = Credential::TLS_CREDENTIAL;
-        else if (!strcmp(u.get(), "encryption"))
-            m_usage = Credential::ENCRYPTION_CREDENTIAL;
-    }
+    string usage = XMLHelper::getAttrString(root, nullptr, _use);
+    if (usage == "signing")
+        m_usage = Credential::SIGNING_CREDENTIAL | Credential::TLS_CREDENTIAL;
+    else if (usage == "TLS")
+        m_usage = Credential::TLS_CREDENTIAL;
+    else if (usage == "encryption")
+        m_usage = Credential::ENCRYPTION_CREDENTIAL;
 
     // Move to Key.
     const DOMElement* keynode = XMLHelper::getFirstChildElement(root,Key);
     if (keynode) {
-        prop = keynode->getAttributeNS(NULL,_format);
-        if (prop && *prop) {
-            auto_ptr_char f(prop);
-            m_key.format = f.get();
-        }
-
-        prop = keynode->getAttributeNS(NULL,password);
-        if (prop && *prop) {
-            auto_ptr_char kp(prop);
-            m_keypass = kp.get();
-        }
+        m_key.format = XMLHelper::getAttrString(keynode, nullptr, _format);
+        m_keypass = XMLHelper::getAttrString(keynode, nullptr, password);
 
         if ((e=XMLHelper::getFirstChildElement(keynode,Path)) && e->hasChildNodes()) {
             prop = e->getFirstChild()->getNodeValue();
@@ -391,24 +375,18 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
             m_key.source = kpath.get();
             XMLToolingConfig::getConfig().getPathResolver()->resolve(m_key.source, PathResolver::XMLTOOLING_CFG_FILE);
             m_key.local = true;
-            prop = e->getAttributeNS(NULL,_reloadChanges);
-            if (prop && (*prop==chLatin_f) || (*prop==chDigit_0))
-                m_key.reloadChanges = false;
+            m_key.reloadChanges = XMLHelper::getAttrBool(e, true, _reloadChanges);
         }
         else if ((e=XMLHelper::getFirstChildElement(keynode,_URL)) && e->hasChildNodes()) {
             prop = e->getFirstChild()->getNodeValue();
             auto_ptr_char kpath(prop);
             m_key.source = kpath.get();
             m_key.local = false;
-            prop = e->getAttributeNS(NULL,backingFilePath);
-            if (!prop || !*prop)
+            m_key.backing = XMLHelper::getAttrString(e, nullptr, backingFilePath);
+            if (m_key.backing.empty())
                 throw XMLSecurityException("FilesystemCredentialResolver can't access key, backingFilePath missing from URL element.");
-            auto_ptr_char b(prop);
-            m_key.backing = b.get();
             XMLToolingConfig::getConfig().getPathResolver()->resolve(m_key.backing, PathResolver::XMLTOOLING_RUN_FILE);
-            prop = e->getAttributeNS(NULL,_reloadInterval);
-            if (prop && *prop)
-                m_key.reloadInterval = XMLString::parseInt(prop);
+            m_key.reloadInterval = XMLHelper::getAttrInt(e, 0, _reloadInterval);
         }
         else {
             log.error("Path/URL element missing inside Key element");
@@ -427,54 +405,42 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
     }
 
     // Check for CRL.
-    const DOMElement* crlnode = XMLHelper::getFirstChildElement(root,CRL);
+    const DOMElement* crlnode = XMLHelper::getFirstChildElement(root, CRL);
     if (crlnode) {
-        const XMLCh* crlformat = crlnode->getAttributeNS(NULL,_format);
-        e = XMLHelper::getFirstChildElement(crlnode,Path);
+        string crlformat = XMLHelper::getAttrString(crlnode, nullptr, _format);
+        e = XMLHelper::getFirstChildElement(crlnode, Path);
         while (e) {
             if (e->hasChildNodes()) {
                 m_crls.push_back(ManagedCRL());
                 ManagedResource& crl = m_crls.back();
-                if (crlformat && *crlformat) {
-                    auto_ptr_char f(crlformat);
-                    crl.format = f.get();
-                }
+                crl.format = crlformat;
                 prop = e->getFirstChild()->getNodeValue();
                 auto_ptr_char crlpath(prop);
                 crl.source = crlpath.get();
                 XMLToolingConfig::getConfig().getPathResolver()->resolve(crl.source, PathResolver::XMLTOOLING_CFG_FILE);
                 crl.local = true;
-                prop = e->getAttributeNS(NULL,_reloadChanges);
-                if (prop && (*prop==chLatin_f) || (*prop==chDigit_0))
-                    crl.reloadChanges = false;
+                crl.reloadChanges = XMLHelper::getAttrBool(e, true, _reloadChanges);
             }
-            e = XMLHelper::getNextSiblingElement(e,Path);
+            e = XMLHelper::getNextSiblingElement(e, Path);
         }
 
-        e=XMLHelper::getFirstChildElement(crlnode,_URL);
+        e = XMLHelper::getFirstChildElement(crlnode, _URL);
         while (e) {
             if (e->hasChildNodes()) {
                 m_crls.push_back(ManagedCRL());
                 ManagedResource& crl = m_crls.back();
-                if (crlformat && *crlformat) {
-                    auto_ptr_char f(crlformat);
-                    crl.format = f.get();
-                }
+                crl.format = crlformat;
                 prop = e->getFirstChild()->getNodeValue();
                 auto_ptr_char crlpath(prop);
                 crl.source = crlpath.get();
                 crl.local = false;
-                prop = e->getAttributeNS(NULL,backingFilePath);
-                if (!prop || !*prop)
+                crl.backing = XMLHelper::getAttrString(e, nullptr, backingFilePath);
+                if (crl.backing.empty())
                     throw XMLSecurityException("FilesystemCredentialResolver can't access CRL, backingFilePath missing from URL element.");
-                auto_ptr_char b(prop);
-                crl.backing = b.get();
                 XMLToolingConfig::getConfig().getPathResolver()->resolve(crl.backing, PathResolver::XMLTOOLING_RUN_FILE);
-                prop = e->getAttributeNS(NULL,_reloadInterval);
-                if (prop && *prop)
-                    crl.reloadInterval = XMLString::parseInt(prop);
+                crl.reloadInterval = XMLHelper::getAttrInt(e, 0, _reloadInterval);
             }
-            e = XMLHelper::getNextSiblingElement(e,_URL);
+            e = XMLHelper::getNextSiblingElement(e, _URL);
         }
         if (m_crls.empty()) {
             log.error("Path/URL element missing inside CRL element");
@@ -485,56 +451,36 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
     // Check for Certificate
     DOMElement* certnode = XMLHelper::getFirstChildElement(root,Certificate);
     if (certnode) {
-        prop = certnode->getAttributeNS(NULL,password);
-        if (prop && *prop) {
-            auto_ptr_char certpass(prop);
-            m_certpass = certpass.get();
-        }
-
-        const XMLCh* certformat = certnode->getAttributeNS(NULL,_format);
-
-        const XMLCh* extractFlag = certnode->getAttributeNS(NULL, extractNames);
-        if (extractFlag && (*extractFlag == chLatin_f || *extractFlag == chDigit_0))
-            m_extractNames = false;
+        m_certpass = XMLHelper::getAttrString(certnode, nullptr, password);
+        string certformat = XMLHelper::getAttrString(certnode, nullptr, _format);
+        m_extractNames = XMLHelper::getAttrBool(certnode, true, extractNames);
 
         e = XMLHelper::getFirstChildElement(certnode);
         while (e) {
             if (e->hasChildNodes() && (XMLString::equals(e->getLocalName(), Path) || XMLString::equals(e->getLocalName(), CAPath))) {
                 m_certs.push_back(ManagedCert());
                 ManagedResource& cert = m_certs.back();
-                if (certformat && *certformat) {
-                    auto_ptr_char f(certformat);
-                    cert.format = f.get();
-                }
+                cert.format = certformat;
                 prop = e->getFirstChild()->getNodeValue();
                 auto_ptr_char certpath(prop);
                 cert.source = certpath.get();
                 XMLToolingConfig::getConfig().getPathResolver()->resolve(cert.source, PathResolver::XMLTOOLING_CFG_FILE);
                 cert.local = true;
-                prop = e->getAttributeNS(NULL,_reloadChanges);
-                if (prop && (*prop==chLatin_f) || (*prop==chDigit_0))
-                    cert.reloadChanges = false;
+                cert.reloadChanges = XMLHelper::getAttrBool(e, true, _reloadChanges);
             }
             else if (e->hasChildNodes() && XMLString::equals(e->getLocalName(), _URL)) {
                 m_certs.push_back(ManagedCert());
                 ManagedResource& cert = m_certs.back();
-                if (certformat && *certformat) {
-                    auto_ptr_char f(certformat);
-                    cert.format = f.get();
-                }
+                cert.format = certformat;
                 prop = e->getFirstChild()->getNodeValue();
                 auto_ptr_char certpath(prop);
                 cert.source = certpath.get();
                 cert.local = false;
-                prop = e->getAttributeNS(NULL,backingFilePath);
-                if (!prop || !*prop)
+                cert.backing = XMLHelper::getAttrString(e, nullptr, backingFilePath);
+                if (cert.backing.empty())
                     throw XMLSecurityException("FilesystemCredentialResolver can't access certificate, backingFilePath missing from URL element.");
-                auto_ptr_char b(prop);
-                cert.backing = b.get();
                 XMLToolingConfig::getConfig().getPathResolver()->resolve(cert.backing, PathResolver::XMLTOOLING_RUN_FILE);
-                prop = e->getAttributeNS(NULL,_reloadInterval);
-                if (prop && *prop)
-                    cert.reloadInterval = XMLString::parseInt(prop);
+                cert.reloadInterval = XMLHelper::getAttrInt(e, 0, _reloadInterval);
             }
             e = XMLHelper::getNextSiblingElement(e);
         }
@@ -546,11 +492,11 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
 
     // Do an initial load of all the objects. If anything blows up here, whatever's
     // been loaded should be freed during teardown of the embedded objects.
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     m_key.filestamp = now;
     m_key.load(log, m_keypass.c_str());
     for (vector<ManagedCert>::iterator i = m_certs.begin(); i != m_certs.end(); ++i) {
-        i->load(log, (i==m_certs.begin()) ? m_certpass.c_str() : NULL);
+        i->load(log, (i==m_certs.begin()) ? m_certpass.c_str() : nullptr);
         i->filestamp = now;
     }
     for (vector<ManagedCRL>::iterator j = m_crls.begin(); j != m_crls.end(); ++j) {
@@ -581,8 +527,8 @@ Credential* FilesystemCredentialResolver::getCredential()
 
     // We (unfortunately) need to duplicate all the objects and put them in one set of arrays
     // in order to create the credential wrapper.
-    FilesystemCredential* credential=NULL;
-    auto_ptr<XSECCryptoKey> xseckey(m_key.key ? m_key.key->clone() : NULL);
+    FilesystemCredential* credential=nullptr;
+    auto_ptr<XSECCryptoKey> xseckey(m_key.key ? m_key.key->clone() : nullptr);
     vector<XSECCryptoX509*> xseccerts;
     vector<XSECCryptoX509CRL*> xseccrls;
     try {
@@ -638,17 +584,35 @@ Lockable* FilesystemCredentialResolver::lock()
             m_key.load(log, m_keypass.c_str());
             updated = true;
         }
+        catch (long& ex) {
+            if (ex == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED) {
+                log.info("remote key (%s) unchanged from cached version", m_key.source.c_str());
+            }
+            else {
+                // Shouldn't happen, we should only get codes intended to be gracefully handled.
+                log.crit("maintaining existing key, remote fetch returned atypical status code (%d)", ex);
+            }
+        }
         catch (exception& ex) {
             log.crit("maintaining existing key: %s", ex.what());
         }
     }
 
     for (vector<ManagedCert>::iterator i = m_certs.begin(); i != m_certs.end(); ++i) {
-        if (i->stale(log, writelock ? NULL : m_lock)) {
+        if (i->stale(log, writelock ? nullptr : m_lock)) {
             writelock = true;
             try {
-                i->load(log, (i==m_certs.begin()) ? m_certpass.c_str() : NULL);
+                i->load(log, (i==m_certs.begin()) ? m_certpass.c_str() : nullptr);
                 updated = true;
+            }
+            catch (long& ex) {
+                if (ex == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED) {
+                    log.info("remote certificate(s) (%s) unchanged from cached version", i->source.c_str());
+                }
+                else {
+                    // Shouldn't happen, we should only get codes intended to be gracefully handled.
+                    log.crit("maintaining existing certificate(s), remote fetch returned atypical status code (%d)", ex);
+                }
             }
             catch (exception& ex) {
                 log.crit("maintaining existing certificate(s): %s", ex.what());
@@ -657,11 +621,20 @@ Lockable* FilesystemCredentialResolver::lock()
     }
 
     for (vector<ManagedCRL>::iterator j = m_crls.begin(); j != m_crls.end(); ++j) {
-        if (j->stale(log, writelock ? NULL : m_lock)) {
+        if (j->stale(log, writelock ? nullptr : m_lock)) {
             writelock = true;
             try {
                 j->load(log);
                 updated = true;
+            }
+            catch (long& ex) {
+                if (ex == HTTPResponse::XMLTOOLING_HTTP_STATUS_NOTMODIFIED) {
+                    log.info("remote CRL(s) (%s) unchanged from cached version", j->source.c_str());
+                }
+                else {
+                    // Shouldn't happen, we should only get codes intended to be gracefully handled.
+                    log.crit("maintaining existing CRL(s), remote fetch returned atypical status code (%d)", ex);
+                }
             }
             catch (exception& ex) {
                 log.crit("maintaining existing CRL(s): %s", ex.what());
@@ -689,7 +662,7 @@ Lockable* FilesystemCredentialResolver::lock()
 
 const Credential* FilesystemCredentialResolver::resolve(const CredentialCriteria* criteria) const
 {
-    return (criteria ? (criteria->matches(*m_credential) ? m_credential : NULL) : m_credential);
+    return (criteria ? (criteria->matches(*m_credential) ? m_credential : nullptr) : m_credential);
 }
 
 vector<const Credential*>::size_type FilesystemCredentialResolver::resolve(
@@ -742,11 +715,11 @@ void FilesystemCredential::attach(SSL_CTX* ctx) const
     else if (m_resolver->m_key.format == "PKCS12") {
         BIO* in=BIO_new(BIO_s_file_internal());
         if (in && BIO_read_filename(in,path)>0) {
-            PKCS12* p12 = d2i_PKCS12_bio(in, NULL);
+            PKCS12* p12 = d2i_PKCS12_bio(in, nullptr);
             if (p12) {
-                EVP_PKEY* pkey=NULL;
-                X509* x=NULL;
-                PKCS12_parse(p12, const_cast<char*>(m_resolver->m_keypass.c_str()), &pkey, &x, NULL);
+                EVP_PKEY* pkey=nullptr;
+                X509* x=nullptr;
+                PKCS12_parse(p12, const_cast<char*>(m_resolver->m_keypass.c_str()), &pkey, &x, nullptr);
                 PKCS12_free(p12);
                 if (x)
                     X509_free(x);

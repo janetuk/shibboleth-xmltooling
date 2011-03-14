@@ -1,5 +1,5 @@
 PKG=SHIBxmltool
-VERSION=1.3.3
+VERSION=1.4.1
 NAME=xmltooling-c
 CATEGORY=application,textproc,security
 DESC=Library for DOM processing with Signature/Encryption for C++

@@ -1,0 +1,8 @@
+<ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:ds11="http://www.w3.org/2009/xmldsig11#">
+    <ds11:DEREncodedKeyValue>
+    MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDQsVsByijs8ArbG2VIYc0I13Mi
+    hwO865fFKqAsru4Wis6xJiO7nZewei/s8YJ5lUc+M7MNTybFWFLfcxugAQvj+17c
+    eOk5P4eYDuoVi+FwcxVLisLDEWdEQdLAL+okLc+kwsh+OzgUiUjduIe3v74lENGb
+    SmLCaP6/AR656IiZNQIDAQAB
+    </ds11:DEREncodedKeyValue>
+</ds:KeyInfo>

@@ -36,6 +36,14 @@
 #define DECL_XMLSIGOBJECTBUILDER(cname) \
     DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,xmlconstants::XMLSIG_NS,xmlconstants::XMLSIG_PREFIX)
 
+/**
+ * Macro for declaring signature builders.
+ * 
+ * @param cname name of class being built
+ */
+#define DECL_XMLSIG11OBJECTBUILDER(cname) \
+    DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,xmlconstants::XMLSIG11_NS,xmlconstants::XMLSIG11_PREFIX)
+
 namespace xmlsignature {
 
     DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,KeyName,Name,XML Digital Signature version 20020212 KeyName element);
@@ -60,6 +68,9 @@ namespace xmlsignature {
     DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,PGPKeyID,ID,XML Digital Signature version 20020212 PGPKeyID element);
     DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,PGPKeyPacket,Packet,XML Digital Signature version 20020212 PGPKeyPacket element);
 
+    DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,OCSPResponse,Response,XML Digital Signature version 1.1 OCSPResponse element);
+    DECL_XMLOBJECT_SIMPLE(XMLTOOL_API,PublicKey,Value,XML Digital Signature version 1.1 PublicKey element);
+
     BEGIN_XMLOBJECT(XMLTOOL_API,DSAKeyValue,xmltooling::XMLObject,XML Digital Signature version 20020212 DSAKeyValue element);
         DECL_TYPED_CHILD(P);
         DECL_TYPED_CHILD(Q);
@@ -79,9 +90,25 @@ namespace xmlsignature {
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
+    BEGIN_XMLOBJECT(XMLTOOL_API,NamedCurve,xmltooling::XMLObject,XML Digital Signature version 1.1 NamedCurve element);
+        DECL_STRING_ATTRIB(URI,URI);
+        /** NamedCurveType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
+    BEGIN_XMLOBJECT(XMLTOOL_API,ECKeyValue,xmltooling::XMLObject,XML Digital Signature version 1.1 ECKeyValue element);
+        DECL_STRING_ATTRIB(Id,ID);
+        DECL_XMLOBJECT_CHILD(ECParameters);
+        DECL_TYPED_CHILD(NamedCurve);
+        DECL_TYPED_CHILD(PublicKey);
+        /** ECKeyValueType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
     BEGIN_XMLOBJECT(XMLTOOL_API,KeyValue,xmltooling::XMLObject,XML Digital Signature version 20020212 KeyValue element);
         DECL_TYPED_CHILD(DSAKeyValue);
         DECL_TYPED_CHILD(RSAKeyValue);
+        DECL_TYPED_CHILD(ECKeyValue);
         DECL_XMLOBJECT_CHILD(UnknownXMLObject);
         /** KeyValueType local name */
         static const XMLCh TYPE_NAME[];
@@ -121,12 +148,21 @@ namespace xmlsignature {
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
+    BEGIN_XMLOBJECT(XMLTOOL_API,X509Digest,xmltooling::XMLObject,XML Digital Signature version 1.1 X509Digest element);
+        DECL_STRING_ATTRIB(Algorithm,ALGORITHM);
+        DECL_SIMPLE_CONTENT(Value);
+        /** X509DigestType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
     BEGIN_XMLOBJECT(XMLTOOL_API,X509Data,xmltooling::ElementExtensibleXMLObject,XML Digital Signature version 20020212 X509Data element);
         DECL_TYPED_CHILDREN(X509IssuerSerial);
         DECL_TYPED_CHILDREN(X509SKI);
         DECL_TYPED_CHILDREN(X509SubjectName);
         DECL_TYPED_CHILDREN(X509Certificate);
         DECL_TYPED_CHILDREN(X509CRL);
+        DECL_TYPED_CHILDREN(X509Digest);
+        DECL_TYPED_CHILDREN(OCSPResponse);
         /** X509DataType local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
@@ -149,15 +185,31 @@ namespace xmlsignature {
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
+    BEGIN_XMLOBJECT(XMLTOOL_API,DEREncodedKeyValue,xmltooling::XMLObject,XML Digital Signature version 1.1 DEREncodedKeyValue element);
+        DECL_STRING_ATTRIB(Id,ID);
+        DECL_SIMPLE_CONTENT(Value);
+        /** DEREncodedKeyValueType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
+    BEGIN_XMLOBJECT(XMLTOOL_API,KeyInfoReference,xmltooling::XMLObject,XML Digital Signature version 1.1 KeyInfoReference element);
+        DECL_STRING_ATTRIB(Id,ID);
+        DECL_STRING_ATTRIB(URI,URI);
+        /** KeyInfoReferenceType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
     BEGIN_XMLOBJECT(XMLTOOL_API,KeyInfo,xmltooling::ElementExtensibleXMLObject,XML Digital Signature version 20020212 KeyInfo element);
         DECL_STRING_ATTRIB(Id,ID);
         DECL_TYPED_CHILDREN(X509Data);
         DECL_TYPED_CHILDREN(KeyName);
         DECL_TYPED_CHILDREN(KeyValue);
+        DECL_TYPED_CHILDREN(DEREncodedKeyValue);
         DECL_TYPED_CHILDREN(RetrievalMethod);
         DECL_TYPED_CHILDREN(MgmtData);
         DECL_TYPED_CHILDREN(PGPData);
         DECL_TYPED_CHILDREN(SPKIData);
+        DECL_TYPED_CHILDREN(KeyInfoReference);
         /** KeyInfoType local name */
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
@@ -194,6 +246,14 @@ namespace xmlsignature {
     DECL_XMLSIGOBJECTBUILDER(RSAKeyValue);
     DECL_XMLSIGOBJECTBUILDER(KeyValue);
     DECL_XMLSIGOBJECTBUILDER(KeyInfo);
+
+    DECL_XMLSIG11OBJECTBUILDER(DEREncodedKeyValue);
+    DECL_XMLSIG11OBJECTBUILDER(ECKeyValue);
+    DECL_XMLSIG11OBJECTBUILDER(KeyInfoReference);
+    DECL_XMLSIG11OBJECTBUILDER(NamedCurve);
+    DECL_XMLSIG11OBJECTBUILDER(OCSPResponse);
+    DECL_XMLSIG11OBJECTBUILDER(PublicKey);
+    DECL_XMLSIG11OBJECTBUILDER(X509Digest);
 
     /**
      * Registers builders and validators for KeyInfo classes into the runtime.

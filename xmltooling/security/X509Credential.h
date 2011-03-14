@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,8 @@ namespace xmltooling {
         enum KeyInfoTypes {
             KEYINFO_X509_CERTIFICATE = 4,
             KEYINFO_X509_SUBJECTNAME = 8,
-            KEYINFO_X509_ISSUERSERIAL = 16
+            KEYINFO_X509_ISSUERSERIAL = 16,
+            KEYINFO_X509_DIGEST = 32
         };
 
         /**

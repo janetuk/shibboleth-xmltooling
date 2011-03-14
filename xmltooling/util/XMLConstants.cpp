@@ -73,6 +73,15 @@ const XMLCh xmlconstants::XMLSIG_NS[] = // http://www.w3.org/2000/09/xmldsig#
 
 const XMLCh xmlconstants::XMLSIG_PREFIX[] = { chLatin_d, chLatin_s, chNull };
 
+const XMLCh xmlconstants::XMLSIG11_NS[] = // http://www.w3.org/2009/xmldsig11#
+{ chLatin_h, chLatin_t, chLatin_t, chLatin_p, chColon, chForwardSlash, chForwardSlash,
+  chLatin_w, chLatin_w, chLatin_w, chPeriod, chLatin_w, chDigit_3, chPeriod, chLatin_o, chLatin_r, chLatin_g, chForwardSlash,
+  chDigit_2, chDigit_0, chDigit_0, chDigit_9, chForwardSlash,
+  chLatin_x, chLatin_m, chLatin_l, chLatin_d, chLatin_s, chLatin_i, chLatin_g, chDigit_1, chDigit_1, chPound, chNull
+};
+
+const XMLCh xmlconstants::XMLSIG11_PREFIX[] = { chLatin_d, chLatin_s, chDigit_1, chDigit_1, chNull };
+
 const XMLCh xmlconstants::XMLENC_NS[] = // http://www.w3.org/2001/04/xmlenc#
 { chLatin_h, chLatin_t, chLatin_t, chLatin_p, chColon, chForwardSlash, chForwardSlash,
   chLatin_w, chLatin_w, chLatin_w, chPeriod, chLatin_w, chDigit_3, chPeriod, chLatin_o, chLatin_r, chLatin_g, chForwardSlash,

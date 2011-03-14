@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,8 +38,7 @@
 namespace xmltooling {
 
     /**
-     * A factory interface for obtaining XMLObjects.
-     * Subclasses MAY supply additional factory methods.
+     * A factory interface for obtaining an XMLObject.
      */
     class XMLTOOL_API XMLObjectBuilder
     {
@@ -49,7 +48,8 @@ namespace xmltooling {
         
         /**
          * Creates an empty XMLObject with a particular element name.
-         * <p>The results are undefined if localName is NULL or empty.
+         * <p>The results are undefined if localName is nullptr or empty.
+         * <p>The caller is responsible for freeing the resulting object.
          * 
          * @param nsURI         namespace URI for element
          * @param localName     local name of element
@@ -58,11 +58,12 @@ namespace xmltooling {
          * @return the empty XMLObject
          */
         virtual XMLObject* buildObject(
-            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=NULL, const QName* schemaType=NULL
+            const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix=nullptr, const QName* schemaType=nullptr
             ) const=0;
 
         /**
          * Creates an empty XMLObject with a particular element name.
+         * <p>The caller is responsible for freeing the resulting object.
          * 
          * @param q     QName of element for object
          * @return the empty XMLObject
@@ -71,6 +72,7 @@ namespace xmltooling {
 
         /**
          * Creates an unmarshalled XMLObject from a DOM Element.
+         * <p>The caller is responsible for freeing the resulting object.
          * 
          * @param element       the unmarshalling source
          * @param bindDocument  true iff the XMLObject should take ownership of the DOM Document
@@ -80,6 +82,7 @@ namespace xmltooling {
 
         /**
          * Creates an unmarshalled XMLObject from the root of a DOM Document.
+         * <p>The caller is responsible for freeing the resulting object.
          * 
          * @param doc           the unmarshalling source
          * @param bindDocument  true iff the XMLObject should take ownership of the DOM Document
@@ -89,10 +92,11 @@ namespace xmltooling {
 
         /**
          * Creates an unmarshalled XMLObject using the default build method, if a builder can be found.
+         * <p>The caller is responsible for freeing the resulting object.
          * 
          * @param element       the unmarshalling source
          * @param bindDocument  true iff the new XMLObject should take ownership of the DOM Document
-         * @return  the unmarshalled object or NULL if no builder is available 
+         * @return  the unmarshalled object or nullptr if no builder is available 
          */
         static XMLObject* buildOneFromElement(xercesc::DOMElement* element, bool bindDocument=false);
 
@@ -100,7 +104,7 @@ namespace xmltooling {
          * Retrieves an XMLObjectBuilder using the key it was registered with.
          * 
          * @param key the key used to register the builder
-         * @return the builder or NULL
+         * @return the builder or nullptr
          */
         static const XMLObjectBuilder* getBuilder(const QName& key);
 
@@ -109,14 +113,14 @@ namespace xmltooling {
          * If no match is found, the default builder is returned, if any.
          * 
          * @param element the element for which to locate a builder
-         * @return the builder or NULL
+         * @return the builder or nullptr
          */
         static const XMLObjectBuilder* getBuilder(const xercesc::DOMElement* element);
 
         /**
          * Retrieves the default XMLObjectBuilder for DOM elements
          * 
-         * @return the default builder or NULL
+         * @return the default builder or nullptr
          */
         static const XMLObjectBuilder* getDefaultBuilder();
 

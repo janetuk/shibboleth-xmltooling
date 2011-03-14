@@ -1,5 +1,5 @@
 /*
-*  Copyright 2001-2009 Internet2
+*  Copyright 2001-2010 Internet2
  * 
 * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,14 +96,16 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(
     }
     
     // If we get here, we didn't have a usable DOM (and/or we released the one we had).
+    prepareForMarshalling();
+
     // We may need to create our own document.
     bool bindDocument=false;
     if (!document) {
-        document=DOMImplementationRegistry::getDOMImplementation(NULL)->createDocument();
+        document=DOMImplementationRegistry::getDOMImplementation(nullptr)->createDocument();
         bindDocument=true;
     }
     
-    XercesJanitor<DOMDocument> janitor(bindDocument ? document : NULL);
+    XercesJanitor<DOMDocument> janitor(bindDocument ? document : nullptr);
 
     m_log.debug("creating root element to marshall");
     DOMElement* domElement = document->createElementNS(
@@ -161,6 +163,8 @@ DOMElement* AbstractXMLObjectMarshaller::marshall(
     }
     
     // If we get here, we didn't have a usable DOM (and/or we released the one we had).
+    prepareForMarshalling();
+
     m_log.debug("creating root element to marshall");
     DOMElement* domElement = parentElement->getOwnerDocument()->createElementNS(
         getElementQName().getNamespaceURI(), getElementQName().getLocalPart()
@@ -203,7 +207,7 @@ void AbstractXMLObjectMarshaller::marshallInto(
             chLatin_S, chLatin_c, chLatin_h, chLatin_e, chLatin_m, chLatin_a,
             chLatin_L, chLatin_o, chLatin_c, chLatin_a, chLatin_t, chLatin_i, chLatin_o, chLatin_n, chNull
             };
-        if (targetElement->getParentNode()==NULL || targetElement->getParentNode()->getNodeType()==DOMNode::DOCUMENT_NODE) {
+        if (targetElement->getParentNode()==nullptr || targetElement->getParentNode()->getNodeType()==DOMNode::DOCUMENT_NODE) {
             if (m_schemaLocation)
                 targetElement->setAttributeNS(XSI_NS,schemaLocation,m_schemaLocation); 
             if (m_noNamespaceSchemaLocation)
@@ -228,8 +232,8 @@ void AbstractXMLObjectMarshaller::marshallInto(
             	targetElement->setAttributeNS(XSI_NS, _nil, xmlconstants::XML_ZERO);
                 break;
         }
-        m_log.debug("adding XSI namespace to list of namespaces used by XMLObject");
-        addNamespace(Namespace(XSI_NS, XSI_PREFIX));
+        m_log.debug("adding XSI namespace to list of namespaces visibly used by XMLObject");
+        addNamespace(Namespace(XSI_NS, XSI_PREFIX, false, Namespace::VisiblyUsed));
     }
 
     marshallElementType(targetElement);
@@ -275,8 +279,8 @@ void AbstractXMLObjectMarshaller::marshallElementType(DOMElement* domElement) co
         if (xsivalue != typeLocalName)
             XMLString::release(&xsivalue);
 
-        m_log.debug("adding XSI namespace to list of namespaces used by XMLObject");
-        addNamespace(Namespace(XSI_NS, XSI_PREFIX));
+        m_log.debug("adding XSI namespace to list of namespaces visibly used by XMLObject");
+        addNamespace(Namespace(XSI_NS, XSI_PREFIX, false, Namespace::VisiblyUsed));
     }
 }
 
@@ -313,12 +317,12 @@ public:
     }
 
     const XMLCh* lookupNamespaceURI(const DOMNode* n, const XMLCh* prefix) const {
-        // Return NULL if no declaration in effect. The empty string signifies the null namespace.
+        // Return nullptr if no declaration in effect. The empty string signifies the null namespace.
         if (!n || n->getNodeType()!=DOMNode::ELEMENT_NODE) {
             // At the root, the default namespace is set to the null namespace.
             if (!prefix || !*prefix)
                 return &chNull;
-            return NULL;    // we're done
+            return nullptr;    // we're done
         }
         DOMNamedNodeMap* attributes = static_cast<const DOMElement*>(n)->getAttributes();
         if (!attributes)
@@ -368,7 +372,7 @@ void AbstractXMLObjectMarshaller::marshallContent(
     for (list<XMLObject*>::const_iterator i=children.begin(); i!=children.end(); ++i) {
         if (*i) {
 #ifndef XMLTOOLING_NO_XMLSEC
-            (*i)->marshall(domElement,NULL,credential);
+            (*i)->marshall(domElement,nullptr,credential);
 #else
             (*i)->marshall(domElement);
 #endif
@@ -380,5 +384,9 @@ void AbstractXMLObjectMarshaller::marshallContent(
 }
 
 void AbstractXMLObjectMarshaller::marshallAttributes(DOMElement* domElement) const
+{
+}
+
+void AbstractXMLObjectMarshaller::prepareForMarshalling() const
 {
 }

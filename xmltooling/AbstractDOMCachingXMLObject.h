@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2009 Internet2
+ *  Copyright 2001-2010 Internet2
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 /**
  * @file xmltooling/AbstractDOMCachingXMLObject.h
  * 
- * AbstractXMLObject mixin that implements DOM caching
+ * AbstractXMLObject mixin that implements DOM caching.
  */
 
 #ifndef __xmltooling_abstractdomxmlobj_h__
@@ -60,10 +60,10 @@ namespace xmltooling {
         /**
          * If a DOM representation exists, this clones it into a new document.
          * 
-         * @param doc   the document to clone into, or NULL, in which case a new document is created
+         * @param doc   the document to clone into, or nullptr, in which case a new document is created
          * @return  the cloned DOM
          */
-        xercesc::DOMElement* cloneDOM(xercesc::DOMDocument* doc=NULL) const;
+        xercesc::DOMElement* cloneDOM(xercesc::DOMDocument* doc=nullptr) const;
 
     private:
         mutable xercesc::DOMElement* m_dom;
