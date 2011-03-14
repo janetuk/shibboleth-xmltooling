@@ -19,6 +19,7 @@ xmltooling (1.4.1-1) UNRELEASED; urgency=low
     build results.
   * Add build dependency on pkg-config, which upstream now uses to find
     the SSL libraries.
+  * Add build dependency on graphviz for better API documentation.
   * Update to debhelper compatibility level V8.
     - Use the autotools-dev debhelper module for config.{sub,guess}.
     - Use debhelper rule minimization.
