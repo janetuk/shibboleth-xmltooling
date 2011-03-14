@@ -15,6 +15,8 @@ xmltooling (1.4.1-1) UNRELEASED; urgency=low
     - Switch to background thread for reloading files
     - Option to re-enable TLS renegotiation when running on 0.9.8m+
     - Improve handling of simple content when comments are present
+  * Force build dependency on xml-security-c 1.6 or later for consistent
+    build results.
 
  -- Russ Allbery <rra@debian.org>  Sun, 13 Mar 2011 17:55:12 -0700
 
