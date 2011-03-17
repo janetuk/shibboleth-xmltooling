@@ -1,3 +1,10 @@
+xmltooling (1.4.1-2) unstable; urgency=low
+
+  * Fix FTBFS with arch-only builds, such as those on the buildds.
+    Thanks, Aaron M. Ucko.  (Closes: #618615)
+
+ -- Russ Allbery <rra@debian.org>  Wed, 16 Mar 2011 23:45:11 -0700
+
 xmltooling (1.4.1-1) unstable; urgency=low
 
   * New upstream release.

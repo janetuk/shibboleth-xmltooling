@@ -13,9 +13,11 @@ override_dh_auto_configure:
 
 override_dh_installdocs:
 	dh_installdocs -A doc/NOTICE.txt
-	rm $(DOCS)/html/jquery.js
-	ln -s /usr/share/javascript/jquery/jquery.min.js \
-	    $(DOCS)/html/jquery.js
+	set -e; if [ -d "$(DOCS)" ] ; then \
+	    rm $(DOCS)/html/jquery.js ; \
+	    ln -s /usr/share/javascript/jquery/jquery.min.js \
+		$(DOCS)/html/jquery.js ; \
+	fi
 
 %:
 	dh $@ --with autotools_dev
