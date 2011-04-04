@@ -2,9 +2,9 @@ Subject: Collected Debian patches for xmltooling
 Author: Russ Allbery <rra@debian.org>
 
 The packaging for xmltooling is maintained in Git using multiple
-branches for fixes, which makes it complex to separate the changes easily
+branches for fixes, which makes it complex to separate the changes
 into individual patches.  They are therefore all included in a single
-Debian branch.
+Debian patch.
 
 For full commit history and separated commits, see the packaging Git
-repsitory.
+repository.
