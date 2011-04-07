@@ -5,8 +5,9 @@ xmltooling (1.4.1-3) unstable; urgency=low
     for consistent build results.  If some Shibboleth-related libraries
     are built against earlier versions of libssl, it produces linking
     failures when building the Shibboleth SP package.
+  * Update standards version to 3.9.2 (no changes required).
 
- -- Russ Allbery <rra@debian.org>  Thu, 07 Apr 2011 14:12:58 -0700
+ -- Russ Allbery <rra@debian.org>  Thu, 07 Apr 2011 14:41:37 -0700
 
 xmltooling (1.4.1-2) unstable; urgency=low
 
