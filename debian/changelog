@@ -1,3 +1,13 @@
+xmltooling (1.4.1-3) unstable; urgency=low
+
+  * Add explicit build dependency on libssl-dev, which is used directly by
+    this package, and force build dependency on libssl-dev 1.0 or later
+    for consistent build results.  If some Shibboleth-related libraries
+    are built against earlier versions of libssl, it produces linking
+    failures when building the Shibboleth SP package.
+
+ -- Russ Allbery <rra@debian.org>  Thu, 07 Apr 2011 14:12:58 -0700
+
 xmltooling (1.4.1-2) unstable; urgency=low
 
   * Fix FTBFS with arch-only builds, such as those on the buildds.
