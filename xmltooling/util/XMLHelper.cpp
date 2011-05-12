@@ -176,9 +176,12 @@ xmltooling::QName* XMLHelper::getNodeValueAsQName(const DOMNode* domNode)
     if (!domNode)
         return nullptr;
     
-    int i;
     const XMLCh* value=domNode->getTextContent();
-    if (value && (i=XMLString::indexOf(value,chColon))>0) {
+    if (!value || !*value)
+        return nullptr;
+
+    int i;
+    if ((i=XMLString::indexOf(value,chColon))>0) {
         XMLCh* prefix=new XMLCh[i+1];
         XMLString::subString(prefix,value,0,i);
         prefix[i]=chNull;

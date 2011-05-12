@@ -55,7 +55,7 @@ namespace {
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
-        xmltooling::QName* m_qname;
+        mutable xmltooling::QName* m_qname;
     public:
         virtual ~FaultcodeImpl() {
             delete m_qname;
@@ -71,6 +71,9 @@ namespace {
         }
         
         const xmltooling::QName* getCode() const {
+            if (!m_qname && getDOM() && getDOM()->getTextContent()) {
+                m_qname = XMLHelper::getNodeValueAsQName(getDOM());
+            }
             return m_qname;
         }
         
@@ -80,8 +83,9 @@ namespace {
                 auto_ptr_XMLCh temp(m_qname->toString().c_str());
                 setTextContent(temp.get());
             }
-            else
+            else {
                 setTextContent(nullptr);
+            }
         }
         
         IMPL_XMLOBJECT_CLONE(Faultcode);
@@ -358,9 +362,9 @@ const XMLCh Envelope::LOCAL_NAME[] =                    UNICODE_LITERAL_8(E,n,v,
 const XMLCh Envelope::TYPE_NAME[] =                     UNICODE_LITERAL_8(E,n,v,e,l,o,p,e);
 const XMLCh Fault::LOCAL_NAME[] =                       UNICODE_LITERAL_5(F,a,u,l,t);
 const XMLCh Fault::TYPE_NAME[] =                        UNICODE_LITERAL_5(F,a,u,l,t);
-const XMLCh Faultactor::LOCAL_NAME[] =                  UNICODE_LITERAL_10(F,a,u,l,t,a,c,t,o,r);
-const XMLCh Faultcode::LOCAL_NAME[] =                   UNICODE_LITERAL_9(F,a,u,l,t,c,o,d,e);
-const XMLCh Faultstring::LOCAL_NAME[] =                 UNICODE_LITERAL_11(F,a,u,l,t,s,t,r,i,n,g);
+const XMLCh Faultactor::LOCAL_NAME[] =                  UNICODE_LITERAL_10(f,a,u,l,t,a,c,t,o,r);
+const XMLCh Faultcode::LOCAL_NAME[] =                   UNICODE_LITERAL_9(f,a,u,l,t,c,o,d,e);
+const XMLCh Faultstring::LOCAL_NAME[] =                 UNICODE_LITERAL_11(f,a,u,l,t,s,t,r,i,n,g);
 const XMLCh Header::LOCAL_NAME[] =                      UNICODE_LITERAL_6(H,e,a,d,e,r);
 const XMLCh Header::TYPE_NAME[] =                       UNICODE_LITERAL_6(H,e,a,d,e,r);
 const XMLCh Header::ACTOR_ATTRIB_NAME[] =               UNICODE_LITERAL_5(a,c,t,o,r);
