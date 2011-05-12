@@ -178,6 +178,7 @@
     <ClCompile Include="NonVisibleNamespaceTest.cpp" />
     <ClCompile Include="SecurityHelperTest.cpp" />
     <ClCompile Include="SignatureTest.cpp" />
+    <ClCompile Include="SOAPTest.cpp" />
     <ClCompile Include="TemplateEngineTest.cpp" />
     <ClCompile Include="UnmarshallingTest.cpp" />
     <ClCompile Include="xmltoolingtest.cpp" />
@@ -336,6 +337,20 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).cpp;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="SignatureTest.h">
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">perl.exe -w ..\..\..\..\cxxtest\cxxtestgen.pl --part --have-eh --have-std --abort-on-fail -o "%(Filename)".cpp "%(FullPath)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">perl.exe -w ..\..\..\..\cxxtest\cxxtestgen.pl --part --have-eh --have-std --abort-on-fail -o "%(Filename)".cpp "%(FullPath)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">perl.exe -w ..\..\..\..\cxxtest\cxxtestgen.pl --part --have-eh --have-std --abort-on-fail -o "%(Filename)".cpp "%(FullPath)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">perl.exe -w ..\..\..\..\cxxtest\cxxtestgen.pl --part --have-eh --have-std --abort-on-fail -o "%(Filename)".cpp "%(FullPath)"
+</Command>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).cpp;%(Outputs)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="SOAPTest.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">perl.exe -w ..\..\..\..\cxxtest\cxxtestgen.pl --part --have-eh --have-std --abort-on-fail -o "%(Filename)".cpp "%(FullPath)"
 </Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">%(Filename).cpp;%(Outputs)</Outputs>
