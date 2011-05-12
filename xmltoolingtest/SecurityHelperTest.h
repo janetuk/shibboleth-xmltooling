@@ -56,13 +56,13 @@ public:
 
     void testKeysFromURLs() {
         string pathname = data_path + "key.pem.bak";
-        auto_ptr<SOAPTransport> t1(getTransport("https://spaces.internet2.edu/download/attachments/5305/key.pem"));
+        auto_ptr<SOAPTransport> t1(getTransport("https://wiki.shibboleth.net/confluence/download/attachments/3277026/key.pem"));
         auto_ptr<XSECCryptoKey> key1(SecurityHelper::loadKeyFromURL(*t1.get(), pathname.c_str()));
         pathname = data_path + "key.der.bak";
-        auto_ptr<SOAPTransport> t2(getTransport("https://spaces.internet2.edu/download/attachments/5305/key.der"));
+        auto_ptr<SOAPTransport> t2(getTransport("https://wiki.shibboleth.net/confluence/download/attachments/3277026/key.der"));
         auto_ptr<XSECCryptoKey> key2(SecurityHelper::loadKeyFromURL(*t2.get(), pathname.c_str()));
         pathname = data_path + "test.pfx.bak";
-        auto_ptr<SOAPTransport> t3(getTransport("https://spaces.internet2.edu/download/attachments/5305/test.pfx"));
+        auto_ptr<SOAPTransport> t3(getTransport("https://wiki.shibboleth.net/confluence/download/attachments/3277026/test.pfx"));
         auto_ptr<XSECCryptoKey> key3(SecurityHelper::loadKeyFromURL(*t3.get(), pathname.c_str(), nullptr, "password"));
 
         TSM_ASSERT("PEM/DER keys did not match", SecurityHelper::matches(*key1.get(), *key2.get()));
@@ -107,13 +107,13 @@ public:
 
     void testCertificatesFromURLs() {
         string pathname = data_path + "cert.pem.bak";
-        auto_ptr<SOAPTransport> t1(getTransport("https://spaces.internet2.edu/download/attachments/5305/cert.pem"));
+        auto_ptr<SOAPTransport> t1(getTransport("https://wiki.shibboleth.net/confluence/download/attachments/3277026/cert.pem"));
         SecurityHelper::loadCertificatesFromURL(certs, *t1.get(), pathname.c_str());
         pathname = data_path + "cert.der.bak";
-        auto_ptr<SOAPTransport> t2(getTransport("https://spaces.internet2.edu/download/attachments/5305/cert.der"));
+        auto_ptr<SOAPTransport> t2(getTransport("https://wiki.shibboleth.net/confluence/download/attachments/3277026/cert.der"));
         SecurityHelper::loadCertificatesFromURL(certs, *t2.get(), pathname.c_str());
         pathname = data_path + "test.pfx.bak";
-        auto_ptr<SOAPTransport> t3(getTransport("https://spaces.internet2.edu/download/attachments/5305/test.pfx"));
+        auto_ptr<SOAPTransport> t3(getTransport("https://wiki.shibboleth.net/confluence/download/attachments/3277026/test.pfx"));
         SecurityHelper::loadCertificatesFromURL(certs, *t3.get(), pathname.c_str(), nullptr, "password");
 
         TSM_ASSERT_EQUALS("Wrong certificate count", certs.size(), 3);
