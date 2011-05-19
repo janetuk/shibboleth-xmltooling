@@ -56,6 +56,9 @@
     <ClCompile Include="xmltoolingtest.cpp">
       <Filter>Generated Code</Filter>
     </ClCompile>
+    <ClCompile Include="SOAPTest.cpp">
+      <Filter>Generated Code</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="XMLObjectBaseTestCase.h">
@@ -109,6 +112,9 @@
       <Filter>Unit Tests</Filter>
     </CustomBuild>
     <CustomBuild Include="xmltoolingtest.h">
+      <Filter>Unit Tests</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SOAPTest.h">
       <Filter>Unit Tests</Filter>
     </CustomBuild>
   </ItemGroup>

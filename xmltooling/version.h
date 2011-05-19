@@ -1,11 +1,12 @@
 /*
- *  Copyright 2001-2011 Internet2
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to UCAID under one or more contributor license agreements.
+ * See the NOTICE file distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file to you under
+ * the Apache License, Version 2.0 (the "License"); you may not use this
+ * file except in compliance with the License.  You may obtain a copy of the
+ * License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +18,7 @@
 /**
  * xmltooling/version.h
  * 
- * Library version macros and constants 
+ * Library version macros and constants.
  */
 
 #if !defined(__xmltooling_version_h__)
@@ -27,6 +28,7 @@
 // support this kind of stuff in the future. If they ever yank some
 // of this stuff, it can be copied into here.
 
+#include <xmltooling/base.h>
 #include <xercesc/util/XercesVersion.hpp>
 
 // ---------------------------------------------------------------------------
@@ -38,8 +40,8 @@
  */
 
 #define XMLTOOLING_VERSION_MAJOR 1
-#define XMLTOOLING_VERSION_MINOR 4
-#define XMLTOOLING_VERSION_REVISION 2
+#define XMLTOOLING_VERSION_MINOR 5
+#define XMLTOOLING_VERSION_REVISION 0
 
 /** DO NOT MODIFY BELOW THIS LINE */
 
@@ -60,11 +62,12 @@
 #define XMLTOOLING_FULLVERSIONNUM INVK_CAT3_SEP_NIL(XMLTOOLING_VERSION_MAJOR,XMLTOOLING_VERSION_MINOR,XMLTOOLING_VERSION_REVISION)
 #define XMLTOOLING_VERSIONSTR     INVK_CAT2_SEP_UNDERSCORE(XMLTOOLING_VERSION_MAJOR,XMLTOOLING_VERSION_MINOR)
 
-const char* const    gXMLToolingVersionStr = XMLTOOLING_VERSIONSTR;
-const char* const    gXMLToolingFullVersionStr = XMLTOOLING_FULLVERSIONSTR;
-const unsigned int   gXMLToolingMajVersion = XMLTOOLING_VERSION_MAJOR;
-const unsigned int   gXMLToolingMinVersion = XMLTOOLING_VERSION_MINOR;
-const unsigned int   gXMLToolingRevision   = XMLTOOLING_VERSION_REVISION;
+extern XMLTOOL_API const char* const    gXMLToolingVersionStr;
+extern XMLTOOL_API const char* const    gXMLToolingFullVersionStr;
+extern XMLTOOL_API const char* const    gXMLToolingDotVersionStr;
+extern XMLTOOL_API const unsigned int   gXMLToolingMajVersion;
+extern XMLTOOL_API const unsigned int   gXMLToolingMinVersion;
+extern XMLTOOL_API const unsigned int   gXMLToolingRevision;
 
 // XMLTooling version numeric constants that can be used for conditional
 // compilation purposes.

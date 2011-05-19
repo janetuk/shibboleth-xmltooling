@@ -258,6 +258,9 @@
     <ClCompile Include="soap\impl\SOAPSchemaValidators.cpp">
       <Filter>Source Files\soap\impl</Filter>
     </ClCompile>
+    <ClCompile Include="version.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AbstractAttributeExtensibleXMLObject.h">
