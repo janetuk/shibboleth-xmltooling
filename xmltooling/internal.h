@@ -75,16 +75,11 @@
 namespace xmltooling {
     
     /// @cond OFF
-    class XMLToolingInternalConfig : public XMLToolingConfig
+    class XMLTOOL_DLLLOCAL XMLToolingInternalConfig : public XMLToolingConfig
     {
     public:
-        XMLToolingInternalConfig() :
-#ifndef XMLTOOLING_NO_XMLSEC
-            m_xsecProvider(nullptr),
-#endif
-            m_lock(nullptr), m_parserPool(nullptr), m_validatingPool(nullptr)
-        {
-        }
+        XMLToolingInternalConfig();
+        ~XMLToolingInternalConfig();
 
         static XMLToolingInternalConfig& getInternalConfig();
 
@@ -125,8 +120,9 @@ namespace xmltooling {
 #endif
 
     private:
+        int m_initCount;
+        Mutex* m_lock;
         std::vector<void*> m_libhandles;
-        void* m_lock;
         ParserPool* m_parserPool;
         ParserPool* m_validatingPool;
     };

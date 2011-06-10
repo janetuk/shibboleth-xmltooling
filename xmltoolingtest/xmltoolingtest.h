@@ -37,11 +37,15 @@ public:
 
         if (!XMLToolingConfig::getConfig().init())
             return false;
+        if (!XMLToolingConfig::getConfig().init())  // should be a no-op
+            return false;
         
         return true;
     }
     bool tearDownWorld() {
+        XMLToolingConfig::getConfig().term();       // should be a no-op
         XMLToolingConfig::getConfig().term();
+        XMLToolingConfig::getConfig().term();       // shouldn't break anything
 #if defined(_MSC_VER ) && defined(XMLTOOLINGTEST_LEAKCHECK)
        _CrtSetReportMode( _CRT_WARN, _CRTDBG_MODE_FILE );
        _CrtSetReportFile( _CRT_WARN, _CRTDBG_FILE_STDOUT );

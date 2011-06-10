@@ -219,6 +219,76 @@ XMLToolingConfig::~XMLToolingConfig()
 {
 }
 
+#ifndef XMLTOOLING_LITE
+const KeyInfoResolver* XMLToolingConfig::getKeyInfoResolver() const
+{
+    return m_keyInfoResolver;
+}
+
+ReplayCache* XMLToolingConfig::getReplayCache() const
+{
+    return m_replayCache;
+}
+
+void XMLToolingConfig::setKeyInfoResolver(xmltooling::KeyInfoResolver *keyInfoResolver)
+{
+    delete m_keyInfoResolver;
+    m_keyInfoResolver = keyInfoResolver;
+}
+
+void XMLToolingConfig::setReplayCache(ReplayCache* replayCache)
+{
+    delete m_replayCache;
+    m_replayCache = replayCache;
+}
+#endif
+
+PathResolver* XMLToolingConfig::getPathResolver() const
+{
+    return m_pathResolver;
+}
+
+TemplateEngine* XMLToolingConfig::getTemplateEngine() const
+{
+    return m_templateEngine;
+}
+
+const URLEncoder* XMLToolingConfig::getURLEncoder() const
+{
+    return m_urlEncoder;
+}
+
+void XMLToolingConfig::setPathResolver(PathResolver* pathResolver)
+{
+    delete m_pathResolver;
+    m_pathResolver = pathResolver;
+}
+
+void XMLToolingConfig::setTemplateEngine(TemplateEngine* templateEngine)
+{
+    delete m_templateEngine;
+    m_templateEngine = templateEngine;
+}
+
+void XMLToolingConfig::setURLEncoder(URLEncoder* urlEncoder)
+{
+    delete m_urlEncoder;
+    m_urlEncoder = urlEncoder;
+}
+
+XMLToolingInternalConfig::XMLToolingInternalConfig() :
+#ifndef XMLTOOLING_NO_XMLSEC
+    m_xsecProvider(nullptr),
+#endif
+    m_initCount(0), m_lock(Mutex::create()), m_parserPool(nullptr), m_validatingPool(nullptr)
+{
+}
+
+XMLToolingInternalConfig::~XMLToolingInternalConfig()
+{
+    delete m_lock;
+}
+
 bool XMLToolingInternalConfig::log_config(const char* config)
 {
     try {
@@ -289,69 +359,25 @@ bool XMLToolingInternalConfig::log_config(const char* config)
     return true;
 }
 
-#ifndef XMLTOOLING_LITE
-const KeyInfoResolver* XMLToolingConfig::getKeyInfoResolver() const
-{
-    return m_keyInfoResolver;
-}
-
-ReplayCache* XMLToolingConfig::getReplayCache() const
-{
-    return m_replayCache;
-}
-
-void XMLToolingConfig::setKeyInfoResolver(xmltooling::KeyInfoResolver *keyInfoResolver)
-{
-    delete m_keyInfoResolver;
-    m_keyInfoResolver = keyInfoResolver;
-}
-
-void XMLToolingConfig::setReplayCache(ReplayCache* replayCache)
-{
-    delete m_replayCache;
-    m_replayCache = replayCache;
-}
-#endif
-
-PathResolver* XMLToolingConfig::getPathResolver() const
-{
-    return m_pathResolver;
-}
-
-TemplateEngine* XMLToolingConfig::getTemplateEngine() const
-{
-    return m_templateEngine;
-}
-
-const URLEncoder* XMLToolingConfig::getURLEncoder() const
-{
-    return m_urlEncoder;
-}
-
-void XMLToolingConfig::setPathResolver(PathResolver* pathResolver)
-{
-    delete m_pathResolver;
-    m_pathResolver = pathResolver;
-}
-
-void XMLToolingConfig::setTemplateEngine(TemplateEngine* templateEngine)
-{
-    delete m_templateEngine;
-    m_templateEngine = templateEngine;
-}
-
-void XMLToolingConfig::setURLEncoder(URLEncoder* urlEncoder)
-{
-    delete m_urlEncoder;
-    m_urlEncoder = urlEncoder;
-}
-
 bool XMLToolingInternalConfig::init()
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("init");
 #endif
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".XMLToolingConfig");
+    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Config");
+
+    Lock initLock(m_lock);
+
+    if (m_initCount == LONG_MAX) {
+        log.crit("library initialized too many times");
+        return false;
+    }
+
+    if (m_initCount >= 1) {
+        ++m_initCount;
+        return true;
+    }
+
     try {
         log.debug("library initialization started");
 
@@ -386,7 +412,6 @@ bool XMLToolingInternalConfig::init()
 
         m_parserPool=new ParserPool();
         m_validatingPool=new ParserPool(true,true);
-        m_lock=XMLPlatformUtils::makeMutex();
 
         // Load catalogs from path.
         if (!catalog_path.empty()) {
@@ -464,11 +489,25 @@ bool XMLToolingInternalConfig::init()
 #endif
 
     log.info("%s library initialization complete", PACKAGE_STRING);
+    ++m_initCount;
     return true;
 }
 
 void XMLToolingInternalConfig::term()
 {
+#ifdef _DEBUG
+    xmltooling::NDC ndc("term");
+#endif
+
+    Lock initLock(m_lock);
+    if (m_initCount == 0) {
+        Category::getInstance(XMLTOOLING_LOGCAT".Config").crit("term without corresponding init");
+        return;
+    }
+    else if (--m_initCount > 0) {
+        return;
+    }
+
 #ifndef XMLTOOLING_NO_XMLSEC
     CRYPTO_set_locking_callback(nullptr);
     for_each(g_openssl_locks.begin(), g_openssl_locks.end(), xmltooling::cleanup<Mutex>());
@@ -533,28 +572,23 @@ void XMLToolingInternalConfig::term()
     XSECPlatformUtils::Terminate();
 #endif
 
-    XMLPlatformUtils::closeMutex(m_lock);
-    m_lock=nullptr;
     XMLPlatformUtils::Terminate();
 
 #ifndef XMLTOOLING_NO_XMLSEC
     curl_global_cleanup();
 #endif
-#ifdef _DEBUG
-    xmltooling::NDC ndc("term");
-#endif
-   Category::getInstance(XMLTOOLING_LOGCAT".XMLToolingConfig").info("%s library shutdown complete", PACKAGE_STRING);
+   Category::getInstance(XMLTOOLING_LOGCAT".Config").info("%s library shutdown complete", PACKAGE_STRING);
 }
 
 Lockable* XMLToolingInternalConfig::lock()
 {
-    xercesc::XMLPlatformUtils::lockMutex(m_lock);
+    m_lock->lock();
     return this;
 }
 
 void XMLToolingInternalConfig::unlock()
 {
-    xercesc::XMLPlatformUtils::unlockMutex(m_lock);
+    m_lock->unlock();
 }
 
 bool XMLToolingInternalConfig::load_library(const char* path, void* context)
@@ -562,7 +596,7 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
 #ifdef _DEBUG
     xmltooling::NDC ndc("LoadLibrary");
 #endif
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".XMLToolingConfig");
+    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Config");
     log.info("loading extension: %s", path);
 
     Locker locker(this);
