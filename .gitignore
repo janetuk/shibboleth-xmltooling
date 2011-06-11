@@ -1,5 +1,6 @@
 
 # /
+/build
 /Debug
 /*.ncb
 /*.suo
@@ -35,6 +36,10 @@
 /doc/Makefile
 /doc/Makefile.in
 
+# /m4/
+/m4/libtool.m4
+/m4/lt*.m4
+
 # /schemas/
 /schemas/catalog.xml
 /schemas/Makefile
@@ -69,3 +74,4 @@
 
 # /xmltoolingtest/data/
 /xmltoolingtest/data/*.bak
+/build-aux

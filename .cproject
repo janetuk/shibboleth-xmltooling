@@ -52,19 +52,30 @@
 								</option>
 								<option id="org.eclipse.linuxtools.cdt.autotools.option.configure.includes.959417153" name="includes" superClass="org.eclipse.linuxtools.cdt.autotools.option.configure.includes" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;C:\Program Files\Microsoft Visual Studio 10.0\VC\include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\Users\scantor\Shibboleth\xerces-c-3.1.1-x86-windows-vc-10.0\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Users\scantor\Shibboleth\xml-security-c-1.6.0\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Users\scantor\Shibboleth\log4shib-1.0.5\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Users\scantor\Shibboleth\curl-7.21.2\include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Users\scantor\Shibboleth\openssl-1.0.0a\inc32&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;C:\Users\scantor\Shibboleth\cxxtest&quot;"/>
+									<listOptionValue builtIn="false" value="/opt/local/include"/>
 								</option>
-								<option id="org.eclipse.linuxtools.cdt.autotools.option.configure.prefix.1110038174" name="Arch-independent install directory (--prefix)" superClass="org.eclipse.linuxtools.cdt.autotools.option.configure.prefix" value="/Users/scantor/Documents/workspace/2.0/install" valueType="string"/>
+								<option id="org.eclipse.linuxtools.cdt.autotools.option.configure.prefix.1110038174" name="Arch-independent install directory (--prefix)" superClass="org.eclipse.linuxtools.cdt.autotools.option.configure.prefix" value="/opt/moonshot" valueType="string"/>
 								<option id="org.eclipse.linuxtools.cdt.autotools.option.configure.user.1361355914" name="User-specified configuration options" superClass="org.eclipse.linuxtools.cdt.autotools.option.configure.user" value="--enable-debug --with-log4shib=/opt/local --with-curl=/opt/local --with-openssl=/opt/local" valueType="string"/>
+								<option id="org.eclipse.linuxtools.cdt.autotools.option.configure.builddir.584817833" name="Build directory" superClass="org.eclipse.linuxtools.cdt.autotools.option.configure.builddir" value="build/2.x" valueType="string"/>
 								<inputType id="org.eclipse.linuxtools.cdt.autotools.inputType.configure.387715961" superClass="org.eclipse.linuxtools.cdt.autotools.inputType.configure"/>
 								<inputType id="org.eclipse.linuxtools.cdt.autotools.inputType.configure1.2086982536" superClass="org.eclipse.linuxtools.cdt.autotools.inputType.configure1"/>
 							</tool>
 							<tool command="autogen.sh" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="" id="org.eclipse.linuxtools.cdt.autotools.toolchain.tool.autogen.414704866" name="autogen.sh" superClass="org.eclipse.linuxtools.cdt.autotools.toolchain.tool.autogen"/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814.205286615" name="/" resourcePath="xmltooling">
+						<toolChain id="org.eclipse.linuxtools.cdt.autotools.toolChain.936318749" name="GNU Autotools Toolchain" superClass="org.eclipse.linuxtools.cdt.autotools.toolChain" unusedChildren="">
+							<targetPlatform id="org.eclipse.linuxtools.cdt.autotools.toolchain.targetPlatform" isAbstract="false" name="GNU Autotools Target Platform" superClass="org.eclipse.linuxtools.cdt.autotools.toolchain.targetPlatform"/>
+							<tool id="org.eclipse.linuxtools.cdt.autotools.gnu.toolchain.tool.configure.1200938024" name="configure" superClass="org.eclipse.linuxtools.cdt.autotools.gnu.toolchain.tool.configure.837026680">
+								<inputType id="org.eclipse.linuxtools.cdt.autotools.inputType.configure.299654480" superClass="org.eclipse.linuxtools.cdt.autotools.inputType.configure"/>
+								<inputType id="org.eclipse.linuxtools.cdt.autotools.inputType.configure1.1208232633" superClass="org.eclipse.linuxtools.cdt.autotools.inputType.configure1"/>
+							</tool>
+							<tool id="org.eclipse.linuxtools.cdt.autotools.toolchain.tool.autogen.805022348" name="autogen.sh" superClass="org.eclipse.linuxtools.cdt.autotools.toolchain.tool.autogen.414704866"/>
 						</toolChain>
 					</folderInfo>
 					<folderInfo id="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814.68494947" name="/" resourcePath="xmltooling/util">
@@ -634,7 +645,7 @@
 						<parser enabled="false"/>
 					</scannerInfoProvider>
 				</profile>
-				<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814;org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814.;org.eclipse.linuxtools.cdt.autotools.gnu.toolchain.tool.configure.837026680;org.eclipse.linuxtools.cdt.autotools.inputType.configure1.2086982536">
+				<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814;org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814.68494947;org.eclipse.linuxtools.cdt.autotools.gnu.toolchain.tool.configure.1263593738;org.eclipse.linuxtools.cdt.autotools.inputType.configure.762316423">
 					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"/>
 					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 						<buildOutputProvider>
@@ -717,7 +728,7 @@
 						</scannerInfoProvider>
 					</profile>
 				</scannerConfigBuildInfo>
-				<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814;org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814.68494947;org.eclipse.linuxtools.cdt.autotools.gnu.toolchain.tool.configure.1263593738;org.eclipse.linuxtools.cdt.autotools.inputType.configure.762316423">
+				<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814;org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814.;org.eclipse.linuxtools.cdt.autotools.gnu.toolchain.tool.configure.837026680;org.eclipse.linuxtools.cdt.autotools.inputType.configure1.2086982536">
 					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"/>
 					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 						<buildOutputProvider>
@@ -802,6 +813,89 @@
 				</scannerConfigBuildInfo>
 				<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.1240427698;org.eclipse.linuxtools.cdt.autotools.core.configuration.build.1240427698.;org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gcc.289572361;cdt.managedbuild.tool.gnu.c.compiler.input.460772889">
 					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
+					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+						<buildOutputProvider>
+							<openAction enabled="true" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+							<parser enabled="true"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerFileProfile">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="false"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="makefileGenerator">
+							<runAction arguments="-f ${project_name}_scd.mk" command="make" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="false"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfile">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="false"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfileCPP">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-c 'g++ -E -P -v -dD &quot;${plugin_state_location}/specs.cpp&quot;'" command="sh" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfileC">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-c 'gcc -E -P -v -dD &quot;${plugin_state_location}/specs.c&quot;'" command="sh" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+				</scannerConfigBuildInfo>
+				<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814;org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814.205286615;org.eclipse.linuxtools.cdt.autotools.gnu.toolchain.tool.configure.1200938024;org.eclipse.linuxtools.cdt.autotools.inputType.configure1.1208232633">
+					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"/>
 					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 						<buildOutputProvider>
 							<openAction enabled="true" filePath=""/>
@@ -1216,6 +1310,89 @@
 					</profile>
 				</scannerConfigBuildInfo>
 				<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814;org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814.1658171119;org.eclipse.linuxtools.cdt.autotools.gnu.toolchain.tool.configure.1868519656;org.eclipse.linuxtools.cdt.autotools.inputType.configure1.1256658993">
+					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"/>
+					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+						<buildOutputProvider>
+							<openAction enabled="true" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+							<parser enabled="true"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerFileProfile">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="false"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="makefileGenerator">
+							<runAction arguments="-f ${project_name}_scd.mk" command="make" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="false"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfile">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="false"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfileCPP">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-c 'g++ -E -P -v -dD &quot;${plugin_state_location}/specs.cpp&quot;'" command="sh" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfileC">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-c 'gcc -E -P -v -dD &quot;${plugin_state_location}/specs.c&quot;'" command="sh" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+				</scannerConfigBuildInfo>
+				<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814;org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814.205286615;org.eclipse.linuxtools.cdt.autotools.gnu.toolchain.tool.configure.1200938024;org.eclipse.linuxtools.cdt.autotools.inputType.configure.299654480">
 					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"/>
 					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 						<buildOutputProvider>
@@ -1861,7 +2038,7 @@
 						<parser enabled="false"/>
 					</scannerInfoProvider>
 				</profile>
-				<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814;org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814.;org.eclipse.linuxtools.cdt.autotools.gnu.toolchain.tool.configure.837026680;org.eclipse.linuxtools.cdt.autotools.inputType.configure1.2086982536">
+				<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814;org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814.68494947;org.eclipse.linuxtools.cdt.autotools.gnu.toolchain.tool.configure.1263593738;org.eclipse.linuxtools.cdt.autotools.inputType.configure.762316423">
 					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"/>
 					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 						<buildOutputProvider>
@@ -1944,7 +2121,7 @@
 						</scannerInfoProvider>
 					</profile>
 				</scannerConfigBuildInfo>
-				<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814;org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814.68494947;org.eclipse.linuxtools.cdt.autotools.gnu.toolchain.tool.configure.1263593738;org.eclipse.linuxtools.cdt.autotools.inputType.configure.762316423">
+				<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814;org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814.;org.eclipse.linuxtools.cdt.autotools.gnu.toolchain.tool.configure.837026680;org.eclipse.linuxtools.cdt.autotools.inputType.configure1.2086982536">
 					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"/>
 					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 						<buildOutputProvider>
@@ -2029,6 +2206,89 @@
 				</scannerConfigBuildInfo>
 				<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.1240427698;org.eclipse.linuxtools.cdt.autotools.core.configuration.build.1240427698.;org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gcc.289572361;cdt.managedbuild.tool.gnu.c.compiler.input.460772889">
 					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC"/>
+					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+						<buildOutputProvider>
+							<openAction enabled="true" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+							<parser enabled="true"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerFileProfile">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="false"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="makefileGenerator">
+							<runAction arguments="-f ${project_name}_scd.mk" command="make" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="false"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfile">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="false"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfileCPP">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-c 'g++ -E -P -v -dD &quot;${plugin_state_location}/specs.cpp&quot;'" command="sh" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfileC">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-c 'gcc -E -P -v -dD &quot;${plugin_state_location}/specs.c&quot;'" command="sh" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+				</scannerConfigBuildInfo>
+				<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814;org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814.205286615;org.eclipse.linuxtools.cdt.autotools.gnu.toolchain.tool.configure.1200938024;org.eclipse.linuxtools.cdt.autotools.inputType.configure1.1208232633">
+					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"/>
 					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 						<buildOutputProvider>
 							<openAction enabled="true" filePath=""/>
@@ -2443,6 +2703,89 @@
 					</profile>
 				</scannerConfigBuildInfo>
 				<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814;org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814.1658171119;org.eclipse.linuxtools.cdt.autotools.gnu.toolchain.tool.configure.1868519656;org.eclipse.linuxtools.cdt.autotools.inputType.configure1.1256658993">
+					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"/>
+					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
+						<buildOutputProvider>
+							<openAction enabled="true" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+							<parser enabled="true"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerFileProfile">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="false"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="makefileGenerator">
+							<runAction arguments="-f ${project_name}_scd.mk" command="make" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="false"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfile">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="false"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/${specs_file}" command="gcc" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileCPP">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.cpp" command="g++" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfileC">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-E -P -v -dD ${plugin_state_location}/specs.c" command="gcc" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfileCPP">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-c 'g++ -E -P -v -dD &quot;${plugin_state_location}/specs.cpp&quot;'" command="sh" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+					<profile id="org.eclipse.cdt.managedbuilder.core.GCCWinManagedMakePerProjectProfileC">
+						<buildOutputProvider>
+							<openAction enabled="false" filePath=""/>
+							<parser enabled="true"/>
+						</buildOutputProvider>
+						<scannerInfoProvider id="specsFile">
+							<runAction arguments="-c 'gcc -E -P -v -dD &quot;${plugin_state_location}/specs.c&quot;'" command="sh" useDefault="true"/>
+							<parser enabled="false"/>
+						</scannerInfoProvider>
+					</profile>
+				</scannerConfigBuildInfo>
+				<scannerConfigBuildInfo instanceId="org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814;org.eclipse.linuxtools.cdt.autotools.configuration.build.1769801814.205286615;org.eclipse.linuxtools.cdt.autotools.gnu.toolchain.tool.configure.1200938024;org.eclipse.linuxtools.cdt.autotools.inputType.configure.299654480">
 					<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="org.eclipse.cdt.managedbuilder.core.GCCManagedMakePerProjectProfile"/>
 					<profile id="org.eclipse.cdt.make.core.GCCStandardMakePerProjectProfile">
 						<buildOutputProvider>
