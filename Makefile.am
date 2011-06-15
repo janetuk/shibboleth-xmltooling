@@ -27,11 +27,10 @@ endif
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = @PACKAGE_NAME@.pc
 
-GENFILES = @PACKAGE_NAME@.spec pkginfo Portfile
+GENFILES = @PACKAGE_NAME@.spec
 
 EXTRA_DIST = $(DX_CONFIG) \
         cpp-@PACKAGE_NAME@.sln \
         config_win32.h \
         $(GENFILES) \
-        $(GENFILES:%=%.in) \
-        postinstall
+        $(GENFILES:%=%.in)
