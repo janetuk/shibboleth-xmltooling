@@ -1,6 +1,6 @@
-
 # /
 /build
+/build-aux
 /Debug
 /*.ncb
 /*.suo
@@ -36,13 +36,10 @@
 /doc/Makefile
 /doc/Makefile.in
 
-<<<<<<< HEAD
 # /m4/
 /m4/libtool.m4
 /m4/lt*.m4
 
-=======
->>>>>>> https://issues.shibboleth.net/jira/browse/CPPXT-77
 # /schemas/
 /schemas/catalog.xml
 /schemas/Makefile
@@ -77,7 +74,3 @@
 
 # /xmltoolingtest/data/
 /xmltoolingtest/data/*.bak
-<<<<<<< HEAD
-/build-aux
-=======
->>>>>>> https://issues.shibboleth.net/jira/browse/CPPXT-77
