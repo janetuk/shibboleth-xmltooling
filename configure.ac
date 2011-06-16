@@ -1,6 +1,6 @@
 # Process this file with autoreconf
 AC_PREREQ([2.50])
-AC_INIT([xmltooling],[1.5],[https://bugs.internet2.edu/],[xmltooling])
+AC_INIT([xmltooling],[1.5],[https://issues.shibboleth.net/],[xmltooling])
 AC_CONFIG_SRCDIR(xmltooling)
 AC_CONFIG_AUX_DIR(build-aux)
 AC_CONFIG_MACRO_DIR(m4)
@@ -32,7 +32,7 @@ else
 fi
 
 AC_CONFIG_HEADERS([config.h xmltooling/config_pub.h])
-AC_CONFIG_FILES([xmltooling.spec pkginfo Portfile])
+AC_CONFIG_FILES([xmltooling.spec])
 AC_CONFIG_FILES([Makefile xmltooling/Makefile xmltoolingtest/Makefile schemas/Makefile doc/Makefile])
 
 AC_PROG_CC([gcc gcc3 cc])
