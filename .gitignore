@@ -24,6 +24,9 @@
 /stamp-h1
 /xmltooling.spec
 /.settings
+/.autotools
+/.cproject
+/.project
 /doxyfile
 /x64
 /Portfile
