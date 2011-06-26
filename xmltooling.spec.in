@@ -16,7 +16,12 @@ BuildRequires:  libxerces-c-devel >= 2.8.0
 BuildRequires:  libxml-security-c-devel >= 1.4.0
 %{?_with_log4cpp:BuildRequires: liblog4cpp-devel >= 1.0}
 %{!?_with_log4cpp:BuildRequires: liblog4shib-devel}
-BuildRequires:	gcc-c++, openssl-devel, curl-devel >= 7.10.6
+BuildRequires: gcc-c++, openssl-devel
+%if 0%{?rhel} >= 6
+BuildRequires: libcurl-openssl-devel >= 7.21.7
+%else
+BuildRequires: curl-devel >= 7.10.6
+%endif
 %if 0%{?suse_version} > 1000
 BuildRequires: pkg-config
 %endif
@@ -67,7 +72,12 @@ Requires:  libxerces-c-devel >= 2.8.0
 Requires: libxml-security-c-devel >= 1.4.0
 %{?_with_log4cpp:Requires: liblog4cpp-devel >= 1.0}
 %{!?_with_log4cpp:Requires: liblog4shib-devel}
-Requires: openssl-devel, curl-devel >= 7.10.6
+Requires: openssl-devel
+%if 0%{?rhel} >= 6
+Requires: libcurl-openssl-devel >= 7.21.7
+%else
+Requires: curl-devel >= 7.10.6
+%endif
 
 %description -n lib@PACKAGE_NAME@-devel
 The XMLTooling library contains generic XML parsing and processing
@@ -95,7 +105,11 @@ This package includes XML schemas and related files.
 %setup -q
 
 %build
+%if 0%{?rhel} >= 6
+%configure %{?@PACKAGE_NAME@_options} --with-curl=/opt/shibboleth
+%else
 %configure %{?@PACKAGE_NAME@_options}
+%endif
 %{__make}
 
 %install
@@ -134,6 +148,9 @@ This package includes XML schemas and related files.
 %doc %{pkgdocdir}
 
 %changelog
+* Sun Jun 26 2011  Scott Cantor  <cantor.2@osu.edu>  - 1.4.2-1
+- Override curl build for RHEL6.
+
 * Tue Oct 26 2010  Scott Cantor  <cantor.2@osu.edu>  - 1.4-1
 - Update version
 - Add pkg-config support.
