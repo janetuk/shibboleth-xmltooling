@@ -49,6 +49,9 @@ Summary:    OpenSAML XMLTooling library
 Group:      Development/Libraries/C and C++
 Provides:   @PACKAGE_NAME@ = %{version}-%{release}
 Obsoletes:  @PACKAGE_NAME@ < %{version}-%{release}
+%if 0%{?rhel} >= 6
+Requires: libcurl-openssl >= 7.21.7
+%endif
 
 %description -n lib@PACKAGE_NAME@5
 The XMLTooling library contains generic XML parsing and processing
