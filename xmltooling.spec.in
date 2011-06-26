@@ -19,6 +19,7 @@ BuildRequires:  libxml-security-c-devel >= 1.4.0
 BuildRequires: gcc-c++, openssl-devel
 %if 0%{?rhel} >= 6
 BuildRequires: libcurl-openssl-devel >= 7.21.7
+Requires: libcurl-openssl >= 7.21.7
 %else
 BuildRequires: curl-devel >= 7.10.6
 %endif
