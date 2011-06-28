@@ -1,12 +1,12 @@
 Name:		@PACKAGE_NAME@
 Version:	@PACKAGE_VERSION@
 Release:	1
-Summary:    OpenSAML XMLTooling library
+Summary:	OpenSAML XMLTooling library
 Group:		Development/Libraries/C and C++
 Vendor:		Internet2
 License:	Apache 2.0
 URL:		http://www.opensaml.org/
-Source:	    %{name}-%{version}.tar.gz
+Source:		%{name}-%{version}.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-root
 %if 0%{?suse_version} > 1030 && 0%{?suse_version} < 1130
 BuildRequires:  libXerces-c-devel >= 2.8.0
@@ -35,6 +35,12 @@ BuildRequires: redhat-rpm-config
 %define pkgdocdir %{_docdir}/%{name}
 %else
 %define pkgdocdir %{_docdir}/%{name}-%{version}
+%endif
+
+# Prevent the RH6 package from requiring a vanilla libcurl.
+%if 0%{?rhel} >= 6
+%filter_from_requires /libcurl\.so\..*/d
+%filter_setup
 %endif
 
 %description
