@@ -50,7 +50,7 @@ for declaring element- and type-specific API and implementation
 classes to add value around the DOM, as well as signing and encryption
 support.
 
-%package -n lib@PACKAGE_NAME@5
+%package -n lib@PACKAGE_NAME@6
 Summary:    OpenSAML XMLTooling library
 Group:      Development/Libraries/C and C++
 Provides:   @PACKAGE_NAME@ = %{version}-%{release}
@@ -59,7 +59,7 @@ Obsoletes:  @PACKAGE_NAME@ < %{version}-%{release}
 Requires: libcurl-openssl >= 7.21.7
 %endif
 
-%description -n lib@PACKAGE_NAME@5
+%description -n lib@PACKAGE_NAME@6
 The XMLTooling library contains generic XML parsing and processing
 classes based on the Xerces-C DOM. It adds more powerful facilities
 for declaring element- and type-specific API and implementation
@@ -71,7 +71,7 @@ This package contains just the shared library.
 %package -n lib@PACKAGE_NAME@-devel
 Summary:	XMLTooling development Headers
 Group:		Development/Libraries/C and C++
-Requires:	lib@PACKAGE_NAME@5 = %{version}-%{release}
+Requires:	lib@PACKAGE_NAME@6 = %{version}-%{release}
 Provides:	@PACKAGE_NAME@-devel = %{version}-%{release}
 Obsoletes:	@PACKAGE_NAME@-devel < %{version}-%{release}
 %if 0%{?suse_version} > 1030 && 0%{?suse_version} < 1130
@@ -141,7 +141,7 @@ This package includes XML schemas and related files.
 %postun -n lib@PACKAGE_NAME@5 -p /sbin/ldconfig
 %endif
 
-%files -n lib@PACKAGE@5
+%files -n lib@PACKAGE@6
 %defattr(-,root,root,-)
 %{_libdir}/*.so.*
 
@@ -158,6 +158,9 @@ This package includes XML schemas and related files.
 %doc %{pkgdocdir}
 
 %changelog
+* Mon Aug 8 2011 Scott Cantor  <cantor.2@osu.edu>  - 1.5-1
+- Update lib package number.
+
 * Sun Jun 26 2011  Scott Cantor  <cantor.2@osu.edu>  - 1.4.2-1
 - Override curl build for RHEL6.
 
