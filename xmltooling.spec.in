@@ -134,14 +134,14 @@ This package includes XML schemas and related files.
 [ "$RPM_BUILD_ROOT" != "/" ] && %{__rm} -rf $RPM_BUILD_ROOT
 
 %ifnos solaris2.8 solaris2.9 solaris2.10
-%post -n lib@PACKAGE_NAME@5 -p /sbin/ldconfig
+%post -n lib@PACKAGE_NAME@6 -p /sbin/ldconfig
 %endif
 
 %ifnos solaris2.8 solaris2.9 solaris2.10
-%postun -n lib@PACKAGE_NAME@5 -p /sbin/ldconfig
+%postun -n lib@PACKAGE_NAME@6 -p /sbin/ldconfig
 %endif
 
-%files -n lib@PACKAGE@6
+%files -n lib@PACKAGE_NAME@6
 %defattr(-,root,root,-)
 %{_libdir}/*.so.*
 
