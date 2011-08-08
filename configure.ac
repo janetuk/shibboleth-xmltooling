@@ -276,7 +276,7 @@ if test x_$with_xmlsec != x_no; then
 
     if test x_$with_xmlsec != x_/usr; then
         CPPFLAGS="-I${with_xmlsec}/include $CPPFLAGS"
-        LDFLAGS="-L${with_xmlsec}/lib $LDFLAGS"
+        XMLSEC_LIBS="$XMLSEC_LIBS -L${with_xmlsec}/lib"
     fi        
     XMLSEC_LIBS="$XMLSEC_LIBS -lxml-security-c"
     
