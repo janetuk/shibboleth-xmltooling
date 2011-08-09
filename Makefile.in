@@ -346,6 +346,12 @@ ACLOCAL_AMFLAGS = -I m4
 @DX_COND_doc_TRUE@    $(DX_CLEAN_LATEX)
 
 MOSTLYCLEANFILES = $(DX_CLEANFILES)
+DISTCLEANFILES = \
+	@PACKAGE_NAME@.pc \
+	@PACKAGE_NAME@.pc.in \
+	@PACKAGE_NAME@-uninstalled.pc \
+	@PACKAGE_NAME@-uninstalled.sh
+
 SUBDIRS = doc schemas @PACKAGE_NAME@ xmltoolingtest
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = @PACKAGE_NAME@.pc
@@ -791,6 +797,7 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"

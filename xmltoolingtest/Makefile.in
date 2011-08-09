@@ -69,6 +69,7 @@ am__objects_2 = xmltoolingtest-ComplexXMLObjectTest.$(OBJEXT) \
 	xmltoolingtest-KeyInfoTest.$(OBJEXT) \
 	xmltoolingtest-MarshallingTest.$(OBJEXT) \
 	xmltoolingtest-NonVisibleNamespaceTest.$(OBJEXT) \
+	xmltoolingtest-SOAPTest.$(OBJEXT) \
 	xmltoolingtest-UnmarshallingTest.$(OBJEXT) \
 	xmltoolingtest-TemplateEngineTest.$(OBJEXT) \
 	xmltoolingtest-xmltoolingtest.$(OBJEXT) $(am__objects_1)
@@ -275,6 +276,7 @@ xmltoolingtest_h = \
     KeyInfoTest.h \
     MarshallingTest.h \
     NonVisibleNamespaceTest.h \
+    SOAPTest.h \
     UnmarshallingTest.h \
     TemplateEngineTest.h \
     xmltoolingtest.h \
@@ -383,6 +385,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xmltoolingtest-MarshallingTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xmltoolingtest-MemoryStorageServiceTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xmltoolingtest-NonVisibleNamespaceTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xmltoolingtest-SOAPTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xmltoolingtest-SecurityHelperTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xmltoolingtest-SignatureTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/xmltoolingtest-TemplateEngineTest.Po@am__quote@
@@ -493,6 +496,20 @@ xmltoolingtest-NonVisibleNamespaceTest.obj: NonVisibleNamespaceTest.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='NonVisibleNamespaceTest.cpp' object='xmltoolingtest-NonVisibleNamespaceTest.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(xmltoolingtest_CXXFLAGS) $(CXXFLAGS) -c -o xmltoolingtest-NonVisibleNamespaceTest.obj `if test -f 'NonVisibleNamespaceTest.cpp'; then $(CYGPATH_W) 'NonVisibleNamespaceTest.cpp'; else $(CYGPATH_W) '$(srcdir)/NonVisibleNamespaceTest.cpp'; fi`
+
+xmltoolingtest-SOAPTest.o: SOAPTest.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(xmltoolingtest_CXXFLAGS) $(CXXFLAGS) -MT xmltoolingtest-SOAPTest.o -MD -MP -MF $(DEPDIR)/xmltoolingtest-SOAPTest.Tpo -c -o xmltoolingtest-SOAPTest.o `test -f 'SOAPTest.cpp' || echo '$(srcdir)/'`SOAPTest.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/xmltoolingtest-SOAPTest.Tpo $(DEPDIR)/xmltoolingtest-SOAPTest.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SOAPTest.cpp' object='xmltoolingtest-SOAPTest.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(xmltoolingtest_CXXFLAGS) $(CXXFLAGS) -c -o xmltoolingtest-SOAPTest.o `test -f 'SOAPTest.cpp' || echo '$(srcdir)/'`SOAPTest.cpp
+
+xmltoolingtest-SOAPTest.obj: SOAPTest.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(xmltoolingtest_CXXFLAGS) $(CXXFLAGS) -MT xmltoolingtest-SOAPTest.obj -MD -MP -MF $(DEPDIR)/xmltoolingtest-SOAPTest.Tpo -c -o xmltoolingtest-SOAPTest.obj `if test -f 'SOAPTest.cpp'; then $(CYGPATH_W) 'SOAPTest.cpp'; else $(CYGPATH_W) '$(srcdir)/SOAPTest.cpp'; fi`
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/xmltoolingtest-SOAPTest.Tpo $(DEPDIR)/xmltoolingtest-SOAPTest.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='SOAPTest.cpp' object='xmltoolingtest-SOAPTest.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(xmltoolingtest_CXXFLAGS) $(CXXFLAGS) -c -o xmltoolingtest-SOAPTest.obj `if test -f 'SOAPTest.cpp'; then $(CYGPATH_W) 'SOAPTest.cpp'; else $(CYGPATH_W) '$(srcdir)/SOAPTest.cpp'; fi`
 
 xmltoolingtest-UnmarshallingTest.o: UnmarshallingTest.cpp
 @am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(xmltoolingtest_CXXFLAGS) $(CXXFLAGS) -MT xmltoolingtest-UnmarshallingTest.o -MD -MP -MF $(DEPDIR)/xmltoolingtest-UnmarshallingTest.Tpo -c -o xmltoolingtest-UnmarshallingTest.o `test -f 'UnmarshallingTest.cpp' || echo '$(srcdir)/'`UnmarshallingTest.cpp

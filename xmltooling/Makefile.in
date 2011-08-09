@@ -89,7 +89,7 @@ am__libxmltooling_lite_la_SOURCES_DIST =  \
 	AbstractAttributeExtensibleXMLObject.cpp \
 	AbstractComplexElement.cpp AbstractDOMCachingXMLObject.cpp \
 	AbstractSimpleElement.cpp AbstractXMLObject.cpp exceptions.cpp \
-	Lockable.cpp Namespace.cpp QName.cpp unicode.cpp \
+	Lockable.cpp Namespace.cpp QName.cpp unicode.cpp version.cpp \
 	XMLObjectBuilder.cpp XMLToolingConfig.cpp impl/AnyElement.cpp \
 	impl/UnknownElement.cpp io/AbstractXMLObjectMarshaller.cpp \
 	io/AbstractXMLObjectUnmarshaller.cpp io/HTTPRequest.cpp \
@@ -112,6 +112,7 @@ am__objects_2 =  \
 	libxmltooling_lite_la-Namespace.lo \
 	libxmltooling_lite_la-QName.lo \
 	libxmltooling_lite_la-unicode.lo \
+	libxmltooling_lite_la-version.lo \
 	libxmltooling_lite_la-XMLObjectBuilder.lo \
 	libxmltooling_lite_la-XMLToolingConfig.lo \
 	libxmltooling_lite_la-AnyElement.lo \
@@ -144,7 +145,7 @@ am__libxmltooling_la_SOURCES_DIST =  \
 	AbstractAttributeExtensibleXMLObject.cpp \
 	AbstractComplexElement.cpp AbstractDOMCachingXMLObject.cpp \
 	AbstractSimpleElement.cpp AbstractXMLObject.cpp exceptions.cpp \
-	Lockable.cpp Namespace.cpp QName.cpp unicode.cpp \
+	Lockable.cpp Namespace.cpp QName.cpp unicode.cpp version.cpp \
 	XMLObjectBuilder.cpp XMLToolingConfig.cpp impl/AnyElement.cpp \
 	impl/UnknownElement.cpp io/AbstractXMLObjectMarshaller.cpp \
 	io/AbstractXMLObjectUnmarshaller.cpp io/HTTPRequest.cpp \
@@ -186,7 +187,7 @@ am__libxmltooling_la_SOURCES_DIST =  \
 am__objects_4 = AbstractAttributeExtensibleXMLObject.lo \
 	AbstractComplexElement.lo AbstractDOMCachingXMLObject.lo \
 	AbstractSimpleElement.lo AbstractXMLObject.lo exceptions.lo \
-	Lockable.lo Namespace.lo QName.lo unicode.lo \
+	Lockable.lo Namespace.lo QName.lo unicode.lo version.lo \
 	XMLObjectBuilder.lo XMLToolingConfig.lo AnyElement.lo \
 	UnknownElement.lo AbstractXMLObjectMarshaller.lo \
 	AbstractXMLObjectUnmarshaller.lo HTTPRequest.lo \
@@ -550,6 +551,7 @@ common_sources = \
 	Namespace.cpp \
 	QName.cpp \
 	unicode.cpp \
+    version.cpp \
 	XMLObjectBuilder.cpp \
 	XMLToolingConfig.cpp \
 	impl/AnyElement.cpp \
@@ -577,8 +579,8 @@ libxmltooling_lite_la_SOURCES = \
 	${common_sources}
 
 libxmltooling_lite_la_CPPFLAGS = -DXMLTOOLING_LITE
-libxmltooling_lite_la_LDFLAGS = -version-info 5:1:0
-@BUILD_XMLSEC_TRUE@libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 5:1:0
+libxmltooling_lite_la_LDFLAGS = -version-info 6:0:0
+@BUILD_XMLSEC_TRUE@libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 6:0:0
 @BUILD_XMLSEC_TRUE@libxmltooling_la_SOURCES = \
 @BUILD_XMLSEC_TRUE@	${common_sources} \
 @BUILD_XMLSEC_TRUE@	${xmlsec_sources}
@@ -780,7 +782,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmltooling_lite_la-XMLToolingConfig.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmltooling_lite_la-exceptions.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmltooling_lite_la-unicode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libxmltooling_lite_la-version.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/unicode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/version.Plo@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -872,6 +876,13 @@ libxmltooling_lite_la-unicode.lo: unicode.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='unicode.cpp' object='libxmltooling_lite_la-unicode.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libxmltooling_lite_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libxmltooling_lite_la-unicode.lo `test -f 'unicode.cpp' || echo '$(srcdir)/'`unicode.cpp
+
+libxmltooling_lite_la-version.lo: version.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libxmltooling_lite_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libxmltooling_lite_la-version.lo -MD -MP -MF $(DEPDIR)/libxmltooling_lite_la-version.Tpo -c -o libxmltooling_lite_la-version.lo `test -f 'version.cpp' || echo '$(srcdir)/'`version.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libxmltooling_lite_la-version.Tpo $(DEPDIR)/libxmltooling_lite_la-version.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='version.cpp' object='libxmltooling_lite_la-version.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libxmltooling_lite_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libxmltooling_lite_la-version.lo `test -f 'version.cpp' || echo '$(srcdir)/'`version.cpp
 
 libxmltooling_lite_la-XMLObjectBuilder.lo: XMLObjectBuilder.cpp
 @am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libxmltooling_lite_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libxmltooling_lite_la-XMLObjectBuilder.lo -MD -MP -MF $(DEPDIR)/libxmltooling_lite_la-XMLObjectBuilder.Tpo -c -o libxmltooling_lite_la-XMLObjectBuilder.lo `test -f 'XMLObjectBuilder.cpp' || echo '$(srcdir)/'`XMLObjectBuilder.cpp
