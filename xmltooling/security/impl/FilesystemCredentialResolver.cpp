@@ -1,5 +1,5 @@
 /*
- *  Copyright 2001-2010 Internet2
+ *  Copyright 2001-2011 Internet2
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -348,6 +348,10 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
             if (e->hasAttributeNS(nullptr, extractNames))
                 child->setAttributeNS(nullptr, extractNames, e->getAttributeNS(nullptr, extractNames));
         }
+        if (e->hasAttributeNS(nullptr, _use)) {
+            dummy->setAttributeNS(nullptr, _use, e->getAttributeNS(nullptr, _use));
+        }
+
         e = dummy;  // reset "root" to the dummy config element
     }
 

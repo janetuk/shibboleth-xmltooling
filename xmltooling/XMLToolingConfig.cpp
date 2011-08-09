@@ -1,11 +1,12 @@
 /*
- *  Copyright 2001-2010 Internet2
+ * Licensed to UCAID under one or more contributor license agreements.
+ * See the NOTICE file distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file to you under
+ * the Apache License, Version 2.0 (the "License"); you may not use this
+ * file except in compliance with the License.  You may obtain a copy of the
+ * License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *       http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -359,7 +360,16 @@ bool XMLToolingInternalConfig::init()
             log.fatal("failed to initialize libcurl, OpenSSL, or Winsock");
             return false;
         }
-        log.debug("libcurl %s initialization complete", LIBCURL_VERSION);
+        curl_version_info_data* curlver = curl_version_info(CURLVERSION_NOW);
+        if (curlver) {
+            log.debug("libcurl %s initialization complete", curlver->version);
+            if (!(curlver->features & CURL_VERSION_SSL)) {
+                log.warn("libcurl lacks TLS/SSL support, this will greatly limit functionality");
+            }
+        }
+        else {
+            log.debug("libcurl %s initialization complete", LIBCURL_VERSION);
+        }
 #endif
 
         XMLPlatformUtils::Initialize();
