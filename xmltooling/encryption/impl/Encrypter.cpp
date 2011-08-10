@@ -338,18 +338,10 @@ const XMLCh* Encrypter::getKeyTransportAlgorithm(const Credential& credential, c
     XMLToolingConfig& conf = XMLToolingConfig::getConfig();
     const char* alg = credential.getAlgorithm();
     if (!alg || !strcmp(alg, "RSA")) {
-        if (XMLString::equals(encryptionAlg,DSIGConstants::s_unicodeStrURI3DES_CBC)) {
-            if (conf.isXMLAlgorithmSupported(DSIGConstants::s_unicodeStrURIRSA_1_5, XMLToolingConfig::ALGTYPE_KEYENCRYPT))
-                return DSIGConstants::s_unicodeStrURIRSA_1_5;
-            else if (conf.isXMLAlgorithmSupported(DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1, XMLToolingConfig::ALGTYPE_KEYENCRYPT))
-                return DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1;
-        }
-        else {
-            if (conf.isXMLAlgorithmSupported(DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1, XMLToolingConfig::ALGTYPE_KEYENCRYPT))
-                return DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1;
-            else if (conf.isXMLAlgorithmSupported(DSIGConstants::s_unicodeStrURIRSA_1_5, XMLToolingConfig::ALGTYPE_KEYENCRYPT))
-                return DSIGConstants::s_unicodeStrURIRSA_1_5;
-        }
+        if (conf.isXMLAlgorithmSupported(DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1, XMLToolingConfig::ALGTYPE_KEYENCRYPT))
+            return DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1;
+        else if (conf.isXMLAlgorithmSupported(DSIGConstants::s_unicodeStrURIRSA_1_5, XMLToolingConfig::ALGTYPE_KEYENCRYPT))
+            return DSIGConstants::s_unicodeStrURIRSA_1_5;
     }
     else if (!strcmp(alg, "AES")) {
         const XMLCh* ret = nullptr;
