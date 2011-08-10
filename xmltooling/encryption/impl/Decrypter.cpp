@@ -348,5 +348,24 @@ XSECCryptoKey* Decrypter::decryptKey(const EncryptedKey& encryptedKey, const XML
         }
     }
     
-    throw DecryptionException("Unable to decrypt key.");
+    // Some algorithms are vulnerable to chosen ciphertext attacks, so we generate a random key
+    // to prevent discovery of the validity of the original candidate.
+    logging::Category::getInstance(XMLTOOLING_LOGCAT".Decrypter").warn(
+        "unable to decrypt key, generating random key for defensive purposes"
+        );
+    pair<const char*,unsigned int> mapped = XMLToolingConfig::getConfig().mapXMLAlgorithmToKeyAlgorithm(algorithm);
+    if (!mapped.second)
+        mapped.second = 256;
+    try {
+        if (XSECPlatformUtils::g_cryptoProvider->getRandom(reinterpret_cast<unsigned char*>(buffer),mapped.second) < mapped.second)
+            throw DecryptionException("Unable to generate random data; was PRNG seeded?");
+        return handler->createKeyForURI(algorithm, buffer, mapped.second);
+    }
+    catch(XSECException& e) {
+        auto_ptr_char temp(e.getMsg());
+        throw DecryptionException(string("XMLSecurity exception while generating key: ") + temp.get());
+    }
+    catch (XSECCryptoException& e) {
+        throw DecryptionException(string("XMLSecurity exception while generating key: ") + e.getMsg());
+    }
 }
