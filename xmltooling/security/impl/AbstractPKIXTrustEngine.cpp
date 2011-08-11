@@ -692,11 +692,20 @@ bool AbstractPKIXTrustEngine::validateWithCRLs(
         return false;
     }
 
-    if ((criteria && criteria->getPeerName() && *(criteria->getPeerName())) || !m_trustedNames.empty()) {
+    if (criteria && criteria->getPeerName() && *(criteria->getPeerName())) {
         log.debug("checking that the certificate name is acceptable");
         if (criteria && criteria->getUsage()==Credential::UNSPECIFIED_CREDENTIAL)
             criteria->setUsage(Credential::SIGNING_CREDENTIAL);
         if (!checkEntityNames(certEE,credResolver,*criteria)) {
+            log.error("certificate name was not acceptable");
+            return false;
+        }
+    }
+    else if (!m_trustedNames.empty()) {
+        log.debug("checking that the certificate name is acceptable");
+        CredentialCriteria cc;
+        cc.setUsage(Credential::SIGNING_CREDENTIAL);
+        if (!checkEntityNames(certEE,credResolver,cc)) {
             log.error("certificate name was not acceptable");
             return false;
         }
