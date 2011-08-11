@@ -1,0 +1,4 @@
+<TrustEngine type="StaticPKIX" certificate="../xmltoolingtest/data/x509/mdt-root.crt.pem" anyPolicyInhibit="true">
+    <TrustedName>Snakeoil Metadata Signer</TrustedName>
+    <PolicyOID>1.3.6.1.4.1.32473.2011.6.21</PolicyOID>
+</TrustEngine>
