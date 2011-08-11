@@ -74,6 +74,9 @@ namespace xmltooling {
     /** CredentialResolver based on local files with no criteria support. */
     #define FILESYSTEM_CREDENTIAL_RESOLVER  "File"
 
+    /** CredentialResolver that returns nothing, for use with some APIs. */
+    #define DUMMY_CREDENTIAL_RESOLVER  "Dummy"
+
     /** CredentialResolver based on chaining together other resolvers. */
     #define CHAINING_CREDENTIAL_RESOLVER    "Chaining"
 };

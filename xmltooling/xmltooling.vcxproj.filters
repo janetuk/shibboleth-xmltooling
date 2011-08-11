@@ -219,6 +219,9 @@
     <ClCompile Include="security\impl\CredentialResolver.cpp">
       <Filter>Source Files\security\impl</Filter>
     </ClCompile>
+    <ClCompile Include="security\impl\DummyCredentialResolver.cpp">
+      <Filter>Source Files\security\impl</Filter>
+    </ClCompile>
     <ClCompile Include="security\impl\ExplicitKeyTrustEngine.cpp">
       <Filter>Source Files\security\impl</Filter>
     </ClCompile>

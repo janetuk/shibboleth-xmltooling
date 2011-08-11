@@ -230,6 +230,7 @@
     <ClCompile Include="security\impl\ChainingTrustEngine.cpp" />
     <ClCompile Include="security\impl\CredentialCriteria.cpp" />
     <ClCompile Include="security\impl\CredentialResolver.cpp" />
+    <ClCompile Include="security\impl\DummyCredentialResolver.cpp" />
     <ClCompile Include="security\impl\ExplicitKeyTrustEngine.cpp" />
     <ClCompile Include="security\impl\FilesystemCredentialResolver.cpp" />
     <ClCompile Include="security\impl\InlineKeyResolver.cpp" />

@@ -137,6 +137,7 @@ xmlsec_sources = \
 	security/impl/ChainingTrustEngine.cpp \
 	security/impl/CredentialCriteria.cpp \
 	security/impl/CredentialResolver.cpp \
+	security/impl/DummyCredentialResolver.cpp \
 	security/impl/ExplicitKeyTrustEngine.cpp \
 	security/impl/FilesystemCredentialResolver.cpp \
 	security/impl/InlineKeyResolver.cpp \
