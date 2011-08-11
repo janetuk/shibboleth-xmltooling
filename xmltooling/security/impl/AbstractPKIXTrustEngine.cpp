@@ -257,9 +257,12 @@ namespace {
         X509* EE,
         STACK_OF(X509)* untrusted,
         AbstractPKIXTrustEngine::PKIXValidationInfoIterator* pkixInfo,
-		bool useCRL,
+        bool useCRL,
         bool fullCRLChain,
-        const vector<XSECCryptoX509CRL*>* inlineCRLs=nullptr
+        const vector<XSECCryptoX509CRL*>* inlineCRLs=nullptr,
+        bool policyMappingInhibit=false,
+        bool anyPolicyInhibit=false,
+        const set<string>* policyOIDs=nullptr
         )
     {
         Category& log=Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine");
@@ -272,6 +275,62 @@ namespace {
         if (!store) {
             log_openssl();
             return false;
+        }
+
+        // PKIX policy checking (cf. RFCs 3280/5280 section 6)
+        if (policyMappingInhibit || anyPolicyInhibit || (policyOIDs && !policyOIDs->empty())) {
+#if (OPENSSL_VERSION_NUMBER < 0x00908000L)
+            log.error("PKIX policy checking option is configured, but OpenSSL version is less than 0.9.8");
+            X509_STORE_free(store);
+            return false;
+#else
+            unsigned long pflags = 0;
+            X509_VERIFY_PARAM *vpm = X509_VERIFY_PARAM_new();
+            if (!vpm) {
+                log_openssl();
+                X509_STORE_free(store);
+                return false;
+            }
+
+            // populate the "user-initial-policy-set" input variable
+            if (policyOIDs && !policyOIDs->empty()) {
+                for (set<string>::const_iterator o=policyOIDs->begin(); o!=policyOIDs->end(); o++) {
+                    ASN1_OBJECT *oid = OBJ_txt2obj(o->c_str(), 1);
+                    if (oid && X509_VERIFY_PARAM_add0_policy(vpm, oid)) {
+                        log.debug("OID (%s) added to set of acceptable policies", o->c_str());
+                    }
+                    else {
+                        log_openssl();
+                        log.error("unable to parse/configure policy OID value (%s)", o->c_str());
+                        if (oid)
+                            ASN1_OBJECT_free(oid);
+                        X509_VERIFY_PARAM_free(vpm);
+                        X509_STORE_free(store);
+                        return false;
+                    }
+                }
+                // when the user has supplied at least one policy OID, he obviously wants to check
+                // for an explicit policy ("initial-explicit-policy")
+                pflags |= X509_V_FLAG_EXPLICIT_POLICY;
+            }
+
+            // "initial-policy-mapping-inhibit" input variable
+            if (policyMappingInhibit)
+                pflags |= X509_V_FLAG_INHIBIT_MAP;
+            // "initial-any-policy-inhibit" input variable
+            if (anyPolicyInhibit)
+                pflags |= X509_V_FLAG_INHIBIT_ANY;
+
+            if (!X509_VERIFY_PARAM_set_flags(vpm, pflags) || !X509_STORE_set1_param(store, vpm)) {
+                log_openssl();
+                log.error("unable to set PKIX policy checking parameters");
+                X509_VERIFY_PARAM_free(vpm);
+                X509_STORE_free(store);
+                return false;
+            }
+
+            X509_VERIFY_PARAM_free(vpm);
+#endif
         }
     
         // This contains the state of the validate operation.
@@ -415,8 +474,12 @@ namespace {
         return false;
     }
 
-    static XMLCh fullCRLChain[] =		UNICODE_LITERAL_12(f,u,l,l,C,R,L,C,h,a,i,n);
-	static XMLCh checkRevocation[] =	UNICODE_LITERAL_15(c,h,e,c,k,R,e,v,o,c,a,t,i,o,n);
+    static XMLCh fullCRLChain[] =		    UNICODE_LITERAL_12(f,u,l,l,C,R,L,C,h,a,i,n);
+    static XMLCh checkRevocation[] =	    UNICODE_LITERAL_15(c,h,e,c,k,R,e,v,o,c,a,t,i,o,n);
+    static XMLCh policyMappingInhibit[] =   UNICODE_LITERAL_20(p,o,l,i,c,y,M,a,p,p,i,n,g,I,n,h,i,b,i,t);
+    static XMLCh anyPolicyInhibit[] =	    UNICODE_LITERAL_16(a,n,y,P,o,l,i,c,y,I,n,h,i,b,i,t);
+    static XMLCh PolicyOID[] =			    UNICODE_LITERAL_9(P,o,l,i,c,y,O,I,D);
+    static XMLCh TrustedName[] =		    UNICODE_LITERAL_11(T,r,u,s,t,e,d,N,a,m,e);
 };
 
 AbstractPKIXTrustEngine::PKIXValidationInfoIterator::PKIXValidationInfoIterator()
@@ -429,8 +492,10 @@ AbstractPKIXTrustEngine::PKIXValidationInfoIterator::~PKIXValidationInfoIterator
 
 AbstractPKIXTrustEngine::AbstractPKIXTrustEngine(const xercesc::DOMElement* e)
 	: TrustEngine(e),
+		m_checkRevocation(XMLHelper::getAttrString(e, nullptr, checkRevocation)),
 		m_fullCRLChain(XMLHelper::getAttrBool(e, false, fullCRLChain)),
-		m_checkRevocation(XMLHelper::getAttrString(e, nullptr, checkRevocation))
+		m_policyMappingInhibit(XMLHelper::getAttrBool(e, false, policyMappingInhibit)),
+		m_anyPolicyInhibit(XMLHelper::getAttrBool(e, false, anyPolicyInhibit))
 {
     if (m_fullCRLChain) {
         Category::getInstance(XMLTOOLING_LOGCAT".TrustEngine.PKIX").warn(
@@ -440,6 +505,20 @@ AbstractPKIXTrustEngine::AbstractPKIXTrustEngine(const xercesc::DOMElement* e)
     }
     else if (m_checkRevocation == "fullChain") {
         m_fullCRLChain = true; // in case anything's using this
+    }
+
+    xercesc::DOMElement* c = XMLHelper::getFirstChildElement(e);
+    while (c) {
+        if (c->hasChildNodes()) {
+            auto_ptr_char v(c->getTextContent());
+            if (v.get() && *v.get()) {
+                if (XMLString::equals(c->getLocalName(), PolicyOID))
+                    m_policyOIDs.insert(v.get());
+                else if (XMLString::equals(c->getLocalName(), TrustedName))
+                    m_trustedNames.insert(v.get());
+            }
+        }
+        c = XMLHelper::getNextSiblingElement(c);
     }
 }
 
@@ -458,10 +537,24 @@ bool AbstractPKIXTrustEngine::checkEntityNames(
     credResolver.resolve(creds,&criteria);
 
     // Build a list of acceptable names.
-    set<string> trustednames;
-    trustednames.insert(criteria.getPeerName());
-    for (vector<const Credential*>::const_iterator cred = creds.begin(); cred!=creds.end(); ++cred)
+    set<string> trustednames = m_trustedNames;
+    if (log.isDebugEnabled()) {
+        for (set<string>::const_iterator n=m_trustedNames.begin(); n!=m_trustedNames.end(); n++) {
+            log.debug("adding to list of trusted names (%s)", n->c_str());
+        }
+    }
+    if (criteria.getPeerName()) {
+        trustednames.insert(criteria.getPeerName());
+        log.debug("adding to list of trusted names (%s)", criteria.getPeerName());
+    }
+    for (vector<const Credential*>::const_iterator cred = creds.begin(); cred!=creds.end(); ++cred) {
         trustednames.insert((*cred)->getKeyNames().begin(), (*cred)->getKeyNames().end());
+        if (log.isDebugEnabled()) {
+            for (set<string>::const_iterator n=(*cred)->getKeyNames().begin(); n!=(*cred)->getKeyNames().end(); n++) {
+                log.debug("adding to list of trusted names (%s)", n->c_str());
+            }
+        }
+    }
 
     X509_NAME* subject=X509_get_subject_name(certEE);
     if (subject) {
@@ -599,9 +692,9 @@ bool AbstractPKIXTrustEngine::validateWithCRLs(
         return false;
     }
 
-    if (criteria && criteria->getPeerName() && *(criteria->getPeerName())) {
+    if ((criteria && criteria->getPeerName() && *(criteria->getPeerName())) || !m_trustedNames.empty()) {
         log.debug("checking that the certificate name is acceptable");
-        if (criteria->getUsage()==Credential::UNSPECIFIED_CREDENTIAL)
+        if (criteria && criteria->getUsage()==Credential::UNSPECIFIED_CREDENTIAL)
             criteria->setUsage(Credential::SIGNING_CREDENTIAL);
         if (!checkEntityNames(certEE,credResolver,*criteria)) {
             log.error("certificate name was not acceptable");
@@ -619,7 +712,10 @@ bool AbstractPKIXTrustEngine::validateWithCRLs(
 				pkix.get(),
 				(m_checkRevocation=="entityOnly" || m_checkRevocation=="fullChain"),
 				(m_checkRevocation=="fullChain"),
-				(m_checkRevocation=="entityOnly" || m_checkRevocation=="fullChain") ? inlineCRLs : nullptr
+				(m_checkRevocation=="entityOnly" || m_checkRevocation=="fullChain") ? inlineCRLs : nullptr,
+				m_policyMappingInhibit,
+				m_anyPolicyInhibit,
+				&m_policyOIDs
 				)) {
             return true;
         }

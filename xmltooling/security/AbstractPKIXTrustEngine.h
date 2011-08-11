@@ -31,6 +31,7 @@
 #include <xmltooling/security/OpenSSLTrustEngine.h>
 #include <xmltooling/security/SignatureTrustEngine.h>
 
+#include <set>
 #include <string>
 
 namespace xmltooling {
@@ -51,24 +52,41 @@ namespace xmltooling {
          * 
          * <ul>
          *  <li>checkRevocation attribute (off, entityOnly, fullChain)
+         *  <li>policyMappingInhibit attribute (boolean)
+         *  <li>anyPolicyInhibit attribute (boolean)
+         *  <li>&lt;TrustedName&gt; element (zero or more)
+         *  <li>&lt;PolicyOID&gt; element (zero or more)
          * </ul>
          * 
          * @param e DOM to supply configuration for provider
          */
         AbstractPKIXTrustEngine(const xercesc::DOMElement* e=nullptr);
 
-		/** Controls revocation checking, currently limited to CRLs and supports "off", "entityOnly", "fullChain". */
-		std::string m_checkRevocation;
+        /** Controls revocation checking, currently limited to CRLs and supports "off", "entityOnly", "fullChain". */
+        std::string m_checkRevocation;
 
         /** Deprecated option, equivalent to checkRevocation="fullChain". */
         bool m_fullCRLChain;
-        
+
+        /** Disable policy mapping when applying PKIX policy checking. */
+        bool m_policyMappingInhibit;
+
+        /** Disallow the anyPolicy OID (2.5.29.32.0) when applying PKIX policy checking. */
+        bool m_anyPolicyInhibit;
+
+        /** A list of acceptable policy OIDs (explicit policy checking). */
+        std::set<std::string> m_policyOIDs;
+
+        /** A list of trusted names (subject DNs / CN attributes / subjectAltName entries). */
+        std::set<std::string> m_trustedNames;
+
         /**
          * Checks that either the name of the peer with the given credentials or the names
          * of the credentials match the subject or subject alternate names of the certificate.
+         * Alternatively explicit trusted names can be supplied statically via configuration.
          * 
          * @param certEE        the credential for the entity to validate
-         * @param credResolver  source of credentials
+         * @param credResolver  source of trusted credentials
          * @param criteria      criteria for selecting credentials, including the peer name
          * 
          * @return true the name check succeeds, false if not
