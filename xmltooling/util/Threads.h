@@ -296,6 +296,15 @@ namespace xmltooling
         }
 
         /**
+         * Locks and wraps the designated mutex.
+         *
+         * @param mtx mutex to lock
+         */
+        Lock(Mutex& mtx) : mutex(&mtx) {
+            mtx.lock();
+        }
+
+        /**
          * Unlocks the wrapped mutex.
          */
         ~Lock() {

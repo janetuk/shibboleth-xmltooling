@@ -247,13 +247,6 @@ namespace xmltooling {
     }
 };
 
-void xmltooling::registerSOAPTransports()
-{
-    XMLToolingConfig& conf=XMLToolingConfig::getConfig();
-    conf.SOAPTransportManager.registerFactory("http", CURLSOAPTransportFactory);
-    conf.SOAPTransportManager.registerFactory("https", CURLSOAPTransportFactory);
-}
-
 void xmltooling::initSOAPTransports()
 {
     g_CURLPool=new CURLPool();
@@ -263,14 +256,6 @@ void xmltooling::termSOAPTransports()
 {
     delete g_CURLPool;
     g_CURLPool = nullptr;
-}
-
-OpenSSLSOAPTransport::OpenSSLSOAPTransport()
-{
-}
-
-OpenSSLSOAPTransport::~OpenSSLSOAPTransport()
-{
 }
 
 CURLPool::~CURLPool()

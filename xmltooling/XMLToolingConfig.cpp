@@ -36,9 +36,11 @@
 #include "security/OpenSSLCryptoX509CRL.h"
 #include "security/CredentialResolver.h"
 #include "security/KeyInfoResolver.h"
+#include "security/PathValidator.h"
 #include "signature/KeyInfo.h"
 #include "signature/Signature.h"
 #include "soap/SOAP.h"
+#include "soap/SOAPTransport.h"
 #include "util/NDC.h"
 #include "util/PathResolver.h"
 #include "util/ReplayCache.h"
@@ -453,15 +455,19 @@ bool XMLToolingInternalConfig::init()
         REGISTER_XMLTOOLING_EXCEPTION_FACTORY(EncryptionException,xmlencryption);
         registerKeyInfoClasses();
         registerEncryptionClasses();
-        registerKeyInfoResolvers();
         registerCredentialResolvers();
+        registerKeyInfoResolvers();
+        registerPathValidators();
         registerTrustEngines();
         registerXMLAlgorithms();
-        registerSOAPTransports();
-        initSOAPTransports();
-        registerStorageServices();
         m_keyInfoResolver = KeyInfoResolverManager.newPlugin(INLINE_KEYINFO_RESOLVER,nullptr);
 #endif
+
+#ifndef XMLTOOLING_LITE
+        registerStorageServices();
+#endif
+        registerSOAPTransports();
+        initSOAPTransports();
 
         m_pathResolver = new PathResolver();
         m_urlEncoder = new URLEncoder();
@@ -522,10 +528,14 @@ void XMLToolingInternalConfig::term()
     XMLToolingException::deregisterFactories();
     AttributeExtensibleXMLObject::deregisterIDAttributes();
 
-#ifndef XMLTOOLING_NO_XMLSEC
-    StorageServiceManager.deregisterFactories();
     termSOAPTransports();
     SOAPTransportManager.deregisterFactories();
+
+#ifndef XMLTOOLING_LITE
+    StorageServiceManager.deregisterFactories();
+#endif
+
+#ifndef XMLTOOLING_NO_XMLSEC
     TrustEngineManager.deregisterFactories();
     CredentialResolverManager.deregisterFactories();
     KeyInfoResolverManager.deregisterFactories();
@@ -569,6 +579,9 @@ void XMLToolingInternalConfig::term()
     delete m_validatingPool;
     m_validatingPool=nullptr;
 
+    for_each(m_namedLocks.begin(), m_namedLocks.end(), cleanup_pair<string,Mutex>());
+    m_namedLocks.clear();
+
 #ifndef XMLTOOLING_NO_XMLSEC
     delete m_xsecProvider;
     m_xsecProvider=nullptr;
@@ -592,6 +605,17 @@ Lockable* XMLToolingInternalConfig::lock()
 void XMLToolingInternalConfig::unlock()
 {
     m_lock->unlock();
+}
+
+Mutex& XMLToolingInternalConfig::getNamedMutex(const char* name)
+{
+    Locker glock(this);
+    map<string,Mutex*>::const_iterator m = m_namedLocks.find(name);
+    if (m != m_namedLocks.end())
+        return *(m->second);
+    Mutex* newlock = Mutex::create();
+    m_namedLocks[name] = newlock;
+    return *newlock;
 }
 
 bool XMLToolingInternalConfig::load_library(const char* path, void* context)

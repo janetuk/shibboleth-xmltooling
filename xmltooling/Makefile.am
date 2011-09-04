@@ -78,6 +78,9 @@ secinclude_HEADERS = \
 	security/KeyInfoCredentialContext.h \
 	security/KeyInfoResolver.h \
 	security/OpenSSLCredential.h \
+	security/OpenSSLPathValidator.h \
+	security/PathValidator.h \
+	security/PKIXPathValidatorParams.h \
 	security/SecurityHelper.h \
 	security/SignatureTrustEngine.h \
 	security/TrustEngine.h \
@@ -143,6 +146,7 @@ xmlsec_sources = \
 	security/impl/InlineKeyResolver.cpp \
 	security/impl/KeyInfoResolver.cpp \
 	security/impl/OpenSSLCryptoX509CRL.cpp \
+	security/impl/PKIXPathValidator.cpp \
 	security/impl/SecurityHelper.cpp \
 	security/impl/StaticPKIXTrustEngine.cpp \
 	security/impl/TrustEngine.cpp \

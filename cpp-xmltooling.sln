@@ -12,7 +12,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{61BF324D-2
 		doxygen.cfg = doxygen.cfg
 		m4\doxygen.m4 = m4\doxygen.m4
 		Makefile.am = Makefile.am
-		xmltooling.spec.in = xmltooling.spec.in
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Schemas", "Schemas", "{23EF5C29-2A13-4F73-99D1-96B8120F148E}"
@@ -75,7 +74,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Doc", "Doc", "{847EC34E-006
 		doc\LICENSE.txt = doc\LICENSE.txt
 		doc\LOG4CPP.LICENSE = doc\LOG4CPP.LICENSE
 		doc\Makefile.am = doc\Makefile.am
-		doc\NOTICE.txt = doc\NOTICE.txt
 		doc\OPENSSL.LICENSE = doc\OPENSSL.LICENSE
 		doc\README.txt = doc\README.txt
 	EndProjectSection

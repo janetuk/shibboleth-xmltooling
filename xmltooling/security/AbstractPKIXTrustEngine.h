@@ -36,6 +36,7 @@
 
 namespace xmltooling {
 
+    class XMLTOOL_API OpenSSLPathValidator;
     class XMLTOOL_API XSECCryptoX509CRL;
 
     /**
@@ -54,6 +55,7 @@ namespace xmltooling {
          *  <li>checkRevocation attribute (off, entityOnly, fullChain)
          *  <li>policyMappingInhibit attribute (boolean)
          *  <li>anyPolicyInhibit attribute (boolean)
+         *  <li>&t;PathValidator&gt; element (zero or more)
          *  <li>&lt;TrustedName&gt; element (zero or more)
          *  <li>&lt;PolicyOID&gt; element (zero or more)
          * </ul>
@@ -61,6 +63,9 @@ namespace xmltooling {
          * @param e DOM to supply configuration for provider
          */
         AbstractPKIXTrustEngine(const xercesc::DOMElement* e=nullptr);
+
+        /** Plugins used to perform path validation. */
+        std::vector<OpenSSLPathValidator*> m_pathValidators;
 
         /** Controls revocation checking, currently limited to CRLs and supports "off", "entityOnly", "fullChain". */
         std::string m_checkRevocation;
@@ -198,6 +203,8 @@ namespace xmltooling {
             CredentialCriteria* criteria=nullptr,
             const std::vector<XSECCryptoX509CRL*>* inlineCRLs=nullptr
             ) const;
+
+        friend class XMLTOOL_DLLLOCAL PKIXParams;
     };
 };
 

@@ -235,7 +235,6 @@ namespace xmltooling {
         virtual long getStatusCode() const;
     };
 
-#ifndef XMLTOOLING_NO_XMLSEC
     /**
      * Registers SOAPTransport classes into the runtime.
      */
@@ -250,7 +249,6 @@ namespace xmltooling {
      * Notifies transport infrastructure to shutdown.
      */
     void XMLTOOL_API termSOAPTransports();
-#endif
 
 };
 

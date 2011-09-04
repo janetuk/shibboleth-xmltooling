@@ -44,7 +44,10 @@
 #include "XMLToolingConfig.h"
 #include "util/ParserPool.h"
 
+#include <map>
+#include <string>
 #include <vector>
+
 #ifndef XMLTOOLING_NO_XMLSEC
     #include <xsec/framework/XSECProvider.hpp>
 #endif
@@ -95,6 +98,9 @@ namespace xmltooling {
         Lockable* lock();
         void unlock();
 
+        // named mutexes to limit lock scope
+        Mutex& getNamedMutex(const char* name);
+
         // configuration
         bool load_library(const char* path, void* context=nullptr);
         bool log_config(const char* config=nullptr);
@@ -126,6 +132,7 @@ namespace xmltooling {
     private:
         int m_initCount;
         Mutex* m_lock;
+        std::map<std::string,Mutex*> m_namedLocks;
         std::vector<void*> m_libhandles;
         ParserPool* m_parserPool;
         ParserPool* m_validatingPool;

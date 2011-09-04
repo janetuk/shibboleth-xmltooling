@@ -28,6 +28,7 @@
 #include "exceptions.h"
 #include "logging.h"
 #include "soap/HTTPSOAPTransport.h"
+#include "soap/OpenSSLSOAPTransport.h"
 #include "soap/SOAP.h"
 #include "soap/SOAPClient.h"
 #include "util/XMLHelper.h"
@@ -40,6 +41,32 @@ using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace xercesc;
 using namespace std;
+
+#if !defined(XMLTOOLING_NO_XMLSEC) && !defined(XMLTOOLING_LITE)
+namespace xmltooling {
+    PluginManager<SOAPTransport,string,SOAPTransport::Address>::Factory CURLSOAPTransportFactory;
+};
+#endif
+
+void xmltooling::registerSOAPTransports()
+{
+#if !defined(XMLTOOLING_NO_XMLSEC) && !defined(XMLTOOLING_LITE)
+    XMLToolingConfig& conf=XMLToolingConfig::getConfig();
+    conf.SOAPTransportManager.registerFactory("http", CURLSOAPTransportFactory);
+    conf.SOAPTransportManager.registerFactory("https", CURLSOAPTransportFactory);
+#endif
+}
+
+
+#ifdef XMLTOOLING_NO_XMLSEC
+void xmltooling::initSOAPTransports()
+{
+}
+
+void xmltooling::termSOAPTransports()
+{
+}
+#endif
 
 SOAPTransport::SOAPTransport()
 {
@@ -83,6 +110,16 @@ bool HTTPSOAPTransport::followRedirects(bool follow, unsigned int maxRedirs)
 {
     return false;
 }
+
+#ifndef XMLTOOLING_NO_XMLSEC
+OpenSSLSOAPTransport::OpenSSLSOAPTransport()
+{
+}
+
+OpenSSLSOAPTransport::~OpenSSLSOAPTransport()
+{
+}
+#endif
 
 SOAPClient::SOAPClient(bool validate) : m_validate(validate), m_transport(nullptr)
 {
