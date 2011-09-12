@@ -1113,7 +1113,8 @@
  */
 #define PROC_QNAME_ATTRIB(proper,ucase,namespaceURI) \
     if (xmltooling::XMLHelper::isNodeNamed(attribute, namespaceURI, ucase##_ATTRIB_NAME)) { \
-        set##proper(XMLHelper::getAttributeValueAsQName(attribute)); \
+        auto_ptr<xmltooling::QName> q(XMLHelper::getAttributeValueAsQName(attribute)); \
+        set##proper(q.get()); \
         return; \
     }
 

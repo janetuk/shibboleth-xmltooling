@@ -31,6 +31,7 @@
  */
 
 #include "internal.h"
+#include "unicode.h"
 #include "util/DateTime.h"
 
 #ifndef WIN32
@@ -1315,18 +1316,17 @@ double DateTime::parseMiliSecond(const int start, const int end) const
     XMLString::copyNString(miliSecData, &(fBuffer[start-1]), miliSecLen);
     *(miliSecData + miliSecLen) = chNull;
 
-    char *nptr = XMLString::transcode(miliSecData);
-    ArrayJanitor<char> jan(nptr);
-    size_t   strLen = strlen(nptr);
+    auto_ptr_char nptr(miliSecData);
+    size_t   strLen = strlen(nptr.get());
     char *endptr = 0;
     errno = 0;
 
     //printf("milisec=<%s>\n", nptr);
 
-    double retVal = strtod(nptr, &endptr);
+    double retVal = strtod(nptr.get(), &endptr);
 
     // check if all chars are valid char
-    if ( (endptr - nptr) != strLen)
+    if ( (endptr - nptr.get()) != strLen)
         throw XMLParserException("Invalid non-numeric characters.");
 
     // we don't check underflow occurs since

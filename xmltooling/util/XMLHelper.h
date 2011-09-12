@@ -104,6 +104,7 @@ namespace xmltooling {
 
         /**
          * Gets the XSI type for a given element if it has one.
+         * <p>The caller is responsible for freeing the result.
          *
          * @param e the element
          * @return the type or null
@@ -158,6 +159,7 @@ namespace xmltooling {
         /**
          * @deprecated
          * Constructs a QName from an attribute's value.
+         * <p>The caller is responsible for freeing the result.
          *
          * @param attribute the attribute with a QName value
          * @return a QName from an attribute's value, or null if the given attribute is null
@@ -166,6 +168,7 @@ namespace xmltooling {
 
         /**
          * Constructs a QName from a node's value.
+         * <p>The caller is responsible for freeing the result.
          *
          * @param domNode the DOM node with a QName value
          * @return a QName from a node's value, or null if the given node has no value

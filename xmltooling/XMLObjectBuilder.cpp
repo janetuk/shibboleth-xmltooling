@@ -55,8 +55,9 @@ XMLObject* XMLObjectBuilder::buildFromQName(const QName& q) const
 
 XMLObject* XMLObjectBuilder::buildFromElement(DOMElement* element, bool bindDocument) const
 {
+    auto_ptr<QName> schemaType(XMLHelper::getXSIType(element));
     auto_ptr<XMLObject> ret(
-        buildObject(element->getNamespaceURI(),element->getLocalName(),element->getPrefix(),XMLHelper::getXSIType(element))
+        buildObject(element->getNamespaceURI(),element->getLocalName(),element->getPrefix(),schemaType.get())
         );
     ret->unmarshall(element,bindDocument);
     return ret.release();
