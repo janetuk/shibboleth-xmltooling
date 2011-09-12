@@ -35,11 +35,13 @@
 #include "util/Threads.h"
 #include "util/XMLHelper.h"
 
+#include <memory>
 #include <algorithm>
 #include <fstream>
 #include <openssl/x509_vfy.h>
 #include <openssl/x509v3.h>
 #include <xsec/enc/OpenSSL/OpenSSLCryptoX509.hpp>
+#include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmltooling::logging;
 using namespace xmltooling;
