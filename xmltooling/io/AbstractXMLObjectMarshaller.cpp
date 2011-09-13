@@ -281,7 +281,7 @@ void AbstractXMLObjectMarshaller::marshallElementType(DOMElement* domElement) co
         }   
         domElement->setAttributeNS(XSI_NS, xsitype, xsivalue);
         if (xsivalue != typeLocalName)
-            XMLString::release(&xsivalue);
+            delete[] xsivalue;
 
         m_log.debug("adding XSI namespace to list of namespaces visibly used by XMLObject");
         addNamespace(Namespace(XSI_NS, XSI_PREFIX, false, Namespace::VisiblyUsed));
