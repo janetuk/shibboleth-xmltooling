@@ -67,25 +67,6 @@ using namespace xmltooling;
 using namespace xercesc;
 using namespace std;
 
-#ifndef XMLTOOLING_LITE
-namespace {
-    class XMLTOOL_DLLLOCAL DummyCredentialResolver : public CredentialResolver
-    {
-    public:
-        DummyCredentialResolver() {}
-        ~DummyCredentialResolver() {}
-
-        Lockable* lock() {return this;}
-        void unlock() {}
-
-        const Credential* resolve(const CredentialCriteria* criteria=nullptr) const {return nullptr;}
-        vector<const Credential*>::size_type resolve(
-            vector<const Credential*>& results, const CredentialCriteria* criteria=nullptr
-            ) const {return 0;}
-    };
-};
-#endif
-
 static const XMLCh id[] =               UNICODE_LITERAL_2(i,d);
 static const XMLCh uri[] =              UNICODE_LITERAL_3(u,r,i);
 static const XMLCh url[] =              UNICODE_LITERAL_3(u,r,l);
@@ -614,8 +595,10 @@ void ReloadableXMLFile::validateSignature(Signature& sigObj) const
         }
     }
     else if (m_trust) {
-        DummyCredentialResolver dummy;
-        if (m_trust->validate(sigObj, dummy, &cc))
+        auto_ptr<CredentialResolver> dummy(
+            XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(DUMMY_CREDENTIAL_RESOLVER, nullptr)
+            );
+        if (m_trust->validate(sigObj, *(dummy.get()), &cc))
             return;
         throw XMLSecurityException("TrustEngine unable to verify signature.");
     }
