@@ -52,7 +52,7 @@ namespace xmltooling {
         /**
          * Creates a new "short" record in the storage service.
          * 
-         * @param context       a storage context label
+         * @param context       a storage context label of up to 255 bytes
          * @param key           null-terminated unique key of up to 255 bytes
          * @param value         null-terminated value of up to 255 bytes to store
          * @param expiration    an expiration timestamp, after which the record can be purged
@@ -67,7 +67,7 @@ namespace xmltooling {
          *
          * <p>The version parameter can be set for "If-Modified-Since" semantics.
          * 
-         * @param context       a storage context label
+         * @param context       a storage context label of up to 255 bytes
          * @param key           null-terminated unique key of up to 255 bytes
          * @param pvalue        location in which to return the record value
          * @param pexpiration   location in which to return the expiration timestamp
@@ -83,7 +83,7 @@ namespace xmltooling {
         /**
          * Updates an existing "short" record in the storage service.
          * 
-         * @param context       a storage context label
+         * @param context       a storage context label of up to 255 bytes
          * @param key           null-terminated unique key of up to 255 bytes
          * @param value         null-terminated value of up to 255 bytes to store, or nullptr to leave alone
          * @param expiration    a new expiration timestamp, or 0 to leave alone
@@ -100,7 +100,7 @@ namespace xmltooling {
         /**
          * Deletes an existing "short" record from the storage service.
          * 
-         * @param context       a storage context label
+         * @param context       a storage context label of up to 255 bytes
          * @param key           null-terminated unique key of up to 255 bytes
          * @return true iff the record existed and was deleted
          *    
@@ -111,7 +111,7 @@ namespace xmltooling {
         /**
          * Creates a new "long" record in the storage service.
          * 
-         * @param context       a storage context label
+         * @param context       a storage context label of up to 255 bytes
          * @param key           null-terminated unique key of up to 255 bytes
          * @param value         null-terminated value of arbitrary length
          * @param expiration    an expiration timestamp, after which the record can be purged
@@ -126,7 +126,7 @@ namespace xmltooling {
          *
          * <p>The version parameter can be set for "If-Modified-Since" semantics.
          * 
-         * @param context       a storage context label
+         * @param context       a storage context label of up to 255 bytes
          * @param key           null-terminated unique key of up to 255 bytes
          * @param pvalue        location in which to return the record value
          * @param pexpiration   location in which to return the expiration timestamp
@@ -142,7 +142,7 @@ namespace xmltooling {
         /**
          * Updates an existing "long" record in the storage service.
          * 
-         * @param context       a storage context label
+         * @param context       a storage context label of up to 255 bytes
          * @param key           null-terminated unique key of up to 255 bytes
          * @param value         null-terminated value of arbitrary length to store, or nullptr to leave alone
          * @param expiration    a new expiration timestamp, or 0 to leave alone
@@ -159,7 +159,7 @@ namespace xmltooling {
         /**
          * Deletes an existing "long" record from the storage service.
          * 
-         * @param context       a storage context label
+         * @param context       a storage context label of up to 255 bytes
          * @param key           null-terminated unique key of up to 255 bytes
          * @return true iff the record existed and was deleted
          *    
