@@ -25,16 +25,19 @@
  */
 
 #include "internal.h"
+#include "logging.h"
+#include "security/SecurityHelper.h"
 #include "util/ReplayCache.h"
-#include "util/StorageService.h"
 
+using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace std;
 
-ReplayCache::ReplayCache(StorageService* storage) : m_owned(storage==nullptr), m_storage(storage)
+ReplayCache::ReplayCache(StorageService* storage)
+    : m_owned(storage==nullptr),
+        m_storage(storage ? storage : XMLToolingConfig::getConfig().StorageServiceManager.newPlugin(MEMORY_STORAGE_SERVICE, nullptr)),
+        m_storageCaps(m_storage->getCapabilities())
 {
-    if (!m_storage)
-        m_storage = XMLToolingConfig::getConfig().StorageServiceManager.newPlugin(MEMORY_STORAGE_SERVICE, nullptr);
 }
 
 ReplayCache::~ReplayCache()
@@ -45,6 +48,30 @@ ReplayCache::~ReplayCache()
 
 bool ReplayCache::check(const char* context, const char* s, time_t expires)
 {
+    if (strlen(context) > m_storageCaps.getContextSize()) {
+        // This is a design/coding failure.
+        Category::getInstance(XMLTOOLING_LOGCAT".ReplayCache").error(
+            "context (%s) too long for StorageService (limit %u)", context, m_storageCaps.getContextSize()
+            );
+        return false;
+    }
+    else if (strlen(s) > m_storageCaps.getKeySize()) {
+        // This is something to work around with a hash.
+#ifndef XMLTOOLING_NO_XMLSEC
+        string h = SecurityHelper::doHash("SHA1", s, strlen(s));
+        // In storage already?
+        if (m_storage->readString(context, h.c_str()))
+            return false;
+        m_storage->createString(context, h.c_str(), "x", expires);
+        return true;
+#else
+        Category::getInstance(XMLTOOLING_LOGCAT".ReplayCache").error(
+            "key (%s) too long for StorageService (limit %u)", s, m_storageCaps.getKeySize()
+            );
+        return false;
+#endif
+    }
+
     // In storage already?
     if (m_storage->readString(context, s))
         return false;

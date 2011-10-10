@@ -30,6 +30,10 @@
 using namespace xmltooling;
 using namespace std;
 
+namespace {
+    static const XMLTOOL_DLLLOCAL StorageService::Capabilities g_ssCaps(255, 255, 255);
+};
+
 namespace xmltooling {
     XMLTOOL_DLLLOCAL PluginManager<StorageService,string,const xercesc::DOMElement*>::Factory MemoryStorageServiceFactory; 
 };
@@ -46,4 +50,33 @@ StorageService::StorageService()
 
 StorageService::~StorageService()
 {
+}
+
+const StorageService::Capabilities& StorageService::getCapabilities() const
+{
+    return g_ssCaps;
+}
+
+StorageService::Capabilities::Capabilities(unsigned int contextSize, unsigned int keySize, unsigned int stringSize)
+    : m_contextSize(contextSize), m_keySize(keySize), m_stringSize(stringSize)
+{
+}
+
+StorageService::Capabilities::~Capabilities()
+{
+}
+
+unsigned int StorageService::Capabilities::getContextSize() const
+{
+    return m_contextSize;
+}
+
+unsigned int StorageService::Capabilities::getKeySize() const
+{
+    return m_keySize;
+}
+
+unsigned int StorageService::Capabilities::getStringSize() const
+{
+    return m_stringSize;
 }

@@ -40,12 +40,21 @@ using namespace std;
 
 using xercesc::DOMElement;
 
+namespace {
+    // Reasonably extended sizes to avoid callers needing to shrink unduly.
+    static const XMLTOOL_DLLLOCAL StorageService::Capabilities g_memCaps(0x4000, 0x4000, 0x4000);
+};
+
 namespace xmltooling {
     class XMLTOOL_DLLLOCAL MemoryStorageService : public StorageService
     {
     public:
         MemoryStorageService(const DOMElement* e);
         virtual ~MemoryStorageService();
+
+        const Capabilities& getCapabilities() const {
+            return g_memCaps;
+        }
 
         bool createString(const char* context, const char* key, const char* value, time_t expiration);
         int readString(const char* context, const char* key, string* pvalue=nullptr, time_t* pexpiration=nullptr, int version=0);

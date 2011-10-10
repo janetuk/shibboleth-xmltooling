@@ -28,6 +28,7 @@
 #define __xmltooling_replay_h__
 
 #include <xmltooling/base.h>
+#include <xmltooling/util/StorageService.h>
 
 namespace xmltooling {
 
@@ -74,6 +75,7 @@ namespace xmltooling {
     private:
         bool m_owned;
         StorageService* m_storage;
+        const StorageService::Capabilities& m_storageCaps;
     };
 };
 
