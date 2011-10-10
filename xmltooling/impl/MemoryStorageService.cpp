@@ -47,29 +47,23 @@ namespace xmltooling {
         MemoryStorageService(const DOMElement* e);
         virtual ~MemoryStorageService();
 
-        bool createString(const char* context, const char* key, const char* value, time_t expiration) {
-            if (m_log.isDebugEnabled() && value && strlen(value) > 255) {
-                m_log.debug("string value for key (%s) exceeded allowed length", key);
-            }
-            return createText(context, key, value, expiration);
-        }
-        int readString(const char* context, const char* key, string* pvalue=nullptr, time_t* pexpiration=nullptr, int version=0) {
-            return readText(context, key, pvalue, pexpiration, version);
-        }
-        int updateString(const char* context, const char* key, const char* value=nullptr, time_t expiration=0, int version=0) {
-            if (m_log.isDebugEnabled() && value && strlen(value) > 255) {
-                m_log.debug("string value for key (%s) exceeded allowed length", key);
-            }
-            return updateText(context, key, value, expiration, version);
-        }
-        bool deleteString(const char* context, const char* key) {
-            return deleteText(context, key);
-        }
+        bool createString(const char* context, const char* key, const char* value, time_t expiration);
+        int readString(const char* context, const char* key, string* pvalue=nullptr, time_t* pexpiration=nullptr, int version=0);
+        int updateString(const char* context, const char* key, const char* value=nullptr, time_t expiration=0, int version=0);
+        bool deleteString(const char* context, const char* key);
 
-        bool createText(const char* context, const char* key, const char* value, time_t expiration);
-        int readText(const char* context, const char* key, string* pvalue=nullptr, time_t* pexpiration=nullptr, int version=0);
-        int updateText(const char* context, const char* key, const char* value=nullptr, time_t expiration=0, int version=0);
-        bool deleteText(const char* context, const char* key);
+        bool createText(const char* context, const char* key, const char* value, time_t expiration) {
+            return createString(context, key, value, expiration);
+        }
+        int readText(const char* context, const char* key, string* pvalue=nullptr, time_t* pexpiration=nullptr, int version=0) {
+            return readString(context, key, pvalue, pexpiration, version);
+        }
+        int updateText(const char* context, const char* key, const char* value=nullptr, time_t expiration=0, int version=0) {
+            return updateString(context, key, value, expiration, version);
+        }
+        bool deleteText(const char* context, const char* key) {
+            return deleteString(context, key);
+        }
 
         void reap(const char* context);
         void updateContext(const char* context, time_t expiration);
@@ -218,16 +212,8 @@ unsigned long MemoryStorageService::Context::reap(time_t exp)
     return count;
 }
 
-bool MemoryStorageService::createText(const char* context, const char* key, const char* value, time_t expiration)
+bool MemoryStorageService::createString(const char* context, const char* key, const char* value, time_t expiration)
 {
-    // This doesn't matter for this implementation, but helps identify bugs that might break others.
-    if (m_log.isDebugEnabled()) {
-        if (strlen(context) > 255)
-            m_log.debug("context value (%s) exceeded allowed length", context);
-        if (strlen(key) > 255)
-            m_log.debug("key value (%s) in context (%s) exceeded allowed length", key, context);
-    }
-
     Context& ctx = writeContext(context);
     SharedLock locker(m_lock, false);
 
@@ -247,7 +233,7 @@ bool MemoryStorageService::createText(const char* context, const char* key, cons
     return true;
 }
 
-int MemoryStorageService::readText(const char* context, const char* key, string* pvalue, time_t* pexpiration, int version)
+int MemoryStorageService::readString(const char* context, const char* key, string* pvalue, time_t* pexpiration, int version)
 {
     Context& ctx = readContext(context);
     SharedLock locker(m_lock, false);
@@ -266,7 +252,7 @@ int MemoryStorageService::readText(const char* context, const char* key, string*
     return i->second.version;
 }
 
-int MemoryStorageService::updateText(const char* context, const char* key, const char* value, time_t expiration, int version)
+int MemoryStorageService::updateString(const char* context, const char* key, const char* value, time_t expiration, int version)
 {
     Context& ctx = writeContext(context);
     SharedLock locker(m_lock, false);
@@ -292,7 +278,7 @@ int MemoryStorageService::updateText(const char* context, const char* key, const
     return i->second.version;
 }
 
-bool MemoryStorageService::deleteText(const char* context, const char* key)
+bool MemoryStorageService::deleteString(const char* context, const char* key)
 {
     Context& ctx = writeContext(context);
     SharedLock locker(m_lock, false);
