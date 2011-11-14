@@ -30,12 +30,14 @@
 #include <xmltooling/base.h>
 
 #if defined(XMLTOOLING_LOG4SHIB)
+# define LOG4SHIB_HAVE_INT64_T 1
 # include <log4shib/Category.hh>
 # include <log4shib/CategoryStream.hh>
 namespace xmltooling {
     namespace logging = log4shib;
 };
 #elif defined(XMLTOOLING_LOG4CPP)
+# define LOG4CPP_HAVE_INT64_T 1
 # include <log4cpp/Category.hh>
 # include <log4cpp/CategoryStream.hh>
 namespace xmltooling {
