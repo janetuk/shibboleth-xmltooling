@@ -236,6 +236,12 @@ bool ParserPool::loadSchema(const XMLCh* nsURI, const XMLCh* pathname)
     return true;
 }
 
+bool ParserPool::loadCatalog(const char* pathname)
+{
+    auto_ptr_XMLCh temp(pathname);
+    return loadCatalog(temp.get());
+}
+
 bool ParserPool::loadCatalog(const XMLCh* pathname)
 {
 #if _DEBUG
