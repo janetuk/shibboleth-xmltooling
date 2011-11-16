@@ -698,8 +698,8 @@
         } \
         void set##proper(int proper) { \
             char buf##proper[64]; \
-            sprintf(buf##proper,"%d",proper); \
-            auto_ptr_XMLCh wide##proper(buf##proper); \
+            std::sprintf(buf##proper,"%d",proper); \
+            xmltooling::auto_ptr_XMLCh wide##proper(buf##proper); \
             set##proper(wide##proper.get()); \
         }
 
@@ -738,7 +738,7 @@
         } \
         void set##proper(const type* proper) { \
             m_##proper = prepareForAssignment(m_##proper,proper); \
-            XMLString::release(&m_##proper##Prefix); \
+            xercesc::XMLString::release(&m_##proper##Prefix); \
             m_##proper##Prefix = nullptr; \
         }
 
@@ -1019,7 +1019,7 @@
  */
 #define MARSHALL_QNAME_ATTRIB(proper,ucase,namespaceURI) \
     if (m_##proper) { \
-        auto_ptr_XMLCh qstr(m_##proper->toString().c_str()); \
+        xmltooling::auto_ptr_XMLCh qstr(m_##proper->toString().c_str()); \
         domElement->setAttributeNS(namespaceURI, ucase##_ATTRIB_NAME, qstr.get()); \
     }
 
@@ -1113,7 +1113,7 @@
  */
 #define PROC_QNAME_ATTRIB(proper,ucase,namespaceURI) \
     if (xmltooling::XMLHelper::isNodeNamed(attribute, namespaceURI, ucase##_ATTRIB_NAME)) { \
-        auto_ptr<xmltooling::QName> q(XMLHelper::getAttributeValueAsQName(attribute)); \
+        std::auto_ptr<xmltooling::QName> q(xmltooling::XMLHelper::getAttributeValueAsQName(attribute)); \
         set##proper(q.get()); \
         return; \
     }
@@ -1251,7 +1251,7 @@
     XMLTOOLING_DOXYGEN(Sets proper.) \
     void set##proper(int proper) { \
         char buf[64]; \
-        sprintf(buf,"%d",proper); \
+        std::sprintf(buf,"%d",proper); \
         xmltooling::auto_ptr_XMLCh widebuf(buf); \
         setTextContent(widebuf.get()); \
     } \
