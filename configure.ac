@@ -160,13 +160,16 @@ else
 fi
 
 # Xerces settings
-AC_ARG_WITH(xerces, 
-    AS_HELP_STRING([--with-xerces=PATH], [where xerces-c is installed]),
-    [if test x_$with_xerces != x_/usr; then
-        LDFLAGS="-L${with_xerces}/lib $LDFLAGS"
-        CPPFLAGS="-I${with_xerces}/include $CPPFLAGS"
-    fi])
-LIBS="-lxerces-c $LIBS"
+AC_ARG_WITH(xerces,
+    AS_HELP_STRING([--with-xerces=PATH],[where xerces-c is installed]),,
+    [with_xerces=/usr])
+if test x_$with_xerces != x_/usr; then
+    CPPFLAGS="-I${with_xerces}/include $CPPFLAGS"
+    LIBS="-L${with_xerces}/lib -lxerces-c $LIBS"
+else
+    LIBS="-lxerces-c $LIBS"
+fi
+
 AC_CHECK_HEADER([xercesc/dom/DOM.hpp],,AC_MSG_ERROR([unable to find xerces header files]))
 AC_MSG_CHECKING([Xerces version])
 AC_PREPROC_IFELSE(
@@ -281,9 +284,10 @@ if test x_$with_xmlsec != x_no; then
 
     if test x_$with_xmlsec != x_/usr; then
         CPPFLAGS="-I${with_xmlsec}/include $CPPFLAGS"
-        XMLSEC_LIBS="$XMLSEC_LIBS -L${with_xmlsec}/lib"
-    fi        
-    XMLSEC_LIBS="$XMLSEC_LIBS -lxml-security-c"
+        XMLSEC_LIBS="-L${with_xmlsec}/lib -lxml-security-c $XMLSEC_LIBS"
+    else
+        XMLSEC_LIBS="-lxml-security-c $XMLSEC_LIBS"
+    fi
     
     # save and append master libs
     save_LIBS="$LIBS"
@@ -367,7 +371,7 @@ int i = 0;
     LIBS="$XMLSEC_LIBS $LIBS"
 	
     AC_CHECK_HEADER([curl/curl.h],,AC_MSG_ERROR([unable to find libcurl header files]))
-    AC_CHECK_LIB([curl],[curl_global_init],,AC_MSG_ERROR([unable to link with libcurl]))
+    AC_CHECK_LIB([curl],[curl_global_init],[],AC_MSG_ERROR([unable to link with libcurl]))
     AC_MSG_CHECKING([for CURLOPT_SSL_CTX_FUNCTION in curl.h])
     AC_EGREP_HEADER([CURLOPT_SSL_CTX_FUNCTION], [curl/curl.h],
         [AC_MSG_RESULT(yes)],
