@@ -371,12 +371,15 @@ int i = 0;
     LIBS="$XMLSEC_LIBS $LIBS"
 	
     AC_CHECK_HEADER([curl/curl.h],,AC_MSG_ERROR([unable to find libcurl header files]))
-    AC_CHECK_LIB([curl],[curl_global_init],[],AC_MSG_ERROR([unable to link with libcurl]))
+    AC_LINK_IFELSE(
+        [AC_LANG_PROGRAM([[#include <curl/curl.h>]],
+            [[curl_global_init(CURL_GLOBAL_ALL)]])],,
+        [AC_MSG_ERROR([unable to link with libcurl])])
     AC_MSG_CHECKING([for CURLOPT_SSL_CTX_FUNCTION in curl.h])
     AC_EGREP_HEADER([CURLOPT_SSL_CTX_FUNCTION], [curl/curl.h],
         [AC_MSG_RESULT(yes)],
         [AC_MSG_ERROR([need libcurl that supports CURLOPT_SSL_CTX_FUNCTION])])
-    AC_CHECK_TYPE([curl_off_t],[AC_DEFINE([HAVE_CURL_OFF_T],[1],[Define to 1 if you have the 'curl_off_t' type.])])
+    AC_CHECK_TYPE([curl_off_t],[AC_DEFINE([HAVE_CURL_OFF_T],[1],[Define to 1 if you have the 'curl_off_t' type.])],,[[#include <curl/curl.h>]])
     
     # restore master libs
     LIBS="$save_LIBS"
