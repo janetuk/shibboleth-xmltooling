@@ -16,7 +16,7 @@ BuildRequires:  libxerces-c-devel >= 2.8.0
 BuildRequires:  libxml-security-c-devel >= 1.4.0
 %{?_with_log4cpp:BuildRequires: liblog4cpp-devel >= 1.0}
 %{!?_with_log4cpp:BuildRequires: liblog4shib-devel}
-BuildRequires: gcc-c++, openssl-devel
+BuildRequires: gcc-c++, openssl-devel, boost-devel >= 1.32.0
 %if 0%{?rhel} >= 6 || 0%{?centos_version} >= 600
 BuildRequires: libcurl-openssl-devel >= 7.21.7
 Requires: libcurl-openssl >= 7.21.7
@@ -158,8 +158,9 @@ This package includes XML schemas and related files.
 %doc %{pkgdocdir}
 
 %changelog
-* Mon Aug 8 2011 Scott Cantor  <cantor.2@osu.edu>  - 1.5-1
+* Mon Nov 14 2011 Scott Cantor  <cantor.2@osu.edu>  - 1.5-1
 - Update lib package number.
+- Add boost-devel dependency.
 
 * Sun Jun 26 2011  Scott Cantor  <cantor.2@osu.edu>  - 1.4.2-1
 - Override curl build for RHEL6.

@@ -675,7 +675,7 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
         if (fn(context)!=0)
             throw runtime_error(string("detected error in xmltooling_extension_init in ") + resolved);
     }
-    catch(exception&) {
+    catch(std::exception&) {
         if (handle)
             dlclose(handle);
         throw;
