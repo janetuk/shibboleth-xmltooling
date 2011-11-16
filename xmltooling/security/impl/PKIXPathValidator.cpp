@@ -51,8 +51,11 @@ using namespace std;
 namespace {
     static int XMLTOOL_DLLLOCAL error_callback(int ok, X509_STORE_CTX* ctx)
     {
-        if (!ok)
-            Category::getInstance("OpenSSL").error("path validation failure: %s", X509_verify_cert_error_string(ctx->error));
+        if (!ok) {
+            Category::getInstance("OpenSSL").error(
+                "path validation failure at depth(%d): %s", ctx->error_depth, X509_verify_cert_error_string(ctx->error)
+                );
+        }
         return ok;
     }
 
@@ -400,17 +403,21 @@ bool PKIXPathValidator::validate(X509* EE, STACK_OF(X509)* untrusted, const Path
 #endif
     }
 
+    if (ret == 1) {
+        m_log.debug("successfully validated certificate chain");
+    }
+#if (OPENSSL_VERSION_NUMBER < 0x10000000L)
+    else if (X509_STORE_CTX_get_error(&ctx) == X509_V_ERR_NO_EXPLICIT_POLICY && !pkixParams->isPolicyMappingInhibited()) {
+        m_log.warn("policy mapping requires OpenSSL 1.0.0 or later");
+    }
+#endif
+
     // Clean up...
     X509_STORE_CTX_cleanup(&ctx);
     X509_STORE_free(store);
     sk_X509_free(CAstack);
 
-    if (ret==1) {
-        m_log.debug("successfully validated certificate chain");
-        return true;
-    }
-
-    return false;
+    return (ret == 1);
 }
 
 XSECCryptoX509CRL* PKIXPathValidator::getRemoteCRLs(const char* cdpuri) const
