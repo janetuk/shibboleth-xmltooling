@@ -55,6 +55,10 @@
 #endif
 
 #include <stdexcept>
+#include <boost/algorithm/string.hpp>
+#include <boost/lambda/bind.hpp>
+#include <boost/lambda/lambda.hpp>
+
 #if defined(XMLTOOLING_LOG4SHIB)
 # include <log4shib/PropertyConfigurator.hh>
 # include <log4shib/OstreamAppender.hh>
@@ -78,6 +82,8 @@ using namespace soap11;
 using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace xercesc;
+using namespace boost::lambda;
+using namespace boost;
 using namespace std;
 
 #ifdef WIN32
@@ -420,18 +426,13 @@ bool XMLToolingInternalConfig::init()
 
         // Load catalogs from path.
         if (!catalog_path.empty()) {
-            char* catpath=strdup(catalog_path.c_str());
-            char* sep=nullptr;
-            char* start=catpath;
-            while (start && *start) {
-                sep=strchr(start,PATH_SEPARATOR_CHAR);
-                if (sep)
-                    *sep=0;
-                auto_ptr_XMLCh temp(start);
-                m_validatingPool->loadCatalog(temp.get());
-                start = sep ? sep + 1 : nullptr;
-            }
-            free(catpath);
+            vector<string> catpaths;
+            split(catpaths, catalog_path, is_any_of(PATH_SEPARATOR_STR), algorithm::token_compress_on);
+            for_each(
+                catpaths.begin(), catpaths.end(),
+                // Call loadCatalog with an inner call to s->c_str() on each entry.
+                lambda::bind(static_cast<bool (ParserPool::*)(const char*)>(&ParserPool::loadCatalog), m_validatingPool, lambda::bind(&string::c_str,_1))
+                );
         }
 
         // default registrations
@@ -651,7 +652,7 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
             throw runtime_error(string("detected error in xmltooling_extension_init: ") + resolved);
         SetErrorMode(em);
     }
-    catch(exception&) {
+    catch(std::exception&) {
         if (handle)
             FreeLibrary(handle);
         SetErrorMode(em);
