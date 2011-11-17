@@ -359,7 +359,7 @@ bool XMLToolingInternalConfig::log_config(const char* config)
 #endif
 	}
     catch (const ConfigureFailure& e) {
-        string msg = string("failed to configure logging: ") + e.what();
+        string msg = string("error in file permissions or logging configuration: ") + e.what();
         Category::getInstance(XMLTOOLING_LOGCAT".Logging").crit(msg);
 #ifdef WIN32
         LogEvent(nullptr, EVENTLOG_ERROR_TYPE, 2100, nullptr, msg.c_str());
