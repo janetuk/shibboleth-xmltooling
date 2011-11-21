@@ -1263,7 +1263,7 @@
 /**
  * Implements cloning methods for an XMLObject specialization implementation class.
  *
- * @param cname    the name of the XMLObject specialization
+ * @param cname the name of the XMLObject specialization
  */
 #define IMPL_XMLOBJECT_CLONE(cname) \
     cname* clone##cname() const { \
@@ -1277,6 +1277,79 @@
             return ret; \
         } \
         return new cname##Impl(*this); \
+    }
+
+/**
+ * Implements cloning methods for an XMLObject specialization implementation class
+ * that must override a base class clone method.
+ *
+ * @param cname the name of the XMLObject specialization
+ * @param base  name of base type.
+ */
+#define IMPL_XMLOBJECT_CLONE2(cname,base) \
+    cname* clone##cname() const { \
+        return dynamic_cast<cname*>(clone()); \
+    } \
+    base* clone##base() const { \
+        return dynamic_cast<base*>(clone()); \
+    } \
+    xmltooling::XMLObject* clone() const { \
+        std::auto_ptr<xmltooling::XMLObject> domClone(xmltooling::AbstractDOMCachingXMLObject::clone()); \
+        cname##Impl* ret=dynamic_cast<cname##Impl*>(domClone.get()); \
+        if (ret) { \
+            domClone.release(); \
+            return ret; \
+        } \
+        return new cname##Impl(*this); \
+    }
+
+/**
+ * Implements cloning methods for an XMLObject specialization implementation class that
+ * needs two stage duplication to avoid invoking virtual methods during construction.
+ *
+ * @param cname the name of the XMLObject specialization
+ */
+#define IMPL_XMLOBJECT_CLONE_EX(cname) \
+    cname* clone##cname() const { \
+        return dynamic_cast<cname*>(clone()); \
+    } \
+    xmltooling::XMLObject* clone() const { \
+        std::auto_ptr<xmltooling::XMLObject> domClone(xmltooling::AbstractDOMCachingXMLObject::clone()); \
+        cname##Impl* ret=dynamic_cast<cname##Impl*>(domClone.get()); \
+        if (ret) { \
+            domClone.release(); \
+            return ret; \
+        } \
+        std::auto_ptr<cname##Impl> ret2(new cname##Impl(*this)); \
+        ret2->_clone(*this); \
+        return ret2.release(); \
+    }
+
+/**
+ * Implements cloning methods for an XMLObject specialization implementation class that
+ * needs two stage duplication to avoid invoking virtual methods during construction,
+ * and must override a base class clone method.
+ *
+ * @param cname the name of the XMLObject specialization
+ * @param base  name of base type
+ */
+#define IMPL_XMLOBJECT_CLONE_EX2(cname,base) \
+    cname* clone##cname() const { \
+        return dynamic_cast<cname*>(clone()); \
+    } \
+    base* clone##base() const { \
+        return dynamic_cast<base*>(clone()); \
+    } \
+    xmltooling::XMLObject* clone() const { \
+        std::auto_ptr<xmltooling::XMLObject> domClone(xmltooling::AbstractDOMCachingXMLObject::clone()); \
+        cname##Impl* ret=dynamic_cast<cname##Impl*>(domClone.get()); \
+        if (ret) { \
+            domClone.release(); \
+            return ret; \
+        } \
+        std::auto_ptr<cname##Impl> ret2(new cname##Impl(*this)); \
+        ret2->_clone(*this); \
+        return ret2.release(); \
     }
 
 /**

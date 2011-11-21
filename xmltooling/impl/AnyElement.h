@@ -63,6 +63,15 @@ namespace xmltooling {
         AnyElementImpl();
         AnyElementImpl(const AnyElementImpl& src);
         
+        /**
+         * Copies the content of a source object into a newly constructed instance.
+         * <p>Used to solve compiler problems that limit calling virtual functions
+         * from the actual copy constructor.
+         *
+         * @param src source to clone
+         */
+        void _clone(const AnyElementImpl& src);
+
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject,m_children.end());
         
         void marshallAttributes(xercesc::DOMElement* domElement) const;

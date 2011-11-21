@@ -45,8 +45,23 @@ AnyElementImpl::AnyElementImpl(const XMLCh* nsURI, const XMLCh* localName, const
 {
 }
 
+AnyElementImpl::AnyElementImpl(const AnyElementImpl& src)
+        : AbstractXMLObject(src),
+          AbstractDOMCachingXMLObject(src),
+          AbstractComplexElement(src),
+          AbstractAttributeExtensibleXMLObject(src)
+{
+}
+
 AnyElementImpl::~AnyElementImpl()
 {
+}
+
+void AnyElementImpl::_clone(const AnyElementImpl& src)
+{
+    const vector<XMLObject*>& children = src.getUnknownXMLObjects();
+    for (vector<XMLObject*>::const_iterator i=children.begin(); i!=children.end(); ++i)
+        getUnknownXMLObjects().push_back((*i)->clone());
 }
 
 XMLObject* AnyElementImpl::clone() const {
@@ -57,18 +72,10 @@ XMLObject* AnyElementImpl::clone() const {
         return ret;
     }
 
-    return new AnyElementImpl(*this);
+    auto_ptr<AnyElementImpl> ret2(new AnyElementImpl(*this));
+    ret2->_clone(*ret2.get());
+    return ret2.release();
 }
-
-AnyElementImpl::AnyElementImpl(const AnyElementImpl& src)
-        : AbstractXMLObject(src),
-          AbstractDOMCachingXMLObject(src),
-          AbstractComplexElement(src),
-          AbstractAttributeExtensibleXMLObject(src) {
-    const vector<XMLObject*>& children = src.getUnknownXMLObjects();
-    for (vector<XMLObject*>::const_iterator i=children.begin(); i!=children.end(); ++i)
-        getUnknownXMLObjects().push_back((*i)->clone());
-}       
 
 void AnyElementImpl::marshallAttributes(DOMElement* domElement) const
 {
