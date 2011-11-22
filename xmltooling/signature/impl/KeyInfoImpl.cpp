@@ -55,33 +55,6 @@ namespace xmlsignature {
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
-    public:
-        virtual ~DSAKeyValueImpl() {}
-
-        DSAKeyValueImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
-            : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
-            init();
-        }
-            
-        DSAKeyValueImpl(const DSAKeyValueImpl& src)
-                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
-            init();
-            if (src.getP())
-                setP(src.getP()->cloneP());
-            if (src.getQ())
-                setQ(src.getQ()->cloneQ());
-            if (src.getG())
-                setG(src.getG()->cloneG());
-            if (src.getY())
-                setY(src.getY()->cloneY());
-            if (src.getJ())
-                setJ(src.getJ()->cloneJ());
-            if (src.getSeed())
-                setSeed(src.getSeed()->cloneSeed());
-            if (src.getPgenCounter())
-                setPgenCounter(src.getPgenCounter()->clonePgenCounter());
-        }
-        
         void init() {
             m_P=nullptr;
             m_Q=nullptr;
@@ -111,7 +84,34 @@ namespace xmlsignature {
             m_pos_PgenCounter=m_pos_Seed;
             ++m_pos_PgenCounter;
         }
-        
+
+    public:
+        virtual ~DSAKeyValueImpl() {}
+
+        DSAKeyValueImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
+            : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
+            init();
+        }
+            
+        DSAKeyValueImpl(const DSAKeyValueImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
+            init();
+            if (src.getP())
+                setP(src.getP()->cloneP());
+            if (src.getQ())
+                setQ(src.getQ()->cloneQ());
+            if (src.getG())
+                setG(src.getG()->cloneG());
+            if (src.getY())
+                setY(src.getY()->cloneY());
+            if (src.getJ())
+                setJ(src.getJ()->cloneJ());
+            if (src.getSeed())
+                setSeed(src.getSeed()->cloneSeed());
+            if (src.getPgenCounter())
+                setPgenCounter(src.getPgenCounter()->clonePgenCounter());
+        }
+                
         IMPL_XMLOBJECT_CLONE(DSAKeyValue);
         IMPL_TYPED_CHILD(P);
         IMPL_TYPED_CHILD(Q);
@@ -140,6 +140,16 @@ namespace xmlsignature {
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
+        void init() {
+            m_Modulus=nullptr;
+            m_Exponent=nullptr;
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
+            m_pos_Modulus=m_children.begin();
+            m_pos_Exponent=m_pos_Modulus;
+            ++m_pos_Exponent;
+        }
+        
     public:
         virtual ~RSAKeyValueImpl() {}
 
@@ -155,16 +165,6 @@ namespace xmlsignature {
                 setModulus(src.getModulus()->cloneModulus());
             if (src.getExponent())
                 setExponent(src.getExponent()->cloneExponent());
-        }
-        
-        void init() {
-            m_Modulus=nullptr;
-            m_Exponent=nullptr;
-            m_children.push_back(nullptr);
-            m_children.push_back(nullptr);
-            m_pos_Modulus=m_children.begin();
-            m_pos_Exponent=m_pos_Modulus;
-            ++m_pos_Exponent;
         }
         
         IMPL_XMLOBJECT_CLONE(RSAKeyValue);
@@ -191,14 +191,12 @@ namespace xmlsignature {
         }
 
         NamedCurveImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
-            : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
-            m_URI=nullptr;
+            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_URI(nullptr) {
         }
 
         NamedCurveImpl(const NamedCurveImpl& src)
-                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
-            m_URI=nullptr;
-            setURI(getURI());
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src), m_URI(nullptr) {
+            setURI(src.getURI());
         }
 
         IMPL_XMLOBJECT_CLONE(NamedCurve);
@@ -221,28 +219,6 @@ namespace xmlsignature {
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
-    public:
-        virtual ~ECKeyValueImpl() {
-            XMLString::release(&m_Id);
-        }
-
-        ECKeyValueImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
-                : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
-            init();
-        }
-            
-        ECKeyValueImpl(const ECKeyValueImpl& src)
-                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
-            init();
-            m_Id=XMLString::replicate(src.m_Id);
-            if (src.getECParameters())
-                setECParameters(src.getECParameters()->clone());
-            if (src.getNamedCurve())
-                setNamedCurve(src.getNamedCurve()->cloneNamedCurve());
-            if (src.getPublicKey())
-                setPublicKey(src.getPublicKey()->clonePublicKey());
-        }
-        
         void init() {
             m_Id=nullptr;
             m_ECParameters=nullptr;
@@ -256,6 +232,28 @@ namespace xmlsignature {
             ++m_pos_NamedCurve;
             m_pos_PublicKey=m_pos_NamedCurve;
             ++m_pos_PublicKey;
+        }
+        
+    public:
+        virtual ~ECKeyValueImpl() {
+            XMLString::release(&m_Id);
+        }
+
+        ECKeyValueImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
+                : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
+            init();
+        }
+            
+        ECKeyValueImpl(const ECKeyValueImpl& src)
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
+            init();
+            setId(src.getId());
+            if (src.getECParameters())
+                setECParameters(src.getECParameters()->clone());
+            if (src.getNamedCurve())
+                setNamedCurve(src.getNamedCurve()->cloneNamedCurve());
+            if (src.getPublicKey())
+                setPublicKey(src.getPublicKey()->clonePublicKey());
         }
         
         IMPL_XMLOBJECT_CLONE(ECKeyValue);
@@ -295,6 +293,24 @@ namespace xmlsignature {
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
+        void init() {
+            m_DSAKeyValue=nullptr;
+            m_RSAKeyValue=nullptr;
+            m_ECKeyValue=nullptr;
+            m_UnknownXMLObject=nullptr;
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
+            m_pos_DSAKeyValue=m_children.begin();
+            m_pos_RSAKeyValue=m_pos_DSAKeyValue;
+            ++m_pos_RSAKeyValue;
+            m_pos_ECKeyValue=m_pos_RSAKeyValue;
+            ++m_pos_ECKeyValue;
+            m_pos_UnknownXMLObject=m_pos_ECKeyValue;
+            ++m_pos_UnknownXMLObject;
+        }
+
     public:
         virtual ~KeyValueImpl() {}
 
@@ -315,25 +331,7 @@ namespace xmlsignature {
             if (src.getUnknownXMLObject())
                 setUnknownXMLObject(src.getUnknownXMLObject()->clone());
         }
-        
-        void init() {
-            m_DSAKeyValue=nullptr;
-            m_RSAKeyValue=nullptr;
-            m_ECKeyValue=nullptr;
-            m_UnknownXMLObject=nullptr;
-            m_children.push_back(nullptr);
-            m_children.push_back(nullptr);
-            m_children.push_back(nullptr);
-            m_children.push_back(nullptr);
-            m_pos_DSAKeyValue=m_children.begin();
-            m_pos_RSAKeyValue=m_pos_DSAKeyValue;
-            ++m_pos_RSAKeyValue;
-            m_pos_ECKeyValue=m_pos_RSAKeyValue;
-            ++m_pos_ECKeyValue;
-            m_pos_UnknownXMLObject=m_pos_ECKeyValue;
-            ++m_pos_UnknownXMLObject;
-        }
-        
+                
         IMPL_XMLOBJECT_CLONE(KeyValue);
         IMPL_TYPED_CHILD(DSAKeyValue);
         IMPL_TYPED_CHILD(RSAKeyValue);
@@ -407,8 +405,8 @@ namespace xmlsignature {
         }
             
         TransformImpl(const TransformImpl& src)
-                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src),
-                    m_Algorithm(XMLString::replicate(src.m_Algorithm)) {
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src), m_Algorithm(nullptr) {
+            setAlgorithm(src.getAlgorithm());
             for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
                 if (*i) {
                     XPath* x=dynamic_cast<XPath*>(*i);
@@ -416,7 +414,10 @@ namespace xmlsignature {
                         getXPaths().push_back(x->cloneXPath());
                         continue;
                     }
-                    getUnknownXMLObjects().push_back((*i)->clone());
+
+                    if (*i) {
+                        getUnknownXMLObjects().push_back((*i)->clone());
+                    }
                 }
             }
         }
@@ -465,10 +466,9 @@ namespace xmlsignature {
             
         TransformsImpl(const TransformsImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
-            VectorOf(Transform) v=getTransforms();
             for (vector<Transform*>::const_iterator i=src.m_Transforms.begin(); i!=src.m_Transforms.end(); i++) {
                 if (*i) {
-                    v.push_back((*i)->cloneTransform());
+                    getTransforms().push_back((*i)->cloneTransform());
                 }
             }
         }
@@ -489,6 +489,13 @@ namespace xmlsignature {
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
+        void init() {
+            m_URI=m_Type=nullptr;
+            m_Transforms=nullptr;
+            m_children.push_back(nullptr);
+            m_pos_Transforms=m_children.begin();
+        }
+        
     public:
         virtual ~RetrievalMethodImpl() {
             XMLString::release(&m_URI);
@@ -503,17 +510,10 @@ namespace xmlsignature {
         RetrievalMethodImpl(const RetrievalMethodImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
-            setURI(getURI());
-            setType(getType());
+            setURI(src.getURI());
+            setType(src.getType());
             if (src.getTransforms())
                 setTransforms(src.getTransforms()->cloneTransforms());
-        }
-        
-        void init() {
-            m_URI=m_Type=nullptr;
-            m_Transforms=nullptr;
-            m_children.push_back(nullptr);
-            m_pos_Transforms=m_children.begin();
         }
         
         IMPL_XMLOBJECT_CLONE(RetrievalMethod);
@@ -545,6 +545,16 @@ namespace xmlsignature {
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
+        void init() {
+            m_X509IssuerName=nullptr;
+            m_X509SerialNumber=nullptr;
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
+            m_pos_X509IssuerName=m_children.begin();
+            m_pos_X509SerialNumber=m_pos_X509IssuerName;
+            ++m_pos_X509SerialNumber;
+        }
+        
     public:
         virtual ~X509IssuerSerialImpl() {}
 
@@ -560,16 +570,6 @@ namespace xmlsignature {
                 setX509IssuerName(src.getX509IssuerName()->cloneX509IssuerName());
             if (src.getX509SerialNumber())
                 setX509SerialNumber(src.getX509SerialNumber()->cloneX509SerialNumber());
-        }
-        
-        void init() {
-            m_X509IssuerName=nullptr;
-            m_X509SerialNumber=nullptr;
-            m_children.push_back(nullptr);
-            m_children.push_back(nullptr);
-            m_pos_X509IssuerName=m_children.begin();
-            m_pos_X509SerialNumber=m_pos_X509IssuerName;
-            ++m_pos_X509SerialNumber;
         }
         
         IMPL_XMLOBJECT_CLONE(X509IssuerSerial);
@@ -678,7 +678,9 @@ namespace xmlsignature {
                         continue;
                     }
 
-                    getUnknownXMLObjects().push_back((*i)->clone());
+                    if (*i) {
+                        getUnknownXMLObjects().push_back((*i)->clone());
+                    }
                 }
             }
         }
@@ -720,6 +722,8 @@ namespace xmlsignature {
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
+        vector< pair<SPKISexp*,XMLObject*> > m_SPKISexps;
+
     public:
         virtual ~SPKIDataImpl() {}
 
@@ -729,18 +733,14 @@ namespace xmlsignature {
             
         SPKIDataImpl(const SPKIDataImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
-            VectorOfPairs(SPKISexp,XMLObject) v=getSPKISexps();
             for (vector< pair<SPKISexp*,XMLObject*> >::const_iterator i=src.m_SPKISexps.begin(); i!=src.m_SPKISexps.end(); i++) {
                 if (i->first) {
-                    v.push_back(make_pair(i->first->cloneSPKISexp(),(i->second ? i->second->clone() : (XMLObject*)nullptr)));
+                    getSPKISexps().push_back(make_pair(i->first->cloneSPKISexp(),(i->second ? i->second->clone() : (XMLObject*)nullptr)));
                 }
             }
         }
         
         IMPL_XMLOBJECT_CLONE(SPKIData);
-
-    private:
-        vector< pair<SPKISexp*,XMLObject*> > m_SPKISexps;
 
     public:
         VectorOfPairs(SPKISexp,XMLObject) getSPKISexps() {
@@ -784,6 +784,16 @@ namespace xmlsignature {
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
+        void init() {
+            m_PGPKeyID=nullptr;
+            m_PGPKeyPacket=nullptr;
+            m_children.push_back(nullptr);
+            m_children.push_back(nullptr);
+            m_pos_PGPKeyID=m_children.begin();
+            m_pos_PGPKeyPacket=m_pos_PGPKeyID;
+            ++m_pos_PGPKeyPacket;
+        }
+        
     public:
         virtual ~PGPDataImpl() {}
 
@@ -799,19 +809,11 @@ namespace xmlsignature {
                 setPGPKeyID(src.getPGPKeyID()->clonePGPKeyID());
             if (src.getPGPKeyPacket())
                 setPGPKeyPacket(src.getPGPKeyPacket()->clonePGPKeyPacket());
-            VectorOf(XMLObject) v=getUnknownXMLObjects();
-            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i)
-                v.push_back((*i)->clone());
-        }
-        
-        void init() {
-            m_PGPKeyID=nullptr;
-            m_PGPKeyPacket=nullptr;
-            m_children.push_back(nullptr);
-            m_children.push_back(nullptr);
-            m_pos_PGPKeyID=m_children.begin();
-            m_pos_PGPKeyPacket=m_pos_PGPKeyID;
-            ++m_pos_PGPKeyPacket;
+            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i) {
+                if (*i) {
+                    getUnknownXMLObjects().push_back((*i)->clone());
+                }
+            }
         }
         
         IMPL_XMLOBJECT_CLONE(PGPData);
@@ -841,6 +843,10 @@ namespace xmlsignature {
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
+        void init() {
+            m_Id=m_URI=nullptr;
+        }
+
     public:
         virtual ~KeyInfoReferenceImpl() {
             XMLString::release(&m_Id);
@@ -855,12 +861,8 @@ namespace xmlsignature {
         KeyInfoReferenceImpl(const KeyInfoReferenceImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
-            setId(getId());
-            setURI(getURI());
-        }
-
-        void init() {
-            m_Id=m_URI=nullptr;
+            setId(src.getId());
+            setURI(src.getURI());
         }
 
         IMPL_XMLOBJECT_CLONE(KeyInfoReference);
@@ -896,9 +898,8 @@ namespace xmlsignature {
         }
             
         KeyInfoImpl(const KeyInfoImpl& src)
-                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src),
-                    m_Id(XMLString::replicate(src.m_Id)) {
-
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src), m_Id(nullptr) {
+            setId(src.getId());
             for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
                 if (*i) {
                     X509Data* xd=dynamic_cast<X509Data*>(*i);
@@ -955,7 +956,9 @@ namespace xmlsignature {
                         continue;
                     }
 
-                    getUnknownXMLObjects().push_back((*i)->clone());
+                    if (*i) {
+                        getUnknownXMLObjects().push_back((*i)->clone());
+                    }
                 }
             }
         }
