@@ -33,10 +33,13 @@
 
 #include <algorithm>
 #include <functional>
+#include <boost/bind.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmltooling::logging;
 using namespace xmltooling;
+using namespace boost;
 using namespace std;
 
 using xercesc::DOMElement;
@@ -46,35 +49,38 @@ namespace xmltooling {
     {
     public:
         ChainingCredentialResolver(const DOMElement* e);
-        virtual ~ChainingCredentialResolver() {
-            for_each(m_resolvers.begin(), m_resolvers.end(), xmltooling::cleanup<CredentialResolver>());
-        }
+        virtual ~ChainingCredentialResolver() {}
 
         Lockable* lock() {
-            for_each(m_resolvers.begin(), m_resolvers.end(), mem_fun(&Lockable::lock));
+            for_each(m_resolvers.begin(), m_resolvers.end(), mem_fun_ref(&Lockable::lock));
             return this;
         }
         void unlock() {
-            for_each(m_resolvers.begin(), m_resolvers.end(), mem_fun(&Lockable::unlock));
+            for_each(m_resolvers.begin(), m_resolvers.end(), mem_fun_ref(&Lockable::unlock));
         }
         
         const Credential* resolve(const CredentialCriteria* criteria=nullptr) const {
             const Credential* cred = nullptr;
-            for (vector<CredentialResolver*>::const_iterator cr = m_resolvers.begin(); !cred && cr!=m_resolvers.end(); ++cr)
-                cred = (*cr)->resolve(criteria);
+            for (ptr_vector<CredentialResolver>::const_iterator cr = m_resolvers.begin(); !cred && cr!=m_resolvers.end(); ++cr)
+                cred = cr->resolve(criteria);
             return cred;
         }
 
         virtual vector<const Credential*>::size_type resolve(
             vector<const Credential*>& results, const CredentialCriteria* criteria=nullptr
             ) const {
-            for (vector<CredentialResolver*>::const_iterator cr = m_resolvers.begin(); cr!=m_resolvers.end(); ++cr)
-                (*cr)->resolve(results, criteria);
+
+            // Member function pointer to method to call.
+            static vector<const Credential*>::size_type (CredentialResolver::* fn)
+                (vector<const Credential*>& results, const CredentialCriteria* criteria) const = &CredentialResolver::resolve;
+
+            // ref() converts pass by copy to pass by reference for output parameter
+            for_each(m_resolvers.begin(), m_resolvers.end(), boost::bind(fn, _1, boost::ref(results), criteria));
             return results.size();
         }
 
     private:
-        vector<CredentialResolver*> m_resolvers;
+        ptr_vector<CredentialResolver> m_resolvers;
     };
 
     CredentialResolver* XMLTOOL_DLLLOCAL ChainingCredentialResolverFactory(const DOMElement* const & e)

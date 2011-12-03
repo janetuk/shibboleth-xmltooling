@@ -54,9 +54,7 @@ namespace xmltooling {
     public:
         StaticPKIXTrustEngine(const DOMElement* e=nullptr);
 
-        virtual ~StaticPKIXTrustEngine() {
-            delete m_credResolver;
-        }
+        virtual ~StaticPKIXTrustEngine() {}
         
         AbstractPKIXTrustEngine::PKIXValidationInfoIterator* getPKIXValidationInfoIterator(
             const CredentialResolver& pkixSource, CredentialCriteria* criteria=nullptr
@@ -68,7 +66,7 @@ namespace xmltooling {
 
     private:
         int m_depth;
-        CredentialResolver* m_credResolver;
+        auto_ptr<CredentialResolver> m_credResolver;
         friend class XMLTOOL_DLLLOCAL StaticPKIXIterator;
     };
     
@@ -131,17 +129,17 @@ namespace xmltooling {
 };
 
 StaticPKIXTrustEngine::StaticPKIXTrustEngine(const DOMElement* e)
-    : AbstractPKIXTrustEngine(e), m_depth(XMLHelper::getAttrInt(e, 1, verifyDepth)), m_credResolver(nullptr)
+    : AbstractPKIXTrustEngine(e), m_depth(XMLHelper::getAttrInt(e, 1, verifyDepth))
 {
     if (e && e->hasAttributeNS(nullptr, certificate)) {
         // Simple File resolver config rooted here.
-        m_credResolver = XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(FILESYSTEM_CREDENTIAL_RESOLVER, e);
+        m_credResolver.reset(XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(FILESYSTEM_CREDENTIAL_RESOLVER, e));
     }
     else {
         e = e ? XMLHelper::getFirstChildElement(e, _CredentialResolver) : nullptr;
         string t = XMLHelper::getAttrString(e, nullptr, type);
         if (!t.empty())
-            m_credResolver = XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(t.c_str(), e);
+            m_credResolver.reset(XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(t.c_str(), e));
         else
             throw XMLSecurityException("Missing <CredentialResolver> element, or no type attribute found");
     }

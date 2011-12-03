@@ -33,6 +33,7 @@
 
 #include <set>
 #include <string>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 namespace xmltooling {
 
@@ -65,7 +66,7 @@ namespace xmltooling {
         AbstractPKIXTrustEngine(const xercesc::DOMElement* e=nullptr);
 
         /** Plugins used to perform path validation. */
-        std::vector<OpenSSLPathValidator*> m_pathValidators;
+        boost::ptr_vector<OpenSSLPathValidator> m_pathValidators;
 
         /** Controls revocation checking, currently limited to CRLs and supports "off", "entityOnly", "fullChain". */
         std::string m_checkRevocation;

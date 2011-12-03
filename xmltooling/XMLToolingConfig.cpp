@@ -56,8 +56,8 @@
 
 #include <stdexcept>
 #include <boost/algorithm/string.hpp>
-#include <boost/lambda/bind.hpp>
-#include <boost/lambda/lambda.hpp>
+#include <boost/bind.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 #if defined(XMLTOOLING_LOG4SHIB)
 # include <log4shib/PropertyConfigurator.hh>
@@ -82,7 +82,6 @@ using namespace soap11;
 using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace xercesc;
-using namespace boost::lambda;
 using namespace boost;
 using namespace std;
 
@@ -114,14 +113,14 @@ using namespace xmlsignature;
 namespace {
     static XMLToolingInternalConfig g_config;
 #ifndef XMLTOOLING_NO_XMLSEC
-    static vector<Mutex*> g_openssl_locks;
+    static ptr_vector<Mutex> g_openssl_locks;
 
     extern "C" void openssl_locking_callback(int mode,int n,const char *file,int line)
     {
         if (mode & CRYPTO_LOCK)
-            g_openssl_locks[n]->lock();
+            g_openssl_locks[n].lock();
         else
-            g_openssl_locks[n]->unlock();
+            g_openssl_locks[n].unlock();
     }
 
 # ifndef WIN32
@@ -431,7 +430,7 @@ bool XMLToolingInternalConfig::init()
             for_each(
                 catpaths.begin(), catpaths.end(),
                 // Call loadCatalog with an inner call to s->c_str() on each entry.
-                lambda::bind(static_cast<bool (ParserPool::*)(const char*)>(&ParserPool::loadCatalog), m_validatingPool, lambda::bind(&string::c_str,_1))
+                boost::bind(static_cast<bool (ParserPool::*)(const char*)>(&ParserPool::loadCatalog), m_validatingPool, boost::bind(&string::c_str,_1))
                 );
         }
 
@@ -520,8 +519,7 @@ void XMLToolingInternalConfig::term()
 
 #ifndef XMLTOOLING_NO_XMLSEC
     CRYPTO_set_locking_callback(nullptr);
-    for_each(g_openssl_locks.begin(), g_openssl_locks.end(), xmltooling::cleanup<Mutex>());
-    g_openssl_locks.clear();
+    g_openssl_locks.release();
 #endif
 
     SchemaValidators.destroyValidators();

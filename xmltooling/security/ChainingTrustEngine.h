@@ -30,7 +30,7 @@
 #include <xmltooling/security/OpenSSLTrustEngine.h>
 #include <xmltooling/security/SignatureTrustEngine.h>
 
-#include <vector>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 namespace xmltooling {
 
@@ -101,10 +101,10 @@ namespace xmltooling {
             CredentialCriteria* criteria=nullptr
             ) const;
     private:
-        std::vector<TrustEngine*> m_engines;
-        std::vector<SignatureTrustEngine*> m_sigEngines;
-        std::vector<X509TrustEngine*> m_x509Engines;
-        std::vector<OpenSSLTrustEngine*> m_osslEngines;
+        boost::ptr_vector<TrustEngine> m_engines;
+        boost::ptr_vector<SignatureTrustEngine,boost::view_clone_allocator> m_sigEngines;
+        boost::ptr_vector<X509TrustEngine,boost::view_clone_allocator> m_x509Engines;
+        boost::ptr_vector<OpenSSLTrustEngine,boost::view_clone_allocator> m_osslEngines;
     };
     
 };

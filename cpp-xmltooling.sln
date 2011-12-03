@@ -6,6 +6,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{61BF324D-2
 		m4\acinclude.m4 = m4\acinclude.m4
 		m4\acx_pthread.m4 = m4\acx_pthread.m4
 		m4\ax_create_pkgconfig_info.m4 = m4\ax_create_pkgconfig_info.m4
+		..\cpp-sp-ext\m4\boost.m4 = ..\cpp-sp-ext\m4\boost.m4
 		config_win32.h = config_win32.h
 		configure.ac = configure.ac
 		doxygen.am = doxygen.am

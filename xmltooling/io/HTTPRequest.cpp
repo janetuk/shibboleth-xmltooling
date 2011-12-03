@@ -27,7 +27,11 @@
 #include "internal.h"
 #include "HTTPRequest.h"
 
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
+
 using namespace xmltooling;
+using namespace boost;
 using namespace std;
 
 GenericRequest::GenericRequest()
@@ -51,32 +55,24 @@ bool HTTPRequest::isSecure() const
     return strcmp(getScheme(),"https")==0;
 }
 
+namespace {
+    void handle_cookie_fn(map<string,string>& cookieMap, vector<string>& nvpair, const string& s) {
+        nvpair.clear();
+        split(nvpair, s, is_any_of("="));
+        if (nvpair.size() == 2) {
+            trim(nvpair[0]);
+            cookieMap[nvpair[0]] = nvpair[1];
+        }
+    }
+}
+
 const char* HTTPRequest::getCookie(const char* name) const
 {
     if (m_cookieMap.empty()) {
         string cookies=getHeader("Cookie");
-
-        string::size_type pos=0,cname,namelen,val,vallen;
-        while (pos !=string::npos && pos < cookies.length()) {
-            while (isspace(cookies[pos])) pos++;
-            cname=pos;
-            pos=cookies.find_first_of("=",pos);
-            if (pos == string::npos)
-                break;
-            namelen=pos-cname;
-            pos++;
-            if (pos==cookies.length())
-                break;
-            val=pos;
-            pos=cookies.find_first_of(";",pos);
-            if (pos != string::npos) {
-                vallen=pos-val;
-                pos++;
-                m_cookieMap.insert(make_pair(cookies.substr(cname,namelen),cookies.substr(val,vallen)));
-            }
-            else
-                m_cookieMap.insert(make_pair(cookies.substr(cname,namelen),cookies.substr(val)));
-        }
+        vector<string> nvpairs, nvpair;
+        split(nvpairs, cookies, is_any_of(";"), algorithm::token_compress_on);
+        for_each(nvpairs.begin(), nvpairs.end(), boost::bind(handle_cookie_fn, boost::ref(m_cookieMap), boost::ref(nvpair), _1));
     }
     map<string,string>::const_iterator lookup=m_cookieMap.find(name);
     return (lookup==m_cookieMap.end()) ? nullptr : lookup->second.c_str();

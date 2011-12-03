@@ -50,7 +50,7 @@ using namespace xmlsignature;
 using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace std;
-
+using boost::ptr_vector;
 
 namespace xmltooling {
     // Adapter between TrustEngine and PathValidator
@@ -185,7 +185,6 @@ AbstractPKIXTrustEngine::AbstractPKIXTrustEngine(const xercesc::DOMElement* e)
 
 AbstractPKIXTrustEngine::~AbstractPKIXTrustEngine()
 {
-    for_each(m_pathValidators.begin(), m_pathValidators.end(), xmltooling::cleanup<PathValidator>());
 }
 
 bool AbstractPKIXTrustEngine::checkEntityNames(
@@ -378,8 +377,8 @@ bool AbstractPKIXTrustEngine::validateWithCRLs(
     auto_ptr<PKIXValidationInfoIterator> pkix(getPKIXValidationInfoIterator(credResolver, criteria));
     while (pkix->next()) {
         PKIXParams params(*this, *pkix.get(), inlineCRLs);
-        for (vector<OpenSSLPathValidator*>::const_iterator v = m_pathValidators.begin(); v != m_pathValidators.end(); ++v) {
-            if ((*v)->validate(certEE, certChain, params)) {
+        for (ptr_vector<OpenSSLPathValidator>::const_iterator v = m_pathValidators.begin(); v != m_pathValidators.end(); ++v) {
+            if (v->validate(certEE, certChain, params)) {
                 return true;
             }
         }

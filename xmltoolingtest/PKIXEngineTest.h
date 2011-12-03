@@ -20,9 +20,9 @@
 
 #include "XMLObjectBaseTestCase.h"
 
+#include <xmltooling/security/ChainingTrustEngine.h>
 #include <xmltooling/security/CredentialResolver.h>
 #include <xmltooling/security/SecurityHelper.h>
-#include <xmltooling/security/X509TrustEngine.h>
 
 #include <fstream>
 #include <xsec/enc/XSECCryptoKey.hpp>
@@ -43,6 +43,7 @@ class PKIXEngineTest : public CxxTest::TestSuite {
     }
 
     CredentialResolver* m_dummy;
+    ChainingTrustEngine* m_chain;
     XSECCryptoX509* m_ee;   // end entity
     XSECCryptoX509* m_int1; // any policy
     XSECCryptoX509* m_int2; // explicit policy
@@ -51,6 +52,7 @@ class PKIXEngineTest : public CxxTest::TestSuite {
 public:
     void setUp() {
         m_dummy = XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(DUMMY_CREDENTIAL_RESOLVER, nullptr);
+        m_chain = dynamic_cast<ChainingTrustEngine*>(XMLToolingConfig::getConfig().TrustEngineManager.newPlugin(CHAINING_TRUSTENGINE, nullptr));
 
         m_ee = m_int1 = m_int2 = m_int3 = nullptr;
         vector<XSECCryptoX509*> certs;
@@ -69,6 +71,7 @@ public:
     }
 
     void tearDown() {
+        delete m_chain;
         delete m_dummy;
         delete m_ee;
         delete m_int1;
@@ -78,37 +81,53 @@ public:
 
 
     void testAnyPolicy() {
-        auto_ptr<X509TrustEngine> trust(buildTrustEngine("AnyPolicy"));
+        TrustEngine* trust = buildTrustEngine("AnyPolicy");
+        m_chain->addTrustEngine(trust);
 
         vector<XSECCryptoX509*> untrusted(1, m_int1);
-        TSM_ASSERT("PKIX validation failed", trust->validate(m_ee, untrusted, *m_dummy));
+        TSM_ASSERT("PKIX validation failed", m_chain->validate(m_ee, untrusted, *m_dummy));
+
+        TSM_ASSERT_EQUALS("Trust engine removal failed", m_chain->removeTrustEngine(trust), trust);
+        delete trust;
     }
 
     void testExplicitPolicy() {
-        auto_ptr<X509TrustEngine> trust(buildTrustEngine("ExplicitPolicy"));
+        TrustEngine* trust = buildTrustEngine("ExplicitPolicy");
+        m_chain->addTrustEngine(trust);
 
         vector<XSECCryptoX509*> untrusted(1, m_int1);
-        TSM_ASSERT("PKIX validation succeeded despite anyPolicyInhibit", !trust->validate(m_ee, untrusted, *m_dummy));
+        TSM_ASSERT("PKIX validation succeeded despite anyPolicyInhibit", !m_chain->validate(m_ee, untrusted, *m_dummy));
 
         untrusted[0] = m_int2;
-        TSM_ASSERT("PKIX validation failed", trust->validate(m_ee, untrusted, *m_dummy));
+        TSM_ASSERT("PKIX validation failed", m_chain->validate(m_ee, untrusted, *m_dummy));
 
         untrusted[0] = m_int3;
-        TSM_ASSERT("PKIX validation failed", trust->validate(m_ee, untrusted, *m_dummy));
+        TSM_ASSERT("PKIX validation failed", m_chain->validate(m_ee, untrusted, *m_dummy));
+
+        TSM_ASSERT_EQUALS("Trust engine removal failed", m_chain->removeTrustEngine(trust), trust);
+        delete trust;
     }
 
     void testExplicitPolicyMap() {
-        auto_ptr<X509TrustEngine> trust(buildTrustEngine("ExplicitPolicyMap"));
+        TrustEngine* trust = buildTrustEngine("ExplicitPolicyMap");
+        m_chain->addTrustEngine(trust);
 
         vector<XSECCryptoX509*> untrusted(1, m_int3);
-        TSM_ASSERT("PKIX validation failed", trust->validate(m_ee, untrusted, *m_dummy));
+        TSM_ASSERT("PKIX validation failed", m_chain->validate(m_ee, untrusted, *m_dummy));
+
+        TSM_ASSERT_EQUALS("Trust engine removal failed", m_chain->removeTrustEngine(trust), trust);
+        delete trust;
     }
 
     void testExplicitPolicyNoMap() {
-        auto_ptr<X509TrustEngine> trust(buildTrustEngine("ExplicitPolicyNoMap"));
+        TrustEngine* trust = buildTrustEngine("ExplicitPolicyNoMap");
+        m_chain->addTrustEngine(trust);
 
         vector<XSECCryptoX509*> untrusted(1, m_int3);
-        TSM_ASSERT("PKIX validation succeeded despite policyMappingInhibit", !trust->validate(m_ee, untrusted, *m_dummy));
+        TSM_ASSERT("PKIX validation succeeded despite policyMappingInhibit", !m_chain->validate(m_ee, untrusted, *m_dummy));
+
+        TSM_ASSERT_EQUALS("Trust engine removal failed", m_chain->removeTrustEngine(trust), trust);
+        delete trust;
     }
 
 };

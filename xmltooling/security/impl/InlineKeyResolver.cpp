@@ -61,15 +61,10 @@ namespace xmltooling {
     class XMLTOOL_DLLLOCAL InlineCredential : public BasicX509Credential
     {
     public:
-        InlineCredential(const KeyInfo* keyInfo=nullptr) : BasicX509Credential(keyInfo!=nullptr), m_credctx(new KeyInfoCredentialContext(keyInfo)) {
-        }
-        InlineCredential(DSIGKeyInfoList* keyInfo) : BasicX509Credential(false), m_credctx(new KeyInfoCredentialContext(keyInfo)) {
-        }
-        InlineCredential(KeyInfoCredentialContext* context) : BasicX509Credential(context->getKeyInfo()!=nullptr), m_credctx(nullptr) {
-        }
-        virtual ~InlineCredential() {
-            delete m_credctx;
-        }
+        InlineCredential(const KeyInfo* keyInfo=nullptr) : BasicX509Credential(keyInfo!=nullptr), m_credctx(new KeyInfoCredentialContext(keyInfo)) {}
+        InlineCredential(DSIGKeyInfoList* keyInfo) : BasicX509Credential(false), m_credctx(new KeyInfoCredentialContext(keyInfo)) {}
+        InlineCredential(KeyInfoCredentialContext* context) : BasicX509Credential(context->getKeyInfo()!=nullptr) {}
+        virtual ~InlineCredential() {}
 
         XSECCryptoKey* getPrivateKey() const {
             return nullptr;
@@ -108,11 +103,11 @@ namespace xmltooling {
         }
         
         const CredentialContext* getCredentalContext() const {
-            return m_credctx;
+            return m_credctx.get();
         }
 
         void setCredentialContext(KeyInfoCredentialContext* context) {
-            m_credctx = context;
+            m_credctx.reset(context);
         }
 
         void resolve(const KeyInfo* keyInfo, int types=0, bool followRefs=false);
@@ -123,7 +118,7 @@ namespace xmltooling {
         bool resolveKey(const KeyInfo* keyInfo, bool followRefs=false);
         bool resolveCRLs(const KeyInfo* keyInfo, bool followRefs=false);
 
-        KeyInfoCredentialContext* m_credctx;
+        auto_ptr<KeyInfoCredentialContext> m_credctx;
     };
 
     static const XMLCh keyInfoReferences[] = UNICODE_LITERAL_17(k,e,y,I,n,f,o,R,e,f,e,r,e,n,c,e,s);
