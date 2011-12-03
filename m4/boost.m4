@@ -644,6 +644,11 @@ BOOST_DEFUN([Numeric_Conversion],
 BOOST_DEFUN([Optional],
 [BOOST_FIND_HEADER([boost/optional.hpp])])
 
+# BOOST_PTR_CONTAINER()
+# ----------------
+# Look for Boost.PointerContainer
+BOOST_DEFUN([Ptr_Container],
+[BOOST_FIND_HEADER([boost/ptr_container/ptr_vector.hpp])])
 
 # BOOST_PREPROCESSOR()
 # --------------------
