@@ -519,7 +519,7 @@ void XMLToolingInternalConfig::term()
 
 #ifndef XMLTOOLING_NO_XMLSEC
     CRYPTO_set_locking_callback(nullptr);
-    g_openssl_locks.release();
+    g_openssl_locks.clear();
 #endif
 
     SchemaValidators.destroyValidators();
