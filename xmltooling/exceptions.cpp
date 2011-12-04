@@ -34,10 +34,12 @@
 #include <stdarg.h>
 #include <memory>
 #include <sstream>
+#include <boost/lexical_cast.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmltooling;
 using namespace xercesc;
+using namespace boost;
 using namespace std;
 using xmlconstants::XMLTOOLING_NS;
 
@@ -105,88 +107,45 @@ void XMLToolingException::setMessage(const char* msg)
     m_processedmsg.erase();
 }
 
-inline const char* get_digit_character()
-{
-    static const char  s_characters[19] = 
-    {
-            '9'
-        ,   '8'
-        ,   '7'
-        ,   '6'
-        ,   '5'
-        ,   '4'
-        ,   '3'
-        ,   '2'
-        ,   '1'
-        ,   '0'
-        ,   '1'
-        ,   '2'
-        ,   '3'
-        ,   '4'
-        ,   '5'
-        ,   '6'
-        ,   '7'
-        ,   '8'
-        ,   '9'
-    };
-    static const char  *s_mid  =   s_characters + 9;
-
-    return s_mid;
-}
-
-inline const char* unsigned_integer_to_string(char* buf, size_t cchBuf, size_t i)
-{
-    char* psz=buf + cchBuf - 1;     // Set psz to last char
-    *psz = 0;                       // Set terminating null
-
-    do {
-        size_t lsd = i % 10;  // Get least significant
-                                    // digit
-
-        i /= 10;                    // Prepare for next most
-                                    // significant digit
-
-        --psz;                      // Move back
-
-        *psz = get_digit_character()[lsd]; // Place the digit
-
-    } while(i!=0 && psz>buf);
-
-    return psz;
-}
-
 void XMLToolingException::addProperties(const params& p)
 {
     m_processedmsg.erase();
-    map<string,string>::size_type i=m_params.size()+1;
-    char buf[20];
+    map<string,string>::size_type i = m_params.size() + 1;
     const vector<const char*>& v=p.get();
-    for (vector<const char*>::const_iterator ci=v.begin(); ci!=v.end(); ci++) {
-        m_params[unsigned_integer_to_string(buf,sizeof(buf),i++)] = *ci;
+    for (vector<const char*>::const_iterator ci = v.begin(); ci != v.end(); ++ci) {
+        try {
+            m_params[lexical_cast<string>(i++)] = *ci;
+        }
+        catch (bad_lexical_cast&) {
+        }
     }
 }
         
 void XMLToolingException::addProperties(const namedparams& p)
 {
     m_processedmsg.erase();
-    const vector<const char*>& v=p.get();
-    for (vector<const char*>::const_iterator ci=v.begin(); ci!=v.end(); ci++) {
+    const vector<const char*>& v = p.get();
+    for (vector<const char*>::const_iterator ci = v.begin(); ci != v.end(); ++ci) {
         m_params.erase(*ci);
         m_params[*ci] = *(ci+1);
-        ci++;   // advance past name to value, then loop will advance it again
+        ++ci;   // advance past name to value, then loop will advance it again
     }
 }
 
 const char* XMLToolingException::getProperty(unsigned int index) const
 {
-    char buf[20];
-    map<string,string>::const_iterator i=m_params.find(unsigned_integer_to_string(buf,sizeof(buf),index));
-    return (i==m_params.end()) ? nullptr : i->second.c_str();
+    try {
+        map<string,string>::const_iterator i = m_params.find(lexical_cast<string>(index));
+        return (i==m_params.end()) ? nullptr : i->second.c_str();
+    }
+    catch (bad_lexical_cast&) {
+        return nullptr;
+    }
 }
 
 const char* XMLToolingException::getProperty(const char* name) const
 {
-    map<string,string>::const_iterator i=m_params.find(name);
+    map<string,string>::const_iterator i = m_params.find(name);
     return (i==m_params.end()) ? nullptr : i->second.c_str();
 }
 
@@ -254,7 +213,7 @@ string XMLToolingException::toString() const
     if (msg)
         xml_encode(xml, "<message>", msg, "</message>");
     const URLEncoder* encoder = XMLToolingConfig::getConfig().getURLEncoder();
-    for (map<string,string>::const_iterator i=m_params.begin(); i!=m_params.end(); i++) {
+    for (map<string,string>::const_iterator i = m_params.begin(); i != m_params.end(); ++i) {
         xml_encode(xml, "<param name='", i->first.c_str(), "'");
         xml_encode(xml, ">", encoder->encode(i->second.c_str()).c_str(), "</param>");
     }
@@ -266,7 +225,7 @@ string XMLToolingException::toQueryString() const
 {
     string q;
     const URLEncoder* enc = XMLToolingConfig::getConfig().getURLEncoder();
-    for (map<string,string>::const_iterator i=m_params.begin(); i!=m_params.end(); i++) {
+    for (map<string,string>::const_iterator i = m_params.begin(); i != m_params.end(); ++i) {
         if (!q.empty())
             q += '&';
         q = q + i->first + '=' + enc->encode(i->second.c_str());
