@@ -131,7 +131,6 @@ namespace xmltooling {
         static std::string unsafe_chars;
 
     private:
-        void trimspace(std::string& s) const;
         void html_encode(std::ostream& os, const char* start) const;
         void process(
             bool visible,

@@ -176,8 +176,8 @@ namespace xmltooling {
 #else
         std::stack<xercesc::DOMBuilder*> m_pool;
 #endif
-        Mutex* m_lock;
-        xercesc::SecurityManager* m_security;
+        std::auto_ptr<Mutex> m_lock;
+        std::auto_ptr<xercesc::SecurityManager> m_security;
     };
 
     /**

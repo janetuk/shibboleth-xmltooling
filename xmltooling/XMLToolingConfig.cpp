@@ -55,9 +55,9 @@
 #endif
 
 #include <stdexcept>
-#include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/tokenizer.hpp>
 
 #if defined(XMLTOOLING_LOG4SHIB)
 # include <log4shib/PropertyConfigurator.hh>
@@ -425,12 +425,12 @@ bool XMLToolingInternalConfig::init()
 
         // Load catalogs from path.
         if (!catalog_path.empty()) {
-            vector<string> catpaths;
-            split(catpaths, catalog_path, is_any_of(PATH_SEPARATOR_STR), algorithm::token_compress_on);
+            boost::tokenizer< char_separator<char> > catpaths(catalog_path, char_separator<char>(PATH_SEPARATOR_STR));
             for_each(
                 catpaths.begin(), catpaths.end(),
                 // Call loadCatalog with an inner call to s->c_str() on each entry.
-                boost::bind(static_cast<bool (ParserPool::*)(const char*)>(&ParserPool::loadCatalog), m_validatingPool, boost::bind(&string::c_str,_1))
+                boost::bind(static_cast<bool (ParserPool::*)(const char*)>(&ParserPool::loadCatalog),
+                    m_validatingPool, boost::bind(&string::c_str,_1))
                 );
         }
 

@@ -28,8 +28,11 @@
 #include "io/GenericRequest.h"
 #include "util/TemplateEngine.h"
 
+#include <boost/algorithm/string/trim.hpp>
+
 using namespace xmltooling;
 using namespace std;
+using boost::trim;
 
 namespace {
     static const pair<const string,string> emptyPair;
@@ -112,27 +115,13 @@ void TemplateEngine::html_encode(ostream& os, const char* start) const
     }
 }
 
-void TemplateEngine::trimspace(string& s) const
-{
-  string::size_type end = s.size() - 1, start = 0;
-
-  // Trim stuff on right.
-  while (end > 0 && !isgraph(s[end])) end--;
-
-  // Trim stuff on left.
-  while (start < end && !isgraph(s[start])) start++;
-
-  // Modify the string.
-  s = s.substr(start, end - start + 1);
-}
-
 void TemplateEngine::process(
     bool visible,
     const string& buf,
     const char*& lastpos,
     ostream& os,
     const TemplateParameters& parameters,
-    const std::pair<const std::string,std::string>& loopentry,
+    const pair<const string,string>& loopentry,
     const XMLToolingException* e
     ) const
 {
@@ -157,7 +146,7 @@ void TemplateEngine::process(
             // search for the end-tag
             if ((thispos = strstr(lastpos, "/>")) != nullptr) {
                 string key = buf.substr(lastpos-line, thispos-lastpos);
-                trimspace(key);
+                trim(key);
 
                 if (key == "$name" && !loopentry.first.empty())
                     html_encode(os,loopentry.first.c_str());
@@ -185,7 +174,7 @@ void TemplateEngine::process(
             // search for the end of this tag
             if ((thispos = strchr(lastpos, '>')) != nullptr) {
                 string key = buf.substr(lastpos-line, thispos-lastpos);
-                trimspace(key);
+                trim(key);
                 bool cond=false;
                 if (visible)
                     cond = parameters.getParameter(key.c_str()) || (e && e->getProperty(key.c_str()));
@@ -215,7 +204,7 @@ void TemplateEngine::process(
             // search for the end of this tag
             if ((thispos = strchr(lastpos, '>')) != nullptr) {
                 string key = buf.substr(lastpos-line, thispos-lastpos);
-                trimspace(key);
+                trim(key);
                 bool cond=visible;
                 if (visible)
                     cond = !(parameters.getParameter(key.c_str()) || (e && e->getProperty(key.c_str())));
@@ -248,7 +237,7 @@ void TemplateEngine::process(
             // search for the end of this tag
             if ((thispos = strchr(lastpos, '>')) != nullptr) {
                 key = buf.substr(lastpos-line, thispos-lastpos);
-                trimspace(key);
+                trim(key);
                 lastpos = thispos + 1; // strlen(">")
             }
 
