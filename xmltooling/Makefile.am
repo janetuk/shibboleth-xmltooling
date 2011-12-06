@@ -203,14 +203,13 @@ common_sources = \
 
 libxmltooling_lite_la_SOURCES = \
 	${common_sources}
-libxmltooling_lite_la_CPPFLAGS = -DXMLTOOLING_LITE $(BOOST_CPPFLAGS)
+libxmltooling_lite_la_CPPFLAGS = -DXMLTOOLING_LITE
 libxmltooling_lite_la_LDFLAGS = -version-info 6:0:0
 
 if BUILD_XMLSEC
 libxmltooling_la_SOURCES = \
 	${common_sources} \
 	${xmlsec_sources}
-libxmltooling_la_CPPFLAGS = $(BOOST_CPPFLAGS)
 libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 6:0:0
 endif
 
