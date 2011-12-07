@@ -11,7 +11,7 @@ Homepage: https://spaces.internet2.edu/display/OpenSAML/XMLTooling-C
 Vcs-Git: git://git.debian.org/git/pkg-shibboleth/xmltooling.git
 Vcs-Browser: http://git.debian.org/?p=pkg-shibboleth/xmltooling.git
 
-Package: libxmltooling5
+Package: libxmltooling6
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: C++ XML parsing library with encryption support (runtime)
@@ -26,7 +26,7 @@ Description: C++ XML parsing library with encryption support (runtime)
 Package: libxmltooling-dev
 Section: libdevel
 Architecture: any
-Depends: ${misc:Depends}, libxmltooling5 (= ${binary:Version}),
+Depends: ${misc:Depends}, libxmltooling6 (= ${binary:Version}),
  libcurl4-openssl-dev, liblog4cpp5-dev, libxerces-c-dev,
  libxml-security-c-dev (>= 1.6)
 Suggests: libxmltooling-doc (= ${source:Version})
