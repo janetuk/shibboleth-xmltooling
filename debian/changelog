@@ -2,7 +2,7 @@ xmltooling (1.5+dfsg~moonshot1-2) unstable; urgency=low
 
   * Update to libxmltooling6
 
- -- Russ Allbery <hartmans@project-moonshot.org>  Wed, 07 Dec 2011 11:56:54 -0500
+ -- Sam Hartman <hartmans@project-moonshot.org>  Wed, 07 Dec 2011 11:56:54 -0500
 
 xmltooling (1.5+dfsg~moonshot1-1) unstable; urgency=low
 
