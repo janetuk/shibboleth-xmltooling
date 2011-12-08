@@ -190,7 +190,7 @@ namespace xmltooling {
     private:
         XMLObject* m_parent;
         QName m_elementQname;
-        QName* m_typeQname;
+        std::auto_ptr<QName> m_typeQname;
     };
 
 };

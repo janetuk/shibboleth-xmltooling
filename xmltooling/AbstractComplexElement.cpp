@@ -28,17 +28,15 @@
 #include "AbstractComplexElement.h"
 
 #include <algorithm>
+#include <boost/lambda/bind.hpp>
+#include <boost/lambda/lambda.hpp>
 
 using namespace xmltooling;
+using namespace xercesc;
+using namespace boost::lambda;
+using namespace boost;
 using namespace std;
 
-using xercesc::XMLString;
-
-namespace {
-    bool _nonnull(const XMLObject* ptr) {
-        return (ptr!=nullptr);
-    }
-}
 
 AbstractComplexElement::AbstractComplexElement()
 {
@@ -46,21 +44,27 @@ AbstractComplexElement::AbstractComplexElement()
 
 AbstractComplexElement::AbstractComplexElement(const AbstractComplexElement& src)
 {
-    for (vector<XMLCh*>::const_iterator i=src.m_text.begin(); i!=src.m_text.end(); ++i)
-        m_text.push_back(XMLString::replicate(*i));
+    static void (vector<XMLCh*>::* push_back)(XMLCh* const&) = &vector<XMLCh*>::push_back;
+    static XMLCh* (*replicate)(const XMLCh*,MemoryManager*) = &XMLString::replicate;
+
+    for_each(
+        src.m_text.begin(), src.m_text.end(),
+        lambda::bind(push_back, boost::ref(m_text), lambda::bind(replicate, _1, XMLPlatformUtils::fgMemoryManager))
+        );
 }
 
 AbstractComplexElement::~AbstractComplexElement() {
+    static void (*release)(XMLCh**,MemoryManager*) = &XMLString::release;
+
     for_each(m_children.begin(), m_children.end(), cleanup<XMLObject>());
-    for (vector<XMLCh*>::iterator i=m_text.begin(); i!=m_text.end(); ++i)
-        XMLString::release(&(*i));
+    for_each(m_text.begin(), m_text.end(), lambda::bind(release, &_1, XMLPlatformUtils::fgMemoryManager));
 }
 
 bool AbstractComplexElement::hasChildren() const
 {
     if (m_children.empty())
         return false;
-    return (find_if(m_children.begin(), m_children.end(), _nonnull) != m_children.end());
+    return (find_if(m_children.begin(), m_children.end(), (_1 != nullptr)) != m_children.end());
 }
 
 const list<XMLObject*>& AbstractComplexElement::getOrderedChildren() const
@@ -87,5 +91,5 @@ void AbstractComplexElement::setTextContent(const XMLCh* value, unsigned int pos
         m_text.push_back(nullptr);
         ++size;
     }
-    m_text[position]=prepareForAssignment(m_text[position],value);
+    m_text[position] = prepareForAssignment(m_text[position], value);
 }

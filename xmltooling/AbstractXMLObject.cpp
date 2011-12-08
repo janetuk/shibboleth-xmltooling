@@ -59,11 +59,11 @@ void XMLObject::releaseThisAndChildrenDOM() const
 AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
     : m_log(logging::Category::getInstance(XMLTOOLING_LOGCAT".XMLObject")),
     	m_schemaLocation(nullptr), m_noNamespaceSchemaLocation(nullptr), m_nil(xmlconstants::XML_BOOL_NULL),
-        m_parent(nullptr), m_elementQname(nsURI, localName, prefix), m_typeQname(nullptr)
+        m_parent(nullptr), m_elementQname(nsURI, localName, prefix)
 {
     addNamespace(Namespace(nsURI, prefix, false, Namespace::VisiblyUsed));
     if (schemaType) {
-        m_typeQname = new QName(*schemaType);
+        m_typeQname.reset(new QName(*schemaType));
         addNamespace(Namespace(m_typeQname->getNamespaceURI(), m_typeQname->getPrefix(), false, Namespace::NonVisiblyUsed));
     }
 }
@@ -71,15 +71,13 @@ AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName,
 AbstractXMLObject::AbstractXMLObject(const AbstractXMLObject& src)
     : m_namespaces(src.m_namespaces), m_log(src.m_log), m_schemaLocation(XMLString::replicate(src.m_schemaLocation)),
         m_noNamespaceSchemaLocation(XMLString::replicate(src.m_noNamespaceSchemaLocation)), m_nil(src.m_nil),
-        m_parent(nullptr), m_elementQname(src.m_elementQname), m_typeQname(nullptr)
+        m_parent(nullptr), m_elementQname(src.m_elementQname),
+        m_typeQname(src.m_typeQname.get() ? new QName(*src.m_typeQname) : nullptr)
 {
-    if (src.m_typeQname)
-        m_typeQname=new QName(*src.m_typeQname);
 }
 
 AbstractXMLObject::~AbstractXMLObject()
 {
-    delete m_typeQname;
     xercesc::XMLString::release(&m_schemaLocation);
     xercesc::XMLString::release(&m_noNamespaceSchemaLocation);
 }
@@ -168,7 +166,7 @@ void AbstractXMLObject::removeNamespace(const Namespace& ns)
 
 const QName* AbstractXMLObject::getSchemaType() const
 {
-    return m_typeQname;
+    return m_typeQname.get();
 }
 
 const XMLCh* AbstractXMLObject::getXMLID() const

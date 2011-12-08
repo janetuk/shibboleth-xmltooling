@@ -38,6 +38,7 @@
 #include "util/XMLConstants.h"
 #include "validation/ValidatorSuite.h"
 
+#include <boost/iterator/indirect_iterator.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
 #include <xsec/dsig/DSIGKeyInfoX509.hpp>
 #include <xsec/enc/XSECKeyInfoResolverDefault.hpp>
@@ -54,6 +55,7 @@ using namespace xmlsignature;
 using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace xercesc;
+using namespace boost;
 using namespace std;
 
 namespace xmltooling {
@@ -203,10 +205,11 @@ void InlineCredential::resolve(const KeyInfo* keyInfo, int types, bool followRef
     const XMLCh* n;
     char* kn;
     const vector<KeyName*>& knames=keyInfo->getKeyNames();
-    for (vector<KeyName*>::const_iterator kn_i=knames.begin(); kn_i!=knames.end(); ++kn_i) {
-        n=(*kn_i)->getName();
+    for (indirect_iterator<vector<KeyName*>::const_iterator> kn_i = make_indirect_iterator(knames.begin());
+            kn_i != make_indirect_iterator(knames.end()); ++kn_i) {
+        n = kn_i->getName();
         if (n && *n) {
-            kn=toUTF8(n);
+            kn = toUTF8(n);
             m_keyNames.insert(kn);
             delete[] kn;
         }
@@ -249,10 +252,11 @@ bool InlineCredential::resolveKey(const KeyInfo* keyInfo, bool followRefs)
 
     // Check for ds:KeyValue
     const vector<KeyValue*>& keyValues = keyInfo->getKeyValues();
-    for (vector<KeyValue*>::const_iterator i = keyValues.begin(); i != keyValues.end(); ++i) {
+    for (indirect_iterator<vector<KeyValue*>::const_iterator> i = make_indirect_iterator(keyValues.begin());
+            i != make_indirect_iterator(keyValues.end()); ++i) {
         try {
-            SchemaValidators.validate(*i);    // see if it's a "valid" key
-            RSAKeyValue* rsakv = (*i)->getRSAKeyValue();
+            SchemaValidators.validate(*(i.base()));    // see if it's a "valid" key
+            RSAKeyValue* rsakv = i->getRSAKeyValue();
             if (rsakv) {
                 log.debug("resolving ds:RSAKeyValue");
                 auto_ptr_char mod(rsakv->getModulus()->getValue());
@@ -263,7 +267,7 @@ bool InlineCredential::resolveKey(const KeyInfo* keyInfo, bool followRefs)
                 m_key = rsa.release();
                 return true;
             }
-            DSAKeyValue* dsakv = (*i)->getDSAKeyValue();
+            DSAKeyValue* dsakv = i->getDSAKeyValue();
             if (dsakv) {
                 log.debug("resolving ds:DSAKeyValue");
                 auto_ptr<XSECCryptoKeyDSA> dsa(XSECPlatformUtils::g_cryptoProvider->keyDSA());
@@ -285,7 +289,7 @@ bool InlineCredential::resolveKey(const KeyInfo* keyInfo, bool followRefs)
                 return true;
             }
 #ifdef XMLTOOLING_XMLSEC_ECC
-            ECKeyValue* eckv = (*i)->getECKeyValue();
+            ECKeyValue* eckv = i->getECKeyValue();
             if (eckv && eckv->getNamedCurve() && eckv->getPublicKey()) {
                 log.warn("resolving ds11:ECKeyValue");
                 auto_ptr<XSECCryptoKeyEC> ec(XSECPlatformUtils::g_cryptoProvider->keyEC());
@@ -313,9 +317,10 @@ bool InlineCredential::resolveKey(const KeyInfo* keyInfo, bool followRefs)
 
     // Check for ds11:DEREncodedKeyValue
     const vector<DEREncodedKeyValue*>& derValues = keyInfo->getDEREncodedKeyValues();
-    for (vector<DEREncodedKeyValue*>::const_iterator j = derValues.begin(); j != derValues.end(); ++j) {
+    for (indirect_iterator<vector<DEREncodedKeyValue*>::const_iterator> j = make_indirect_iterator(derValues.begin());
+            j != make_indirect_iterator(derValues.end()); ++j) {
         log.debug("resolving ds11:DEREncodedKeyValue");
-        m_key = SecurityHelper::fromDEREncoding((*j)->getValue());
+        m_key = SecurityHelper::fromDEREncoding(j->getValue());
         if (m_key)
             return true;
         log.warn("failed to resolve ds11:DEREncodedKeyValue");
@@ -327,8 +332,9 @@ bool InlineCredential::resolveKey(const KeyInfo* keyInfo, bool followRefs)
         const XMLCh* fragID=nullptr;
         const XMLObject* treeRoot=nullptr;
         const vector<KeyInfoReference*>& refs = keyInfo->getKeyInfoReferences();
-        for (vector<KeyInfoReference*>::const_iterator ref = refs.begin(); ref != refs.end(); ++ref) {
-            fragID = (*ref)->getURI();
+        for (indirect_iterator<vector<KeyInfoReference*>::const_iterator> ref = make_indirect_iterator(refs.begin());
+                ref != make_indirect_iterator(refs.end()); ++ref) {
+            fragID = ref->getURI();
             if (!fragID || *fragID != chPound || !*(fragID+1)) {
                 log.warn("skipping ds11:KeyInfoReference with an empty or non-local reference");
                 continue;
@@ -357,11 +363,12 @@ bool InlineCredential::resolveCerts(const KeyInfo* keyInfo, bool followRefs)
 
     // Check for ds:X509Data
     const vector<X509Data*>& x509Datas=keyInfo->getX509Datas();
-    for (vector<X509Data*>::const_iterator j=x509Datas.begin(); m_xseccerts.empty() && j!=x509Datas.end(); ++j) {
+    for (vector<X509Data*>::const_iterator j = x509Datas.begin(); m_xseccerts.empty() && j != x509Datas.end(); ++j) {
         const vector<X509Certificate*> x509Certs=const_cast<const X509Data*>(*j)->getX509Certificates();
-        for (vector<X509Certificate*>::const_iterator k=x509Certs.begin(); k!=x509Certs.end(); ++k) {
+        for (indirect_iterator<vector<X509Certificate*>::const_iterator> k = make_indirect_iterator(x509Certs.begin());
+                k != make_indirect_iterator(x509Certs.end()); ++k) {
             try {
-                auto_ptr_char x((*k)->getValue());
+                auto_ptr_char x(k->getValue());
                 if (!x.get()) {
                     log.warn("skipping empty ds:X509Certificate");
                 }
@@ -387,8 +394,9 @@ bool InlineCredential::resolveCerts(const KeyInfo* keyInfo, bool followRefs)
         const XMLCh* fragID=NULL;
         const XMLObject* treeRoot=NULL;
         const vector<KeyInfoReference*>& refs = keyInfo->getKeyInfoReferences();
-        for (vector<KeyInfoReference*>::const_iterator ref = refs.begin(); ref != refs.end(); ++ref) {
-            fragID = (*ref)->getURI();
+        for (indirect_iterator<vector<KeyInfoReference*>::const_iterator> ref = make_indirect_iterator(refs.begin());
+                ref != make_indirect_iterator(refs.end()); ++ref) {
+            fragID = ref->getURI();
             if (!fragID || *fragID != chPound || !*(fragID+1)) {
                 log.warn("skipping ds11:KeyInfoReference with an empty or non-local reference");
                 continue;
@@ -421,9 +429,10 @@ bool InlineCredential::resolveCRLs(const KeyInfo* keyInfo, bool followRefs)
     const vector<X509Data*>& x509Datas=keyInfo->getX509Datas();
     for (vector<X509Data*>::const_iterator j=x509Datas.begin(); j!=x509Datas.end(); ++j) {
         const vector<X509CRL*> x509CRLs=const_cast<const X509Data*>(*j)->getX509CRLs();
-        for (vector<X509CRL*>::const_iterator k=x509CRLs.begin(); k!=x509CRLs.end(); ++k) {
+        for (indirect_iterator<vector<X509CRL*>::const_iterator> k = make_indirect_iterator(x509CRLs.begin());
+                k != make_indirect_iterator(x509CRLs.end()); ++k) {
             try {
-                auto_ptr_char x((*k)->getValue());
+                auto_ptr_char x(k->getValue());
                 if (!x.get()) {
                     log.warn("skipping empty ds:X509CRL");
                 }
@@ -449,8 +458,9 @@ bool InlineCredential::resolveCRLs(const KeyInfo* keyInfo, bool followRefs)
         const XMLCh* fragID=NULL;
         const XMLObject* treeRoot=NULL;
         const vector<KeyInfoReference*>& refs = keyInfo->getKeyInfoReferences();
-        for (vector<KeyInfoReference*>::const_iterator ref = refs.begin(); ref != refs.end(); ++ref) {
-            fragID = (*ref)->getURI();
+        for (indirect_iterator<vector<KeyInfoReference*>::const_iterator> ref = make_indirect_iterator(refs.begin());
+                ref != make_indirect_iterator(refs.end()); ++ref) {
+            fragID = ref->getURI();
             if (!fragID || *fragID != chPound || !*(fragID+1)) {
                 log.warn("skipping ds11:KeyInfoReference with an empty or non-local reference");
                 continue;
