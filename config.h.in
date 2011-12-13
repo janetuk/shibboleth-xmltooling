@@ -1,5 +1,29 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Defined if the requested minimum BOOST version is satisfied */
+#undef HAVE_BOOST
+
+/* Define to 1 if you have <boost/algorithm/string.hpp> */
+#undef HAVE_BOOST_ALGORITHM_STRING_HPP
+
+/* Define to 1 if you have <boost/bind.hpp> */
+#undef HAVE_BOOST_BIND_HPP
+
+/* Define to 1 if you have <boost/cast.hpp> */
+#undef HAVE_BOOST_CAST_HPP
+
+/* Define to 1 if you have <boost/lambda/lambda.hpp> */
+#undef HAVE_BOOST_LAMBDA_LAMBDA_HPP
+
+/* Define to 1 if you have <boost/lexical_cast.hpp> */
+#undef HAVE_BOOST_LEXICAL_CAST_HPP
+
+/* Define to 1 if you have <boost/ptr_container/ptr_vector.hpp> */
+#undef HAVE_BOOST_PTR_CONTAINER_PTR_VECTOR_HPP
+
+/* Define to 1 if you have <boost/tokenizer.hpp> */
+#undef HAVE_BOOST_TOKENIZER_HPP
+
 /* Define to 1 if C++ compiler supports covariant virtual methods. */
 #undef HAVE_COVARIANT_RETURNS
 
@@ -19,9 +43,6 @@
 /* Define to 1 if you have an STL implementation that supports
    std::iterator_traits. */
 #undef HAVE_ITERATOR_TRAITS
-
-/* Define to 1 if you have the `curl' library (-lcurl). */
-#undef HAVE_LIBCURL
 
 /* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL
