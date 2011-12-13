@@ -1,17 +1,21 @@
-/*
- *  Copyright 2001-2010 Internet2
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/**
+ * Licensed to the University Corporation for Advanced Internet
+ * Development, Inc. (UCAID) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * UCAID licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the
+ * License at
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
  */
 
 /**
@@ -24,6 +28,7 @@
 #include "exceptions.h"
 #include "logging.h"
 #include "soap/HTTPSOAPTransport.h"
+#include "soap/OpenSSLSOAPTransport.h"
 #include "soap/SOAP.h"
 #include "soap/SOAPClient.h"
 #include "util/XMLHelper.h"
@@ -36,6 +41,32 @@ using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace xercesc;
 using namespace std;
+
+#if !defined(XMLTOOLING_NO_XMLSEC) && !defined(XMLTOOLING_LITE)
+namespace xmltooling {
+    PluginManager<SOAPTransport,string,SOAPTransport::Address>::Factory CURLSOAPTransportFactory;
+};
+#endif
+
+void xmltooling::registerSOAPTransports()
+{
+#if !defined(XMLTOOLING_NO_XMLSEC) && !defined(XMLTOOLING_LITE)
+    XMLToolingConfig& conf=XMLToolingConfig::getConfig();
+    conf.SOAPTransportManager.registerFactory("http", CURLSOAPTransportFactory);
+    conf.SOAPTransportManager.registerFactory("https", CURLSOAPTransportFactory);
+#endif
+}
+
+
+#ifdef XMLTOOLING_NO_XMLSEC
+void xmltooling::initSOAPTransports()
+{
+}
+
+void xmltooling::termSOAPTransports()
+{
+}
+#endif
 
 SOAPTransport::SOAPTransport()
 {
@@ -79,6 +110,16 @@ bool HTTPSOAPTransport::followRedirects(bool follow, unsigned int maxRedirs)
 {
     return false;
 }
+
+#ifndef XMLTOOLING_NO_XMLSEC
+OpenSSLSOAPTransport::OpenSSLSOAPTransport()
+{
+}
+
+OpenSSLSOAPTransport::~OpenSSLSOAPTransport()
+{
+}
+#endif
 
 SOAPClient::SOAPClient(bool validate) : m_validate(validate), m_transport(nullptr)
 {

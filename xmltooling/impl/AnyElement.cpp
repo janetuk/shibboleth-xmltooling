@@ -1,17 +1,21 @@
-/*
- *  Copyright 2001-2009 Internet2
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/**
+ * Licensed to the University Corporation for Advanced Internet
+ * Development, Inc. (UCAID) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * UCAID licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the
+ * License at
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
  */
 
 /**
@@ -41,8 +45,23 @@ AnyElementImpl::AnyElementImpl(const XMLCh* nsURI, const XMLCh* localName, const
 {
 }
 
+AnyElementImpl::AnyElementImpl(const AnyElementImpl& src)
+        : AbstractXMLObject(src),
+          AbstractDOMCachingXMLObject(src),
+          AbstractComplexElement(src),
+          AbstractAttributeExtensibleXMLObject(src)
+{
+}
+
 AnyElementImpl::~AnyElementImpl()
 {
+}
+
+void AnyElementImpl::_clone(const AnyElementImpl& src)
+{
+    const vector<XMLObject*>& children = src.getUnknownXMLObjects();
+    for (vector<XMLObject*>::const_iterator i=children.begin(); i!=children.end(); ++i)
+        getUnknownXMLObjects().push_back((*i)->clone());
 }
 
 XMLObject* AnyElementImpl::clone() const {
@@ -53,18 +72,10 @@ XMLObject* AnyElementImpl::clone() const {
         return ret;
     }
 
-    return new AnyElementImpl(*this);
+    auto_ptr<AnyElementImpl> ret2(new AnyElementImpl(*this));
+    ret2->_clone(*ret2.get());
+    return ret2.release();
 }
-
-AnyElementImpl::AnyElementImpl(const AnyElementImpl& src)
-        : AbstractXMLObject(src),
-          AbstractDOMCachingXMLObject(src),
-          AbstractComplexElement(src),
-          AbstractAttributeExtensibleXMLObject(src) {
-    const vector<XMLObject*>& children = src.getUnknownXMLObjects();
-    for (vector<XMLObject*>::const_iterator i=children.begin(); i!=children.end(); ++i)
-        getUnknownXMLObjects().push_back((*i)->clone());
-}       
 
 void AnyElementImpl::marshallAttributes(DOMElement* domElement) const
 {

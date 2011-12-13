@@ -1,0 +1,80 @@
+# /
+/build
+/build-aux
+/Debug
+/*.ncb
+/*.suo
+/Release
+/aclocal.m4
+/autom4te.cache
+/config.guess
+/config.h
+/config.h.in
+/config.h.in~
+/config.log
+/config.status
+/config.sub
+/configure
+/depcomp
+/install-sh
+/libtool
+/Makefile
+/Makefile.in
+/missing
+/pkginfo
+/stamp-h1
+/xmltooling.spec
+/.settings
+/.autotools
+/.cproject
+/.project
+/doxyfile
+/x64
+/Portfile
+/*.gz
+/*.opensdf
+/*.sdf
+/ipch
+
+# /doc/
+/doc/Makefile
+/doc/Makefile.in
+
+# /m4/
+/m4/libtool.m4
+/m4/lt*.m4
+
+# /schemas/
+/schemas/catalog.xml
+/schemas/Makefile
+/schemas/Makefile.in
+
+# /xmltooling/
+/xmltooling/Debug
+/xmltooling/*.user
+/xmltooling/Release
+/xmltooling/config_pub.h
+/xmltooling/.deps
+/xmltooling/.libs
+/xmltooling/Makefile
+/xmltooling/Makefile.in
+/xmltooling/stamp-h2
+/xmltooling/xmltooling-lite-Debug
+/xmltooling/xmltooling-lite-Release
+/xmltooling/x64
+/xmltooling/*.aps
+
+# /xmltoolingtest/
+/xmltoolingtest/Debug
+/xmltoolingtest/*.user
+/xmltoolingtest/*.cpp
+/xmltoolingtest/Release
+/xmltoolingtest/.deps
+/xmltoolingtest/.libs
+/xmltoolingtest/Makefile
+/xmltoolingtest/Makefile.in
+/xmltoolingtest/xmltoolingtest
+/xmltoolingtest/x64
+
+# /xmltoolingtest/data/
+/xmltoolingtest/data/*.bak

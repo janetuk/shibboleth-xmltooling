@@ -1,17 +1,21 @@
-/*
-*  Copyright 2001-2010 Internet2
+/**
+ * Licensed to the University Corporation for Advanced Internet
+ * Development, Inc. (UCAID) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.
  *
-* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * UCAID licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the
+ * License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
  */
 
 /**
@@ -55,11 +59,11 @@ void XMLObject::releaseThisAndChildrenDOM() const
 AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
     : m_log(logging::Category::getInstance(XMLTOOLING_LOGCAT".XMLObject")),
     	m_schemaLocation(nullptr), m_noNamespaceSchemaLocation(nullptr), m_nil(xmlconstants::XML_BOOL_NULL),
-        m_parent(nullptr), m_elementQname(nsURI, localName, prefix), m_typeQname(nullptr)
+        m_parent(nullptr), m_elementQname(nsURI, localName, prefix)
 {
     addNamespace(Namespace(nsURI, prefix, false, Namespace::VisiblyUsed));
     if (schemaType) {
-        m_typeQname = new QName(*schemaType);
+        m_typeQname.reset(new QName(*schemaType));
         addNamespace(Namespace(m_typeQname->getNamespaceURI(), m_typeQname->getPrefix(), false, Namespace::NonVisiblyUsed));
     }
 }
@@ -67,15 +71,13 @@ AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName,
 AbstractXMLObject::AbstractXMLObject(const AbstractXMLObject& src)
     : m_namespaces(src.m_namespaces), m_log(src.m_log), m_schemaLocation(XMLString::replicate(src.m_schemaLocation)),
         m_noNamespaceSchemaLocation(XMLString::replicate(src.m_noNamespaceSchemaLocation)), m_nil(src.m_nil),
-        m_parent(nullptr), m_elementQname(src.m_elementQname), m_typeQname(nullptr)
+        m_parent(nullptr), m_elementQname(src.m_elementQname),
+        m_typeQname(src.m_typeQname.get() ? new QName(*src.m_typeQname) : nullptr)
 {
-    if (src.m_typeQname)
-        m_typeQname=new QName(*src.m_typeQname);
 }
 
 AbstractXMLObject::~AbstractXMLObject()
 {
-    delete m_typeQname;
     xercesc::XMLString::release(&m_schemaLocation);
     xercesc::XMLString::release(&m_noNamespaceSchemaLocation);
 }
@@ -164,7 +166,7 @@ void AbstractXMLObject::removeNamespace(const Namespace& ns)
 
 const QName* AbstractXMLObject::getSchemaType() const
 {
-    return m_typeQname;
+    return m_typeQname.get();
 }
 
 const XMLCh* AbstractXMLObject::getXMLID() const

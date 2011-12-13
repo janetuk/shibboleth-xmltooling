@@ -1,17 +1,21 @@
-/*
- *  Copyright 2001-2010 Internet2
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/**
+ * Licensed to the University Corporation for Advanced Internet
+ * Development, Inc. (UCAID) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * UCAID licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the
+ * License at
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
  */
 
 /**
@@ -68,6 +72,7 @@ namespace xmlencryption {
             m_pos_OAEPparams=m_pos_KeySize;
             ++m_pos_OAEPparams;
         }
+
     public:
         virtual ~EncryptionMethodImpl() {
             XMLString::release(&m_Algorithm);
@@ -86,9 +91,11 @@ namespace xmlencryption {
                 setKeySize(src.getKeySize()->cloneKeySize());
             if (src.getOAEPparams())
                 setOAEPparams(src.getOAEPparams()->cloneOAEPparams());
-            VectorOf(XMLObject) v=getUnknownXMLObjects();
-            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i)
-                v.push_back((*i)->clone());
+            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i) {
+                if (*i) {
+                    getUnknownXMLObjects().push_back((*i)->clone());
+                }
+            }
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptionMethod);
@@ -137,10 +144,9 @@ namespace xmlencryption {
             
         TransformsImpl(const TransformsImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
-            VectorOf(xmlsignature::Transform) v=getTransforms();
             for (vector<xmlsignature::Transform*>::const_iterator i=src.m_Transforms.begin(); i!=src.m_Transforms.end(); i++) {
                 if (*i) {
-                    v.push_back((*i)->cloneTransform());
+                    getTransforms().push_back((*i)->cloneTransform());
                 }
             }
         }
@@ -167,6 +173,7 @@ namespace xmlencryption {
             m_children.push_back(nullptr);
             m_pos_Transforms=m_children.begin();
         }
+
     public:
         virtual ~CipherReferenceImpl() {
             XMLString::release(&m_URI);
@@ -220,6 +227,7 @@ namespace xmlencryption {
             m_pos_CipherReference=m_pos_CipherValue;
             ++m_pos_CipherReference;
         }
+
     public:
         virtual ~CipherDataImpl() {}
 
@@ -259,6 +267,7 @@ namespace xmlencryption {
         void init() {
             m_Id=m_Target=nullptr;
         }
+
     public:
         virtual ~EncryptionPropertyImpl() {
             XMLString::release(&m_Id);
@@ -278,9 +287,11 @@ namespace xmlencryption {
             init();
             setId(src.getId());
             setTarget(src.getTarget());
-            VectorOf(XMLObject) v=getUnknownXMLObjects();
-            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i)
-                v.push_back((*i)->clone());
+            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i) {
+                if (*i) {
+                    getUnknownXMLObjects().push_back((*i)->clone());
+                }
+            }
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptionProperty);
@@ -328,6 +339,7 @@ namespace xmlencryption {
         void init() {
             m_Id=nullptr;
         }
+
     public:
         virtual ~EncryptionPropertiesImpl() {
             XMLString::release(&m_Id);
@@ -342,10 +354,9 @@ namespace xmlencryption {
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
             setId(src.getId());
-            VectorOf(EncryptionProperty) v=getEncryptionPropertys();
             for (vector<EncryptionProperty*>::const_iterator i=src.m_EncryptionPropertys.begin(); i!=src.m_EncryptionPropertys.end(); i++) {
                 if (*i) {
-                    v.push_back((*i)->cloneEncryptionProperty());
+                    getEncryptionPropertys().push_back((*i)->cloneEncryptionProperty());
                 }
             }
         }
@@ -376,13 +387,9 @@ namespace xmlencryption {
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
     {
-        void init() {
-            m_URI=nullptr;
-        }
-        
     protected:
         ReferenceTypeImpl() {
-            init();
+            m_URI=nullptr;
         }
         
     public:
@@ -391,20 +398,23 @@ namespace xmlencryption {
         }
 
         ReferenceTypeImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
-            : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
-            init();
+            : AbstractXMLObject(nsURI, localName, prefix, schemaType), m_URI(nullptr) {
         }
             
         ReferenceTypeImpl(const ReferenceTypeImpl& src)
-                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
-            init();
+                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src), m_URI(nullptr) {
+        }
+
+        void _clone(const ReferenceTypeImpl& src) {
             setURI(src.getURI());
-            VectorOf(XMLObject) v=getUnknownXMLObjects();
-            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i)
-                v.push_back((*i)->clone());
+            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i) {
+                if (*i) {
+                    getUnknownXMLObjects().push_back((*i)->clone());
+                }
+            }
         }
         
-        IMPL_XMLOBJECT_CLONE(ReferenceType);
+        IMPL_XMLOBJECT_CLONE_EX(ReferenceType);
         IMPL_STRING_ATTRIB(URI);
         IMPL_XMLOBJECT_CHILDREN(UnknownXMLObject,m_children.end());
 
@@ -432,11 +442,8 @@ namespace xmlencryption {
             : AbstractXMLObject(nsURI, localName, prefix, schemaType) {}
             
         DataReferenceImpl(const DataReferenceImpl& src) : AbstractXMLObject(src), ReferenceTypeImpl(src) {}
-        
-        IMPL_XMLOBJECT_CLONE(DataReference);
-        ReferenceType* cloneReferenceType() const {
-            return new DataReferenceImpl(*this);
-        }
+
+        IMPL_XMLOBJECT_CLONE_EX(DataReference);
     };
 
     class XMLTOOL_DLLLOCAL KeyReferenceImpl : public virtual KeyReference, public ReferenceTypeImpl
@@ -449,10 +456,7 @@ namespace xmlencryption {
             
         KeyReferenceImpl(const KeyReferenceImpl& src) : AbstractXMLObject(src), ReferenceTypeImpl(src) {}
         
-        IMPL_XMLOBJECT_CLONE(KeyReference);
-        ReferenceType* cloneReferenceType() const {
-            return new KeyReferenceImpl(*this);
-        }
+        IMPL_XMLOBJECT_CLONE_EX(KeyReference);
     };
 
     class XMLTOOL_DLLLOCAL ReferenceListImpl : public virtual ReferenceList,
@@ -523,6 +527,7 @@ namespace xmlencryption {
             m_pos_EncryptionProperties=m_pos_CipherData;
             ++m_pos_EncryptionProperties;
         }
+
     protected:
         EncryptedTypeImpl() {
             init();
@@ -544,6 +549,9 @@ namespace xmlencryption {
         EncryptedTypeImpl(const EncryptedTypeImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
+        }
+
+        void _clone(const EncryptedTypeImpl& src) {
             setId(src.getId());
             setType(src.getType());
             setMimeType(src.getMimeType());
@@ -558,7 +566,7 @@ namespace xmlencryption {
                 setEncryptionProperties(src.getEncryptionProperties()->cloneEncryptionProperties());
         }
         
-        IMPL_XMLOBJECT_CLONE(EncryptedType);
+        IMPL_XMLOBJECT_CLONE_EX(EncryptedType);
         IMPL_ID_ATTRIB_EX(Id,ID,nullptr);
         IMPL_STRING_ATTRIB(Type);
         IMPL_STRING_ATTRIB(MimeType);
@@ -603,10 +611,7 @@ namespace xmlencryption {
             
         EncryptedDataImpl(const EncryptedDataImpl& src) : AbstractXMLObject(src), EncryptedTypeImpl(src) {}
         
-        IMPL_XMLOBJECT_CLONE(EncryptedData);
-        EncryptedType* cloneEncryptedType() const {
-            return new EncryptedDataImpl(*this);
-        }
+        IMPL_XMLOBJECT_CLONE_EX(EncryptedData);
     };
 
     class XMLTOOL_DLLLOCAL EncryptedKeyImpl : public virtual EncryptedKey, public EncryptedTypeImpl
@@ -637,10 +642,16 @@ namespace xmlencryption {
             init();
         }
         
-        IMPL_XMLOBJECT_CLONE(EncryptedKey);
-        EncryptedType* cloneEncryptedType() const {
-            return new EncryptedKeyImpl(*this);
+        void _clone(const EncryptedKeyImpl& src) {
+            EncryptedTypeImpl::_clone(src);
+            setRecipient(src.getRecipient());
+            if (src.getReferenceList())
+                setReferenceList(src.getReferenceList()->cloneReferenceList());
+            if (src.getCarriedKeyName())
+                setCarriedKeyName(src.getCarriedKeyName()->cloneCarriedKeyName());
         }
+
+        IMPL_XMLOBJECT_CLONE_EX(EncryptedKey);
         IMPL_STRING_ATTRIB(Recipient);
         IMPL_TYPED_CHILD(ReferenceList);
         IMPL_TYPED_CHILD(CarriedKeyName);

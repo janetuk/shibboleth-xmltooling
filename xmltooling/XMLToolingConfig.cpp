@@ -1,18 +1,21 @@
-/*
- * Licensed to UCAID under one or more contributor license agreements.
- * See the NOTICE file distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may not use this
- * file except in compliance with the License.  You may obtain a copy of the
+/**
+ * Licensed to the University Corporation for Advanced Internet
+ * Development, Inc. (UCAID) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.
+ *
+ * UCAID licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the
  * License at
  *
- *       http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
  */
 
 /**
@@ -33,9 +36,11 @@
 #include "security/OpenSSLCryptoX509CRL.h"
 #include "security/CredentialResolver.h"
 #include "security/KeyInfoResolver.h"
+#include "security/PathValidator.h"
 #include "signature/KeyInfo.h"
 #include "signature/Signature.h"
 #include "soap/SOAP.h"
+#include "soap/SOAPTransport.h"
 #include "util/NDC.h"
 #include "util/PathResolver.h"
 #include "util/ReplayCache.h"
@@ -50,6 +55,10 @@
 #endif
 
 #include <stdexcept>
+#include <boost/bind.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
+#include <boost/tokenizer.hpp>
+
 #if defined(XMLTOOLING_LOG4SHIB)
 # include <log4shib/PropertyConfigurator.hh>
 # include <log4shib/OstreamAppender.hh>
@@ -73,6 +82,7 @@ using namespace soap11;
 using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace xercesc;
+using namespace boost;
 using namespace std;
 
 #ifdef WIN32
@@ -103,14 +113,14 @@ using namespace xmlsignature;
 namespace {
     static XMLToolingInternalConfig g_config;
 #ifndef XMLTOOLING_NO_XMLSEC
-    static vector<Mutex*> g_openssl_locks;
+    static ptr_vector<Mutex> g_openssl_locks;
 
     extern "C" void openssl_locking_callback(int mode,int n,const char *file,int line)
     {
         if (mode & CRYPTO_LOCK)
-            g_openssl_locks[n]->lock();
+            g_openssl_locks[n].lock();
         else
-            g_openssl_locks[n]->unlock();
+            g_openssl_locks[n].unlock();
     }
 
 # ifndef WIN32
@@ -219,6 +229,76 @@ XMLToolingConfig::~XMLToolingConfig()
 {
 }
 
+#ifndef XMLTOOLING_LITE
+const KeyInfoResolver* XMLToolingConfig::getKeyInfoResolver() const
+{
+    return m_keyInfoResolver;
+}
+
+ReplayCache* XMLToolingConfig::getReplayCache() const
+{
+    return m_replayCache;
+}
+
+void XMLToolingConfig::setKeyInfoResolver(xmltooling::KeyInfoResolver *keyInfoResolver)
+{
+    delete m_keyInfoResolver;
+    m_keyInfoResolver = keyInfoResolver;
+}
+
+void XMLToolingConfig::setReplayCache(ReplayCache* replayCache)
+{
+    delete m_replayCache;
+    m_replayCache = replayCache;
+}
+#endif
+
+PathResolver* XMLToolingConfig::getPathResolver() const
+{
+    return m_pathResolver;
+}
+
+TemplateEngine* XMLToolingConfig::getTemplateEngine() const
+{
+    return m_templateEngine;
+}
+
+const URLEncoder* XMLToolingConfig::getURLEncoder() const
+{
+    return m_urlEncoder;
+}
+
+void XMLToolingConfig::setPathResolver(PathResolver* pathResolver)
+{
+    delete m_pathResolver;
+    m_pathResolver = pathResolver;
+}
+
+void XMLToolingConfig::setTemplateEngine(TemplateEngine* templateEngine)
+{
+    delete m_templateEngine;
+    m_templateEngine = templateEngine;
+}
+
+void XMLToolingConfig::setURLEncoder(URLEncoder* urlEncoder)
+{
+    delete m_urlEncoder;
+    m_urlEncoder = urlEncoder;
+}
+
+XMLToolingInternalConfig::XMLToolingInternalConfig() :
+#ifndef XMLTOOLING_NO_XMLSEC
+    m_xsecProvider(nullptr),
+#endif
+    m_initCount(0), m_lock(Mutex::create()), m_parserPool(nullptr), m_validatingPool(nullptr)
+{
+}
+
+XMLToolingInternalConfig::~XMLToolingInternalConfig()
+{
+    delete m_lock;
+}
+
 bool XMLToolingInternalConfig::log_config(const char* config)
 {
     try {
@@ -278,7 +358,7 @@ bool XMLToolingInternalConfig::log_config(const char* config)
 #endif
 	}
     catch (const ConfigureFailure& e) {
-        string msg = string("failed to configure logging: ") + e.what();
+        string msg = string("error in file permissions or logging configuration: ") + e.what();
         Category::getInstance(XMLTOOLING_LOGCAT".Logging").crit(msg);
 #ifdef WIN32
         LogEvent(nullptr, EVENTLOG_ERROR_TYPE, 2100, nullptr, msg.c_str());
@@ -289,69 +369,25 @@ bool XMLToolingInternalConfig::log_config(const char* config)
     return true;
 }
 
-#ifndef XMLTOOLING_LITE
-const KeyInfoResolver* XMLToolingConfig::getKeyInfoResolver() const
-{
-    return m_keyInfoResolver;
-}
-
-ReplayCache* XMLToolingConfig::getReplayCache() const
-{
-    return m_replayCache;
-}
-
-void XMLToolingConfig::setKeyInfoResolver(xmltooling::KeyInfoResolver *keyInfoResolver)
-{
-    delete m_keyInfoResolver;
-    m_keyInfoResolver = keyInfoResolver;
-}
-
-void XMLToolingConfig::setReplayCache(ReplayCache* replayCache)
-{
-    delete m_replayCache;
-    m_replayCache = replayCache;
-}
-#endif
-
-PathResolver* XMLToolingConfig::getPathResolver() const
-{
-    return m_pathResolver;
-}
-
-TemplateEngine* XMLToolingConfig::getTemplateEngine() const
-{
-    return m_templateEngine;
-}
-
-const URLEncoder* XMLToolingConfig::getURLEncoder() const
-{
-    return m_urlEncoder;
-}
-
-void XMLToolingConfig::setPathResolver(PathResolver* pathResolver)
-{
-    delete m_pathResolver;
-    m_pathResolver = pathResolver;
-}
-
-void XMLToolingConfig::setTemplateEngine(TemplateEngine* templateEngine)
-{
-    delete m_templateEngine;
-    m_templateEngine = templateEngine;
-}
-
-void XMLToolingConfig::setURLEncoder(URLEncoder* urlEncoder)
-{
-    delete m_urlEncoder;
-    m_urlEncoder = urlEncoder;
-}
-
 bool XMLToolingInternalConfig::init()
 {
 #ifdef _DEBUG
     xmltooling::NDC ndc("init");
 #endif
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".XMLToolingConfig");
+    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Config");
+
+    Lock initLock(m_lock);
+
+    if (m_initCount == INT_MAX) {
+        log.crit("library initialized too many times");
+        return false;
+    }
+
+    if (m_initCount >= 1) {
+        ++m_initCount;
+        return true;
+    }
+
     try {
         log.debug("library initialization started");
 
@@ -386,22 +422,16 @@ bool XMLToolingInternalConfig::init()
 
         m_parserPool=new ParserPool();
         m_validatingPool=new ParserPool(true,true);
-        m_lock=XMLPlatformUtils::makeMutex();
 
         // Load catalogs from path.
         if (!catalog_path.empty()) {
-            char* catpath=strdup(catalog_path.c_str());
-            char* sep=nullptr;
-            char* start=catpath;
-            while (start && *start) {
-                sep=strchr(start,PATH_SEPARATOR_CHAR);
-                if (sep)
-                    *sep=0;
-                auto_ptr_XMLCh temp(start);
-                m_validatingPool->loadCatalog(temp.get());
-                start = sep ? sep + 1 : nullptr;
-            }
-            free(catpath);
+            boost::tokenizer< char_separator<char> > catpaths(catalog_path, char_separator<char>(PATH_SEPARATOR_STR));
+            for_each(
+                catpaths.begin(), catpaths.end(),
+                // Call loadCatalog with an inner call to s->c_str() on each entry.
+                boost::bind(static_cast<bool (ParserPool::*)(const char*)>(&ParserPool::loadCatalog),
+                    m_validatingPool, boost::bind(&string::c_str,_1))
+                );
         }
 
         // default registrations
@@ -425,15 +455,19 @@ bool XMLToolingInternalConfig::init()
         REGISTER_XMLTOOLING_EXCEPTION_FACTORY(EncryptionException,xmlencryption);
         registerKeyInfoClasses();
         registerEncryptionClasses();
-        registerKeyInfoResolvers();
         registerCredentialResolvers();
+        registerKeyInfoResolvers();
+        registerPathValidators();
         registerTrustEngines();
         registerXMLAlgorithms();
-        registerSOAPTransports();
-        initSOAPTransports();
-        registerStorageServices();
         m_keyInfoResolver = KeyInfoResolverManager.newPlugin(INLINE_KEYINFO_RESOLVER,nullptr);
 #endif
+
+#ifndef XMLTOOLING_LITE
+        registerStorageServices();
+#endif
+        registerSOAPTransports();
+        initSOAPTransports();
 
         m_pathResolver = new PathResolver();
         m_urlEncoder = new URLEncoder();
@@ -464,14 +498,27 @@ bool XMLToolingInternalConfig::init()
 #endif
 
     log.info("%s library initialization complete", PACKAGE_STRING);
+    ++m_initCount;
     return true;
 }
 
 void XMLToolingInternalConfig::term()
 {
+#ifdef _DEBUG
+    xmltooling::NDC ndc("term");
+#endif
+
+    Lock initLock(m_lock);
+    if (m_initCount == 0) {
+        Category::getInstance(XMLTOOLING_LOGCAT".Config").crit("term without corresponding init");
+        return;
+    }
+    else if (--m_initCount > 0) {
+        return;
+    }
+
 #ifndef XMLTOOLING_NO_XMLSEC
     CRYPTO_set_locking_callback(nullptr);
-    for_each(g_openssl_locks.begin(), g_openssl_locks.end(), xmltooling::cleanup<Mutex>());
     g_openssl_locks.clear();
 #endif
 
@@ -480,10 +527,14 @@ void XMLToolingInternalConfig::term()
     XMLToolingException::deregisterFactories();
     AttributeExtensibleXMLObject::deregisterIDAttributes();
 
-#ifndef XMLTOOLING_NO_XMLSEC
-    StorageServiceManager.deregisterFactories();
     termSOAPTransports();
     SOAPTransportManager.deregisterFactories();
+
+#ifndef XMLTOOLING_LITE
+    StorageServiceManager.deregisterFactories();
+#endif
+
+#ifndef XMLTOOLING_NO_XMLSEC
     TrustEngineManager.deregisterFactories();
     CredentialResolverManager.deregisterFactories();
     KeyInfoResolverManager.deregisterFactories();
@@ -527,34 +578,43 @@ void XMLToolingInternalConfig::term()
     delete m_validatingPool;
     m_validatingPool=nullptr;
 
+    for_each(m_namedLocks.begin(), m_namedLocks.end(), cleanup_pair<string,Mutex>());
+    m_namedLocks.clear();
+
 #ifndef XMLTOOLING_NO_XMLSEC
     delete m_xsecProvider;
     m_xsecProvider=nullptr;
     XSECPlatformUtils::Terminate();
 #endif
 
-    XMLPlatformUtils::closeMutex(m_lock);
-    m_lock=nullptr;
     XMLPlatformUtils::Terminate();
 
 #ifndef XMLTOOLING_NO_XMLSEC
     curl_global_cleanup();
 #endif
-#ifdef _DEBUG
-    xmltooling::NDC ndc("term");
-#endif
-   Category::getInstance(XMLTOOLING_LOGCAT".XMLToolingConfig").info("%s library shutdown complete", PACKAGE_STRING);
+   Category::getInstance(XMLTOOLING_LOGCAT".Config").info("%s library shutdown complete", PACKAGE_STRING);
 }
 
 Lockable* XMLToolingInternalConfig::lock()
 {
-    xercesc::XMLPlatformUtils::lockMutex(m_lock);
+    m_lock->lock();
     return this;
 }
 
 void XMLToolingInternalConfig::unlock()
 {
-    xercesc::XMLPlatformUtils::unlockMutex(m_lock);
+    m_lock->unlock();
+}
+
+Mutex& XMLToolingInternalConfig::getNamedMutex(const char* name)
+{
+    Locker glock(this);
+    map<string,Mutex*>::const_iterator m = m_namedLocks.find(name);
+    if (m != m_namedLocks.end())
+        return *(m->second);
+    Mutex* newlock = Mutex::create();
+    m_namedLocks[name] = newlock;
+    return *newlock;
 }
 
 bool XMLToolingInternalConfig::load_library(const char* path, void* context)
@@ -562,7 +622,7 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
 #ifdef _DEBUG
     xmltooling::NDC ndc("LoadLibrary");
 #endif
-    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".XMLToolingConfig");
+    Category& log=Category::getInstance(XMLTOOLING_LOGCAT".Config");
     log.info("loading extension: %s", path);
 
     Locker locker(this);
@@ -590,7 +650,7 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
             throw runtime_error(string("detected error in xmltooling_extension_init: ") + resolved);
         SetErrorMode(em);
     }
-    catch(exception&) {
+    catch(std::exception&) {
         if (handle)
             FreeLibrary(handle);
         SetErrorMode(em);
@@ -613,7 +673,7 @@ bool XMLToolingInternalConfig::load_library(const char* path, void* context)
         if (fn(context)!=0)
             throw runtime_error(string("detected error in xmltooling_extension_init in ") + resolved);
     }
-    catch(exception&) {
+    catch(std::exception&) {
         if (handle)
             dlclose(handle);
         throw;

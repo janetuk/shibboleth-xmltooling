@@ -23,6 +23,7 @@ xmlsec_sources = \
     FilesystemCredentialResolverTest.h \
     InlineKeyResolverTest.h \
     MemoryStorageServiceTest.h \
+    PKIXEngineTest.h \
     SecurityHelperTest.h \
     SignatureTest.h
 else
@@ -43,14 +44,18 @@ xmltoolingtest_h = \
     ${xmlsec_sources}
 
 noinst_HEADERS = \
-    XMLObjectBaseTestCase.h
+    XMLObjectBaseTestCase.h \
+    $(xmltoolingtest_h)
 
 nodist_xmltoolingtest_SOURCES = $(xmltoolingtest_h:.h=.cpp)
 
+if BUILD_UNITTEST
+BUILT_SOURCES = $(nodist_xmltoolingtest_SOURCES)
 CLEANFILES = $(nodist_xmltoolingtest_SOURCES)
+endif
 
 do-cxxtestgen:
-	if test $(HFILE) = "xmltoolingtest.h"; then \
+	if test "$(CPPFILE)" = "xmltoolingtest.cpp"; then \
 		$(CXXTEST) --error-printer --have-eh --have-std --abort-on-fail -o $(CPPFILE) $(HFILE); \
 	else \
 		$(CXXTEST) --part --have-eh --have-std --abort-on-fail -o $(CPPFILE) $(HFILE); \
@@ -59,4 +64,4 @@ do-cxxtestgen:
 $(nodist_xmltoolingtest_SOURCES): %.cpp: %.h
 	$(MAKE) do-cxxtestgen HFILE=$< CPPFILE=$@
 
-EXTRA_DIST = xmltoolingtest.vcxproj xmltoolingtest.vcxproj.filters $(xmltoolingtest_h) data
+EXTRA_DIST = xmltoolingtest.vcxproj xmltoolingtest.vcxproj.filters data

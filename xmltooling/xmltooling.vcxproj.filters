@@ -219,6 +219,9 @@
     <ClCompile Include="security\impl\CredentialResolver.cpp">
       <Filter>Source Files\security\impl</Filter>
     </ClCompile>
+    <ClCompile Include="security\impl\DummyCredentialResolver.cpp">
+      <Filter>Source Files\security\impl</Filter>
+    </ClCompile>
     <ClCompile Include="security\impl\ExplicitKeyTrustEngine.cpp">
       <Filter>Source Files\security\impl</Filter>
     </ClCompile>
@@ -260,6 +263,9 @@
     </ClCompile>
     <ClCompile Include="version.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="security\impl\PKIXPathValidator.cpp">
+      <Filter>Source Files\security\impl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -499,6 +505,15 @@
     </ClInclude>
     <ClInclude Include="soap\SOAPTransport.h">
       <Filter>Header Files\soap</Filter>
+    </ClInclude>
+    <ClInclude Include="security\OpenSSLPathValidator.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\PathValidator.h">
+      <Filter>Header Files\security</Filter>
+    </ClInclude>
+    <ClInclude Include="security\PKIXPathValidatorParams.h">
+      <Filter>Header Files\security</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,17 +1,21 @@
-/*
- *  Copyright 2001-2010 Internet2
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/**
+ * Licensed to the University Corporation for Advanced Internet
+ * Development, Inc. (UCAID) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * UCAID licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the
+ * License at
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
  */
 
 /**
@@ -37,6 +41,7 @@
 
 namespace xmltooling {
     
+    class XMLTOOL_API Mutex;
     class XMLTOOL_API ParserPool;
     class XMLTOOL_API PathResolver;
     class XMLTOOL_API TemplateEngine;
@@ -48,6 +53,7 @@ namespace xmltooling {
 #ifndef XMLTOOLING_NO_XMLSEC
     class XMLTOOL_API CredentialResolver;
     class XMLTOOL_API KeyInfoResolver;
+    class XMLTOOL_API PathValidator;
     class XMLTOOL_API TrustEngine;
     class XMLTOOL_API XSECCryptoX509CRL;
 #endif
@@ -152,6 +158,15 @@ namespace xmltooling {
          */
         virtual ParserPool& getValidatingParser() const=0;
 
+        /**
+         * Returns a reference to a named mutex.
+         * <p>The first access to a given name will create the object.
+         *
+         * @param name  name of mutex to access
+         * @return  reference to a mutex object
+         */
+        virtual Mutex& getNamedMutex(const char* name)=0;
+
 #ifndef XMLTOOLING_NO_XMLSEC
         /**
          * Returns the global KeyInfoResolver instance.
@@ -250,6 +265,13 @@ namespace xmltooling {
          */
         unsigned int clock_skew_secs;
 
+#ifndef XMLTOOLING_LITE
+        /**
+         * Manages factories for StorageService plugins.
+         */
+        PluginManager<StorageService,std::string,const xercesc::DOMElement*> StorageServiceManager;
+#endif
+
 #ifndef XMLTOOLING_NO_XMLSEC
         /**
          * Returns an X.509 CRL implementation object.
@@ -257,24 +279,24 @@ namespace xmltooling {
         virtual XSECCryptoX509CRL* X509CRL() const=0;
 
         /**
-         * Manages factories for KeyInfoResolver plugins.
-         */
-        PluginManager<KeyInfoResolver,std::string,const xercesc::DOMElement*> KeyInfoResolverManager;
-
-        /**
          * Manages factories for CredentialResolver plugins.
          */
         PluginManager<CredentialResolver,std::string,const xercesc::DOMElement*> CredentialResolverManager;
 
         /**
+         * Manages factories for KeyInfoResolver plugins.
+         */
+        PluginManager<KeyInfoResolver,std::string,const xercesc::DOMElement*> KeyInfoResolverManager;
+
+        /**
+         * Manages factories for PathValidator plugins.
+         */
+        PluginManager<PathValidator,std::string,const xercesc::DOMElement*> PathValidatorManager;
+
+        /**
          * Manages factories for TrustEngine plugins.
          */
         PluginManager<TrustEngine,std::string,const xercesc::DOMElement*> TrustEngineManager;
-
-        /**
-         * Manages factories for StorageService plugins.
-         */
-        PluginManager<StorageService,std::string,const xercesc::DOMElement*> StorageServiceManager;
 
         /**
          * Maps an XML Signature/Encryption algorithm identifier to a library-specific

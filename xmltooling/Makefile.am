@@ -78,6 +78,9 @@ secinclude_HEADERS = \
 	security/KeyInfoCredentialContext.h \
 	security/KeyInfoResolver.h \
 	security/OpenSSLCredential.h \
+	security/OpenSSLPathValidator.h \
+	security/PathValidator.h \
+	security/PKIXPathValidatorParams.h \
 	security/SecurityHelper.h \
 	security/SignatureTrustEngine.h \
 	security/TrustEngine.h \
@@ -137,11 +140,13 @@ xmlsec_sources = \
 	security/impl/ChainingTrustEngine.cpp \
 	security/impl/CredentialCriteria.cpp \
 	security/impl/CredentialResolver.cpp \
+	security/impl/DummyCredentialResolver.cpp \
 	security/impl/ExplicitKeyTrustEngine.cpp \
 	security/impl/FilesystemCredentialResolver.cpp \
 	security/impl/InlineKeyResolver.cpp \
 	security/impl/KeyInfoResolver.cpp \
 	security/impl/OpenSSLCryptoX509CRL.cpp \
+	security/impl/PKIXPathValidator.cpp \
 	security/impl/SecurityHelper.cpp \
 	security/impl/StaticPKIXTrustEngine.cpp \
 	security/impl/TrustEngine.cpp \
@@ -202,10 +207,10 @@ libxmltooling_lite_la_CPPFLAGS = -DXMLTOOLING_LITE
 libxmltooling_lite_la_LDFLAGS = -version-info 6:0:0
 
 if BUILD_XMLSEC
-libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 6:0:0
 libxmltooling_la_SOURCES = \
 	${common_sources} \
 	${xmlsec_sources}
+libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 6:0:0
 endif
 
 install-exec-hook:

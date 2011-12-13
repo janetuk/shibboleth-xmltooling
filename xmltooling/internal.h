@@ -1,17 +1,21 @@
-/*
- *  Copyright 2001-2010 Internet2
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/**
+ * Licensed to the University Corporation for Advanced Internet
+ * Development, Inc. (UCAID) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * UCAID licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the
+ * License at
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
  */
 
 /*
@@ -24,6 +28,7 @@
 #ifdef WIN32
 # define _CRT_SECURE_NO_DEPRECATE 1
 # define _CRT_NONSTDC_NO_DEPRECATE 1
+# define _SCL_SECURE_NO_WARNINGS 1
 #endif
 
 // Export public APIs.
@@ -40,7 +45,10 @@
 #include "XMLToolingConfig.h"
 #include "util/ParserPool.h"
 
+#include <map>
+#include <string>
 #include <vector>
+
 #ifndef XMLTOOLING_NO_XMLSEC
     #include <xsec/framework/XSECProvider.hpp>
 #endif
@@ -75,16 +83,11 @@
 namespace xmltooling {
     
     /// @cond OFF
-    class XMLToolingInternalConfig : public XMLToolingConfig
+    class XMLTOOL_DLLLOCAL XMLToolingInternalConfig : public XMLToolingConfig
     {
     public:
-        XMLToolingInternalConfig() :
-#ifndef XMLTOOLING_NO_XMLSEC
-            m_xsecProvider(nullptr),
-#endif
-            m_lock(nullptr), m_parserPool(nullptr), m_validatingPool(nullptr)
-        {
-        }
+        XMLToolingInternalConfig();
+        ~XMLToolingInternalConfig();
 
         static XMLToolingInternalConfig& getInternalConfig();
 
@@ -95,6 +98,9 @@ namespace xmltooling {
         // global mutex available to library applications
         Lockable* lock();
         void unlock();
+
+        // named mutexes to limit lock scope
+        Mutex& getNamedMutex(const char* name);
 
         // configuration
         bool load_library(const char* path, void* context=nullptr);
@@ -125,8 +131,10 @@ namespace xmltooling {
 #endif
 
     private:
+        int m_initCount;
+        Mutex* m_lock;
+        std::map<std::string,Mutex*> m_namedLocks;
         std::vector<void*> m_libhandles;
-        void* m_lock;
         ParserPool* m_parserPool;
         ParserPool* m_validatingPool;
     };

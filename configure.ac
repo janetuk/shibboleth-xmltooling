@@ -1,6 +1,6 @@
 # Process this file with autoreconf
 AC_PREREQ([2.50])
-AC_INIT([xmltooling],[1.5],[https://bugs.internet2.edu/],[xmltooling])
+AC_INIT([xmltooling],[1.5],[https://issues.shibboleth.net/],[xmltooling])
 AC_CONFIG_SRCDIR(xmltooling)
 AC_CONFIG_AUX_DIR(build-aux)
 AC_CONFIG_MACRO_DIR(m4)
@@ -32,7 +32,7 @@ else
 fi
 
 AC_CONFIG_HEADERS([config.h xmltooling/config_pub.h])
-AC_CONFIG_FILES([xmltooling.spec pkginfo Portfile])
+AC_CONFIG_FILES([xmltooling.spec])
 AC_CONFIG_FILES([Makefile xmltooling/Makefile xmltoolingtest/Makefile schemas/Makefile doc/Makefile])
 
 AC_PROG_CC([gcc gcc3 cc])
@@ -49,16 +49,19 @@ if test "$GCC" = "yes" ; then
 #        ])
     CFLAGS="-Wall $GCC_CFLAGS"
     CXXFLAGS="-Wall $GCC_CXXFLAGS"
-else
-# Fix for Sun Workshop compiler in debug mode, may be Sun case #6360993
-	case "${host_cpu}-${host_os}" in
-	        *solaris*)
-			if test "$CXX" = "CC" ; then
-				CXXFLAGS="$CXXFLAGS -Qoption ccfe -stabs=no%dfltlit+no%dflthlp"
-			fi
-	        ;;
-	esac
 fi
+
+# Fix for Sun Workshop compiler in debug mode, may be Sun case #6360993
+# Also enables POSIX semantics for some functions.
+case "${host_cpu}-${host_os}" in
+    *solaris*)
+	CFLAGS="$CFLAGS -D_POSIX_PTHREAD_SEMANTICS"
+	CXXFLAGS="$CXXFLAGS -D_POSIX_PTHREAD_SEMANTICS"
+	if test "$CXX" = "CC" ; then
+		CXXFLAGS="$CXXFLAGS -Qoption ccfe -stabs=no%dfltlit+no%dflthlp"
+	fi
+    ;;
+esac
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -89,6 +92,16 @@ AC_LANG([C++])
 # C++ requirements
 AC_CXX_NAMESPACES
 AC_CXX_REQUIRE_STL
+
+# Boost
+BOOST_REQUIRE
+BOOST_BIND
+BOOST_CONVERSION
+BOOST_LAMBDA
+BOOST_PTR_CONTAINER
+BOOST_STRING_ALGO
+BOOST_TOKENIZER
+CPPFLAGS = "$BOOST_CPPFLAGS $CPPFLAGS"
 
 # are covariant methods allowed?
 AC_LINK_IFELSE(
@@ -155,13 +168,16 @@ else
 fi
 
 # Xerces settings
-AC_ARG_WITH(xerces, 
-    AS_HELP_STRING([--with-xerces=PATH], [where xerces-c is installed]),
-    [if test x_$with_xerces != x_/usr; then
-        LDFLAGS="-L${with_xerces}/lib $LDFLAGS"
-        CPPFLAGS="-I${with_xerces}/include $CPPFLAGS"
-    fi])
-LIBS="-lxerces-c $LIBS"
+AC_ARG_WITH(xerces,
+    AS_HELP_STRING([--with-xerces=PATH],[where xerces-c is installed]),,
+    [with_xerces=/usr])
+if test x_$with_xerces != x_/usr; then
+    CPPFLAGS="-I${with_xerces}/include $CPPFLAGS"
+    LIBS="-L${with_xerces}/lib -lxerces-c $LIBS"
+else
+    LIBS="-lxerces-c $LIBS"
+fi
+
 AC_CHECK_HEADER([xercesc/dom/DOM.hpp],,AC_MSG_ERROR([unable to find xerces header files]))
 AC_MSG_CHECKING([Xerces version])
 AC_PREPROC_IFELSE(
@@ -276,9 +292,10 @@ if test x_$with_xmlsec != x_no; then
 
     if test x_$with_xmlsec != x_/usr; then
         CPPFLAGS="-I${with_xmlsec}/include $CPPFLAGS"
-        LDFLAGS="-L${with_xmlsec}/lib $LDFLAGS"
-    fi        
-    XMLSEC_LIBS="$XMLSEC_LIBS -lxml-security-c"
+        XMLSEC_LIBS="-L${with_xmlsec}/lib -lxml-security-c $XMLSEC_LIBS"
+    else
+        XMLSEC_LIBS="-lxml-security-c $XMLSEC_LIBS"
+    fi
     
     # save and append master libs
     save_LIBS="$LIBS"
@@ -362,12 +379,15 @@ int i = 0;
     LIBS="$XMLSEC_LIBS $LIBS"
 	
     AC_CHECK_HEADER([curl/curl.h],,AC_MSG_ERROR([unable to find libcurl header files]))
-    AC_CHECK_LIB([curl],[curl_global_init],,AC_MSG_ERROR([unable to link with libcurl]))
+    AC_LINK_IFELSE(
+        [AC_LANG_PROGRAM([[#include <curl/curl.h>]],
+            [[curl_global_init(CURL_GLOBAL_ALL)]])],,
+        [AC_MSG_ERROR([unable to link with libcurl])])
     AC_MSG_CHECKING([for CURLOPT_SSL_CTX_FUNCTION in curl.h])
     AC_EGREP_HEADER([CURLOPT_SSL_CTX_FUNCTION], [curl/curl.h],
         [AC_MSG_RESULT(yes)],
         [AC_MSG_ERROR([need libcurl that supports CURLOPT_SSL_CTX_FUNCTION])])
-    AC_CHECK_TYPE([curl_off_t],[AC_DEFINE([HAVE_CURL_OFF_T],[1],[Define to 1 if you have the 'curl_off_t' type.])])
+    AC_CHECK_TYPE([curl_off_t],[AC_DEFINE([HAVE_CURL_OFF_T],[1],[Define to 1 if you have the 'curl_off_t' type.])],,[[#include <curl/curl.h>]])
     
     # restore master libs
     LIBS="$save_LIBS"

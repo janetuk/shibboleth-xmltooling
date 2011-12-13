@@ -1,17 +1,21 @@
-/*
- *  Copyright 2001-2010 Internet2
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/**
+ * Licensed to the University Corporation for Advanced Internet
+ * Development, Inc. (UCAID) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * UCAID licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the
+ * License at
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
  */
 
 /**
@@ -27,10 +31,13 @@
 #include <xmltooling/security/OpenSSLTrustEngine.h>
 #include <xmltooling/security/SignatureTrustEngine.h>
 
+#include <set>
 #include <string>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 namespace xmltooling {
 
+    class XMLTOOL_API OpenSSLPathValidator;
     class XMLTOOL_API XSECCryptoX509CRL;
 
     /**
@@ -47,24 +54,45 @@ namespace xmltooling {
          * 
          * <ul>
          *  <li>checkRevocation attribute (off, entityOnly, fullChain)
+         *  <li>policyMappingInhibit attribute (boolean)
+         *  <li>anyPolicyInhibit attribute (boolean)
+         *  <li>&t;PathValidator&gt; element (zero or more)
+         *  <li>&lt;TrustedName&gt; element (zero or more)
+         *  <li>&lt;PolicyOID&gt; element (zero or more)
          * </ul>
          * 
          * @param e DOM to supply configuration for provider
          */
         AbstractPKIXTrustEngine(const xercesc::DOMElement* e=nullptr);
 
-		/** Controls revocation checking, currently limited to CRLs and supports "off", "entityOnly", "fullChain". */
-		std::string m_checkRevocation;
+        /** Plugins used to perform path validation. */
+        boost::ptr_vector<OpenSSLPathValidator> m_pathValidators;
+
+        /** Controls revocation checking, currently limited to CRLs and supports "off", "entityOnly", "fullChain". */
+        std::string m_checkRevocation;
 
         /** Deprecated option, equivalent to checkRevocation="fullChain". */
         bool m_fullCRLChain;
-        
+
+        /** Disable policy mapping when applying PKIX policy checking. */
+        bool m_policyMappingInhibit;
+
+        /** Disallow the anyPolicy OID (2.5.29.32.0) when applying PKIX policy checking. */
+        bool m_anyPolicyInhibit;
+
+        /** A list of acceptable policy OIDs (explicit policy checking). */
+        std::set<std::string> m_policyOIDs;
+
+        /** A list of trusted names (subject DNs / CN attributes / subjectAltName entries). */
+        std::set<std::string> m_trustedNames;
+
         /**
          * Checks that either the name of the peer with the given credentials or the names
          * of the credentials match the subject or subject alternate names of the certificate.
+         * Alternatively explicit trusted names can be supplied statically via configuration.
          * 
          * @param certEE        the credential for the entity to validate
-         * @param credResolver  source of credentials
+         * @param credResolver  source of trusted credentials
          * @param criteria      criteria for selecting credentials, including the peer name
          * 
          * @return true the name check succeeds, false if not
@@ -176,6 +204,8 @@ namespace xmltooling {
             CredentialCriteria* criteria=nullptr,
             const std::vector<XSECCryptoX509CRL*>* inlineCRLs=nullptr
             ) const;
+
+        friend class XMLTOOL_DLLLOCAL PKIXParams;
     };
 };
 

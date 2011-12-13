@@ -1,17 +1,21 @@
-/*
- *  Copyright 2001-2010 Internet2
+/**
+ * Licensed to the University Corporation for Advanced Internet
+ * Development, Inc. (UCAID) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * UCAID licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the
+ * License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
  */
 
 /**
@@ -110,6 +114,17 @@ namespace xmltooling {
          * @param pathname  path to a catalog file
          * @return true iff the catalog was successfully processed
          */
+        bool loadCatalog(const char* pathname);
+
+        /**
+         * Load an OASIS catalog file to map schema namespace URIs to filenames.
+         *
+         * This does not provide real catalog support; only the &lt;uri&gt; element
+         * is supported to map from a namespace URI to a relative path or file:// URI.
+         *
+         * @param pathname  path to a catalog file
+         * @return true iff the catalog was successfully processed
+         */
         bool loadCatalog(const XMLCh* pathname);
 
         /**
@@ -161,8 +176,8 @@ namespace xmltooling {
 #else
         std::stack<xercesc::DOMBuilder*> m_pool;
 #endif
-        Mutex* m_lock;
-        xercesc::SecurityManager* m_security;
+        std::auto_ptr<Mutex> m_lock;
+        std::auto_ptr<xercesc::SecurityManager> m_security;
     };
 
     /**

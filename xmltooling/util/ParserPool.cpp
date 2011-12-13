@@ -1,17 +1,21 @@
-/*
- *  Copyright 2001-2010 Internet2
+/**
+ * Licensed to the University Corporation for Advanced Internet
+ * Development, Inc. (UCAID) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * UCAID licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the
+ * License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
  */
 
 /**
@@ -29,10 +33,12 @@
 #include "util/Threads.h"
 #include "util/XMLHelper.h"
 
-#include <algorithm>
-#include <functional>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <algorithm>
+#include <functional>
+#include <boost/algorithm/string.hpp>
+#include <boost/bind.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
 #include <xercesc/sax/SAXException.hpp>
@@ -43,6 +49,7 @@
 using namespace xmltooling::logging;
 using namespace xmltooling;
 using namespace xercesc;
+using namespace boost;
 using namespace std;
 
 
@@ -104,8 +111,6 @@ ParserPool::~ParserPool()
         m_pool.top()->release();
         m_pool.pop();
     }
-    delete m_lock;
-    delete m_security;
 }
 
 DOMDocument* ParserPool::newDocument()
@@ -193,8 +198,7 @@ DOMDocument* ParserPool::parse(istream& is)
 }
 
 // Functor to double its argument separated by a character and append to a buffer
-template <class T> class doubleit
-{
+template <class T> class doubleit {
 public:
     doubleit(T& t, const typename T::value_type& s) : temp(t), sep(s) {}
     void operator() (const pair<const T,T>& s) { temp += s.first + sep + s.first + sep; }
@@ -224,12 +228,18 @@ bool ParserPool::loadSchema(const XMLCh* nsURI, const XMLCh* pathname)
         return false;
     }
 
-    Lock lock(m_lock);
+    Lock lock(m_lock.get());
     m_schemaLocMap[nsURI]=pathname;
     m_schemaLocations.erase();
-    for_each(m_schemaLocMap.begin(),m_schemaLocMap.end(),doubleit<xstring>(m_schemaLocations,chSpace));
+    for_each(m_schemaLocMap.begin(), m_schemaLocMap.end(), doubleit<xstring>(m_schemaLocations,chSpace));
 
     return true;
+}
+
+bool ParserPool::loadCatalog(const char* pathname)
+{
+    auto_ptr_XMLCh temp(pathname);
+    return loadCatalog(temp.get());
 }
 
 bool ParserPool::loadCatalog(const XMLCh* pathname)
@@ -278,7 +288,7 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
 
         // Fetch all the <system> elements.
         DOMNodeList* mappings=root->getElementsByTagNameNS(CATALOG_NS,system);
-        Lock lock(m_lock);
+        Lock lock(m_lock.get());
         for (XMLSize_t i=0; i<mappings->getLength(); i++) {
             root=static_cast<DOMElement*>(mappings->item(i));
             const XMLCh* from=root->getAttributeNS(nullptr,systemId);
@@ -286,9 +296,9 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
             m_schemaLocMap[from]=to;
         }
         m_schemaLocations.erase();
-        for_each(m_schemaLocMap.begin(),m_schemaLocMap.end(),doubleit<xstring>(m_schemaLocations,chSpace));
+        for_each(m_schemaLocMap.begin(), m_schemaLocMap.end(), doubleit<xstring>(m_schemaLocations,chSpace));
     }
-    catch (exception& e) {
+    catch (std::exception& e) {
         log.error("catalog loader caught exception: %s", e.what());
         return false;
     }
@@ -324,25 +334,27 @@ DOMInputSource* ParserPool::resolveEntity(
     }
 
     // Find well-known schemas in the specified location.
-    map<xstring,xstring>::const_iterator i=m_schemaLocMap.find(systemId);
-    if (i!=m_schemaLocMap.end())
-        return new Wrapper4InputSource(new LocalFileInputSource(baseURI,i->second.c_str()));
+    map<xstring,xstring>::const_iterator i = m_schemaLocMap.find(systemId);
+    if (i != m_schemaLocMap.end())
+        return new Wrapper4InputSource(new LocalFileInputSource(baseURI, i->second.c_str()));
 
-    // Check for entity as a value in the map.
-    for (i=m_schemaLocMap.begin(); i!=m_schemaLocMap.end(); ++i) {
-        if (XMLString::endsWith(i->second.c_str(), systemId))
-            return new Wrapper4InputSource(new LocalFileInputSource(baseURI,i->second.c_str()));
-    }
+    // Check for entity as a suffix of a value in the map.
+    i = find_if(
+        m_schemaLocMap.begin(), m_schemaLocMap.end(),
+        boost::bind(ends_with<const xstring&,const xstring&>, boost::bind(&map<xstring,xstring>::value_type::second, _1), systemId)
+        );
+    if (i != m_schemaLocMap.end())
+        return new Wrapper4InputSource(new LocalFileInputSource(baseURI, i->second.c_str()));
 
     // We'll allow anything without embedded slashes.
-    if (XMLString::indexOf(systemId, chForwardSlash)==-1)
-        return new Wrapper4InputSource(new LocalFileInputSource(baseURI,systemId));
+    if (XMLString::indexOf(systemId, chForwardSlash) == -1 && XMLString::indexOf(systemId, chBackSlash) == -1)
+        return new Wrapper4InputSource(new LocalFileInputSource(baseURI, systemId));
 
     // Shortcircuit the request.
     auto_ptr_char temp(systemId);
     log.debug("unauthorized entity request (%s), blocking it", temp.get());
     static const XMLByte nullbuf[] = {0};
-    return new Wrapper4InputSource(new MemBufInputSource(nullbuf,0,systemId));
+    return new Wrapper4InputSource(new MemBufInputSource(nullbuf, 0, systemId));
 }
 
 #ifdef XMLTOOLING_XERCESC_COMPLIANT_DOMLS
@@ -366,13 +378,13 @@ DOMLSParser* ParserPool::createBuilder()
     parser->getDomConfig()->setParameter(XMLUni::fgXercesUserAdoptsDOMDocument, true);
     parser->getDomConfig()->setParameter(XMLUni::fgXercesDisableDefaultEntityResolution, true);
     parser->getDomConfig()->setParameter(XMLUni::fgDOMResourceResolver, dynamic_cast<DOMLSResourceResolver*>(this));
-    parser->getDomConfig()->setParameter(XMLUni::fgXercesSecurityManager, m_security);
+    parser->getDomConfig()->setParameter(XMLUni::fgXercesSecurityManager, m_security.get());
     return parser;
 }
 
 DOMLSParser* ParserPool::checkoutBuilder()
 {
-    Lock lock(m_lock);
+    Lock lock(m_lock.get());
     if (m_pool.empty()) {
         DOMLSParser* builder=createBuilder();
         return builder;
@@ -387,7 +399,7 @@ DOMLSParser* ParserPool::checkoutBuilder()
 void ParserPool::checkinBuilder(DOMLSParser* builder)
 {
     if (builder) {
-        Lock lock(m_lock);
+        Lock lock(m_lock.get());
         m_pool.push(builder);
     }
 }
@@ -410,7 +422,7 @@ DOMBuilder* ParserPool::createBuilder()
         // This ensures the entity resolver will be given the namespace as a systemId it can check.
         parser->setProperty(XMLUni::fgXercesSchemaExternalSchemaLocation,const_cast<XMLCh*>(m_schemaLocations.c_str()));
     }
-    parser->setProperty(XMLUni::fgXercesSecurityManager, m_security);
+    parser->setProperty(XMLUni::fgXercesSecurityManager, m_security.get());
     parser->setFeature(XMLUni::fgXercesUserAdoptsDOMDocument, true);
     parser->setFeature(XMLUni::fgXercesDisableDefaultEntityResolution, true);
     parser->setEntityResolver(this);
@@ -419,7 +431,7 @@ DOMBuilder* ParserPool::createBuilder()
 
 DOMBuilder* ParserPool::checkoutBuilder()
 {
-    Lock lock(m_lock);
+    Lock lock(m_lock.get());
     if (m_pool.empty()) {
         DOMBuilder* builder=createBuilder();
         return builder;
@@ -434,7 +446,7 @@ DOMBuilder* ParserPool::checkoutBuilder()
 void ParserPool::checkinBuilder(DOMBuilder* builder)
 {
     if (builder) {
-        Lock lock(m_lock);
+        Lock lock(m_lock.get());
         m_pool.push(builder);
     }
 }

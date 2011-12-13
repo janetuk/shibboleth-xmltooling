@@ -1,17 +1,21 @@
-/*
- *  Copyright 2001-2010 Internet2
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/**
+ * Licensed to the University Corporation for Advanced Internet
+ * Development, Inc. (UCAID) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * UCAID licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the
+ * License at
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
  */
 
 /**
@@ -27,11 +31,16 @@
 #include "util/XMLHelper.h"
 #include "util/XMLConstants.h"
 
+#include <boost/lambda/bind.hpp>
+#include <boost/lambda/if.hpp>
+#include <boost/lambda/lambda.hpp>
 #include <xercesc/framework/MemBufFormatTarget.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmltooling;
 using namespace xercesc;
+using namespace boost::lambda;
+using namespace boost;
 using namespace std;
 
 static const XMLCh type[]={chLatin_t, chLatin_y, chLatin_p, chLatin_e, chNull };
@@ -73,7 +82,7 @@ DOMAttr* XMLHelper::getIdAttribute(const DOMElement* domElement)
     
     DOMNamedNodeMap* attributes = domElement->getAttributes();
     DOMAttr* attribute;
-    for(XMLSize_t i = 0; i < attributes->getLength(); i++) {
+    for(XMLSize_t i = 0; i < attributes->getLength(); ++i) {
         attribute = static_cast<DOMAttr*>(attributes->item(i));
         if(attribute->isId()) {
             return attribute;
@@ -90,7 +99,7 @@ const XMLObject* XMLHelper::getXMLObjectById(const XMLObject& tree, const XMLCh*
     
     const XMLObject* ret;
     const list<XMLObject*>& children = tree.getOrderedChildren();
-    for (list<XMLObject*>::const_iterator i=children.begin(); i!=children.end(); ++i) {
+    for (list<XMLObject*>::const_iterator i = children.begin(); i != children.end(); ++i) {
         if (*i) {
             ret = getXMLObjectById(*(*i), id);
             if (ret)
@@ -105,10 +114,10 @@ XMLObject* XMLHelper::getXMLObjectById(XMLObject& tree, const XMLCh* id)
 {
     if (XMLString::equals(id, tree.getXMLID()))
         return &tree;
-    
+
     XMLObject* ret;
     const list<XMLObject*>& children = tree.getOrderedChildren();
-    for (list<XMLObject*>::const_iterator i=children.begin(); i!=children.end(); ++i) {
+    for (list<XMLObject*>::const_iterator i = children.begin(); i != children.end(); ++i) {
         if (*i) {
             ret = getXMLObjectById(*(*i), id);
             if (ret)
@@ -122,11 +131,10 @@ XMLObject* XMLHelper::getXMLObjectById(XMLObject& tree, const XMLCh* id)
 void XMLHelper::getNonVisiblyUsedPrefixes(const XMLObject& tree, map<xstring,xstring>& prefixes)
 {
     map<xstring,xstring> child_prefixes;
-    const list<XMLObject*>& children = tree.getOrderedChildren();
-    for (list<XMLObject*>::const_iterator i = children.begin(); i != children.end(); ++i) {
-        if (*i)
-            getNonVisiblyUsedPrefixes(*(*i), child_prefixes);
-    }
+    for_each(
+        tree.getOrderedChildren().begin(), tree.getOrderedChildren().end(),
+        if_(_1 != nullptr)[lambda::bind(&getNonVisiblyUsedPrefixes, boost::ref(*_1), boost::ref(child_prefixes))]
+        );
     const set<Namespace>& nsset = tree.getNamespaces();
     for (set<Namespace>::const_iterator ns = nsset.begin(); ns != nsset.end(); ++ns) {
         // Check for xmlns:xml.

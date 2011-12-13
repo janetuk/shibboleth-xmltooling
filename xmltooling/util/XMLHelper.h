@@ -1,17 +1,21 @@
-/*
- *  Copyright 2001-2011 Internet2
+/**
+ * Licensed to the University Corporation for Advanced Internet
+ * Development, Inc. (UCAID) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * UCAID licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the
+ * License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
  */
 
 /**
@@ -100,6 +104,7 @@ namespace xmltooling {
 
         /**
          * Gets the XSI type for a given element if it has one.
+         * <p>The caller is responsible for freeing the result.
          *
          * @param e the element
          * @return the type or null
@@ -154,6 +159,7 @@ namespace xmltooling {
         /**
          * @deprecated
          * Constructs a QName from an attribute's value.
+         * <p>The caller is responsible for freeing the result.
          *
          * @param attribute the attribute with a QName value
          * @return a QName from an attribute's value, or null if the given attribute is null
@@ -162,6 +168,7 @@ namespace xmltooling {
 
         /**
          * Constructs a QName from a node's value.
+         * <p>The caller is responsible for freeing the result.
          *
          * @param domNode the DOM node with a QName value
          * @return a QName from a node's value, or null if the given node has no value

@@ -1,17 +1,21 @@
-/*
- *  Copyright 2001-2010 Internet2
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/**
+ * Licensed to the University Corporation for Advanced Internet
+ * Development, Inc. (UCAID) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * UCAID licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the
+ * License at
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
  */
 
 /**
@@ -38,19 +42,65 @@ namespace xmltooling {
      * Keys need to be unique only within a given context, so multiple
      * components can share a single storage service safely as long as they
      * use different labels.
+     *
+     * <p>The allowable sizes for contexts, keys, and short values can vary
+     * and be reported by the implementation to callers, but MUST be at least
+     * 255 bytes.
      */
     class XMLTOOL_API StorageService
     {
         MAKE_NONCOPYABLE(StorageService);
     public:
         virtual ~StorageService();
+
+        class XMLTOOL_API Capabilities {
+            MAKE_NONCOPYABLE(Capabilities);
+            unsigned int m_contextSize, m_keySize, m_stringSize;
+        public:
+            /**
+             * Constructor.
+             *
+             * @param contextSize   max size of context labels in characters
+             * @param keysize       max size of keys in characters
+             * @param stringSize    max size of string values in characters
+             */
+            Capabilities(unsigned int contextSize, unsigned int keySize, unsigned int stringSize);
+            ~Capabilities();
+
+            /**
+             * Returns max size of context labels in characters
+             * @return  max size of context labels in characters
+             */
+            unsigned int getContextSize() const;
+
+            /**
+             * Returns max size of keys in characters
+             * @return  max size of keys in characters
+             */
+            unsigned int getKeySize() const;
+
+            /**
+             * Returns max size of string values in characters
+             * @return  max size of string values in characters
+             */
+            unsigned int getStringSize() const;
+        };
         
+        /**
+         * Returns the capabilities of the underlying service.
+         * <p>If implementations support only the 255 character minimum, the default
+         * implementation of this method will suffice.
+         *
+         * @return  a reference to an interface to access the service's capabilities
+         */
+        virtual const Capabilities& getCapabilities() const;
+
         /**
          * Creates a new "short" record in the storage service.
          * 
          * @param context       a storage context label
-         * @param key           null-terminated unique key of up to 255 bytes
-         * @param value         null-terminated value of up to 255 bytes to store
+         * @param key           null-terminated unique key
+         * @param value         null-terminated value
          * @param expiration    an expiration timestamp, after which the record can be purged
          * @return  true iff record was inserted, false iff a duplicate was found
          * 
@@ -64,7 +114,7 @@ namespace xmltooling {
          * <p>The version parameter can be set for "If-Modified-Since" semantics.
          * 
          * @param context       a storage context label
-         * @param key           null-terminated unique key of up to 255 bytes
+         * @param key           null-terminated unique key
          * @param pvalue        location in which to return the record value
          * @param pexpiration   location in which to return the expiration timestamp
          * @param version       if > 0, only copy back data if newer than supplied version
@@ -80,8 +130,8 @@ namespace xmltooling {
          * Updates an existing "short" record in the storage service.
          * 
          * @param context       a storage context label
-         * @param key           null-terminated unique key of up to 255 bytes
-         * @param value         null-terminated value of up to 255 bytes to store, or nullptr to leave alone
+         * @param key           null-terminated unique key
+         * @param value         null-terminated value to store, or nullptr to leave alone
          * @param expiration    a new expiration timestamp, or 0 to leave alone
          * @param version       if > 0, only update if the current version matches this value
          * @return the version of the record after update, 0 if no record exists, or -1 if the version
@@ -97,7 +147,7 @@ namespace xmltooling {
          * Deletes an existing "short" record from the storage service.
          * 
          * @param context       a storage context label
-         * @param key           null-terminated unique key of up to 255 bytes
+         * @param key           null-terminated unique key
          * @return true iff the record existed and was deleted
          *    
          * @throws IOException  raised if errors occur in the deletion process 
@@ -108,7 +158,7 @@ namespace xmltooling {
          * Creates a new "long" record in the storage service.
          * 
          * @param context       a storage context label
-         * @param key           null-terminated unique key of up to 255 bytes
+         * @param key           null-terminated unique key
          * @param value         null-terminated value of arbitrary length
          * @param expiration    an expiration timestamp, after which the record can be purged
          * @return  true iff record was inserted, false iff a duplicate was found
@@ -123,7 +173,7 @@ namespace xmltooling {
          * <p>The version parameter can be set for "If-Modified-Since" semantics.
          * 
          * @param context       a storage context label
-         * @param key           null-terminated unique key of up to 255 bytes
+         * @param key           null-terminated unique key
          * @param pvalue        location in which to return the record value
          * @param pexpiration   location in which to return the expiration timestamp
          * @param version       if > 0, only copy back data if newer than supplied version
@@ -139,7 +189,7 @@ namespace xmltooling {
          * Updates an existing "long" record in the storage service.
          * 
          * @param context       a storage context label
-         * @param key           null-terminated unique key of up to 255 bytes
+         * @param key           null-terminated unique key
          * @param value         null-terminated value of arbitrary length to store, or nullptr to leave alone
          * @param expiration    a new expiration timestamp, or 0 to leave alone
          * @param version       if > 0, only update if the current version matches this value
@@ -156,7 +206,7 @@ namespace xmltooling {
          * Deletes an existing "long" record from the storage service.
          * 
          * @param context       a storage context label
-         * @param key           null-terminated unique key of up to 255 bytes
+         * @param key           null-terminated unique key
          * @return true iff the record existed and was deleted
          *    
          * @throws IOException  raised if errors occur in the deletion process 

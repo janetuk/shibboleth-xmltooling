@@ -190,6 +190,7 @@
     <ClCompile Include="Lockable.cpp" />
     <ClCompile Include="Namespace.cpp" />
     <ClCompile Include="QName.cpp" />
+    <ClCompile Include="security\impl\PKIXPathValidator.cpp" />
     <ClCompile Include="unicode.cpp" />
     <ClCompile Include="version.cpp" />
     <ClCompile Include="XMLObjectBuilder.cpp" />
@@ -230,6 +231,7 @@
     <ClCompile Include="security\impl\ChainingTrustEngine.cpp" />
     <ClCompile Include="security\impl\CredentialCriteria.cpp" />
     <ClCompile Include="security\impl\CredentialResolver.cpp" />
+    <ClCompile Include="security\impl\DummyCredentialResolver.cpp" />
     <ClCompile Include="security\impl\ExplicitKeyTrustEngine.cpp" />
     <ClCompile Include="security\impl\FilesystemCredentialResolver.cpp" />
     <ClCompile Include="security\impl\InlineKeyResolver.cpp" />
@@ -263,6 +265,9 @@
     <ClInclude Include="Namespace.h" />
     <ClInclude Include="PluginManager.h" />
     <ClInclude Include="QName.h" />
+    <ClInclude Include="security\OpenSSLPathValidator.h" />
+    <ClInclude Include="security\PathValidator.h" />
+    <ClInclude Include="security\PKIXPathValidatorParams.h" />
     <ClInclude Include="unicode.h" />
     <ClInclude Include="version.h" />
     <ClInclude Include="XMLObject.h" />

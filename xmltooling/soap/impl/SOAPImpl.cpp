@@ -1,17 +1,21 @@
-/*
- *  Copyright 2001-2010 Internet2
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/**
+ * Licensed to the University Corporation for Advanced Internet
+ * Development, Inc. (UCAID) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * UCAID licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the
+ * License at
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
  */
 
 /**
@@ -110,9 +114,11 @@ namespace {
                     AbstractAttributeExtensibleXMLObject(src),
                     AbstractComplexElement(src),
                     AbstractDOMCachingXMLObject(src) {
-            VectorOf(XMLObject) v=getUnknownXMLObjects();
-            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i)
-                v.push_back((*i)->clone());
+            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i) {
+                if (*i) {
+                    getUnknownXMLObjects().push_back((*i)->clone());
+                }
+            }
         }
         
         IMPL_XMLOBJECT_CLONE(Detail);
@@ -155,6 +161,7 @@ namespace {
             m_pos_Detail=m_pos_Faultactor;
             ++m_pos_Detail;
         }
+
     protected:
         FaultImpl() {
             init();
@@ -217,9 +224,11 @@ namespace {
                     AbstractAttributeExtensibleXMLObject(src),
                     AbstractComplexElement(src),
                     AbstractDOMCachingXMLObject(src) {
-            VectorOf(XMLObject) v=getUnknownXMLObjects();
-            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i)
-                v.push_back((*i)->clone());
+            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i) {
+                if (*i) {
+                    getUnknownXMLObjects().push_back((*i)->clone());
+                }
+            }
         }
         
         IMPL_XMLOBJECT_CLONE(Body);
@@ -259,9 +268,11 @@ namespace {
                     AbstractAttributeExtensibleXMLObject(src),
                     AbstractComplexElement(src),
                     AbstractDOMCachingXMLObject(src) {
-            VectorOf(XMLObject) v=getUnknownXMLObjects();
-            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i)
-                v.push_back((*i)->clone());
+            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i) {
+                if (*i) {
+                    getUnknownXMLObjects().push_back((*i)->clone());
+                }
+            }
         }
         
         IMPL_XMLOBJECT_CLONE(Header);
@@ -297,6 +308,7 @@ namespace {
             m_pos_Body=m_pos_Header;
             ++m_pos_Body;
         }
+
     public:
         virtual ~EnvelopeImpl() {}
 
@@ -306,8 +318,7 @@ namespace {
         }
             
         EnvelopeImpl(const EnvelopeImpl& src)
-                : AbstractXMLObject(src), AbstractAttributeExtensibleXMLObject(src),
-                    AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
+                : AbstractXMLObject(src), AbstractAttributeExtensibleXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
             if (src.getHeader())
                 setHeader(src.getHeader()->cloneHeader());

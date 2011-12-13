@@ -1,17 +1,21 @@
-/*
- *  Copyright 2009 Internet2
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/**
+ * Licensed to the University Corporation for Advanced Internet
+ * Development, Inc. (UCAID) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * UCAID licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the
+ * License at
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+ * either express or implied. See the License for the specific
+ * language governing permissions and limitations under the License.
  */
 
 /**
@@ -23,7 +27,11 @@
 #include "internal.h"
 #include "HTTPResponse.h"
 
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/bind.hpp>
+
 using namespace xmltooling;
+using namespace boost;
 using namespace std;
 
 GenericResponse::GenericResponse()
@@ -43,6 +51,9 @@ vector<string>& HTTPResponse::getAllowedSchemes()
 
 void HTTPResponse::sanitizeURL(const char* url)
 {
+    // predicate for checking scheme below
+    static bool (*fn)(const string&, const string&, const std::locale&) = iequals;
+
     const char* ch;
     for (ch=url; *ch; ++ch) {
         if (iscntrl((unsigned char)(*ch)))  // convert to unsigned to allow full range from 00-FF
@@ -53,14 +64,10 @@ void HTTPResponse::sanitizeURL(const char* url)
     if (!ch)
         throw IOException("URL is malformed.");
     string s(url, ch - url);
-    for (vector<string>::const_iterator i = m_allowedSchemes.begin(); i != m_allowedSchemes.end(); ++i) {
-#ifdef HAVE_STRCASECMP
-        if (!strcasecmp(s.c_str(), i->c_str()))
-#else
-        if (!stricmp(s.c_str(), i->c_str()))
-#endif
-            return;
-    }
+    vector<string>::const_iterator i =
+        find_if(m_allowedSchemes.begin(), m_allowedSchemes.end(), boost::bind(fn, boost::cref(s), _1, boost::cref(std::locale())));
+    if (i != m_allowedSchemes.end())
+        return;
 
     throw IOException("URL contains invalid scheme ($1).", params(1, s.c_str()));
 }
