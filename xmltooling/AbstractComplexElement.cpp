@@ -64,7 +64,7 @@ bool AbstractComplexElement::hasChildren() const
 {
     if (m_children.empty())
         return false;
-    return (find_if(m_children.begin(), m_children.end(), (_1 != nullptr)) != m_children.end());
+    return (find_if(m_children.begin(), m_children.end(), (_1 != ((XMLObject*)nullptr))) != m_children.end());
 }
 
 const list<XMLObject*>& AbstractComplexElement::getOrderedChildren() const
