@@ -30,6 +30,7 @@
 #include <xmltooling/unicode.h>
 
 #include <map>
+#include <memory>
 #include <stack>
 #include <string>
 #include <istream>

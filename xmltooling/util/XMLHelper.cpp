@@ -133,7 +133,7 @@ void XMLHelper::getNonVisiblyUsedPrefixes(const XMLObject& tree, map<xstring,xst
     map<xstring,xstring> child_prefixes;
     for_each(
         tree.getOrderedChildren().begin(), tree.getOrderedChildren().end(),
-        if_(_1 != nullptr)[lambda::bind(&getNonVisiblyUsedPrefixes, boost::ref(*_1), boost::ref(child_prefixes))]
+        if_(_1 != ((XMLObject*)nullptr))[lambda::bind(&getNonVisiblyUsedPrefixes, boost::ref(*_1), boost::ref(child_prefixes))]
         );
     const set<Namespace>& nsset = tree.getNamespaces();
     for (set<Namespace>::const_iterator ns = nsset.begin(); ns != nsset.end(); ++ns) {

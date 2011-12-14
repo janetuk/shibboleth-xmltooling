@@ -325,6 +325,7 @@ DOMInputSource* ParserPool::resolveEntity(
 #endif
     if (!systemId)
         return nullptr;
+    xstring sysId(systemId);
 
     Category& log=Category::getInstance(XMLTOOLING_LOGCAT".ParserPool");
     if (log.isDebugEnabled()) {
@@ -334,14 +335,15 @@ DOMInputSource* ParserPool::resolveEntity(
     }
 
     // Find well-known schemas in the specified location.
-    map<xstring,xstring>::const_iterator i = m_schemaLocMap.find(systemId);
+    map<xstring,xstring>::const_iterator i = m_schemaLocMap.find(sysId);
     if (i != m_schemaLocMap.end())
         return new Wrapper4InputSource(new LocalFileInputSource(baseURI, i->second.c_str()));
 
     // Check for entity as a suffix of a value in the map.
+    bool (*p_ends_with)(const xstring&, const xstring&) = ends_with;
     i = find_if(
         m_schemaLocMap.begin(), m_schemaLocMap.end(),
-        boost::bind(ends_with<const xstring&,const xstring&>, boost::bind(&map<xstring,xstring>::value_type::second, _1), systemId)
+        boost::bind(p_ends_with, boost::bind(&map<xstring,xstring>::value_type::second, _1), boost::ref(sysId))
         );
     if (i != m_schemaLocMap.end())
         return new Wrapper4InputSource(new LocalFileInputSource(baseURI, i->second.c_str()));
