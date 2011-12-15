@@ -52,7 +52,7 @@ namespace xmltooling {
 };
 
 static const XMLCh _TrustEngine[] =                 UNICODE_LITERAL_11(T,r,u,s,t,E,n,g,i,n,e);
-static const XMLCh type[] =                         UNICODE_LITERAL_4(t,y,p,e);
+static const XMLCh _type[] =                         UNICODE_LITERAL_4(t,y,p,e);
 
 ChainingTrustEngine::ChainingTrustEngine(const DOMElement* e) : TrustEngine(e)
 {
@@ -60,7 +60,7 @@ ChainingTrustEngine::ChainingTrustEngine(const DOMElement* e) : TrustEngine(e)
     e = e ? XMLHelper::getFirstChildElement(e, _TrustEngine) : nullptr;
     while (e) {
         try {
-            string t = XMLHelper::getAttrString(e, nullptr, type);
+            string t = XMLHelper::getAttrString(e, nullptr, _type);
             if (!t.empty()) {
                 log.info("building TrustEngine of type %s", t.c_str());
                 addTrustEngine(XMLToolingConfig::getConfig().TrustEngineManager.newPlugin(t.c_str(), e));
