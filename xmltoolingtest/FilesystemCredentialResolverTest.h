@@ -41,7 +41,7 @@ public:
 
         auto_ptr<CredentialResolver> credResolver(
             XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(
-                FILESYSTEM_CREDENTIAL_RESOLVER,doc->getDocumentElement()
+                CHAINING_CREDENTIAL_RESOLVER,doc->getDocumentElement()
                 )
             );
 
