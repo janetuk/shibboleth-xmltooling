@@ -41,15 +41,17 @@ public:
 
         auto_ptr<CredentialResolver> credResolver(
             XMLToolingConfig::getConfig().CredentialResolverManager.newPlugin(
-                FILESYSTEM_CREDENTIAL_RESOLVER,doc->getDocumentElement()
+                CHAINING_CREDENTIAL_RESOLVER,doc->getDocumentElement()
                 )
             );
 
+        vector<const Credential*> creds;
         Locker locker(credResolver.get());
-        const X509Credential* cred=dynamic_cast<const X509Credential*>(credResolver->resolve());
-        TSM_ASSERT("Retrieved credential was null", cred!=nullptr);
-        TSM_ASSERT("Retrieved key was null", cred->getPrivateKey()!=nullptr);
-        TSM_ASSERT_EQUALS("Unexpected number of certificates", 1, cred->getEntityCertificateChain().size());
-        TSM_ASSERT_EQUALS("Custom key name not found", 1, cred->getKeyNames().count("Sample Key"));
+        credResolver->resolve(creds);
+        TSM_ASSERT_EQUALS("Retrieved credential was null", 1, creds.size());
+        TSM_ASSERT("Retrieved key was null", creds.front()->getPrivateKey()!=nullptr);
+        TSM_ASSERT_EQUALS("Unexpected number of certificates", 1,
+            dynamic_cast<const X509Credential*>(creds.front())->getEntityCertificateChain().size());
+        TSM_ASSERT_EQUALS("Custom key name not found", 1, creds.front()->getKeyNames().count("Sample Key"));
     }
 };

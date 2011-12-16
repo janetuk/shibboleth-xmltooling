@@ -131,10 +131,11 @@ XMLObject* XMLHelper::getXMLObjectById(XMLObject& tree, const XMLCh* id)
 void XMLHelper::getNonVisiblyUsedPrefixes(const XMLObject& tree, map<xstring,xstring>& prefixes)
 {
     map<xstring,xstring> child_prefixes;
-    for_each(
-        tree.getOrderedChildren().begin(), tree.getOrderedChildren().end(),
-        if_(_1 != ((XMLObject*)nullptr))[lambda::bind(&getNonVisiblyUsedPrefixes, boost::ref(*_1), boost::ref(child_prefixes))]
-        );
+    for(list<XMLObject*>::const_iterator i = tree.getOrderedChildren().begin(); i != tree.getOrderedChildren().end(); ++i) {
+        if (*i) {
+            getNonVisiblyUsedPrefixes(*(*i), child_prefixes);
+        }
+    }
     const set<Namespace>& nsset = tree.getNamespaces();
     for (set<Namespace>::const_iterator ns = nsset.begin(); ns != nsset.end(); ++ns) {
         // Check for xmlns:xml.

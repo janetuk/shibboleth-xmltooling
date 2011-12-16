@@ -31,6 +31,8 @@
 #include <xmltooling/QName.h>
 #include <xmltooling/XMLObject.h>
 
+#include <memory>
+
 #if defined (_MSC_VER)
     #pragma warning( push )
     #pragma warning( disable : 4250 4251 )

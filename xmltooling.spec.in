@@ -82,7 +82,7 @@ Requires:  libxerces-c-devel >= 2.8.0
 Requires: libxml-security-c-devel >= 1.4.0
 %{?_with_log4cpp:Requires: liblog4cpp-devel >= 1.0}
 %{!?_with_log4cpp:Requires: liblog4shib-devel}
-Requires: openssl-devel
+Requires: openssl-devel, boost-devel >= 1.32.0
 %if 0%{?rhel} >= 6 || 0%{?centos_version} >= 600
 Requires: libcurl-openssl-devel >= 7.21.7
 %else
@@ -158,7 +158,7 @@ This package includes XML schemas and related files.
 %doc %{pkgdocdir}
 
 %changelog
-* Mon Nov 14 2011 Scott Cantor  <cantor.2@osu.edu>  - 1.5-1
+* Wed Dec 14 2011 Scott Cantor  <cantor.2@osu.edu>  - 1.5-1
 - Update lib package number.
 - Add boost-devel dependency.
 
