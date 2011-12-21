@@ -1357,6 +1357,79 @@
     }
 
 /**
+ * Implements cloning of a child attribute, for use in copy constructor or
+ * deferred clone methods.
+ *
+ * proper   the proper name of the attribute to clone
+ */
+#define IMPL_CLONE_ATTRIB(proper) \
+    set##proper(src.get##proper())
+
+/**
+ * Implements cloning of a child object, for use in copy constructor or
+ * deferred clone methods.
+ *
+ * proper   the proper name of the child object to clone
+ */
+#define IMPL_CLONE_XMLOBJECT_CHILD(proper) \
+    if (src.get##proper()) \
+        set##proper(src.get##proper()->clone())
+
+/**
+ * Implements cloning of a typed child object, for use in copy constructor or
+ * deferred clone methods.
+ *
+ * proper   the proper name of the child type to clone
+ */
+#define IMPL_CLONE_TYPED_CHILD(proper) \
+    if (src.get##proper()) \
+        set##proper(src.get##proper()->clone##proper())
+
+/**
+ * Implements cloning of an untyped child collection, for use in copy constructor or
+ * deferred clone methods.
+ */
+#define IMPL_CLONE_XMLOBJECT_CHILDREN() \
+    static void (VectorOf(XMLObject)::* XMLObject_push_back)(XMLObject* const&) = &VectorOf(XMLObject)::push_back; \
+    VectorOf(XMLObject) cXMLObject = getUnknownXMLObjects(); \
+    std::for_each( \
+        src.m_UnknownXMLObjects.begin(), src.m_UnknownXMLObjects.end(), \
+        boost::lambda::if_(boost::lambda::_1 != ((XMLObject*)nullptr)) \
+            [boost::lambda::bind(XMLObject_push_back, boost::ref(cXMLObject), boost::lambda::bind(&XMLObject::clone, boost::lambda::_1))] \
+        )
+
+/**
+ * Implements cloning of a child collection, for use in copy constructor or
+ * deferred clone methods.
+ *
+ * proper   the proper name of the child type to clone
+ */
+#define IMPL_CLONE_TYPED_CHILDREN(proper) \
+    static void (VectorOf(proper)::* proper##_push_back)(proper* const&) = &VectorOf(proper)::push_back; \
+    VectorOf(proper) c##proper = get##proper##s(); \
+    std::for_each( \
+        src.m_##proper##s.begin(), src.m_##proper##s.end(), \
+        boost::lambda::if_(boost::lambda::_1 != ((proper*)nullptr)) \
+            [boost::lambda::bind(proper##_push_back, boost::ref(c##proper), boost::lambda::bind(&proper::clone##proper, boost::lambda::_1))] \
+        )
+
+/**
+ * Implements cloning of a child collection in a foreign namespace, for use in copy constructor or
+ * deferred clone methods.
+ *
+ * proper   the proper name of the child type to clone
+ * ns       the namespace of the child type
+ */
+#define IMPL_CLONE_TYPED_FOREIGN_CHILDREN(proper,ns) \
+    static void (VectorOf(ns::proper)::* proper##_push_back)(ns::proper* const&) = &VectorOf(ns::proper)::push_back; \
+    VectorOf(ns::proper) c##proper = get##proper##s(); \
+    std::for_each( \
+        src.m_##proper##s.begin(), src.m_##proper##s.end(), \
+        boost::lambda::if_(boost::lambda::_1 != ((ns::proper*)nullptr)) \
+            [boost::lambda::bind(proper##_push_back, boost::ref(c##proper), boost::lambda::bind(&ns::proper::clone##proper, boost::lambda::_1))] \
+        )
+
+/**
  * Declares an XMLObject specialization with a simple content model and type,
  * handling it as string data.
  *

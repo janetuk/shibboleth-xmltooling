@@ -33,6 +33,10 @@
 #include "signature/KeyInfo.h"
 #include "util/XMLHelper.h"
 
+#include <boost/lambda/bind.hpp>
+#include <boost/lambda/casts.hpp>
+#include <boost/lambda/if.hpp>
+#include <boost/lambda/lambda.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmlsignature;
@@ -96,20 +100,13 @@ namespace xmlsignature {
         DSAKeyValueImpl(const DSAKeyValueImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
-            if (src.getP())
-                setP(src.getP()->cloneP());
-            if (src.getQ())
-                setQ(src.getQ()->cloneQ());
-            if (src.getG())
-                setG(src.getG()->cloneG());
-            if (src.getY())
-                setY(src.getY()->cloneY());
-            if (src.getJ())
-                setJ(src.getJ()->cloneJ());
-            if (src.getSeed())
-                setSeed(src.getSeed()->cloneSeed());
-            if (src.getPgenCounter())
-                setPgenCounter(src.getPgenCounter()->clonePgenCounter());
+            IMPL_CLONE_TYPED_CHILD(P);
+            IMPL_CLONE_TYPED_CHILD(Q);
+            IMPL_CLONE_TYPED_CHILD(G);
+            IMPL_CLONE_TYPED_CHILD(Y);
+            IMPL_CLONE_TYPED_CHILD(J);
+            IMPL_CLONE_TYPED_CHILD(Seed);
+            IMPL_CLONE_TYPED_CHILD(PgenCounter);
         }
                 
         IMPL_XMLOBJECT_CLONE(DSAKeyValue);
@@ -161,10 +158,8 @@ namespace xmlsignature {
         RSAKeyValueImpl(const RSAKeyValueImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
-            if (src.getModulus())
-                setModulus(src.getModulus()->cloneModulus());
-            if (src.getExponent())
-                setExponent(src.getExponent()->cloneExponent());
+            IMPL_CLONE_TYPED_CHILD(Modulus);
+            IMPL_CLONE_TYPED_CHILD(Exponent);
         }
         
         IMPL_XMLOBJECT_CLONE(RSAKeyValue);
@@ -196,7 +191,7 @@ namespace xmlsignature {
 
         NamedCurveImpl(const NamedCurveImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src), m_URI(nullptr) {
-            setURI(src.getURI());
+            IMPL_CLONE_ATTRIB(URI);
         }
 
         IMPL_XMLOBJECT_CLONE(NamedCurve);
@@ -247,13 +242,10 @@ namespace xmlsignature {
         ECKeyValueImpl(const ECKeyValueImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
-            setId(src.getId());
-            if (src.getECParameters())
-                setECParameters(src.getECParameters()->clone());
-            if (src.getNamedCurve())
-                setNamedCurve(src.getNamedCurve()->cloneNamedCurve());
-            if (src.getPublicKey())
-                setPublicKey(src.getPublicKey()->clonePublicKey());
+            IMPL_CLONE_ATTRIB(Id);
+            IMPL_CLONE_XMLOBJECT_CHILD(ECParameters);
+            IMPL_CLONE_TYPED_CHILD(NamedCurve);
+            IMPL_CLONE_TYPED_CHILD(PublicKey);
         }
         
         IMPL_XMLOBJECT_CLONE(ECKeyValue);
@@ -322,14 +314,10 @@ namespace xmlsignature {
         KeyValueImpl(const KeyValueImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
-            if (src.getDSAKeyValue())
-                setDSAKeyValue(src.getDSAKeyValue()->cloneDSAKeyValue());
-            if (src.getRSAKeyValue())
-                setRSAKeyValue(src.getRSAKeyValue()->cloneRSAKeyValue());
-            if (src.getECKeyValue())
-                setECKeyValue(src.getECKeyValue()->cloneECKeyValue());
-            if (src.getUnknownXMLObject())
-                setUnknownXMLObject(src.getUnknownXMLObject()->clone());
+            IMPL_CLONE_TYPED_CHILD(DSAKeyValue);
+            IMPL_CLONE_TYPED_CHILD(RSAKeyValue);
+            IMPL_CLONE_TYPED_CHILD(ECKeyValue);
+            IMPL_CLONE_XMLOBJECT_CHILD(UnknownXMLObject);
         }
                 
         IMPL_XMLOBJECT_CLONE(KeyValue);
@@ -372,7 +360,7 @@ namespace xmlsignature {
 
         DEREncodedKeyValueImpl(const DEREncodedKeyValueImpl& src)
                 : AbstractXMLObject(src), AbstractSimpleElement(src), AbstractDOMCachingXMLObject(src), m_Id(nullptr) {
-            setId(src.getId());
+            IMPL_CLONE_ATTRIB(Id);
         }
 
         IMPL_XMLOBJECT_CLONE(DEREncodedKeyValue);
@@ -406,18 +394,16 @@ namespace xmlsignature {
             
         TransformImpl(const TransformImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src), m_Algorithm(nullptr) {
-            setAlgorithm(src.getAlgorithm());
-            for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
-                if (*i) {
-                    XPath* x=dynamic_cast<XPath*>(*i);
-                    if (x) {
-                        getXPaths().push_back(x->cloneXPath());
-                        continue;
-                    }
+            IMPL_CLONE_ATTRIB(Algorithm);
+            for (list<XMLObject*>::const_iterator i = src.m_children.begin(); i != src.m_children.end(); ++i) {
+                XPath* x=dynamic_cast<XPath*>(*i);
+                if (x) {
+                    getXPaths().push_back(x->cloneXPath());
+                    continue;
+                }
 
-                    if (*i) {
-                        getUnknownXMLObjects().push_back((*i)->clone());
-                    }
+                if (*i) {
+                    getUnknownXMLObjects().push_back((*i)->clone());
                 }
             }
         }
@@ -466,11 +452,7 @@ namespace xmlsignature {
             
         TransformsImpl(const TransformsImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
-            for (vector<Transform*>::const_iterator i=src.m_Transforms.begin(); i!=src.m_Transforms.end(); i++) {
-                if (*i) {
-                    getTransforms().push_back((*i)->cloneTransform());
-                }
-            }
+            IMPL_CLONE_TYPED_CHILDREN(Transform);
         }
         
         IMPL_XMLOBJECT_CLONE(Transforms);
@@ -510,10 +492,9 @@ namespace xmlsignature {
         RetrievalMethodImpl(const RetrievalMethodImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
-            setURI(src.getURI());
-            setType(src.getType());
-            if (src.getTransforms())
-                setTransforms(src.getTransforms()->cloneTransforms());
+            IMPL_CLONE_ATTRIB(URI);
+            IMPL_CLONE_ATTRIB(Type);
+            IMPL_CLONE_TYPED_CHILD(Transforms);
         }
         
         IMPL_XMLOBJECT_CLONE(RetrievalMethod);
@@ -566,10 +547,8 @@ namespace xmlsignature {
         X509IssuerSerialImpl(const X509IssuerSerialImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
-            if (src.getX509IssuerName())
-                setX509IssuerName(src.getX509IssuerName()->cloneX509IssuerName());
-            if (src.getX509SerialNumber())
-                setX509SerialNumber(src.getX509SerialNumber()->cloneX509SerialNumber());
+            IMPL_CLONE_TYPED_CHILD(X509IssuerName);
+            IMPL_CLONE_TYPED_CHILD(X509SerialNumber);
         }
         
         IMPL_XMLOBJECT_CLONE(X509IssuerSerial);
@@ -601,7 +580,7 @@ namespace xmlsignature {
 
         X509DigestImpl(const X509DigestImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src), m_Algorithm(nullptr) {
-            setAlgorithm(src.getAlgorithm());
+            IMPL_CLONE_ATTRIB(Algorithm);
         }
 
         IMPL_XMLOBJECT_CLONE(X509Digest);
@@ -634,53 +613,51 @@ namespace xmlsignature {
             
         X509DataImpl(const X509DataImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
-            for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
+            for (list<XMLObject*>::const_iterator i = src.m_children.begin(); i != src.m_children.end(); ++i) {
+                X509Certificate* xcert=dynamic_cast<X509Certificate*>(*i);
+                if (xcert) {
+                    getX509Certificates().push_back(xcert->cloneX509Certificate());
+                    continue;
+                }
+
+                X509CRL* xcrl=dynamic_cast<X509CRL*>(*i);
+                if (xcrl) {
+                    getX509CRLs().push_back(xcrl->cloneX509CRL());
+                    continue;
+                }
+
+                X509SubjectName* xsn=dynamic_cast<X509SubjectName*>(*i);
+                if (xsn) {
+                    getX509SubjectNames().push_back(xsn->cloneX509SubjectName());
+                    continue;
+                }
+
+                X509IssuerSerial* xis=dynamic_cast<X509IssuerSerial*>(*i);
+                if (xis) {
+                    getX509IssuerSerials().push_back(xis->cloneX509IssuerSerial());
+                    continue;
+                }
+
+                X509SKI* xski=dynamic_cast<X509SKI*>(*i);
+                if (xski) {
+                    getX509SKIs().push_back(xski->cloneX509SKI());
+                    continue;
+                }
+
+                X509Digest* xdig=dynamic_cast<X509Digest*>(*i);
+                if (xdig) {
+                    getX509Digests().push_back(xdig->cloneX509Digest());
+                    continue;
+                }
+
+                OCSPResponse* ocsp=dynamic_cast<OCSPResponse*>(*i);
+                if (ocsp) {
+                    getOCSPResponses().push_back(ocsp->cloneOCSPResponse());
+                    continue;
+                }
+
                 if (*i) {
-                    X509Certificate* xcert=dynamic_cast<X509Certificate*>(*i);
-                    if (xcert) {
-                        getX509Certificates().push_back(xcert->cloneX509Certificate());
-                        continue;
-                    }
-
-                    X509CRL* xcrl=dynamic_cast<X509CRL*>(*i);
-                    if (xcrl) {
-                        getX509CRLs().push_back(xcrl->cloneX509CRL());
-                        continue;
-                    }
-
-                    X509SubjectName* xsn=dynamic_cast<X509SubjectName*>(*i);
-                    if (xsn) {
-                        getX509SubjectNames().push_back(xsn->cloneX509SubjectName());
-                        continue;
-                    }
-
-                    X509IssuerSerial* xis=dynamic_cast<X509IssuerSerial*>(*i);
-                    if (xis) {
-                        getX509IssuerSerials().push_back(xis->cloneX509IssuerSerial());
-                        continue;
-                    }
-
-                    X509SKI* xski=dynamic_cast<X509SKI*>(*i);
-                    if (xski) {
-                        getX509SKIs().push_back(xski->cloneX509SKI());
-                        continue;
-                    }
-
-                    X509Digest* xdig=dynamic_cast<X509Digest*>(*i);
-                    if (xdig) {
-                        getX509Digests().push_back(xdig->cloneX509Digest());
-                        continue;
-                    }
-
-                    OCSPResponse* ocsp=dynamic_cast<OCSPResponse*>(*i);
-                    if (ocsp) {
-                        getOCSPResponses().push_back(ocsp->cloneOCSPResponse());
-                        continue;
-                    }
-
-                    if (*i) {
-                        getUnknownXMLObjects().push_back((*i)->clone());
-                    }
+                    getUnknownXMLObjects().push_back((*i)->clone());
                 }
             }
         }
@@ -733,7 +710,7 @@ namespace xmlsignature {
             
         SPKIDataImpl(const SPKIDataImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
-            for (vector< pair<SPKISexp*,XMLObject*> >::const_iterator i=src.m_SPKISexps.begin(); i!=src.m_SPKISexps.end(); i++) {
+            for (vector< pair<SPKISexp*,XMLObject*> >::const_iterator i = src.m_SPKISexps.begin(); i != src.m_SPKISexps.end(); ++i) {
                 if (i->first) {
                     getSPKISexps().push_back(make_pair(i->first->cloneSPKISexp(),(i->second ? i->second->clone() : (XMLObject*)nullptr)));
                 }
@@ -805,15 +782,9 @@ namespace xmlsignature {
         PGPDataImpl(const PGPDataImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
-            if (src.getPGPKeyID())
-                setPGPKeyID(src.getPGPKeyID()->clonePGPKeyID());
-            if (src.getPGPKeyPacket())
-                setPGPKeyPacket(src.getPGPKeyPacket()->clonePGPKeyPacket());
-            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i) {
-                if (*i) {
-                    getUnknownXMLObjects().push_back((*i)->clone());
-                }
-            }
+            IMPL_CLONE_TYPED_CHILD(PGPKeyID);
+            IMPL_CLONE_TYPED_CHILD(PGPKeyPacket);
+            IMPL_CLONE_XMLOBJECT_CHILDREN();
         }
         
         IMPL_XMLOBJECT_CLONE(PGPData);
@@ -861,8 +832,8 @@ namespace xmlsignature {
         KeyInfoReferenceImpl(const KeyInfoReferenceImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
-            setId(src.getId());
-            setURI(src.getURI());
+            IMPL_CLONE_ATTRIB(Id);
+            IMPL_CLONE_ATTRIB(URI);
         }
 
         IMPL_XMLOBJECT_CLONE(KeyInfoReference);
@@ -899,66 +870,64 @@ namespace xmlsignature {
             
         KeyInfoImpl(const KeyInfoImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src), m_Id(nullptr) {
-            setId(src.getId());
-            for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
+            IMPL_CLONE_ATTRIB(Id);
+            for (list<XMLObject*>::const_iterator i = src.m_children.begin(); i != src.m_children.end(); ++i) {
+                X509Data* xd=dynamic_cast<X509Data*>(*i);
+                if (xd) {
+                    getX509Datas().push_back(xd->cloneX509Data());
+                    continue;
+                }
+
+                KeyName* kn=dynamic_cast<KeyName*>(*i);
+                if (kn) {
+                    getKeyNames().push_back(kn->cloneKeyName());
+                    continue;
+                }
+
+                KeyValue* kv=dynamic_cast<KeyValue*>(*i);
+                if (kv) {
+                    getKeyValues().push_back(kv->cloneKeyValue());
+                    continue;
+                }
+
+                DEREncodedKeyValue* ekv=dynamic_cast<DEREncodedKeyValue*>(*i);
+                if (ekv) {
+                    getDEREncodedKeyValues().push_back(ekv->cloneDEREncodedKeyValue());
+                    continue;
+                }
+
+                RetrievalMethod* rm=dynamic_cast<RetrievalMethod*>(*i);
+                if (rm) {
+                    getRetrievalMethods().push_back(rm->cloneRetrievalMethod());
+                    continue;
+                }
+
+                MgmtData* md=dynamic_cast<MgmtData*>(*i);
+                if (md) {
+                    getMgmtDatas().push_back(md->cloneMgmtData());
+                    continue;
+                }
+
+                SPKIData* sd=dynamic_cast<SPKIData*>(*i);
+                if (sd) {
+                    getSPKIDatas().push_back(sd->cloneSPKIData());
+                    continue;
+                }
+
+                PGPData* pd=dynamic_cast<PGPData*>(*i);
+                if (pd) {
+                    getPGPDatas().push_back(pd->clonePGPData());
+                    continue;
+                }
+
+                KeyInfoReference* kref=dynamic_cast<KeyInfoReference*>(*i);
+                if (kref) {
+                    getKeyInfoReferences().push_back(kref->cloneKeyInfoReference());
+                    continue;
+                }
+
                 if (*i) {
-                    X509Data* xd=dynamic_cast<X509Data*>(*i);
-                    if (xd) {
-                        getX509Datas().push_back(xd->cloneX509Data());
-                        continue;
-                    }
-
-                    KeyName* kn=dynamic_cast<KeyName*>(*i);
-                    if (kn) {
-                        getKeyNames().push_back(kn->cloneKeyName());
-                        continue;
-                    }
-
-                    KeyValue* kv=dynamic_cast<KeyValue*>(*i);
-                    if (kv) {
-                        getKeyValues().push_back(kv->cloneKeyValue());
-                        continue;
-                    }
-
-                    DEREncodedKeyValue* ekv=dynamic_cast<DEREncodedKeyValue*>(*i);
-                    if (ekv) {
-                        getDEREncodedKeyValues().push_back(ekv->cloneDEREncodedKeyValue());
-                        continue;
-                    }
-
-                    RetrievalMethod* rm=dynamic_cast<RetrievalMethod*>(*i);
-                    if (rm) {
-                        getRetrievalMethods().push_back(rm->cloneRetrievalMethod());
-                        continue;
-                    }
-
-                    MgmtData* md=dynamic_cast<MgmtData*>(*i);
-                    if (md) {
-                        getMgmtDatas().push_back(md->cloneMgmtData());
-                        continue;
-                    }
-
-                    SPKIData* sd=dynamic_cast<SPKIData*>(*i);
-                    if (sd) {
-                        getSPKIDatas().push_back(sd->cloneSPKIData());
-                        continue;
-                    }
-
-                    PGPData* pd=dynamic_cast<PGPData*>(*i);
-                    if (pd) {
-                        getPGPDatas().push_back(pd->clonePGPData());
-                        continue;
-                    }
-
-                    KeyInfoReference* kref=dynamic_cast<KeyInfoReference*>(*i);
-                    if (kref) {
-                        getKeyInfoReferences().push_back(kref->cloneKeyInfoReference());
-                        continue;
-                    }
-
-                    if (*i) {
-                        getUnknownXMLObjects().push_back((*i)->clone());
-                    }
+                    getUnknownXMLObjects().push_back((*i)->clone());
                 }
             }
         }
