@@ -1366,6 +1366,24 @@
     set##proper(src.get##proper())
 
 /**
+ * Implements cloning of an integer child attribute, for use in copy constructor or
+ * deferred clone methods.
+ *
+ * proper   the proper name of the attribute to clone
+ */
+#define IMPL_CLONE_INTEGER_ATTRIB(proper) \
+    set##proper(src.m_##proper)
+
+/**
+ * Implements cloning of a boolean child attribute, for use in copy constructor or
+ * deferred clone methods.
+ *
+ * proper   the proper name of the attribute to clone
+ */
+#define IMPL_CLONE_BOOLEAN_ATTRIB(proper) \
+    proper(src.m_##proper)
+
+/**
  * Implements cloning of a child object, for use in copy constructor or
  * deferred clone methods.
  *
