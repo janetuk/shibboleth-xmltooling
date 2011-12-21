@@ -17,7 +17,12 @@ BuildRequires:  libxml-security-c-devel >= 1.4.0
 %{?_with_log4cpp:BuildRequires: liblog4cpp-devel >= 1.0}
 %{!?_with_log4cpp:BuildRequires: liblog4shib-devel}
 BuildRequires: gcc-c++, openssl-devel, boost-devel >= 1.32.0
+%if 0%{?rhel} >= 6 || 0%{?centos_version} >= 600
+BuildRequires: libcurl-openssl-devel >= 7.21.7
+Requires: libcurl-openssl >= 7.21.7
+%else
 BuildRequires: curl-devel >= 7.10.6
+%endif
 %if 0%{?suse_version} > 1000
 BuildRequires: pkg-config
 %endif
@@ -32,6 +37,11 @@ BuildRequires: redhat-rpm-config
 %define pkgdocdir %{_docdir}/%{name}-%{version}
 %endif
 
+# Prevent the RH6 package from requiring a vanilla libcurl.
+%if 0%{?rhel} >= 6 || 0%{?centos_version} >= 600
+%filter_from_requires /libcurl\.so\..*/d
+%filter_setup
+%endif
 
 %description
 The XMLTooling library contains generic XML parsing and processing
@@ -45,6 +55,9 @@ Summary:    OpenSAML XMLTooling library
 Group:      Development/Libraries/C and C++
 Provides:   @PACKAGE_NAME@ = %{version}-%{release}
 Obsoletes:  @PACKAGE_NAME@ < %{version}-%{release}
+%if 0%{?rhel} >= 6 || 0%{?centos_version} >= 600
+Requires: libcurl-openssl >= 7.21.7
+%endif
 
 %description -n lib@PACKAGE_NAME@6
 The XMLTooling library contains generic XML parsing and processing
@@ -70,7 +83,11 @@ Requires: libxml-security-c-devel >= 1.4.0
 %{?_with_log4cpp:Requires: liblog4cpp-devel >= 1.0}
 %{!?_with_log4cpp:Requires: liblog4shib-devel}
 Requires: openssl-devel, boost-devel >= 1.32.0
+%if 0%{?rhel} >= 6 || 0%{?centos_version} >= 600
+Requires: libcurl-openssl-devel >= 7.21.7
+%else
 Requires: curl-devel >= 7.10.6
+%endif
 
 %description -n lib@PACKAGE_NAME@-devel
 The XMLTooling library contains generic XML parsing and processing
@@ -98,7 +115,11 @@ This package includes XML schemas and related files.
 %setup -q
 
 %build
+%if 0%{?rhel} >= 6 || 0%{?centos_version} >= 600
+%configure %{?@PACKAGE_NAME@_options} --with-curl=/opt/shibboleth
+%else
 %configure %{?@PACKAGE_NAME@_options}
+%endif
 %{__make}
 
 %install

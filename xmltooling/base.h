@@ -697,10 +697,12 @@
             m_##proper = prepareForAssignment(m_##proper,proper); \
         } \
         void set##proper(int proper) { \
-            char buf##proper[64]; \
-            std::sprintf(buf##proper,"%d",proper); \
-            xmltooling::auto_ptr_XMLCh wide##proper(buf##proper); \
-            set##proper(wide##proper.get()); \
+            try { \
+                xmltooling::xstring buf = boost::lexical_cast<xmltooling::xstring>(proper); \
+                set##proper(buf.c_str()); \
+            } \
+            catch (boost::bad_lexical_cast&) { \
+            } \
         }
 
 /**
@@ -1250,10 +1252,12 @@
     } \
     XMLTOOLING_DOXYGEN(Sets proper.) \
     void set##proper(int proper) { \
-        char buf[64]; \
-        std::sprintf(buf,"%d",proper); \
-        xmltooling::auto_ptr_XMLCh widebuf(buf); \
-        setTextContent(widebuf.get()); \
+        try { \
+            xmltooling::xstring buf = boost::lexical_cast<xmltooling::xstring>(proper); \
+            setTextContent(buf.c_str()); \
+        } \
+        catch (boost::bad_lexical_cast&) { \
+        } \
     } \
     XMLTOOLING_DOXYGEN(Sets or clears proper.) \
     void set##proper(const XMLCh* proper) { \

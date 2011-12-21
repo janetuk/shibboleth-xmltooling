@@ -32,6 +32,7 @@
 #include <xmltooling/util/XMLConstants.h>
 
 #include <cstdio>
+#include <boost/lexical_cast.hpp>
 
 namespace xmlsignature {
     class XMLTOOL_API KeyInfo;
