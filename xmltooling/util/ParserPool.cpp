@@ -239,7 +239,8 @@ bool ParserPool::loadSchema(const XMLCh* nsURI, const XMLCh* pathname)
 
 bool ParserPool::loadCatalogs(const char* pathnames)
 {
-    boost::tokenizer< char_separator<char> > catpaths(string(pathnames), char_separator<char>(PATH_SEPARATOR_STR));
+    string temp(pathnames);
+    boost::tokenizer< char_separator<char> > catpaths(temp, char_separator<char>(PATH_SEPARATOR_STR));
     for_each(
         catpaths.begin(), catpaths.end(),
         // Call loadCatalog with an inner call to s->c_str() on each entry.
