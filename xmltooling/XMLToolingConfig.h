@@ -250,6 +250,7 @@ namespace xmltooling {
         void setURLEncoder(URLEncoder* urlEncoder);
         
         /**
+         * @deprecated
          * List of catalog files to load into validating parser pool at initialization time.
          * <p>Like other path settings, the separator depends on the platform
          * (semicolon on Windows, colon otherwise). 

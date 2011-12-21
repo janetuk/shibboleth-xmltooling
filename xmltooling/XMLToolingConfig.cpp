@@ -55,9 +55,7 @@
 #endif
 
 #include <stdexcept>
-#include <boost/bind.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/tokenizer.hpp>
 
 #if defined(XMLTOOLING_LOG4SHIB)
 # include <log4shib/PropertyConfigurator.hh>
@@ -423,16 +421,9 @@ bool XMLToolingInternalConfig::init()
         m_parserPool=new ParserPool();
         m_validatingPool=new ParserPool(true,true);
 
-        // Load catalogs from path.
-        if (!catalog_path.empty()) {
-            boost::tokenizer< char_separator<char> > catpaths(catalog_path, char_separator<char>(PATH_SEPARATOR_STR));
-            for_each(
-                catpaths.begin(), catpaths.end(),
-                // Call loadCatalog with an inner call to s->c_str() on each entry.
-                boost::bind(static_cast<bool (ParserPool::*)(const char*)>(&ParserPool::loadCatalog),
-                    m_validatingPool, boost::bind(&string::c_str,_1))
-                );
-        }
+        // Load catalogs from deprecated path setting.
+        if (!catalog_path.empty())
+            m_validatingPool->loadCatalogs(catalog_path.c_str());
 
         // default registrations
         XMLObjectBuilder::registerDefaultBuilder(new UnknownElementBuilder());

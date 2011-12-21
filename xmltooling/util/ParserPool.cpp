@@ -39,6 +39,7 @@
 #include <functional>
 #include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
+#include <boost/tokenizer.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
 #include <xercesc/sax/SAXException.hpp>
@@ -234,6 +235,18 @@ bool ParserPool::loadSchema(const XMLCh* nsURI, const XMLCh* pathname)
     for_each(m_schemaLocMap.begin(), m_schemaLocMap.end(), doubleit<xstring>(m_schemaLocations,chSpace));
 
     return true;
+}
+
+bool ParserPool::loadCatalogs(const char* pathnames)
+{
+    boost::tokenizer< char_separator<char> > catpaths(string(pathnames), char_separator<char>(PATH_SEPARATOR_STR));
+    for_each(
+        catpaths.begin(), catpaths.end(),
+        // Call loadCatalog with an inner call to s->c_str() on each entry.
+        boost::bind(static_cast<bool (ParserPool::*)(const char*)>(&ParserPool::loadCatalog),
+            boost::ref(this), boost::bind(&string::c_str, _1))
+        );
+    return catpaths.begin() != catpaths.end();
 }
 
 bool ParserPool::loadCatalog(const char* pathname)
