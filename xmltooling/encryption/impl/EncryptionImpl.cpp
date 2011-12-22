@@ -93,7 +93,7 @@ namespace xmlencryption {
             IMPL_CLONE_ATTRIB(Algorithm);
             IMPL_CLONE_TYPED_CHILD(KeySize);
             IMPL_CLONE_TYPED_CHILD(OAEPparams);
-            IMPL_CLONE_XMLOBJECT_CHILDREN();
+            IMPL_CLONE_XMLOBJECT_CHILDREN(UnknownXMLObject);
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptionMethod);
@@ -278,7 +278,7 @@ namespace xmlencryption {
             init();
             IMPL_CLONE_ATTRIB(Id);
             IMPL_CLONE_ATTRIB(Target);
-            IMPL_CLONE_XMLOBJECT_CHILDREN();
+            IMPL_CLONE_XMLOBJECT_CHILDREN(UnknownXMLObject);
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptionProperty);
@@ -390,7 +390,7 @@ namespace xmlencryption {
 
         void _clone(const ReferenceTypeImpl& src) {
             IMPL_CLONE_ATTRIB(URI);
-            IMPL_CLONE_XMLOBJECT_CHILDREN();
+            IMPL_CLONE_XMLOBJECT_CHILDREN(UnknownXMLObject);
         }
         
         IMPL_XMLOBJECT_CLONE_EX(ReferenceType);
@@ -453,19 +453,10 @@ namespace xmlencryption {
             
         ReferenceListImpl(const ReferenceListImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
-            for (list<XMLObject*>::const_iterator i = src.m_children.begin(); i != src.m_children.end(); ++i) {
-                DataReference* data=dynamic_cast<DataReference*>(*i);
-                if (data) {
-                    getDataReferences().push_back(data->cloneDataReference());
-                    continue;
-                }
-
-                KeyReference* key=dynamic_cast<KeyReference*>(*i);
-                if (key) {
-                    getKeyReferences().push_back(key->cloneKeyReference());
-                    continue;
-                }
-            }
+            IMPL_CLONE_CHILDBAG_BEGIN;
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(DataReference);
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(KeyReference);
+            IMPL_CLONE_CHILDBAG_END;
         }
         
         IMPL_XMLOBJECT_CLONE(ReferenceList);

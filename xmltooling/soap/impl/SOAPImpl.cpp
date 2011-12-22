@@ -117,7 +117,7 @@ namespace {
                     AbstractAttributeExtensibleXMLObject(src),
                     AbstractComplexElement(src),
                     AbstractDOMCachingXMLObject(src) {
-            IMPL_CLONE_XMLOBJECT_CHILDREN();
+            IMPL_CLONE_XMLOBJECT_CHILDREN(UnknownXMLObject);
         }
         
         IMPL_XMLOBJECT_CLONE(Detail);
@@ -219,7 +219,7 @@ namespace {
                     AbstractAttributeExtensibleXMLObject(src),
                     AbstractComplexElement(src),
                     AbstractDOMCachingXMLObject(src) {
-            IMPL_CLONE_XMLOBJECT_CHILDREN();
+            IMPL_CLONE_XMLOBJECT_CHILDREN(UnknownXMLObject);
         }
         
         IMPL_XMLOBJECT_CLONE(Body);
@@ -259,7 +259,7 @@ namespace {
                     AbstractAttributeExtensibleXMLObject(src),
                     AbstractComplexElement(src),
                     AbstractDOMCachingXMLObject(src) {
-            IMPL_CLONE_XMLOBJECT_CHILDREN();
+            IMPL_CLONE_XMLOBJECT_CHILDREN(UnknownXMLObject);
         }
         
         IMPL_XMLOBJECT_CLONE(Header);

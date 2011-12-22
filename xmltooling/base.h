@@ -1366,6 +1366,17 @@
     set##proper(src.get##proper())
 
 /**
+ * Implements cloning of a child attribute in a foreign namespace, for use in copy constructor or
+ * deferred clone methods.
+ *
+ * proper   the proper name of the attribute to clone
+ */
+#define IMPL_CLONE_FOREIGN_ATTRIB(proper) \
+    set##proper(src.get##proper()); \
+    if (src.m_##proper##Prefix) \
+        m_##proper##Prefix = xercesc::XMLString::replicate(src.m_##proper##Prefix)
+
+/**
  * Implements cloning of an integer child attribute, for use in copy constructor or
  * deferred clone methods.
  *
@@ -1406,14 +1417,16 @@
 /**
  * Implements cloning of an untyped child collection, for use in copy constructor or
  * deferred clone methods.
+ *
+ * proper   the proper name of the child type to clone
  */
-#define IMPL_CLONE_XMLOBJECT_CHILDREN() \
+#define IMPL_CLONE_XMLOBJECT_CHILDREN(proper) \
     static void (VectorOf(XMLObject)::* XMLObject_push_back)(XMLObject* const&) = &VectorOf(XMLObject)::push_back; \
-    VectorOf(XMLObject) cXMLObject = getUnknownXMLObjects(); \
+    VectorOf(XMLObject) c##proper = get##proper##s(); \
     std::for_each( \
-        src.m_UnknownXMLObjects.begin(), src.m_UnknownXMLObjects.end(), \
+        src.m_##proper##s.begin(), src.m_##proper##s.end(), \
         boost::lambda::if_(boost::lambda::_1 != ((XMLObject*)nullptr)) \
-            [boost::lambda::bind(XMLObject_push_back, boost::ref(cXMLObject), boost::lambda::bind(&XMLObject::clone, boost::lambda::_1))] \
+            [boost::lambda::bind(XMLObject_push_back, boost::ref(c##proper), boost::lambda::bind(&XMLObject::clone, boost::lambda::_1))] \
         )
 
 /**
@@ -1446,6 +1459,52 @@
         boost::lambda::if_(boost::lambda::_1 != ((ns::proper*)nullptr)) \
             [boost::lambda::bind(proper##_push_back, boost::ref(c##proper), boost::lambda::bind(&ns::proper::clone##proper, boost::lambda::_1))] \
         )
+
+/**
+ * Opens an iteration loop over all of the children of an object.
+ */
+#define IMPL_CLONE_CHILDBAG_BEGIN \
+    for (list<xmltooling::XMLObject*>::const_iterator _bagit = src.m_children.begin(); _bagit != src.m_children.end(); ++_bagit) {
+
+/**
+ * Closes an iteration loop over all of the children of an object.
+ */
+#define IMPL_CLONE_CHILDBAG_END }
+
+/**
+ * Implements cloning of a typed child in a bag iteration loop based on a cast check.
+ *
+ * @param proper    the proper name of the child type to clone
+ */
+#define IMPL_CLONE_TYPED_CHILD_IN_BAG(proper) \
+    proper* _##proper##cast = dynamic_cast<proper*>(*_bagit); \
+    if (_##proper##cast) { \
+        get##proper##s().push_back(_##proper##cast->clone##proper()); \
+        continue; \
+    }
+
+/**
+ * Implements cloning of a typed child in a forign namespace in a bag iteration loop based on a cast check.
+ *
+ * @param proper    the proper name of the child type to clone
+ * @param ns        the namespace of the child type
+ */
+#define IMPL_CLONE_TYPED_FOREIGN_CHILD_IN_BAG(proper,ns) \
+    ns::proper* _##proper##cast = dynamic_cast<ns::proper*>(*_bagit); \
+    if (_##proper##cast) { \
+        get##proper##s().push_back(_##proper##cast->clone##proper()); \
+        continue; \
+    }
+
+/**
+ * Implements cloning of an XMLObject child in a bag iteration loop.
+ *
+ * @param proper    the proper name of the child to clone
+ */
+#define IMPL_CLONE_XMLOBJECT_CHILD_IN_BAG(proper) \
+    if (*_bagit) { \
+        get##proper##s().push_back((*_bagit)->clone()); \
+    }
 
 /**
  * Declares an XMLObject specialization with a simple content model and type,

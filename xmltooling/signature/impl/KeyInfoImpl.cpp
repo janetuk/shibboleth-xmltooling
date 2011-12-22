@@ -395,17 +395,10 @@ namespace xmlsignature {
         TransformImpl(const TransformImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src), m_Algorithm(nullptr) {
             IMPL_CLONE_ATTRIB(Algorithm);
-            for (list<XMLObject*>::const_iterator i = src.m_children.begin(); i != src.m_children.end(); ++i) {
-                XPath* x=dynamic_cast<XPath*>(*i);
-                if (x) {
-                    getXPaths().push_back(x->cloneXPath());
-                    continue;
-                }
-
-                if (*i) {
-                    getUnknownXMLObjects().push_back((*i)->clone());
-                }
-            }
+            IMPL_CLONE_CHILDBAG_BEGIN;
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(XPath);
+                IMPL_CLONE_XMLOBJECT_CHILD_IN_BAG(UnknownXMLObject);
+            IMPL_CLONE_CHILDBAG_END;
         }
         
         IMPL_XMLOBJECT_CLONE(Transform);
@@ -613,53 +606,16 @@ namespace xmlsignature {
             
         X509DataImpl(const X509DataImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
-            for (list<XMLObject*>::const_iterator i = src.m_children.begin(); i != src.m_children.end(); ++i) {
-                X509Certificate* xcert=dynamic_cast<X509Certificate*>(*i);
-                if (xcert) {
-                    getX509Certificates().push_back(xcert->cloneX509Certificate());
-                    continue;
-                }
-
-                X509CRL* xcrl=dynamic_cast<X509CRL*>(*i);
-                if (xcrl) {
-                    getX509CRLs().push_back(xcrl->cloneX509CRL());
-                    continue;
-                }
-
-                X509SubjectName* xsn=dynamic_cast<X509SubjectName*>(*i);
-                if (xsn) {
-                    getX509SubjectNames().push_back(xsn->cloneX509SubjectName());
-                    continue;
-                }
-
-                X509IssuerSerial* xis=dynamic_cast<X509IssuerSerial*>(*i);
-                if (xis) {
-                    getX509IssuerSerials().push_back(xis->cloneX509IssuerSerial());
-                    continue;
-                }
-
-                X509SKI* xski=dynamic_cast<X509SKI*>(*i);
-                if (xski) {
-                    getX509SKIs().push_back(xski->cloneX509SKI());
-                    continue;
-                }
-
-                X509Digest* xdig=dynamic_cast<X509Digest*>(*i);
-                if (xdig) {
-                    getX509Digests().push_back(xdig->cloneX509Digest());
-                    continue;
-                }
-
-                OCSPResponse* ocsp=dynamic_cast<OCSPResponse*>(*i);
-                if (ocsp) {
-                    getOCSPResponses().push_back(ocsp->cloneOCSPResponse());
-                    continue;
-                }
-
-                if (*i) {
-                    getUnknownXMLObjects().push_back((*i)->clone());
-                }
-            }
+            IMPL_CLONE_CHILDBAG_BEGIN;
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(X509Certificate);
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(X509CRL);
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(X509SubjectName);
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(X509IssuerSerial);
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(X509SKI);
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(X509Digest);
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(OCSPResponse);
+                IMPL_CLONE_XMLOBJECT_CHILD_IN_BAG(UnknownXMLObject);
+            IMPL_CLONE_CHILDBAG_END;
         }
         
         IMPL_XMLOBJECT_CLONE(X509Data);
@@ -784,7 +740,7 @@ namespace xmlsignature {
             init();
             IMPL_CLONE_TYPED_CHILD(PGPKeyID);
             IMPL_CLONE_TYPED_CHILD(PGPKeyPacket);
-            IMPL_CLONE_XMLOBJECT_CHILDREN();
+            IMPL_CLONE_XMLOBJECT_CHILDREN(UnknownXMLObject);
         }
         
         IMPL_XMLOBJECT_CLONE(PGPData);
@@ -871,65 +827,18 @@ namespace xmlsignature {
         KeyInfoImpl(const KeyInfoImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src), m_Id(nullptr) {
             IMPL_CLONE_ATTRIB(Id);
-            for (list<XMLObject*>::const_iterator i = src.m_children.begin(); i != src.m_children.end(); ++i) {
-                X509Data* xd=dynamic_cast<X509Data*>(*i);
-                if (xd) {
-                    getX509Datas().push_back(xd->cloneX509Data());
-                    continue;
-                }
-
-                KeyName* kn=dynamic_cast<KeyName*>(*i);
-                if (kn) {
-                    getKeyNames().push_back(kn->cloneKeyName());
-                    continue;
-                }
-
-                KeyValue* kv=dynamic_cast<KeyValue*>(*i);
-                if (kv) {
-                    getKeyValues().push_back(kv->cloneKeyValue());
-                    continue;
-                }
-
-                DEREncodedKeyValue* ekv=dynamic_cast<DEREncodedKeyValue*>(*i);
-                if (ekv) {
-                    getDEREncodedKeyValues().push_back(ekv->cloneDEREncodedKeyValue());
-                    continue;
-                }
-
-                RetrievalMethod* rm=dynamic_cast<RetrievalMethod*>(*i);
-                if (rm) {
-                    getRetrievalMethods().push_back(rm->cloneRetrievalMethod());
-                    continue;
-                }
-
-                MgmtData* md=dynamic_cast<MgmtData*>(*i);
-                if (md) {
-                    getMgmtDatas().push_back(md->cloneMgmtData());
-                    continue;
-                }
-
-                SPKIData* sd=dynamic_cast<SPKIData*>(*i);
-                if (sd) {
-                    getSPKIDatas().push_back(sd->cloneSPKIData());
-                    continue;
-                }
-
-                PGPData* pd=dynamic_cast<PGPData*>(*i);
-                if (pd) {
-                    getPGPDatas().push_back(pd->clonePGPData());
-                    continue;
-                }
-
-                KeyInfoReference* kref=dynamic_cast<KeyInfoReference*>(*i);
-                if (kref) {
-                    getKeyInfoReferences().push_back(kref->cloneKeyInfoReference());
-                    continue;
-                }
-
-                if (*i) {
-                    getUnknownXMLObjects().push_back((*i)->clone());
-                }
-            }
+            IMPL_CLONE_CHILDBAG_BEGIN;
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(X509Data);
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(KeyName);
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(KeyValue);
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(DEREncodedKeyValue);
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(RetrievalMethod);
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(MgmtData);
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(SPKIData);
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(PGPData);
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(KeyInfoReference);
+                IMPL_CLONE_XMLOBJECT_CHILD_IN_BAG(UnknownXMLObject);
+            IMPL_CLONE_CHILDBAG_END;
         }
         
         IMPL_XMLOBJECT_CLONE(KeyInfo);
