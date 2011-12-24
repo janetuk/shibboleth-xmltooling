@@ -229,7 +229,7 @@ bool ParserPool::loadSchema(const XMLCh* nsURI, const XMLCh* pathname)
         return false;
     }
 
-    Lock lock(m_lock.get());
+    Lock lock(m_lock);
     m_schemaLocMap[nsURI]=pathname;
     m_schemaLocations.erase();
     for_each(m_schemaLocMap.begin(), m_schemaLocMap.end(), doubleit<xstring>(m_schemaLocations,chSpace));
@@ -302,7 +302,7 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
 
         // Fetch all the <system> elements.
         DOMNodeList* mappings=root->getElementsByTagNameNS(CATALOG_NS,system);
-        Lock lock(m_lock.get());
+        Lock lock(m_lock);
         for (XMLSize_t i=0; i<mappings->getLength(); i++) {
             root=static_cast<DOMElement*>(mappings->item(i));
             const XMLCh* from=root->getAttributeNS(nullptr,systemId);
@@ -400,7 +400,7 @@ DOMLSParser* ParserPool::createBuilder()
 
 DOMLSParser* ParserPool::checkoutBuilder()
 {
-    Lock lock(m_lock.get());
+    Lock lock(m_lock);
     if (m_pool.empty()) {
         DOMLSParser* builder=createBuilder();
         return builder;
@@ -415,7 +415,7 @@ DOMLSParser* ParserPool::checkoutBuilder()
 void ParserPool::checkinBuilder(DOMLSParser* builder)
 {
     if (builder) {
-        Lock lock(m_lock.get());
+        Lock lock(m_lock);
         m_pool.push(builder);
     }
 }
@@ -447,7 +447,7 @@ DOMBuilder* ParserPool::createBuilder()
 
 DOMBuilder* ParserPool::checkoutBuilder()
 {
-    Lock lock(m_lock.get());
+    Lock lock(m_lock);
     if (m_pool.empty()) {
         DOMBuilder* builder=createBuilder();
         return builder;
@@ -462,7 +462,7 @@ DOMBuilder* ParserPool::checkoutBuilder()
 void ParserPool::checkinBuilder(DOMBuilder* builder)
 {
     if (builder) {
-        Lock lock(m_lock.get());
+        Lock lock(m_lock);
         m_pool.push(builder);
     }
 }

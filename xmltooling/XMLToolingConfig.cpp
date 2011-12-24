@@ -294,7 +294,6 @@ XMLToolingInternalConfig::XMLToolingInternalConfig() :
 
 XMLToolingInternalConfig::~XMLToolingInternalConfig()
 {
-    delete m_lock;
 }
 
 bool XMLToolingInternalConfig::log_config(const char* config)

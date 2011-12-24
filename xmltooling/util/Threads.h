@@ -29,6 +29,7 @@
 
 #include <xmltooling/exceptions.h>
 
+#include <memory>
 #include <signal.h>
 
 namespace xmltooling
@@ -305,6 +306,16 @@ namespace xmltooling
         }
 
         /**
+         * Locks and wraps the designated mutex.
+         *
+         * @param mtx mutex to lock
+         */
+        Lock(std::auto_ptr<Mutex>& mtx) : mutex(mtx.get()) {
+            if (mutex)
+                mutex->lock();
+        }
+
+        /**
          * Unlocks the wrapped mutex.
          */
         ~Lock() {
@@ -329,6 +340,17 @@ namespace xmltooling
          * @param lockit    true if the lock should be acquired here, false if already acquired
          */
         SharedLock(RWLock* lock, bool lockit=true) : rwlock(lock) {
+            if (rwlock && lockit)
+                rwlock->rdlock();
+        }
+
+        /**
+         * Locks and wraps the designated shared lock.
+         *
+         * @param lock      lock to acquire
+         * @param lockit    true if the lock should be acquired here, false if already acquired
+         */
+        SharedLock(std::auto_ptr<RWLock>& lock, bool lockit=true) : rwlock(lock.get()) {
             if (rwlock && lockit)
                 rwlock->rdlock();
         }
