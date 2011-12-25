@@ -698,8 +698,9 @@
         } \
         void set##proper(int proper) { \
             try { \
-                xmltooling::xstring buf = boost::lexical_cast<xmltooling::xstring>(proper); \
-                set##proper(buf.c_str()); \
+                std::string buf(boost::lexical_cast<std::string>(proper)); \
+                xmltooling::auto_ptr_XMLCh widen(buf.c_str()); \
+                set##proper(widen.get()); \
             } \
             catch (boost::bad_lexical_cast&) { \
             } \
@@ -1253,8 +1254,9 @@
     XMLTOOLING_DOXYGEN(Sets proper.) \
     void set##proper(int proper) { \
         try { \
-            xmltooling::xstring buf = boost::lexical_cast<xmltooling::xstring>(proper); \
-            setTextContent(buf.c_str()); \
+            std::string buf(boost::lexical_cast<std::string>(proper)); \
+            xmltooling::auto_ptr_XMLCh widen(buf.c_str()); \
+            setTextContent(widen.get()); \
         } \
         catch (boost::bad_lexical_cast&) { \
         } \

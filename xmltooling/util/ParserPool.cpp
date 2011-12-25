@@ -244,8 +244,7 @@ bool ParserPool::loadCatalogs(const char* pathnames)
     for_each(
         catpaths.begin(), catpaths.end(),
         // Call loadCatalog with an inner call to s->c_str() on each entry.
-        boost::bind(static_cast<bool (ParserPool::*)(const char*)>(&ParserPool::loadCatalog),
-            boost::ref(this), boost::bind(&string::c_str, _1))
+        boost::bind(static_cast<bool (ParserPool::*)(const char*)>(&ParserPool::loadCatalog), this, boost::bind(&string::c_str, _1))
         );
     return catpaths.begin() != catpaths.end();
 }
