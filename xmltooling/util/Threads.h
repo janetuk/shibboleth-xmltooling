@@ -30,6 +30,7 @@
 #include <xmltooling/exceptions.h>
 
 #include <memory>
+#include <boost/scoped_ptr.hpp>
 #include <signal.h>
 
 namespace xmltooling
@@ -310,7 +311,17 @@ namespace xmltooling
          *
          * @param mtx mutex to lock
          */
-        Lock(std::auto_ptr<Mutex>& mtx) : mutex(mtx.get()) {
+        Lock(const std::auto_ptr<Mutex>& mtx) : mutex(mtx.get()) {
+            if (mutex)
+                mutex->lock();
+        }
+
+        /**
+         * Locks and wraps the designated mutex.
+         *
+         * @param mtx mutex to lock
+         */
+        Lock(const boost::scoped_ptr<Mutex>& mtx) : mutex(mtx.get()) {
             if (mutex)
                 mutex->lock();
         }
@@ -350,7 +361,18 @@ namespace xmltooling
          * @param lock      lock to acquire
          * @param lockit    true if the lock should be acquired here, false if already acquired
          */
-        SharedLock(std::auto_ptr<RWLock>& lock, bool lockit=true) : rwlock(lock.get()) {
+        SharedLock(const std::auto_ptr<RWLock>& lock, bool lockit=true) : rwlock(lock.get()) {
+            if (rwlock && lockit)
+                rwlock->rdlock();
+        }
+
+        /**
+         * Locks and wraps the designated shared lock.
+         *
+         * @param lock      lock to acquire
+         * @param lockit    true if the lock should be acquired here, false if already acquired
+         */
+        SharedLock(const boost::scoped_ptr<RWLock>& lock, bool lockit=true) : rwlock(lock.get()) {
             if (rwlock && lockit)
                 rwlock->rdlock();
         }
