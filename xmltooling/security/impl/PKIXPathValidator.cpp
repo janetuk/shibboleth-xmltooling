@@ -339,20 +339,8 @@ bool PKIXPathValidator::validate(X509* EE, STACK_OF(X509)* untrusted, const Path
         set<string> crlissuers;
         time_t now = time(nullptr);
 
-        const vector<XSECCryptoX509CRL*>& crls = pkixParams->getCRLs();
-        for (vector<XSECCryptoX509CRL*>::const_iterator j=crls.begin(); j!=crls.end(); ++j) {
-            if ((*j)->getProviderName()==DSIGConstants::s_unicodeStrPROVOpenSSL &&
-                (X509_cmp_time(X509_CRL_get_nextUpdate(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL()), &now) > 0)) {
-                // owned by store
-                X509_STORE_add_crl(store, X509_CRL_dup(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL()));
-                string crlissuer(X509_NAME_to_string(X509_CRL_get_issuer(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL())));
-                if (!crlissuer.empty()) {
-                    m_log.debug("added CRL issued by (%s)", crlissuer.c_str());
-                    crlissuers.insert(crlissuer);
-                }
-            }
-        }
-
+        // Pull CRLs from external CDP first, since an attacker is likely to stick an old but valid CRL into
+        // the signature.
         for (int i = 0; i < sk_X509_num(untrusted); ++i) {
             X509 *cert = sk_X509_value(untrusted, i);
             string crlissuer(X509_NAME_to_string(X509_get_issuer_name(cert)));
@@ -360,7 +348,6 @@ bool PKIXPathValidator::validate(X509* EE, STACK_OF(X509)* untrusted, const Path
                // We already have a CRL for this cert, so skip CRLDP processing for this one.
                continue;
             }
-
             bool foundUsableCDP = false;
             STACK_OF(DIST_POINT)* dps = (STACK_OF(DIST_POINT)*)X509_get_ext_d2i(cert, NID_crl_distribution_points, nullptr, nullptr);
             for (int ii = 0; !foundUsableCDP && ii < sk_DIST_POINT_num(dps); ++ii) {
@@ -369,12 +356,8 @@ bool PKIXPathValidator::validate(X509* EE, STACK_OF(X509)* untrusted, const Path
                     continue;
                 for (int iii = 0; !foundUsableCDP && iii < sk_GENERAL_NAME_num(dp->distpoint->name.fullname); ++iii) {
                     GENERAL_NAME* gen = sk_GENERAL_NAME_value(dp->distpoint->name.fullname, iii);
-                    // Only consider HTTP URIs, and stop after the first one we find.
-#ifdef HAVE_STRCASECMP
-                    if (gen->type == GEN_URI && (!strncasecmp((const char*)gen->d.ia5->data, "http:", 5))) {
-#else
-                    if (gen->type == GEN_URI && (!strnicmp((const char*)gen->d.ia5->data, "http:", 5))) {
-#endif
+                    // Only consider URIs, and stop after the first one we find.
+                    if (gen->type == GEN_URI) {
                         const char* cdpuri = (const char*)gen->d.ia5->data;
                         auto_ptr<XSECCryptoX509CRL> crl(getRemoteCRLs(cdpuri));
                         if (crl.get() && crl->getProviderName()==DSIGConstants::s_unicodeStrPROVOpenSSL &&
@@ -389,6 +372,23 @@ bool PKIXPathValidator::validate(X509* EE, STACK_OF(X509)* untrusted, const Path
                 }
             }
             sk_DIST_POINT_free(dps);
+        }
+
+        // Pick up any valid CRLs inline.
+        const vector<XSECCryptoX509CRL*>& crls = pkixParams->getCRLs();
+        for (vector<XSECCryptoX509CRL*>::const_iterator j=crls.begin(); j!=crls.end(); ++j) {
+            if ((*j)->getProviderName()==DSIGConstants::s_unicodeStrPROVOpenSSL &&
+                (X509_cmp_time(X509_CRL_get_nextUpdate(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL()), &now) > 0)) {
+                string crlissuer(X509_NAME_to_string(X509_CRL_get_issuer(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL())));
+                if (crlissuer.empty() || crlissuers.count(crlissuer)) {
+                   // We already have a CRL for this cert, so skip this one.
+                   continue;
+                }
+                m_log.debug("added CRL issued by (%s)", crlissuer.c_str());
+                crlissuers.insert(crlissuer);
+                // owned by store
+                X509_STORE_add_crl(store, X509_CRL_dup(static_cast<OpenSSLCryptoX509CRL*>(*j)->getOpenSSLX509CRL()));
+            }
         }
 
         // Do a second pass verify with CRLs in place.
