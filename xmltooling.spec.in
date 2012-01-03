@@ -17,12 +17,7 @@ BuildRequires:  libxml-security-c-devel >= 1.4.0
 %{?_with_log4cpp:BuildRequires: liblog4cpp-devel >= 1.0}
 %{!?_with_log4cpp:BuildRequires: liblog4shib-devel}
 BuildRequires: gcc-c++, openssl-devel, boost-devel >= 1.32.0
-%if 0%{?rhel} >= 6 || 0%{?centos_version} >= 600
-BuildRequires: libcurl-openssl-devel >= 7.21.7
-Requires: libcurl-openssl >= 7.21.7
-%else
 BuildRequires: curl-devel >= 7.10.6
-%endif
 %if 0%{?suse_version} > 1000
 BuildRequires: pkg-config
 %endif
@@ -37,11 +32,6 @@ BuildRequires: redhat-rpm-config
 %define pkgdocdir %{_docdir}/%{name}-%{version}
 %endif
 
-# Prevent the RH6 package from requiring a vanilla libcurl.
-%if 0%{?rhel} >= 6 || 0%{?centos_version} >= 600
-%filter_from_requires /libcurl\.so\..*/d
-%filter_setup
-%endif
 
 %description
 The XMLTooling library contains generic XML parsing and processing
