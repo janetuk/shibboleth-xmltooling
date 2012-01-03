@@ -105,11 +105,7 @@ This package includes XML schemas and related files.
 %setup -q
 
 %build
-%if 0%{?rhel} >= 6 || 0%{?centos_version} >= 600
-%configure %{?@PACKAGE_NAME@_options} --with-curl=/opt/shibboleth
-%else
 %configure %{?@PACKAGE_NAME@_options}
-%endif
 %{__make}
 
 %install
