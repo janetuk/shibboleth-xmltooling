@@ -327,11 +327,22 @@ namespace xmltooling
         }
 
         /**
-         * Unlocks the wrapped mutex.
+         * Unlocks the wrapped mutex, if any.
          */
         ~Lock() {
             if (mutex)
                 mutex->unlock();
+        }
+
+        /**
+         * Releases control of the original Mutex and returns it without unlocking it.
+         *
+         * @return the original, locked Mutex
+         */
+        Mutex* release() {
+            Mutex* ret = mutex;
+            mutex = nullptr;
+            return ret;
         }
 
     private:
@@ -378,11 +389,22 @@ namespace xmltooling
         }
 
         /**
-         * Unlocks the wrapped shared lock.
+         * Unlocks the wrapped shared lock, if any.
          */
         ~SharedLock() {
             if (rwlock)
                 rwlock->unlock();
+        }
+
+        /**
+         * Releases control of the original shared lock and returns it without unlocking it.
+         *
+         * @return the original shared lock
+         */
+        RWLock* release() {
+            RWLock* ret = rwlock;
+            rwlock = nullptr;
+            return ret;
         }
 
     private:
