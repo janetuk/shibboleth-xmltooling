@@ -406,7 +406,7 @@ bool PKIXPathValidator::validate(X509* EE, STACK_OF(X509)* untrusted, const Path
     if (ret == 1) {
         m_log.debug("successfully validated certificate chain");
     }
-#if (OPENSSL_VERSION_NUMBER < 0x10000000L)
+#if defined(X509_V_ERR_NO_EXPLICIT_POLICY) && (OPENSSL_VERSION_NUMBER < 0x10000000L)
     else if (X509_STORE_CTX_get_error(&ctx) == X509_V_ERR_NO_EXPLICIT_POLICY && !pkixParams->isPolicyMappingInhibited()) {
         m_log.warn("policy mapping requires OpenSSL 1.0.0 or later");
     }
