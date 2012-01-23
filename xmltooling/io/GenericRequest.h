@@ -27,8 +27,9 @@
 #ifndef __xmltooling_genreq_h__
 #define __xmltooling_genreq_h__
 
-#include <xmltooling/base.h>
+#include <xmltooling/unicode.h>
 
+#include <map>
 #include <string>
 #include <vector>
 
@@ -37,6 +38,11 @@
 #endif
 
 namespace xmltooling {
+
+#if defined (_MSC_VER)
+    #pragma warning( push )
+    #pragma warning( disable : 4251 )
+#endif
 
     /**
      * Interface to generic protocol requests that transport XML messages.
@@ -157,7 +163,69 @@ namespace xmltooling {
             std::vector<std::string>&
 #endif
             getClientCertificates() const=0;
+
+        /**
+         * Returns a language range to use in selecting language-specific
+         * content for this request.
+         * <p>The syntax is that of the HTTP 1.1 Accept-Language header, even
+         * if the underlying request is not HTTP.
+         *
+         * @return an HTTP 1.1 syntax language range specifier
+         */
+        virtual std::string getLanguageRange() const {
+            return "";
+        }
+
+        /**
+         * Initializes the language matching process; call this method to begin the
+         * matching process by calling the matchLang method.
+         * <p>The language matching process is not thread-safe and must be externally
+         * syncronized.
+         *
+         * @return  true iff language matching is possible
+         */
+        bool startLangMatching() const;
+
+        /**
+         * Continues the language matching process; additional calls to matchLang can
+         * be done as long as this method returns true.
+         * <p>The language matching process is not thread-safe and must be externally
+         * syncronized.
+         *
+         * @return  true iff more ranges are available to match against
+         */
+        bool continueLangMatching() const;
+
+        /**
+         * Matches a language tag against the currently active range.
+         * <p>The language matching process is not thread-safe and must be externally
+         * syncronized.
+         * 
+         * @param tag   a language tag (e.g., an xml:lang value)
+         * @return  true iff the tag matches the active range
+         */
+        bool matchLang(const XMLCh* tag) const;
+
+        /**
+         * Establish default handling of language ranges.
+         * 
+         * @param langFromClient    honor client's language preferences if any
+         * @param defaultRange      priority list of space-delimited language tags to use by default
+         */
+        static void setLangDefaults(bool langFromClient, const XMLCh* defaultRange);
+
+    private:
+        typedef std::multimap< float,std::vector<xstring> > langrange_t;
+        mutable langrange_t m_langRange;
+        mutable langrange_t::const_reverse_iterator m_langRangeIter;
+        static langrange_t m_defaultRange;
+        static bool m_langFromClient;
     };
+
+#if defined (_MSC_VER)
+    #pragma warning( pop )
+#endif
+
 };
 
 #endif /* __xmltooling_genreq_h__ */

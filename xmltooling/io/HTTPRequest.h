@@ -30,7 +30,7 @@
 #include <xmltooling/io/GenericRequest.h>
 
 #include <map>
-#include <cstring>
+#include <string>
 
 namespace xmltooling {
 
@@ -55,6 +55,7 @@ namespace xmltooling {
         virtual ~HTTPRequest();
 
         bool isSecure() const;
+        std::string getLanguageRange() const;
           
         /**
          * Returns the HTTP method of the request (GET, POST, etc.)
