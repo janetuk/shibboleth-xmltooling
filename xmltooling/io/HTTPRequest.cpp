@@ -43,7 +43,7 @@ using namespace std;
 bool GenericRequest::m_langFromClient = true;
 GenericRequest::langrange_t GenericRequest::m_defaultRange;
 
-GenericRequest::GenericRequest() : m_langRangeIter(m_langRange.crend())
+GenericRequest::GenericRequest() : m_langRangeIter(m_langRange.rend())
 {
 }
 
