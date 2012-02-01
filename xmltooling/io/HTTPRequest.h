@@ -55,6 +55,7 @@ namespace xmltooling {
         virtual ~HTTPRequest();
 
         bool isSecure() const;
+        bool isDefaultPort() const;
         std::string getLanguageRange() const;
           
         /**

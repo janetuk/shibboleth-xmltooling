@@ -85,6 +85,13 @@ namespace xmltooling {
         virtual int getPort() const=0;
 
         /**
+         * Returns true iff the request port is the default port for the request protocol.
+         *
+         * @return  default port indicator
+         */
+        virtual bool isDefaultPort() const;
+
+        /**
          * Returns the MIME type of the request, if known.
          *
          * @return the MIME type, or an empty string

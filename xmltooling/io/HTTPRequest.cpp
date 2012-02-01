@@ -51,6 +51,11 @@ GenericRequest::~GenericRequest()
 {
 }
 
+bool GenericRequest::isDefaultPort() const
+{
+    return false;
+}
+
 void GenericRequest::setLangDefaults(bool langFromClient, const XMLCh* defaultRange)
 {
     m_langFromClient = langFromClient;
@@ -182,6 +187,14 @@ HTTPRequest::~HTTPRequest()
 bool HTTPRequest::isSecure() const
 {
     return strcmp(getScheme(),"https")==0;
+}
+
+bool HTTPRequest::isDefaultPort() const
+{
+    if (isSecure())
+        return getPort() == 443;
+    else
+        return getPort() == 80;
 }
 
 string HTTPRequest::getLanguageRange() const
