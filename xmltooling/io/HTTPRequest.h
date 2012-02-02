@@ -29,9 +29,6 @@
 
 #include <xmltooling/io/GenericRequest.h>
 
-#include <map>
-#include <string>
-
 namespace xmltooling {
 
 #if defined (_MSC_VER)

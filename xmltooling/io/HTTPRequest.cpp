@@ -56,6 +56,20 @@ bool GenericRequest::isDefaultPort() const
     return false;
 }
 
+void GenericRequest::absolutize(string& url) const
+{
+    if (url.empty())
+        url = '/';
+    if (url[0] == '/') {
+        // Compute a URL to the root of the site.
+        const char* scheme = getScheme();
+        string root = string(scheme) + "://" + getHostname();
+        if (!isDefaultPort())
+            root += ":" + lexical_cast<string>(getPort());
+        url = root + url;
+    }
+}
+
 void GenericRequest::setLangDefaults(bool langFromClient, const XMLCh* defaultRange)
 {
     m_langFromClient = langFromClient;

@@ -172,6 +172,13 @@ namespace xmltooling {
             getClientCertificates() const=0;
 
         /**
+         * Converts a relative URL into an absolute one based on the properties of the request.
+         *
+         * @param url   input URL to convert, will be modified in place
+         */
+        virtual void absolutize(std::string& url) const;
+
+        /**
          * Returns a language range to use in selecting language-specific
          * content for this request.
          * <p>The syntax is that of the HTTP 1.1 Accept-Language header, even
