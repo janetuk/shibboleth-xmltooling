@@ -34,6 +34,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 #include <xercesc/util/XMLStringTokenizer.hpp>
+#include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmltooling;
 using namespace xercesc;
