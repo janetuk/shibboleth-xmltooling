@@ -75,7 +75,7 @@ namespace {
     size_t curl_header_hook(void* ptr, size_t size, size_t nmemb, void* stream)
     {
         // only handle single-byte data
-        if (size!=1 || nmemb<5 || !stream)
+        if (size != 1 || nmemb < 5 || !stream)
             return nmemb;
         string* cacheTag = reinterpret_cast<string*>(stream);
         const char* hdr = reinterpret_cast<char*>(ptr);
@@ -117,9 +117,9 @@ namespace {
                 }
                 break;
             }
-            // append until whitespace
+            // append until data's gone or we see a CR/LF
             while (remaining > 0) {
-                if (!isspace(*hdr)) {
+                if (*hdr != '\r' && *hdr != '\n') {
                     (*cacheTag) += *hdr++;
                     --remaining;
                     continue;
