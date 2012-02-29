@@ -222,6 +222,126 @@
         xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
         xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
         xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, xercesc::chNull}
+#define UNICODE_LITERAL_35(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chNull}
+#define UNICODE_LITERAL_36(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chNull}
+#define UNICODE_LITERAL_37(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chNull}
+#define UNICODE_LITERAL_38(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chNull}
+#define UNICODE_LITERAL_39(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chNull}
+#define UNICODE_LITERAL_40(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chNull}
+#define UNICODE_LITERAL_41(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chNull}
+#define UNICODE_LITERAL_42(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, xercesc::chNull}
+#define UNICODE_LITERAL_43(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chNull}
+#define UNICODE_LITERAL_44(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chLatin_##rr, xercesc::chNull}
+#define UNICODE_LITERAL_45(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr,ss) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chLatin_##rr, xercesc::chLatin_##ss, xercesc::chNull}
+#define UNICODE_LITERAL_46(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr,ss,tt) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chLatin_##rr, xercesc::chLatin_##ss, xercesc::chLatin_##tt, xercesc::chNull}
+#define UNICODE_LITERAL_47(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr,ss,tt,uu) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chLatin_##rr, xercesc::chLatin_##ss, xercesc::chLatin_##tt, xercesc::chLatin_##uu, xercesc::chNull}
+#define UNICODE_LITERAL_48(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr,ss,tt,uu,vv) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chLatin_##rr, xercesc::chLatin_##ss, xercesc::chLatin_##tt, xercesc::chLatin_##uu, xercesc::chLatin_##vv, xercesc::chNull}
+#define UNICODE_LITERAL_49(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr,ss,tt,uu,vv,ww) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chLatin_##rr, xercesc::chLatin_##ss, xercesc::chLatin_##tt, xercesc::chLatin_##uu, xercesc::chLatin_##vv, xercesc::chLatin_##ww, xercesc::chNull}
+#define UNICODE_LITERAL_50(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr,ss,tt,uu,vv,ww,xx) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chLatin_##rr, xercesc::chLatin_##ss, xercesc::chLatin_##tt, xercesc::chLatin_##uu, xercesc::chLatin_##vv, xercesc::chLatin_##ww, xercesc::chLatin_##xx, xercesc::chNull}
+#define UNICODE_LITERAL_51(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr,ss,tt,uu,vv,ww,xx,yy) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chLatin_##rr, xercesc::chLatin_##ss, xercesc::chLatin_##tt, xercesc::chLatin_##uu, xercesc::chLatin_##vv, xercesc::chLatin_##ww, xercesc::chLatin_##xx, \
+        xercesc::chLatin_##yy, xercesc::chNull}
+#define UNICODE_LITERAL_52(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr,ss,tt,uu,vv,ww,xx,yy,zz) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chLatin_##rr, xercesc::chLatin_##ss, xercesc::chLatin_##tt, xercesc::chLatin_##uu, xercesc::chLatin_##vv, xercesc::chLatin_##ww, xercesc::chLatin_##xx, \
+        xercesc::chLatin_##yy, xercesc::chLatin_##zz, xercesc::chNull}
 #endif /* DOXYGEN_SKIP */
 
 /**
