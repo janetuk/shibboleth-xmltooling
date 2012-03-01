@@ -427,7 +427,7 @@ XSECCryptoX509CRL* PKIXPathValidator::getRemoteCRLs(const char* cdpuri) const
 
     // The filenames for the CRL cache are based on a hash of the CRL location.
     string cdpfile = SecurityHelper::doHash("SHA1", cdpuri, strlen(cdpuri)) + ".crl";
-    XMLToolingConfig::getConfig().getPathResolver()->resolve(cdpfile, PathResolver::XMLTOOLING_RUN_FILE);
+    XMLToolingConfig::getConfig().getPathResolver()->resolve(cdpfile, PathResolver::XMLTOOLING_CACHE_FILE);
     string cdpstaging = cdpfile + ".tmp";
 
     time_t now = time(nullptr);
