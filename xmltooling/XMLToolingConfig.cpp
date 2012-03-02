@@ -714,6 +714,9 @@ void XMLToolingInternalConfig::registerXMLAlgorithm(
     )
 {
     m_algorithmMap[type][xmlAlgorithm] = pair<string,unsigned int>((keyAlgorithm ? keyAlgorithm : ""), size);
+    // Authenticated encryption algorithms are also generic encryption algorithms.
+    if (type == ALGTYPE_AUTHNENCRYPT)
+        m_algorithmMap[ALGTYPE_ENCRYPT][xmlAlgorithm] = pair<string,unsigned int>((keyAlgorithm ? keyAlgorithm : ""), size);
 }
 
 bool XMLToolingInternalConfig::isXMLAlgorithmSupported(const XMLCh* xmlAlgorithm, XMLSecurityAlgorithmType type)

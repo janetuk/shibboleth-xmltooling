@@ -317,7 +317,8 @@ namespace xmltooling {
             ALGTYPE_SIGN,
             ALGTYPE_ENCRYPT,
             ALGTYPE_KEYENCRYPT,
-            ALGTYPE_KEYAGREE
+            ALGTYPE_KEYAGREE,
+            ALGTYPE_AUTHNENCRYPT
         };
 
         /**

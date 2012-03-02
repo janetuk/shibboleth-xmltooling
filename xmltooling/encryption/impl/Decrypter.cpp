@@ -48,8 +48,14 @@ using namespace xmltooling;
 using namespace xercesc;
 using namespace std;
 
-Decrypter::Decrypter(const CredentialResolver* credResolver, CredentialCriteria* criteria, const EncryptedKeyResolver* EKResolver)
-    : m_cipher(nullptr), m_credResolver(credResolver), m_criteria(criteria), m_EKResolver(EKResolver)
+
+Decrypter::Decrypter(
+    const CredentialResolver* credResolver,
+    CredentialCriteria* criteria,
+    const EncryptedKeyResolver* EKResolver,
+    bool requireAuthenticatedCipher
+    ) : m_cipher(nullptr), m_credResolver(credResolver), m_criteria(criteria), m_EKResolver(EKResolver),
+        m_requireAuthenticatedCipher(requireAuthenticatedCipher)
 {
 }
 
@@ -72,22 +78,30 @@ void Decrypter::setKEKResolver(const CredentialResolver* resolver, CredentialCri
 
 DOMDocumentFragment* Decrypter::decryptData(const EncryptedData& encryptedData, XSECCryptoKey* key)
 {
-    if (encryptedData.getDOM()==nullptr)
+    if (encryptedData.getDOM() == nullptr)
         throw DecryptionException("The object must be marshalled before decryption.");
+
+    XMLToolingInternalConfig& xmlconf = XMLToolingInternalConfig::getInternalConfig();
+    if (m_requireAuthenticatedCipher) {
+        const XMLCh* alg = encryptedData.getEncryptionMethod() ? encryptedData.getEncryptionMethod()->getAlgorithm() : nullptr;
+        if (!alg || !xmlconf.isXMLAlgorithmSupported(alg, XMLToolingConfig::ALGTYPE_AUTHNENCRYPT)) {
+            throw DecryptionException("Unauthenticated data encryption algorithm unsupported.");
+        }
+    }
 
     // We can reuse the cipher object if the document hasn't changed.
 
     if (m_cipher && m_cipher->getDocument()!=encryptedData.getDOM()->getOwnerDocument()) {
-        XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
+        xmlconf.m_xsecProvider->releaseCipher(m_cipher);
         m_cipher=nullptr;
     }
     
     if (!m_cipher)
-        m_cipher=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(encryptedData.getDOM()->getOwnerDocument());
+        m_cipher = xmlconf.m_xsecProvider->newCipher(encryptedData.getDOM()->getOwnerDocument());
 
     try {
         m_cipher->setKey(key->clone());
-        DOMNode* ret=m_cipher->decryptElementDetached(encryptedData.getDOM());
+        DOMNode* ret = m_cipher->decryptElementDetached(encryptedData.getDOM());
         if (ret->getNodeType()!=DOMNode::DOCUMENT_FRAGMENT_NODE) {
             ret->release();
             throw DecryptionException("Decryption operation did not result in DocumentFragment.");
@@ -117,7 +131,7 @@ DOMDocumentFragment* Decrypter::decryptData(const EncryptedData& encryptedData, 
         const EncryptionMethod* meth = encryptedData.getEncryptionMethod();
         if (meth)
             m_criteria->setXMLAlgorithm(meth->getAlgorithm());
-        m_credResolver->resolve(creds,m_criteria);
+        m_credResolver->resolve(creds, m_criteria);
     }
     else {
         CredentialCriteria criteria;
@@ -126,12 +140,12 @@ DOMDocumentFragment* Decrypter::decryptData(const EncryptedData& encryptedData, 
         const EncryptionMethod* meth = encryptedData.getEncryptionMethod();
         if (meth)
             criteria.setXMLAlgorithm(meth->getAlgorithm());
-        m_credResolver->resolve(creds,&criteria);
+        m_credResolver->resolve(creds, &criteria);
     }
 
     // Loop over them and try each one.
     XSECCryptoKey* key;
-    for (vector<const Credential*>::const_iterator cred = creds.begin(); cred!=creds.end(); ++cred) {
+    for (vector<const Credential*>::const_iterator cred = creds.begin(); cred != creds.end(); ++cred) {
         try {
             key = (*cred)->getPrivateKey();
             if (!key)
@@ -169,18 +183,26 @@ DOMDocumentFragment* Decrypter::decryptData(const EncryptedData& encryptedData, 
 
 void Decrypter::decryptData(ostream& out, const EncryptedData& encryptedData, XSECCryptoKey* key)
 {
-    if (encryptedData.getDOM()==nullptr)
+    if (encryptedData.getDOM() == nullptr)
         throw DecryptionException("The object must be marshalled before decryption.");
+
+    XMLToolingInternalConfig& xmlconf = XMLToolingInternalConfig::getInternalConfig();
+    if (m_requireAuthenticatedCipher) {
+        const XMLCh* alg = encryptedData.getEncryptionMethod() ? encryptedData.getEncryptionMethod()->getAlgorithm() : nullptr;
+        if (!alg || !xmlconf.isXMLAlgorithmSupported(alg, XMLToolingConfig::ALGTYPE_AUTHNENCRYPT)) {
+            throw DecryptionException("Unauthenticated data encryption algorithm unsupported.");
+        }
+    }
 
     // We can reuse the cipher object if the document hasn't changed.
 
-    if (m_cipher && m_cipher->getDocument()!=encryptedData.getDOM()->getOwnerDocument()) {
-        XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
-        m_cipher=nullptr;
+    if (m_cipher && m_cipher->getDocument() != encryptedData.getDOM()->getOwnerDocument()) {
+        xmlconf.m_xsecProvider->releaseCipher(m_cipher);
+        m_cipher = nullptr;
     }
     
     if (!m_cipher)
-        m_cipher=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(encryptedData.getDOM()->getOwnerDocument());
+        m_cipher = xmlconf.m_xsecProvider->newCipher(encryptedData.getDOM()->getOwnerDocument());
 
     try {
         m_cipher->setKey(key->clone());
@@ -228,7 +250,7 @@ void Decrypter::decryptData(ostream& out, const EncryptedData& encryptedData, co
 
     // Loop over them and try each one.
     XSECCryptoKey* key;
-    for (vector<const Credential*>::const_iterator cred = creds.begin(); cred!=creds.end(); ++cred) {
+    for (vector<const Credential*>::const_iterator cred = creds.begin(); cred != creds.end(); ++cred) {
         try {
             key = (*cred)->getPrivateKey();
             if (!key)
@@ -290,11 +312,11 @@ XSECCryptoKey* Decrypter::decryptKey(const EncryptedKey& encryptedKey, const XML
 
     if (m_cipher && m_cipher->getDocument()!=encryptedKey.getDOM()->getOwnerDocument()) {
         XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->releaseCipher(m_cipher);
-        m_cipher=nullptr;
+        m_cipher = nullptr;
     }
     
     if (!m_cipher)
-        m_cipher=XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(encryptedKey.getDOM()->getOwnerDocument());
+        m_cipher = XMLToolingInternalConfig::getInternalConfig().m_xsecProvider->newCipher(encryptedKey.getDOM()->getOwnerDocument());
     
     // Resolve key decryption keys.
     int types = CredentialCriteria::KEYINFO_EXTRACTION_KEY | CredentialCriteria::KEYINFO_EXTRACTION_KEYNAMES;
@@ -320,7 +342,7 @@ XSECCryptoKey* Decrypter::decryptKey(const EncryptedKey& encryptedKey, const XML
         throw DecryptionException("Unable to resolve any key decryption keys.");
 
     XMLByte buffer[1024];
-    for (vector<const Credential*>::const_iterator cred = creds.begin(); cred!=creds.end(); ++cred) {
+    for (vector<const Credential*>::const_iterator cred = creds.begin(); cred != creds.end(); ++cred) {
         try {
             if (!(*cred)->getPrivateKey())
                 throw DecryptionException("Credential did not contain a private key.");
