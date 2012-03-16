@@ -663,8 +663,19 @@ int xmltooling::verify_callback(X509_STORE_CTX* x509_ctx, void* arg)
     }
 
     if (!success) {
-        log.error("supplied TrustEngine failed to validate SSL/TLS server certificate");
-        x509_ctx->error=X509_V_ERR_APPLICATION_VERIFICATION;     // generic error, check log for plugin specifics
+        log.error("supplied TrustEngine failed to validate SSL/TLS server certificate:");
+        if (x509_ctx->cert) {
+            BIO* b = BIO_new(BIO_s_mem());
+            X509_print(b, x509_ctx->cert);
+            BUF_MEM* bptr = nullptr;
+            BIO_get_mem_ptr(b, &bptr);
+            if (bptr && bptr->length > 0) {
+                string s(bptr->data, bptr->length);
+                log.error(s);
+            }
+            BIO_free(b);
+        }
+        x509_ctx->error = X509_V_ERR_APPLICATION_VERIFICATION;     // generic error, check log for plugin specifics
         ctx->setAuthenticated(false);
         return ctx->m_mandatory ? 0 : 1;
     }
