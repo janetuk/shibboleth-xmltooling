@@ -135,6 +135,13 @@ const XMLCh* AbstractAttributeExtensibleXMLObject::getAttribute(const xmltooling
     return (i != m_attributeMap.end()) ? i->second : nullptr;
 }
 
+const XMLCh* AbstractAttributeExtensibleXMLObject::getLang() const
+{
+    static const XMLCh _lang[] = UNICODE_LITERAL_4(l,a,n,g);
+    static xmltooling::QName qname(xmlconstants::XML_NS, _lang);
+    return getAttribute(qname);
+}
+
 void AbstractAttributeExtensibleXMLObject::setAttribute(const xmltooling::QName& qualifiedName, const XMLCh* value, bool ID)
 {
     map<xmltooling::QName,XMLCh*>::iterator i=m_attributeMap.find(qualifiedName);

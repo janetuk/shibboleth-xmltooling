@@ -56,6 +56,36 @@ void XMLObject::releaseThisAndChildrenDOM() const
     releaseDOM();
 }
 
+const XMLCh* XMLObject::getLang() const
+{
+    return nullptr;
+}
+
+void XMLObject::setNil(const XMLCh* value)
+{
+    if (value) {
+        switch (*value) {
+            case xercesc::chLatin_t:
+                nil(xmlconstants::XML_BOOL_TRUE);
+                break;
+            case xercesc::chLatin_f:
+                nil(xmlconstants::XML_BOOL_FALSE);
+                break;
+            case xercesc::chDigit_1:
+                nil(xmlconstants::XML_BOOL_ONE);
+                break;
+            case xercesc::chDigit_0:
+                nil(xmlconstants::XML_BOOL_ZERO);
+                break;
+            default:
+                nil(xmlconstants::XML_BOOL_NULL);
+        }
+    }
+    else {
+        nil(xmlconstants::XML_BOOL_NULL);
+    }
+}
+
 AbstractXMLObject::AbstractXMLObject(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const QName* schemaType)
     : m_log(logging::Category::getInstance(XMLTOOLING_LOGCAT".XMLObject")),
     	m_schemaLocation(nullptr), m_noNamespaceSchemaLocation(nullptr), m_nil(xmlconstants::XML_BOOL_NULL),
@@ -103,31 +133,6 @@ const QName& AbstractXMLObject::getElementQName() const
 const set<Namespace>& AbstractXMLObject::getNamespaces() const
 {
     return m_namespaces;
-}
-
-void XMLObject::setNil(const XMLCh* value)
-{
-    if (value) {
-        switch (*value) {
-            case xercesc::chLatin_t:
-                nil(xmlconstants::XML_BOOL_TRUE);
-                break;
-            case xercesc::chLatin_f:
-                nil(xmlconstants::XML_BOOL_FALSE);
-                break;
-            case xercesc::chDigit_1:
-                nil(xmlconstants::XML_BOOL_ONE);
-                break;
-            case xercesc::chDigit_0:
-                nil(xmlconstants::XML_BOOL_ZERO);
-                break;
-            default:
-                nil(xmlconstants::XML_BOOL_NULL);
-        }
-    }
-    else {
-        nil(xmlconstants::XML_BOOL_NULL);
-    }
 }
 
 void AbstractXMLObject::addNamespace(const Namespace& ns) const
