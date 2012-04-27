@@ -101,6 +101,13 @@ namespace xmltooling {
          */
         virtual const char* getCookie(const char* name) const;
 
+        /**
+         * Gets all the cookies supplied by the client.
+         *
+         * @return  a map of cookie name/value pairs
+         */
+        virtual const std::map<std::string,std::string>& getCookies() const;
+
     private:
         mutable std::map<std::string,std::string> m_cookieMap;
     };

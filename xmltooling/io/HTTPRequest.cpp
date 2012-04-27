@@ -228,7 +228,7 @@ namespace {
     }
 }
 
-const char* HTTPRequest::getCookie(const char* name) const
+const map<string,string>& HTTPRequest::getCookies() const
 {
     if (m_cookieMap.empty()) {
         string cookies=getHeader("Cookie");
@@ -236,6 +236,11 @@ const char* HTTPRequest::getCookie(const char* name) const
         tokenizer< char_separator<char> > nvpairs(cookies, char_separator<char>(";"));
         for_each(nvpairs.begin(), nvpairs.end(), boost::bind(handle_cookie_fn, boost::ref(m_cookieMap), boost::ref(nvpair), _1));
     }
-    map<string,string>::const_iterator lookup=m_cookieMap.find(name);
+    return m_cookieMap;
+}
+
+const char* HTTPRequest::getCookie(const char* name) const
+{
+    map<string,string>::const_iterator lookup = getCookies().find(name);
     return (lookup==m_cookieMap.end()) ? nullptr : lookup->second.c_str();
 }
