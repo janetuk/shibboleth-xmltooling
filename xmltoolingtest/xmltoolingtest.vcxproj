@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3E34CDCC-FCBA-490D-A165-1CB6F4559799}</ProjectGuid>
     <RootNamespace>xmltoolingtest</RootNamespace>
-    <CxxTestRoot>..\..\..\..\cxxtest\</CxxTestRoot>
+    <CxxTestRoot>..\..\..\cxxtest\</CxxTestRoot>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
