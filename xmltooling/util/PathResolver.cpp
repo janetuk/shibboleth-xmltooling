@@ -101,6 +101,16 @@ bool PathResolver::isAbsolute(const char* s) const
 
 const string& PathResolver::resolve(string& s, file_type_t filetype, const char* pkgname, const char* prefix) const
 {
+#ifdef WIN32
+    // Check for possible environment variable(s).
+    if (s.find('%') != string::npos) {
+        char expbuf[MAX_PATH + 2];
+        DWORD cnt = ExpandEnvironmentStrings(s.c_str(), expbuf, sizeof(expbuf));
+        if (cnt != 0 && cnt <= sizeof(expbuf))
+            s = expbuf;
+    }
+#endif
+
     if (!isAbsolute(s.c_str())) {
         switch (filetype) {
             case XMLTOOLING_LIB_FILE:

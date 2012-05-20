@@ -29,6 +29,7 @@
 #include "logging.h"
 #include "util/CurlURLInputStream.h"
 #include "util/NDC.h"
+#include "util/PathResolver.h"
 #include "util/ParserPool.h"
 #include "util/Threads.h"
 #include "util/XMLHelper.h"
@@ -39,7 +40,6 @@
 #include <functional>
 #include <boost/algorithm/string.hpp>
 #include <boost/bind.hpp>
-#include <boost/tokenizer.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
 #include <xercesc/sax/SAXException.hpp>
@@ -240,13 +240,13 @@ bool ParserPool::loadSchema(const XMLCh* nsURI, const XMLCh* pathname)
 bool ParserPool::loadCatalogs(const char* pathnames)
 {
     string temp(pathnames);
-    boost::tokenizer< char_separator<char> > catpaths(temp, char_separator<char>(PATH_SEPARATOR_STR));
-    for_each(
-        catpaths.begin(), catpaths.end(),
-        // Call loadCatalog with an inner call to s->c_str() on each entry.
-        boost::bind(static_cast<bool (ParserPool::*)(const char*)>(&ParserPool::loadCatalog), this, boost::bind(&string::c_str, _1))
-        );
-    return catpaths.begin() != catpaths.end();
+    vector<string> catpaths;
+    split(catpaths, temp, is_any_of(PATH_SEPARATOR_STR), algorithm::token_compress_on);
+    for (vector<string>::iterator i = catpaths.begin(); i != catpaths.end(); ++i) {
+        XMLToolingConfig::getConfig().getPathResolver()->resolve(*i, PathResolver::XMLTOOLING_XML_FILE);
+        loadCatalog(i->c_str());
+    }
+    return !catpaths.empty();
 }
 
 bool ParserPool::loadCatalog(const char* pathname)
