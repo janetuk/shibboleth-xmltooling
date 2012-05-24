@@ -69,7 +69,7 @@ AC_TYPE_SIZE_T
 AC_CHECK_SIZEOF([long])
 
 # Checks for library functions.
-AC_CHECK_FUNCS([strchr strdup strstr timegm strcasecmp])
+AC_CHECK_FUNCS([strchr strdup strstr timegm gmtime_r strcasecmp])
 AC_CHECK_HEADERS([dlfcn.h])
 AC_CHECK_FUNC(dlclose, , [ AC_CHECK_LIB(dl, dlopen) ])
 
