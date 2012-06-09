@@ -104,9 +104,9 @@ const string& PathResolver::resolve(string& s, file_type_t filetype, const char*
 #ifdef WIN32
     // Check for possible environment variable(s).
     if (s.find('%') != string::npos) {
-        // This is an ugly workaround for Windows XP, which doesn't support the APPDATA variable.
-        if (!getenv("APPDATA") && s.find("%APPDATA%") != string::npos) {
-            s.replace(s.find("%APPDATA%"), 9, "%ALLUSERSPROFILE%\\Application Data");
+        // This is an ugly workaround for Windows XP/2003, which don't support the PROGRAMDATA variable.
+        if (!getenv("PROGRAMDATA") && s.find("%PROGRAMDATA%") != string::npos) {
+            s.replace(s.find("%PROGRAMDATA%"), 9, "%ALLUSERSPROFILE%/Application Data");
         }
         char expbuf[MAX_PATH + 2];
         DWORD cnt = ExpandEnvironmentStrings(s.c_str(), expbuf, sizeof(expbuf));
