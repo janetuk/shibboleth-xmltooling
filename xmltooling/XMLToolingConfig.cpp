@@ -746,7 +746,7 @@ void XMLToolingInternalConfig::registerXMLAlgorithms()
     // With ECDSA, XML-Security exports a public macro for OpenSSL's support, and any
     // versions of XML-Security that didn't provide the macro don't handle ECDSA anyway.
 
-    // With AES, all supported XML-Security versions export a macro for OpenSSL's support.
+    // With AES and GCM, all supported XML-Security versions export a macro for OpenSSL's support.
 
     // With SHA2, only the very latest XML-Security exports a macro, but all the versions
     // will handle SHA2 *if* OpenSSL does. So we use our own macro to check OpenSSL's
@@ -811,6 +811,12 @@ void XMLToolingInternalConfig::registerXMLAlgorithms()
 
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES256_CBC, "AES", 256, ALGTYPE_ENCRYPT);
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES256, "AES", 256, ALGTYPE_KEYENCRYPT);
+#endif
+
+#ifdef XSEC_OPENSSL_HAVE_GCM
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES128_GCM, "AES", 128, ALGTYPE_AUTHNENCRYPT);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES192_GCM, "AES", 192, ALGTYPE_AUTHNENCRYPT);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES256_GCM, "AES", 256, ALGTYPE_AUTHNENCRYPT);
 #endif
 }
 
