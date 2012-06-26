@@ -72,7 +72,7 @@ namespace xmltooling {
     public:
         CURLSOAPTransport(const Address& addr)
             : m_sender(addr.m_from ? addr.m_from : ""), m_peerName(addr.m_to ? addr.m_to : ""), m_endpoint(addr.m_endpoint),
-                m_handle(nullptr), m_headers(nullptr),
+                m_handle(nullptr), m_keepHandle(false), m_headers(nullptr),
 #ifndef XMLTOOLING_NO_XMLSEC
                     m_cred(nullptr), m_trustEngine(nullptr), m_peerResolver(nullptr), m_mandatory(false),
 #endif
@@ -91,10 +91,15 @@ namespace xmltooling {
 
         virtual ~CURLSOAPTransport() {
             curl_slist_free_all(m_headers);
-            curl_easy_setopt(m_handle, CURLOPT_USERAGENT, nullptr);
-            curl_easy_setopt(m_handle, CURLOPT_ERRORBUFFER, nullptr);
-            curl_easy_setopt(m_handle, CURLOPT_PRIVATE, m_authenticated ? "secure" : nullptr); // Save off security "state".
-            g_CURLPool->put(m_sender.c_str(), m_peerName.c_str(), m_endpoint.c_str(), m_handle);
+            if (m_keepHandle) {
+                curl_easy_setopt(m_handle, CURLOPT_USERAGENT, nullptr);
+                curl_easy_setopt(m_handle, CURLOPT_ERRORBUFFER, nullptr);
+                curl_easy_setopt(m_handle, CURLOPT_PRIVATE, m_authenticated ? "secure" : nullptr); // Save off security "state".
+                g_CURLPool->put(m_sender.c_str(), m_peerName.c_str(), m_endpoint.c_str(), m_handle);
+            }
+            else {
+                curl_easy_cleanup(m_handle);
+            }
         }
 
         bool isConfidential() const {
@@ -207,6 +212,7 @@ namespace xmltooling {
         // per-call state
         string m_sender,m_peerName,m_endpoint,m_simplecreds;
         CURL* m_handle;
+        bool m_keepHandle;
         stringstream m_stream;
         struct curl_slist* m_headers;
 		string m_useragent;
@@ -307,6 +313,8 @@ CURL* CURLPool::get(const SOAPTransport::Address& addr)
     curl_easy_setopt(handle,CURLOPT_NOPROGRESS,1);
     curl_easy_setopt(handle,CURLOPT_NOSIGNAL,1);
     curl_easy_setopt(handle,CURLOPT_FAILONERROR,1);
+    // This may (but probably won't) help with < 7.20 bug in DNS caching.
+    curl_easy_setopt(handle,CURLOPT_DNS_CACHE_TIMEOUT,120);
     curl_easy_setopt(handle,CURLOPT_SSL_CIPHER_LIST,"ALL:!aNULL:!LOW:!EXPORT:!SSLv2");
     // Verification of the peer is via TrustEngine only.
     curl_easy_setopt(handle,CURLOPT_SSL_VERIFYPEER,0);
@@ -565,6 +573,9 @@ void CURLSOAPTransport::send(istream* in)
             string("CURLSOAPTransport failed while contacting SOAP endpoint (") + m_endpoint + "): " +
                 (curl_errorbuf[0] ? curl_errorbuf : "no further information available"));
     }
+
+    // This won't prevent every possible failed connection from being kept, but it's something.
+    m_keepHandle = true;
 
     // Check for outgoing cache tag.
     if (m_cacheTag) {
