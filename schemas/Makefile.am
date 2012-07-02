@@ -3,6 +3,7 @@ AUTOMAKE_OPTIONS = foreign
 schemafiles = \
 	soap-envelope.xsd \
 	xenc-schema.xsd \
+	xenc11-schema.xsd \
 	xmldsig-core-schema.xsd \
 	xmldsig11-schema.xsd \
 	xml.xsd \
