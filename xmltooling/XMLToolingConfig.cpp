@@ -798,7 +798,7 @@ void XMLToolingInternalConfig::registerXMLAlgorithms()
 
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_1_5, "RSA", 0, ALGTYPE_KEYENCRYPT);
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1, "RSA", 0, ALGTYPE_KEYENCRYPT);
-#ifdef XMLTOOLING_XSEC_OAEP11
+#ifdef XMLTOOLING_XMLSEC_OAEP11
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_OAEP, "RSA", 0, ALGTYPE_KEYENCRYPT);
 #endif
 
