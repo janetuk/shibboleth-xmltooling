@@ -68,8 +68,5 @@
 #  define XMLTOOLING_XMLSEC_ECC 1
 #  define XMLTOOLING_XMLSEC_DEBUGLOGGING 1
 # endif
-# if (_XSEC_VERSION_FULL >= 10700)
-#  define XMLTOOLING_XMLSEC_OAEP11 1
-# endif
 #endif
 

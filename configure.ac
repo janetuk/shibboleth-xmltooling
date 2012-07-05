@@ -348,13 +348,6 @@ int i = 0;
         [AC_MSG_RESULT([yes])AC_DEFINE([XMLTOOLING_XMLSEC_C14N11],[1],[Define to 1 if XML-Security-C includes C14N 1.1 support.])],
         [AC_MSG_RESULT([no])])
 
-    AC_MSG_CHECKING([whether XML-Security-C includes MGF-pluggable RSA-OAEP support])
-    AC_COMPILE_IFELSE(
-        [AC_LANG_PROGRAM([[#include <xsec/dsig/DSIGConstants.hpp>]],
-            [[encryptionMethod em = ENCRYPT_RSA_OAEP;]])],
-        [AC_MSG_RESULT([yes])AC_DEFINE([XMLTOOLING_XMLSEC_OAEP11],[1],[Define to 1 if XML-Security-C includes MGF-pluggable RSA-OAEP support.])],
-        [AC_MSG_RESULT([no])])
-
     AC_MSG_CHECKING([whether XML-Security-C includes debug logging support])
     AC_COMPILE_IFELSE(
         [AC_LANG_PROGRAM([[#include <xsec/utils/XSECPlatformUtils.hpp>]],

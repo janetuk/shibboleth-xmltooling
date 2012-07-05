@@ -32,6 +32,3 @@
 
 /* Define to 1 if you have the `xsecsize_t' type. */
 #undef HAVE_XSECSIZE_T
-
-/* Define to 1 if XML-Security-C includes MGF-pluggable RSA-OAEP support. */
-#undef XMLTOOLING_XMLSEC_OAEP11

@@ -745,6 +745,7 @@ void XMLToolingInternalConfig::registerXMLAlgorithms()
 
     // With ECDSA, XML-Security exports a public macro for OpenSSL's support, and any
     // versions of XML-Security that didn't provide the macro don't handle ECDSA anyway.
+    // However, the SHA-224 variant was left out of the initial XML-Security release.
 
     // With AES and GCM, all supported XML-Security versions export a macro for OpenSSL's support.
 
@@ -764,6 +765,10 @@ void XMLToolingInternalConfig::registerXMLAlgorithms()
 #endif
 
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIDSA_SHA1, "DSA", 0, ALGTYPE_SIGN);
+#if defined(URI_ID_DSA_SHA256) && defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA256)
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIDSA_SHA256, "DSA", 0, ALGTYPE_SIGN);
+#endif
+
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_MD5, "RSA", 0, ALGTYPE_SIGN);
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA1, "RSA", 0, ALGTYPE_SIGN);
 #if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA256)
@@ -777,10 +782,13 @@ void XMLToolingInternalConfig::registerXMLAlgorithms()
 
 #ifdef XSEC_OPENSSL_HAVE_EC
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA1, "EC", 0, ALGTYPE_SIGN);
-#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA256)
+# if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA256)
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA256, "EC", 0, ALGTYPE_SIGN);
+#  ifdef URI_ID_ECDSA_SHA224
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA224, "EC", 0, ALGTYPE_SIGN);
+#  endif
 # endif
-#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA512)
+# if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA512)
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA384, "EC", 0, ALGTYPE_SIGN);
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA512, "EC", 0, ALGTYPE_SIGN);
 # endif
@@ -798,7 +806,7 @@ void XMLToolingInternalConfig::registerXMLAlgorithms()
 
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_1_5, "RSA", 0, ALGTYPE_KEYENCRYPT);
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1, "RSA", 0, ALGTYPE_KEYENCRYPT);
-#ifdef XMLTOOLING_XMLSEC_OAEP11
+#ifdef URI_ID_RSA_OAEP
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_OAEP, "RSA", 0, ALGTYPE_KEYENCRYPT);
 #endif
 
