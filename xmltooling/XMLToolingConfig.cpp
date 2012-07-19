@@ -822,6 +822,12 @@ void XMLToolingInternalConfig::registerXMLAlgorithms()
 
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES256_CBC, "AES", 256, ALGTYPE_ENCRYPT);
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES256, "AES", 256, ALGTYPE_KEYENCRYPT);
+
+# ifdef URI_ID_KW_AES128_PAD
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES128_PAD, "AES", 128, ALGTYPE_KEYENCRYPT);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES192_PAD, "AES", 192, ALGTYPE_KEYENCRYPT);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES256_PAD, "AES", 256, ALGTYPE_KEYENCRYPT);
+# endif
 #endif
 
 #ifdef XSEC_OPENSSL_HAVE_GCM
