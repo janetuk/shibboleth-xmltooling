@@ -157,17 +157,17 @@ bool GenericRequest::startLangMatching() const
     }
     
     m_langRangeIter = m_langRange.rbegin();
-    return (m_langRangeIter != m_langRange.rend());
+    return (m_langRangeIter != const_cast<const langrange_t&>(m_langRange).rend());
 }
 
 bool GenericRequest::continueLangMatching() const
 {
-    return (++m_langRangeIter != m_langRange.rend());
+    return (++m_langRangeIter != const_cast<const langrange_t&>(m_langRange).rend());
 }
 
 bool GenericRequest::matchLang(const XMLCh* tag) const
 {
-    if (m_langRangeIter == m_langRange.rend())
+    if (m_langRangeIter == const_cast<const langrange_t&>(m_langRange).rend())
         return false;
 
     // To match against a given range, the range has to be built up and then
