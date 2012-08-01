@@ -636,6 +636,46 @@ namespace xmlencryption {
         }
     };
 
+    class XMLTOOL_DLLLOCAL MGFImpl : public virtual MGF,
+        public AbstractSimpleElement,
+        public AbstractDOMCachingXMLObject,
+        public AbstractXMLObjectMarshaller,
+        public AbstractXMLObjectUnmarshaller
+    {
+        void init() {
+            m_Algorithm = nullptr;
+        }
+
+    public:
+        virtual ~MGFImpl() {
+            XMLString::release(&m_Algorithm);
+        }
+
+        MGFImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
+                : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
+            init();
+        }
+            
+        MGFImpl(const MGFImpl& src)
+                : AbstractXMLObject(src), AbstractSimpleElement(src), AbstractDOMCachingXMLObject(src) {
+            init();
+            IMPL_CLONE_ATTRIB(Algorithm);
+        }
+        
+        IMPL_XMLOBJECT_CLONE(MGF);
+        IMPL_STRING_ATTRIB(Algorithm);
+
+    protected:
+        void marshallAttributes(DOMElement* domElement) const {
+            MARSHALL_STRING_ATTRIB(Algorithm,ALGORITHM,nullptr);
+        }
+
+        void processAttribute(const DOMAttr* attribute) {
+            PROC_STRING_ATTRIB(Algorithm,ALGORITHM,nullptr);
+            AbstractXMLObjectUnmarshaller::processAttribute(attribute);
+        }
+    };
+
 };
 
 #if defined (_MSC_VER)
@@ -659,6 +699,8 @@ IMPL_XMLOBJECTBUILDER(KeySize);
 IMPL_XMLOBJECTBUILDER(OAEPparams);
 IMPL_XMLOBJECTBUILDER(ReferenceList);
 IMPL_XMLOBJECTBUILDER(Transforms);
+
+IMPL_XMLOBJECTBUILDER(MGF);
 
 // Unicode literals
 
@@ -700,3 +742,7 @@ const XMLCh ReferenceType::TYPE_NAME[] =                UNICODE_LITERAL_13(R,e,f
 const XMLCh ReferenceType::URI_ATTRIB_NAME[] =          UNICODE_LITERAL_3(U,R,I);
 const XMLCh Transforms::LOCAL_NAME[] =                  UNICODE_LITERAL_10(T,r,a,n,s,f,o,r,m,s);
 const XMLCh Transforms::TYPE_NAME[] =                   UNICODE_LITERAL_14(T,r,a,n,s,f,o,r,m,s,T,y,p,e);
+
+const XMLCh MGF::LOCAL_NAME[] =                         UNICODE_LITERAL_3(M,G,F);
+const XMLCh MGF::TYPE_NAME[] =                          UNICODE_LITERAL_7(M,G,F,T,y,p,e);
+const XMLCh MGF::ALGORITHM_ATTRIB_NAME[] =              UNICODE_LITERAL_9(A,l,g,o,r,i,t,h,m);

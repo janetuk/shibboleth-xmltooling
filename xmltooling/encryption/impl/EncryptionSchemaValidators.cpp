@@ -34,6 +34,7 @@ using namespace xmlencryption;
 using namespace xmltooling;
 using namespace std;
 using xmlconstants::XMLENC_NS;
+using xmlconstants::XMLENC11_NS;
 
 namespace xmlencryption {
 
@@ -112,7 +113,11 @@ namespace xmlencryption {
     BEGIN_XMLOBJECTVALIDATOR_SUB(XMLTOOL_DLLLOCAL,EncryptedKey,EncryptedType);
         EncryptedTypeSchemaValidator::validate(xmlObject);
     END_XMLOBJECTVALIDATOR;
-    
+
+    BEGIN_XMLOBJECTVALIDATOR(XMLTOOL_DLLLOCAL,MGF);
+        XMLOBJECTVALIDATOR_REQUIRE(MGF,Algorithm);
+    END_XMLOBJECTVALIDATOR;
+
 };
 
 #define REGISTER_ELEMENT(namespaceURI,cname) \
@@ -149,4 +154,7 @@ void xmlencryption::registerEncryptionClasses()
     REGISTER_TYPE(XMLENC_NS,EncryptionProperties);
     REGISTER_TYPE(XMLENC_NS,EncryptionProperty);
     REGISTER_TYPE(XMLENC_NS,Transforms);
+
+    REGISTER_ELEMENT(XMLENC11_NS,MGF);
+    REGISTER_TYPE(XMLENC11_NS,MGF);
 }
