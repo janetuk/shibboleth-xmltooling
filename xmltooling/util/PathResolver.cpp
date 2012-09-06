@@ -28,6 +28,10 @@
 #include "exceptions.h"
 #include "util/PathResolver.h"
 
+#ifdef WIN32
+# include <Shlobj.h>
+#endif
+
 using namespace xmltooling;
 using namespace std;
 
@@ -106,7 +110,10 @@ const string& PathResolver::resolve(string& s, file_type_t filetype, const char*
     if (s.find('%') != string::npos) {
         // This is an ugly workaround for Windows XP/2003, which don't support the PROGRAMDATA variable.
         if (!getenv("PROGRAMDATA") && s.find("%PROGRAMDATA%") != string::npos) {
-            s.replace(s.find("%PROGRAMDATA%"), 13, "%ALLUSERSPROFILE%/Application Data");
+            char appdatapath[MAX_PATH + 2];
+            if (SHGetFolderPath(NULL, CSIDL_COMMON_APPDATA, NULL, SHGFP_TYPE_CURRENT, appdatapath) == S_OK) {
+                s.replace(s.find("%PROGRAMDATA%"), 13, appdatapath);
+            }
         }
         char expbuf[MAX_PATH + 2];
         DWORD cnt = ExpandEnvironmentStrings(s.c_str(), expbuf, sizeof(expbuf));

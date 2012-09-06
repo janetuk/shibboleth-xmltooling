@@ -229,8 +229,13 @@ bool ParserPool::loadSchema(const XMLCh* nsURI, const XMLCh* pathname)
         return false;
     }
 
+    // Roundtrip to local code page and back to translate path as needed.
+    string topath(p.get());
+    XMLToolingConfig::getConfig().getPathResolver()->resolve(topath, PathResolver::XMLTOOLING_XML_FILE);
+    auto_ptr_XMLCh temp(topath.c_str());
+
     Lock lock(m_lock);
-    m_schemaLocMap[nsURI]=pathname;
+    m_schemaLocMap[nsURI] = temp.get();
     m_schemaLocations.erase();
     for_each(m_schemaLocMap.begin(), m_schemaLocMap.end(), doubleit<xstring>(m_schemaLocations,chSpace));
 
@@ -251,7 +256,9 @@ bool ParserPool::loadCatalogs(const char* pathnames)
 
 bool ParserPool::loadCatalog(const char* pathname)
 {
-    auto_ptr_XMLCh temp(pathname);
+    string p(pathname);
+    XMLToolingConfig::getConfig().getPathResolver()->resolve(p, PathResolver::XMLTOOLING_XML_FILE);
+    auto_ptr_XMLCh temp(p.c_str());
     return loadCatalog(temp.get());
 }
 
@@ -300,13 +307,20 @@ bool ParserPool::loadCatalog(const XMLCh* pathname)
         }
 
         // Fetch all the <system> elements.
-        DOMNodeList* mappings=root->getElementsByTagNameNS(CATALOG_NS,system);
+        DOMNodeList* mappings = root->getElementsByTagNameNS(CATALOG_NS,system);
         Lock lock(m_lock);
-        for (XMLSize_t i=0; i<mappings->getLength(); i++) {
-            root=static_cast<DOMElement*>(mappings->item(i));
-            const XMLCh* from=root->getAttributeNS(nullptr,systemId);
-            const XMLCh* to=root->getAttributeNS(nullptr,uri);
-            m_schemaLocMap[from]=to;
+        for (XMLSize_t i = 0; i < mappings->getLength(); i++) {
+            root = static_cast<DOMElement*>(mappings->item(i));
+            const XMLCh* from = root->getAttributeNS(nullptr,systemId);
+            const XMLCh* to = root->getAttributeNS(nullptr,uri);
+
+            // Roundtrip to local code page and back to translate path as needed.
+            auto_ptr_char temp(to);
+            string topath(temp.get());
+            XMLToolingConfig::getConfig().getPathResolver()->resolve(topath, PathResolver::XMLTOOLING_XML_FILE);
+            auto_ptr_XMLCh temp2(topath.c_str());
+
+            m_schemaLocMap[from] = temp2.get();
         }
         m_schemaLocations.erase();
         for_each(m_schemaLocMap.begin(), m_schemaLocMap.end(), doubleit<xstring>(m_schemaLocations,chSpace));
