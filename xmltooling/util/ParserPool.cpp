@@ -247,10 +247,8 @@ bool ParserPool::loadCatalogs(const char* pathnames)
     string temp(pathnames);
     vector<string> catpaths;
     split(catpaths, temp, is_any_of(PATH_SEPARATOR_STR), algorithm::token_compress_on);
-    for (vector<string>::iterator i = catpaths.begin(); i != catpaths.end(); ++i) {
-        XMLToolingConfig::getConfig().getPathResolver()->resolve(*i, PathResolver::XMLTOOLING_XML_FILE);
-        loadCatalog(i->c_str());
-    }
+    static bool (ParserPool::* lc)(const char*) = &ParserPool::loadCatalog;
+    for_each(catpaths.begin(), catpaths.end(), boost::bind(lc, this, boost::bind(&string::c_str, _1)));
     return !catpaths.empty();
 }
 
