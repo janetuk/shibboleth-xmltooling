@@ -413,12 +413,15 @@ bool XMLToolingInternalConfig::init()
 # ifdef XMLTOOLING_XMLSEC_DEBUGLOGGING
         XSECPlatformUtils::SetReferenceLoggingSink(TXFMOutputLogFactory);
 # endif
-        m_xsecProvider=new XSECProvider();
+        m_xsecProvider = new XSECProvider();
         log.debug("XML-Security %s initialization complete", XSEC_FULLVERSIONDOT);
 #endif
 
-        m_parserPool=new ParserPool();
-        m_validatingPool=new ParserPool(true,true);
+        m_parserPool = new ParserPool();
+        m_validatingPool = new ParserPool(true,true);
+
+        m_pathResolver = new PathResolver();
+        m_urlEncoder = new URLEncoder();
 
         // Load catalogs from deprecated path setting.
         if (!catalog_path.empty())
@@ -458,9 +461,6 @@ bool XMLToolingInternalConfig::init()
 #endif
         registerSOAPTransports();
         initSOAPTransports();
-
-        m_pathResolver = new PathResolver();
-        m_urlEncoder = new URLEncoder();
 
         HTTPResponse::getAllowedSchemes().push_back("https");
         HTTPResponse::getAllowedSchemes().push_back("http");
