@@ -557,7 +557,7 @@ namespace xmlsignature {
     };
 
     class XMLTOOL_DLLLOCAL X509DigestImpl : public virtual X509Digest,
-        public AbstractComplexElement,
+        public AbstractSimpleElement,
         public AbstractDOMCachingXMLObject,
         public AbstractXMLObjectMarshaller,
         public AbstractXMLObjectUnmarshaller
@@ -572,7 +572,7 @@ namespace xmlsignature {
         }
 
         X509DigestImpl(const X509DigestImpl& src)
-                : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src), m_Algorithm(nullptr) {
+                : AbstractXMLObject(src), AbstractSimpleElement(src), AbstractDOMCachingXMLObject(src), m_Algorithm(nullptr) {
             IMPL_CLONE_ATTRIB(Algorithm);
         }
 
