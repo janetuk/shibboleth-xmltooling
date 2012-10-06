@@ -115,6 +115,11 @@ namespace xmltooling {
         void resolve(const KeyInfo* keyInfo, int types=0, bool followRefs=false);
         void resolve(DSIGKeyInfoList* keyInfo, int types=0, bool followRefs=false);
 
+        bool isEmpty() const {
+            return (!m_key && m_xseccerts.empty() && m_crls.empty() &&
+                m_keyNames.empty() && m_serial.empty() && m_issuerName.empty());
+        }
+
     private:
         bool resolveCerts(const KeyInfo* keyInfo, bool followRefs=false);
         bool resolveKey(const KeyInfo* keyInfo, bool followRefs=false);
@@ -141,7 +146,7 @@ namespace xmltooling {
                 types = Credential::RESOLVE_KEYS|X509Credential::RESOLVE_CERTS|X509Credential::RESOLVE_CRLS;
             auto_ptr<InlineCredential> credential(new InlineCredential(keyInfo));
             credential->resolve(keyInfo, types, m_followRefs);
-            return credential.release();
+            return credential->isEmpty() ? nullptr : credential.release();
         }
         Credential* resolve(DSIGKeyInfoList* keyInfo, int types=0) const {
             if (!keyInfo)
@@ -150,7 +155,7 @@ namespace xmltooling {
                 types = Credential::RESOLVE_KEYS|X509Credential::RESOLVE_CERTS|X509Credential::RESOLVE_CRLS;
             auto_ptr<InlineCredential> credential(new InlineCredential(keyInfo));
             credential->resolve(keyInfo, types, m_followRefs);
-            return credential.release();
+            return credential->isEmpty() ? nullptr : credential.release();
         }
         Credential* resolve(KeyInfoCredentialContext* context, int types=0) const {
             if (!context)
@@ -162,7 +167,9 @@ namespace xmltooling {
                 credential->resolve(context->getKeyInfo(), types, m_followRefs);
             else if (context->getNativeKeyInfo())
                 credential->resolve(context->getNativeKeyInfo(), types, m_followRefs);
-            credential->setCredentialContext(context);
+            if (credential->isEmpty())
+                return nullptr;
+            credential->setCredentialContext(context);  // transfers ownership to credential
             return credential.release();
         }
 
