@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2010
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{61BF324D-2532-49C9-93CE-DF0E89529D4F}"
 	ProjectSection(SolutionItems) = preProject
 		m4\acinclude.m4 = m4\acinclude.m4

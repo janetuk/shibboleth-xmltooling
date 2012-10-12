@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="VersionMacros">
+    <CxxTestRoot>$(BuildRoot)\cxxtest</CxxTestRoot>
+    <ApacheRoot>C:\</ApacheRoot>
+    <openssl>openssl-1.0.1c</openssl>
+    <curl>curl-7.26.0</curl>
+    <xerces Condition="'$(Platform)'=='x64'">xerces-c-3.1.1-x86_64-windows-vc-10.0</xerces>
+    <xerces Condition="'$(Platform)'=='win32'">xerces-c-3.1.1-x86-windows-vc-10.0</xerces>
+    <xmlsec>xml-security-c-1.7.0</xmlsec>
+    <boost>boost_1_49_0</boost>
+    <log4shib>log4shib-1.0.5</log4shib>
+    <zlib>zlib-1.2.7</zlib>
+    <fcgi>fcgi-2.4.0-VC10</fcgi>
+
+  </PropertyGroup>
+</Project>
