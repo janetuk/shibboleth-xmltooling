@@ -30,7 +30,8 @@ pkgconfig_DATA = @PACKAGE_NAME@.pc
 GENFILES = @PACKAGE_NAME@.spec
 
 EXTRA_DIST = $(DX_CONFIG) \
-        cpp-@PACKAGE_NAME@.sln \
-        config_win32.h \
-        $(GENFILES) \
-        $(GENFILES:%=%.in)
+	cpp-@PACKAGE_NAME@.sln \
+	config_win32.h \
+	msbuild \
+	$(GENFILES) \
+	$(GENFILES:%=%.in)
