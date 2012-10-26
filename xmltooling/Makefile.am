@@ -204,13 +204,13 @@ common_sources = \
 libxmltooling_lite_la_SOURCES = \
 	${common_sources}
 libxmltooling_lite_la_CPPFLAGS = -DXMLTOOLING_LITE
-libxmltooling_lite_la_LDFLAGS = -version-info 6:1:0
+libxmltooling_lite_la_LDFLAGS = -version-info 6:2:0
 
 if BUILD_XMLSEC
 libxmltooling_la_SOURCES = \
 	${common_sources} \
 	${xmlsec_sources}
-libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 6:1:0
+libxmltooling_la_LDFLAGS = $(XMLSEC_LIBS) -version-info 6:2:0
 endif
 
 install-exec-hook:
