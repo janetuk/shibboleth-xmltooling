@@ -16,8 +16,23 @@
     <BuildMacro Include="CxxTestRoot">
       <Value>$(CxxTestRoot)</Value>
     </BuildMacro>
-    <BuildMacro Include="ApacheRoot">
-      <Value>$(ApacheRoot)</Value>
+    <BuildMacro Include="Apache13Root">
+      <Value>$(Apache13Root)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Apache20Root">
+      <Value>$(Apache20Root)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Apache22Root">
+      <Value>$(Apache22Root)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Apache24Root">
+      <Value>$(Apache24Root)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Apache22Root64">
+      <Value>$(Apache22Root64)</Value>
+    </BuildMacro>
+    <BuildMacro Include="Apache24Root64">
+      <Value>$(Apache24Root64)</Value>
     </BuildMacro>
     <BuildMacro Include="openssl">
       <Value>$(openssl)</Value>

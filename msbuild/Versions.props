@@ -2,7 +2,6 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Label="VersionMacros">
     <CxxTestRoot>$(BuildRoot)\cxxtest</CxxTestRoot>
-    <ApacheRoot>E:\</ApacheRoot>
 
     <ShibbolethVersion>2.5.0</ShibbolethVersion>
 
@@ -15,7 +14,8 @@
     <CurlVersion>7.26.0</CurlVersion>
     <curl>curl-$(CurlVersion)</curl>
 
-    <boost>boost_1_50_0</boost>
+    <boost>boost_1_51_0</boost>
+    
     <Log4ShibVersion>1.0.5</Log4ShibVersion>
     <Log4ShibFileVersion>1_0</Log4ShibFileVersion>
     <!-- Change the 4 components below if the Log4ShibFileVersion name changes -->
@@ -33,9 +33,9 @@
     <SamlComponent64>{9EE0A8D1-A6DC-4E2A-904F-BBEF70A0D67B}</SamlComponent64>
     <SamlComponent64d>{00836378-7FB9-4A09-AF49-3AA33DEF9BC6}</SamlComponent64d>
 
-    <XmlToolingVersion>1.5.1</XmlToolingVersion>
+    <XmlToolingVersion>1.5.2</XmlToolingVersion>
     <XmlToolingFileVersion>1_5</XmlToolingFileVersion>
-    <!-- Change the 8 components below if the OpenSAMLFileVersion name changes -->
+    <!-- Change the 8 components below if the XmlToolingFileVersion name changes -->
     <XMLToolingComponent32>{53533A59-A563-439D-B13D-A4D7090C42D3}</XMLToolingComponent32>
     <XMLToolingLiteComponent32>{5045A722-D6D6-4E55-9196-CB7C50B4446F}</XMLToolingLiteComponent32>
     <XMLToolingComponent32d>{380E59DF-24F8-4F60-97A7-CC67FB76B4CC}</XMLToolingComponent32d>
