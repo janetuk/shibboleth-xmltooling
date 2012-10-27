@@ -50,10 +50,10 @@
     <openssl>openssl-$(OpenSSLDirVersion)</openssl>
     <OpenSSLFileVersion>1_0</OpenSSLFileVersion>
     <!-- Change the 8 components below if OpenSSLFileVersion changes -->
-    <LibEay32Component>='{1DE4C235-0F1E-41EF-B7B8-9F3FD03A8F26}</LibEay32Component>
-    <SSlEay32Component>='{9D0D75C3-69B6-4A29-9890-EF3DD939B6CA}</SSlEay32Component>
-    <LibEay32Componentd>='{53BCB6F4-77DC-4B6C-9798-EC10796D3C59}</LibEay32Componentd>
-    <SSlEay32Componentd>='{A9583DF6-F075-4F43-991C-3611B31036DF}</SSlEay32Componentd>
+    <LibEay32Component>{1DE4C235-0F1E-41EF-B7B8-9F3FD03A8F26}</LibEay32Component>
+    <SSlEay32Component>{9D0D75C3-69B6-4A29-9890-EF3DD939B6CA}</SSlEay32Component>
+    <LibEay32Componentd>{53BCB6F4-77DC-4B6C-9798-EC10796D3C59}</LibEay32Componentd>
+    <SSlEay32Componentd>{A9583DF6-F075-4F43-991C-3611B31036DF}</SSlEay32Componentd>
     <LibEay64Component>{DCB83813-11B4-469D-BD26-5DBF9815AC36}</LibEay64Component>
     <SSlEay64Component>{EAC28C6F-C98E-454F-BFE7-076D7C0A5CF1}</SSlEay64Component>
     <LibEay64Componentd>{D6E409C6-2F1C-42BA-8759-CF898C62C9A9}</LibEay64Componentd>
