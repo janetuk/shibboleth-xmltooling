@@ -19,9 +19,6 @@ clean:
 	del/s *.lib
 	del/s *.wixlib
 	del/s *.msi
-
-veryclean: clean
-	cd ..\..
 	del/s *.obj *.wixobj
 	del/s *.lib *.wixlib
 	del/s *.pdb *.wixpdb
@@ -35,9 +32,9 @@ msi64: mergemodules32 exe32 mergemodules64 exe64
 	cd $(SPROOT)
 	msbuild  /property:Platform=x64;Configuration=Release /maxcpucount .\shibboleth.sln /t:Installers\MergeModules;Installers\Installer
 
-mergemodules32: shibsp32 saml32 xmltooling32
+mergemodules32: xmltooling32 saml32 shibsp32
 
-mergemodules64: shibsp64 saml64 xmltooling64
+mergemodules64: xmltooling64 saml64 shibsp64
 
 shibsp32:
 	cd $(SPROOT)
