@@ -3,13 +3,13 @@
 
 SPROOT=$(MAKEDIR)\..\..\cpp-sp
 XMLROOT=$(MAKEDIR)\..\..\cpp-xmltooling
-SAMLROOT=$(MAKEDIR)\..\..\cpp-OpenSaml
+SAMLROOT=$(MAKEDIR)\..\..\cpp-opensaml
 
 
 #
 # The targets.  We want to build the two installers
 #
-all: clean msi32 msi64
+all: msi32 msi64
 
 clean: 
 	cd ..\..
