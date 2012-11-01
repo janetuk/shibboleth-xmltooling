@@ -12,16 +12,13 @@ SAMLROOT=$(MAKEDIR)\..\..\cpp-opensaml
 all: msi32 msi64
 
 clean: 
-	cd ..\..
-	del/s *.dll
-	del/s *.exe
-	del/s *.msm
-	del/s *.lib
-	del/s *.wixlib
-	del/s *.msi
-	del/s *.obj *.wixobj
-	del/s *.lib *.wixlib
-	del/s *.pdb *.wixpdb
+	cd $(SPROOT)
+	del/s *.dll *.exe *.msm *.lib *.obj
+	del/s *.wixobj *.lib *.wixlib  *.pdb *.wixpdb *.wixlib  *.msi 
+	cd $(XMLROOT)
+	del/s *.dll *.exe *.msm *.lib *.obj
+	cd $(SAMLROOT)
+	del/s *.dll *.exe *.msm *.lib *.obj
 
 #
 msi32: mergemodules32 exe32 
