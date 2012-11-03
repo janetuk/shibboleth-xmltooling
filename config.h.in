@@ -21,6 +21,12 @@
 /* Define to 1 if you have <boost/ptr_container/ptr_vector.hpp> */
 #undef HAVE_BOOST_PTR_CONTAINER_PTR_VECTOR_HPP
 
+/* Define to 1 if you have <boost/scoped_ptr.hpp> */
+#undef HAVE_BOOST_SCOPED_PTR_HPP
+
+/* Define to 1 if you have <boost/shared_ptr.hpp> */
+#undef HAVE_BOOST_SHARED_PTR_HPP
+
 /* Define to 1 if you have <boost/tokenizer.hpp> */
 #undef HAVE_BOOST_TOKENIZER_HPP
 
@@ -32,6 +38,9 @@
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
+
+/* Define to 1 if you have the `gmtime_r' function. */
+#undef HAVE_GMTIME_R
 
 /* Define to 1 if you have an STL implementation that supports useful string
    specialization. */
