@@ -3,7 +3,7 @@ Version:	@PACKAGE_VERSION@
 Release:	1
 Summary:	OpenSAML XMLTooling library
 Group:		Development/Libraries/C and C++
-Vendor:		Internet2
+Vendor:		Shibboleth Consortium
 License:	Apache 2.0
 URL:		http://www.opensaml.org/
 Source:		%{name}-%{version}.tar.gz
@@ -15,7 +15,7 @@ BuildRequires:  libxerces-c-devel >= 2.8.0
 %endif
 BuildRequires:  libxml-security-c-devel >= 1.4.0
 %{?_with_log4cpp:BuildRequires: liblog4cpp-devel >= 1.0}
-%{!?_with_log4cpp:BuildRequires: liblog4shib-devel}
+%{!?_with_log4cpp:BuildRequires: liblog4shib-devel >= 1.0.4}
 BuildRequires: gcc-c++, openssl-devel, boost-devel >= 1.32.0
 %if 0%{?rhel} >= 6 || 0%{?centos_version} >= 600
 BuildRequires: libcurl-openssl-devel >= 7.21.7
@@ -81,7 +81,7 @@ Requires:  libxerces-c-devel >= 2.8.0
 %endif
 Requires: libxml-security-c-devel >= 1.4.0
 %{?_with_log4cpp:Requires: liblog4cpp-devel >= 1.0}
-%{!?_with_log4cpp:Requires: liblog4shib-devel}
+%{!?_with_log4cpp:Requires: liblog4shib-devel >= 1.0.4}
 Requires: openssl-devel, boost-devel >= 1.32.0
 %if 0%{?rhel} >= 6 || 0%{?centos_version} >= 600
 Requires: libcurl-openssl-devel >= 7.21.7

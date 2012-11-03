@@ -222,6 +222,126 @@
         xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
         xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
         xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, xercesc::chNull}
+#define UNICODE_LITERAL_35(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chNull}
+#define UNICODE_LITERAL_36(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chNull}
+#define UNICODE_LITERAL_37(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chNull}
+#define UNICODE_LITERAL_38(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chNull}
+#define UNICODE_LITERAL_39(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chNull}
+#define UNICODE_LITERAL_40(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chNull}
+#define UNICODE_LITERAL_41(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chNull}
+#define UNICODE_LITERAL_42(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, xercesc::chNull}
+#define UNICODE_LITERAL_43(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chNull}
+#define UNICODE_LITERAL_44(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chLatin_##rr, xercesc::chNull}
+#define UNICODE_LITERAL_45(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr,ss) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chLatin_##rr, xercesc::chLatin_##ss, xercesc::chNull}
+#define UNICODE_LITERAL_46(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr,ss,tt) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chLatin_##rr, xercesc::chLatin_##ss, xercesc::chLatin_##tt, xercesc::chNull}
+#define UNICODE_LITERAL_47(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr,ss,tt,uu) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chLatin_##rr, xercesc::chLatin_##ss, xercesc::chLatin_##tt, xercesc::chLatin_##uu, xercesc::chNull}
+#define UNICODE_LITERAL_48(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr,ss,tt,uu,vv) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chLatin_##rr, xercesc::chLatin_##ss, xercesc::chLatin_##tt, xercesc::chLatin_##uu, xercesc::chLatin_##vv, xercesc::chNull}
+#define UNICODE_LITERAL_49(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr,ss,tt,uu,vv,ww) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chLatin_##rr, xercesc::chLatin_##ss, xercesc::chLatin_##tt, xercesc::chLatin_##uu, xercesc::chLatin_##vv, xercesc::chLatin_##ww, xercesc::chNull}
+#define UNICODE_LITERAL_50(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr,ss,tt,uu,vv,ww,xx) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chLatin_##rr, xercesc::chLatin_##ss, xercesc::chLatin_##tt, xercesc::chLatin_##uu, xercesc::chLatin_##vv, xercesc::chLatin_##ww, xercesc::chLatin_##xx, xercesc::chNull}
+#define UNICODE_LITERAL_51(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr,ss,tt,uu,vv,ww,xx,yy) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chLatin_##rr, xercesc::chLatin_##ss, xercesc::chLatin_##tt, xercesc::chLatin_##uu, xercesc::chLatin_##vv, xercesc::chLatin_##ww, xercesc::chLatin_##xx, \
+        xercesc::chLatin_##yy, xercesc::chNull}
+#define UNICODE_LITERAL_52(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,aa,bb,cc,dd,ee,ff,gg,hh,ii,jj,kk,ll,mm,nn,oo,pp,qq,rr,ss,tt,uu,vv,ww,xx,yy,zz) \
+    {xercesc::chLatin_##a, xercesc::chLatin_##b, xercesc::chLatin_##c, xercesc::chLatin_##d, xercesc::chLatin_##e, xercesc::chLatin_##f, xercesc::chLatin_##g, xercesc::chLatin_##h, xercesc::chLatin_##i, \
+        xercesc::chLatin_##j, xercesc::chLatin_##k, xercesc::chLatin_##l, xercesc::chLatin_##m, xercesc::chLatin_##n, xercesc::chLatin_##o, xercesc::chLatin_##p, xercesc::chLatin_##q, xercesc::chLatin_##r, \
+        xercesc::chLatin_##s, xercesc::chLatin_##t, xercesc::chLatin_##u, xercesc::chLatin_##v, xercesc::chLatin_##w, xercesc::chLatin_##x, xercesc::chLatin_##y, xercesc::chLatin_##z, \
+        xercesc::chLatin_##aa, xercesc::chLatin_##bb, xercesc::chLatin_##cc, xercesc::chLatin_##dd, xercesc::chLatin_##ee, xercesc::chLatin_##ff, xercesc::chLatin_##gg, xercesc::chLatin_##hh, \
+        xercesc::chLatin_##ii, xercesc::chLatin_##jj, xercesc::chLatin_##kk, xercesc::chLatin_##ll, xercesc::chLatin_##mm, xercesc::chLatin_##nn, xercesc::chLatin_##oo, xercesc::chLatin_##pp, \
+        xercesc::chLatin_##qq, xercesc::chLatin_##rr, xercesc::chLatin_##ss, xercesc::chLatin_##tt, xercesc::chLatin_##uu, xercesc::chLatin_##vv, xercesc::chLatin_##ww, xercesc::chLatin_##xx, \
+        xercesc::chLatin_##yy, xercesc::chLatin_##zz, xercesc::chNull}
 #endif /* DOXYGEN_SKIP */
 
 /**
@@ -697,10 +817,13 @@
             m_##proper = prepareForAssignment(m_##proper,proper); \
         } \
         void set##proper(int proper) { \
-            char buf##proper[64]; \
-            std::sprintf(buf##proper,"%d",proper); \
-            xmltooling::auto_ptr_XMLCh wide##proper(buf##proper); \
-            set##proper(wide##proper.get()); \
+            try { \
+                std::string buf(boost::lexical_cast<std::string>(proper)); \
+                xmltooling::auto_ptr_XMLCh widen(buf.c_str()); \
+                set##proper(widen.get()); \
+            } \
+            catch (boost::bad_lexical_cast&) { \
+            } \
         }
 
 /**
@@ -1250,10 +1373,13 @@
     } \
     XMLTOOLING_DOXYGEN(Sets proper.) \
     void set##proper(int proper) { \
-        char buf[64]; \
-        std::sprintf(buf,"%d",proper); \
-        xmltooling::auto_ptr_XMLCh widebuf(buf); \
-        setTextContent(widebuf.get()); \
+        try { \
+            std::string buf(boost::lexical_cast<std::string>(proper)); \
+            xmltooling::auto_ptr_XMLCh widen(buf.c_str()); \
+            setTextContent(widen.get()); \
+        } \
+        catch (boost::bad_lexical_cast&) { \
+        } \
     } \
     XMLTOOLING_DOXYGEN(Sets or clears proper.) \
     void set##proper(const XMLCh* proper) { \
@@ -1350,6 +1476,156 @@
         std::auto_ptr<cname##Impl> ret2(new cname##Impl(*this)); \
         ret2->_clone(*this); \
         return ret2.release(); \
+    }
+
+/**
+ * Implements cloning of a child attribute, for use in copy constructor or
+ * deferred clone methods.
+ *
+ * proper   the proper name of the attribute to clone
+ */
+#define IMPL_CLONE_ATTRIB(proper) \
+    set##proper(src.get##proper())
+
+/**
+ * Implements cloning of a child attribute in a foreign namespace, for use in copy constructor or
+ * deferred clone methods.
+ *
+ * proper   the proper name of the attribute to clone
+ */
+#define IMPL_CLONE_FOREIGN_ATTRIB(proper) \
+    set##proper(src.get##proper()); \
+    if (src.m_##proper##Prefix) \
+        m_##proper##Prefix = xercesc::XMLString::replicate(src.m_##proper##Prefix)
+
+/**
+ * Implements cloning of an integer child attribute, for use in copy constructor or
+ * deferred clone methods.
+ *
+ * proper   the proper name of the attribute to clone
+ */
+#define IMPL_CLONE_INTEGER_ATTRIB(proper) \
+    set##proper(src.m_##proper)
+
+/**
+ * Implements cloning of a boolean child attribute, for use in copy constructor or
+ * deferred clone methods.
+ *
+ * proper   the proper name of the attribute to clone
+ */
+#define IMPL_CLONE_BOOLEAN_ATTRIB(proper) \
+    proper(src.m_##proper)
+
+/**
+ * Implements cloning of a child object, for use in copy constructor or
+ * deferred clone methods.
+ *
+ * proper   the proper name of the child object to clone
+ */
+#define IMPL_CLONE_XMLOBJECT_CHILD(proper) \
+    if (src.get##proper()) \
+        set##proper(src.get##proper()->clone())
+
+/**
+ * Implements cloning of a typed child object, for use in copy constructor or
+ * deferred clone methods.
+ *
+ * proper   the proper name of the child type to clone
+ */
+#define IMPL_CLONE_TYPED_CHILD(proper) \
+    if (src.get##proper()) \
+        set##proper(src.get##proper()->clone##proper())
+
+/**
+ * Implements cloning of an untyped child collection, for use in copy constructor or
+ * deferred clone methods.
+ *
+ * proper   the proper name of the child type to clone
+ */
+#define IMPL_CLONE_XMLOBJECT_CHILDREN(proper) \
+    static void (VectorOf(XMLObject)::* XMLObject_push_back)(XMLObject* const&) = &VectorOf(XMLObject)::push_back; \
+    VectorOf(XMLObject) c##proper = get##proper##s(); \
+    std::for_each( \
+        src.m_##proper##s.begin(), src.m_##proper##s.end(), \
+        boost::lambda::if_(boost::lambda::_1 != ((XMLObject*)nullptr)) \
+            [boost::lambda::bind(XMLObject_push_back, boost::ref(c##proper), boost::lambda::bind(&XMLObject::clone, boost::lambda::_1))] \
+        )
+
+/**
+ * Implements cloning of a child collection, for use in copy constructor or
+ * deferred clone methods.
+ *
+ * proper   the proper name of the child type to clone
+ */
+#define IMPL_CLONE_TYPED_CHILDREN(proper) \
+    static void (VectorOf(proper)::* proper##_push_back)(proper* const&) = &VectorOf(proper)::push_back; \
+    VectorOf(proper) c##proper = get##proper##s(); \
+    std::for_each( \
+        src.m_##proper##s.begin(), src.m_##proper##s.end(), \
+        boost::lambda::if_(boost::lambda::_1 != ((proper*)nullptr)) \
+            [boost::lambda::bind(proper##_push_back, boost::ref(c##proper), boost::lambda::bind(&proper::clone##proper, boost::lambda::_1))] \
+        )
+
+/**
+ * Implements cloning of a child collection in a foreign namespace, for use in copy constructor or
+ * deferred clone methods.
+ *
+ * proper   the proper name of the child type to clone
+ * ns       the namespace of the child type
+ */
+#define IMPL_CLONE_TYPED_FOREIGN_CHILDREN(proper,ns) \
+    static void (VectorOf(ns::proper)::* proper##_push_back)(ns::proper* const&) = &VectorOf(ns::proper)::push_back; \
+    VectorOf(ns::proper) c##proper = get##proper##s(); \
+    std::for_each( \
+        src.m_##proper##s.begin(), src.m_##proper##s.end(), \
+        boost::lambda::if_(boost::lambda::_1 != ((ns::proper*)nullptr)) \
+            [boost::lambda::bind(proper##_push_back, boost::ref(c##proper), boost::lambda::bind(&ns::proper::clone##proper, boost::lambda::_1))] \
+        )
+
+/**
+ * Opens an iteration loop over all of the children of an object.
+ */
+#define IMPL_CLONE_CHILDBAG_BEGIN \
+    for (list<xmltooling::XMLObject*>::const_iterator _bagit = src.m_children.begin(); _bagit != src.m_children.end(); ++_bagit) {
+
+/**
+ * Closes an iteration loop over all of the children of an object.
+ */
+#define IMPL_CLONE_CHILDBAG_END }
+
+/**
+ * Implements cloning of a typed child in a bag iteration loop based on a cast check.
+ *
+ * @param proper    the proper name of the child type to clone
+ */
+#define IMPL_CLONE_TYPED_CHILD_IN_BAG(proper) \
+    proper* _##proper##cast = dynamic_cast<proper*>(*_bagit); \
+    if (_##proper##cast) { \
+        get##proper##s().push_back(_##proper##cast->clone##proper()); \
+        continue; \
+    }
+
+/**
+ * Implements cloning of a typed child in a forign namespace in a bag iteration loop based on a cast check.
+ *
+ * @param proper    the proper name of the child type to clone
+ * @param ns        the namespace of the child type
+ */
+#define IMPL_CLONE_TYPED_FOREIGN_CHILD_IN_BAG(proper,ns) \
+    ns::proper* _##proper##cast = dynamic_cast<ns::proper*>(*_bagit); \
+    if (_##proper##cast) { \
+        get##proper##s().push_back(_##proper##cast->clone##proper()); \
+        continue; \
+    }
+
+/**
+ * Implements cloning of an XMLObject child in a bag iteration loop.
+ *
+ * @param proper    the proper name of the child to clone
+ */
+#define IMPL_CLONE_XMLOBJECT_CHILD_IN_BAG(proper) \
+    if (*_bagit) { \
+        get##proper##s().push_back((*_bagit)->clone()); \
     }
 
 /**

@@ -35,6 +35,10 @@
 #include "signature/KeyInfo.h"
 #include "util/XMLHelper.h"
 
+#include <boost/lambda/bind.hpp>
+#include <boost/lambda/casts.hpp>
+#include <boost/lambda/if.hpp>
+#include <boost/lambda/lambda.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace xmlencryption;
@@ -86,16 +90,10 @@ namespace xmlencryption {
         EncryptionMethodImpl(const EncryptionMethodImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
-            setAlgorithm(src.getAlgorithm());
-            if (src.getKeySize())
-                setKeySize(src.getKeySize()->cloneKeySize());
-            if (src.getOAEPparams())
-                setOAEPparams(src.getOAEPparams()->cloneOAEPparams());
-            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i) {
-                if (*i) {
-                    getUnknownXMLObjects().push_back((*i)->clone());
-                }
-            }
+            IMPL_CLONE_ATTRIB(Algorithm);
+            IMPL_CLONE_TYPED_CHILD(KeySize);
+            IMPL_CLONE_TYPED_CHILD(OAEPparams);
+            IMPL_CLONE_XMLOBJECT_CHILDREN(UnknownXMLObject);
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptionMethod);
@@ -144,11 +142,7 @@ namespace xmlencryption {
             
         TransformsImpl(const TransformsImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
-            for (vector<xmlsignature::Transform*>::const_iterator i=src.m_Transforms.begin(); i!=src.m_Transforms.end(); i++) {
-                if (*i) {
-                    getTransforms().push_back((*i)->cloneTransform());
-                }
-            }
+            IMPL_CLONE_TYPED_FOREIGN_CHILDREN(Transform,xmlsignature);
         }
         
         IMPL_XMLOBJECT_CLONE(Transforms);
@@ -187,9 +181,8 @@ namespace xmlencryption {
         CipherReferenceImpl(const CipherReferenceImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
-            setURI(src.getURI());
-            if (src.getTransforms())
-                setTransforms(src.getTransforms()->cloneTransforms());
+            IMPL_CLONE_ATTRIB(URI);
+            IMPL_CLONE_TYPED_CHILD(Transforms);
         }
         
         IMPL_XMLOBJECT_CLONE(CipherReference);
@@ -239,10 +232,8 @@ namespace xmlencryption {
         CipherDataImpl(const CipherDataImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
-            if (src.getCipherValue())
-                setCipherValue(src.getCipherValue()->cloneCipherValue());
-            if (src.getCipherReference())
-                setCipherReference(src.getCipherReference()->cloneCipherReference());
+            IMPL_CLONE_TYPED_CHILD(CipherValue);
+            IMPL_CLONE_TYPED_CHILD(CipherReference);
         }
         
         IMPL_XMLOBJECT_CLONE(CipherData);
@@ -285,13 +276,9 @@ namespace xmlencryption {
                     AbstractComplexElement(src),
                     AbstractDOMCachingXMLObject(src) {
             init();
-            setId(src.getId());
-            setTarget(src.getTarget());
-            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i) {
-                if (*i) {
-                    getUnknownXMLObjects().push_back((*i)->clone());
-                }
-            }
+            IMPL_CLONE_ATTRIB(Id);
+            IMPL_CLONE_ATTRIB(Target);
+            IMPL_CLONE_XMLOBJECT_CHILDREN(UnknownXMLObject);
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptionProperty);
@@ -353,12 +340,8 @@ namespace xmlencryption {
         EncryptionPropertiesImpl(const EncryptionPropertiesImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
-            setId(src.getId());
-            for (vector<EncryptionProperty*>::const_iterator i=src.m_EncryptionPropertys.begin(); i!=src.m_EncryptionPropertys.end(); i++) {
-                if (*i) {
-                    getEncryptionPropertys().push_back((*i)->cloneEncryptionProperty());
-                }
-            }
+            IMPL_CLONE_ATTRIB(Id);
+            IMPL_CLONE_TYPED_CHILDREN(EncryptionProperty);
         }
         
         IMPL_XMLOBJECT_CLONE(EncryptionProperties);
@@ -406,12 +389,8 @@ namespace xmlencryption {
         }
 
         void _clone(const ReferenceTypeImpl& src) {
-            setURI(src.getURI());
-            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i) {
-                if (*i) {
-                    getUnknownXMLObjects().push_back((*i)->clone());
-                }
-            }
+            IMPL_CLONE_ATTRIB(URI);
+            IMPL_CLONE_XMLOBJECT_CHILDREN(UnknownXMLObject);
         }
         
         IMPL_XMLOBJECT_CLONE_EX(ReferenceType);
@@ -474,21 +453,10 @@ namespace xmlencryption {
             
         ReferenceListImpl(const ReferenceListImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
-            for (list<XMLObject*>::const_iterator i=src.m_children.begin(); i!=src.m_children.end(); i++) {
-                if (*i) {
-                    DataReference* data=dynamic_cast<DataReference*>(*i);
-                    if (data) {
-                        getDataReferences().push_back(data->cloneDataReference());
-                        continue;
-                    }
-
-                    KeyReference* key=dynamic_cast<KeyReference*>(*i);
-                    if (key) {
-                        getKeyReferences().push_back(key->cloneKeyReference());
-                        continue;
-                    }
-                }
-            }
+            IMPL_CLONE_CHILDBAG_BEGIN;
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(DataReference);
+                IMPL_CLONE_TYPED_CHILD_IN_BAG(KeyReference);
+            IMPL_CLONE_CHILDBAG_END;
         }
         
         IMPL_XMLOBJECT_CLONE(ReferenceList);
@@ -552,18 +520,14 @@ namespace xmlencryption {
         }
 
         void _clone(const EncryptedTypeImpl& src) {
-            setId(src.getId());
-            setType(src.getType());
-            setMimeType(src.getMimeType());
-            setEncoding(src.getEncoding());
-            if (src.getEncryptionMethod())
-                setEncryptionMethod(src.getEncryptionMethod()->cloneEncryptionMethod());
-            if (src.getKeyInfo())
-                setKeyInfo(src.getKeyInfo()->cloneKeyInfo());
-            if (src.getCipherData())
-                setCipherData(src.getCipherData()->cloneCipherData());
-            if (src.getEncryptionProperties())
-                setEncryptionProperties(src.getEncryptionProperties()->cloneEncryptionProperties());
+            IMPL_CLONE_ATTRIB(Id);
+            IMPL_CLONE_ATTRIB(Type);
+            IMPL_CLONE_ATTRIB(MimeType);
+            IMPL_CLONE_ATTRIB(Encoding);
+            IMPL_CLONE_TYPED_CHILD(EncryptionMethod);
+            IMPL_CLONE_TYPED_CHILD(KeyInfo);
+            IMPL_CLONE_TYPED_CHILD(CipherData);
+            IMPL_CLONE_TYPED_CHILD(EncryptionProperties);
         }
         
         IMPL_XMLOBJECT_CLONE_EX(EncryptedType);
@@ -644,11 +608,9 @@ namespace xmlencryption {
         
         void _clone(const EncryptedKeyImpl& src) {
             EncryptedTypeImpl::_clone(src);
-            setRecipient(src.getRecipient());
-            if (src.getReferenceList())
-                setReferenceList(src.getReferenceList()->cloneReferenceList());
-            if (src.getCarriedKeyName())
-                setCarriedKeyName(src.getCarriedKeyName()->cloneCarriedKeyName());
+            IMPL_CLONE_ATTRIB(Recipient);
+            IMPL_CLONE_TYPED_CHILD(ReferenceList);
+            IMPL_CLONE_TYPED_CHILD(CarriedKeyName);
         }
 
         IMPL_XMLOBJECT_CLONE_EX(EncryptedKey);
@@ -671,6 +633,46 @@ namespace xmlencryption {
         void processAttribute(const DOMAttr* attribute) {
             PROC_STRING_ATTRIB(Recipient,RECIPIENT,nullptr);
             EncryptedTypeImpl::processAttribute(attribute);
+        }
+    };
+
+    class XMLTOOL_DLLLOCAL MGFImpl : public virtual MGF,
+        public AbstractSimpleElement,
+        public AbstractDOMCachingXMLObject,
+        public AbstractXMLObjectMarshaller,
+        public AbstractXMLObjectUnmarshaller
+    {
+        void init() {
+            m_Algorithm = nullptr;
+        }
+
+    public:
+        virtual ~MGFImpl() {
+            XMLString::release(&m_Algorithm);
+        }
+
+        MGFImpl(const XMLCh* nsURI, const XMLCh* localName, const XMLCh* prefix, const xmltooling::QName* schemaType)
+                : AbstractXMLObject(nsURI, localName, prefix, schemaType) {
+            init();
+        }
+            
+        MGFImpl(const MGFImpl& src)
+                : AbstractXMLObject(src), AbstractSimpleElement(src), AbstractDOMCachingXMLObject(src) {
+            init();
+            IMPL_CLONE_ATTRIB(Algorithm);
+        }
+        
+        IMPL_XMLOBJECT_CLONE(MGF);
+        IMPL_STRING_ATTRIB(Algorithm);
+
+    protected:
+        void marshallAttributes(DOMElement* domElement) const {
+            MARSHALL_STRING_ATTRIB(Algorithm,ALGORITHM,nullptr);
+        }
+
+        void processAttribute(const DOMAttr* attribute) {
+            PROC_STRING_ATTRIB(Algorithm,ALGORITHM,nullptr);
+            AbstractXMLObjectUnmarshaller::processAttribute(attribute);
         }
     };
 
@@ -697,6 +699,8 @@ IMPL_XMLOBJECTBUILDER(KeySize);
 IMPL_XMLOBJECTBUILDER(OAEPparams);
 IMPL_XMLOBJECTBUILDER(ReferenceList);
 IMPL_XMLOBJECTBUILDER(Transforms);
+
+IMPL_XMLOBJECTBUILDER(MGF);
 
 // Unicode literals
 
@@ -738,3 +742,7 @@ const XMLCh ReferenceType::TYPE_NAME[] =                UNICODE_LITERAL_13(R,e,f
 const XMLCh ReferenceType::URI_ATTRIB_NAME[] =          UNICODE_LITERAL_3(U,R,I);
 const XMLCh Transforms::LOCAL_NAME[] =                  UNICODE_LITERAL_10(T,r,a,n,s,f,o,r,m,s);
 const XMLCh Transforms::TYPE_NAME[] =                   UNICODE_LITERAL_14(T,r,a,n,s,f,o,r,m,s,T,y,p,e);
+
+const XMLCh MGF::LOCAL_NAME[] =                         UNICODE_LITERAL_3(M,G,F);
+const XMLCh MGF::TYPE_NAME[] =                          UNICODE_LITERAL_7(M,G,F,T,y,p,e);
+const XMLCh MGF::ALGORITHM_ATTRIB_NAME[] =              UNICODE_LITERAL_9(A,l,g,o,r,i,t,h,m);

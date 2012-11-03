@@ -112,13 +112,19 @@ AbstractAttributeExtensibleXMLObject::AbstractAttributeExtensibleXMLObject(const
 
 AbstractAttributeExtensibleXMLObject::~AbstractAttributeExtensibleXMLObject()
 {
+#ifdef XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE
+    static void (*release)(XMLCh**) = &XMLString::release;
+#else
     static void (*release)(XMLCh**,MemoryManager*) = &XMLString::release;
+#endif
     for_each(
         m_attributeMap.begin(), m_attributeMap.end(),
         lambda::bind(
             release,
-            &lambda::bind(&map<xmltooling::QName,XMLCh*>::value_type::second, boost::ref(_1)),
-            XMLPlatformUtils::fgMemoryManager
+            &lambda::bind(&map<xmltooling::QName,XMLCh*>::value_type::second, boost::ref(_1))
+#ifndef XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE
+            ,XMLPlatformUtils::fgMemoryManager
+#endif
             )
         );
 }
@@ -127,6 +133,13 @@ const XMLCh* AbstractAttributeExtensibleXMLObject::getAttribute(const xmltooling
 {
     map<xmltooling::QName,XMLCh*>::const_iterator i = m_attributeMap.find(qualifiedName);
     return (i != m_attributeMap.end()) ? i->second : nullptr;
+}
+
+const XMLCh* AbstractAttributeExtensibleXMLObject::getLang() const
+{
+    static const XMLCh _lang[] = UNICODE_LITERAL_4(l,a,n,g);
+    static xmltooling::QName qname(xmlconstants::XML_NS, _lang);
+    return getAttribute(qname);
 }
 
 void AbstractAttributeExtensibleXMLObject::setAttribute(const xmltooling::QName& qualifiedName, const XMLCh* value, bool ID)

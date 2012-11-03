@@ -189,7 +189,7 @@ ReloadableXMLFile::ReloadableXMLFile(const DOMElement* e, Category& log, bool st
             log.debug("using remote resource (%s)", m_source.c_str());
             m_backing = XMLHelper::getAttrString(e, nullptr, backingFilePath);
             if (!m_backing.empty()) {
-                XMLToolingConfig::getConfig().getPathResolver()->resolve(m_backing, PathResolver::XMLTOOLING_RUN_FILE);
+                XMLToolingConfig::getConfig().getPathResolver()->resolve(m_backing, PathResolver::XMLTOOLING_CACHE_FILE);
                 log.debug("backup remote resource to (%s)", m_backing.c_str());
                 try {
                     string tagname = m_backing + ".tag";

@@ -34,6 +34,9 @@
 #include "soap/SOAP.h"
 #include "util/XMLHelper.h"
 
+#include <boost/lambda/bind.hpp>
+#include <boost/lambda/if.hpp>
+#include <boost/lambda/lambda.hpp>
 #include <xercesc/util/XMLUniDefs.hpp>
 
 using namespace soap11;
@@ -71,7 +74,7 @@ namespace {
             
         FaultcodeImpl(const FaultcodeImpl& src)
                 : AbstractXMLObject(src), AbstractSimpleElement(src), AbstractDOMCachingXMLObject(src), m_qname(nullptr) {
-            setCode(src.getCode());
+            IMPL_CLONE_ATTRIB(Code);
         }
         
         const xmltooling::QName* getCode() const {
@@ -114,11 +117,7 @@ namespace {
                     AbstractAttributeExtensibleXMLObject(src),
                     AbstractComplexElement(src),
                     AbstractDOMCachingXMLObject(src) {
-            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i) {
-                if (*i) {
-                    getUnknownXMLObjects().push_back((*i)->clone());
-                }
-            }
+            IMPL_CLONE_XMLOBJECT_CHILDREN(UnknownXMLObject);
         }
         
         IMPL_XMLOBJECT_CLONE(Detail);
@@ -178,14 +177,10 @@ namespace {
         FaultImpl(const FaultImpl& src)
                 : AbstractXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
-            if (src.getFaultcode())
-                setFaultcode(src.getFaultcode()->cloneFaultcode());
-            if (src.getFaultstring())
-                setFaultstring(src.getFaultstring()->cloneFaultstring());
-            if (src.getFaultactor())
-                setFaultactor(src.getFaultactor()->cloneFaultactor());
-            if (src.getDetail())
-                setDetail(src.getDetail()->cloneDetail());
+            IMPL_CLONE_TYPED_CHILD(Faultcode);
+            IMPL_CLONE_TYPED_CHILD(Faultstring);
+            IMPL_CLONE_TYPED_CHILD(Faultactor);
+            IMPL_CLONE_TYPED_CHILD(Detail);
         }
         
         IMPL_XMLOBJECT_CLONE(Fault);
@@ -224,11 +219,7 @@ namespace {
                     AbstractAttributeExtensibleXMLObject(src),
                     AbstractComplexElement(src),
                     AbstractDOMCachingXMLObject(src) {
-            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i) {
-                if (*i) {
-                    getUnknownXMLObjects().push_back((*i)->clone());
-                }
-            }
+            IMPL_CLONE_XMLOBJECT_CHILDREN(UnknownXMLObject);
         }
         
         IMPL_XMLOBJECT_CLONE(Body);
@@ -268,11 +259,7 @@ namespace {
                     AbstractAttributeExtensibleXMLObject(src),
                     AbstractComplexElement(src),
                     AbstractDOMCachingXMLObject(src) {
-            for (vector<XMLObject*>::const_iterator i=src.m_UnknownXMLObjects.begin(); i!=src.m_UnknownXMLObjects.end(); ++i) {
-                if (*i) {
-                    getUnknownXMLObjects().push_back((*i)->clone());
-                }
-            }
+            IMPL_CLONE_XMLOBJECT_CHILDREN(UnknownXMLObject);
         }
         
         IMPL_XMLOBJECT_CLONE(Header);
@@ -320,15 +307,13 @@ namespace {
         EnvelopeImpl(const EnvelopeImpl& src)
                 : AbstractXMLObject(src), AbstractAttributeExtensibleXMLObject(src), AbstractComplexElement(src), AbstractDOMCachingXMLObject(src) {
             init();
-            if (src.getHeader())
-                setHeader(src.getHeader()->cloneHeader());
-            if (src.getBody())
-                setBody(src.getBody()->cloneBody());
+            IMPL_CLONE_TYPED_CHILD(Header);
+            IMPL_CLONE_TYPED_CHILD(Body);
         }
         
+        IMPL_XMLOBJECT_CLONE(Envelope);
         IMPL_TYPED_CHILD(Header);
         IMPL_TYPED_CHILD(Body);
-        IMPL_XMLOBJECT_CLONE(Envelope);
 
     protected:
         void marshallAttributes(DOMElement* domElement) const {

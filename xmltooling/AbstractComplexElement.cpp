@@ -54,10 +54,21 @@ AbstractComplexElement::AbstractComplexElement(const AbstractComplexElement& src
 }
 
 AbstractComplexElement::~AbstractComplexElement() {
+#ifdef XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE
+    static void (*release)(XMLCh**) = &XMLString::release;
+#else
     static void (*release)(XMLCh**,MemoryManager*) = &XMLString::release;
+#endif
 
     for_each(m_children.begin(), m_children.end(), cleanup<XMLObject>());
-    for_each(m_text.begin(), m_text.end(), lambda::bind(release, &_1, XMLPlatformUtils::fgMemoryManager));
+    for_each(m_text.begin(), m_text.end(),
+        lambda::bind(
+            release, &_1
+#ifndef XMLTOOLING_XERCESC_HAS_XMLBYTE_RELEASE
+            ,XMLPlatformUtils::fgMemoryManager
+#endif
+            )
+        );
 }
 
 bool AbstractComplexElement::hasChildren() const

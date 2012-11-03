@@ -27,6 +27,7 @@
 #ifndef __xmltooling_predicates_h__
 #define __xmltooling_predicates_h__
 
+#include <xmltooling/QName.h>
 #include <xmltooling/XMLObject.h>
 
 #include <functional>

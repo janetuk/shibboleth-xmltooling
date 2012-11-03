@@ -48,7 +48,8 @@ namespace xmltooling {
             XMLTOOLING_LOG_FILE,
             XMLTOOLING_XML_FILE,
             XMLTOOLING_RUN_FILE,
-            XMLTOOLING_CFG_FILE
+            XMLTOOLING_CFG_FILE,
+            XMLTOOLING_CACHE_FILE
         };
 
         /**
@@ -106,6 +107,14 @@ namespace xmltooling {
         virtual void setCfgDir(const char* dir);
 
         /**
+         * Set the cache directory to use when resolving files.
+         * <p>If relative, the default prefix will be prepended.
+         *
+         * @param dir    the cache directory to use
+         */
+        virtual void setCacheDir(const char* dir);
+
+        /**
          * Changes the input filename into an absolute pathname to the same file.
          *
          * @param s         filename to resolve
@@ -120,7 +129,7 @@ namespace xmltooling {
     private:
         bool isAbsolute(const char* s) const;
 
-        std::string m_defaultPackage,m_defaultPrefix,m_lib,m_log,m_xml,m_run,m_cfg;
+        std::string m_defaultPackage,m_defaultPrefix,m_lib,m_log,m_xml,m_run,m_cfg,m_cache;
     };
 };
 

@@ -52,14 +52,22 @@ namespace xmlencryption {
         /**
          * Constructor.
          * 
+         * <p>The final boolean parameter is used to enforce a requirement for an authenticated cipher
+         * suite such as AES-GCM or similar. These ciphers include an HMAC or equivalent step that
+         * prevents tampering. Newer applications should set this parameter to true unless the ciphertext
+         * has been independently authenticated, and even in such a case, it is rarely possible to prevent
+         * chosen ciphertext attacks by trusted signers.
+         *
          * @param credResolver  locked credential resolver to supply decryption keys
          * @param criteria      optional external criteria to use with resolver
          * @param EKResolver    locates an EncryptedKey pertaining to the EncryptedData
+         * @param requireAuthenticatedCipher    true iff the bulk data encryption algorithm must be an authenticated cipher
          */
         Decrypter(
             const xmltooling::CredentialResolver* credResolver=nullptr,
             xmltooling::CredentialCriteria* criteria=nullptr,
-            const EncryptedKeyResolver* EKResolver=nullptr
+            const EncryptedKeyResolver* EKResolver=nullptr,
+            bool requireAuthenticatedCipher=false
             );
 
         virtual ~Decrypter();
@@ -148,6 +156,7 @@ namespace xmlencryption {
         const xmltooling::CredentialResolver* m_credResolver;
         xmltooling::CredentialCriteria* m_criteria;
         const EncryptedKeyResolver* m_EKResolver;
+        bool m_requireAuthenticatedCipher;
     };
 
     DECL_XMLTOOLING_EXCEPTION(DecryptionException,XMLTOOL_EXCEPTIONAPI(XMLTOOL_API),xmlencryption,xmltooling::XMLToolingException,Exceptions in decryption processing);

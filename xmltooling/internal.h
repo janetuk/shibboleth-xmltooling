@@ -132,7 +132,7 @@ namespace xmltooling {
 
     private:
         int m_initCount;
-        Mutex* m_lock;
+        std::auto_ptr<Mutex> m_lock;
         std::map<std::string,Mutex*> m_namedLocks;
         std::vector<void*> m_libhandles;
         ParserPool* m_parserPool;

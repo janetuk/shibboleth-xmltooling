@@ -32,6 +32,7 @@
 #include <xmltooling/util/XMLConstants.h>
 
 #include <cstdio>
+#include <boost/lexical_cast.hpp>
 
 namespace xmlsignature {
     class XMLTOOL_API KeyInfo;
@@ -45,6 +46,14 @@ namespace xmlsignature {
  */
 #define DECL_XMLENCOBJECTBUILDER(cname) \
     DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,xmlconstants::XMLENC_NS,xmlconstants::XMLENC_PREFIX)
+
+/**
+ * Macro for declaring encryption 1.1 builders.
+ * 
+ * @param cname name of class being built
+ */
+#define DECL_XMLENC11OBJECTBUILDER(cname) \
+    DECL_XMLOBJECTBUILDER(XMLTOOL_API,cname,xmlconstants::XMLENC11_NS,xmlconstants::XMLENC11_PREFIX)
 
 /**
  * @namespace xmlencryption
@@ -145,6 +154,12 @@ namespace xmlencryption {
         static const XMLCh TYPE_NAME[];
     END_XMLOBJECT;
 
+    BEGIN_XMLOBJECT(XMLTOOL_API,MGF,xmltooling::XMLObject,XML Encryption 1.1 MGF element);
+        DECL_STRING_ATTRIB(Algorithm,ALGORITHM);
+        /** MGFType local name */
+        static const XMLCh TYPE_NAME[];
+    END_XMLOBJECT;
+
     DECL_XMLENCOBJECTBUILDER(CarriedKeyName);
     DECL_XMLENCOBJECTBUILDER(CipherData);
     DECL_XMLENCOBJECTBUILDER(CipherReference);
@@ -160,6 +175,8 @@ namespace xmlencryption {
     DECL_XMLENCOBJECTBUILDER(OAEPparams);
     DECL_XMLENCOBJECTBUILDER(ReferenceList);
     DECL_XMLENCOBJECTBUILDER(Transforms);
+
+    DECL_XMLENC11OBJECTBUILDER(MGF);
 
     /**
      * Registers builders and validators for XML Encryption classes into the runtime.

@@ -29,9 +29,6 @@
 
 #include <xmltooling/io/GenericRequest.h>
 
-#include <map>
-#include <cstring>
-
 namespace xmltooling {
 
 #if defined (_MSC_VER)
@@ -55,6 +52,8 @@ namespace xmltooling {
         virtual ~HTTPRequest();
 
         bool isSecure() const;
+        bool isDefaultPort() const;
+        std::string getLanguageRange() const;
           
         /**
          * Returns the HTTP method of the request (GET, POST, etc.)
@@ -101,6 +100,13 @@ namespace xmltooling {
          * @return  cookie value or nullptr
          */
         virtual const char* getCookie(const char* name) const;
+
+        /**
+         * Gets all the cookies supplied by the client.
+         *
+         * @return  a map of cookie name/value pairs
+         */
+        virtual const std::map<std::string,std::string>& getCookies() const;
 
     private:
         mutable std::map<std::string,std::string> m_cookieMap;

@@ -89,7 +89,7 @@ public:
         TS_ASSERT(sxObject.get()!=nullptr);
 
         const set<Namespace>& namespaces = sxObject->getNamespaces();
-        bool cond1=false, cond2=false, cond3=false;
+        bool cond1=false, cond2=false;
         for (set<Namespace>::const_iterator ns = namespaces.begin(); ns != namespaces.end(); ++ns) {
             if (XMLString::equals(ns->getNamespacePrefix(), SimpleXMLObject::NAMESPACE_PREFIX)) {
                 TSM_ASSERT("'test' namespace was visibly used", ns->usage() != Namespace::VisiblyUsed);

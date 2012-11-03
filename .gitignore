@@ -35,6 +35,11 @@
 /*.opensdf
 /*.sdf
 /ipch
+/config.cache
+/xmltooling-uninstalled.pc
+/xmltooling-uninstalled.sh
+/xmltooling.pc
+/xmltooling.pc.in
 
 # /doc/
 /doc/Makefile

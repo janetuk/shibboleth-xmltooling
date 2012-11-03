@@ -28,6 +28,10 @@
 #include "exceptions.h"
 #include "util/PathResolver.h"
 
+#ifdef WIN32
+# include <Shlobj.h>
+#endif
+
 using namespace xmltooling;
 using namespace std;
 
@@ -38,6 +42,7 @@ PathResolver::PathResolver() : m_defaultPackage(PACKAGE_NAME), m_defaultPrefix("
     setXMLDir("/usr/share/xml");
     setRunDir("/var/run");
     setCfgDir("/etc");
+    setCacheDir("/var/cache");
 }
 
 PathResolver::~PathResolver()
@@ -79,6 +84,11 @@ void PathResolver::setCfgDir(const char* dir)
     m_cfg = dir;
 }
 
+void PathResolver::setCacheDir(const char* dir)
+{
+    m_cache = dir;
+}
+
 bool PathResolver::isAbsolute(const char* s) const
 {
     switch (*s) {
@@ -95,6 +105,23 @@ bool PathResolver::isAbsolute(const char* s) const
 
 const string& PathResolver::resolve(string& s, file_type_t filetype, const char* pkgname, const char* prefix) const
 {
+#ifdef WIN32
+    // Check for possible environment variable(s).
+    if (s.find('%') != string::npos) {
+        // This is an ugly workaround for Windows XP/2003, which don't support the PROGRAMDATA variable.
+        if (!getenv("PROGRAMDATA") && s.find("%PROGRAMDATA%") != string::npos) {
+            char appdatapath[MAX_PATH + 2];
+            if (SHGetFolderPath(NULL, CSIDL_COMMON_APPDATA, NULL, SHGFP_TYPE_CURRENT, appdatapath) == S_OK) {
+                s.replace(s.find("%PROGRAMDATA%"), 13, appdatapath);
+            }
+        }
+        char expbuf[MAX_PATH + 2];
+        DWORD cnt = ExpandEnvironmentStrings(s.c_str(), expbuf, sizeof(expbuf));
+        if (cnt != 0 && cnt <= sizeof(expbuf))
+            s = expbuf;
+    }
+#endif
+
     if (!isAbsolute(s.c_str())) {
         switch (filetype) {
             case XMLTOOLING_LIB_FILE:
@@ -132,6 +159,16 @@ const string& PathResolver::resolve(string& s, file_type_t filetype, const char*
             case XMLTOOLING_CFG_FILE:
                 s = m_cfg + '/' + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
                 if (!isAbsolute(m_cfg.c_str())) {
+                    if (prefix || m_defaultPrefix != "/usr")
+                        s = string(prefix ? prefix : m_defaultPrefix) + '/' + s;
+                    else
+                        s = string("/") + s;
+                }
+                break;
+
+            case XMLTOOLING_CACHE_FILE:
+                s = m_cache + '/' + (pkgname ? pkgname : m_defaultPackage) + '/' + s;
+                if (!isAbsolute(m_cache.c_str())) {
                     if (prefix || m_defaultPrefix != "/usr")
                         s = string(prefix ? prefix : m_defaultPrefix) + '/' + s;
                     else

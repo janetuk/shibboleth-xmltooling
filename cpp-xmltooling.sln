@@ -1,18 +1,19 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{61BF324D-2532-49C9-93CE-DF0E89529D4F}"
 	ProjectSection(SolutionItems) = preProject
 		m4\acinclude.m4 = m4\acinclude.m4
 		m4\acx_pthread.m4 = m4\acx_pthread.m4
 		m4\ax_create_pkgconfig_info.m4 = m4\ax_create_pkgconfig_info.m4
-		..\cpp-sp-ext\m4\boost.m4 = ..\cpp-sp-ext\m4\boost.m4
+		m4\boost.m4 = m4\boost.m4
 		config_win32.h = config_win32.h
 		configure.ac = configure.ac
 		doxygen.am = doxygen.am
 		doxygen.cfg = doxygen.cfg
 		m4\doxygen.m4 = m4\doxygen.m4
 		Makefile.am = Makefile.am
+		xmltooling.spec.in = xmltooling.spec.in
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Schemas", "Schemas", "{23EF5C29-2A13-4F73-99D1-96B8120F148E}"
@@ -21,6 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Schemas", "Schemas", "{23EF
 		schemas\Makefile.am = schemas\Makefile.am
 		schemas\soap-envelope.xsd = schemas\soap-envelope.xsd
 		schemas\xenc-schema.xsd = schemas\xenc-schema.xsd
+		schemas\xenc11-schema.xsd = schemas\xenc11-schema.xsd
 		schemas\xml.xsd = schemas\xml.xsd
 		schemas\xmldsig-core-schema.xsd = schemas\xmldsig-core-schema.xsd
 		schemas\xmldsig11-schema.xsd = schemas\xmldsig11-schema.xsd

@@ -393,7 +393,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
             m_key.backing = XMLHelper::getAttrString(e, nullptr, backingFilePath);
             if (m_key.backing.empty())
                 throw XMLSecurityException("FilesystemCredentialResolver can't access key, backingFilePath missing from URL element.");
-            XMLToolingConfig::getConfig().getPathResolver()->resolve(m_key.backing, PathResolver::XMLTOOLING_RUN_FILE);
+            XMLToolingConfig::getConfig().getPathResolver()->resolve(m_key.backing, PathResolver::XMLTOOLING_CACHE_FILE);
             m_key.reloadInterval = XMLHelper::getAttrInt(e, 0, _reloadInterval);
         }
         else {
@@ -445,7 +445,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
                 crl.backing = XMLHelper::getAttrString(e, nullptr, backingFilePath);
                 if (crl.backing.empty())
                     throw XMLSecurityException("FilesystemCredentialResolver can't access CRL, backingFilePath missing from URL element.");
-                XMLToolingConfig::getConfig().getPathResolver()->resolve(crl.backing, PathResolver::XMLTOOLING_RUN_FILE);
+                XMLToolingConfig::getConfig().getPathResolver()->resolve(crl.backing, PathResolver::XMLTOOLING_CACHE_FILE);
                 crl.reloadInterval = XMLHelper::getAttrInt(e, 0, _reloadInterval);
             }
             e = XMLHelper::getNextSiblingElement(e, _URL);
@@ -487,7 +487,7 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
                 cert.backing = XMLHelper::getAttrString(e, nullptr, backingFilePath);
                 if (cert.backing.empty())
                     throw XMLSecurityException("FilesystemCredentialResolver can't access certificate, backingFilePath missing from URL element.");
-                XMLToolingConfig::getConfig().getPathResolver()->resolve(cert.backing, PathResolver::XMLTOOLING_RUN_FILE);
+                XMLToolingConfig::getConfig().getPathResolver()->resolve(cert.backing, PathResolver::XMLTOOLING_CACHE_FILE);
                 cert.reloadInterval = XMLHelper::getAttrInt(e, 0, _reloadInterval);
             }
             e = XMLHelper::getNextSiblingElement(e);

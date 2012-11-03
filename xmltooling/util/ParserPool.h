@@ -107,15 +107,28 @@ namespace xmltooling {
         xercesc::DOMDocument* parse(std::istream& is);
 
         /**
+         * Load OASIS catalog files to map schema namespace URIs to filenames.
+         *
+         * <p>This does not provide real catalog support; only the &lt;uri&gt; element
+         * is supported to map from a namespace URI to a relative path or file:// URI.
+         *
+         * <p>Multiple files can be specified using a platform-specific path delimiter.
+         *
+         * @param pathname  path to one or more catalog files
+         * @return true iff the catalogs were successfully processed
+         */
+        bool loadCatalogs(const char* pathnames);
+
+        /**
          * Load an OASIS catalog file to map schema namespace URIs to filenames.
          *
-         * This does not provide real catalog support; only the &lt;uri&gt; element
+         * <p>This does not provide real catalog support; only the &lt;uri&gt; element
          * is supported to map from a namespace URI to a relative path or file:// URI.
          *
          * @param pathname  path to a catalog file
          * @return true iff the catalog was successfully processed
          */
-        bool loadCatalog(const char* pathname);
+        bool loadCatalog(const char* pathnames);
 
         /**
          * Load an OASIS catalog file to map schema namespace URIs to filenames.

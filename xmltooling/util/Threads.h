@@ -29,6 +29,8 @@
 
 #include <xmltooling/exceptions.h>
 
+#include <memory>
+#include <boost/scoped_ptr.hpp>
 #include <signal.h>
 
 namespace xmltooling
@@ -305,11 +307,42 @@ namespace xmltooling
         }
 
         /**
-         * Unlocks the wrapped mutex.
+         * Locks and wraps the designated mutex.
+         *
+         * @param mtx mutex to lock
+         */
+        Lock(const std::auto_ptr<Mutex>& mtx) : mutex(mtx.get()) {
+            if (mutex)
+                mutex->lock();
+        }
+
+        /**
+         * Locks and wraps the designated mutex.
+         *
+         * @param mtx mutex to lock
+         */
+        Lock(const boost::scoped_ptr<Mutex>& mtx) : mutex(mtx.get()) {
+            if (mutex)
+                mutex->lock();
+        }
+
+        /**
+         * Unlocks the wrapped mutex, if any.
          */
         ~Lock() {
             if (mutex)
                 mutex->unlock();
+        }
+
+        /**
+         * Releases control of the original Mutex and returns it without unlocking it.
+         *
+         * @return the original, locked Mutex
+         */
+        Mutex* release() {
+            Mutex* ret = mutex;
+            mutex = nullptr;
+            return ret;
         }
 
     private:
@@ -334,11 +367,44 @@ namespace xmltooling
         }
 
         /**
-         * Unlocks the wrapped shared lock.
+         * Locks and wraps the designated shared lock.
+         *
+         * @param lock      lock to acquire
+         * @param lockit    true if the lock should be acquired here, false if already acquired
+         */
+        SharedLock(const std::auto_ptr<RWLock>& lock, bool lockit=true) : rwlock(lock.get()) {
+            if (rwlock && lockit)
+                rwlock->rdlock();
+        }
+
+        /**
+         * Locks and wraps the designated shared lock.
+         *
+         * @param lock      lock to acquire
+         * @param lockit    true if the lock should be acquired here, false if already acquired
+         */
+        SharedLock(const boost::scoped_ptr<RWLock>& lock, bool lockit=true) : rwlock(lock.get()) {
+            if (rwlock && lockit)
+                rwlock->rdlock();
+        }
+
+        /**
+         * Unlocks the wrapped shared lock, if any.
          */
         ~SharedLock() {
             if (rwlock)
                 rwlock->unlock();
+        }
+
+        /**
+         * Releases control of the original shared lock and returns it without unlocking it.
+         *
+         * @return the original shared lock
+         */
+        RWLock* release() {
+            RWLock* ret = rwlock;
+            rwlock = nullptr;
+            return ret;
         }
 
     private:

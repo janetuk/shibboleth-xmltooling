@@ -54,6 +54,7 @@ namespace xmltooling {
         void setAttribute(const QName& qualifiedName, const XMLCh* value, bool ID=false);
         const std::map<QName,XMLCh*>& getExtensionAttributes() const;
         const XMLCh* getXMLID() const;
+        const XMLCh* getLang() const;
     
      protected:
         AbstractAttributeExtensibleXMLObject();

@@ -1,6 +1,6 @@
 # Process this file with autoreconf
 AC_PREREQ([2.50])
-AC_INIT([xmltooling],[1.5],[https://issues.shibboleth.net/],[xmltooling])
+AC_INIT([xmltooling],[1.5.1],[https://issues.shibboleth.net/],[xmltooling])
 AC_CONFIG_SRCDIR(xmltooling)
 AC_CONFIG_AUX_DIR(build-aux)
 AC_CONFIG_MACRO_DIR(m4)
@@ -69,7 +69,7 @@ AC_TYPE_SIZE_T
 AC_CHECK_SIZEOF([long])
 
 # Checks for library functions.
-AC_CHECK_FUNCS([strchr strdup strstr timegm strcasecmp])
+AC_CHECK_FUNCS([strchr strdup strstr timegm gmtime_r strcasecmp])
 AC_CHECK_HEADERS([dlfcn.h])
 AC_CHECK_FUNC(dlclose, , [ AC_CHECK_LIB(dl, dlopen) ])
 
@@ -99,9 +99,10 @@ BOOST_BIND
 BOOST_CONVERSION
 BOOST_LAMBDA
 BOOST_PTR_CONTAINER
+BOOST_SMART_PTR
 BOOST_STRING_ALGO
 BOOST_TOKENIZER
-CPPFLAGS = "$BOOST_CPPFLAGS $CPPFLAGS"
+CPPFLAGS="$BOOST_CPPFLAGS $CPPFLAGS"
 
 # are covariant methods allowed?
 AC_LINK_IFELSE(

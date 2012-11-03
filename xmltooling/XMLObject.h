@@ -131,6 +131,13 @@ namespace xmltooling {
         virtual const XMLCh* getXMLID() const=0;
 
         /**
+         * Returns the xml:lang property of the object, if any.
+         *
+         * @return  an xml:lang value, or nullptr
+         */
+        virtual const XMLCh* getLang() const;
+
+        /**
          * Returns the xsi:nil property of the object, or false if not set.
          * 
          * @return	the xsi:nil property

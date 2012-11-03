@@ -65,10 +65,10 @@ namespace xmlconstants {
     /**  XML Signature QName prefix ("ds") */
     extern XMLTOOL_API const XMLCh XMLSIG_PREFIX[];
 
-    /**  XML Signature namespace ("http://www.w3.org/2009/xmldsig11#") */
+    /**  XML Signature 1.1 namespace ("http://www.w3.org/2009/xmldsig11#") */
     extern XMLTOOL_API const XMLCh XMLSIG11_NS[];
 
-    /**  XML Signature QName prefix ("ds11") */
+    /**  XML Signature 1.1 QName prefix ("ds11") */
     extern XMLTOOL_API const XMLCh XMLSIG11_PREFIX[];
     
     /**  XML Encryption namespace ("http://www.w3.org/2001/04/xmlenc#") */
@@ -77,6 +77,12 @@ namespace xmlconstants {
     /**  XML Encryption QName prefix ("xenc") */
     extern XMLTOOL_API const XMLCh XMLENC_PREFIX[];
     
+    /**  XML Encryption 1.1 namespace ("http://www.w3.org/2009/xmlenc11#") */
+    extern XMLTOOL_API const XMLCh XMLENC11_NS[];
+    
+    /**  XML Encryption 1.1 QName prefix ("xenc11") */
+    extern XMLTOOL_API const XMLCh XMLENC11_PREFIX[];
+
     /**  SOAP 1.1 Envelope XML namespace ("http://schemas.xmlsoap.org/soap/envelope/") */
     extern XMLTOOL_API const XMLCh SOAP11ENV_NS[]; 
 

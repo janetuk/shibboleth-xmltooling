@@ -55,9 +55,7 @@
 #endif
 
 #include <stdexcept>
-#include <boost/bind.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
-#include <boost/tokenizer.hpp>
 
 #if defined(XMLTOOLING_LOG4SHIB)
 # include <log4shib/PropertyConfigurator.hh>
@@ -296,7 +294,6 @@ XMLToolingInternalConfig::XMLToolingInternalConfig() :
 
 XMLToolingInternalConfig::~XMLToolingInternalConfig()
 {
-    delete m_lock;
 }
 
 bool XMLToolingInternalConfig::log_config(const char* config)
@@ -423,16 +420,9 @@ bool XMLToolingInternalConfig::init()
         m_parserPool=new ParserPool();
         m_validatingPool=new ParserPool(true,true);
 
-        // Load catalogs from path.
-        if (!catalog_path.empty()) {
-            boost::tokenizer< char_separator<char> > catpaths(catalog_path, char_separator<char>(PATH_SEPARATOR_STR));
-            for_each(
-                catpaths.begin(), catpaths.end(),
-                // Call loadCatalog with an inner call to s->c_str() on each entry.
-                boost::bind(static_cast<bool (ParserPool::*)(const char*)>(&ParserPool::loadCatalog),
-                    m_validatingPool, boost::bind(&string::c_str,_1))
-                );
-        }
+        // Load catalogs from deprecated path setting.
+        if (!catalog_path.empty())
+            m_validatingPool->loadCatalogs(catalog_path.c_str());
 
         // default registrations
         XMLObjectBuilder::registerDefaultBuilder(new UnknownElementBuilder());
@@ -724,6 +714,9 @@ void XMLToolingInternalConfig::registerXMLAlgorithm(
     )
 {
     m_algorithmMap[type][xmlAlgorithm] = pair<string,unsigned int>((keyAlgorithm ? keyAlgorithm : ""), size);
+    // Authenticated encryption algorithms are also generic encryption algorithms.
+    if (type == ALGTYPE_AUTHNENCRYPT)
+        m_algorithmMap[ALGTYPE_ENCRYPT][xmlAlgorithm] = pair<string,unsigned int>((keyAlgorithm ? keyAlgorithm : ""), size);
 }
 
 bool XMLToolingInternalConfig::isXMLAlgorithmSupported(const XMLCh* xmlAlgorithm, XMLSecurityAlgorithmType type)
@@ -752,8 +745,9 @@ void XMLToolingInternalConfig::registerXMLAlgorithms()
 
     // With ECDSA, XML-Security exports a public macro for OpenSSL's support, and any
     // versions of XML-Security that didn't provide the macro don't handle ECDSA anyway.
+    // However, the SHA-224 variant was left out of the initial XML-Security release.
 
-    // With AES, all supported XML-Security versions export a macro for OpenSSL's support.
+    // With AES and GCM, all supported XML-Security versions export a macro for OpenSSL's support.
 
     // With SHA2, only the very latest XML-Security exports a macro, but all the versions
     // will handle SHA2 *if* OpenSSL does. So we use our own macro to check OpenSSL's
@@ -771,6 +765,10 @@ void XMLToolingInternalConfig::registerXMLAlgorithms()
 #endif
 
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIDSA_SHA1, "DSA", 0, ALGTYPE_SIGN);
+#if defined(URI_ID_DSA_SHA256) && defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA256)
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIDSA_SHA256, "DSA", 0, ALGTYPE_SIGN);
+#endif
+
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_MD5, "RSA", 0, ALGTYPE_SIGN);
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_SHA1, "RSA", 0, ALGTYPE_SIGN);
 #if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA256)
@@ -784,10 +782,13 @@ void XMLToolingInternalConfig::registerXMLAlgorithms()
 
 #ifdef XSEC_OPENSSL_HAVE_EC
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA1, "EC", 0, ALGTYPE_SIGN);
-#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA256)
+# if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA256)
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA256, "EC", 0, ALGTYPE_SIGN);
+#  ifdef URI_ID_ECDSA_SHA224
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA224, "EC", 0, ALGTYPE_SIGN);
+#  endif
 # endif
-#if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA512)
+# if defined(XMLTOOLING_OPENSSL_HAVE_SHA2) && !defined(OPENSSL_NO_SHA512)
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA384, "EC", 0, ALGTYPE_SIGN);
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIECDSA_SHA512, "EC", 0, ALGTYPE_SIGN);
 # endif
@@ -805,6 +806,9 @@ void XMLToolingInternalConfig::registerXMLAlgorithms()
 
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_1_5, "RSA", 0, ALGTYPE_KEYENCRYPT);
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_OAEP_MGFP1, "RSA", 0, ALGTYPE_KEYENCRYPT);
+#ifdef URI_ID_RSA_OAEP
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIRSA_OAEP, "RSA", 0, ALGTYPE_KEYENCRYPT);
+#endif
 
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURI3DES_CBC, "DESede", 192, ALGTYPE_ENCRYPT);
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_3DES, "DESede", 192, ALGTYPE_KEYENCRYPT);
@@ -818,6 +822,18 @@ void XMLToolingInternalConfig::registerXMLAlgorithms()
 
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES256_CBC, "AES", 256, ALGTYPE_ENCRYPT);
     registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES256, "AES", 256, ALGTYPE_KEYENCRYPT);
+
+# ifdef URI_ID_KW_AES128_PAD
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES128_PAD, "AES", 128, ALGTYPE_KEYENCRYPT);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES192_PAD, "AES", 192, ALGTYPE_KEYENCRYPT);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIKW_AES256_PAD, "AES", 256, ALGTYPE_KEYENCRYPT);
+# endif
+#endif
+
+#ifdef XSEC_OPENSSL_HAVE_GCM
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES128_GCM, "AES", 128, ALGTYPE_AUTHNENCRYPT);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES192_GCM, "AES", 192, ALGTYPE_AUTHNENCRYPT);
+    registerXMLAlgorithm(DSIGConstants::s_unicodeStrURIAES256_GCM, "AES", 256, ALGTYPE_AUTHNENCRYPT);
 #endif
 }
 
