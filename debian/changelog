@@ -1,3 +1,9 @@
+xmltooling (1.5+dfsg~moonshot4-1) unstable; urgency=low
+
+  * New upstream version based of the 1.5 release
+
+ -- Sam Hartman <hartmans@debian.org>  Sat, 03 Nov 2012 05:14:38 -0400
+
 xmltooling (1.5+dfsg~moonshot3-1) unstable; urgency=low
 
   * New upstream
