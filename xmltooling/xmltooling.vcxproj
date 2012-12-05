@@ -104,7 +104,7 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>wsock32.lib;log4shib1D.lib;xerces-c_3D.lib;xsec_1D.lib;libeay32D.lib;ssleay32D.lib;libcurld_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wsock32.lib;log4shib1D.lib;xerces-c_3D.lib;xsec_1D.lib;libeay32D.lib;ssleay32D.lib;libcurl5d_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <DataExecutionPrevention>
@@ -132,7 +132,7 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>wsock32.lib;log4shib1D.lib;xerces-c_3D.lib;xsec_1D.lib;libeay32D.lib;ssleay32D.lib;libcurld_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wsock32.lib;log4shib1D.lib;xerces-c_3D.lib;xsec_1D.lib;libeay32D.lib;ssleay32D.lib;libcurl5d_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <DataExecutionPrevention>
@@ -150,7 +150,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>wsock32.lib;log4shib1.lib;xerces-c_3.lib;xsec_1.lib;libeay32.lib;ssleay32.lib;libcurl_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wsock32.lib;log4shib1.lib;xerces-c_3.lib;xsec_1.lib;libeay32.lib;ssleay32.lib;libcurl5_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -173,7 +173,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>wsock32.lib;log4shib1.lib;xerces-c_3.lib;xsec_1.lib;libeay32.lib;ssleay32.lib;libcurl_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>wsock32.lib;log4shib1.lib;xerces-c_3.lib;xsec_1.lib;libeay32.lib;ssleay32.lib;libcurl5_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
