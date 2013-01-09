@@ -6,8 +6,8 @@
     <ShibbolethVersion>2.5.1</ShibbolethVersion>
 
     <!-- Change the Ids below AT LEAST on every change to ShibbolethVersion -->
-    <ShibbolethId32>{57622F3F-E505-4E78-B09F-DFEE79B995A1}</ShibbolethId32>
-    <ShibbolethId64>{57FAEFB4-9BB8-4CC8-9897-5071E7DBB304}</ShibbolethId64>
+    <ShibbolethId32>{DE927001-90B8-44B8-9F89-A8317FCC0EEE}</ShibbolethId32>
+    <ShibbolethId64>{5E572502-FF6E-4B57-8E99-513157DB2C57}</ShibbolethId64>
     <!-- NEVER CHANGE THE UPGRADE CODE UNLESS YOU REALLY REALLY KNOW WHAT YOU ARE DOING -->
     <ShibbolethUpgradeCode>{28A4EB62-E860-49CA-BE43-44ADEB91DBF6}</ShibbolethUpgradeCode>
 
