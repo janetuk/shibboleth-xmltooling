@@ -25,7 +25,7 @@
     <Log4ShibComponent64d>{792E6762-70FE-418A-9336-39DDF1A6BAE7}</Log4ShibComponent64d>
     <log4shib>log4shib-$(Log4ShibVersion)</log4shib>
 
-    <OpenSAMLVersion>2.5.1</OpenSAMLVersion>
+    <OpenSAMLVersion>2.5.2</OpenSAMLVersion>
     <OpenSAMLFileVersion>2_5</OpenSAMLFileVersion>
     <!-- Change the 4 components below if the OpenSAMLFileVersion name changes -->
     <SamlComponent32>{B52F8C71-2042-4CDF-A250-BD773985A2AB}</SamlComponent32>
