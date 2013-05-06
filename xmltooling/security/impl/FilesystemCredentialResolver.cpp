@@ -516,6 +516,9 @@ FilesystemCredentialResolver::FilesystemCredentialResolver(const DOMElement* e)
     auto_ptr<Credential> credential(getCredential());
     m_lock = RWLock::create();
     m_credential = credential.release();
+    if (m_credential->getPrivateKey() == nullptr) {
+        log.info("no private key resolved, usable for verification/trust only");
+    }
 }
 
 FilesystemCredentialResolver::~FilesystemCredentialResolver()

@@ -51,7 +51,7 @@ BEGIN
 #else
             VALUE "FileDescription", "OpenSAML XMLTooling Library\0"
 #endif
-            VALUE "FileVersion", "1, 5, 2, 0\0"
+            VALUE "FileVersion", "1, 5, 3, 0\0"
 #ifdef XMLTOOLING_LITE
 #ifdef _DEBUG
             VALUE "InternalName", "xmltooling-lite1_5D\0"
@@ -65,7 +65,7 @@ BEGIN
             VALUE "InternalName", "xmltooling1_5\0"
 #endif
 #endif
-            VALUE "LegalCopyright", "Copyright © 2012 UCAID\0"
+            VALUE "LegalCopyright", "Copyright © 2013 UCAID\0"
             VALUE "LegalTrademarks", "\0"
 #ifdef XMLTOOLING_LITE
 #ifdef _DEBUG
@@ -81,8 +81,8 @@ BEGIN
 #endif
 #endif
             VALUE "PrivateBuild", "\0"
-            VALUE "ProductName", "OpenSAML 2.5.1\0"
-            VALUE "ProductVersion", "2, 5, 1, 0\0"
+            VALUE "ProductName", "OpenSAML 2.5.3\0"
+            VALUE "ProductVersion", "2, 5, 3, 0\0"
             VALUE "SpecialBuild", "\0"
         END
     END
