@@ -568,7 +568,11 @@ void CURLSOAPTransport::send(istream* in)
 
     // Make the call.
     log.debug("sending SOAP message to %s", m_endpoint.c_str());
-    if (curl_easy_perform(m_handle) != CURLE_OK) {
+    CURLcode code = curl_easy_perform(m_handle);
+    if (code != CURLE_OK) {
+        if (code == CURLE_SSL_CIPHER) {
+            log.error("on Red Hat 6+, make sure libcurl used is built with OpenSSL");
+        }
         throw IOException(
             string("CURLSOAPTransport failed while contacting SOAP endpoint (") + m_endpoint + "): " +
                 (curl_errorbuf[0] ? curl_errorbuf : "no further information available"));

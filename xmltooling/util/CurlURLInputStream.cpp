@@ -523,6 +523,9 @@ bool CurlURLInputStream::readMore(int* runningHandles)
 
         default:
             fLog.error("error while fetching %s: (%d) %s", fURL.c_str(), msg->data.result, fError);
+            if (msg->data.result == CURLE_SSL_CIPHER) {
+                fLog.error("on Red Hat 6+, make sure libcurl used is built with OpenSSL");
+            }
             ThrowXML1(NetAccessorException, XMLExcepts::NetAcc_InternalError, fURL.c_str());
             break;
         }

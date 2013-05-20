@@ -397,7 +397,9 @@ bool XMLToolingInternalConfig::init()
         if (curlver) {
             log.debug("libcurl %s initialization complete", curlver->version);
             if (!(curlver->features & CURL_VERSION_SSL)) {
-                log.warn("libcurl lacks TLS/SSL support, this will greatly limit functionality");
+                log.crit("libcurl lacks TLS/SSL support, this will greatly limit functionality");
+            } else if (curlver->ssl_version && !strstr(curlver->ssl_version, "OpenSSL")) {
+                log.crit("libcurl lacks OpenSSL-specific options, this will greatly limit functionality");
             }
         }
         else {
