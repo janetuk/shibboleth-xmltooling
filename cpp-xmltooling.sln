@@ -12,9 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{61BF324D-2
 		doxygen.am = doxygen.am
 		doxygen.cfg = doxygen.cfg
 		m4\doxygen.m4 = m4\doxygen.m4
-		msbuild\Includes.props = msbuild\Includes.props
 		Makefile.am = Makefile.am
-		msbuild\Versions.props = msbuild\Versions.props
 		xmltooling.spec.in = xmltooling.spec.in
 	EndProjectSection
 EndProject

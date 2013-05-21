@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3E34CDCC-FCBA-490D-A165-1CB6F4559799}</ProjectGuid>
     <RootNamespace>xmltoolingtest</RootNamespace>
-    <CxxTestRoot>..\..\..\cxxtest\</CxxTestRoot>
+    <CxxTestRoot>$(BuildRoot)\cxxtest\</CxxTestRoot>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -60,8 +60,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <Import Project="..\..\BuildPath.props" />
-  <Import Project="..\MsBuild\Versions.props" />
-  <Import Project="..\MsBuild\Includes.props" />
+  <Import Project="$(ParentRoot)\Versions.props" />
+  <Import Project="$(ParentRoot)\Includes.props" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
