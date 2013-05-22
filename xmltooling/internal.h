@@ -55,6 +55,8 @@
 
 #define XMLTOOLING_LOGCAT "XMLTooling"
 
+#define XMLTOOLING_ENTITY_EXPANSION_LIMIT 100
+
 // Macros for path and directory separators.
 #if defined __CYGWIN32__ && !defined __CYGWIN__
    /* For backwards compatibility with Cygwin b19 and

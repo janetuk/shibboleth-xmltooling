@@ -104,7 +104,17 @@ namespace {
 
 
 ParserPool::ParserPool(bool namespaceAware, bool schemaAware)
-    : m_namespaceAware(namespaceAware), m_schemaAware(schemaAware), m_lock(Mutex::create()), m_security(new SecurityManager()) {}
+        : m_namespaceAware(namespaceAware), m_schemaAware(schemaAware), m_lock(Mutex::create()), m_security(new SecurityManager()) {
+
+    int expLimit = 0;
+    const char* env = getenv("XMLTOOLING_ENTITY_EXPANSION_LIMIT");
+    if (env) {
+        expLimit = atoi(env);
+    }
+    if (expLimit <= 0)
+        expLimit = XMLTOOLING_ENTITY_EXPANSION_LIMIT;
+    m_security->setEntityExpansionLimit(expLimit);
+}
 
 ParserPool::~ParserPool()
 {
